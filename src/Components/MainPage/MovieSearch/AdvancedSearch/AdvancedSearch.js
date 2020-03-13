@@ -198,11 +198,11 @@ export default React.memo(function AdvancedSearch({
         <div className="advanced-search__cont">
           <button
             className="button button--advanced-search"
-            onClick={() => setAdvSearchOpen(advSearchOpen)}
+            onClick={() => setAdvSearchOpen(!advSearchOpen)}
           >
             Open Advanced Search
           </button>
-          {advSearchOpen && (
+          {!advSearchOpen && (
             <div className="form__wrapper">
               <Form>
                 <div className="inputs__cont">
