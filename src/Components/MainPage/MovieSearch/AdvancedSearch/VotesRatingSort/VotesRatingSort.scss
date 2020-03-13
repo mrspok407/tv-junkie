@@ -1,0 +1,16 @@
+.inputs__other {
+  display: grid;
+  grid-template-columns: 1fr 1fr 2fr;
+  margin-top: 8px;
+
+  div {
+    display: flex;
+    justify-content: center;
+  }
+}
+
+.inputs__sortby {
+  select {
+    border: 0;
+  }
+}

@@ -1,0 +1,45 @@
+.movie-results--selected-movies {
+  display: grid;
+  grid-auto-rows: minmax(165px, max-content);
+  grid-template-rows: max-content;
+  grid-row-gap: 30px;
+  flex: 1;
+  @media only screen and (max-width: 850px) {
+    display: none;
+  }
+}
+
+.movie-results__movie--selected {
+  display: grid;
+  grid-template-columns: 35% 65%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.247);
+
+  &-info {
+    display: flex;
+    flex-direction: column;
+    padding: 0 5px 0 5px;
+  }
+
+  &-overview {
+    margin: 3px 0 3px 0;
+    font: {
+      size: 0.9rem;
+    }
+  }
+
+  &-poster {
+    background-size: auto 100%;
+    background-repeat: no-repeat;
+    background-position: center top;
+  }
+  &-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: rgb(36, 36, 36);
+  }
+  &-year {
+    margin-top: 5px;
+    font-size: 1.05rem;
+    font-weight: 400;
+  }
+}

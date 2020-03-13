@@ -1,0 +1,93 @@
+.movie-results--advanced-search {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(300px, 50%));
+  grid-auto-rows: auto minmax(300px, max-content);
+  grid-gap: 30px;
+  flex: 2;
+  @media only screen and (max-width: 1200px) {
+    grid-template-columns: minmax(300px, 80%);
+    justify-content: center;
+  }
+  &--no-movies {
+    text-align: center;
+    font-size: 2rem;
+    margin-top: 50px;
+    color: rgb(32, 32, 32);
+  }
+}
+
+.movie-results__movie--advanced {
+  display: flex;
+  flex-direction: column;
+  background-color: rgb(61, 61, 61);
+  box-shadow: 0 3px 9px rgba(0, 0, 0, 0.884);
+
+  &-main-info {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    padding: 15px 15px 0px 15px;
+  }
+
+  &-title {
+    text-align: center;
+    font: {
+      size: 1.6rem;
+      weight: 600;
+    }
+    grid-column: 1 / -1;
+    color: rgb(247, 247, 247);
+    letter-spacing: 1px;
+    margin-bottom: 2px;
+  }
+  &-year {
+    text-align: center;
+    font-size: 1rem;
+    color: rgb(224, 224, 224);
+  }
+
+  &-rating {
+    text-align: center;
+    font-size: 1.3rem;
+    color: rgb(247, 247, 247);
+    &-vote-count {
+      margin-left: 2px;
+      font-size: 0.6rem;
+      color: rgb(218, 218, 218);
+    }
+    span:first-child {
+      font-size: 0.8rem;
+      color: rgb(177, 177, 177);
+    }
+  }
+  &-genres {
+    display: flex;
+    justify-content: space-evenly;
+    margin-bottom: 10px;
+    font-size: 0.7rem;
+    color: rgb(218, 218, 218);
+  }
+  &-overview {
+    display: grid;
+    grid-gap: 20px;
+    grid-template-columns: 100%;
+    grid-template-rows: minmax(150px, max-content);
+    margin-bottom: 10px;
+  }
+  &-poster {
+    display: flex;
+    justify-content: center;
+    div {
+      width: 267px;
+      border-radius: 2px;
+      background-size: auto 100%;
+      background-repeat: no-repeat;
+      background-position: center top;
+      box-shadow: 0 0 4px 0px white;
+    }
+  }
+  &-description {
+    color: rgb(230, 230, 230);
+    padding: 0 15px 0 15px;
+    line-height: 20px;
+  }
+}

@@ -1,0 +1,8 @@
+@function getColor($colorName, $palette) {
+  @return map-get($palette, $colorName);
+}
+
+$btnPalette: (
+  btnPrimary: peru,
+  btnSecondary: #66b4e6
+);

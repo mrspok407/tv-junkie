@@ -1,0 +1,109 @@
+.inputs__genres-wrapper {
+  z-index: 1;
+}
+
+.inputs__genres {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  justify-content: space-around;
+  margin-top: 8px;
+
+  &-select {
+    position: relative;
+    display: flex;
+    justify-content: center;
+
+    &--with {
+      border-right: 1px solid #fff;
+    }
+  }
+
+  &-button {
+    width: 100%;
+    line-height: 23px;
+    height: 40px;
+    border: 0;
+    cursor: pointer;
+    outline: none;
+    color: #fff;
+    font-size: 1.1rem;
+    background-color: #66b4e6;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat, repeat;
+    background-position: right 0.4em top 50%, 0 0;
+    background-size: 0.65em auto, 100%;
+  }
+
+  &-list {
+    position: absolute;
+    top: 100%;
+    width: 100%;
+    background-color: #333;
+    color: rgb(238, 238, 238);
+  }
+  &-checkbox-wrapper {
+    padding: 10px;
+  }
+}
+
+.checkbox-genre {
+  position: relative;
+  margin-bottom: 3px;
+  cursor: pointer;
+  user-select: none;
+
+  input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  label {
+    padding-left: 32px;
+    margin: 0;
+    width: 100%;
+    cursor: pointer;
+  }
+
+  .custom-checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 17px;
+    width: 17px;
+    background-color: #eee;
+    &:after {
+      content: "";
+      position: absolute;
+      display: none;
+      left: 6px;
+      top: 2px;
+      width: 5px;
+      height: 10px;
+      border: solid white;
+      border-width: 0 3px 3px 0;
+      transform: rotate(45deg);
+    }
+  }
+
+  input:checked ~ .custom-checkmark {
+    background-color: peru;
+    &:after {
+      display: block;
+    }
+  }
+}
+
+.checkbox-genre--disabled {
+  label {
+    text-decoration: line-through;
+    color: #a5a5a5;
+  }
+  .custom-checkmark {
+    background-color: gray;
+  }
+}

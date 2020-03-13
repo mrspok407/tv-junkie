@@ -1,0 +1,27 @@
+.movie-search {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+
+  &__cont {
+    position: relative;
+    display: flex;
+    width: 100%;
+    width: 400px;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  &__random {
+    width: 100%;
+  }
+
+  &__no-movies {
+    font: {
+      size: 2rem;
+      weight: bold;
+    }
+    color: rgb(201, 140, 80);
+  }
+}

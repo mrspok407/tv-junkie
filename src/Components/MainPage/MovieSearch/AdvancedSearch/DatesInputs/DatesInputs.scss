@@ -1,0 +1,27 @@
+.inputs__dates {
+  display: grid;
+  grid-template-columns: 1fr 1fr 2fr;
+  justify-content: center;
+  margin-top: 3px;
+
+  &-year,
+  &-decade {
+    display: flex;
+    justify-content: center;
+  }
+
+  &-range {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.dates-range__from,
+.dates-range__to {
+  display: flex;
+  justify-content: center;
+}
+
+.dates-range__to select {
+  border: 0;
+}
