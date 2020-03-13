@@ -198,7 +198,7 @@ export default React.memo(function AdvancedSearch({
         <div className="advanced-search__cont">
           <button
             className="button button--advanced-search"
-            onClick={() => setAdvSearchOpen(!advSearchOpen)}
+            onClick={() => setAdvSearchOpen(advSearchOpen)}
           >
             Open Advanced Search
           </button>
@@ -223,7 +223,6 @@ export default React.memo(function AdvancedSearch({
                   <div className="inputs__with-actors">
                     <WithActorsInput
                       API_KEY={API_KEY}
-                      // eslint-disable-next-line react/no-this-in-sfc
                       toggleActor={toggleActor}
                       withActors={withActors}
                     />
