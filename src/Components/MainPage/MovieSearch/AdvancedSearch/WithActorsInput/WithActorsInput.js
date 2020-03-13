@@ -42,7 +42,7 @@ export default class WithActorsInput extends Component {
     const { API_KEY } = this.props
     axios
       .get(
-        `http://api.tmdb.org/3/search/person?api_key=${API_KEY}&query=${query}`,
+        `https://api.tmdb.org/3/search/person?api_key=${API_KEY}&query=${query}`,
         {
           cancelToken: new CancelToken(function executor(c) {
             cancelRequest = c

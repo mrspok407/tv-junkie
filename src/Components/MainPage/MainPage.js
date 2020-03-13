@@ -138,36 +138,6 @@ export default class MainPage extends Component {
             finish: `${parseInt(toYear, 10)}-12-31`
           }
 
-    // function getWithGenres() {
-    //   const withGenres = []
-    //   genres
-    //     .filter(item => item.withGenre)
-    //     .map(item => withGenres.push(item.id.toString()))
-    //   return withGenres.join()
-    // }
-
-    // function getWithoutGenres() {
-    //   const withoutGenres = []
-    //   genres
-    //     .filter(item => item.withoutGenre)
-    //     .map(item => withoutGenres.push(item.id.toString()))
-    //   return withoutGenres.join()
-    // }
-
-    // const getWithGenres = () => {
-    //   return genres
-    //     .filter(item => item.withGenre)
-    //     .map(item => item.id.toString())
-    //     .join()
-    // }
-
-    // const getWithoutGenres = () => {
-    //   return genres
-    //     .filter(item => item.withoutGenre)
-    //     .map(item => item.id.toString())
-    //     .join()
-    // }
-
     const getWithGenres = genres
       .filter(item => item.withGenre)
       .map(item => item.id.toString())
