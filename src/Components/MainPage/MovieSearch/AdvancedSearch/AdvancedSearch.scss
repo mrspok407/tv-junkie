@@ -2,7 +2,6 @@
 @import "./DatesInputs/DatesInputs.scss";
 @import "./VotesRatingSort/VotesRatingSort.scss";
 @import "./WithActorsInput/WithActorsInput.scss";
-@import "../../../../styles/globals";
 
 .advanced-search__cont {
   width: 100%;
@@ -11,6 +10,20 @@
 .inputs__cont {
   display: flex;
   flex-direction: column;
+}
+
+.form__wrapper {
+  opacity: 0;
+  transform: translate(0, -100px);
+  transition: 1s;
+  animation: showAdvSearch 0.3s forwards;
+  // z-index: 0;
+  @keyframes showAdvSearch {
+    to {
+      transform: translate(0, 0px);
+      opacity: 1;
+    }
+  }
 }
 
 .inputs__buttons {

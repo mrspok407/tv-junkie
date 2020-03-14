@@ -14,7 +14,7 @@ export default class MovieResultsAdvSearch extends React.PureComponent {
     } = this.props
     return (
       <div className="movie-results movie-results--advanced-search">
-        <div className="movie-results__name">
+        <div className="movie-results__name movie-results__name--advanced">
           <h2>Advansed Searched Movies</h2>
           <button
             type="button"
@@ -24,41 +24,43 @@ export default class MovieResultsAdvSearch extends React.PureComponent {
             Clear Searched
           </button>
         </div>
-        {searchingAdvancedSearch ? (
-          <MovieResultsLoader />
-        ) : (
-          advancedSearchMovies.map(
-            (
-              {
-                title,
-                id,
-                release_date,
-                vote_average,
-                genre_ids,
-                overview,
-                backdrop_path,
-                vote_count
-              },
-              index
-            ) => (
-              <MovieCardAdvSearch
-                key={id}
-                title={title}
-                year={release_date}
-                id={id}
-                voteAverage={vote_average}
-                genreIds={genre_ids}
-                poster={backdrop_path}
-                overview={overview}
-                voteCount={vote_count}
-                index={index}
-                toggleMovie={toggleMovie}
-                selectedMovies={selectedMovies}
-                advancedSearchMovies={advancedSearchMovies}
-              />
+        <div className="movie-results--advanced-wrapper">
+          {searchingAdvancedSearch ? (
+            <MovieResultsLoader />
+          ) : (
+            advancedSearchMovies.map(
+              (
+                {
+                  title,
+                  id,
+                  release_date,
+                  vote_average,
+                  genre_ids,
+                  overview,
+                  backdrop_path,
+                  vote_count
+                },
+                index
+              ) => (
+                <MovieCardAdvSearch
+                  key={id}
+                  title={title}
+                  year={release_date}
+                  id={id}
+                  voteAverage={vote_average}
+                  genreIds={genre_ids}
+                  poster={backdrop_path}
+                  overview={overview}
+                  voteCount={vote_count}
+                  index={index}
+                  toggleMovie={toggleMovie}
+                  selectedMovies={selectedMovies}
+                  advancedSearchMovies={advancedSearchMovies}
+                />
+              )
             )
-          )
-        )}
+          )}
+        </div>
       </div>
     )
   }

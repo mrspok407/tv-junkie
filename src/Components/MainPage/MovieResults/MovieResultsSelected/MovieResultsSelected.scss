@@ -13,6 +13,16 @@
   display: grid;
   grid-template-columns: 35% 65%;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.247);
+  opacity: 0;
+  transition: 0.3s;
+  transform: translate(0, -50px);
+  animation: showMovieCardSelected 0.5s forwards;
+  @keyframes showMovieCardSelected {
+    to {
+      transform: translate(0, 0px);
+      opacity: 1;
+    }
+  }
 
   &-info {
     display: flex;

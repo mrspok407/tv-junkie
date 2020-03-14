@@ -1,13 +1,15 @@
 .movie-results-cont {
-  display: flex;
   display: grid;
-  grid-template-columns: 66.66% 33.34%;
-  grid-gap: 10px;
+  grid-template-columns: 2fr 1fr;
+  grid-gap: 30px;
   min-height: 400px;
   width: 80%;
   max-width: 1350px;
-  @media only screen and (max-width: 850px) {
+  @media only screen and (max-width: 1050px) {
     width: 95%;
+    grid-gap: 10px;
+  }
+  @media only screen and (max-width: 850px) {
     grid-template-columns: 100%;
   }
 }
@@ -126,4 +128,8 @@
   text-align: center;
   color: #333;
   grid-column: 1 / -1;
+
+  &--advanced {
+    margin-bottom: 30px;
+  }
 }

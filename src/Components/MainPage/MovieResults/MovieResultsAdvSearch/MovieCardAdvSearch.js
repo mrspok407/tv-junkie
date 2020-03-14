@@ -5,7 +5,6 @@ export default React.memo(function MovieCardAdvSearch({
   title = "No title available",
   year = "No data",
   id,
-  index,
   selectedMovies,
   toggleMovie,
   advancedSearchMovies,
@@ -99,10 +98,7 @@ export default React.memo(function MovieCardAdvSearch({
   )
 
   return (
-    <div
-      className={`movie-results__movie movie-results__movie--advanced movie-results__movie--advanced-${index +
-        1}`}
-    >
+    <div className="movie-results__movie movie-results__movie--advanced">
       <div className="movie-results__movie--advanced-main-info">
         <div className="movie-results__movie--advanced-title">
           {!title ? "No title available" : title}

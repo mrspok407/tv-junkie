@@ -142,7 +142,7 @@ export default class MovieSearch extends Component {
           />
           <div className="movie-search__random">
             <button
-              className="button"
+              className="button button--random-search"
               type="button"
               onClick={() => randomMovies()}
             >
