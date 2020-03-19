@@ -1,17 +1,17 @@
 .movie-results-cont {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  grid-gap: 30px;
+  // display: grid;
+  // grid-template-columns: 1fr;
+  // grid-gap: 30px;
   min-height: 400px;
-  width: 80%;
+  width: 90%;
   max-width: 1350px;
-  @media only screen and (max-width: 1050px) {
-    width: 95%;
-    grid-gap: 10px;
-  }
-  @media only screen and (max-width: 850px) {
-    grid-template-columns: 100%;
-  }
+  // @media only screen and (max-width: 1050px) {
+  //   width: 95%;
+  //   grid-gap: 10px;
+  // }
+  // @media only screen and (max-width: 850px) {
+  //   grid-template-columns: 100%;
+  // }
 }
 
 .movie-results {

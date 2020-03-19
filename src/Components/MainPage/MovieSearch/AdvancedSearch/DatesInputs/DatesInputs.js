@@ -1,11 +1,8 @@
 import React from "react"
 import SelectInput from "../InputTemplates/SelectInput"
+import { range } from "../../../../../Utils"
 
-export default function DatesInputs({
-  setFieldValue,
-  handleChange,
-  listOfYears
-}) {
+export default function DatesInputs({ setFieldValue, handleChange }) {
   return (
     <>
       <div className="inputs__dates-year">
@@ -20,11 +17,13 @@ export default function DatesInputs({
           }}
         >
           <option />
-          {listOfYears(1).map(item => (
-            <option key={item} value={item}>
-              {item}
-            </option>
-          ))}
+          {range(1900, 2020, 1)
+            .reverse()
+            .map(item => (
+              <option key={item} value={item}>
+                {item}
+              </option>
+            ))}
         </SelectInput>
       </div>
       <div className="inputs__dates-decade">
@@ -39,11 +38,13 @@ export default function DatesInputs({
           }}
         >
           <option />
-          {listOfYears(10).map(item => (
-            <option key={item} value={item}>
-              {item}
-            </option>
-          ))}
+          {range(1900, 2020, 10)
+            .reverse()
+            .map(item => (
+              <option key={item} value={item}>
+                {item}
+              </option>
+            ))}
         </SelectInput>
       </div>
       <div className="inputs__dates-range">
@@ -58,11 +59,13 @@ export default function DatesInputs({
             }}
           >
             <option />
-            {listOfYears(1).map(item => (
-              <option key={item} value={item}>
-                {item}
-              </option>
-            ))}
+            {range(1900, 2020, 1)
+              .reverse()
+              .map(item => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
           </SelectInput>
         </div>
         <div className="dates-range__to">
@@ -76,11 +79,13 @@ export default function DatesInputs({
             }}
           >
             <option />
-            {listOfYears(1).map(item => (
-              <option key={item} value={item}>
-                {item}
-              </option>
-            ))}
+            {range(1900, 2020, 1)
+              .reverse()
+              .map(item => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
           </SelectInput>
         </div>
       </div>

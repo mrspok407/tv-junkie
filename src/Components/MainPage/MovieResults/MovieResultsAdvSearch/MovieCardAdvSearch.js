@@ -134,7 +134,9 @@ export default React.memo(function MovieCardAdvSearch({
           />
         </div>
         <div className="movie-results__movie--advanced-description">
-          {overview}
+          {overview.length > 150
+            ? `${overview.substring(0, 150)}...`
+            : overview}
         </div>
       </div>
       {selectedMovies.some(e => e.id === id) ? (

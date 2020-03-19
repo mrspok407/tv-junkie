@@ -1,0 +1,13 @@
+.header {
+  display: flex;
+  flex-direction: column;
+}
+
+.logo {
+  display: flex;
+  justify-content: center;
+  margin-top: 120px;
+  &__img {
+    width: 85%;
+  }
+}

@@ -5,6 +5,7 @@ import MovieResultsAdvSearch from "./MovieResults/MovieResultsAdvSearch/MovieRes
 import MovieResultsSelected from "./MovieResults/MovieResultsSelected/MovieResultsSelected"
 import "./MovieResults/MovieResults.scss"
 import PlaceholderNoResults from "./MovieSearch/Placeholders/PlaceholderNoResults"
+import Header from "./Header/Header"
 
 const API_KEY = "c5e3186413780c3aeec39b0767a6ec99"
 
@@ -150,15 +151,6 @@ export default class MainPage extends Component {
 
     const getActors = withActors.map(item => item.id).join()
 
-    console.log(getActors)
-
-    // const listWithGenres = getWithGenres()
-    // const listWithoutGenres = getWithoutGenres()
-
-    // const listOfActors = getActors()
-
-    // console.log(listOfActors)
-
     const voteCountMoreThan =
       parseInt(voteCount, 10) <= 100 || voteCount === "" ? "25" : voteCount
 
@@ -243,6 +235,7 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_cast=${getActors}`,
     const { selectedMovies, searchingRandomMovies, withActors } = this.state
     return (
       <>
+        <Header />
         <MovieSearch
           handleClickOutside={this.handleClickOutside}
           onSearch={this.handleSearch}
@@ -258,12 +251,12 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_cast=${getActors}`,
         />
         <div className="movie-results-cont">
           {this.renderAdvMovies()}
-          <MovieResultsSelected
+          {/* <MovieResultsSelected
             selectedMovies={selectedMovies}
             searchingRandomMovies={searchingRandomMovies}
             toggleMovie={this.toggleMovie}
             clearSelectedMovies={this.clearSelectedMovies}
-          />
+          /> */}
         </div>
       </>
     )

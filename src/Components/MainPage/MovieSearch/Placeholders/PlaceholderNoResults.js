@@ -1,7 +1,19 @@
-import React from "react"
+import React, { Component } from "react"
 
-export default ({ className = "", message = "Nothing found" }) => (
-  <div className={`placeholder placeholder--no-results ${className}`}>
-    {message}
-  </div>
-)
+export default class PlaceholderNoResults extends Component {
+  componentDidMount() {
+    document.addEventListener("mousedown", this.props.handleClickOutside)
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener("mousedown", this.props.handleClickOutside)
+  }
+
+  render() {
+    return (
+      <div className="placeholder placeholder--no-results">
+        {this.props.message}
+      </div>
+    )
+  }
+}

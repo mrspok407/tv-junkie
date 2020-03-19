@@ -1,15 +1,36 @@
-.movie-search__input {
+@import "../../../../styles/globals";
+
+.movie-search__input-cont {
   position: relative;
   width: 100%;
   overflow: hidden;
+}
 
-  input {
-    padding-left: 10px;
-    height: 50px;
-    width: 100%;
-    font: {
-      size: 2rem;
-    }
-    color: #333;
+.movie-search__input {
+  padding-left: 40px;
+  display: flex;
+  height: 50px;
+  width: 100%;
+  border: 0;
+  outline: none;
+  background-color: #131313;
+  font: {
+    size: 2rem;
   }
+  color: getColor(textColor, $inputPalette);
+}
+
+.movie-search__input::placeholder {
+  opacity: 1;
+  color: getColor(placeholderColor, $inputPalette);
+}
+
+.movie-search__search-icon {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translate(0, -50%);
+  width: 30px;
+  height: 30px;
+  color: getColor(textColor, $inputPalette);
 }

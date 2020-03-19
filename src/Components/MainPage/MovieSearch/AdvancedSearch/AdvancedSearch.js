@@ -8,121 +8,18 @@ import DatesInputs from "./DatesInputs/DatesInputs"
 import GenreInputs from "./GenreInputs/GenreInputs"
 import VotesRatingSort from "./VotesRatingSort/VotesRatingSort"
 import WithActorsInput from "./WithActorsInput/WithActorsInput"
+import { listOfGenres } from "../../../../Utils"
 import "./AdvancedSearch.scss"
 
-export default React.memo(function AdvancedSearch({
+export default function AdvancedSearch({
   advancedSearch,
   API_KEY,
   withActors,
   toggleActor,
   clearWithActors
 }) {
-  const listOfYears = increment => {
-    const years = []
-    for (let i = 2020; i >= 1900; i -= increment) {
-      years.push(i)
-    }
-    return years
-  }
-
   const [advSearchOpen, setAdvSearchOpen] = useState(true)
-  const [genres, setGenres] = useState([
-    {
-      id: 28,
-      name: "Action",
-      isChecked: false
-    },
-    {
-      id: 12,
-      name: "Adventure",
-      isChecked: false
-    },
-    {
-      id: 16,
-      name: "Animation",
-      isChecked: false
-    },
-    {
-      id: 35,
-      name: "Comedy",
-      isChecked: false
-    },
-    {
-      id: 80,
-      name: "Crime",
-      isChecked: false
-    },
-    {
-      id: 99,
-      name: "Documentary",
-      isChecked: false
-    },
-    {
-      id: 18,
-      name: "Drama",
-      isChecked: false
-    },
-    {
-      id: 10751,
-      name: "Family",
-      isChecked: false
-    },
-    {
-      id: 14,
-      name: "Fantasy",
-      isChecked: false
-    },
-    {
-      id: 36,
-      name: "History",
-      isChecked: false
-    },
-    {
-      id: 27,
-      name: "Horror",
-      isChecked: false
-    },
-    {
-      id: 10402,
-      name: "Music",
-      isChecked: false
-    },
-    {
-      id: 9648,
-      name: "Mystery",
-      isChecked: false
-    },
-    {
-      id: 10749,
-      name: "Romance",
-      isChecked: false
-    },
-    {
-      id: 878,
-      name: "Science Fiction",
-      isChecked: false
-    },
-    {
-      id: 10770,
-      name: "TV Movie",
-      isChecked: false
-    },
-    {
-      id: 53,
-      name: "Thriller",
-      isChecked: false
-    },
-    {
-      id: 10752,
-      name: "War",
-      isChecked: false
-    },
-    {
-      id: 37,
-      name: "Western",
-      isChecked: false
-    }
-  ])
+  const [genres, setGenres] = useState(listOfGenres)
 
   function toggleGenre(e) {
     const newGenres = [...genres]
@@ -210,7 +107,6 @@ export default React.memo(function AdvancedSearch({
                     <DatesInputs
                       setFieldValue={setFieldValue}
                       handleChange={handleChange}
-                      listOfYears={listOfYears}
                     />
                   </div>
                   <div className="inputs__genres-wrapper">
@@ -257,4 +153,4 @@ export default React.memo(function AdvancedSearch({
       )}
     </Formik>
   )
-})
+}

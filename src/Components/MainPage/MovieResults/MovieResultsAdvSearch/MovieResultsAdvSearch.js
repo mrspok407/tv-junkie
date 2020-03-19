@@ -15,7 +15,7 @@ export default class MovieResultsAdvSearch extends React.PureComponent {
     return (
       <div className="movie-results movie-results--advanced-search">
         <div className="movie-results__name movie-results__name--advanced">
-          <h2>Advansed Searched Movies</h2>
+          <h2>Advanced Searched Movies</h2>
           <button
             type="button"
             className="button button--clear-movies"

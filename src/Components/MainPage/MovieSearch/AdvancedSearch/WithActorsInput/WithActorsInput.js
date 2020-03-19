@@ -55,15 +55,6 @@ export default class WithActorsInput extends Component {
           isSearchingActors: false,
           totalPages
         })
-        // if (movies.length > 0) {
-        //   this.setState({
-        //     listIsOpen: true
-        //   })
-        // } else {
-        //   this.setState({
-        //     listIsOpen: false
-        //   })
-        // }
       })
       .catch(err => {
         if (axios.isCancel(err)) return
@@ -170,19 +161,21 @@ export default class WithActorsInput extends Component {
             onKeyDown={this.handleKeyDown}
             onFocus={this.onFocus}
           />
-          <button
-            type="button"
-            className="input-clear input-clear--actors"
-            onClick={this.resetSearch}
-          />
+          {this.state.query && (
+            <button
+              type="button"
+              className="input-clear input-clear--actors"
+              onClick={this.resetSearch}
+            />
+          )}
         </div>
-        {totalPages === 0 && query !== "" ? (
+        {isSearchingActors ? (
+          <Placeholder className="placeholder--actors-search" />
+        ) : !isSearchingActors && totalPages === 0 && query !== "" ? (
           <PlaceholderNoResults
             message="No actors found"
             className="placeholder--no-results-actors"
           />
-        ) : isSearchingActors ? (
-          <Placeholder className="placeholder--actors-search" />
         ) : (
           listIsOpen && <div className="actors-list">{this.renderActors()}</div>
         )}

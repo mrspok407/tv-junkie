@@ -6,3 +6,20 @@ $btnPalette: (
   btnPrimary: peru,
   btnSecondary: #66b4e6
 );
+
+$inputPalette: (
+  textColor: #efefef,
+  placeholderColor: #cececea6
+);
+
+$movieListPalette: (
+  backgroundColor: #fdfdfd,
+  backgroundColorHover: rgb(39, 39, 39),
+  separatorColor: #d0d0d0,
+  titleColor: #000000,
+  overviewColor: #1b1b1b,
+  titleColorHover: #ffffff,
+  overviewColorHover: #d6d6d6
+);
+
+@import "mixins";
