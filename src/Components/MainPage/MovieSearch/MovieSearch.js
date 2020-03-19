@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import axios, { CancelToken } from "axios"
-import MovieList from "./MovieList/MovieList"
+import MovieList from "./MovieList/SearchList"
 import Input from "./Input/Input"
 import Placeholder from "./Placeholders/PlaceholderSearching"
 import AdvancedSearch from "./AdvancedSearch/AdvancedSearch"

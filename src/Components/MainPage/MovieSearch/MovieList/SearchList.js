@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/mouse-events-have-key-events */
 import React, { Component } from "react"
-import MovieCard from "./MovieCard"
-import "./MovieList.scss"
+import MovieCard from "./SearchCard"
+import "./SearchList.scss"
 
 export default class MovieList extends Component {
   // state = { movieCardHovered: false, movieCardId: "" }
