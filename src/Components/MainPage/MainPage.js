@@ -2,10 +2,11 @@ import React, { Component } from "react"
 import axios, { CancelToken } from "axios"
 import MovieSearch from "./MovieSearch/MovieSearch"
 import MovieResultsAdvSearch from "./MovieResults/MovieResultsAdvSearch/MovieResultsAdvSearch"
-import MovieResultsSelected from "./MovieResults/MovieResultsSelected/MovieResultsSelected"
+// import MovieResultsSelected from "./MovieResults/MovieResultsSelected/MovieResultsSelected"
 import "./MovieResults/MovieResults.scss"
-import PlaceholderNoResults from "./MovieSearch/Placeholders/PlaceholderNoResults"
-import Header from "./Header/Header"
+import PlaceholderNoResults from "./Placeholders/PlaceholderNoResults"
+import Header from "../Header/Header"
+import Footer from "../Footer/Footer"
 
 const API_KEY = "c5e3186413780c3aeec39b0767a6ec99"
 
@@ -28,7 +29,7 @@ export default class MainPage extends Component {
         JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_ACTORS)) || [],
       totalPagesAdvMovies: null,
       searchingMovie: false,
-      searchingRandomMovies: false,
+      // searchingRandomMovies: false,
       searchingAdvancedSearch: false,
       error: ""
     }
@@ -118,6 +119,10 @@ export default class MainPage extends Component {
     if (cancelRequest !== undefined) {
       cancelRequest()
     }
+
+    this.setState({
+      searchingAdvancedSearch: true
+    })
 
     const { advancedSearchMovies } = this.state
 
@@ -232,7 +237,7 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_cast=${getActors}`,
   }
 
   render() {
-    const { selectedMovies, searchingRandomMovies, withActors } = this.state
+    const { selectedMovies, withActors } = this.state
     return (
       <>
         <Header />
@@ -258,6 +263,7 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_cast=${getActors}`,
             clearSelectedMovies={this.clearSelectedMovies}
           /> */}
         </div>
+        <Footer />
       </>
     )
   }

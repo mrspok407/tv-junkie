@@ -1,5 +1,5 @@
 import React from "react"
-import MovieResultsLoader from "../MovieResultsLoader"
+import MovieResultsLoader from "../../Placeholders/MovieResultsLoader"
 import "./MovieResultsSelected.scss"
 
 export default class MovieResultsSelected extends React.PureComponent {

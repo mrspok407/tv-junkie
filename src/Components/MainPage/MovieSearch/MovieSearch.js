@@ -1,20 +1,20 @@
 import React, { Component } from "react"
 import axios, { CancelToken } from "axios"
-import MovieList from "./MovieList/SearchList"
+import SearchList from "./SearchList/SearchList"
 import Input from "./Input/Input"
-import Placeholder from "./Placeholders/PlaceholderSearching"
 import AdvancedSearch from "./AdvancedSearch/AdvancedSearch"
 import "./MovieSearch.scss"
-import PlaceholderNoResults from "./Placeholders/PlaceholderNoResults"
+import PlaceholderNoResults from "../Placeholders/PlaceholderNoResults"
 
-let cancelRequest
+let cancelRequestMovies
+let cancelRequestActors
 
 export default class MovieSearch extends Component {
   constructor(props) {
     super(props)
     this.state = {
       query: "",
-      movies: [],
+      searchResults: [],
       isSearchingList: false,
       totalPages: null,
       listIsOpen: false,
@@ -26,13 +26,17 @@ export default class MovieSearch extends Component {
 
   handleSearch = query => {
     console.log(query)
-    if (cancelRequest !== undefined) {
-      cancelRequest()
+    if (
+      cancelRequestMovies !== undefined ||
+      cancelRequestActors !== undefined
+    ) {
+      cancelRequestMovies()
+      cancelRequestActors()
     }
     if (!query || !query.trim())
       return this.setState({
         query: "",
-        movies: [],
+        searchResults: [],
         isSearchingList: false,
         error: ""
       })
@@ -42,18 +46,24 @@ export default class MovieSearch extends Component {
     const { API_KEY } = this.props
 
     const getMovies = axios.get(
-      `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${query}`
+      `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${query}`,
+      {
+        cancelToken: new CancelToken(function executor(c) {
+          cancelRequestMovies = c
+        })
+      }
     )
     const getActors = axios.get(
-      `https://api.tmdb.org/3/search/person?api_key=${API_KEY}&query=${query}`
+      `https://api.tmdb.org/3/search/person?api_key=${API_KEY}&query=${query}`,
+      {
+        cancelToken: new CancelToken(function executor(c) {
+          cancelRequestActors = c
+        })
+      }
     )
 
     axios
-      .all([getMovies, getActors], {
-        cancelToken: new CancelToken(function executor(c) {
-          cancelRequest = c
-        })
-      })
+      .all([getMovies, getActors])
       .then(
         axios.spread((...responses) => {
           const movies = responses[0].data
@@ -69,7 +79,7 @@ export default class MovieSearch extends Component {
           )
 
           this.setState({
-            movies: moviesAndActors,
+            searchResults: moviesAndActors,
             isSearchingList: false,
             totalPages
           })
@@ -78,41 +88,16 @@ export default class MovieSearch extends Component {
       .catch(err => {
         if (axios.isCancel(err)) return
         this.setState({
-          movies: [],
+          searchResults: [],
           isSearchingList: false,
           error: "Something went wrong"
         })
       })
-
-    // axios
-    //   .get(
-    //     `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${query}`,
-    //     {
-    // cancelToken: new CancelToken(function executor(c) {
-    //   cancelRequest = c
-    // })
-    //     }
-    //   )
-    //   .then(({ data: { results: movies, total_pages: totalPages } }) => {
-    // this.setState({
-    //   movies,
-    //   isSearchingList: false,
-    //   totalPages
-    // })
-    //   })
-    // .catch(err => {
-    //   if (axios.isCancel(err)) return
-    //   this.setState({
-    //     movies: [],
-    //     isSearchingList: false,
-    //     error: "Something went wrong"
-    //   })
-    // })
   }
 
-  renderMovies = list => {
-    const { movies, error } = this.state
-    return error || !Array.isArray(movies) ? (
+  renderSearch = list => {
+    const { searchResults, error } = this.state
+    return error || !Array.isArray(searchResults) ? (
       <div className="error">
         <p>{error || "Something gone terrible wrong"}</p>
       </div>
@@ -142,7 +127,11 @@ export default class MovieSearch extends Component {
     return (
       <div className="movie-search">
         <div ref={this.searchContRef} className="movie-search__cont">
-          <Input onSearch={this.handleSearch} onFocus={this.onFocus} />
+          <Input
+            onSearch={this.handleSearch}
+            onFocus={this.onFocus}
+            isSearchingList={this.state.isSearchingList}
+          />
           {/* <div className="movie-search__random">
             <button
               className="button button--random-search"
@@ -160,22 +149,21 @@ export default class MovieSearch extends Component {
             withActors={this.props.withActors}
             clearWithActors={this.props.clearWithActors}
           />
-          <div className="search-list">
-            {this.state.isSearchingList ? (
-              <Placeholder />
-            ) : !this.state.isSearchingList &&
-              this.state.totalPages === 0 &&
-              this.state.query !== "" &&
-              this.state.listIsOpen ? (
+          <div
+            className={`search-list ${this.state.isSearchingList ? "" : ""}`}
+          >
+            {this.state.totalPages === 0 &&
+            this.state.query !== "" &&
+            this.state.listIsOpen ? (
               <PlaceholderNoResults
                 message="No results found"
                 handleClickOutside={this.handleClickOutside}
               />
             ) : (
               this.state.listIsOpen &&
-              this.renderMovies(
-                <MovieList
-                  movies={this.state.movies}
+              this.renderSearch(
+                <SearchList
+                  searchResults={this.state.searchResults}
                   selectedMovies={this.props.selectedMovies}
                   toggleMovie={this.props.toggleMovie}
                   handleClickOutside={this.handleClickOutside}

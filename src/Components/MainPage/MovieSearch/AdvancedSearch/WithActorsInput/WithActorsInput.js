@@ -1,8 +1,8 @@
 import React, { Component } from "react"
 import debounce from "debounce"
 import axios, { CancelToken } from "axios"
-import Placeholder from "../../Placeholders/PlaceholderSearching"
-import PlaceholderNoResults from "../../Placeholders/PlaceholderNoResults"
+import PlaceholderSearching from "../../../Placeholders/PlaceholderSearching"
+import PlaceholderNoResults from "../../../Placeholders/PlaceholderNoResults"
 
 let cancelRequest
 
@@ -170,7 +170,7 @@ export default class WithActorsInput extends Component {
           )}
         </div>
         {isSearchingActors ? (
-          <Placeholder className="placeholder--actors-search" />
+          <PlaceholderSearching className="placeholder--actors-search" />
         ) : !isSearchingActors && totalPages === 0 && query !== "" ? (
           <PlaceholderNoResults
             message="No actors found"

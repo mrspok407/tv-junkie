@@ -1,5 +1,5 @@
 import React from "react"
-import MovieResultsLoader from "../MovieResultsLoader"
+import Loader from "../../Placeholders/Loader"
 import MovieCardAdvSearch from "./MovieCardAdvSearch"
 import "./MovieResultsAdvSearch.scss"
 
@@ -26,7 +26,7 @@ export default class MovieResultsAdvSearch extends React.PureComponent {
         </div>
         <div className="movie-results--advanced-wrapper">
           {searchingAdvancedSearch ? (
-            <MovieResultsLoader />
+            <Loader className="loader--adv-results" />
           ) : (
             advancedSearchMovies.map(
               (

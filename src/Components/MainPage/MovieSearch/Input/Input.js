@@ -1,13 +1,14 @@
 import React, { Component } from "react"
 import debounce from "debounce"
 import "./Input.scss"
+import Loader from "../../Placeholders/Loader"
 
 export default class Input extends Component {
   constructor(props) {
     super(props)
 
     this.state = {
-      query: "tom"
+      query: ""
     }
   }
 
@@ -49,12 +50,13 @@ export default class Input extends Component {
           }}
           className="movie-search__input"
           type="text"
-          placeholder="Search for a movie"
+          placeholder="Movie or an actor"
           value={this.state.query}
           onChange={this.handleChange}
           onKeyDown={this.handleKeyDown}
           onFocus={this.props.onFocus}
         />
+        {this.props.isSearchingList && <Loader className="loader--input" />}
         {this.state.query && (
           <button
             type="button"

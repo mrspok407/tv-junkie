@@ -1,8 +1,6 @@
 import React, { Component } from "react"
 
 export default class MovieCard extends Component {
-  state = { movieCardHovered: false, movieCardId: "" }
-
   render() {
     const {
       original_title,
@@ -13,22 +11,13 @@ export default class MovieCard extends Component {
       id,
       known_for,
       known_for_department,
-      movies,
+      searchResults,
       toggleMovie,
       selectedMovies,
       isMovie
     } = this.props
     return (
-      <div
-        onMouseEnter={() => {
-          this.setState({ movieCardHovered: true, movieCardId: id })
-        }}
-        onMouseLeave={() => {
-          this.setState({ movieCardHovered: false, movieCardId: id })
-        }}
-        key={id}
-        className="search-card"
-      >
+      <div key={id} className="search-card">
         <div
           className="search-card__image"
           style={
@@ -43,23 +32,11 @@ export default class MovieCard extends Component {
           }
         />
         <div className="search-card__info">
-          <div
-            className={`search-card__info-title ${
-              this.state.movieCardHovered && this.state.movieCardId === id
-                ? "search-card__info-title--hovered"
-                : ""
-            }`}
-          >
+          <div className="search-card__info-title">
             {original_title || name}
           </div>
 
-          <div
-            className={`search-card__info-description ${
-              this.state.movieCardHovered && this.state.movieCardId === id
-                ? "search-card__info-description--hovered"
-                : ""
-            }`}
-          >
+          <div className="search-card__info-description">
             {isMovie && (
               <div className="search-card__info-description--movie">
                 {overview.length > 150
@@ -74,18 +51,28 @@ export default class MovieCard extends Component {
                   Main activity: {known_for_department}
                 </div>
                 <div className="search-card__info-person-movies">
-                  {known_for.map((item, i) => (
-                    <span key={item.id}>
-                      {item.original_title}
-                      {known_for.length - 1 !== i
-                        ? item.release_date
-                          ? ` (${item.release_date.slice(0, 4)}), `
-                          : ""
-                        : item.release_date
-                        ? ` (${item.release_date.slice(0, 4)})`
-                        : ""}
-                    </span>
-                  ))}
+                  {known_for.map((item, i) => {
+                    const mediaType = item.media_type
+
+                    const title =
+                      mediaType === "movie"
+                        ? item.original_title || "No title"
+                        : item.name || "No title"
+
+                    const releaseDate =
+                      mediaType === "movie"
+                        ? item.release_date || ""
+                        : item.first_air_date || ""
+
+                    return (
+                      <span key={item.id}>
+                        {title}
+                        {known_for.length - 1 !== i
+                          ? ` (${releaseDate.slice(0, 4)}), `
+                          : ` (${releaseDate.slice(0, 4)})`}
+                      </span>
+                    )
+                  })}
                 </div>
               </div>
             )}
@@ -103,7 +90,7 @@ export default class MovieCard extends Component {
                 {selectedMovies.some(e => e.id === id) ? (
                   <button
                     className="button button--movielist button--pressed"
-                    onClick={() => toggleMovie(id, movies)}
+                    onClick={() => toggleMovie(id, searchResults)}
                     type="button"
                   >
                     Remove movie
@@ -111,7 +98,7 @@ export default class MovieCard extends Component {
                 ) : (
                   <button
                     className="button button--movielist"
-                    onClick={() => toggleMovie(id, movies)}
+                    onClick={() => toggleMovie(id, searchResults)}
                     type="button"
                   >
                     Add movie

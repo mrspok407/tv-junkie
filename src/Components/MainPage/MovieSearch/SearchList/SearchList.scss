@@ -7,10 +7,16 @@
   align-items: center;
   flex-direction: column;
   width: 100%;
+  background-color: getColor(backgroundColor, $movieListPalette);
   z-index: 1;
+
+  &--searching {
+    min-height: 100vh;
+  }
 }
 
 .search-card {
+  $parentRef: &;
   display: flex;
   position: relative;
   width: 100%;
@@ -18,6 +24,21 @@
   overflow: hidden;
   cursor: pointer;
   background-color: getColor(backgroundColor, $movieListPalette);
+  transition: 0.2s;
+  opacity: 0;
+  animation: showCard 0.25s forwards;
+  @keyframes showCard {
+    to {
+      opacity: 1;
+    }
+  }
+
+  @mixin cardHovered {
+    #{$parentRef}:hover & {
+      @content;
+    }
+  }
+
   &:after {
     content: "";
     position: absolute;
@@ -27,8 +48,10 @@
     height: 1px;
     background-color: getColor(separatorColor, $movieListPalette);
   }
+  &:last-child:after {
+    display: none;
+  }
   &:hover {
-    transition: 0.2s;
     background-color: getColor(backgroundColorHover, $movieListPalette);
   }
 
@@ -49,22 +72,22 @@
 
     &-title {
       margin-bottom: 5px;
+      transition: 0.2s;
+      @include cardHovered {
+        color: getColor(titleColorHover, $movieListPalette);
+      }
+
       font: {
         size: 1.3rem;
         weight: 600;
       }
       color: getColor(titleColor, $movieListPalette);
-      &--hovered {
-        transition: 0.2s;
-        color: getColor(titleColorHover, $movieListPalette);
-      }
     }
     &-description {
       margin-bottom: 5px;
+      transition: 0.2s;
       color: getColor(overviewColor, $movieListPalette);
-
-      &--hovered {
-        transition: 0.2s;
+      @include cardHovered {
         color: getColor(overviewColorHover, $movieListPalette);
       }
     }
@@ -72,10 +95,6 @@
       margin-top: 4px;
     }
   }
-}
-
-.search-card:hover .search-card__info-title {
-  color: getColor(titleColorHover, $movieListPalette);
 }
 
 .search-card__add-movie {
