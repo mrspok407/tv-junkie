@@ -1,7 +1,7 @@
 import React, { Component } from "react"
 import debounce from "debounce"
 import axios, { CancelToken } from "axios"
-import PlaceholderSearching from "../../../Placeholders/PlaceholderSearching"
+import Loader from "../../../Placeholders/Loader"
 import PlaceholderNoResults from "../../../Placeholders/PlaceholderNoResults"
 
 let cancelRequest
@@ -79,53 +79,101 @@ export default class WithActorsInput extends Component {
   }
 
   renderActors = () => {
-    const { actors } = this.state
+    const { actors, error } = this.state
     const { toggleActor, withActors } = this.props
-    return !Array.isArray(actors) ? (
+    return error || !Array.isArray(actors) ? (
       <div className="error">
-        <p>Something gone terrible wrong</p>
+        <p>{error || "Something gone terrible wrong"}</p>
       </div>
     ) : (
-      actors.map(({ name, id, profile_path }) => (
-        <div key={id} className="actors-wrapper">
-          <div
-            className="actors-photo"
-            style={
-              profile_path !== null
-                ? {
-                    backgroundImage: `url(https://image.tmdb.org/t/p/w500/${profile_path.substring(
-                      1
-                    )})`
-                  }
-                : {
-                    backgroundImage: `url(https://d32qys9a6wm9no.cloudfront.net/images/movies/poster/500x735.png)`
-                  }
-            }
-          />
-          <div className="actors-info">
-            <div className="actors-name">{name}</div>
-            <div className="actors-button">
-              {withActors.some(e => e.id === id) ? (
-                <button
-                  className="button button--actors button--pressed"
-                  onClick={() => toggleActor(id, name)}
-                  type="button"
-                >
-                  Remove
-                </button>
-              ) : (
-                <button
-                  className="button button--actors"
-                  onClick={() => toggleActor(id, name)}
-                  type="button"
-                >
-                  Add
-                </button>
-              )}
+      actors.map(
+        ({
+          name,
+          profile_path,
+          id,
+          known_for,
+          known_for_department,
+          isMovie
+        }) => (
+          <div key={id} className="search-card">
+            <div
+              className="search-card__image"
+              style={
+                profile_path !== null
+                  ? {
+                      backgroundImage: `url(https://image.tmdb.org/t/p/w500/${profile_path})`
+                    }
+                  : {
+                      backgroundImage: `url(https://d32qys9a6wm9no.cloudfront.net/images/movies/poster/500x735.png)`
+                    }
+              }
+            />
+            <div className="search-card__info">
+              <div className="search-card__info-title">{name}</div>
+
+              <div className="search-card__info-description">
+                {known_for && (
+                  <div className="search-card__info-description--person">
+                    <div className="search-card__info-activity">
+                      Main activity: {known_for_department}
+                    </div>
+                    <div className="search-card__info-person-movies">
+                      {known_for.map((item, i) => {
+                        const mediaType = item.media_type
+
+                        const title =
+                          mediaType === "movie"
+                            ? item.original_title || "No title"
+                            : item.name || "No title"
+
+                        const releaseDate =
+                          mediaType === "movie"
+                            ? item.release_date || ""
+                            : item.first_air_date || ""
+
+                        return (
+                          <span key={item.id}>
+                            {title}
+                            {known_for.length - 1 !== i
+                              ? ` (${releaseDate.slice(0, 4)}), `
+                              : ` (${releaseDate.slice(0, 4)})`}
+                          </span>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div
+                className={
+                  isMovie
+                    ? "search-card__buttons"
+                    : "search-card__buttons search-card__buttons--person"
+                }
+              >
+                {withActors.some(e => e.id === id) ? (
+                  <button
+                    className="button button--searchlist button--pressed"
+                    onClick={() => toggleActor(id, name)}
+                    type="button"
+                  >
+                    Remove
+                  </button>
+                ) : (
+                  <button
+                    className="button button--searchlist"
+                    onClick={() => toggleActor(id, name)}
+                    type="button"
+                  >
+                    Add
+                  </button>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      ))
+        )
+      )
     )
   }
 
@@ -147,13 +195,27 @@ export default class WithActorsInput extends Component {
   }
 
   render() {
-    const { listIsOpen, isSearchingActors, query, totalPages } = this.state
-    const { withActors, toggleActor } = this.props
-
     return (
-      <div ref={this.searchContRef} className="with-actors-input__cont">
-        <div className="actors-input">
+      <div ref={this.searchContRef} className="inputs__with-actors">
+        <div className="search__input-cont">
+          <div className="search__search-icon">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="ipc-icon ipc-icon--magnify"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              role="presentation"
+            >
+              <path fill="none" d="M0 0h24v24H0V0z" />
+              <path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 0 0 1.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 0 0-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 0 0 5.34-1.48l.27.28v.79l4.25 4.25c.41.41 1.08.41 1.49 0 .41-.41.41-1.08 0-1.49L15.5 14zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+            </svg>
+          </div>
+
           <input
+            ref={_input => {
+              this.inputRef = _input
+            }}
+            className="search__input"
             type="text"
             placeholder="With actors"
             value={this.state.query}
@@ -161,32 +223,35 @@ export default class WithActorsInput extends Component {
             onKeyDown={this.handleKeyDown}
             onFocus={this.onFocus}
           />
+          {this.state.isSearchingActors && <Loader className="loader--input" />}
           {this.state.query && (
             <button
               type="button"
-              className="input-clear input-clear--actors"
+              className="button--input-clear"
               onClick={this.resetSearch}
             />
           )}
         </div>
-        {isSearchingActors ? (
-          <PlaceholderSearching className="placeholder--actors-search" />
-        ) : !isSearchingActors && totalPages === 0 && query !== "" ? (
+        {this.state.totalPages === 0 &&
+        this.state.query !== "" &&
+        this.state.listIsOpen ? (
           <PlaceholderNoResults
-            message="No actors found"
-            className="placeholder--no-results-actors"
+            message="No results found"
+            handleClickOutside={this.handleClickOutside}
           />
         ) : (
-          listIsOpen && <div className="actors-list">{this.renderActors()}</div>
+          this.state.listIsOpen && (
+            <div className="search-list">{this.renderActors()}</div>
+          )
         )}
         <div className="actors-added">
-          {withActors.map(item => (
+          {this.props.withActors.map(item => (
             <div key={item.id} className="actors-added__actor">
               {item.name}
               <button
-                className="input-clear input-clear--del-actor"
+                className="button--input-clear button--input-clear__withactors"
                 type="button"
-                onClick={() => toggleActor(item.id, item.name)}
+                onClick={() => this.props.toggleActor(item.id, item.name)}
               />
             </div>
           ))}

@@ -30,8 +30,8 @@ export default class Input extends Component {
 
   render() {
     return (
-      <div className="movie-search__input-cont">
-        <div className="movie-search__search-icon">
+      <>
+        <div className="search__search-icon">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="ipc-icon ipc-icon--magnify"
@@ -48,7 +48,7 @@ export default class Input extends Component {
           ref={_input => {
             this.inputRef = _input
           }}
-          className="movie-search__input"
+          className="search__input"
           type="text"
           placeholder="Movie or an actor"
           value={this.state.query}
@@ -64,7 +64,7 @@ export default class Input extends Component {
             onClick={this.resetSearch}
           />
         )}
-      </div>
+      </>
     )
   }
 }

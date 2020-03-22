@@ -14,15 +14,16 @@ export default class MovieResultsAdvSearch extends React.PureComponent {
     } = this.props
     return (
       <div className="movie-results movie-results--advanced-search">
-        <div className="movie-results__name movie-results__name--advanced">
-          <h2>Advanced Searched Movies</h2>
-          <button
-            type="button"
-            className="button button--clear-movies"
-            onClick={() => clearAdvSearchMovies()}
-          >
-            Clear Searched
-          </button>
+        <div className="movie-results__button">
+          {advancedSearchMovies.length && (
+            <button
+              type="button"
+              className="button button--clear-movies"
+              onClick={() => clearAdvSearchMovies()}
+            >
+              Clear Searched
+            </button>
+          )}
         </div>
         <div className="movie-results--advanced-wrapper">
           {searchingAdvancedSearch ? (

@@ -1,12 +1,11 @@
 @import "../../../../styles/globals";
 
-.movie-search__input-cont {
+.search__input-cont {
   position: relative;
   width: 100%;
-  overflow: hidden;
 }
 
-.movie-search__input {
+.search__input {
   padding-left: 40px;
   display: flex;
   height: 50px;
@@ -20,12 +19,12 @@
   color: getColor(textColor, $inputPalette);
 }
 
-.movie-search__input::placeholder {
+.search__input::placeholder {
   opacity: 1;
   color: getColor(placeholderColor, $inputPalette);
 }
 
-.movie-search__search-icon {
+.search__search-icon {
   position: absolute;
   top: 50%;
   left: 0;

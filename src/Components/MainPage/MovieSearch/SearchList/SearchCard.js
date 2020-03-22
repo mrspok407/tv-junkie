@@ -89,7 +89,7 @@ export default class MovieCard extends Component {
               <div className="search-card__add-movie-btn">
                 {selectedMovies.some(e => e.id === id) ? (
                   <button
-                    className="button button--movielist button--pressed"
+                    className="button button--searchlist button--pressed"
                     onClick={() => toggleMovie(id, searchResults)}
                     type="button"
                   >
@@ -97,7 +97,7 @@ export default class MovieCard extends Component {
                   </button>
                 ) : (
                   <button
-                    className="button button--movielist"
+                    className="button button--searchlist"
                     onClick={() => toggleMovie(id, searchResults)}
                     type="button"
                   >
@@ -108,7 +108,7 @@ export default class MovieCard extends Component {
             )}
 
             <div className="search-card__full-info-btn">
-              <button className="button button--movielist" type="button">
+              <button className="button button--searchlist" type="button">
                 Full info
               </button>
             </div>

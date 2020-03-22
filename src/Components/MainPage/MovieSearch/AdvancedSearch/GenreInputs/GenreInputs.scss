@@ -90,6 +90,10 @@
     }
   }
 
+  &:hover .custom-checkmark {
+    background-color: gray;
+  }
+
   input:checked ~ .custom-checkmark {
     background-color: peru;
     &:after {

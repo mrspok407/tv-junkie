@@ -11,7 +11,10 @@ export default class PlaceholderNoResults extends Component {
 
   render() {
     return (
-      <div className="placeholder placeholder--no-results">
+      <div
+        className={`placeholder placeholder--no-results ${this.props
+          .className || ""}`}
+      >
         {this.props.message}
       </div>
     )

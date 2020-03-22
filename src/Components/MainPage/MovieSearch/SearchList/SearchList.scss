@@ -10,6 +10,9 @@
   background-color: getColor(backgroundColor, $movieListPalette);
   z-index: 1;
 
+  // overflow-y: scroll;
+  // height: calc(100vh - 348px);
+
   &--searching {
     min-height: 100vh;
   }

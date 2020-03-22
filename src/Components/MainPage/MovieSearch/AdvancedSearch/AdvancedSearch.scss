@@ -5,6 +5,7 @@
 
 .advanced-search__cont {
   width: 100%;
+  z-index: 0;
 }
 
 .inputs__cont {
@@ -14,9 +15,10 @@
 
 .form__wrapper {
   opacity: 0;
-  transform: translate(0, -100px);
+  transform: translate(0, -40px);
   transition: 1s;
-  animation: showAdvSearch 0.3s forwards;
+  animation: showAdvSearch 0.4s forwards;
+  color: #fff;
   // z-index: 0;
   @keyframes showAdvSearch {
     to {

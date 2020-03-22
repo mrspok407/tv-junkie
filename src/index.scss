@@ -21,6 +21,54 @@ body {
   min-height: 100vh;
 }
 
+.scroll-top {
+  position: fixed;
+  width: 35px;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  @include mediaMaxW(850px) {
+    display: none;
+  }
+  &:after,
+  &:before {
+    content: "";
+    position: absolute;
+    bottom: 170px;
+    left: 14px;
+    width: 22px;
+    height: 4px;
+    border-radius: 10px;
+    transform: rotate(45deg);
+    background-color: #797979;
+    transition: 0.2s;
+  }
+  &:before {
+    transform: rotate(-45deg);
+    left: 0px;
+  }
+
+  &:hover:after,
+  &:hover:before {
+    background-color: #929292;
+  }
+
+  button {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    margin: 0;
+    padding: 0;
+    outline: none;
+    background-color: #35353554;
+    cursor: pointer;
+    transition: 0.2s;
+    &:hover {
+      background-color: #353535ad;
+    }
+  }
+}
+
 /* Chrome, Safari, Edge, Opera */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {

@@ -99,7 +99,7 @@ export default function AdvancedSearch({
           >
             Open Advanced Search
           </button>
-          {!advSearchOpen && (
+          {advSearchOpen && (
             <div className="form__wrapper">
               <Form>
                 <div className="inputs__cont">
@@ -115,19 +115,16 @@ export default function AdvancedSearch({
                   <div className="inputs__other">
                     <VotesRatingSort handleChange={handleChange} />
                   </div>
-
-                  <div className="inputs__with-actors">
-                    <WithActorsInput
-                      API_KEY={API_KEY}
-                      toggleActor={toggleActor}
-                      withActors={withActors}
-                    />
-                  </div>
+                  <WithActorsInput
+                    API_KEY={API_KEY}
+                    toggleActor={toggleActor}
+                    withActors={withActors}
+                  />
                 </div>
 
                 <div className="inputs__buttons">
                   <div className="inputs__buttons--search">
-                    <button className="button" type="submit">
+                    <button className="button button--search-adv" type="submit">
                       Search
                     </button>
                   </div>

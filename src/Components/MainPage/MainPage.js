@@ -1,5 +1,6 @@
 import React, { Component } from "react"
 import axios, { CancelToken } from "axios"
+import debounce from "debounce"
 import MovieSearch from "./MovieSearch/MovieSearch"
 import MovieResultsAdvSearch from "./MovieResults/MovieResultsAdvSearch/MovieResultsAdvSearch"
 // import MovieResultsSelected from "./MovieResults/MovieResultsSelected/MovieResultsSelected"
@@ -31,8 +32,16 @@ export default class MainPage extends Component {
       searchingMovie: false,
       // searchingRandomMovies: false,
       searchingAdvancedSearch: false,
-      error: ""
+      error: "",
+      showScrollToTop: false
     }
+  }
+
+  componentDidMount() {
+    document.addEventListener(
+      "scroll",
+      debounce(() => this.toggleShowToTop(), 50)
+    )
   }
 
   componentDidUpdate() {
@@ -224,7 +233,10 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_cast=${getActors}`,
   renderAdvMovies = () => {
     const { advancedSearchMovies, totalPagesAdvMovies } = this.state
     return !Array.isArray(advancedSearchMovies) || totalPagesAdvMovies === 0 ? (
-      <PlaceholderNoResults message="No movies found" />
+      <PlaceholderNoResults
+        message="No movies found"
+        className="placeholder--no-results__adv-movies"
+      />
     ) : (
       <MovieResultsAdvSearch
         selectedMovies={this.state.selectedMovies}
@@ -234,6 +246,18 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_cast=${getActors}`,
         clearAdvSearchMovies={this.clearAdvSearchMovies}
       />
     )
+  }
+
+  toggleShowToTop = () => {
+    this.setState({
+      showScrollToTop: window.pageYOffset > 600
+    })
+  }
+
+  toggleScrollToTop = () => {
+    window.scrollTo({
+      top: 0
+    })
   }
 
   render() {
@@ -263,6 +287,12 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_cast=${getActors}`,
             clearSelectedMovies={this.clearSelectedMovies}
           /> */}
         </div>
+        {this.state.showScrollToTop && (
+          <div className="scroll-top">
+            <button type="button" onClick={() => this.toggleScrollToTop()} />
+          </div>
+        )}
+
         <Footer />
       </>
     )

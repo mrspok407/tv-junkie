@@ -125,33 +125,14 @@ export default class MovieSearch extends Component {
 
   render() {
     return (
-      <div className="movie-search">
-        <div ref={this.searchContRef} className="movie-search__cont">
-          <Input
-            onSearch={this.handleSearch}
-            onFocus={this.onFocus}
-            isSearchingList={this.state.isSearchingList}
-          />
-          {/* <div className="movie-search__random">
-            <button
-              className="button button--random-search"
-              type="button"
-              onClick={() => this.props.randomMovies()}
-            >
-              Random movies
-            </button>
-          </div> */}
-
-          <AdvancedSearch
-            advancedSearch={this.props.advancedSearch}
-            API_KEY={this.props.API_KEY}
-            toggleActor={this.props.toggleActor}
-            withActors={this.props.withActors}
-            clearWithActors={this.props.clearWithActors}
-          />
-          <div
-            className={`search-list ${this.state.isSearchingList ? "" : ""}`}
-          >
+      <div className="search">
+        <div className="search__cont">
+          <div ref={this.searchContRef} className="search__input-cont">
+            <Input
+              onSearch={this.handleSearch}
+              onFocus={this.onFocus}
+              isSearchingList={this.state.isSearchingList}
+            />
             {this.state.totalPages === 0 &&
             this.state.query !== "" &&
             this.state.listIsOpen ? (
@@ -162,15 +143,44 @@ export default class MovieSearch extends Component {
             ) : (
               this.state.listIsOpen &&
               this.renderSearch(
+                <div className="search-list">
+                  <SearchList
+                    searchResults={this.state.searchResults}
+                    selectedMovies={this.props.selectedMovies}
+                    toggleMovie={this.props.toggleMovie}
+                    handleClickOutside={this.handleClickOutside}
+                  />
+                </div>
+              )
+            )}
+          </div>
+          <AdvancedSearch
+            advancedSearch={this.props.advancedSearch}
+            API_KEY={this.props.API_KEY}
+            toggleActor={this.props.toggleActor}
+            withActors={this.props.withActors}
+            clearWithActors={this.props.clearWithActors}
+          />
+          {/* {this.state.totalPages === 0 &&
+          this.state.query !== "" &&
+          this.state.listIsOpen ? (
+            <PlaceholderNoResults
+              message="No results found"
+              handleClickOutside={this.handleClickOutside}
+            />
+          ) : (
+            this.state.listIsOpen &&
+            this.renderSearch(
+              <div className="search-list">
                 <SearchList
                   searchResults={this.state.searchResults}
                   selectedMovies={this.props.selectedMovies}
                   toggleMovie={this.props.toggleMovie}
                   handleClickOutside={this.handleClickOutside}
                 />
-              )
-            )}
-          </div>
+              </div>
+            )
+          )} */}
         </div>
       </div>
     )

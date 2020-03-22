@@ -1,6 +1,6 @@
 @import "../../../styles/mixins";
 
-.movie-search {
+.search {
   display: flex;
   align-items: center;
   width: 600px;
@@ -17,17 +17,5 @@
     align-items: center;
     flex-direction: column;
     width: 100%;
-  }
-
-  &__random {
-    width: 100%;
-  }
-
-  &__no-movies {
-    font: {
-      size: 2rem;
-      weight: bold;
-    }
-    color: rgb(201, 140, 80);
   }
 }
