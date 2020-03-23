@@ -4,6 +4,7 @@
 body {
   font-family: "Open Sans", sans-serif;
   background-color: #131313;
+  @include scrollbar(5px, getColor(btnSecondary, $btnPalette), #c5bbb1);
 }
 
 *,

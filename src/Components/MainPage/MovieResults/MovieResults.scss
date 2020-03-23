@@ -4,20 +4,11 @@
   width: 90%;
   max-width: 1350px;
   margin-bottom: 50px;
+  z-index: 0;
 }
 
 .movie-results__button {
   display: flex;
   justify-content: center;
   margin: 10px 0 10px 0;
-}
-
-.movie-results__name {
-  text-align: center;
-  color: #333;
-  grid-column: 1 / -1;
-
-  &--advanced {
-    margin-bottom: 30px;
-  }
 }

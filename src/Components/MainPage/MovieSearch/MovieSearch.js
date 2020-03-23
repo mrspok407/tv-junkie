@@ -156,6 +156,7 @@ export default class MovieSearch extends Component {
           </div>
           <AdvancedSearch
             advancedSearch={this.props.advancedSearch}
+            searchingAdvancedSearch={this.props.searchingAdvancedSearch}
             API_KEY={this.props.API_KEY}
             toggleActor={this.props.toggleActor}
             withActors={this.props.withActors}

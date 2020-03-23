@@ -3,7 +3,7 @@ import axios, { CancelToken } from "axios"
 import debounce from "debounce"
 import MovieSearch from "./MovieSearch/MovieSearch"
 import MovieResultsAdvSearch from "./MovieResults/MovieResultsAdvSearch/MovieResultsAdvSearch"
-// import MovieResultsSelected from "./MovieResults/MovieResultsSelected/MovieResultsSelected"
+import MovieResultsSelected from "./MovieResults/MovieResultsSelected/MovieResultsSelected"
 import "./MovieResults/MovieResults.scss"
 import PlaceholderNoResults from "./Placeholders/PlaceholderNoResults"
 import Header from "../Header/Header"
@@ -174,7 +174,7 @@ export default class MainPage extends Component {
 &include_adult=false&include_video=true&page=1&primary_release_year=${year}&\
 primary_release_date.gte=${yearRange.start}&primary_release_date.lte=${yearRange.finish}\
 &with_genres=${getWithGenres}&without_genres=${getWithoutGenres}&vote_average.gte=${rating}&\
-vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_cast=${getActors}`,
+vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`,
         {
           cancelToken: new CancelToken(function executor(c) {
             cancelRequest = c
@@ -261,32 +261,33 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_cast=${getActors}`,
   }
 
   render() {
-    const { selectedMovies, withActors } = this.state
     return (
       <>
         <Header />
         <MovieSearch
           handleClickOutside={this.handleClickOutside}
           onSearch={this.handleSearch}
-          selectedMovies={selectedMovies}
+          selectedMovies={this.state.selectedMovies}
+          searchingAdvancedSearch={this.state.searchingAdvancedSearch}
           toggleMovie={this.toggleMovie}
           toggleActor={this.toggleActor}
-          withActors={withActors}
+          withActors={this.state.withActors}
           renderMovies={this.renderMovies}
           randomMovies={this.randomMovies}
           advancedSearch={this.advancedSearch}
           clearWithActors={this.clearWithActors}
           API_KEY={API_KEY}
         />
-        <div className="movie-results-cont">
-          {this.renderAdvMovies()}
-          {/* <MovieResultsSelected
-            selectedMovies={selectedMovies}
-            searchingRandomMovies={searchingRandomMovies}
+        <div className="movie-results-cont">{this.renderAdvMovies()}</div>
+        {this.state.selectedMovies.length > 0 && (
+          <MovieResultsSelected
+            selectedMovies={this.state.selectedMovies}
+            searchingRandomMovies={this.state.searchingRandomMovies}
             toggleMovie={this.toggleMovie}
             clearSelectedMovies={this.clearSelectedMovies}
-          /> */}
-        </div>
+          />
+        )}
+
         {this.state.showScrollToTop && (
           <div className="scroll-top">
             <button type="button" onClick={() => this.toggleScrollToTop()} />

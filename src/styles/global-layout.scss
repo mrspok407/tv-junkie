@@ -35,10 +35,16 @@
   transition: 0.5s;
 }
 
-.button--clear-movies {
+.button--clear-movies,
+.button--clear-selected-content {
   max-width: 200px;
   font-size: 1rem;
   background-color: getColor(btnSecondary, $btnPalette);
+}
+
+.button--clear-selected-content {
+  max-width: initial;
+  width: 100%;
 }
 
 .button--input-clear {
@@ -93,6 +99,10 @@
 
 .button--search-adv {
   background-color: getColor(btnSecondary, $btnPalette);
+}
+
+.button--selected-content {
+  margin-bottom: 5px;
 }
 
 .select-input-container {
@@ -248,7 +258,6 @@
 
 .loader {
   position: relative;
-  margin-top: 50px;
   opacity: 0;
   grid-column: 1 / -1;
   animation: show 0.4s 0.4s forwards;
@@ -338,7 +347,8 @@
   }
 }
 
-.loader--input {
+.loader--input,
+.loader--adv-results {
   position: absolute;
   top: 16px;
   right: 60px;
@@ -362,16 +372,9 @@
 }
 
 .loader--adv-results {
-  .loader-dots {
-    div {
-      background-color: #fff;
-    }
-  }
-  .loader-shadow {
-    div {
-      box-shadow: 0px 0px 30px 5px rgb(238, 54, 106);
-    }
-  }
+  position: absolute;
+  right: 11px;
+  top: 14px;
 }
 
 .logo {

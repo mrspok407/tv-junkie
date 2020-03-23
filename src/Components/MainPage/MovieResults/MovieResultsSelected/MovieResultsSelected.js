@@ -1,66 +1,101 @@
 import React from "react"
-import MovieResultsLoader from "../../Placeholders/MovieResultsLoader"
 import "./MovieResultsSelected.scss"
 
 export default class MovieResultsSelected extends React.PureComponent {
-  render() {
-    const {
-      searchingRandomMovies,
-      selectedMovies,
-      toggleMovie,
-      clearSelectedMovies
-    } = this.props
-    return (
-      <div className="movie-results movie-results--selected-movies">
-        <div className="movie-results__name">
-          <h2>Selected Movies</h2>
-          <button
-            type="button"
-            className="button button--clear-movies"
-            onClick={() => clearSelectedMovies()}
-          >
-            Clear Selected
-          </button>
-        </div>
+  constructor(props) {
+    super(props)
 
-        {searchingRandomMovies ? (
-          <MovieResultsLoader />
-        ) : (
-          selectedMovies.map(
-            ({ title, id, release_date, poster_path, overview }) => (
-              <div
-                key={id}
-                className="movie-results__movie movie-results__movie--selected"
+    this.state = {
+      showSelected: false
+    }
+
+    this.selectedContentRef = React.createRef()
+  }
+
+  componentDidMount() {
+    document.addEventListener("mousedown", this.handleClickOutside)
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener("mousedown", this.handleClickOutside)
+  }
+
+  handleClickOutside = e => {
+    if (
+      this.selectedContentRef.current &&
+      !this.selectedContentRef.current.contains(e.target)
+    ) {
+      this.setState({
+        showSelected: false
+      })
+    }
+  }
+
+  render() {
+    const { selectedMovies, toggleMovie, clearSelectedMovies } = this.props
+    return (
+      <div
+        ref={this.selectedContentRef}
+        className="selected-content__container"
+      >
+        <button
+          type="button"
+          className="button--show-selected"
+          onClick={() =>
+            this.setState(prevState => ({
+              showSelected: !prevState.showSelected
+            }))
+          }
+        >
+          {selectedMovies.length}
+        </button>
+        {this.state.showSelected && (
+          <div className="selected-content__list">
+            <div className="selected-content__clear">
+              <button
+                type="button"
+                className="button button--clear-selected-content"
+                onClick={() => clearSelectedMovies()}
               >
-                <div
-                  className="movie-results__movie--selected-poster"
-                  style={{
-                    backgroundImage: `url(https://image.tmdb.org/t/p/w200${poster_path})`
-                  }}
-                />
-                <div className="movie-results__movie--selected-info">
-                  <div className="movie-results__movie--selected-title">
-                    {title.length > 65 ? `${title.substring(0, 65)}...` : title}
+                Clear Selected
+              </button>
+            </div>
+
+            {selectedMovies.map(
+              ({ title, id, release_date, poster_path, overview }) => (
+                <div key={id} className="selected-content__item">
+                  <div
+                    className="selected-content__item-poster"
+                    style={{
+                      backgroundImage: `url(https://image.tmdb.org/t/p/w200${poster_path})`
+                    }}
+                  />
+                  <div className="selected-content__item-info">
+                    <div className="selected-content__item-title">
+                      {title.length > 65
+                        ? `${title.substring(0, 65)}...`
+                        : title}
+                    </div>
+                    <div className="selected-content__item-year">
+                      {release_date}
+                    </div>
+                    <div className="selected-content__item-overview">
+                      {overview.length > 120
+                        ? `${overview.substring(0, 120)}...`
+                        : overview}
+                    </div>
+                    <button
+                      className="button button--selected-content"
+                      type="button"
+                      onClick={() => toggleMovie(id)}
+                    >
+                      Remove
+                    </button>
                   </div>
-                  <div className="movie-results__movie--selected-year">
-                    {release_date}
-                  </div>
-                  <div className="movie-results__movie--selected-overview">
-                    {overview.length > 120
-                      ? `${overview.substring(0, 120)}...`
-                      : overview}
-                  </div>
-                  <button
-                    className="button button--selected-movies"
-                    type="button"
-                    onClick={() => toggleMovie(id)}
-                  >
-                    Remove
-                  </button>
                 </div>
-              </div>
-            )
-          )
+              )
+            )}
+          </div>
         )}
       </div>
     )

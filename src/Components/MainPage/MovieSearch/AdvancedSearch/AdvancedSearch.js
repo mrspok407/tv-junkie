@@ -8,11 +8,13 @@ import DatesInputs from "./DatesInputs/DatesInputs"
 import GenreInputs from "./GenreInputs/GenreInputs"
 import VotesRatingSort from "./VotesRatingSort/VotesRatingSort"
 import WithActorsInput from "./WithActorsInput/WithActorsInput"
+import Loader from "../../Placeholders/Loader"
 import { listOfGenres } from "../../../../Utils"
 import "./AdvancedSearch.scss"
 
 export default function AdvancedSearch({
   advancedSearch,
+  searchingAdvancedSearch,
   API_KEY,
   withActors,
   toggleActor,
@@ -127,6 +129,9 @@ export default function AdvancedSearch({
                     <button className="button button--search-adv" type="submit">
                       Search
                     </button>
+                    {searchingAdvancedSearch && (
+                      <Loader className="loader--adv-results" />
+                    )}
                   </div>
                   <div className="inputs__buttons--reset">
                     <button
