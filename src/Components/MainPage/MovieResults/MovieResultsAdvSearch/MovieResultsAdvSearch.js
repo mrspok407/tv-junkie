@@ -1,6 +1,7 @@
 import React from "react"
 import MovieCardAdvSearch from "./MovieCardAdvSearch"
 import "./MovieResultsAdvSearch.scss"
+import Loader from "../../Placeholders/Loader"
 
 export default class MovieResultsAdvSearch extends React.PureComponent {
   render() {
@@ -28,6 +29,7 @@ export default class MovieResultsAdvSearch extends React.PureComponent {
                 genre_ids,
                 overview,
                 backdrop_path,
+                poster_path,
                 vote_count
               },
               index
@@ -41,6 +43,7 @@ export default class MovieResultsAdvSearch extends React.PureComponent {
                 voteAverage={vote_average}
                 genreIds={genre_ids}
                 poster={backdrop_path}
+                posterBackdrop={poster_path}
                 overview={overview}
                 voteCount={vote_count}
                 index={index}
@@ -51,6 +54,7 @@ export default class MovieResultsAdvSearch extends React.PureComponent {
             )
           )}
         </div>
+        {this.props.loadingNewPage && <Loader className="loader--new-page" />}
       </div>
     )
   }

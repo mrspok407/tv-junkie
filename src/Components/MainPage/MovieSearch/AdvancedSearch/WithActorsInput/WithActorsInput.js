@@ -23,7 +23,6 @@ export default class WithActorsInput extends Component {
 
   componentDidMount() {
     document.addEventListener("mousedown", this.handleClickOutside)
-    this.runSearch()
   }
 
   componentWillUnmount() {
@@ -87,14 +86,7 @@ export default class WithActorsInput extends Component {
       </div>
     ) : (
       actors.map(
-        ({
-          name,
-          profile_path,
-          id,
-          known_for,
-          known_for_department,
-          isMovie
-        }) => (
+        ({ name, profile_path, id, known_for, known_for_department }) => (
           <div key={id} className="search-card">
             <div
               className="search-card__image"
@@ -145,13 +137,7 @@ export default class WithActorsInput extends Component {
                 )}
               </div>
 
-              <div
-                className={
-                  isMovie
-                    ? "search-card__buttons"
-                    : "search-card__buttons search-card__buttons--person"
-                }
-              >
+              <div className="search-card__buttons search-card__buttons--person">
                 {withActors.some(e => e.id === id) ? (
                   <button
                     className="button button--searchlist button--pressed"

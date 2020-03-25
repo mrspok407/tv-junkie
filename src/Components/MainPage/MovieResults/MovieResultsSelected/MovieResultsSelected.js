@@ -62,38 +62,57 @@ export default class MovieResultsSelected extends React.PureComponent {
             </div>
 
             {selectedMovies.map(
-              ({ title, id, release_date, poster_path, overview }) => (
-                <div key={id} className="selected-content__item">
-                  <div
-                    className="selected-content__item-poster"
-                    style={{
-                      backgroundImage: `url(https://image.tmdb.org/t/p/w200${poster_path})`
-                    }}
-                  />
-                  <div className="selected-content__item-info">
-                    <div className="selected-content__item-title">
-                      {title.length > 65
-                        ? `${title.substring(0, 65)}...`
-                        : title}
+              ({
+                original_title = "",
+                original_name = "",
+                id,
+                release_date = "",
+                first_air_date = "",
+                poster_path,
+                backdrop_path,
+                overview = ""
+              }) => {
+                const title = original_title || original_name
+                const date = release_date || first_air_date
+
+                return (
+                  <div key={id} className="selected-content__item">
+                    <div
+                      className="selected-content__item-poster"
+                      style={
+                        poster_path !== null
+                          ? {
+                              backgroundImage: `url(https://image.tmdb.org/t/p/w500/${poster_path ||
+                                backdrop_path})`
+                            }
+                          : {
+                              backgroundImage: `url(https://d32qys9a6wm9no.cloudfront.net/images/movies/poster/500x735.png)`
+                            }
+                      }
+                    />
+                    <div className="selected-content__item-info">
+                      <div className="selected-content__item-title">
+                        {title.length > 65
+                          ? `${title.substring(0, 65)}...`
+                          : title}
+                      </div>
+                      <div className="selected-content__item-year">{date}</div>
+                      <div className="selected-content__item-overview">
+                        {overview && overview.length > 120
+                          ? `${overview.substring(0, 120)}...`
+                          : overview}
+                      </div>
+                      <button
+                        className="button button--selected-content"
+                        type="button"
+                        onClick={() => toggleMovie(id)}
+                      >
+                        Remove
+                      </button>
                     </div>
-                    <div className="selected-content__item-year">
-                      {release_date}
-                    </div>
-                    <div className="selected-content__item-overview">
-                      {overview.length > 120
-                        ? `${overview.substring(0, 120)}...`
-                        : overview}
-                    </div>
-                    <button
-                      className="button button--selected-content"
-                      type="button"
-                      onClick={() => toggleMovie(id)}
-                    >
-                      Remove
-                    </button>
                   </div>
-                </div>
-              )
+                )
+              }
             )}
           </div>
         )}

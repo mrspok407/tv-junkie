@@ -4,8 +4,6 @@ import SearchCard from "./SearchCard"
 import "./SearchList.scss"
 
 export default class MovieList extends Component {
-  // state = { movieCardHovered: false, movieCardId: "" }
-
   componentDidMount() {
     document.addEventListener("mousedown", this.props.handleClickOutside)
   }
@@ -15,26 +13,35 @@ export default class MovieList extends Component {
   }
 
   render() {
-    const { searchResults, toggleMovie, selectedMovies } = this.props
+    const {
+      searchResults,
+      toggleMovie,
+      selectedMovies,
+      mediaTypeSearching
+    } = this.props
     return searchResults.map(
       ({
-        original_title,
+        original_title = "",
+        original_name = "",
         name = "",
         poster_path = "",
         profile_path = "",
+        backdrop_path = "",
         overview = "",
         id,
+        media_type = "",
         known_for,
         known_for_department
       }) => {
-        const isMovie = !!overview
         return (
           <SearchCard
             key={id}
-            original_title={original_title}
-            name={name}
-            poster_path={poster_path}
-            profile_path={profile_path}
+            movieTitle={original_title}
+            showTitle={original_name}
+            personName={name}
+            poster={poster_path}
+            personImage={profile_path}
+            posterBackdrop={backdrop_path}
             overview={overview}
             id={id}
             known_for={known_for}
@@ -42,7 +49,8 @@ export default class MovieList extends Component {
             searchResults={searchResults}
             toggleMovie={toggleMovie}
             selectedMovies={selectedMovies}
-            isMovie={isMovie}
+            mediaType={media_type}
+            mediaTypeSearching={mediaTypeSearching}
           />
         )
       }

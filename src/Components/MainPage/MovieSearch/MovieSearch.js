@@ -6,8 +6,7 @@ import AdvancedSearch from "./AdvancedSearch/AdvancedSearch"
 import "./MovieSearch.scss"
 import PlaceholderNoResults from "../Placeholders/PlaceholderNoResults"
 
-let cancelRequestMovies
-let cancelRequestActors
+let cancelRequest
 
 export default class MovieSearch extends Component {
   constructor(props) {
@@ -18,20 +17,16 @@ export default class MovieSearch extends Component {
       isSearchingList: false,
       totalPages: null,
       listIsOpen: false,
+      mediaTypeSearching: "",
       error: ""
     }
 
     this.searchContRef = React.createRef()
   }
 
-  handleSearch = query => {
-    console.log(query)
-    if (
-      cancelRequestMovies !== undefined ||
-      cancelRequestActors !== undefined
-    ) {
-      cancelRequestMovies()
-      cancelRequestActors()
+  handleSearch = (query, mediatype) => {
+    if (cancelRequest !== undefined) {
+      cancelRequest()
     }
     if (!query || !query.trim())
       return this.setState({
@@ -45,46 +40,32 @@ export default class MovieSearch extends Component {
 
     const { API_KEY } = this.props
 
-    const getMovies = axios.get(
-      `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${query}`,
-      {
-        cancelToken: new CancelToken(function executor(c) {
-          cancelRequestMovies = c
-        })
-      }
-    )
-    const getActors = axios.get(
-      `https://api.tmdb.org/3/search/person?api_key=${API_KEY}&query=${query}`,
-      {
-        cancelToken: new CancelToken(function executor(c) {
-          cancelRequestActors = c
-        })
-      }
-    )
-
     axios
-      .all([getMovies, getActors])
-      .then(
-        axios.spread((...responses) => {
-          const movies = responses[0].data
-          const actors = responses[1].data
-          const totalPages = movies.total_pages + actors.total_pages
-          const moviesAndActors = [...movies.results, ...actors.results].sort(
-            (a, b) => {
-              if (a.popularity > b.popularity) {
-                return -1
-              }
-              return 1
-            }
-          )
-
-          this.setState({
-            searchResults: moviesAndActors,
-            isSearchingList: false,
-            totalPages
+      .get(
+        `https://api.tmdb.org/3/search/${mediatype.toLowerCase()}?api_key=${API_KEY}&query=${query}`,
+        {
+          cancelToken: new CancelToken(function executor(c) {
+            cancelRequest = c
           })
-        })
+        }
       )
+      .then(({ data: { results, total_pages: totalPages } }) => {
+        const content = [...results]
+        const contentSortByPopularity = content.sort((a, b) => {
+          if (a.popularity > b.popularity) {
+            return -1
+          }
+          return 1
+        })
+
+        this.setState({
+          searchResults: contentSortByPopularity,
+          isSearchingList: false,
+          totalPages,
+          mediaTypeSearching: mediatype.toLowerCase()
+        })
+      })
+
       .catch(err => {
         if (axios.isCancel(err)) return
         this.setState({
@@ -148,6 +129,7 @@ export default class MovieSearch extends Component {
                     searchResults={this.state.searchResults}
                     selectedMovies={this.props.selectedMovies}
                     toggleMovie={this.props.toggleMovie}
+                    mediaTypeSearching={this.state.mediaTypeSearching}
                     handleClickOutside={this.handleClickOutside}
                   />
                 </div>
@@ -162,26 +144,6 @@ export default class MovieSearch extends Component {
             withActors={this.props.withActors}
             clearWithActors={this.props.clearWithActors}
           />
-          {/* {this.state.totalPages === 0 &&
-          this.state.query !== "" &&
-          this.state.listIsOpen ? (
-            <PlaceholderNoResults
-              message="No results found"
-              handleClickOutside={this.handleClickOutside}
-            />
-          ) : (
-            this.state.listIsOpen &&
-            this.renderSearch(
-              <div className="search-list">
-                <SearchList
-                  searchResults={this.state.searchResults}
-                  selectedMovies={this.props.selectedMovies}
-                  toggleMovie={this.props.toggleMovie}
-                  handleClickOutside={this.handleClickOutside}
-                />
-              </div>
-            )
-          )} */}
         </div>
       </div>
     )

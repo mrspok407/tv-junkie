@@ -8,16 +8,20 @@ import "./MovieResults/MovieResults.scss"
 import PlaceholderNoResults from "./Placeholders/PlaceholderNoResults"
 import Header from "../Header/Header"
 import Footer from "../Footer/Footer"
+import ScrollToTop from "../../Utils/ScrollToTop"
 
 const API_KEY = "c5e3186413780c3aeec39b0767a6ec99"
 
 const LOCAL_STORAGE_KEY = "selectedMovies"
 const LOCAL_STORAGE_KEY_ADV = "advancedSearchMovies"
 const LOCAL_STORAGE_KEY_ACTORS = "addedActors"
+const LOCAL_STORAGE_KEY_INPUTS = "advSearchInputs"
+const LOCAL_STORAGE_KEY_PAGENUMBER = "pageNumber"
+const LOCAL_STORAGE_KEY_TOTALPAGES = "totalPages"
 
 const currentYear = new Date().getFullYear()
 
-let cancelRequest
+let cancelRequestAdvSearch
 
 export default class MainPage extends Component {
   constructor(props) {
@@ -26,21 +30,25 @@ export default class MainPage extends Component {
       selectedMovies: JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || [],
       advancedSearchMovies:
         JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_ADV)) || [],
+      numOfPagesLoaded:
+        JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_PAGENUMBER)) || 0,
+      advSearchInputValues:
+        JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_INPUTS)) || {},
       withActors:
         JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_ACTORS)) || [],
-      totalPagesAdvMovies: null,
+      totalPagesAdvMovies:
+        JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_TOTALPAGES)) || null,
       searchingMovie: false,
-      // searchingRandomMovies: false,
       searchingAdvancedSearch: false,
-      error: "",
-      showScrollToTop: false
+      loadingNewPage: false,
+      error: ""
     }
   }
 
   componentDidMount() {
     document.addEventListener(
       "scroll",
-      debounce(() => this.toggleShowToTop(), 50)
+      debounce(() => this.loadNewPage(), 100)
     )
   }
 
@@ -56,6 +64,18 @@ export default class MainPage extends Component {
     localStorage.setItem(
       LOCAL_STORAGE_KEY_ACTORS,
       JSON.stringify(this.state.withActors)
+    )
+    localStorage.setItem(
+      LOCAL_STORAGE_KEY_INPUTS,
+      JSON.stringify(this.state.advSearchInputValues)
+    )
+    localStorage.setItem(
+      LOCAL_STORAGE_KEY_PAGENUMBER,
+      JSON.stringify(this.state.numOfPagesLoaded)
+    )
+    localStorage.setItem(
+      LOCAL_STORAGE_KEY_TOTALPAGES,
+      JSON.stringify(this.state.totalPagesAdvMovies)
     )
   }
 
@@ -77,43 +97,6 @@ export default class MainPage extends Component {
     }
   }
 
-  randomMovies = () => {
-    if (cancelRequest !== undefined) {
-      cancelRequest()
-    }
-
-    const selectedMovies = [...this.state.selectedMovies]
-
-    this.setState({ searchingRandomMovies: true })
-
-    const randomPage = Math.ceil(Math.random() * 45)
-
-    axios
-      .get(
-        `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US&sort_by=vote_average.desc&include_adult=false&\n
-    include_video=false&page=${randomPage}&primary_release_date.gte=2000-01-01&vote_count.gte=2000&vote_average.gte=6`,
-        {
-          cancelToken: new CancelToken(function executor(c) {
-            cancelRequest = c
-          })
-        }
-      )
-      .then(res => {
-        const randomMovies = res.data.results.splice(0, 10)
-        this.setState({
-          selectedMovies: randomMovies,
-          searchingRandomMovies: false
-        })
-      })
-      .catch(err => {
-        if (axios.isCancel(err)) return
-        this.setState({
-          selectedMovies,
-          searchingRandomMovies: false
-        })
-      })
-  }
-
   advancedSearch = (
     year,
     decade,
@@ -125,8 +108,8 @@ export default class MainPage extends Component {
     withActors,
     genres
   ) => {
-    if (cancelRequest !== undefined) {
-      cancelRequest()
+    if (cancelRequestAdvSearch !== undefined) {
+      cancelRequestAdvSearch()
     }
 
     this.setState({
@@ -168,6 +151,20 @@ export default class MainPage extends Component {
     const voteCountMoreThan =
       parseInt(voteCount, 10) <= 100 || voteCount === "" ? "25" : voteCount
 
+    this.setState({
+      advSearchInputValues: {
+        year,
+        yearRangeStart: yearRange.start,
+        yearRangeFinish: yearRange.finish,
+        getWithGenres,
+        getWithoutGenres,
+        rating,
+        voteCountMoreThan,
+        sortBy,
+        getActors
+      }
+    })
+
     axios
       .get(
         `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US\
@@ -177,7 +174,7 @@ primary_release_date.gte=${yearRange.start}&primary_release_date.lte=${yearRange
 vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`,
         {
           cancelToken: new CancelToken(function executor(c) {
-            cancelRequest = c
+            cancelRequestAdvSearch = c
           })
         }
       )
@@ -185,6 +182,7 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`,
         this.setState({
           advancedSearchMovies: movies,
           searchingAdvancedSearch: false,
+          numOfPagesLoaded: 1,
           totalPagesAdvMovies: totalPages
         })
       })
@@ -195,6 +193,78 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`,
           searchingAdvancedSearch: false
         })
       })
+  }
+
+  loadNewPage = () => {
+    // if (cancelRequestNewPage !== undefined) {
+    //   cancelRequestNewPage()
+    // }
+    console.log(this.state.totalPagesAdvMovies)
+
+    if (this.state.loadingNewPage) return
+
+    if (
+      this.state.advancedSearchMovies.length < 20 ||
+      this.state.totalPagesAdvMovies <= this.state.numOfPagesLoaded
+    )
+      return
+
+    // if (2 + 2 === 4) return
+
+    if (
+      window.innerHeight + window.scrollY >=
+      document.body.scrollHeight - 650
+    ) {
+      this.setState({
+        loadingNewPage: true
+      })
+
+      const {
+        year,
+        yearRangeStart,
+        yearRangeFinish,
+        getWithGenres,
+        getWithoutGenres,
+        rating,
+        voteCountMoreThan,
+        sortBy,
+        getActors
+      } = this.state.advSearchInputValues
+
+      const pageNum = this.state.numOfPagesLoaded + 1
+
+      const { advancedSearchMovies } = this.state
+
+      axios
+        .get(
+          `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US\
+&include_adult=false&include_video=true&page=${pageNum}&primary_release_year=${year}&\
+primary_release_date.gte=${yearRangeStart}&primary_release_date.lte=${yearRangeFinish}\
+&with_genres=${getWithGenres}&without_genres=${getWithoutGenres}&vote_average.gte=${rating}&\
+vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
+          // {
+          //   cancelToken: new CancelToken(function executor(c) {
+          //     cancelRequestNewPage = c
+          //   })
+          // }
+        )
+        .then(({ data: { results: movies, total_pages: totalPages } }) => {
+          this.setState({
+            advancedSearchMovies: [...advancedSearchMovies, ...movies],
+            numOfPagesLoaded: pageNum,
+            totalPagesAdvMovies: totalPages,
+            loadingNewPage: false
+          })
+          console.log(this.state.advancedSearchMovies)
+        })
+        .catch(err => {
+          if (axios.isCancel(err)) return
+          this.setState({
+            advancedSearchMovies: [...advancedSearchMovies],
+            loadingNewPage: false
+          })
+        })
+    }
   }
 
   clearSelectedMovies = () => {
@@ -243,21 +313,10 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`,
         toggleMovie={this.toggleMovie}
         advancedSearchMovies={this.state.advancedSearchMovies}
         searchingAdvancedSearch={this.state.searchingAdvancedSearch}
+        loadingNewPage={this.state.loadingNewPage}
         clearAdvSearchMovies={this.clearAdvSearchMovies}
       />
     )
-  }
-
-  toggleShowToTop = () => {
-    this.setState({
-      showScrollToTop: window.pageYOffset > 600
-    })
-  }
-
-  toggleScrollToTop = () => {
-    window.scrollTo({
-      top: 0
-    })
   }
 
   render() {
@@ -287,13 +346,7 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`,
             clearSelectedMovies={this.clearSelectedMovies}
           />
         )}
-
-        {this.state.showScrollToTop && (
-          <div className="scroll-top">
-            <button type="button" onClick={() => this.toggleScrollToTop()} />
-          </div>
-        )}
-
+        <ScrollToTop />
         <Footer />
       </>
     )

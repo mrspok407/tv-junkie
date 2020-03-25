@@ -3,10 +3,12 @@ import React, { Component } from "react"
 export default class MovieCard extends Component {
   render() {
     const {
-      original_title,
-      name,
-      poster_path,
-      profile_path,
+      movieTitle,
+      showTitle,
+      personName,
+      poster,
+      personImage,
+      posterBackdrop,
       overview,
       id,
       known_for,
@@ -14,17 +16,19 @@ export default class MovieCard extends Component {
       searchResults,
       toggleMovie,
       selectedMovies,
-      isMovie
+      mediaType,
+      mediaTypeSearching
     } = this.props
     return (
       <div key={id} className="search-card">
         <div
           className="search-card__image"
           style={
-            poster_path !== null && profile_path !== null
+            poster !== null && personImage !== null
               ? {
-                  backgroundImage: `url(https://image.tmdb.org/t/p/w500/${poster_path ||
-                    profile_path})`
+                  backgroundImage: `url(https://image.tmdb.org/t/p/w500/${poster ||
+                    posterBackdrop ||
+                    personImage})`
                 }
               : {
                   backgroundImage: `url(https://d32qys9a6wm9no.cloudfront.net/images/movies/poster/500x735.png)`
@@ -33,34 +37,36 @@ export default class MovieCard extends Component {
         />
         <div className="search-card__info">
           <div className="search-card__info-title">
-            {original_title || name}
+            {movieTitle || showTitle || personName}
           </div>
 
           <div className="search-card__info-description">
-            {isMovie && (
+            {mediaTypeSearching === "movie" ||
+            mediaTypeSearching === "tv" ||
+            mediaTypeSearching === "multi" ? (
               <div className="search-card__info-description--movie">
                 {overview.length > 150
                   ? `${overview.substring(0, 150)}...`
                   : overview}
               </div>
+            ) : (
+              ""
             )}
 
-            {known_for && (
+            {mediaTypeSearching === "person" || mediaType === "person" ? (
               <div className="search-card__info-description--person">
                 <div className="search-card__info-activity">
                   Main activity: {known_for_department}
                 </div>
                 <div className="search-card__info-person-movies">
                   {known_for.map((item, i) => {
-                    const mediaType = item.media_type
-
                     const title =
-                      mediaType === "movie"
+                      item.media_type === "movie"
                         ? item.original_title || "No title"
                         : item.name || "No title"
 
                     const releaseDate =
-                      mediaType === "movie"
+                      item.media_type === "movie"
                         ? item.release_date || ""
                         : item.first_air_date || ""
 
@@ -75,17 +81,23 @@ export default class MovieCard extends Component {
                   })}
                 </div>
               </div>
+            ) : (
+              ""
             )}
           </div>
 
           <div
             className={
-              isMovie
+              mediaTypeSearching === "movie" ||
+              mediaTypeSearching === "tv" ||
+              (mediaTypeSearching === "multi" && mediaType !== "person")
                 ? "search-card__buttons"
                 : "search-card__buttons search-card__buttons--person"
             }
           >
-            {isMovie && (
+            {mediaTypeSearching === "movie" ||
+            mediaTypeSearching === "tv" ||
+            (mediaTypeSearching === "multi" && mediaType !== "person") ? (
               <div className="search-card__add-movie-btn">
                 {selectedMovies.some(e => e.id === id) ? (
                   <button
@@ -93,7 +105,10 @@ export default class MovieCard extends Component {
                     onClick={() => toggleMovie(id, searchResults)}
                     type="button"
                   >
-                    Remove movie
+                    Remove{" "}
+                    {mediaType === "movie" || mediaTypeSearching === "movie"
+                      ? "movie"
+                      : "show"}
                   </button>
                 ) : (
                   <button
@@ -101,10 +116,15 @@ export default class MovieCard extends Component {
                     onClick={() => toggleMovie(id, searchResults)}
                     type="button"
                   >
-                    Add movie
+                    Add{" "}
+                    {mediaType === "movie" || mediaTypeSearching === "movie"
+                      ? "movie"
+                      : "show"}
                   </button>
                 )}
               </div>
+            ) : (
+              ""
             )}
 
             <div className="search-card__full-info-btn">

@@ -101,7 +101,7 @@ export default function AdvancedSearch({
           >
             Open Advanced Search
           </button>
-          {advSearchOpen && (
+          {!advSearchOpen && (
             <div className="form__wrapper">
               <Form>
                 <div className="inputs__cont">

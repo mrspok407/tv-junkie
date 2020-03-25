@@ -105,3 +105,5 @@ export const listOfGenres = [
     isChecked: false
   }
 ]
+
+export const mediaTypesArr = ["Multi", "Movie", "TV", "Person"]
