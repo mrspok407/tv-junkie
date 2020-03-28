@@ -42,7 +42,7 @@ export default class MovieSearch extends Component {
 
     axios
       .get(
-        `https://api.tmdb.org/3/search/${mediatype.toLowerCase()}?api_key=${API_KEY}&query=${query}`,
+        `https://api.tmdb.org/3/search/${mediatype.type.toLowerCase()}?api_key=${API_KEY}&query=${query}`,
         {
           cancelToken: new CancelToken(function executor(c) {
             cancelRequest = c
@@ -62,7 +62,7 @@ export default class MovieSearch extends Component {
           searchResults: contentSortByPopularity,
           isSearchingList: false,
           totalPages,
-          mediaTypeSearching: mediatype.toLowerCase()
+          mediaTypeSearching: mediatype.type.toLowerCase()
         })
       })
 

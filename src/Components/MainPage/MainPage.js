@@ -199,7 +199,6 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`,
     // if (cancelRequestNewPage !== undefined) {
     //   cancelRequestNewPage()
     // }
-    console.log(this.state.totalPagesAdvMovies)
 
     if (this.state.loadingNewPage) return
 
@@ -208,8 +207,6 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`,
       this.state.totalPagesAdvMovies <= this.state.numOfPagesLoaded
     )
       return
-
-    // if (2 + 2 === 4) return
 
     if (
       window.innerHeight + window.scrollY >=

@@ -50,8 +50,6 @@
   transform: translate(0, 20px);
   border-top-left-radius: 20px;
   border-bottom-left-radius: 20px;
-  @include mediaMaxW(850px) {
-  }
   @include scrollbar(5px, getColor(btnSecondary, $btnPalette), #c5bbb1);
   animation: showSelectedContentList 0.35s forwards;
   @keyframes showSelectedContentList {

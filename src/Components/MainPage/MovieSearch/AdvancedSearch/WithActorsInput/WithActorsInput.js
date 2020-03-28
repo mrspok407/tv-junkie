@@ -201,7 +201,7 @@ export default class WithActorsInput extends Component {
             ref={_input => {
               this.inputRef = _input
             }}
-            className="search__input"
+            className="search__input search__input--with-actors"
             type="text"
             placeholder="With actors"
             value={this.state.query}

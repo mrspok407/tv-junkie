@@ -1,3 +1,8 @@
+import iconMediaTypeMulti from "../assets/images/icons/media-type-multi.png"
+import iconMediaTypeMovie from "../assets/images/icons/media-type-movie.png"
+import iconMediaTypePerson from "../assets/images/icons/media-type-person.png"
+import iconMediaTypeTv from "../assets/images/icons/media-type-tv.png"
+
 export const range = (start, stop, step) =>
   Array.from({ length: (stop - start) / step + 1 }, (_, i) => start + i * step)
 
@@ -106,4 +111,9 @@ export const listOfGenres = [
   }
 ]
 
-export const mediaTypesArr = ["Multi", "Movie", "TV", "Person"]
+export const mediaTypesArr = [
+  { type: "Multi", icon: iconMediaTypeMulti, id: 22 },
+  { type: "Movie", icon: iconMediaTypeMovie, id: 52 },
+  { type: "TV", icon: iconMediaTypeTv, id: 24 },
+  { type: "Person", icon: iconMediaTypePerson, id: 21 }
+]
