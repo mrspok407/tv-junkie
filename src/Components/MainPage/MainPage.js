@@ -21,9 +21,7 @@ const LOCAL_STORAGE_KEY_TOTALPAGES = "totalPages"
 
 const currentYear = new Date().getFullYear()
 
-// let cancelRequestAdvSearch
-let cancelRequestMovies
-let cancelRequestTvShows
+let cancelRequestAdvSearch
 
 export default class MainPage extends Component {
   constructor(props) {
@@ -33,7 +31,7 @@ export default class MainPage extends Component {
       advancedSearchMovies:
         JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_ADV)) || [],
       numOfPagesLoaded:
-        JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_PAGENUMBER)) || 0,
+        JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_PAGENUMBER)) || 1,
       advSearchInputValues:
         JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_INPUTS)) || {},
       withActors:
@@ -107,21 +105,17 @@ export default class MainPage extends Component {
     rating,
     voteCount,
     sortBy,
+    mediaType,
     withActors,
-    genres,
-    mediaType
+    genres
   ) => {
-    if (
-      cancelRequestMovies !== undefined ||
-      cancelRequestTvShows !== undefined
-    ) {
-      // cancelRequestAdvSearch()
-      cancelRequestMovies()
-      cancelRequestTvShows()
+    if (cancelRequestAdvSearch !== undefined) {
+      cancelRequestAdvSearch()
     }
 
     this.setState({
-      searchingAdvancedSearch: true
+      searchingAdvancedSearch: true,
+      numOfPagesLoaded: 1
     })
 
     const { advancedSearchMovies } = this.state
@@ -153,7 +147,7 @@ export default class MainPage extends Component {
       .filter(item => item.withoutGenre)
       .map(item => item.id.toString())
       .join()
-    // console.log(withActors.length)
+
     const getActors = withActors.map(item => item.id).join()
 
     const voteCountMoreThan =
@@ -172,157 +166,57 @@ export default class MainPage extends Component {
         rating,
         voteCountMoreThan,
         sortBy,
-        getActors
+        getActors,
+        mediaType,
+        sortTvDate
       }
     })
 
-    const sortMapping = {
-      vote_count: "vote_count",
-      vote_average: "vote_average",
-      popularity: "popularity",
-      primary_release_date: ["release_date", "first_air_date"]
-    }
+    // const sortMapping = {
+    //   vote_count: "vote_count",
+    //   vote_average: "vote_average",
+    //   popularity: "popularity",
+    //   primary_release_date: ["release_date", "first_air_date"]
+    // }
 
-    const getSortField = (item, sortKey) => {
-      const fieldAccessor = sortMapping[sortKey]
-      return Array.isArray(fieldAccessor)
-        ? fieldAccessor.reduce((acc, a) => item[a] || acc, 0)
-        : item[fieldAccessor]
-    }
+    // const getSortField = (item, sortKey) => {
+    //   const fieldAccessor = sortMapping[sortKey]
+    //   return Array.isArray(fieldAccessor)
+    //     ? fieldAccessor.reduce((acc, a) => item[a] || acc, 0)
+    //     : item[fieldAccessor]
+    // }
 
-    const getMovies = axios.get(
+    const getMovies =
+      mediaType === "movie" &&
       `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US\
-&include_adult=false&include_video=true&page=1&primary_release_year=${year}&\
+&include_adult=false&include_video=true&page=${this.state.numOfPagesLoaded}&primary_release_year=${year}&\
 primary_release_date.gte=${yearRange.start}&primary_release_date.lte=${yearRange.finish}\
 &with_genres=${getWithGenres}&without_genres=${getWithoutGenres}&vote_average.gte=${rating}&\
-vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`,
-      {
-        cancelToken: new CancelToken(function executor(c) {
-          cancelRequestMovies = c
-        })
-      }
-    )
-    const getTvShows = axios.get(
+vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
+
+    const getTvShows =
+      mediaType === "tv" &&
       `https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}\
-&language=en-US&page=1&sort_by=${sortTvDate}&first_air_date.gte=${yearRange.start}&first_air_date.lte=${yearRange.finish}\
+&language=en-US&page=${this.state.numOfPagesLoaded}&sort_by=${sortTvDate}&first_air_date.gte=${yearRange.start}&first_air_date.lte=${yearRange.finish}\
 &first_air_date_year=${year}&vote_average.gte=${rating}&vote_count.gte=${voteCountMoreThan}&include_null_first_air_dates=false\
-&with_genres=${getWithGenres}&without_genres=${getWithoutGenres}`,
-      {
-        cancelToken: new CancelToken(function executor(c) {
-          cancelRequestTvShows = c
-        })
-      }
-    )
+&with_genres=${getWithGenres}&without_genres=${getWithoutGenres}`
+
+    console.log(getMovies)
 
     axios
-      .all([getMovies, getTvShows])
-      .then(
-        axios.spread((...responses) => {
-          const movies = responses[0].data.results
-          const tvShows = withActors.length > 0 ? [] : responses[1].data.results
-          const totalPages = movies.total_pages + tvShows.total_pages
-
-          console.log(movies)
-          // const sort =
-          //   sortBy === "primary_release_date.desc"
-          //     ? "release_date"
-          //     : sortBy.slice(0, -5)
-
-          // const getDate = ({ release_date, first_air_date }) =>
-          //   release_date || first_air_date
-
-          const moviesAndTvShows = [...movies, ...tvShows].sort(
-            (itemA, itemB) => {
-              const a = getSortField(itemA, sortBy.slice(0, -5))
-              const b = getSortField(itemB, sortBy.slice(0, -5))
-
-              if (a > b) {
-                return -1
-              }
-              return 1
-
-              // return b - a
-
-              // const sortedA =
-              //   sortBy === "primary_release_date.desc"
-              //     ? a.release_date || a.first_air_date
-              //     : a[sortBy.slice(0, -5)]
-              // const sortedB =
-              //   sortBy === "primary_release_date.desc"
-              //     ? b.release_date || b.first_air_date
-              //     : b[sortBy.slice(0, -5)]
-
-              // const test = ({
-              //   release_date,
-              //   first_air_date,
-              //   vote_count,
-              //   vote_average,
-              //   popularity
-              // }) => {
-              //   const sort =
-              //     (sortBy === "vote_count.desc" && vote_count) ||
-              //     (sortBy === "vote_average.desc" && vote_average) ||
-              //     (sortBy === "popularity.desc" && popularity) ||
-              //     (sortBy === "primary_release_date.desc"
-              //       ? release_date || first_air_date
-              //       : 0)
-
-              //   return sort
-              // }
-
-              // const getAvgVote = ({ vote_average }) =>
-              //   sortBy === "vote_average.desc" ? vote_average : false
-
-              // const getDate = ({ release_date, first_air_date }) =>
-              //   sortBy === "primary_release_date.desc"
-              //     ? release_date || first_air_date
-              //     : false
-
-              // console.log(getAvgVote(a))
-              // console.log(getDate(a))
-
-              // const test = getAvgVote(a) || getDate(a)
-
-              // console.log(test)
-
-              // if (sortedA > sortedB) {
-              // if (test(a) > test(b)) {
-              //   return -1
-              // }
-              // return 1
-            }
-          )
-
-          this.setState({
-            advancedSearchMovies: moviesAndTvShows,
-            searchingAdvancedSearch: false,
-            numOfPagesLoaded: 1,
-            totalPagesAdvMovies: totalPages
-          })
+      .get(getMovies || getTvShows, {
+        cancelToken: new CancelToken(function executor(c) {
+          cancelRequestAdvSearch = c
         })
-      )
-
-      //     axios
-      //       .get(
-      //         `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US\
-      // &include_adult=false&include_video=true&page=1&primary_release_year=${year}&\
-      // primary_release_date.gte=${yearRange.start}&primary_release_date.lte=${yearRange.finish}\
-      // &with_genres=${getWithGenres}&without_genres=${getWithoutGenres}&vote_average.gte=${rating}&\
-      // vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`,
-      //         {
-      //           cancelToken: new CancelToken(function executor(c) {
-      //             cancelRequestAdvSearch = c
-      //           })
-      //         }
-      //       )
-      // .then(({ data: { results: movies, total_pages: totalPages } }) => {
-      // this.setState({
-      //   advancedSearchMovies: movies,
-      //   searchingAdvancedSearch: false,
-      //   numOfPagesLoaded: 1,
-      //   totalPagesAdvMovies: totalPages
-      // })
-      // })
+      })
+      .then(({ data: { results: movies, total_pages: totalPages } }) => {
+        this.setState({
+          advancedSearchMovies: movies,
+          searchingAdvancedSearch: false,
+          numOfPagesLoaded: 1,
+          totalPagesAdvMovies: totalPages
+        })
+      })
       .catch(err => {
         if (axios.isCancel(err)) return
         this.setState({
@@ -330,13 +224,38 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`,
           searchingAdvancedSearch: false
         })
       })
+
+    // axios
+    //   .all([getMovies, getTvShows])
+    //   .then(
+    //     axios.spread((...responses) => {
+    //       const movies = responses[0].data.results
+    //       const tvShows = withActors.length > 0 ? [] : responses[1].data.results
+    //       const totalPages = movies.total_pages + tvShows.total_pages
+
+    //       const moviesAndTvShows = [...movies, ...tvShows].sort(
+    //         (itemA, itemB) => {
+    //           const a = getSortField(itemA, sortBy.slice(0, -5))
+    //           const b = getSortField(itemB, sortBy.slice(0, -5))
+
+    //           if (a > b) {
+    //             return -1
+    //           }
+    //           return 1
+    //         }
+    //       )
+
+    //       this.setState({
+    //         advancedSearchMovies: moviesAndTvShows,
+    //         searchingAdvancedSearch: false,
+    //         numOfPagesLoaded: 1,
+    //         totalPagesAdvMovies: totalPages
+    //       })
+    //     })
+    //   )
   }
 
   loadNewPage = () => {
-    // if (cancelRequestNewPage !== undefined) {
-    //   cancelRequestNewPage()
-    // }
-
     if (this.state.loadingNewPage) return
 
     if (
@@ -362,26 +281,32 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`,
         rating,
         voteCountMoreThan,
         sortBy,
-        getActors
+        getActors,
+        mediaType,
+        sortTvDate
       } = this.state.advSearchInputValues
 
       const pageNum = this.state.numOfPagesLoaded + 1
 
       const { advancedSearchMovies } = this.state
 
-      axios
-        .get(
-          `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US\
+      const getMovies =
+        mediaType === "movie" &&
+        `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US\
 &include_adult=false&include_video=true&page=${pageNum}&primary_release_year=${year}&\
 primary_release_date.gte=${yearRangeStart}&primary_release_date.lte=${yearRangeFinish}\
 &with_genres=${getWithGenres}&without_genres=${getWithoutGenres}&vote_average.gte=${rating}&\
 vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
-          // {
-          //   cancelToken: new CancelToken(function executor(c) {
-          //     cancelRequestNewPage = c
-          //   })
-          // }
-        )
+
+      const getTvShows =
+        mediaType === "tv" &&
+        `https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}\
+&language=en-US&page=${pageNum}&sort_by=${sortTvDate}&first_air_date.gte=${yearRangeStart}&first_air_date.lte=${yearRangeFinish}\
+&first_air_date_year=${year}&vote_average.gte=${rating}&vote_count.gte=${voteCountMoreThan}&include_null_first_air_dates=false\
+&with_genres=${getWithGenres}&without_genres=${getWithoutGenres}`
+
+      axios
+        .get(getMovies || getTvShows)
         .then(({ data: { results: movies, total_pages: totalPages } }) => {
           this.setState({
             advancedSearchMovies: [...advancedSearchMovies, ...movies],

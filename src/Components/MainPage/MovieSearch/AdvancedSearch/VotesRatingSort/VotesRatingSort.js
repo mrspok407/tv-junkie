@@ -57,8 +57,8 @@ export default function VotesRatingSort({ handleChange }) {
           name="mediaType"
           onChange={e => handleChange(e)}
         >
-          <option value="movies">Movies</option>
-          <option value="tvShows">TV Shows</option>
+          <option value="movie">Movies</option>
+          <option value="tv">TV Shows</option>
         </SelectInput>
       </div>
     </>

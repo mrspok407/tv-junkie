@@ -65,7 +65,7 @@ export default function AdvancedSearch({
         rating: "",
         voteCount: "",
         sortBy: "vote_count.desc",
-        mediaType: "movies"
+        mediaType: "movie"
       }}
       validationSchema={Yup.object({
         // year: Yup.mixed().required("Required")
@@ -95,7 +95,7 @@ export default function AdvancedSearch({
         setSubmitting(false)
       }}
     >
-      {({ setFieldValue, handleChange }) => (
+      {({ setFieldValue, handleChange, values }) => (
         <div className="advanced-search__cont">
           <button
             className="button button--advanced-search"
@@ -119,11 +119,15 @@ export default function AdvancedSearch({
                   <div className="inputs__other">
                     <VotesRatingSort handleChange={handleChange} />
                   </div>
-                  <WithActorsInput
-                    API_KEY={API_KEY}
-                    toggleActor={toggleActor}
-                    withActors={withActors}
-                  />
+                  {values.mediaType === "movie" ? (
+                    <WithActorsInput
+                      API_KEY={API_KEY}
+                      toggleActor={toggleActor}
+                      withActors={withActors}
+                    />
+                  ) : (
+                    ""
+                  )}
                 </div>
 
                 <div className="inputs__buttons">
