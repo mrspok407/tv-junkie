@@ -21,7 +21,9 @@ const LOCAL_STORAGE_KEY_TOTALPAGES = "totalPages"
 
 const currentYear = new Date().getFullYear()
 
-let cancelRequestAdvSearch
+// let cancelRequestAdvSearch
+let cancelRequestMovies
+let cancelRequestTvShows
 
 export default class MainPage extends Component {
   constructor(props) {
@@ -108,8 +110,13 @@ export default class MainPage extends Component {
     withActors,
     genres
   ) => {
-    if (cancelRequestAdvSearch !== undefined) {
-      cancelRequestAdvSearch()
+    if (
+      cancelRequestMovies !== undefined ||
+      cancelRequestTvShows !== undefined
+    ) {
+      // cancelRequestAdvSearch()
+      cancelRequestMovies()
+      cancelRequestTvShows()
     }
 
     this.setState({
@@ -151,6 +158,9 @@ export default class MainPage extends Component {
     const voteCountMoreThan =
       parseInt(voteCount, 10) <= 100 || voteCount === "" ? "25" : voteCount
 
+    const sortTvDate =
+      sortBy === "primary_release_date.desc" ? "first_air_date.desc" : sortBy
+
     this.setState({
       advSearchInputValues: {
         year,
@@ -165,27 +175,96 @@ export default class MainPage extends Component {
       }
     })
 
-    axios
-      .get(
-        `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US\
+    const getMovies = axios.get(
+      `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US\
 &include_adult=false&include_video=true&page=1&primary_release_year=${year}&\
 primary_release_date.gte=${yearRange.start}&primary_release_date.lte=${yearRange.finish}\
 &with_genres=${getWithGenres}&without_genres=${getWithoutGenres}&vote_average.gte=${rating}&\
 vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`,
-        {
-          cancelToken: new CancelToken(function executor(c) {
-            cancelRequestAdvSearch = c
-          })
-        }
-      )
-      .then(({ data: { results: movies, total_pages: totalPages } }) => {
-        this.setState({
-          advancedSearchMovies: movies,
-          searchingAdvancedSearch: false,
-          numOfPagesLoaded: 1,
-          totalPagesAdvMovies: totalPages
+      {
+        cancelToken: new CancelToken(function executor(c) {
+          cancelRequestMovies = c
         })
-      })
+      }
+    )
+    const getTvShows = axios.get(
+      `https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}\
+&language=en-US&page=1&sort_by=${sortTvDate}&first_air_date.gte=${yearRange.start}&first_air_date.lte=${yearRange.finish}\
+&first_air_date_year=${year}&vote_average.gte=${rating}&vote_count.gte=${voteCountMoreThan}&include_null_first_air_dates=false\
+&with_genres=${getWithGenres}&without_genres=${getWithoutGenres}`,
+      {
+        cancelToken: new CancelToken(function executor(c) {
+          cancelRequestTvShows = c
+        })
+      }
+    )
+
+    axios
+      .all([getMovies, getTvShows])
+      .then(
+        axios.spread((...responses) => {
+          const movies = responses[0].data
+          const tvShows = responses[1].data
+          const totalPages = movies.total_pages + tvShows.total_pages
+
+          // const sort =
+          //   sortBy === "primary_release_date.desc"
+          //     ? "release_date"
+          //     : sortBy.slice(0, -5)
+
+          // const getDate = ({ release_date, first_air_date }) =>
+          //   release_date || first_air_date
+
+          const moviesAndTvShows = [...movies.results, ...tvShows.results].sort(
+            (a, b) => {
+              const sortedA =
+                sortBy === "primary_release_date.desc"
+                  ? a.release_date || a.first_air_date
+                  : a[sortBy.slice(0, -5)]
+              const sortedB =
+                sortBy === "primary_release_date.desc"
+                  ? b.release_date || b.first_air_date
+                  : b[sortBy.slice(0, -5)]
+              // const getDate = ({ release_date, first_air_date }) =>
+              //   release_date || first_air_date
+
+              if (sortedA > sortedB) {
+                return -1
+              }
+              return 1
+            }
+          )
+
+          this.setState({
+            advancedSearchMovies: moviesAndTvShows,
+            searchingAdvancedSearch: false,
+            numOfPagesLoaded: 1,
+            totalPagesAdvMovies: totalPages
+          })
+        })
+      )
+
+      //     axios
+      //       .get(
+      //         `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US\
+      // &include_adult=false&include_video=true&page=1&primary_release_year=${year}&\
+      // primary_release_date.gte=${yearRange.start}&primary_release_date.lte=${yearRange.finish}\
+      // &with_genres=${getWithGenres}&without_genres=${getWithoutGenres}&vote_average.gte=${rating}&\
+      // vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`,
+      //         {
+      //           cancelToken: new CancelToken(function executor(c) {
+      //             cancelRequestAdvSearch = c
+      //           })
+      //         }
+      //       )
+      // .then(({ data: { results: movies, total_pages: totalPages } }) => {
+      // this.setState({
+      //   advancedSearchMovies: movies,
+      //   searchingAdvancedSearch: false,
+      //   numOfPagesLoaded: 1,
+      //   totalPagesAdvMovies: totalPages
+      // })
+      // })
       .catch(err => {
         if (axios.isCancel(err)) return
         this.setState({

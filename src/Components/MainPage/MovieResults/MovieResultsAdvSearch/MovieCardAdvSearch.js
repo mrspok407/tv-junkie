@@ -20,6 +20,9 @@ export default React.memo(function MovieCardAdvSearch({
     listOfGenres.filter(item => item.id === genreId)
   )
 
+  // const title = original_title || original_name
+  // const date = release_date || first_air_date
+
   return (
     <div className="movie-results__movie movie-results__movie--advanced">
       <div className="movie-results__movie--advanced-main-info">

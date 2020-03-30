@@ -108,6 +108,46 @@ export const listOfGenres = [
     id: 37,
     name: "Western",
     isChecked: false
+  },
+  {
+    id: 10759,
+    name: "Action & Adventure",
+    isChecked: false
+  },
+  {
+    id: 10762,
+    name: "Kids",
+    isChecked: false
+  },
+  {
+    id: 10763,
+    name: "News",
+    isChecked: false
+  },
+  {
+    id: 10764,
+    name: "Reality",
+    isChecked: false
+  },
+  {
+    id: 10765,
+    name: "Sci-Fi & Fantasy",
+    isChecked: false
+  },
+  {
+    id: 10766,
+    name: "Soap",
+    isChecked: false
+  },
+  {
+    id: 10767,
+    name: "Talk",
+    isChecked: false
+  },
+  {
+    id: 10768,
+    name: "War & Politics",
+    isChecked: false
   }
 ]
 
