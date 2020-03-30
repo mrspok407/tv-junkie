@@ -98,7 +98,7 @@ export default class MovieResultsAdvSearch extends React.PureComponent {
                       }
                       type="button"
                     >
-                      Remove movie
+                      Remove {original_title ? "movie" : "show"}
                     </button>
                   ) : (
                     <button
@@ -111,7 +111,7 @@ export default class MovieResultsAdvSearch extends React.PureComponent {
                       }
                       type="button"
                     >
-                      Add movie
+                      Add {original_title ? "movie" : "show"}
                     </button>
                   )}
                 </div>

@@ -51,6 +51,16 @@ export default function VotesRatingSort({ handleChange }) {
           ))}
         </SelectInput>
       </div>
+      <div className="inputs__media-type">
+        <SelectInput
+          label="Media Type"
+          name="mediaType"
+          onChange={e => handleChange(e)}
+        >
+          <option value="movies">Movies</option>
+          <option value="tvShows">TV Shows</option>
+        </SelectInput>
+      </div>
     </>
   )
 }

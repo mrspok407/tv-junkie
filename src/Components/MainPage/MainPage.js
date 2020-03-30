@@ -108,7 +108,8 @@ export default class MainPage extends Component {
     voteCount,
     sortBy,
     withActors,
-    genres
+    genres,
+    mediaType
   ) => {
     if (
       cancelRequestMovies !== undefined ||
@@ -152,7 +153,7 @@ export default class MainPage extends Component {
       .filter(item => item.withoutGenre)
       .map(item => item.id.toString())
       .join()
-
+    // console.log(withActors.length)
     const getActors = withActors.map(item => item.id).join()
 
     const voteCountMoreThan =
@@ -174,6 +175,20 @@ export default class MainPage extends Component {
         getActors
       }
     })
+
+    const sortMapping = {
+      vote_count: "vote_count",
+      vote_average: "vote_average",
+      popularity: "popularity",
+      primary_release_date: ["release_date", "first_air_date"]
+    }
+
+    const getSortField = (item, sortKey) => {
+      const fieldAccessor = sortMapping[sortKey]
+      return Array.isArray(fieldAccessor)
+        ? fieldAccessor.reduce((acc, a) => item[a] || acc, 0)
+        : item[fieldAccessor]
+    }
 
     const getMovies = axios.get(
       `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US\
@@ -203,10 +218,11 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`,
       .all([getMovies, getTvShows])
       .then(
         axios.spread((...responses) => {
-          const movies = responses[0].data
-          const tvShows = responses[1].data
+          const movies = responses[0].data.results
+          const tvShows = withActors.length > 0 ? [] : responses[1].data.results
           const totalPages = movies.total_pages + tvShows.total_pages
 
+          console.log(movies)
           // const sort =
           //   sortBy === "primary_release_date.desc"
           //     ? "release_date"
@@ -215,23 +231,65 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`,
           // const getDate = ({ release_date, first_air_date }) =>
           //   release_date || first_air_date
 
-          const moviesAndTvShows = [...movies.results, ...tvShows.results].sort(
-            (a, b) => {
-              const sortedA =
-                sortBy === "primary_release_date.desc"
-                  ? a.release_date || a.first_air_date
-                  : a[sortBy.slice(0, -5)]
-              const sortedB =
-                sortBy === "primary_release_date.desc"
-                  ? b.release_date || b.first_air_date
-                  : b[sortBy.slice(0, -5)]
-              // const getDate = ({ release_date, first_air_date }) =>
-              //   release_date || first_air_date
+          const moviesAndTvShows = [...movies, ...tvShows].sort(
+            (itemA, itemB) => {
+              const a = getSortField(itemA, sortBy.slice(0, -5))
+              const b = getSortField(itemB, sortBy.slice(0, -5))
 
-              if (sortedA > sortedB) {
+              if (a > b) {
                 return -1
               }
               return 1
+
+              // return b - a
+
+              // const sortedA =
+              //   sortBy === "primary_release_date.desc"
+              //     ? a.release_date || a.first_air_date
+              //     : a[sortBy.slice(0, -5)]
+              // const sortedB =
+              //   sortBy === "primary_release_date.desc"
+              //     ? b.release_date || b.first_air_date
+              //     : b[sortBy.slice(0, -5)]
+
+              // const test = ({
+              //   release_date,
+              //   first_air_date,
+              //   vote_count,
+              //   vote_average,
+              //   popularity
+              // }) => {
+              //   const sort =
+              //     (sortBy === "vote_count.desc" && vote_count) ||
+              //     (sortBy === "vote_average.desc" && vote_average) ||
+              //     (sortBy === "popularity.desc" && popularity) ||
+              //     (sortBy === "primary_release_date.desc"
+              //       ? release_date || first_air_date
+              //       : 0)
+
+              //   return sort
+              // }
+
+              // const getAvgVote = ({ vote_average }) =>
+              //   sortBy === "vote_average.desc" ? vote_average : false
+
+              // const getDate = ({ release_date, first_air_date }) =>
+              //   sortBy === "primary_release_date.desc"
+              //     ? release_date || first_air_date
+              //     : false
+
+              // console.log(getAvgVote(a))
+              // console.log(getDate(a))
+
+              // const test = getAvgVote(a) || getDate(a)
+
+              // console.log(test)
+
+              // if (sortedA > sortedB) {
+              // if (test(a) > test(b)) {
+              //   return -1
+              // }
+              // return 1
             }
           )
 

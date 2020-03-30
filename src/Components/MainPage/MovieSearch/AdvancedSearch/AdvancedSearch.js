@@ -64,7 +64,8 @@ export default function AdvancedSearch({
         yearTo: "",
         rating: "",
         voteCount: "",
-        sortBy: "vote_count.desc"
+        sortBy: "vote_count.desc",
+        mediaType: "movies"
       }}
       validationSchema={Yup.object({
         // year: Yup.mixed().required("Required")
@@ -87,6 +88,7 @@ export default function AdvancedSearch({
           values.rating,
           values.voteCount,
           values.sortBy,
+          values.mediaType,
           withActors,
           genres
         )
