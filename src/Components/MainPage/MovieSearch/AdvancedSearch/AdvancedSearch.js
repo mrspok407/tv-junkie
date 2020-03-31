@@ -6,7 +6,7 @@ import { Persist } from "formik-persist"
 import * as Yup from "yup"
 import DatesInputs from "./DatesInputs/DatesInputs"
 import GenreInputs from "./GenreInputs/GenreInputs"
-import VotesRatingSort from "./VotesRatingSort/VotesRatingSort"
+import VotesRatingSortType from "./VotesRatingSortType/VotesRatingSortType"
 import WithActorsInput from "./WithActorsInput/WithActorsInput"
 import Loader from "../../Placeholders/Loader"
 import { listOfGenres } from "../../../../Utils"
@@ -117,7 +117,7 @@ export default function AdvancedSearch({
                     <GenreInputs toggleGenre={toggleGenre} genres={genres} />
                   </div>
                   <div className="inputs__other">
-                    <VotesRatingSort handleChange={handleChange} />
+                    <VotesRatingSortType handleChange={handleChange} />
                   </div>
                   {values.mediaType === "movie" ? (
                     <WithActorsInput

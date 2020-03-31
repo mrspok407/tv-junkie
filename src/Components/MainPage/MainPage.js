@@ -266,7 +266,7 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
 
     if (
       window.innerHeight + window.scrollY >=
-      document.body.scrollHeight - 650
+      document.body.scrollHeight - 850
     ) {
       this.setState({
         loadingNewPage: true

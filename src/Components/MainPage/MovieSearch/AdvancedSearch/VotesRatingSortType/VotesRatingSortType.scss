@@ -1,8 +1,13 @@
+@import "../../../../../styles/globals";
+
 .inputs__other {
   display: grid;
   grid-template-columns: 0.8fr 1fr 1.8fr 1fr;
   // grid-template-columns: repeat(4, 1fr);
   margin-top: 8px;
+  @include mediaMaxW(470px) {
+    grid-template-columns: 1fr 1fr;
+  }
 
   div {
     display: flex;
@@ -13,5 +18,13 @@
 .inputs__media-type {
   select {
     border: 0;
+  }
+}
+
+.inputs__vote-count {
+  @include mediaMaxW(470px) {
+    select {
+      border: 0;
+    }
   }
 }
