@@ -1,17 +1,18 @@
 import React, { Component } from "react"
 import axios, { CancelToken } from "axios"
 import { throttle } from "throttle-debounce"
-import MovieSearch from "./MovieSearch/MovieSearch"
-import MovieResultsAdvSearch from "./MovieResults/MovieResultsAdvSearch/MovieResultsAdvSearch"
-import MovieResultsSelected from "./MovieResults/MovieResultsSelected/MovieResultsSelected"
-import "./MovieResults/MovieResults.scss"
-import PlaceholderNoResults from "./Placeholders/PlaceholderNoResults"
+import Search from "./Search/Search"
+import ContentResultsAdvSearch from "./ContentResults/ContentResultsAdvSearch/ContentResultsAdvSearch"
+import ContentResultsSelected from "./ContentResults/ContentResultsSelected/ContentResultsSelected"
+import "./ContentResults/ContentResults.scss"
+import PlaceholderNoResults from "../Placeholders/PlaceholderNoResults"
+import { SelectedContentContext } from "../Context/SelectedContentContext"
 // import Footer from "../Footer/Footer"
 // import ScrollToTop from "../../Utils/ScrollToTop"
 
 const API_KEY = "c5e3186413780c3aeec39b0767a6ec99"
 
-const LOCAL_STORAGE_KEY_CONTENT = "selectedContent"
+// const LOCAL_STORAGE_KEY_CONTENT = "selectedContent"
 const LOCAL_STORAGE_KEY_ADV = "advancedSearchContent"
 const LOCAL_STORAGE_KEY_ACTORS = "addedActors"
 const LOCAL_STORAGE_KEY_INPUTS = "advSearchInputs"
@@ -73,20 +74,6 @@ export default class MainPage extends Component {
       JSON.stringify(this.state.totalPagesAdvMovies)
     )
   }
-
-  // props. = (id, contentArr) => {
-  //   const newSelectedContent = [...this.props.selectedContent]
-  //   const indexInSelected = newSelectedContent.findIndex(e => e.id === id)
-
-  //   if (indexInSelected !== -1) {
-  //     newSelectedContent.splice(indexInSelected, 1)
-  //     this.props.updateSelectedContent(newSelectedContent)
-  //   } else {
-  //     const indexInAdvanced = contentArr.findIndex(e => e.id === id)
-  //     const content = contentArr[indexInAdvanced]
-  //     this.props.updateSelectedContent([content, ...newSelectedContent])
-  //   }
-  // }
 
   advancedSearch = (
     year,
@@ -331,9 +318,7 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
         className="placeholder--no-results__adv-movies"
       />
     ) : (
-      <MovieResultsAdvSearch
-        selectedContent={this.props.selectedContent}
-        toggleContent={this.props.toggleContent}
+      <ContentResultsAdvSearch
         advancedSearchContent={this.state.advancedSearchContent}
         searchingAdvancedSearch={this.state.searchingAdvancedSearch}
         loadingNewPage={this.state.loadingNewPage}
@@ -345,12 +330,10 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
   render() {
     return (
       <>
-        <MovieSearch
+        <Search
           handleClickOutside={this.handleClickOutside}
           onSearch={this.handleSearch}
-          selectedContent={this.props.selectedContent}
           searchingAdvancedSearch={this.state.searchingAdvancedSearch}
-          toggleContent={this.props.toggleContent}
           toggleActor={this.toggleActor}
           withActors={this.state.withActors}
           renderMovies={this.renderMovies}
@@ -359,18 +342,12 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
           clearWithActors={this.clearWithActors}
           API_KEY={API_KEY}
         />
-        <div className="movie-results-cont">{this.renderAdvMovies()}</div>
-        {this.props.selectedContent.length > 0 && (
-          <MovieResultsSelected
-            selectedContent={this.props.selectedContent}
-            searchingRandomMovies={this.state.searchingRandomMovies}
-            toggleContent={this.props.toggleContent}
-            clearSelectedContent={this.props.clearSelectedContent}
-          />
-        )}
-        {/* <ScrollToTop /> */}
+        <div className="content-results-cont">{this.renderAdvMovies()}</div>
+        {this.context.selectedContent.length > 0 && <ContentResultsSelected />}
         {/* <Footer /> */}
       </>
     )
   }
 }
+
+MainPage.contextType = SelectedContentContext

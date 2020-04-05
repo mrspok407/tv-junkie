@@ -1,13 +1,17 @@
-.movie-results-cont {
+@import "../../../styles/globals";
+
+.content-results-cont {
   position: relative;
   min-height: 400px;
-  // width: 90%;
   max-width: 1350px;
   margin-bottom: 150px;
   z-index: 0;
+  @include mediaMaxW(650px) {
+    padding: 0 15px 0 15px;
+  }
 }
 
-.movie-results__button {
+.content-results__button {
   display: flex;
   justify-content: center;
   margin: 10px 0 10px 0;

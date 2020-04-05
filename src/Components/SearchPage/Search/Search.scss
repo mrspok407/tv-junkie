@@ -6,7 +6,7 @@
   width: 600px;
   padding: 15px;
   z-index: 1;
-  @include mediaMaxW(650px) {
+  @include mediaMaxW(700px) {
     width: 100%;
   }
 

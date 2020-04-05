@@ -1,5 +1,6 @@
 import React from "react"
-import "./MovieResultsSelected.scss"
+import "./ContentResultsSelected.scss"
+import { SelectedContentContext } from "../../../Context/SelectedContentContext"
 
 export default class MovieResultsSelected extends React.PureComponent {
   constructor(props) {
@@ -32,7 +33,6 @@ export default class MovieResultsSelected extends React.PureComponent {
   }
 
   render() {
-    const { selectedContent, toggleContent, clearSelectedContent } = this.props
     return (
       <div
         ref={this.selectedContentRef}
@@ -47,7 +47,7 @@ export default class MovieResultsSelected extends React.PureComponent {
             }))
           }
         >
-          {selectedContent.length}
+          {this.context.selectedContent.length}
         </button>
         {this.state.showSelected && (
           <div className="selected-content__list">
@@ -55,13 +55,13 @@ export default class MovieResultsSelected extends React.PureComponent {
               <button
                 type="button"
                 className="button button--clear-selected-content"
-                onClick={() => clearSelectedContent()}
+                onClick={() => this.context.clearSelectedContent()}
               >
                 Clear Selected
               </button>
             </div>
 
-            {selectedContent.map(
+            {this.context.selectedContent.map(
               ({
                 original_title = "",
                 original_name = "",
@@ -105,7 +105,7 @@ export default class MovieResultsSelected extends React.PureComponent {
                       <button
                         className="button button--selected-content"
                         type="button"
-                        onClick={() => toggleContent(id)}
+                        onClick={() => this.context.toggleContent(id)}
                       >
                         Remove
                       </button>
@@ -120,3 +120,5 @@ export default class MovieResultsSelected extends React.PureComponent {
     )
   }
 }
+
+MovieResultsSelected.contextType = SelectedContentContext

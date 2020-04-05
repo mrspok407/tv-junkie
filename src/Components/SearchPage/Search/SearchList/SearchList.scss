@@ -24,14 +24,6 @@
   overflow: hidden;
   cursor: pointer;
   background-color: getColor(backgroundColor, $movieListPalette);
-  transition: 0.2s;
-  opacity: 0;
-  animation: showCard 0.25s forwards;
-  @keyframes showCard {
-    to {
-      opacity: 1;
-    }
-  }
 
   @mixin cardHovered {
     #{$parentRef}:hover & {

@@ -16,12 +16,13 @@
     weight: 600;
   }
   color: rgb(255, 255, 255);
-  &--advanced-movies {
-    width: 80%;
-    margin-top: auto;
-    margin-bottom: 12px;
-    align-self: center;
-  }
+}
+
+.button--content-results {
+  width: 80%;
+  margin-top: auto;
+  margin-bottom: 12px;
+  align-self: center;
 }
 
 .button--advanced-search,
@@ -402,6 +403,10 @@
   .logo__img {
     max-width: 400px;
   }
+}
+
+.no-selected-content {
+  color: peru;
 }
 
 .error {

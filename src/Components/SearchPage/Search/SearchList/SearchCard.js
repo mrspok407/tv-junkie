@@ -1,6 +1,7 @@
 import React, { Component } from "react"
+import { SelectedContentContext } from "../../../Context/SelectedContentContext"
 
-export default class MovieCard extends Component {
+export default class SearchCard extends Component {
   render() {
     const {
       movieTitle,
@@ -14,8 +15,6 @@ export default class MovieCard extends Component {
       known_for,
       known_for_department,
       searchResults,
-      toggleContent,
-      selectedContent,
       mediaType,
       mediaTypeSearching
     } = this.props
@@ -99,10 +98,12 @@ export default class MovieCard extends Component {
             mediaTypeSearching === "tv" ||
             (mediaTypeSearching === "multi" && mediaType !== "person") ? (
               <div className="search-card__add-movie-btn">
-                {selectedContent.some(e => e.id === id) ? (
+                {this.context.selectedContent.some(e => e.id === id) ? (
                   <button
                     className="button button--searchlist button--pressed"
-                    onClick={() => toggleContent(id, searchResults)}
+                    onClick={() =>
+                      this.context.toggleContent(id, searchResults)
+                    }
                     type="button"
                   >
                     Remove{" "}
@@ -113,7 +114,9 @@ export default class MovieCard extends Component {
                 ) : (
                   <button
                     className="button button--searchlist"
-                    onClick={() => toggleContent(id, searchResults)}
+                    onClick={() =>
+                      this.context.toggleContent(id, searchResults)
+                    }
                     type="button"
                   >
                     Add{" "}
@@ -138,3 +141,5 @@ export default class MovieCard extends Component {
     )
   }
 }
+
+SearchCard.contextType = SelectedContentContext

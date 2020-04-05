@@ -3,8 +3,8 @@ import axios, { CancelToken } from "axios"
 import SearchList from "./SearchList/SearchList"
 import Input from "./Input/Input"
 import AdvancedSearch from "./AdvancedSearch/AdvancedSearch"
-import "./MovieSearch.scss"
-import PlaceholderNoResults from "../Placeholders/PlaceholderNoResults"
+import "./Search.scss"
+import PlaceholderNoResults from "../../Placeholders/PlaceholderNoResults"
 
 let cancelRequest
 
@@ -127,8 +127,6 @@ export default class MovieSearch extends Component {
                 <div className="search-list">
                   <SearchList
                     searchResults={this.state.searchResults}
-                    selectedContent={this.props.selectedContent}
-                    toggleContent={this.props.toggleContent}
                     mediaTypeSearching={this.state.mediaTypeSearching}
                     handleClickOutside={this.handleClickOutside}
                   />

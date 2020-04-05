@@ -1,7 +1,7 @@
 import React, { Component } from "react"
 import debounce from "debounce"
 import "./Input.scss"
-import Loader from "../../Placeholders/Loader"
+import Loader from "../../../Placeholders/Loader"
 import { mediaTypesArr } from "../../../../Utils"
 
 export default class Input extends Component {

@@ -1,8 +1,8 @@
 import React, { Component } from "react"
 import debounce from "debounce"
 import axios, { CancelToken } from "axios"
-import Loader from "../../../Placeholders/Loader"
-import PlaceholderNoResults from "../../../Placeholders/PlaceholderNoResults"
+import Loader from "../../../../Placeholders/Loader"
+import PlaceholderNoResults from "../../../../Placeholders/PlaceholderNoResults"
 
 let cancelRequest
 
