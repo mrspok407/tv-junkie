@@ -15,8 +15,8 @@ export default class MovieList extends Component {
   render() {
     const {
       searchResults,
-      toggleMovie,
-      selectedMovies,
+      toggleContent,
+      selectedContent,
       mediaTypeSearching
     } = this.props
     return searchResults.map(
@@ -47,8 +47,8 @@ export default class MovieList extends Component {
             known_for={known_for}
             known_for_department={known_for_department}
             searchResults={searchResults}
-            toggleMovie={toggleMovie}
-            selectedMovies={selectedMovies}
+            toggleContent={toggleContent}
+            selectedContent={selectedContent}
             mediaType={media_type}
             mediaTypeSearching={mediaTypeSearching}
           />

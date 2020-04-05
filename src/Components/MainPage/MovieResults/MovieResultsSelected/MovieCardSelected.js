@@ -2,7 +2,7 @@ import React from "react"
 
 export default class MovieCardSelected extends React.PureComponent {
   render() {
-    const { title, year, id, poster, overview, toggleMovie } = this.props
+    const { title, year, id, poster, overview, toggleContent } = this.props
     return (
       <div className="movie-results__movie movie-results__movie--selected">
         <div
@@ -24,7 +24,7 @@ export default class MovieCardSelected extends React.PureComponent {
           <button
             className="button button--selected-movies"
             type="button"
-            onClick={() => toggleMovie(id)}
+            onClick={() => toggleContent(id)}
           >
             Remove
           </button>

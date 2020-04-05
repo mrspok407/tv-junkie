@@ -22,6 +22,7 @@ export default function AdvancedSearch({
 }) {
   const [advSearchOpen, setAdvSearchOpen] = useState(true)
   const [genres, setGenres] = useState(listOfGenres)
+  // const [year, setYear] = useState("")
 
   function toggleGenre(e) {
     const newGenres = [...genres]
@@ -54,6 +55,10 @@ export default function AdvancedSearch({
     })
     setGenres(resetGenres)
   }
+
+  // function changeYear(e) {
+  //   setYear(e)
+  // }
 
   return (
     <Formik
@@ -111,6 +116,8 @@ export default function AdvancedSearch({
                     <DatesInputs
                       setFieldValue={setFieldValue}
                       handleChange={handleChange}
+                      // year={year}
+                      // changeYear={changeYear}
                     />
                   </div>
                   <div className="inputs__genres-wrapper">

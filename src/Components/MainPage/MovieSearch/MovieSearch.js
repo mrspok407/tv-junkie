@@ -127,8 +127,8 @@ export default class MovieSearch extends Component {
                 <div className="search-list">
                   <SearchList
                     searchResults={this.state.searchResults}
-                    selectedMovies={this.props.selectedMovies}
-                    toggleMovie={this.props.toggleMovie}
+                    selectedContent={this.props.selectedContent}
+                    toggleContent={this.props.toggleContent}
                     mediaTypeSearching={this.state.mediaTypeSearching}
                     handleClickOutside={this.handleClickOutside}
                   />

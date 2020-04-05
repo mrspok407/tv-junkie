@@ -6,10 +6,9 @@ import { listOfGenres } from "../../../../Utils"
 
 export default class MovieResultsAdvSearch extends React.PureComponent {
   render() {
-    console.log(this.props.advancedSearchMovies)
     return (
       <div className="movie-results movie-results--advanced-search">
-        {this.props.advancedSearchMovies.length > 0 && (
+        {this.props.advancedSearchContent.length > 0 && (
           <div className="movie-results__button">
             <button
               type="button"
@@ -21,7 +20,7 @@ export default class MovieResultsAdvSearch extends React.PureComponent {
           </div>
         )}
         <div className="movie-results--advanced-wrapper">
-          {this.props.advancedSearchMovies.map(
+          {this.props.advancedSearchContent.map(
             ({
               original_title,
               original_name,
@@ -87,13 +86,13 @@ export default class MovieResultsAdvSearch extends React.PureComponent {
                         : overview}
                     </div>
                   </div>
-                  {this.props.selectedMovies.some(e => e.id === id) ? (
+                  {this.props.selectedContent.some(e => e.id === id) ? (
                     <button
                       className="button button--advanced-movies button--pressed"
                       onClick={() =>
-                        this.props.toggleMovie(
+                        this.props.toggleContent(
                           id,
-                          this.props.advancedSearchMovies
+                          this.props.advancedSearchContent
                         )
                       }
                       type="button"
@@ -104,9 +103,9 @@ export default class MovieResultsAdvSearch extends React.PureComponent {
                     <button
                       className="button button--advanced-movies"
                       onClick={() =>
-                        this.props.toggleMovie(
+                        this.props.toggleContent(
                           id,
-                          this.props.advancedSearchMovies
+                          this.props.advancedSearchContent
                         )
                       }
                       type="button"
@@ -127,9 +126,9 @@ export default class MovieResultsAdvSearch extends React.PureComponent {
                 //   overview={overview}
                 //   voteCount={vote_count}
                 //   index={index}
-                //   toggleMovie={this.props.toggleMovie}
-                //   selectedMovies={this.props.selectedMovies}
-                //   advancedSearchMovies={this.props.advancedSearchMovies}
+                //   toggleContent={this.props.toggleContent}
+                //   selectedContent={this.props.selectedContent}
+                //   advancedSearchContent={this.props.advancedSearchContent}
                 // />
               )
             }

@@ -11,10 +11,11 @@ export default class scrollToTop extends Component {
   }
 
   componentDidMount() {
-    document.addEventListener(
-      "scroll",
-      debounce(() => this.toggleShowToTop(), 50)
-    )
+    window.addEventListener("scroll", this.toggleShowToTopDeb)
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("scroll", this.toggleShowToTopDeb)
   }
 
   toggleShowToTop = () => {
@@ -22,6 +23,8 @@ export default class scrollToTop extends Component {
       showScrollToTop: window.pageYOffset > 600
     })
   }
+
+  toggleShowToTopDeb = debounce(() => this.toggleShowToTop(), 50)
 
   toggleScrollToTop = () => {
     window.scrollTo({

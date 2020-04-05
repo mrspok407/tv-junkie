@@ -32,7 +32,7 @@ export default class MovieResultsSelected extends React.PureComponent {
   }
 
   render() {
-    const { selectedMovies, toggleMovie, clearSelectedMovies } = this.props
+    const { selectedContent, toggleContent, clearSelectedContent } = this.props
     return (
       <div
         ref={this.selectedContentRef}
@@ -47,7 +47,7 @@ export default class MovieResultsSelected extends React.PureComponent {
             }))
           }
         >
-          {selectedMovies.length}
+          {selectedContent.length}
         </button>
         {this.state.showSelected && (
           <div className="selected-content__list">
@@ -55,13 +55,13 @@ export default class MovieResultsSelected extends React.PureComponent {
               <button
                 type="button"
                 className="button button--clear-selected-content"
-                onClick={() => clearSelectedMovies()}
+                onClick={() => clearSelectedContent()}
               >
                 Clear Selected
               </button>
             </div>
 
-            {selectedMovies.map(
+            {selectedContent.map(
               ({
                 original_title = "",
                 original_name = "",
@@ -105,7 +105,7 @@ export default class MovieResultsSelected extends React.PureComponent {
                       <button
                         className="button button--selected-content"
                         type="button"
-                        onClick={() => toggleMovie(id)}
+                        onClick={() => toggleContent(id)}
                       >
                         Remove
                       </button>

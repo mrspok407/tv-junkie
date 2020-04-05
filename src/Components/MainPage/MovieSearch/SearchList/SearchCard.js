@@ -14,8 +14,8 @@ export default class MovieCard extends Component {
       known_for,
       known_for_department,
       searchResults,
-      toggleMovie,
-      selectedMovies,
+      toggleContent,
+      selectedContent,
       mediaType,
       mediaTypeSearching
     } = this.props
@@ -99,10 +99,10 @@ export default class MovieCard extends Component {
             mediaTypeSearching === "tv" ||
             (mediaTypeSearching === "multi" && mediaType !== "person") ? (
               <div className="search-card__add-movie-btn">
-                {selectedMovies.some(e => e.id === id) ? (
+                {selectedContent.some(e => e.id === id) ? (
                   <button
                     className="button button--searchlist button--pressed"
-                    onClick={() => toggleMovie(id, searchResults)}
+                    onClick={() => toggleContent(id, searchResults)}
                     type="button"
                   >
                     Remove{" "}
@@ -113,7 +113,7 @@ export default class MovieCard extends Component {
                 ) : (
                   <button
                     className="button button--searchlist"
-                    onClick={() => toggleMovie(id, searchResults)}
+                    onClick={() => toggleContent(id, searchResults)}
                     type="button"
                   >
                     Add{" "}

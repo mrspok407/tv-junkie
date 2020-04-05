@@ -1,19 +1,18 @@
 import React, { Component } from "react"
 import axios, { CancelToken } from "axios"
-import debounce from "debounce"
+import { throttle } from "throttle-debounce"
 import MovieSearch from "./MovieSearch/MovieSearch"
 import MovieResultsAdvSearch from "./MovieResults/MovieResultsAdvSearch/MovieResultsAdvSearch"
 import MovieResultsSelected from "./MovieResults/MovieResultsSelected/MovieResultsSelected"
 import "./MovieResults/MovieResults.scss"
 import PlaceholderNoResults from "./Placeholders/PlaceholderNoResults"
-import Header from "../Header/Header"
-import Footer from "../Footer/Footer"
-import ScrollToTop from "../../Utils/ScrollToTop"
+// import Footer from "../Footer/Footer"
+// import ScrollToTop from "../../Utils/ScrollToTop"
 
 const API_KEY = "c5e3186413780c3aeec39b0767a6ec99"
 
-const LOCAL_STORAGE_KEY = "selectedMovies"
-const LOCAL_STORAGE_KEY_ADV = "advancedSearchMovies"
+const LOCAL_STORAGE_KEY_CONTENT = "selectedContent"
+const LOCAL_STORAGE_KEY_ADV = "advancedSearchContent"
 const LOCAL_STORAGE_KEY_ACTORS = "addedActors"
 const LOCAL_STORAGE_KEY_INPUTS = "advSearchInputs"
 const LOCAL_STORAGE_KEY_PAGENUMBER = "pageNumber"
@@ -27,8 +26,7 @@ export default class MainPage extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      selectedMovies: JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || [],
-      advancedSearchMovies:
+      advancedSearchContent:
         JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_ADV)) || [],
       numOfPagesLoaded:
         JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_PAGENUMBER)) || 1,
@@ -46,20 +44,17 @@ export default class MainPage extends Component {
   }
 
   componentDidMount() {
-    document.addEventListener(
-      "scroll",
-      debounce(() => this.loadNewPage(), 100)
-    )
+    window.addEventListener("scroll", this.handleScroll)
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("scroll", this.handleScroll)
   }
 
   componentDidUpdate() {
     localStorage.setItem(
-      LOCAL_STORAGE_KEY,
-      JSON.stringify(this.state.selectedMovies)
-    )
-    localStorage.setItem(
       LOCAL_STORAGE_KEY_ADV,
-      JSON.stringify(this.state.advancedSearchMovies)
+      JSON.stringify(this.state.advancedSearchContent)
     )
     localStorage.setItem(
       LOCAL_STORAGE_KEY_ACTORS,
@@ -79,23 +74,19 @@ export default class MainPage extends Component {
     )
   }
 
-  toggleMovie = (id, movieArr) => {
-    const newSelectedMovies = [...this.state.selectedMovies]
-    const indexInSelected = newSelectedMovies.findIndex(e => e.id === id)
+  // props. = (id, contentArr) => {
+  //   const newSelectedContent = [...this.props.selectedContent]
+  //   const indexInSelected = newSelectedContent.findIndex(e => e.id === id)
 
-    if (indexInSelected !== -1) {
-      newSelectedMovies.splice(indexInSelected, 1)
-      this.setState({
-        selectedMovies: newSelectedMovies
-      })
-    } else {
-      const indexInAdvanced = movieArr.findIndex(e => e.id === id)
-      const movie = movieArr[indexInAdvanced]
-      this.setState({
-        selectedMovies: [movie, ...newSelectedMovies]
-      })
-    }
-  }
+  //   if (indexInSelected !== -1) {
+  //     newSelectedContent.splice(indexInSelected, 1)
+  //     this.props.updateSelectedContent(newSelectedContent)
+  //   } else {
+  //     const indexInAdvanced = contentArr.findIndex(e => e.id === id)
+  //     const content = contentArr[indexInAdvanced]
+  //     this.props.updateSelectedContent([content, ...newSelectedContent])
+  //   }
+  // }
 
   advancedSearch = (
     year,
@@ -118,7 +109,7 @@ export default class MainPage extends Component {
       numOfPagesLoaded: 1
     })
 
-    const { advancedSearchMovies } = this.state
+    const { advancedSearchContent } = this.state
 
     const toYear = yearTo || currentYear
     const fromYear = yearFrom || "1900"
@@ -139,13 +130,17 @@ export default class MainPage extends Component {
           }
 
     const getWithGenres = genres
-      .filter(item => item.withGenre)
-      .map(item => item.id.toString())
+      .reduce((acc, item) => {
+        if (item.withGenre) acc.push(item.id.toString())
+        return acc
+      }, [])
       .join()
 
     const getWithoutGenres = genres
-      .filter(item => item.withoutGenre)
-      .map(item => item.id.toString())
+      .reduce((acc, item) => {
+        if (item.withoutGenre) acc.push(item.id.toString())
+        return acc
+      }, [])
       .join()
 
     const getActors = withActors.map(item => item.id).join()
@@ -201,8 +196,6 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
 &first_air_date_year=${year}&vote_average.gte=${rating}&vote_count.gte=${voteCountMoreThan}&include_null_first_air_dates=false\
 &with_genres=${getWithGenres}&without_genres=${getWithoutGenres}`
 
-    console.log(getMovies)
-
     axios
       .get(getMovies || getTvShows, {
         cancelToken: new CancelToken(function executor(c) {
@@ -211,7 +204,7 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
       })
       .then(({ data: { results: movies, total_pages: totalPages } }) => {
         this.setState({
-          advancedSearchMovies: movies,
+          advancedSearchContent: movies,
           searchingAdvancedSearch: false,
           numOfPagesLoaded: 1,
           totalPagesAdvMovies: totalPages
@@ -220,46 +213,41 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
       .catch(err => {
         if (axios.isCancel(err)) return
         this.setState({
-          advancedSearchMovies: [...advancedSearchMovies],
+          advancedSearchContent: [...advancedSearchContent],
           searchingAdvancedSearch: false
         })
       })
-
-    // axios
-    //   .all([getMovies, getTvShows])
-    //   .then(
-    //     axios.spread((...responses) => {
-    //       const movies = responses[0].data.results
-    //       const tvShows = withActors.length > 0 ? [] : responses[1].data.results
-    //       const totalPages = movies.total_pages + tvShows.total_pages
-
-    //       const moviesAndTvShows = [...movies, ...tvShows].sort(
-    //         (itemA, itemB) => {
-    //           const a = getSortField(itemA, sortBy.slice(0, -5))
-    //           const b = getSortField(itemB, sortBy.slice(0, -5))
-
-    //           if (a > b) {
-    //             return -1
-    //           }
-    //           return 1
-    //         }
-    //       )
-
-    //       this.setState({
-    //         advancedSearchMovies: moviesAndTvShows,
-    //         searchingAdvancedSearch: false,
-    //         numOfPagesLoaded: 1,
-    //         totalPagesAdvMovies: totalPages
-    //       })
-    //     })
-    //   )
   }
 
-  loadNewPage = () => {
+  loadMorePages = (getMovies, getTvShows, advancedSearchContent, pageNum) => {
+    this.setState({
+      loadingNewPage: true
+    })
+
+    axios
+      .get(getMovies || getTvShows)
+      .then(({ data: { results: movies, total_pages: totalPages } }) => {
+        this.setState({
+          advancedSearchContent: [...advancedSearchContent, ...movies],
+          numOfPagesLoaded: pageNum,
+          totalPagesAdvMovies: totalPages,
+          loadingNewPage: false
+        })
+      })
+      .catch(err => {
+        if (axios.isCancel(err)) return
+        this.setState({
+          advancedSearchContent: [...advancedSearchContent],
+          loadingNewPage: false
+        })
+      })
+  }
+
+  handleScroll = throttle(500, () => {
     if (this.state.loadingNewPage) return
 
     if (
-      this.state.advancedSearchMovies.length < 20 ||
+      this.state.advancedSearchContent.length < 20 ||
       this.state.totalPagesAdvMovies <= this.state.numOfPagesLoaded
     )
       return
@@ -268,10 +256,6 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
       window.innerHeight + window.scrollY >=
       document.body.scrollHeight - 850
     ) {
-      this.setState({
-        loadingNewPage: true
-      })
-
       const {
         year,
         yearRangeStart,
@@ -288,7 +272,7 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
 
       const pageNum = this.state.numOfPagesLoaded + 1
 
-      const { advancedSearchMovies } = this.state
+      const { advancedSearchContent } = this.state
 
       const getMovies =
         mediaType === "movie" &&
@@ -305,33 +289,12 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
 &first_air_date_year=${year}&vote_average.gte=${rating}&vote_count.gte=${voteCountMoreThan}&include_null_first_air_dates=false\
 &with_genres=${getWithGenres}&without_genres=${getWithoutGenres}`
 
-      axios
-        .get(getMovies || getTvShows)
-        .then(({ data: { results: movies, total_pages: totalPages } }) => {
-          this.setState({
-            advancedSearchMovies: [...advancedSearchMovies, ...movies],
-            numOfPagesLoaded: pageNum,
-            totalPagesAdvMovies: totalPages,
-            loadingNewPage: false
-          })
-          console.log(this.state.advancedSearchMovies)
-        })
-        .catch(err => {
-          if (axios.isCancel(err)) return
-          this.setState({
-            advancedSearchMovies: [...advancedSearchMovies],
-            loadingNewPage: false
-          })
-        })
+      this.loadMorePages(getMovies, getTvShows, advancedSearchContent, pageNum)
     }
-  }
-
-  clearSelectedMovies = () => {
-    this.setState({ selectedMovies: [] })
-  }
+  })
 
   clearAdvSearchMovies = () => {
-    this.setState({ advancedSearchMovies: [] })
+    this.setState({ advancedSearchContent: [] })
   }
 
   clearWithActors = () => {
@@ -360,17 +323,18 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
   }
 
   renderAdvMovies = () => {
-    const { advancedSearchMovies, totalPagesAdvMovies } = this.state
-    return !Array.isArray(advancedSearchMovies) || totalPagesAdvMovies === 0 ? (
+    const { advancedSearchContent, totalPagesAdvMovies } = this.state
+    return !Array.isArray(advancedSearchContent) ||
+      totalPagesAdvMovies === 0 ? (
       <PlaceholderNoResults
         message="No movies found"
         className="placeholder--no-results__adv-movies"
       />
     ) : (
       <MovieResultsAdvSearch
-        selectedMovies={this.state.selectedMovies}
-        toggleMovie={this.toggleMovie}
-        advancedSearchMovies={this.state.advancedSearchMovies}
+        selectedContent={this.props.selectedContent}
+        toggleContent={this.props.toggleContent}
+        advancedSearchContent={this.state.advancedSearchContent}
         searchingAdvancedSearch={this.state.searchingAdvancedSearch}
         loadingNewPage={this.state.loadingNewPage}
         clearAdvSearchMovies={this.clearAdvSearchMovies}
@@ -381,13 +345,12 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
   render() {
     return (
       <>
-        <Header />
         <MovieSearch
           handleClickOutside={this.handleClickOutside}
           onSearch={this.handleSearch}
-          selectedMovies={this.state.selectedMovies}
+          selectedContent={this.props.selectedContent}
           searchingAdvancedSearch={this.state.searchingAdvancedSearch}
-          toggleMovie={this.toggleMovie}
+          toggleContent={this.props.toggleContent}
           toggleActor={this.toggleActor}
           withActors={this.state.withActors}
           renderMovies={this.renderMovies}
@@ -397,16 +360,16 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
           API_KEY={API_KEY}
         />
         <div className="movie-results-cont">{this.renderAdvMovies()}</div>
-        {this.state.selectedMovies.length > 0 && (
+        {this.props.selectedContent.length > 0 && (
           <MovieResultsSelected
-            selectedMovies={this.state.selectedMovies}
+            selectedContent={this.props.selectedContent}
             searchingRandomMovies={this.state.searchingRandomMovies}
-            toggleMovie={this.toggleMovie}
-            clearSelectedMovies={this.clearSelectedMovies}
+            toggleContent={this.props.toggleContent}
+            clearSelectedContent={this.props.clearSelectedContent}
           />
         )}
-        <ScrollToTop />
-        <Footer />
+        {/* <ScrollToTop /> */}
+        {/* <Footer /> */}
       </>
     )
   }

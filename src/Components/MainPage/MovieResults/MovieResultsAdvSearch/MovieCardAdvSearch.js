@@ -6,9 +6,9 @@ export default React.memo(function MovieCardAdvSearch({
   title = "No title available",
   year = "No data",
   id,
-  selectedMovies,
-  toggleMovie,
-  advancedSearchMovies,
+  selectedContent,
+  toggleContent,
+  advancedSearchContent,
   voteAverage = "",
   voteCount = "",
   genreIds = [],
@@ -66,10 +66,10 @@ export default React.memo(function MovieCardAdvSearch({
             : overview}
         </div>
       </div>
-      {selectedMovies.some(e => e.id === id) ? (
+      {selectedContent.some(e => e.id === id) ? (
         <button
           className="button button--advanced-movies button--pressed"
-          onClick={() => toggleMovie(id, advancedSearchMovies)}
+          onClick={() => toggleContent(id, advancedSearchContent)}
           type="button"
         >
           Remove movie
@@ -77,7 +77,7 @@ export default React.memo(function MovieCardAdvSearch({
       ) : (
         <button
           className="button button--advanced-movies"
-          onClick={() => toggleMovie(id, advancedSearchMovies)}
+          onClick={() => toggleContent(id, advancedSearchContent)}
           type="button"
         >
           Add movie
