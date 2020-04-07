@@ -157,3 +157,5 @@ export const mediaTypesArr = [
   { type: "TV", icon: iconMediaTypeTv, id: 24 },
   { type: "Person", icon: iconMediaTypePerson, id: 21 }
 ]
+
+export const API_KEY = "c5e3186413780c3aeec39b0767a6ec99"

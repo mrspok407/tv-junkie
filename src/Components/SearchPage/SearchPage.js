@@ -12,7 +12,6 @@ import ScrollToTop from "../../Utils/ScrollToTop"
 
 const API_KEY = "c5e3186413780c3aeec39b0767a6ec99"
 
-// const LOCAL_STORAGE_KEY_CONTENT = "selectedContent"
 const LOCAL_STORAGE_KEY_ADV = "advancedSearchContent"
 const LOCAL_STORAGE_KEY_ACTORS = "addedActors"
 const LOCAL_STORAGE_KEY_INPUTS = "advSearchInputs"
