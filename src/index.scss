@@ -28,7 +28,7 @@ body {
   }
 }
 
-.scroll-top {
+.scroll-to {
   position: fixed;
   width: 35px;
   height: 100vh;
@@ -53,6 +53,15 @@ body {
   &:before {
     transform: rotate(-45deg);
     left: 0px;
+  }
+
+  &--prev {
+    &:after {
+      transform: rotate(-45deg);
+    }
+    &:before {
+      transform: rotate(45deg);
+    }
   }
 
   &:hover:after,

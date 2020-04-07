@@ -1,12 +1,17 @@
 import React, { useContext } from "react"
-import { listOfGenres } from "../../Utils"
-import { SelectedContentContext } from "../Context/SelectedContentContext"
+import { listOfGenres } from "../../../Utils"
+import { SelectedContentContext } from "../../Context/SelectedContentContext"
+import "./ContentResults.scss"
 
-export default function ContentResults({ contentArr, toggleContentArr }) {
+export default function ContentResults({
+  contentArr,
+  toggleContentArr,
+  className = ""
+}) {
   const { selectedContent, toggleContent } = useContext(SelectedContentContext)
 
   return (
-    <div className="content-results__wrapper">
+    <div className={`content-results__wrapper ${className}`}>
       {contentArr.map(
         ({
           original_title,

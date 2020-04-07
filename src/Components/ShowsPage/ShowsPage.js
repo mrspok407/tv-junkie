@@ -1,7 +1,8 @@
 import React, { Component } from "react"
-import ContentResults from "../Templates/ContentResults"
+import ContentResults from "../Templates/ContentResults/ContentResults"
 import PlaceholderNoSelectedContent from "../Placeholders/PlaceholderNoSelectedContent"
 import { SelectedContentContext } from "../Context/SelectedContentContext"
+import ScrollToTop from "../../Utils/ScrollToTop"
 
 export default class Shows extends Component {
   render() {
@@ -15,11 +16,13 @@ export default class Shows extends Component {
             <ContentResults
               contentArr={onlyShows}
               toggleContentArr={onlyShows}
+              className="content-results__wrapper--shows-page"
             />
           </div>
         ) : (
           <PlaceholderNoSelectedContent />
         )}
+        <ScrollToTop />
       </>
     )
   }

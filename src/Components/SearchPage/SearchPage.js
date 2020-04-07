@@ -2,11 +2,11 @@ import React, { Component } from "react"
 import axios, { CancelToken } from "axios"
 import { throttle } from "throttle-debounce"
 import Search from "./Search/Search"
-import ContentResultsAdvSearch from "./ContentResults/ContentResultsAdvSearch/ContentResultsAdvSearch"
-import ContentResultsSelected from "./ContentResults/ContentResultsSelected/ContentResultsSelected"
-import "./ContentResults/ContentResults.scss"
+import ContentResultsAdvSearch from "./AdvSearchResults/SearchResults/SearchResults"
+import ContentResultsSelected from "./AdvSearchResults/SelectedContent/SelectedContent"
 import PlaceholderNoResults from "../Placeholders/PlaceholderNoResults"
 import { SelectedContentContext } from "../Context/SelectedContentContext"
+import ScrollToTop from "../../Utils/ScrollToTop"
 // import Footer from "../Footer/Footer"
 // import ScrollToTop from "../../Utils/ScrollToTop"
 
@@ -342,8 +342,9 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
           clearWithActors={this.clearWithActors}
           API_KEY={API_KEY}
         />
-        <div className="content-results-cont">{this.renderAdvMovies()}</div>
+        {this.renderAdvMovies()}
         {this.context.selectedContent.length > 0 && <ContentResultsSelected />}
+        <ScrollToTop />
         {/* <Footer /> */}
       </>
     )

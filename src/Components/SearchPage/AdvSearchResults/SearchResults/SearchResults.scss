@@ -1,6 +1,6 @@
-@import "../../../styles/globals";
+@import "../../../../styles/globals";
 
-.content-results-cont {
+.advanced-search-results-cont {
   position: relative;
   min-height: 400px;
   max-width: 1350px;
@@ -11,7 +11,7 @@
   }
 }
 
-.content-results__button {
+.content-results__button--clear-searched {
   display: flex;
   justify-content: center;
   margin: 10px 0 10px 0;

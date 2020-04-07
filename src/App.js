@@ -4,7 +4,7 @@ import SearchPage from "./Components/SearchPage/SearchPage"
 import Header from "./Components/Header/Header"
 import ShowsPage from "./Components/ShowsPage/ShowsPage"
 import MoviesPage from "./Components/MoviesPage/MoviesPage"
-import ScrollToTop from "./Utils/ScrollToTop"
+// import ScrollToTop from "./Utils/ScrollToTop"
 import { SelectedContentContext } from "./Components/Context/SelectedContentContext"
 
 const LOCAL_STORAGE_KEY_CONTENT = "selectedContent"
@@ -65,7 +65,7 @@ export default class App extends Component {
               <Route path="/shows" component={ShowsPage} />
               <Route path="/movies" component={MoviesPage} />
             </Switch>
-            <ScrollToTop />
+            {/* <ScrollToTop /> */}
           </div>
         </Router>
       </SelectedContentContext.Provider>

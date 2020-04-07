@@ -1,43 +1,65 @@
 import React, { Component } from "react"
-import debounce from "debounce"
+import { throttle } from "throttle-debounce"
+
+const scrollToTopThreshold = 1000
 
 export default class scrollToTop extends Component {
   constructor(props) {
     super(props)
 
     this.state = {
-      showScrollToTop: false
+      scrollToTopShown: false,
+      scrollToPreviousShown: false,
+      savedY: 0
     }
   }
 
   componentDidMount() {
-    window.addEventListener("scroll", this.toggleShowToTopDeb)
+    window.addEventListener("scroll", this.handleScroll)
   }
 
   componentWillUnmount() {
-    window.removeEventListener("scroll", this.toggleShowToTopDeb)
+    window.removeEventListener("scroll", this.handleScroll)
   }
 
-  toggleShowToTop = () => {
+  handleScroll = throttle(200, () => {
+    const { scrollToTopShown } = this.state
+    const { scrollY } = window
+
+    if (scrollY >= scrollToTopThreshold) {
+      if (!scrollToTopShown) {
+        this.setState({ scrollToTopShown: true, scrollToPreviousShown: false })
+      }
+    } else if (scrollToTopShown) {
+      this.setState({ scrollToTopShown: false })
+    }
+  })
+
+  scrollToTop = () => {
     this.setState({
-      showScrollToTop: window.pageYOffset > 600
+      scrollToTopShown: false,
+      scrollToPreviousShown: true,
+      savedY: window.scrollY
     })
+    window.scrollTo(0, 0)
   }
 
-  toggleShowToTopDeb = debounce(() => this.toggleShowToTop(), 50)
-
-  toggleScrollToTop = () => {
-    window.scrollTo({
-      top: 0
-    })
+  scrollToPrevious = () => {
+    this.setState({ scrollToTopShown: true, scrollToPreviousShown: false })
+    window.scrollTo(0, this.state.savedY)
   }
 
   render() {
     return (
       <>
-        {this.state.showScrollToTop && (
-          <div className="scroll-top">
-            <button type="button" onClick={() => this.toggleScrollToTop()} />
+        {this.state.scrollToTopShown && (
+          <div className="scroll-to scroll-to--top">
+            <button type="button" onClick={this.scrollToTop} />
+          </div>
+        )}
+        {this.state.scrollToPreviousShown && (
+          <div className="scroll-to scroll-to--prev">
+            <button type="button" onClick={this.scrollToPrevious} />
           </div>
         )}
       </>

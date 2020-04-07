@@ -1,5 +1,5 @@
 import React from "react"
-import "./ContentResultsSelected.scss"
+import "./SelectedContent.scss"
 import { SelectedContentContext } from "../../../Context/SelectedContentContext"
 
 export default class MovieResultsSelected extends React.PureComponent {

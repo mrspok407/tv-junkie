@@ -1,4 +1,10 @@
-@import "../../../../styles/globals";
+@import "../../../styles/globals";
+
+.content-results__button {
+  display: flex;
+  justify-content: center;
+  margin: 10px 0 10px 0;
+}
 
 .content-results {
   position: relative;
@@ -26,6 +32,11 @@
   }
   @include mediaMaxW(700px) {
     grid-template-columns: repeat(1, 1fr);
+  }
+
+  &--shows-page,
+  &--movies-page {
+    padding-top: 50px;
   }
 }
 
