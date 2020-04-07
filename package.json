@@ -21,8 +21,6 @@
     "react-scripts": "3.4.0",
     "react-transition-group": "^1.2.1",
     "throttle-debounce": "^2.1.0",
-    "torrent-search-api": "^2.1.1",
-    "x-ray": "^2.3.4",
     "yup": "^0.28.1"
   },
   "scripts": {
