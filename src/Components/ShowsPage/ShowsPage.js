@@ -5,6 +5,7 @@ import PlaceholderNoSelectedContent from "../Placeholders/PlaceholderNoSelectedC
 import { SelectedContentContext } from "../Context/SelectedContentContext"
 import ScrollToTop from "../../Utils/ScrollToTop"
 import { API_KEY } from "../../Utils"
+import "./ShowsPage.scss"
 
 export default class Shows extends Component {
   constructor(props) {
@@ -12,17 +13,19 @@ export default class Shows extends Component {
 
     this.state = {
       showsArr: [],
-      lastEpisodeNum: null,
-      lastSeasonNum: null,
-      tvShowName: "",
-      error: ""
+      error: "",
+      loadingIds: [],
+      detailedInfoShows: []
     }
   }
 
   getEpisodeInfo = id => {
-    const updatedShowArr = this.state.showsArr
+    if (this.state.loadingIds.includes(id)) return
 
-    if (updatedShowArr.some(e => e.id === id)) return
+    this.setState(prevState => ({
+      loadingIds: [...prevState.loadingIds, id],
+      detailedInfoShows: [...prevState.detailedInfoShows, id]
+    }))
 
     axios
       .get(
@@ -30,12 +33,10 @@ export default class Shows extends Component {
       )
       .then(res => {
         const tvShow = res.data
-        this.setState({
-          showsArr: [...updatedShowArr, tvShow],
-          tvShowName: tvShow.name
-        })
-
-        console.log(this.state.showsArr)
+        this.setState(prevState => ({
+          showsArr: [...prevState.showsArr, tvShow],
+          loadingIds: [...prevState.loadingIds.filter(item => item !== id)]
+        }))
       })
       .catch(err => {
         this.setState({
@@ -57,10 +58,11 @@ export default class Shows extends Component {
               contentArr={onlyShows}
               toggleContentArr={onlyShows}
               className="content-results__wrapper--shows-page"
-              lastAirDate={this.state.lastAirDate}
               getEpisodeInfo={this.getEpisodeInfo}
               requestedShowId={this.state.requestedShowId}
               showsArr={this.state.showsArr}
+              loadingIds={this.state.loadingIds}
+              detailedInfoShows={this.state.detailedInfoShows}
             />
           </div>
         ) : (

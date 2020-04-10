@@ -9,9 +9,13 @@ export default function ContentResults({
   toggleContentArr,
   className = "",
   showsArr,
-  getEpisodeInfo
+  getEpisodeInfo,
+  loadingIds,
+  detailedInfoShows
 }) {
   const { selectedContent, toggleContent } = useContext(SelectedContentContext)
+  console.log(showsArr)
+  console.log(loadingIds)
 
   return (
     <div className={`content-results__wrapper ${className}`}>
@@ -35,6 +39,40 @@ export default function ContentResults({
 
           const title = original_title || original_name
           const date = release_date || first_air_date
+
+          let tvShowDetails
+          let name
+          let nameInUrl
+          let season
+          let episode
+          let lastAirDate
+
+          if (showsArr) {
+            tvShowDetails = showsArr.find(item => item.id === id)
+          }
+
+          if (tvShowDetails) {
+            name = tvShowDetails.name
+            nameInUrl = tvShowDetails.name.split(" ").join("+")
+            lastAirDate = tvShowDetails.last_air_date
+            const {
+              season_number,
+              episode_number
+            } = tvShowDetails.last_episode_to_air
+
+            const seasonToString = season_number.toString()
+            const episodeToString = episode_number.toString()
+
+            season =
+              seasonToString.length === 1
+                ? "s0".concat(seasonToString)
+                : "s".concat(seasonToString)
+            episode =
+              episodeToString.length === 1
+                ? "e0".concat(episodeToString)
+                : "e".concat(episodeToString)
+          }
+
           return (
             <div key={id} className="content-results__item">
               <div className="content-results__item-main-info">
@@ -78,48 +116,38 @@ export default function ContentResults({
                     : overview}
                 </div>
               </div>
+
               {contentType === "shows" && (
-                <button type="button" onClick={() => getEpisodeInfo(id)}>
-                  Show Links
-                </button>
+                <div className="content-results__item-links">
+                  {!detailedInfoShows.includes(id) ? (
+                    <button
+                      type="button"
+                      className="button button--content-results button--show-links"
+                      onClick={() => getEpisodeInfo(id)}
+                    >
+                      Last Episode Links
+                    </button>
+                  ) : (
+                    loadingIds.includes(id) && <div>Loading...</div>
+                  )}
+
+                  {tvShowDetails && (
+                    <div>
+                      <a
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        href={`https://www.ettvdl.com/torrents-search.php?search=${nameInUrl}+${season}${episode}`}
+                      >
+                        Torrent
+                      </a>
+                      <p>{name}</p>
+                      <p>{season}</p>
+                      <p>{episode}</p>
+                      <p>{lastAirDate}</p>
+                    </div>
+                  )}
+                </div>
               )}
-              {contentType === "shows" &&
-                showsArr.map(item => {
-                  const name = item.name.split(" ").join("+")
-                  const {
-                    season_number,
-                    episode_number
-                  } = item.last_episode_to_air
-
-                  const seasonToString = season_number.toString()
-                  const episodeToString = episode_number.toString()
-
-                  const season =
-                    seasonToString.length === 1
-                      ? "s0".concat(seasonToString)
-                      : "s".concat(seasonToString)
-                  const episode =
-                    episodeToString.length === 1
-                      ? "e0".concat(episodeToString)
-                      : "e".concat(episodeToString)
-                  return (
-                    item.id === id && (
-                      <div key={item.id}>
-                        <a
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          href={`https://www.ettvdl.com/torrents-search.php?search=${name}+${season}${episode}`}
-                        >
-                          Torrent
-                        </a>
-                        <p>{name}</p>
-                        <p>{season}</p>
-                        <p>{episode}</p>
-                        <p>{item.last_air_date}</p>
-                      </div>
-                    )
-                  )
-                })}
               {selectedContent.some(e => e.id === id) ? (
                 <button
                   className="button button--content-results button--pressed"
