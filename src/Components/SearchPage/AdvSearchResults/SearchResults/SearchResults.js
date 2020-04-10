@@ -23,6 +23,7 @@ export default class MovieResultsAdvSearch extends React.PureComponent {
           <ContentResults
             contentArr={this.props.advancedSearchContent}
             toggleContentArr={this.props.advancedSearchContent}
+            contentType="adv-search"
           />
           {this.props.loadingNewPage && <Loader className="loader--new-page" />}
         </div>

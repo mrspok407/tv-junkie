@@ -25,8 +25,7 @@
   align-self: center;
 }
 
-.button--advanced-search,
-.button--random-search {
+.button--advanced-search {
   position: relative;
   z-index: 1;
 }
@@ -37,7 +36,8 @@
 }
 
 .button--clear-movies,
-.button--clear-selected-content {
+.button--clear-selected-content,
+.button--show-all-links {
   max-width: 200px;
   font-size: 1rem;
   background-color: getColor(btnSecondary, $btnPalette);
@@ -48,7 +48,8 @@
   width: 100%;
 }
 
-.button--input-clear {
+.button--input-clear,
+.button--del-content-results {
   position: absolute;
   top: 50%;
   right: 0;
@@ -98,6 +99,16 @@
   }
 }
 
+.button--del-content-results {
+  top: 3px;
+  right: 3px;
+  transform: translate(0, 0);
+  width: 30px;
+  height: 30px;
+  opacity: 1;
+  animation: inherit;
+}
+
 .button--search-adv {
   background-color: getColor(btnSecondary, $btnPalette);
 }
@@ -109,7 +120,7 @@
 .button--show-links {
   width: 100%;
   height: 100%;
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   margin: 0;
 }
 
@@ -366,7 +377,8 @@
 }
 
 .loader--input,
-.loader--adv-results {
+.loader--adv-results,
+.loader--show-links {
   position: absolute;
   top: 16px;
   right: 60px;
@@ -385,6 +397,21 @@
       width: 15px;
       height: 15px;
       box-shadow: 0px 0px 15px 3px rgb(238, 54, 106);
+    }
+  }
+}
+
+.loader--show-links {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation-delay: 0.15s;
+  .loader-dots,
+  .loader-shadow {
+    div {
+      width: 25px;
+      height: 25px;
+      margin: 0 5px 0 5px;
     }
   }
 }

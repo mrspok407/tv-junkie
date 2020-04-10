@@ -4,15 +4,8 @@
   position: relative;
   min-height: 400px;
   max-width: 1350px;
-  margin-bottom: 150px;
   z-index: 0;
   @include mediaMaxW(650px) {
     padding: 0 15px 0 15px;
   }
-}
-
-.content-results__button--clear-searched {
-  display: flex;
-  justify-content: center;
-  margin: 10px 0 10px 0;
 }
