@@ -13,19 +13,23 @@ export default function ContentResults({
   toggleContentArr,
   className = "",
   showsArr,
+  moviesArr,
   getEpisodeInfo,
   loadingIds,
-  detailedInfoShows
+  detailedInfoShows,
+  detailedInfoMovies
 }) {
   const { selectedContent, toggleContent } = useContext(SelectedContentContext)
 
   function showLinksToAll() {
-    contentArr.map(item => getEpisodeInfo(item.id))
+    contentArr.map(item =>
+      getEpisodeInfo(item.id, item.original_title, item.release_date)
+    )
   }
-
+  console.log(moviesArr)
   return (
     <>
-      {contentType === "shows" && (
+      {contentType !== "adv-search" && (
         <div className="content-results__button--clear-searched">
           <button
             className="button button--show-all-links"
@@ -58,6 +62,21 @@ export default function ContentResults({
 
             const title = original_title || original_name
             const date = release_date || first_air_date
+
+            let movie
+            let urlMovieTitle
+            let movieHash1080p
+
+            if (moviesArr) {
+              movie = moviesArr.find(item => item.id === id)
+            }
+
+            if (movie) {
+              movieHash1080p = movie.torrents.find(
+                item => item.quality === "1080p"
+              ).hash
+              urlMovieTitle = movie.title.split(" ").join("+")
+            }
 
             let tvShowDetails
             let nameInUrl
@@ -102,6 +121,10 @@ export default function ContentResults({
                   ? "e0".concat(episodeToString)
                   : "e".concat(episodeToString)
             }
+
+            // console.log(moviesArr)
+            // console.log(detailedInfoMovies)
+            // console.log(loadingIds)
 
             return (
               <div key={id} className="content-results__item">
@@ -192,6 +215,49 @@ export default function ContentResults({
                           >
                             480p
                           </a>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {contentType === "movies" && (
+                  <div className="content-results__item-links">
+                    {!detailedInfoMovies.includes(id) ? (
+                      <button
+                        type="button"
+                        className="button button--content-results button--show-links"
+                        onClick={() =>
+                          getEpisodeInfo(id, original_title, release_date)
+                        }
+                      >
+                        Show Links
+                      </button>
+                    ) : (
+                      loadingIds.includes(id) && (
+                        <div>
+                          <Loader className="loader--show-links" />
+                        </div>
+                      )
+                    )}
+
+                    {movie && (
+                      <div className="content-results__item-links-wrapper">
+                        <div className="content-results__item-links-torrents">
+                          <a
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            href={`magnet:?xt=urn:btih:${movieHash1080p}&dn=${urlMovieTitle}&xl=310660222&tr=udp%3A%2F%2Ftracker.coppersurfer.tk:6969/announce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org:6969/announce&tr=udp%3A%2F%2Ftracker.pirateparty.gr:6969/announce&tr=udp%3A%2F%2Fexodus.desync.com:6969/announce&tr=udp%3A%2F%2Ftracker.opentrackr.org:1337/announce&tr=udp%3A%2F%2Ftracker.internetwarriors.net:1337/announce&tr=udp%3A%2F%2Ftracker.torrent.eu.org:451&tr=udp%3A%2F%2Ftracker.cyberia.is:6969/announce&tr=udp%3A%2F%2Fopen.demonii.si:1337/announce&tr=udp%3A%2F%2Fopen.stealth.si:80/announce&tr=udp%3A%2F%2Ftracker.tiny-vps.com:6969/announce&tr=udp%3A%2F%2Ftracker.iamhansen.xyz:2000/announce&tr=udp%3A%2F%2Fexplodie.org:6969/announce&tr=udp%3A%2F%2Fdenis.stalker.upeer.me:6969/announce&tr=udp%3A%2F%2Fipv4.tracker.harry.lu:80/announce`}
+                          >
+                            1080p
+                          </a>
+                          {/* <a
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            href=""
+                          >
+                            720p
+                          </a> */}
                         </div>
                       </div>
                     )}

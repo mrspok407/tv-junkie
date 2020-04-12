@@ -7,8 +7,6 @@ import ScrollToTop from "../../Utils/ScrollToTop"
 import { API_KEY } from "../../Utils"
 import "./ShowsPage.scss"
 
-// https://cors-anywhere.herokuapp.com/torrentapi.org/pubapi_v2.php?app_id=pet-project&format=json_extended&mode=search&category=41&search_string=better+call+saul+s05e08&sort=seeders&token=2aehol3kw0
-
 export default class Shows extends Component {
   constructor(props) {
     super(props)
@@ -59,12 +57,11 @@ export default class Shows extends Component {
               contentType="shows"
               contentArr={onlyShows}
               toggleContentArr={onlyShows}
-              className="content-results__wrapper--shows-page"
               getEpisodeInfo={this.getEpisodeInfo}
-              requestedShowId={this.state.requestedShowId}
               showsArr={this.state.showsArr}
               loadingIds={this.state.loadingIds}
               detailedInfoShows={this.state.detailedInfoShows}
+              className="content-results__wrapper--shows-page"
             />
           </div>
         ) : (
