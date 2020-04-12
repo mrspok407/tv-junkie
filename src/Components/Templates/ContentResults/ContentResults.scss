@@ -38,6 +38,7 @@
     grid-template-columns: repeat(2, 1fr);
   }
   @include mediaMaxW(700px) {
+    padding: 0 15px 0 15px;
     grid-template-columns: repeat(1, 1fr);
   }
 }
@@ -150,7 +151,7 @@
     }
     &-torrents {
       display: grid;
-      grid-template-columns: repeat(2, 45%);
+      grid-template-columns: repeat(3, 1fr);
       justify-content: space-around;
       padding-top: 5px;
 
@@ -158,6 +159,7 @@
         position: relative;
         text-align: center;
         padding: 15px 10px 15px 10px;
+        margin: 0 5px 0 5px;
         background-color: peru;
         color: #fff;
         text-decoration: none;

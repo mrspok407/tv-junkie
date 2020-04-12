@@ -1,5 +1,5 @@
 import React, { Component } from "react"
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
+import { HashRouter as Router, Switch, Route } from "react-router-dom"
 import SearchPage from "./Components/SearchPage/SearchPage"
 import Header from "./Components/Header/Header"
 import ShowsPage from "./Components/ShowsPage/ShowsPage"
@@ -57,7 +57,7 @@ export default class App extends Component {
   render() {
     return (
       <SelectedContentContext.Provider value={this.state}>
-        <Router>
+        <Router basename="/">
           <div className="container">
             <Header />
             <Switch>

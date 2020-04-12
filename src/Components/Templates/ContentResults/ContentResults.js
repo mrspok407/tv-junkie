@@ -4,6 +4,9 @@ import { SelectedContentContext } from "../../Context/SelectedContentContext"
 import "./ContentResults.scss"
 import Loader from "../../Placeholders/Loader"
 
+const todaysDate = new Date()
+const todayDayOfTheMonth = todaysDate.getDate()
+
 export default function ContentResults({
   contentType,
   contentArr,
@@ -15,8 +18,6 @@ export default function ContentResults({
   detailedInfoShows
 }) {
   const { selectedContent, toggleContent } = useContext(SelectedContentContext)
-  console.log(showsArr)
-  console.log(loadingIds)
 
   function showLinksToAll() {
     contentArr.map(item => getEpisodeInfo(item.id))
@@ -24,7 +25,7 @@ export default function ContentResults({
 
   return (
     <>
-      {contentType !== "adv-search" && (
+      {contentType === "shows" && (
         <div className="content-results__button--clear-searched">
           <button
             className="button button--show-all-links"
@@ -76,9 +77,13 @@ export default function ContentResults({
               ).toISOString()
               const options = { month: "long", day: "numeric", year: "numeric" }
               const formatedDate = new Date(airDateISO)
-              lastAirDate = new Intl.DateTimeFormat("en-US", options).format(
-                formatedDate
-              )
+              const airDateOfTheMonth = formatedDate.getDate()
+              lastAirDate =
+                airDateOfTheMonth === todayDayOfTheMonth
+                  ? "Aired today"
+                  : new Intl.DateTimeFormat("en-US", options).format(
+                      formatedDate
+                    )
 
               const {
                 season_number,
@@ -169,16 +174,23 @@ export default function ContentResults({
                           <a
                             target="_blank"
                             rel="noopener noreferrer"
-                            href={`https://www.ettvdl.com/torrents-search.php?search=${nameInUrl}+${season}${episode}+1080p`}
+                            href={`https://www.ettvdl.com/torrents-search.php?search=${nameInUrl}+${season}${episode}+1080p&cat=41`}
                           >
                             1080p
                           </a>
                           <a
                             target="_blank"
                             rel="noopener noreferrer"
-                            href={`https://www.ettvdl.com/torrents-search.php?search=${nameInUrl}+${season}${episode}+720p`}
+                            href={`https://www.ettvdl.com/torrents-search.php?search=${nameInUrl}+${season}${episode}+720p&cat=41`}
                           >
                             720p
+                          </a>
+                          <a
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            href={`https://www.ettvdl.com/torrents-search.php?search=${nameInUrl}+${season}${episode}&cat=5`}
+                          >
+                            480p
                           </a>
                         </div>
                       </div>
