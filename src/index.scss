@@ -4,7 +4,7 @@
 body {
   font-family: "Open Sans", sans-serif;
   background-color: #131313;
-  @include scrollbar(5px, getColor(btnSecondary, $btnPalette), #c5bbb1);
+  @include scrollbar(5px, getColor(blueClr, $mainPalette), #c5bbb1);
 }
 
 *,
@@ -21,11 +21,7 @@ body {
   align-items: center;
   min-height: 100vh;
   max-width: 1350px;
-  width: 90%;
   margin: auto;
-  @include mediaMaxW(650px) {
-    width: initial;
-  }
 }
 
 .scroll-to {

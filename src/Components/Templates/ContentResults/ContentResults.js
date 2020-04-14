@@ -4,11 +4,15 @@ import { SelectedContentContext } from "../../Context/SelectedContentContext"
 import "./ContentResults.scss"
 import Loader from "../../Placeholders/Loader"
 
-const todaysDate = new Date()
-const todayDayOfTheMonth = todaysDate.getDate()
+const todayDate = new Date()
+const todayDayOfTheMonth = todayDate.getDate()
+const yesterdayDayOfTheMonth = new Date()
+yesterdayDayOfTheMonth.setDate(yesterdayDayOfTheMonth.getDate() - 1)
 
 export default function ContentResults({
   contentType,
+  advancedSearchContent,
+  clearAdvSearchMovies,
   contentArr,
   toggleContentArr,
   className = "",
@@ -16,20 +20,34 @@ export default function ContentResults({
   moviesArr,
   getEpisodeInfo,
   loadingIds,
-  detailedInfoShows,
-  detailedInfoMovies
+  showsIds,
+  moviesIds,
+  error
 }) {
   const { selectedContent, toggleContent } = useContext(SelectedContentContext)
 
   function showLinksToAll() {
+    const showAllLinksPressed = true
     contentArr.map(item =>
-      getEpisodeInfo(item.id, item.original_title, item.release_date)
+      getEpisodeInfo(
+        item.id,
+        showAllLinksPressed,
+        item.original_title,
+        item.release_date
+      )
     )
   }
-  console.log(moviesArr)
+
+  const maxColumns = 4
+  const currentNumOfColumns =
+    contentArr.length <= maxColumns - 1 ? contentArr.length : maxColumns
+
   return (
-    <>
-      {contentType !== "adv-search" && (
+    <div
+      className="content-results"
+      style={{ "--container-width": `calc(30% * ${currentNumOfColumns})` }}
+    >
+      {contentType !== "adv-search" ? (
         <div className="content-results__button--clear-searched">
           <button
             className="button button--show-all-links"
@@ -39,6 +57,18 @@ export default function ContentResults({
             Show Links To All
           </button>
         </div>
+      ) : (
+        advancedSearchContent.length > 0 && (
+          <div className="content-results__button--clear-searched">
+            <button
+              type="button"
+              className="button button--clear-movies"
+              onClick={() => clearAdvSearchMovies()}
+            >
+              Clear Searched
+            </button>
+          </div>
+        )
       )}
 
       <div className={`content-results__wrapper ${className}`}>
@@ -61,11 +91,13 @@ export default function ContentResults({
             )
 
             const title = original_title || original_name
-            const date = release_date || first_air_date
+            const releaseDate = release_date || first_air_date
 
+            // Movies //
             let movie
             let urlMovieTitle
             let movieHash1080p
+            let movieHash720p
 
             if (moviesArr) {
               movie = moviesArr.find(item => item.id === id)
@@ -75,31 +107,39 @@ export default function ContentResults({
               movieHash1080p = movie.torrents.find(
                 item => item.quality === "1080p"
               ).hash
+
+              movieHash720p = movie.torrents.find(
+                item => item.quality === "720p"
+              ).hash
+
               urlMovieTitle = movie.title.split(" ").join("+")
             }
+            // Movies end //
 
-            let tvShowDetails
-            let nameInUrl
-            let season
-            let episode
+            // Shows //
+            let tvShow
+            let urlShowTitle
+            let lastSeason
+            let lastEpisode
             let lastAirDate
 
             if (showsArr) {
-              tvShowDetails = showsArr.find(item => item.id === id)
+              tvShow = showsArr.find(item => item.id === id)
             }
 
-            if (tvShowDetails) {
-              nameInUrl = tvShowDetails.name.split(" ").join("+")
+            if (tvShow) {
+              urlShowTitle = tvShow.name.split(" ").join("+")
 
-              const airDateISO = new Date(
-                tvShowDetails.last_air_date
-              ).toISOString()
+              const airDateISO = new Date(tvShow.last_air_date).toISOString()
               const options = { month: "long", day: "numeric", year: "numeric" }
               const formatedDate = new Date(airDateISO)
               const airDateOfTheMonth = formatedDate.getDate()
+
               lastAirDate =
                 airDateOfTheMonth === todayDayOfTheMonth
-                  ? "Aired today"
+                  ? "Air today"
+                  : airDateOfTheMonth === yesterdayDayOfTheMonth.getDate()
+                  ? "Aired yesterday"
                   : new Intl.DateTimeFormat("en-US", options).format(
                       formatedDate
                     )
@@ -107,24 +147,21 @@ export default function ContentResults({
               const {
                 season_number,
                 episode_number
-              } = tvShowDetails.last_episode_to_air
+              } = tvShow.last_episode_to_air
 
               const seasonToString = season_number.toString()
               const episodeToString = episode_number.toString()
 
-              season =
+              lastSeason =
                 seasonToString.length === 1
                   ? "s0".concat(seasonToString)
                   : "s".concat(seasonToString)
-              episode =
+              lastEpisode =
                 episodeToString.length === 1
                   ? "e0".concat(episodeToString)
                   : "e".concat(episodeToString)
             }
-
-            // console.log(moviesArr)
-            // console.log(detailedInfoMovies)
-            // console.log(loadingIds)
+            // Shows end //
 
             return (
               <div key={id} className="content-results__item">
@@ -133,7 +170,7 @@ export default function ContentResults({
                     {!title ? "No title available" : title}
                   </div>
                   <div className="content-results__item-year">
-                    ({!date ? "No data" : date.slice(0, 4)})
+                    ({!releaseDate ? "No data" : releaseDate.slice(0, 4)})
                   </div>
                   <div className="content-results__item-rating">
                     {vote_average}
@@ -172,7 +209,7 @@ export default function ContentResults({
 
                 {contentType === "shows" && (
                   <div className="content-results__item-links">
-                    {!detailedInfoShows.includes(id) ? (
+                    {!showsIds.includes(id) ? (
                       <button
                         type="button"
                         className="button button--content-results button--show-links"
@@ -180,38 +217,42 @@ export default function ContentResults({
                       >
                         Show Last Episode Links
                       </button>
+                    ) : loadingIds.includes(id) && !error ? (
+                      <div>
+                        <Loader className="loader--show-links" />
+                      </div>
                     ) : (
                       loadingIds.includes(id) && (
-                        <div>
-                          <Loader className="loader--show-links" />
+                        <div className="content-results__item-links--error">
+                          {error}
                         </div>
                       )
                     )}
 
-                    {tvShowDetails && (
+                    {tvShow && (
                       <div className="content-results__item-links-wrapper">
                         <div className="content-results__item-links-episode">
-                          {`${season}${episode} ${lastAirDate}`}
+                          {`${lastSeason}${lastEpisode} ${lastAirDate}`}
                         </div>
                         <div className="content-results__item-links-torrents">
                           <a
                             target="_blank"
                             rel="noopener noreferrer"
-                            href={`https://www.ettvdl.com/torrents-search.php?search=${nameInUrl}+${season}${episode}+1080p&cat=41`}
+                            href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${lastSeason}${lastEpisode}+1080p&cat=41`}
                           >
                             1080p
                           </a>
                           <a
                             target="_blank"
                             rel="noopener noreferrer"
-                            href={`https://www.ettvdl.com/torrents-search.php?search=${nameInUrl}+${season}${episode}+720p&cat=41`}
+                            href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${lastSeason}${lastEpisode}+720p&cat=41`}
                           >
                             720p
                           </a>
                           <a
                             target="_blank"
                             rel="noopener noreferrer"
-                            href={`https://www.ettvdl.com/torrents-search.php?search=${nameInUrl}+${season}${episode}&cat=5`}
+                            href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${lastSeason}${lastEpisode}&cat=5`}
                           >
                             480p
                           </a>
@@ -223,20 +264,29 @@ export default function ContentResults({
 
                 {contentType === "movies" && (
                   <div className="content-results__item-links">
-                    {!detailedInfoMovies.includes(id) ? (
+                    {!moviesIds.includes(id) ? (
                       <button
                         type="button"
                         className="button button--content-results button--show-links"
                         onClick={() =>
-                          getEpisodeInfo(id, original_title, release_date)
+                          getEpisodeInfo(
+                            id,
+                            false,
+                            original_title,
+                            release_date
+                          )
                         }
                       >
                         Show Links
                       </button>
+                    ) : loadingIds.includes(id) && !error ? (
+                      <div>
+                        <Loader className="loader--show-links" />
+                      </div>
                     ) : (
                       loadingIds.includes(id) && (
-                        <div>
-                          <Loader className="loader--show-links" />
+                        <div className="content-results__item-links--error">
+                          {error}
                         </div>
                       )
                     )}
@@ -251,13 +301,13 @@ export default function ContentResults({
                           >
                             1080p
                           </a>
-                          {/* <a
+                          <a
                             target="_blank"
                             rel="noopener noreferrer"
-                            href=""
+                            href={`magnet:?xt=urn:btih:${movieHash720p}&dn=${urlMovieTitle}&xl=310660222&tr=udp%3A%2F%2Ftracker.coppersurfer.tk:6969/announce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org:6969/announce&tr=udp%3A%2F%2Ftracker.pirateparty.gr:6969/announce&tr=udp%3A%2F%2Fexodus.desync.com:6969/announce&tr=udp%3A%2F%2Ftracker.opentrackr.org:1337/announce&tr=udp%3A%2F%2Ftracker.internetwarriors.net:1337/announce&tr=udp%3A%2F%2Ftracker.torrent.eu.org:451&tr=udp%3A%2F%2Ftracker.cyberia.is:6969/announce&tr=udp%3A%2F%2Fopen.demonii.si:1337/announce&tr=udp%3A%2F%2Fopen.stealth.si:80/announce&tr=udp%3A%2F%2Ftracker.tiny-vps.com:6969/announce&tr=udp%3A%2F%2Ftracker.iamhansen.xyz:2000/announce&tr=udp%3A%2F%2Fexplodie.org:6969/announce&tr=udp%3A%2F%2Fdenis.stalker.upeer.me:6969/announce&tr=udp%3A%2F%2Fipv4.tracker.harry.lu:80/announce`}
                           >
                             720p
-                          </a> */}
+                          </a>
                         </div>
                       </div>
                     )}
@@ -296,6 +346,6 @@ export default function ContentResults({
           }
         )}
       </div>
-    </>
+    </div>
   )
 }

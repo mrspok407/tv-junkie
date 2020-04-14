@@ -31,7 +31,7 @@
     font-size: 1.3rem;
     z-index: 1;
     &--active li {
-      @include mediaMaxW(480px) {
+      @include mediaMaxW(1000px) {
         &:after,
         &:before {
           content: "";
@@ -51,7 +51,7 @@
       }
     }
 
-    @include mediaMaxW(480px) {
+    @include mediaMaxW(1000px) {
       width: 102px;
       padding: 14px 5px 14px 5px;
       font-size: 1rem;
@@ -93,7 +93,7 @@
   opacity: 1;
   transform: translate(0, 0);
   z-index: 0;
-  @include mediaMaxW(480px) {
+  @include mediaMaxW(1000px) {
     display: none;
     width: 102px;
   }

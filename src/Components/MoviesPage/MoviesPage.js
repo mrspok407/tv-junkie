@@ -14,16 +14,19 @@ export default class Movies extends Component {
       moviesArr: [],
       error: "",
       loadingIds: [],
-      detailedInfoMovies: []
+      moviesIds: [],
+      showAllLinksPressed: false
     }
   }
 
-  getEpisodeInfo = (id, title, date) => {
-    if (this.state.loadingIds.includes(id)) return
+  getEpisodeInfo = (id, showAllLinksPressed = false, title, date) => {
+    if (this.state.moviesIds.includes(id) || this.state.showAllLinksPressed)
+      return
 
     this.setState(prevState => ({
       loadingIds: [...prevState.loadingIds, id],
-      detailedInfoMovies: [...prevState.detailedInfoMovies, id]
+      moviesIds: [...prevState.moviesIds, id],
+      showAllLinksPressed
     }))
 
     axios
@@ -37,9 +40,9 @@ export default class Movies extends Component {
           loadingIds: [...prevState.loadingIds.filter(item => item !== id)]
         }))
       })
-      .catch(err => {
+      .catch(() => {
         this.setState({
-          error: err || "Error occured"
+          error: "Something went wrong, sorry"
         })
       })
   }
@@ -51,18 +54,18 @@ export default class Movies extends Component {
     return (
       <>
         {onlyMovies.length ? (
-          <div className="content-results">
-            <ContentResults
-              contentType="movies"
-              contentArr={onlyMovies}
-              toggleContentArr={onlyMovies}
-              moviesArr={this.state.moviesArr}
-              loadingIds={this.state.loadingIds}
-              detailedInfoMovies={this.state.detailedInfoMovies}
-              getEpisodeInfo={this.getEpisodeInfo}
-              className="content-results__wrapper--movies-page"
-            />
-          </div>
+          <ContentResults
+            contentType="movies"
+            contentArr={onlyMovies}
+            toggleContentArr={onlyMovies}
+            moviesArr={this.state.moviesArr}
+            loadingIds={this.state.loadingIds}
+            moviesIds={this.state.moviesIds}
+            getEpisodeInfo={this.getEpisodeInfo}
+            showAllLinksPressed={this.state.showAllLinksPressed}
+            error={this.state.error}
+            className="content-results__wrapper--movies-page"
+          />
         ) : (
           <PlaceholderNoSelectedContent />
         )}

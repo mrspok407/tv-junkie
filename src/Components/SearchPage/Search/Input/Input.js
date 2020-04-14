@@ -18,7 +18,8 @@ export default class Input extends Component {
   }
 
   componentDidMount() {
-    if (this.inputRef) this.inputRef.focus()
+    const windowWidth = window.innerWidth
+    if (this.inputRef && windowWidth > 1000) this.inputRef.focus()
     document.addEventListener("mousedown", this.handleClickOutside)
   }
 

@@ -2,9 +2,9 @@
   @return map-get($palette, $colorName);
 }
 
-$btnPalette: (
-  btnPrimary: peru,
-  btnSecondary: #66b4e6
+$mainPalette: (
+  orangeClr: peru,
+  blueClr: #66b4e6
 );
 
 $inputPalette: (

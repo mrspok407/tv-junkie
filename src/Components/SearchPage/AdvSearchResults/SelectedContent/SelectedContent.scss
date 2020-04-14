@@ -31,7 +31,7 @@
   z-index: 1;
   &:after {
     @include hoverBoxShadow(50%, 0.25s);
-    box-shadow: 0px 0px 4px 1px getColor(btnSecondary, $btnPalette);
+    box-shadow: 0px 0px 4px 1px getColor(blueClr, $mainPalette);
   }
   &:hover:after {
     opacity: 1;
@@ -50,7 +50,7 @@
   transform: translate(0, 20px);
   border-top-left-radius: 20px;
   border-bottom-left-radius: 20px;
-  @include scrollbar(5px, getColor(btnSecondary, $btnPalette), #c5bbb1);
+  @include scrollbar(5px, getColor(blueClr, $mainPalette), #c5bbb1);
   animation: showSelectedContentList 0.35s forwards;
   @keyframes showSelectedContentList {
     to {

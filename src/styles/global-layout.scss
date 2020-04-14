@@ -2,7 +2,7 @@
 
 .button {
   position: relative;
-  background-color: getColor(btnPrimary, $btnPalette);
+  background-color: getColor(orangeClr, $mainPalette);
   line-height: 40px;
   letter-spacing: 1px;
   width: 100%;
@@ -28,6 +28,9 @@
     transition: 0.3s;
     background-color: #fff;
     z-index: -1;
+    @include mediaMaxW(1000px) {
+      display: none;
+    }
   }
   &:before {
     left: initial;
@@ -43,7 +46,7 @@
 }
 
 .button--pressed {
-  background-color: getColor(btnSecondary, $btnPalette);
+  background-color: getColor(blueClr, $mainPalette);
   transition: 0.5s;
   &:after,
   &:before {
@@ -81,7 +84,7 @@
 .button--show-all-links {
   max-width: 200px;
   font-size: 1rem;
-  background-color: getColor(btnSecondary, $btnPalette);
+  background-color: getColor(blueClr, $mainPalette);
 }
 
 .button--clear-selected-content {
@@ -155,21 +158,21 @@
 }
 
 .button--search-adv {
-  background-color: getColor(btnSecondary, $btnPalette);
+  background-color: getColor(blueClr, $mainPalette);
 }
 
 .button--selected-content {
   margin-bottom: 5px;
   &:after,
   &:before {
-    background-color: getColor(btnSecondary, $btnPalette);
+    background-color: getColor(blueClr, $mainPalette);
   }
 }
 
 .button--show-links {
   width: 100%;
   height: 100%;
-  font-size: 1.4rem;
+  font-size: 1.35rem;
   margin: 0;
 }
 
@@ -460,7 +463,7 @@
     div {
       width: 25px;
       height: 25px;
-      margin: 0 5px 0 5px;
+      // margin: 0 5px 0 5px;
     }
   }
 }

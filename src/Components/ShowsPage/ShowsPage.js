@@ -13,18 +13,21 @@ export default class Shows extends Component {
 
     this.state = {
       showsArr: [],
-      error: "",
       loadingIds: [],
-      detailedInfoShows: []
+      showsIds: [],
+      showAllLinksPressed: false,
+      error: ""
     }
   }
 
-  getEpisodeInfo = id => {
-    if (this.state.loadingIds.includes(id)) return
+  getEpisodeInfo = (id, showAllLinksPressed) => {
+    if (this.state.showsIds.includes(id) || this.state.showAllLinksPressed)
+      return
 
     this.setState(prevState => ({
       loadingIds: [...prevState.loadingIds, id],
-      detailedInfoShows: [...prevState.detailedInfoShows, id]
+      showsIds: [...prevState.showsIds, id],
+      showAllLinksPressed
     }))
 
     axios
@@ -38,9 +41,9 @@ export default class Shows extends Component {
           loadingIds: [...prevState.loadingIds.filter(item => item !== id)]
         }))
       })
-      .catch(err => {
+      .catch(() => {
         this.setState({
-          error: err || "Error occured"
+          error: "Something went wrong, sorry"
         })
       })
   }
@@ -52,18 +55,17 @@ export default class Shows extends Component {
     return (
       <>
         {onlyShows.length ? (
-          <div className="content-results">
-            <ContentResults
-              contentType="shows"
-              contentArr={onlyShows}
-              toggleContentArr={onlyShows}
-              getEpisodeInfo={this.getEpisodeInfo}
-              showsArr={this.state.showsArr}
-              loadingIds={this.state.loadingIds}
-              detailedInfoShows={this.state.detailedInfoShows}
-              className="content-results__wrapper--shows-page"
-            />
-          </div>
+          <ContentResults
+            contentType="shows"
+            contentArr={onlyShows}
+            toggleContentArr={onlyShows}
+            getEpisodeInfo={this.getEpisodeInfo}
+            showsArr={this.state.showsArr}
+            loadingIds={this.state.loadingIds}
+            showsIds={this.state.showsIds}
+            error={this.state.error}
+            className="content-results__wrapper--shows-page"
+          />
         ) : (
           <PlaceholderNoSelectedContent />
         )}
