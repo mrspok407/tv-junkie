@@ -1,6 +1,7 @@
 /* eslint-disable jsx-a11y/mouse-events-have-key-events */
 import React, { Component } from "react"
 import { NavLink } from "react-router-dom"
+import { SelectedContentContext } from "../Context/SelectedContentContext"
 import logo from "../../assets/images/main-page-logo.png"
 import "./Header.scss"
 
@@ -30,7 +31,8 @@ export default class Header extends Component {
 
   hoverMenuDefault = () => {
     const navItemActive = document.querySelector(".nav__item--active")
-    const navItemOffsetLeft = navItemActive.offsetLeft
+    const navItemOffsetLeft =
+      navItemActive !== null ? navItemActive.offsetLeft : 0
 
     this.setState({
       opacity: 1,
@@ -39,11 +41,23 @@ export default class Header extends Component {
   }
 
   render() {
+    const { isActiveLink, addActiveLink } = this.context
     return (
       <header className="header">
         <nav className="nav">
-          <ul className="nav__list">
-            <NavLink exact to="/" activeClassName="nav__item--active">
+          <ul
+            className={
+              isActiveLink
+                ? "nav__list nav__list--no-active-links"
+                : "nav__list"
+            }
+          >
+            <NavLink
+              exact
+              to="/"
+              activeClassName="nav__item--active"
+              onClick={addActiveLink}
+            >
               <li
                 data-item="1"
                 onMouseEnter={e => this.hoverMenuEnter(e.target)}
@@ -54,7 +68,12 @@ export default class Header extends Component {
               </li>
             </NavLink>
 
-            <NavLink to="/shows" activeClassName="nav__item--active">
+            <NavLink
+              exact
+              to="/shows"
+              activeClassName="nav__item--active"
+              onClick={addActiveLink}
+            >
               <li
                 data-item="2"
                 onMouseEnter={e => this.hoverMenuEnter(e.target)}
@@ -64,7 +83,12 @@ export default class Header extends Component {
                 Your Shows
               </li>
             </NavLink>
-            <NavLink to="/movies" activeClassName="nav__item--active">
+            <NavLink
+              exact
+              to="/movies"
+              activeClassName="nav__item--active"
+              onClick={addActiveLink}
+            >
               <li
                 data-item="3"
                 onMouseEnter={e => this.hoverMenuEnter(e.target)}
@@ -92,3 +116,5 @@ export default class Header extends Component {
     )
   }
 }
+
+Header.contextType = SelectedContentContext

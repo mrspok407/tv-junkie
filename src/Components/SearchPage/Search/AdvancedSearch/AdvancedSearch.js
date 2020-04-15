@@ -20,7 +20,7 @@ export default function AdvancedSearch({
   toggleActor,
   clearWithActors
 }) {
-  const [advSearchOpen, setAdvSearchOpen] = useState(true)
+  const [advSearchOpen, setAdvSearchOpen] = useState(false)
   const [genres, setGenres] = useState(listOfGenres)
   // const [year, setYear] = useState("")
 
@@ -106,9 +106,9 @@ export default function AdvancedSearch({
             className="button button--advanced-search"
             onClick={() => setAdvSearchOpen(!advSearchOpen)}
           >
-            Open Advanced Search
+            {!advSearchOpen ? "Open Advanced Search" : "Close Advanced Search"}
           </button>
-          {!advSearchOpen && (
+          {advSearchOpen && (
             <div className="form__wrapper">
               <Form>
                 <div className="inputs__cont">

@@ -4,12 +4,10 @@ import SearchPage from "./Components/SearchPage/SearchPage"
 import Header from "./Components/Header/Header"
 import ShowsPage from "./Components/ShowsPage/ShowsPage"
 import MoviesPage from "./Components/MoviesPage/MoviesPage"
-// import ScrollToTop from "./Utils/ScrollToTop"
+import FullContentInfo from "./Components/Templates/FullContentInfo/FullContentInfo"
 import { SelectedContentContext } from "./Components/Context/SelectedContentContext"
 
 const LOCAL_STORAGE_KEY_CONTENT = "selectedContent"
-
-// export const SelectedContentContext = createContext()
 
 export default class App extends Component {
   constructor(props) {
@@ -39,11 +37,26 @@ export default class App extends Component {
       })
     }
 
+    this.deleteActiveLink = () => {
+      this.setState({
+        isActiveLink: true
+      })
+    }
+
+    this.addActiveLink = () => {
+      this.setState({
+        isActiveLink: false
+      })
+    }
+
     this.state = {
       selectedContent:
         JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_CONTENT)) || [],
       toggleContent: this.toggleContent,
-      clearSelectedContent: this.clearSelectedContent
+      clearSelectedContent: this.clearSelectedContent,
+      isActiveLink: false,
+      deleteActiveLink: this.deleteActiveLink,
+      addActiveLink: this.addActiveLink
     }
   }
 
@@ -62,7 +75,8 @@ export default class App extends Component {
             <Header />
             <Switch>
               <Route path="/" exact component={SearchPage} />
-              <Route path="/shows" component={ShowsPage} />
+              <Route path="/shows" exact component={ShowsPage} />
+              <Route path="/:mediaType/:id" component={FullContentInfo} />
               <Route path="/movies" component={MoviesPage} />
             </Switch>
             {/* <ScrollToTop /> */}

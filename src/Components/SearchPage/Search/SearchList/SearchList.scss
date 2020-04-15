@@ -43,8 +43,10 @@
   &:last-child:after {
     display: none;
   }
-  &:hover {
-    background-color: getColor(backgroundColorHover, $movieListPalette);
+  @include mediaMinW(1000px) {
+    &:hover {
+      background-color: getColor(backgroundColorHover, $movieListPalette);
+    }
   }
 
   &__image {
@@ -65,10 +67,11 @@
     &-title {
       margin-bottom: 5px;
       transition: 0.2s;
-      @include cardHovered {
-        color: getColor(titleColorHover, $movieListPalette);
+      @include mediaMinW(1000px) {
+        @include cardHovered {
+          color: getColor(titleColorHover, $movieListPalette);
+        }
       }
-
       font: {
         size: 1.3rem;
         weight: 600;
@@ -79,8 +82,10 @@
       margin-bottom: 5px;
       transition: 0.2s;
       color: getColor(overviewColor, $movieListPalette);
-      @include cardHovered {
-        color: getColor(overviewColorHover, $movieListPalette);
+      @include mediaMinW(1000px) {
+        @include cardHovered {
+          color: getColor(overviewColorHover, $movieListPalette);
+        }
       }
     }
     &-person-movies {

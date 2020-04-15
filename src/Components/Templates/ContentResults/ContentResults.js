@@ -1,4 +1,5 @@
 import React, { useContext } from "react"
+import { Link } from "react-router-dom"
 import { listOfGenres } from "../../../Utils"
 import { SelectedContentContext } from "../../Context/SelectedContentContext"
 import "./ContentResults.scss"
@@ -24,7 +25,9 @@ export default function ContentResults({
   moviesIds,
   error
 }) {
-  const { selectedContent, toggleContent } = useContext(SelectedContentContext)
+  const { selectedContent, toggleContent, deleteActiveLink } = useContext(
+    SelectedContentContext
+  )
 
   function showLinksToAll() {
     const showAllLinksPressed = true
@@ -43,10 +46,7 @@ export default function ContentResults({
     contentArr.length <= maxColumns - 1 ? contentArr.length : maxColumns
 
   return (
-    <div
-      className="content-results"
-      style={{ "--container-width": `calc(30% * ${currentNumOfColumns})` }}
-    >
+    <div className="content-results">
       {contentType !== "adv-search" ? (
         <div className="content-results__button--clear-searched">
           <button
@@ -71,7 +71,18 @@ export default function ContentResults({
         )
       )}
 
-      <div className={`content-results__wrapper ${className}`}>
+      <div
+        className={`content-results__wrapper ${className}`}
+        style={
+          currentNumOfColumns <= 3
+            ? {
+                gridTemplateColumns: "repeat(auto-fit, minmax(300px, 350px))"
+              }
+            : {
+                gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))"
+              }
+        }
+      >
         {contentArr.map(
           ({
             original_title,
@@ -86,6 +97,8 @@ export default function ContentResults({
             poster_path,
             vote_count
           }) => {
+            const mediaType = original_title ? "movie" : "show"
+
             const filteredGenres = genre_ids.map(genreId =>
               listOfGenres.filter(item => item.id === genreId)
             )
@@ -165,47 +178,49 @@ export default function ContentResults({
 
             return (
               <div key={id} className="content-results__item">
-                <div className="content-results__item-main-info">
-                  <div className="content-results__item-title">
-                    {!title ? "No title available" : title}
+                <Link to={`/${mediaType}/${id}`} onClick={deleteActiveLink}>
+                  <div className="content-results__item-main-info">
+                    <div className="content-results__item-title">
+                      {!title ? "No title available" : title}
+                    </div>
+                    <div className="content-results__item-year">
+                      ({!releaseDate ? "No data" : releaseDate.slice(0, 4)})
+                    </div>
+                    <div className="content-results__item-rating">
+                      {vote_average}
+                      <span>/10</span>
+                      <span className="content-results__item-rating-vote-count">
+                        ({vote_count})
+                      </span>
+                    </div>
                   </div>
-                  <div className="content-results__item-year">
-                    ({!releaseDate ? "No data" : releaseDate.slice(0, 4)})
+                  <div className="content-results__item-genres">
+                    {filteredGenres.map(item => (
+                      <span key={item[0].id}>{item[0].name}</span>
+                    ))}
                   </div>
-                  <div className="content-results__item-rating">
-                    {vote_average}
-                    <span>/10</span>
-                    <span className="content-results__item-rating-vote-count">
-                      ({vote_count})
-                    </span>
+                  <div className="content-results__item-overview">
+                    <div className="content-results__item-poster">
+                      <div
+                        style={
+                          backdrop_path !== null
+                            ? {
+                                backgroundImage: `url(https://image.tmdb.org/t/p/w500/${backdrop_path ||
+                                  poster_path})`
+                              }
+                            : {
+                                backgroundImage: `url(https://homestaymatch.com/images/no-image-available.png)`
+                              }
+                        }
+                      />
+                    </div>
+                    <div className="content-results__item-description">
+                      {overview.length > 150
+                        ? `${overview.substring(0, 150)}...`
+                        : overview}
+                    </div>
                   </div>
-                </div>
-                <div className="content-results__item-genres">
-                  {filteredGenres.map(item => (
-                    <span key={item[0].id}>{item[0].name}</span>
-                  ))}
-                </div>
-                <div className="content-results__item-overview">
-                  <div className="content-results__item-poster">
-                    <div
-                      style={
-                        backdrop_path !== null
-                          ? {
-                              backgroundImage: `url(https://image.tmdb.org/t/p/w500/${backdrop_path ||
-                                poster_path})`
-                            }
-                          : {
-                              backgroundImage: `url(https://homestaymatch.com/images/no-image-available.png)`
-                            }
-                      }
-                    />
-                  </div>
-                  <div className="content-results__item-description">
-                    {overview.length > 150
-                      ? `${overview.substring(0, 150)}...`
-                      : overview}
-                  </div>
-                </div>
+                </Link>
 
                 {contentType === "shows" && (
                   <div className="content-results__item-links">
