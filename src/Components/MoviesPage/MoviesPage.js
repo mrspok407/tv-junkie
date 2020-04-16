@@ -57,7 +57,6 @@ export default class Movies extends Component {
           <ContentResults
             contentType="movies"
             contentArr={onlyMovies}
-            toggleContentArr={onlyMovies}
             moviesArr={this.state.moviesArr}
             loadingIds={this.state.loadingIds}
             moviesIds={this.state.moviesIds}

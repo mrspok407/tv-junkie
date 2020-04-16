@@ -16,6 +16,7 @@ export default class App extends Component {
     this.toggleContent = (id, contentArr) => {
       const newSelectedContent = [...this.state.selectedContent]
       const indexInSelected = newSelectedContent.findIndex(e => e.id === id)
+      console.log(indexInSelected)
 
       if (indexInSelected !== -1) {
         newSelectedContent.splice(indexInSelected, 1)
@@ -28,6 +29,7 @@ export default class App extends Component {
         this.setState({
           selectedContent: [content, ...newSelectedContent]
         })
+        console.log(content)
       }
     }
 

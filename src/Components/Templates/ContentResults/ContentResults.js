@@ -15,7 +15,6 @@ export default function ContentResults({
   advancedSearchContent,
   clearAdvSearchMovies,
   contentArr,
-  toggleContentArr,
   className = "",
   showsArr,
   moviesArr,
@@ -334,7 +333,7 @@ export default function ContentResults({
                     {contentType === "adv-search" ? (
                       <button
                         className="button button--content-results button--pressed"
-                        onClick={() => toggleContent(id, toggleContentArr)}
+                        onClick={() => toggleContent(id, contentArr)}
                         type="button"
                       >
                         Remove {original_title ? "movie" : "show"}
@@ -342,7 +341,7 @@ export default function ContentResults({
                     ) : (
                       <button
                         className="button--del-content-results"
-                        onClick={() => toggleContent(id, toggleContentArr)}
+                        onClick={() => toggleContent(id, contentArr)}
                         type="button"
                       />
                     )}
@@ -350,7 +349,7 @@ export default function ContentResults({
                 ) : (
                   <button
                     className="button button--content-results"
-                    onClick={() => toggleContent(id, toggleContentArr)}
+                    onClick={() => toggleContent(id, contentArr)}
                     type="button"
                   >
                     Add {original_title ? "movie" : "show"}

@@ -58,7 +58,6 @@ export default class Shows extends Component {
           <ContentResults
             contentType="shows"
             contentArr={onlyShows}
-            toggleContentArr={onlyShows}
             getEpisodeInfo={this.getEpisodeInfo}
             showsArr={this.state.showsArr}
             loadingIds={this.state.loadingIds}
