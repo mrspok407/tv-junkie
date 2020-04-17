@@ -14,9 +14,9 @@ export default class App extends Component {
     super(props)
 
     this.toggleContent = (id, contentArr) => {
+      console.log(contentArr)
       const newSelectedContent = [...this.state.selectedContent]
       const indexInSelected = newSelectedContent.findIndex(e => e.id === id)
-      console.log(indexInSelected)
 
       if (indexInSelected !== -1) {
         newSelectedContent.splice(indexInSelected, 1)

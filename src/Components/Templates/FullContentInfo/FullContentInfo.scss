@@ -21,8 +21,32 @@ $titleClr: peru;
     background-repeat: no-repeat;
     background-size: cover;
     border-radius: 5px;
-    max-height: 351px;
     height: 100%;
+
+    &-wrapper {
+      display: grid;
+      grid-template-rows: 1fr;
+      grid-row-gap: 5px;
+    }
+    &--movie {
+      grid-template-rows: 90% 10%;
+    }
+  }
+
+  &__links-torrents {
+    display: grid;
+    grid-template-columns: repeat(2, 48%);
+    grid-template-rows: minmax(40px, max-content);
+    justify-content: space-between;
+
+    a {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-decoration: none;
+      color: #fff;
+      background-color: getColor(orangeClr, $mainPalette);
+    }
   }
 
   &__info {
@@ -32,6 +56,13 @@ $titleClr: peru;
       grid-template-rows: minmax(45px, max-content);
       align-items: center;
       border-bottom: 1px solid #86868647;
+      &:last-child {
+        border: none;
+      }
+    }
+    &--button {
+      grid-template-columns: 1fr;
+      padding-top: 5px;
     }
     &-option {
       color: #ffffffb3;
@@ -55,6 +86,10 @@ $titleClr: peru;
       line-height: 26px;
       font-size: 1rem;
       color: #dedede;
+    }
+    &-no-info {
+      color: #ffffffb3;
+      font-size: 1rem;
     }
   }
 }

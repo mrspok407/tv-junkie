@@ -28,6 +28,8 @@ export default function ContentResults({
     SelectedContentContext
   )
 
+  console.log(selectedContent)
+
   function showLinksToAll() {
     const showAllLinksPressed = true
     contentArr.map(item =>

@@ -14,6 +14,7 @@ export default class MovieList extends Component {
 
   render() {
     const { searchResults, mediaTypeSearching } = this.props
+    console.log(searchResults)
     return searchResults.map(
       ({
         original_title = "",
