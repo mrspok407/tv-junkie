@@ -66,6 +66,14 @@ $gridGap: 10px;
       opacity: 1;
     }
   }
+  &:after {
+    @include hoverBoxShadow(0px, 0.2s);
+    z-index: -9999;
+    box-shadow: 0px 0px 6px 1px #66b4e6;
+  }
+  &:hover:after {
+    opacity: 1;
+  }
 
   &-main-info {
     display: grid;

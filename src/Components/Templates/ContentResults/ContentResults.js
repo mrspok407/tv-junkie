@@ -28,8 +28,6 @@ export default function ContentResults({
     SelectedContentContext
   )
 
-  console.log(selectedContent)
-
   function showLinksToAll() {
     const showAllLinksPressed = true
     contentArr.map(item =>
@@ -179,7 +177,12 @@ export default function ContentResults({
 
             return (
               <div key={id} className="content-results__item">
-                <Link to={`/${mediaType}/${id}`} onClick={deleteActiveLink}>
+                <Link
+                  to={{
+                    pathname: `/${mediaType}/${id}`,
+                    state: { logoDisable: true }
+                  }}
+                >
                   <div className="content-results__item-main-info">
                     <div className="content-results__item-title">
                       {!title ? "No title available" : title}

@@ -5,6 +5,7 @@ import PlaceholderNoSelectedContent from "../Placeholders/PlaceholderNoSelectedC
 import { SelectedContentContext } from "../Context/SelectedContentContext"
 import ScrollToTop from "../../Utils/ScrollToTop"
 import "./MoviesPage.scss"
+import Header from "../Header/Header"
 
 export default class Movies extends Component {
   constructor(props) {
@@ -53,6 +54,7 @@ export default class Movies extends Component {
     )
     return (
       <>
+        <Header />
         {onlyMovies.length ? (
           <ContentResults
             contentType="movies"

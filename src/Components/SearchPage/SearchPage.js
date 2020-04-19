@@ -7,6 +7,7 @@ import ContentResultsSelected from "./AdvSearchResults/SelectedContent/SelectedC
 import PlaceholderNoResults from "../Placeholders/PlaceholderNoResults"
 import { SelectedContentContext } from "../Context/SelectedContentContext"
 import ScrollToTop from "../../Utils/ScrollToTop"
+import Header from "../Header/Header"
 // import Footer from "../Footer/Footer"
 // import ScrollToTop from "../../Utils/ScrollToTop"
 
@@ -329,6 +330,7 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
   render() {
     return (
       <>
+        <Header />
         <Search
           handleClickOutside={this.handleClickOutside}
           onSearch={this.handleSearch}

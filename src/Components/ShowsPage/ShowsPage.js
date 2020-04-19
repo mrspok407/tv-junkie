@@ -6,6 +6,7 @@ import { SelectedContentContext } from "../Context/SelectedContentContext"
 import ScrollToTop from "../../Utils/ScrollToTop"
 import { API_KEY } from "../../Utils"
 import "./ShowsPage.scss"
+import Header from "../Header/Header"
 
 export default class Shows extends Component {
   constructor(props) {
@@ -54,6 +55,7 @@ export default class Shows extends Component {
     )
     return (
       <>
+        <Header />
         {onlyShows.length ? (
           <ContentResults
             contentType="shows"

@@ -5,6 +5,8 @@ import axios from "axios"
 import { SelectedContentContext } from "../../Context/SelectedContentContext"
 import { API_KEY } from "../../../Utils"
 import "./FullContentInfo.scss"
+import PlaceholderLoadingFullInfo from "../../Placeholders/PlaceholderLoadingFullInfo"
+import Header from "../../Header/Header"
 
 export default function FullContentInfo({
   match: {
@@ -29,6 +31,8 @@ export default function FullContentInfo({
     budget: ""
   })
 
+  const [loading, setLoading] = useState(true)
+
   const [infoToPass, setInfoToPass] = useState([])
   const [movieTorrents, setMovieTorrents] = useState({
     title: "",
@@ -48,7 +52,7 @@ export default function FullContentInfo({
   }, [mediaType])
 
   const getFullShowInfo = () => {
-    console.log("show")
+    setLoading(true)
 
     const getExternalId = axios.get(
       `https://api.themoviedb.org/3/tv/${id}/external_ids?api_key=${API_KEY}&language=en-US`
@@ -112,7 +116,7 @@ export default function FullContentInfo({
           }
         }) => {
           setOptions({
-            poster: image.original,
+            poster: image.medium,
             title: name,
             releaseDate: premiered,
             lastAirDate: _embedded.previousepisode.airdate,
@@ -125,6 +129,8 @@ export default function FullContentInfo({
             description: summary,
             seasons: _embedded.seasons.length
           })
+
+          setLoading(false)
         }
       )
       .catch(() => {
@@ -133,8 +139,7 @@ export default function FullContentInfo({
   }
 
   const getFullMovieInfo = () => {
-    console.log("movie")
-
+    setLoading(true)
     axios
       .get(
         `https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=en-US`
@@ -162,6 +167,11 @@ export default function FullContentInfo({
           const genresIds = genres.map(item => item.id)
           const yearRelease = release_date.slice(0, 4)
 
+          const prodComp =
+            production_companies.length === 0 && production_companies
+              ? "No info"
+              : production_companies[0].name
+
           setInfoToPass([
             {
               original_title,
@@ -183,12 +193,14 @@ export default function FullContentInfo({
             runtime,
             status,
             genres: movieGenres,
-            productionCompany: production_companies[0].name,
+            productionCompany: prodComp,
             rating: vote_average,
             description: overview,
             tagline,
             budget
           })
+
+          setLoading(false)
 
           return axios.get(
             `https://yts.mx/api/v2/list_movies.json?query_term=${original_title} ${yearRelease}`
@@ -238,11 +250,9 @@ export default function FullContentInfo({
   const yearEnded = mediaType === "show" && lastAirDate.slice(0, 4)
 
   const yearRange =
-    status === "Running"
+    status !== "Ended"
       ? `${yearRelease} - ...`
-      : status === "Ended"
-      ? `${yearRelease} - ${yearEnded}`
-      : ""
+      : `${yearRelease} - ${yearEnded}`
 
   const company = network || webChannel
   const formatedDescription =
@@ -277,154 +287,161 @@ export default function FullContentInfo({
     )
 
   return (
-    <div className="full-detailes-container">
-      {error ? (
-        <span style={{ textAlign: "center", width: "100%" }}>{error}</span>
-      ) : (
-        <div className="full-detailes">
-          <div
-            className={
-              mediaType === "show"
-                ? "full-detailes__poster-wrapper"
-                : "full-detailes__poster-wrapper full-detailes__poster-wrapper--movie"
-            }
-          >
+    <>
+      <Header isLogoVisible={false} />
+      <div className="full-detailes-container">
+        {error ? (
+          <span style={{ textAlign: "center", width: "100%" }}>{error}</span>
+        ) : !loading ? (
+          <div className="full-detailes">
             <div
-              className="full-detailes__poster"
-              style={
+              className={
                 mediaType === "show"
-                  ? { backgroundImage: `url(${poster})` }
-                  : mediaType === "movie"
-                  ? {
-                      backgroundImage: `url(https://image.tmdb.org/t/p/w500/${poster})`
-                    }
-                  : {
-                      backgroundImage: `url(https://homestaymatch.com/images/no-image-available.png)`
-                    }
+                  ? "full-detailes__poster-wrapper"
+                  : "full-detailes__poster-wrapper full-detailes__poster-wrapper--movie"
               }
-            />
-            {mediaType === "movie" && (
-              <div className="full-detailes__links">
-                <div className="full-detailes__links-torrents">
-                  <a
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    href={`magnet:?xt=urn:btih:${movieTorrents.hash1080p}&dn=${movieTorrents.title}&xl=310660222&tr=udp%3A%2F%2Ftracker.coppersurfer.tk:6969/announce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org:6969/announce&tr=udp%3A%2F%2Ftracker.pirateparty.gr:6969/announce&tr=udp%3A%2F%2Fexodus.desync.com:6969/announce&tr=udp%3A%2F%2Ftracker.opentrackr.org:1337/announce&tr=udp%3A%2F%2Ftracker.internetwarriors.net:1337/announce&tr=udp%3A%2F%2Ftracker.torrent.eu.org:451&tr=udp%3A%2F%2Ftracker.cyberia.is:6969/announce&tr=udp%3A%2F%2Fopen.demonii.si:1337/announce&tr=udp%3A%2F%2Fopen.stealth.si:80/announce&tr=udp%3A%2F%2Ftracker.tiny-vps.com:6969/announce&tr=udp%3A%2F%2Ftracker.iamhansen.xyz:2000/announce&tr=udp%3A%2F%2Fexplodie.org:6969/announce&tr=udp%3A%2F%2Fdenis.stalker.upeer.me:6969/announce&tr=udp%3A%2F%2Fipv4.tracker.harry.lu:80/announce`}
-                  >
-                    1080p
-                  </a>
-                  <a
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    href={`magnet:?xt=urn:btih:${movieTorrents.hash720p}&dn=${movieTorrents.title}&xl=310660222&tr=udp%3A%2F%2Ftracker.coppersurfer.tk:6969/announce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org:6969/announce&tr=udp%3A%2F%2Ftracker.pirateparty.gr:6969/announce&tr=udp%3A%2F%2Fexodus.desync.com:6969/announce&tr=udp%3A%2F%2Ftracker.opentrackr.org:1337/announce&tr=udp%3A%2F%2Ftracker.internetwarriors.net:1337/announce&tr=udp%3A%2F%2Ftracker.torrent.eu.org:451&tr=udp%3A%2F%2Ftracker.cyberia.is:6969/announce&tr=udp%3A%2F%2Fopen.demonii.si:1337/announce&tr=udp%3A%2F%2Fopen.stealth.si:80/announce&tr=udp%3A%2F%2Ftracker.tiny-vps.com:6969/announce&tr=udp%3A%2F%2Ftracker.iamhansen.xyz:2000/announce&tr=udp%3A%2F%2Fexplodie.org:6969/announce&tr=udp%3A%2F%2Fdenis.stalker.upeer.me:6969/announce&tr=udp%3A%2F%2Fipv4.tracker.harry.lu:80/announce`}
-                  >
-                    720p
-                  </a>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div className="full-detailes__info">
-            <div className="full-detailes__info-title">
-              {title}
-              <span>
-                {mediaType === "show" ? ` (${yearRange})` : `(${yearRelease})`}
-              </span>
-            </div>
-            <div className="full-detailes__info-row">
-              <div className="full-detailes__info-option">Year</div>
-              <div className="full-detailes__info-value">{yearRelease}</div>
-            </div>
-            {status !== "Released" && (
-              <div className="full-detailes__info-row">
-                <div className="full-detailes__info-option">Status</div>
-                <div className="full-detailes__info-value">{status}</div>
-              </div>
-            )}
-
-            <div className="full-detailes__info-row">
-              <div className="full-detailes__info-option">Genres</div>
-              <div className="full-detailes__info-value">
-                {genres.join(", ")}
-              </div>
-            </div>
-            <div className="full-detailes__info-row">
-              <div className="full-detailes__info-option">Company</div>
-              <div className="full-detailes__info-value">
-                {mediaType === "show"
-                  ? company
-                  : mediaType === "movie"
-                  ? productionCompany
-                  : "No information"}
-              </div>
-            </div>
-            <div className="full-detailes__info-row">
-              <div className="full-detailes__info-option">Rating</div>
-              <div className="full-detailes__info-value">
-                {mediaType === "show" && rating.average !== 0 ? (
-                  rating.average
-                ) : mediaType === "movie" && rating !== 0 ? (
-                  rating
-                ) : (
-                  <span className="full-detailes__info-no-info">
-                    No info yet
-                  </span>
-                )}
-              </div>
-            </div>
-            <div className="full-detailes__info-row">
-              <div className="full-detailes__info-option">Runtime</div>
-              <div className="full-detailes__info-value">
-                {runtime !== 0 ? (
-                  `${runtime} min`
-                ) : (
-                  <span className="full-detailes__info-no-info">
-                    No info yet
-                  </span>
-                )}
-              </div>
-            </div>
-            {mediaType === "movie" && (
-              <>
-                <div className="full-detailes__info-row">
-                  <div className="full-detailes__info-option">Tagline</div>
-                  <div className="full-detailes__info-value">{tagline}</div>
-                </div>
-                <div className="full-detailes__info-row">
-                  <div className="full-detailes__info-option">Budget</div>
-                  <div className="full-detailes__info-value">
-                    {formatedBudget}
+            >
+              <div
+                className="full-detailes__poster"
+                style={
+                  mediaType === "show"
+                    ? { backgroundImage: `url(${poster})` }
+                    : mediaType === "movie"
+                    ? {
+                        backgroundImage: `url(https://image.tmdb.org/t/p/w500/${poster})`
+                      }
+                    : {
+                        backgroundImage: `url(https://homestaymatch.com/images/no-image-available.png)`
+                      }
+                }
+              />
+              {mediaType === "movie" && (
+                <div className="full-detailes__links">
+                  <div className="full-detailes__links-torrents">
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href={`magnet:?xt=urn:btih:${movieTorrents.hash1080p}&dn=${movieTorrents.title}&xl=310660222&tr=udp%3A%2F%2Ftracker.coppersurfer.tk:6969/announce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org:6969/announce&tr=udp%3A%2F%2Ftracker.pirateparty.gr:6969/announce&tr=udp%3A%2F%2Fexodus.desync.com:6969/announce&tr=udp%3A%2F%2Ftracker.opentrackr.org:1337/announce&tr=udp%3A%2F%2Ftracker.internetwarriors.net:1337/announce&tr=udp%3A%2F%2Ftracker.torrent.eu.org:451&tr=udp%3A%2F%2Ftracker.cyberia.is:6969/announce&tr=udp%3A%2F%2Fopen.demonii.si:1337/announce&tr=udp%3A%2F%2Fopen.stealth.si:80/announce&tr=udp%3A%2F%2Ftracker.tiny-vps.com:6969/announce&tr=udp%3A%2F%2Ftracker.iamhansen.xyz:2000/announce&tr=udp%3A%2F%2Fexplodie.org:6969/announce&tr=udp%3A%2F%2Fdenis.stalker.upeer.me:6969/announce&tr=udp%3A%2F%2Fipv4.tracker.harry.lu:80/announce`}
+                    >
+                      1080p
+                    </a>
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href={`magnet:?xt=urn:btih:${movieTorrents.hash720p}&dn=${movieTorrents.title}&xl=310660222&tr=udp%3A%2F%2Ftracker.coppersurfer.tk:6969/announce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org:6969/announce&tr=udp%3A%2F%2Ftracker.pirateparty.gr:6969/announce&tr=udp%3A%2F%2Fexodus.desync.com:6969/announce&tr=udp%3A%2F%2Ftracker.opentrackr.org:1337/announce&tr=udp%3A%2F%2Ftracker.internetwarriors.net:1337/announce&tr=udp%3A%2F%2Ftracker.torrent.eu.org:451&tr=udp%3A%2F%2Ftracker.cyberia.is:6969/announce&tr=udp%3A%2F%2Fopen.demonii.si:1337/announce&tr=udp%3A%2F%2Fopen.stealth.si:80/announce&tr=udp%3A%2F%2Ftracker.tiny-vps.com:6969/announce&tr=udp%3A%2F%2Ftracker.iamhansen.xyz:2000/announce&tr=udp%3A%2F%2Fexplodie.org:6969/announce&tr=udp%3A%2F%2Fdenis.stalker.upeer.me:6969/announce&tr=udp%3A%2F%2Fipv4.tracker.harry.lu:80/announce`}
+                    >
+                      720p
+                    </a>
                   </div>
                 </div>
-              </>
-            )}
-
-            <div className="full-detailes__info-row full-detailes__info--button">
-              {selectedContent.some(e => e.id === Number(id)) ? (
-                <button
-                  className="button button--searchlist button--pressed"
-                  onClick={() => toggleContent(Number(id), infoToPass)}
-                  type="button"
-                >
-                  Remove {mediaType === "movie" ? "movie" : "show"}
-                </button>
-              ) : (
-                <button
-                  className="button button--searchlist"
-                  onClick={() => toggleContent(Number(id), infoToPass)}
-                  type="button"
-                >
-                  Add {mediaType === "movie" ? "movie" : "show"}
-                </button>
               )}
             </div>
+
+            <div className="full-detailes__info">
+              <div className="full-detailes__info-title">
+                {title}
+                <span>
+                  {mediaType === "show"
+                    ? ` (${yearRange})`
+                    : `(${yearRelease})`}
+                </span>
+              </div>
+              <div className="full-detailes__info-row">
+                <div className="full-detailes__info-option">Year</div>
+                <div className="full-detailes__info-value">{yearRelease}</div>
+              </div>
+              {status !== "Released" && (
+                <div className="full-detailes__info-row">
+                  <div className="full-detailes__info-option">Status</div>
+                  <div className="full-detailes__info-value">{status}</div>
+                </div>
+              )}
+
+              <div className="full-detailes__info-row">
+                <div className="full-detailes__info-option">Genres</div>
+                <div className="full-detailes__info-value">
+                  {genres.join(", ")}
+                </div>
+              </div>
+              <div className="full-detailes__info-row">
+                <div className="full-detailes__info-option">Company</div>
+                <div className="full-detailes__info-value">
+                  {mediaType === "show"
+                    ? company
+                    : mediaType === "movie"
+                    ? productionCompany
+                    : "No information"}
+                </div>
+              </div>
+              <div className="full-detailes__info-row">
+                <div className="full-detailes__info-option">Rating</div>
+                <div className="full-detailes__info-value">
+                  {mediaType === "show" && rating.average !== 0 ? (
+                    rating.average
+                  ) : mediaType === "movie" && rating !== 0 ? (
+                    rating
+                  ) : (
+                    <span className="full-detailes__info-no-info">
+                      No info yet
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className="full-detailes__info-row">
+                <div className="full-detailes__info-option">Runtime</div>
+                <div className="full-detailes__info-value">
+                  {runtime !== 0 ? (
+                    `${runtime} min`
+                  ) : (
+                    <span className="full-detailes__info-no-info">
+                      No info yet
+                    </span>
+                  )}
+                </div>
+              </div>
+              {mediaType === "movie" && (
+                <>
+                  <div className="full-detailes__info-row">
+                    <div className="full-detailes__info-option">Tagline</div>
+                    <div className="full-detailes__info-value">{tagline}</div>
+                  </div>
+                  <div className="full-detailes__info-row">
+                    <div className="full-detailes__info-option">Budget</div>
+                    <div className="full-detailes__info-value">
+                      {formatedBudget}
+                    </div>
+                  </div>
+                </>
+              )}
+
+              <div className="full-detailes__info-row full-detailes__info--button">
+                {selectedContent.some(e => e.id === Number(id)) ? (
+                  <button
+                    className="button button--searchlist button--pressed"
+                    onClick={() => toggleContent(Number(id), infoToPass)}
+                    type="button"
+                  >
+                    Remove {mediaType === "movie" ? "movie" : "show"}
+                  </button>
+                ) : (
+                  <button
+                    className="button button--searchlist"
+                    onClick={() => toggleContent(Number(id), infoToPass)}
+                    type="button"
+                  >
+                    Add {mediaType === "movie" ? "movie" : "show"}
+                  </button>
+                )}
+              </div>
+            </div>
+            <div className="full-detailes__info-description">
+              {formatedDescription}
+            </div>
           </div>
-          <div className="full-detailes__info-description">
-            {formatedDescription}
-          </div>
-        </div>
-      )}
-    </div>
+        ) : (
+          <PlaceholderLoadingFullInfo delayAnimation="0.4s" />
+        )}
+      </div>
+    </>
   )
 }

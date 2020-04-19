@@ -1,7 +1,6 @@
 import React, { Component } from "react"
 import { HashRouter as Router, Switch, Route } from "react-router-dom"
 import SearchPage from "./Components/SearchPage/SearchPage"
-import Header from "./Components/Header/Header"
 import ShowsPage from "./Components/ShowsPage/ShowsPage"
 import MoviesPage from "./Components/MoviesPage/MoviesPage"
 import FullContentInfo from "./Components/Templates/FullContentInfo/FullContentInfo"
@@ -74,7 +73,6 @@ export default class App extends Component {
       <SelectedContentContext.Provider value={this.state}>
         <Router basename="/">
           <div className="container">
-            <Header />
             <Switch>
               <Route path="/" exact component={SearchPage} />
               <Route path="/shows" exact component={ShowsPage} />

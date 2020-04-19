@@ -19,75 +19,58 @@
     a {
       color: #fff;
     }
-    &--no-active-links {
-      .nav__hover-line {
-        display: none;
-      }
-      .nav__item {
-        &:after,
-        &:before {
-          content: "";
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 3px;
-          border-radius: 5px;
-          background-color: peru;
-          transition: 0.1s;
-          opacity: 0;
-        }
-        &:before {
-          top: initial;
-          bottom: 0;
-        }
-        &:hover:after,
-        &:hover:before {
-          opacity: 1;
-        }
-      }
-    }
   }
 
   &__item {
-    position: relative;
-    width: 152px;
-    padding: 26px 16px 26px 16px;
-    border: none;
-    text-align: center;
-    cursor: pointer;
-    font-size: 1.3rem;
-    z-index: 1;
-    &--active li {
+    li {
+      position: relative;
+      width: 152px;
+      padding: 26px 16px 26px 16px;
+      border: none;
+      text-align: center;
+      cursor: pointer;
+      font-size: 1.3rem;
+      z-index: 1;
+      &:after,
+      &:before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 90%;
+        transform: translate(5%, 0);
+        height: 3px;
+        border-radius: 5px;
+        background-color: getColor(blueClr, $mainPalette);
+        transition: 0.2s;
+        opacity: 0;
+      }
+      &:before {
+        top: initial;
+        bottom: 0;
+      }
+      &:hover:after,
+      &:hover:before {
+        opacity: 1;
+      }
       @include mediaMaxW(1000px) {
-        &:after,
-        &:before {
-          content: "";
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 3px;
-          border-radius: 5px;
-          background-color: peru;
-          transition: 0.1s;
-        }
-        &:before {
-          top: initial;
-          bottom: 0;
-        }
+        width: 102px;
+        padding: 14px 5px 14px 5px;
+        font-size: 1rem;
       }
     }
-
-    @include mediaMaxW(1000px) {
-      width: 102px;
-      padding: 14px 5px 14px 5px;
-      font-size: 1rem;
+    &--active li {
+      &:after,
+      &:before {
+        background-color: peru;
+        opacity: 1;
+      }
     }
   }
 }
 
 .nav__hover-line {
+  display: none;
   position: absolute;
   top: 0;
   left: 0;
@@ -118,8 +101,4 @@
     top: initial;
     bottom: 0;
   }
-}
-
-.logo {
-  display: none;
 }
