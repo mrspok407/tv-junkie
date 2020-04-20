@@ -6,6 +6,7 @@ import "./ContentResults.scss"
 import Loader from "../../Placeholders/Loader"
 
 const todayDate = new Date()
+const currentYear = todayDate.getFullYear()
 const todayDayOfTheMonth = todayDate.getDate()
 const yesterdayDayOfTheMonth = new Date()
 yesterdayDayOfTheMonth.setDate(yesterdayDayOfTheMonth.getDate() - 1)
@@ -24,9 +25,7 @@ export default function ContentResults({
   moviesIds,
   error
 }) {
-  const { selectedContent, toggleContent, deleteActiveLink } = useContext(
-    SelectedContentContext
-  )
+  const { selectedContent, toggleContent } = useContext(SelectedContentContext)
 
   function showLinksToAll() {
     const showAllLinksPressed = true
@@ -105,6 +104,8 @@ export default function ContentResults({
             const title = original_title || original_name
             const releaseDate = release_date || first_air_date
 
+            const releaseDateAsDateObj = new Date(first_air_date)
+
             // Movies //
             let movie
             let urlMovieTitle
@@ -141,17 +142,20 @@ export default function ContentResults({
 
             if (tvShow) {
               urlShowTitle = tvShow.name.split(" ").join("+")
+              console.log(tvShow)
 
               const airDateISO = new Date(tvShow.last_air_date).toISOString()
               const options = { month: "long", day: "numeric", year: "numeric" }
               const formatedDate = new Date(airDateISO)
               const airDateOfTheMonth = formatedDate.getDate()
+              const airYear = formatedDate.getFullYear()
 
               lastAirDate =
-                airDateOfTheMonth === todayDayOfTheMonth
-                  ? "Air today"
-                  : airDateOfTheMonth === yesterdayDayOfTheMonth.getDate()
-                  ? "Aired yesterday"
+                airYear === currentYear
+                  ? airDateOfTheMonth === todayDayOfTheMonth
+                    ? "Air today"
+                    : airDateOfTheMonth === yesterdayDayOfTheMonth.getDate() &&
+                      "Aired yesterday"
                   : new Intl.DateTimeFormat("en-US", options).format(
                       formatedDate
                     )
@@ -160,6 +164,11 @@ export default function ContentResults({
                 season_number,
                 episode_number
               } = tvShow.last_episode_to_air
+                ? tvShow.last_episode_to_air
+                : {
+                    season_number: "",
+                    episode_number: ""
+                  }
 
               const seasonToString = season_number.toString()
               const episodeToString = episode_number.toString()
@@ -174,7 +183,6 @@ export default function ContentResults({
                   : "e".concat(episodeToString)
             }
             // Shows end //
-
             return (
               <div key={id} className="content-results__item">
                 <Link
@@ -188,15 +196,17 @@ export default function ContentResults({
                       {!title ? "No title available" : title}
                     </div>
                     <div className="content-results__item-year">
-                      ({!releaseDate ? "No data" : releaseDate.slice(0, 4)})
+                      {!releaseDate ? "" : `(${releaseDate.slice(0, 4)})`}
                     </div>
-                    <div className="content-results__item-rating">
-                      {vote_average}
-                      <span>/10</span>
-                      <span className="content-results__item-rating-vote-count">
-                        ({vote_count})
-                      </span>
-                    </div>
+                    {vote_average !== 0 && (
+                      <div className="content-results__item-rating">
+                        {vote_average}
+                        <span>/10</span>
+                        <span className="content-results__item-rating-vote-count">
+                          ({vote_count})
+                        </span>
+                      </div>
+                    )}
                   </div>
                   <div className="content-results__item-genres">
                     {filteredGenres.map(item => (
@@ -226,60 +236,64 @@ export default function ContentResults({
                   </div>
                 </Link>
 
-                {contentType === "shows" && (
-                  <div className="content-results__item-links">
-                    {!showsIds.includes(id) ? (
-                      <button
-                        type="button"
-                        className="button button--content-results button--show-links"
-                        onClick={() => getEpisodeInfo(id)}
-                      >
-                        Show Last Episode Links
-                      </button>
-                    ) : loadingIds.includes(id) && !error ? (
-                      <div>
-                        <Loader className="loader--show-links" />
-                      </div>
-                    ) : (
-                      loadingIds.includes(id) && (
-                        <div className="content-results__item-links--error">
-                          {error}
+                {contentType === "shows" &&
+                  (first_air_date &&
+                  releaseDateAsDateObj.getTime() < todayDate.getTime() ? (
+                    <div className="content-results__item-links">
+                      {!showsIds.includes(id) ? (
+                        <button
+                          type="button"
+                          className="button button--content-results button--show-links"
+                          onClick={() => getEpisodeInfo(id)}
+                        >
+                          Show Last Episode Links
+                        </button>
+                      ) : loadingIds.includes(id) && !error ? (
+                        <div>
+                          <Loader className="loader--show-links" />
                         </div>
-                      )
-                    )}
+                      ) : (
+                        loadingIds.includes(id) && (
+                          <div className="content-results__item-links--error">
+                            {error}
+                          </div>
+                        )
+                      )}
 
-                    {tvShow && (
-                      <div className="content-results__item-links-wrapper">
-                        <div className="content-results__item-links-episode">
-                          {`${lastSeason}${lastEpisode} ${lastAirDate}`}
+                      {tvShow && (
+                        <div className="content-results__item-links-wrapper">
+                          <div className="content-results__item-links-episode">
+                            {`${lastSeason}${lastEpisode} ${lastAirDate}`}
+                          </div>
+                          <div className="content-results__item-links-torrents">
+                            <a
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${lastSeason}${lastEpisode}+1080p&cat=41`}
+                            >
+                              1080p
+                            </a>
+                            <a
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${lastSeason}${lastEpisode}+720p&cat=41`}
+                            >
+                              720p
+                            </a>
+                            <a
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${lastSeason}${lastEpisode}&cat=5`}
+                            >
+                              480p
+                            </a>
+                          </div>
                         </div>
-                        <div className="content-results__item-links-torrents">
-                          <a
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${lastSeason}${lastEpisode}+1080p&cat=41`}
-                          >
-                            1080p
-                          </a>
-                          <a
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${lastSeason}${lastEpisode}+720p&cat=41`}
-                          >
-                            720p
-                          </a>
-                          <a
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${lastSeason}${lastEpisode}&cat=5`}
-                          >
-                            480p
-                          </a>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
+                      )}
+                    </div>
+                  ) : (
+                    ""
+                  ))}
 
                 {contentType === "movies" && (
                   <div className="content-results__item-links">
@@ -298,14 +312,14 @@ export default function ContentResults({
                       >
                         Show Links
                       </button>
-                    ) : loadingIds.includes(id) && !error ? (
+                    ) : loadingIds.includes(id) && !error.includes(id) ? (
                       <div>
                         <Loader className="loader--show-links" />
                       </div>
                     ) : (
                       loadingIds.includes(id) && (
                         <div className="content-results__item-links--error">
-                          {error}
+                          No links available
                         </div>
                       )
                     )}

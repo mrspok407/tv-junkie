@@ -13,7 +13,6 @@ export default class App extends Component {
     super(props)
 
     this.toggleContent = (id, contentArr) => {
-      console.log(contentArr)
       const newSelectedContent = [...this.state.selectedContent]
       const indexInSelected = newSelectedContent.findIndex(e => e.id === id)
 
@@ -28,7 +27,6 @@ export default class App extends Component {
         this.setState({
           selectedContent: [content, ...newSelectedContent]
         })
-        console.log(content)
       }
     }
 

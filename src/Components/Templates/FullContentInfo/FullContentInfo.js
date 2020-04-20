@@ -8,6 +8,8 @@ import "./FullContentInfo.scss"
 import PlaceholderLoadingFullInfo from "../../Placeholders/PlaceholderLoadingFullInfo"
 import Header from "../../Header/Header"
 
+const todayDate = new Date()
+
 export default function FullContentInfo({
   match: {
     params: { id, mediaType }
@@ -23,7 +25,6 @@ export default function FullContentInfo({
     genres: [],
     network: "",
     productionCompany: "",
-    webChannel: "",
     rating: "",
     description: "",
     seasons: "",
@@ -54,88 +55,155 @@ export default function FullContentInfo({
   const getFullShowInfo = () => {
     setLoading(true)
 
-    const getExternalId = axios.get(
-      `https://api.themoviedb.org/3/tv/${id}/external_ids?api_key=${API_KEY}&language=en-US`
-    )
-
-    const getInfoToPass = axios.get(
-      `https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}&language=en-US`
-    )
-
     axios
-      .all([getExternalId, getInfoToPass])
+      .get(
+        `https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}&language=en-US`
+      )
       .then(
-        axios.spread((...responses) => {
-          const externalId = !responses[0].data.tvdb_id
-            ? `imdb=${responses[0].data.imdb_id}`
-            : `thetvdb=${responses[0].data.tvdb_id}`
-          const showsInfo = responses[1].data
-          console.log(showsInfo)
-
-          const genreIds = showsInfo.genres.map(item => item.id)
+        ({
+          data,
+          data: {
+            original_name,
+            first_air_date,
+            vote_average,
+            genres,
+            overview,
+            backdrop_path,
+            poster_path,
+            vote_count,
+            episode_run_time,
+            status,
+            networks,
+            last_air_date,
+            number_of_seasons
+          }
+        }) => {
+          const genreIds =
+            genres && genres.length ? genres.map(item => item.id) : "-"
+          const genreNames =
+            genres && genres.length
+              ? genres.map(item => item.name).join(", ")
+              : "-"
+          const networkNames =
+            networks && networks.length
+              ? networks.map(item => item.name).join(", ")
+              : "-"
 
           setInfoToPass([
             {
-              original_name: showsInfo.original_name,
-              id: showsInfo.id,
-              first_air_date: showsInfo.first_air_date,
-              vote_average: showsInfo.vote_average,
+              original_name,
+              id: data.id,
+              first_air_date,
+              vote_average,
               genre_ids: genreIds,
-              overview: showsInfo.overview,
-              backdrop_path: showsInfo.backdrop_path,
-              poster_path: showsInfo.poster_path,
-              vote_count: showsInfo.vote_count
+              overview,
+              backdrop_path,
+              poster_path,
+              vote_count
             }
           ])
 
-          return axios.get(
-            `http://api.tvmaze.com/lookup/shows?${externalId}&embed=episodes`
-          )
-        })
-      )
-      .then(({ data }) => {
-        const tvmazeId = data.id
-        return axios.get(
-          `http://api.tvmaze.com/shows/${tvmazeId}?embed[]=episodes&embed[]=seasons&embed[]=previousepisode`
-        )
-      })
-      .then(
-        ({
-          data: {
-            name,
-            image,
-            premiered,
-            runtime,
-            status,
-            genres,
-            network,
-            webChannel,
-            rating,
-            summary,
-            _embedded
-          }
-        }) => {
           setOptions({
-            poster: image.medium,
-            title: name,
-            releaseDate: premiered,
-            lastAirDate: _embedded.previousepisode.airdate,
-            runtime,
-            status,
-            genres,
-            network: network ? network.name : false,
-            webChannel: webChannel ? webChannel.name : false,
-            rating,
-            description: summary,
-            seasons: _embedded.seasons.length
+            poster: poster_path,
+            title: original_name || "-",
+            releaseDate: first_air_date || "-",
+            lastAirDate: last_air_date || "-",
+            runtime: episode_run_time[0] || "-",
+            status: status || "-",
+            genres: genreNames || "-",
+            network: networkNames || "-",
+            rating: vote_average || "-",
+            description: overview || "-",
+            seasons: number_of_seasons || "-"
           })
-
           setLoading(false)
         }
       )
       .catch(() => {
         setError("Something went wrong, sorry")
       })
+
+    // const getExternalId = axios.get(
+    //   `https://api.themoviedb.org/3/tv/${id}/external_ids?api_key=${API_KEY}&language=en-US`
+    // )
+
+    // const getInfoToPass = axios.get(
+    //   `https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}&language=en-US`
+    // )
+
+    // axios
+    //   .all([getExternalId, getInfoToPass])
+    //   .then(
+    //     axios.spread((...responses) => {
+    //       const externalId = !responses[0].data.tvdb_id
+    //         ? `imdb=${responses[0].data.imdb_id}`
+    //         : `thetvdb=${responses[0].data.tvdb_id}`
+    //       const showsInfo = responses[1].data
+
+    //       const genreIds = showsInfo.genres.map(item => item.id)
+
+    // setInfoToPass([
+    //   {
+    //     original_name: showsInfo.original_name,
+    //     id: showsInfo.id,
+    //     first_air_date: showsInfo.first_air_date,
+    //     vote_average: showsInfo.vote_average,
+    //     genre_ids: genreIds,
+    //     overview: showsInfo.overview,
+    //     backdrop_path: showsInfo.backdrop_path,
+    //     poster_path: showsInfo.poster_path,
+    //     vote_count: showsInfo.vote_count
+    //   }
+    // ])
+
+    //       return axios.get(
+    //         `https://api.tvmaze.com/lookup/shows?${externalId}&embed=episodes`
+    //       )
+    //     })
+    //   )
+    //   .then(({ data }) => {
+    //     const tvmazeId = data.id
+    //     return axios.get(
+    //       `https://api.tvmaze.com/shows/${tvmazeId}?embed[]=episodes&embed[]=seasons&embed[]=previousepisode`
+    //     )
+    //   })
+    //   .then(
+    //     ({
+    //       data: {
+    //         name,
+    //         image,
+    //         premiered,
+    //         runtime,
+    //         status,
+    //         genres,
+    //         network,
+    //         webChannel,
+    //         rating,
+    //         summary,
+    //         _embedded
+    //       }
+    //     }) => {
+    // setOptions({
+    //   poster: image.medium,
+    //   title: name,
+    //   releaseDate: premiered,
+    //   lastAirDate: _embedded.previousepisode.airdate,
+    //   runtime,
+    //   status,
+    //   genres,
+    //   network: network ? network.name : false,
+    //   webChannel: webChannel ? webChannel.name : false,
+    //   rating,
+    //   description: summary,
+    //   seasons: _embedded.seasons.length
+    // })
+
+    // setLoading(false)
+    //     }
+    //   )
+    // .catch(() => {
+    //   setError("Something went wrong, sorry")
+    // })
   }
 
   const getFullMovieInfo = () => {
@@ -163,13 +231,13 @@ export default function FullContentInfo({
             budget
           }
         }) => {
-          const movieGenres = genres.map(item => item.name)
+          const movieGenres = genres.map(item => item.name).join(", ")
           const genresIds = genres.map(item => item.id)
           const yearRelease = release_date.slice(0, 4)
 
           const prodComp =
-            production_companies.length === 0 && production_companies
-              ? "No info"
+            production_companies.length === 0 || !production_companies
+              ? "-"
               : production_companies[0].name
 
           setInfoToPass([
@@ -188,16 +256,16 @@ export default function FullContentInfo({
 
           setOptions({
             poster: poster_path,
-            title: original_title,
-            releaseDate: release_date,
-            runtime,
-            status,
-            genres: movieGenres,
+            title: original_title || "-",
+            releaseDate: release_date || "-",
+            runtime: runtime || "-",
+            status: status || "-",
+            genres: movieGenres || "-",
             productionCompany: prodComp,
-            rating: vote_average,
-            description: overview,
-            tagline,
-            budget
+            rating: vote_average || "-",
+            description: overview || "-",
+            tagline: tagline || "-",
+            budget: budget || "-"
           })
 
           setLoading(false)
@@ -238,7 +306,6 @@ export default function FullContentInfo({
     status,
     genres,
     network,
-    webChannel,
     productionCompany,
     rating,
     description,
@@ -249,31 +316,15 @@ export default function FullContentInfo({
   const yearRelease = releaseDate.slice(0, 4)
   const yearEnded = mediaType === "show" && lastAirDate.slice(0, 4)
 
+  const yearReleaseAsDateObj = new Date(releaseDate)
+
   const yearRange =
     status !== "Ended"
       ? `${yearRelease} - ...`
       : `${yearRelease} - ${yearEnded}`
 
-  const company = network || webChannel
-  const formatedDescription =
-    mediaType === "show"
-      ? description
-          .split("<p>")
-          .join("")
-          .split("</p>")
-          .join("")
-          .split("<b>")
-          .join("")
-          .split("</b>")
-          .join("")
-          .split("<i>")
-          .join("")
-          .split("</i>")
-          .join("")
-      : description
-
   const formatedBudget =
-    budget !== 0 ? (
+    budget !== 0 && budget !== "-" ? (
       new Intl.NumberFormat("en-US", {
         style: "currency",
         currency: "USD"
@@ -283,7 +334,7 @@ export default function FullContentInfo({
         .split(",")
         .join(".")
     ) : (
-      <span className="full-detailes__info-no-info">No info yet</span>
+      <span className="full-detailes__info-no-info">-</span>
     )
 
   return (
@@ -305,7 +356,9 @@ export default function FullContentInfo({
                 className="full-detailes__poster"
                 style={
                   mediaType === "show"
-                    ? { backgroundImage: `url(${poster})` }
+                    ? {
+                        backgroundImage: `url(https://image.tmdb.org/t/p/w500/${poster})`
+                      }
                     : mediaType === "movie"
                     ? {
                         backgroundImage: `url(https://image.tmdb.org/t/p/w500/${poster})`
@@ -315,7 +368,8 @@ export default function FullContentInfo({
                       }
                 }
               />
-              {mediaType === "movie" && (
+              {mediaType === "movie" &&
+              yearReleaseAsDateObj.getTime() < todayDate.getTime() ? (
                 <div className="full-detailes__links">
                   <div className="full-detailes__links-torrents">
                     <a
@@ -334,6 +388,8 @@ export default function FullContentInfo({
                     </a>
                   </div>
                 </div>
+              ) : (
+                ""
               )}
             </div>
 
@@ -341,14 +397,22 @@ export default function FullContentInfo({
               <div className="full-detailes__info-title">
                 {title}
                 <span>
-                  {mediaType === "show"
+                  {mediaType === "show" && yearRelease !== "-"
                     ? ` (${yearRange})`
-                    : `(${yearRelease})`}
+                    : ""}
                 </span>
               </div>
               <div className="full-detailes__info-row">
                 <div className="full-detailes__info-option">Year</div>
-                <div className="full-detailes__info-value">{yearRelease}</div>
+                <div className="full-detailes__info-value">
+                  {yearRelease !== "-" ? (
+                    `${yearRelease}`
+                  ) : (
+                    <span className="full-detailes__info-no-info">
+                      {yearRelease}
+                    </span>
+                  )}
+                </div>
               </div>
               {status !== "Released" && (
                 <div className="full-detailes__info-row">
@@ -359,30 +423,29 @@ export default function FullContentInfo({
 
               <div className="full-detailes__info-row">
                 <div className="full-detailes__info-option">Genres</div>
-                <div className="full-detailes__info-value">
-                  {genres.join(", ")}
-                </div>
+                <div className="full-detailes__info-value">{genres}</div>
               </div>
               <div className="full-detailes__info-row">
                 <div className="full-detailes__info-option">Company</div>
                 <div className="full-detailes__info-value">
                   {mediaType === "show"
-                    ? company
-                    : mediaType === "movie"
-                    ? productionCompany
-                    : "No information"}
+                    ? network
+                    : mediaType === "movie" &&
+                      (productionCompany !== "-" ? (
+                        productionCompany
+                      ) : (
+                        <span className="full-detailes__info-no-info">-</span>
+                      ))}
                 </div>
               </div>
               <div className="full-detailes__info-row">
                 <div className="full-detailes__info-option">Rating</div>
                 <div className="full-detailes__info-value">
-                  {mediaType === "show" && rating.average !== 0 ? (
-                    rating.average
-                  ) : mediaType === "movie" && rating !== 0 ? (
+                  {rating !== "-" ? (
                     rating
                   ) : (
                     <span className="full-detailes__info-no-info">
-                      No info yet
+                      {rating}
                     </span>
                   )}
                 </div>
@@ -390,11 +453,11 @@ export default function FullContentInfo({
               <div className="full-detailes__info-row">
                 <div className="full-detailes__info-option">Runtime</div>
                 <div className="full-detailes__info-value">
-                  {runtime !== 0 ? (
+                  {runtime !== "-" ? (
                     `${runtime} min`
                   ) : (
                     <span className="full-detailes__info-no-info">
-                      No info yet
+                      {runtime}
                     </span>
                   )}
                 </div>
@@ -403,7 +466,15 @@ export default function FullContentInfo({
                 <>
                   <div className="full-detailes__info-row">
                     <div className="full-detailes__info-option">Tagline</div>
-                    <div className="full-detailes__info-value">{tagline}</div>
+                    <div className="full-detailes__info-value">
+                      {tagline !== "-" ? (
+                        `${tagline}`
+                      ) : (
+                        <span className="full-detailes__info-no-info">
+                          {tagline}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <div className="full-detailes__info-row">
                     <div className="full-detailes__info-option">Budget</div>
@@ -434,9 +505,7 @@ export default function FullContentInfo({
                 )}
               </div>
             </div>
-            <div className="full-detailes__info-description">
-              {formatedDescription}
-            </div>
+            <div className="full-detailes__info-description">{description}</div>
           </div>
         ) : (
           <PlaceholderLoadingFullInfo delayAnimation="0.4s" />

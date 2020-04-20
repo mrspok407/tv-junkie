@@ -13,7 +13,7 @@ export default class Movies extends Component {
 
     this.state = {
       moviesArr: [],
-      error: "",
+      error: [],
       loadingIds: [],
       moviesIds: [],
       showAllLinksPressed: false
@@ -42,9 +42,9 @@ export default class Movies extends Component {
         }))
       })
       .catch(() => {
-        this.setState({
-          error: "Something went wrong, sorry"
-        })
+        this.setState(prevState => ({
+          error: [...prevState.error, id]
+        }))
       })
   }
 

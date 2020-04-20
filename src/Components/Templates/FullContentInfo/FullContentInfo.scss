@@ -57,6 +57,7 @@ $titleClr: peru;
       grid-template-rows: minmax(45px, max-content);
       align-items: center;
       border-bottom: 1px solid #86868647;
+      padding: 3px 0 3px 0;
       &:last-child {
         border: none;
       }
