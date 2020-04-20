@@ -142,7 +142,6 @@ export default function ContentResults({
 
             if (tvShow) {
               urlShowTitle = tvShow.name.split(" ").join("+")
-              console.log(tvShow)
 
               const airDateISO = new Date(tvShow.last_air_date).toISOString()
               const options = { month: "long", day: "numeric", year: "numeric" }
@@ -154,8 +153,11 @@ export default function ContentResults({
                 airYear === currentYear
                   ? airDateOfTheMonth === todayDayOfTheMonth
                     ? "Air today"
-                    : airDateOfTheMonth === yesterdayDayOfTheMonth.getDate() &&
-                      "Aired yesterday"
+                    : airDateOfTheMonth === yesterdayDayOfTheMonth.getDate()
+                    ? "Aired yesterday"
+                    : new Intl.DateTimeFormat("en-US", options).format(
+                        formatedDate
+                      )
                   : new Intl.DateTimeFormat("en-US", options).format(
                       formatedDate
                     )
@@ -183,6 +185,7 @@ export default function ContentResults({
                   : "e".concat(episodeToString)
             }
             // Shows end //
+            console.log(loadingIds)
             return (
               <div key={id} className="content-results__item">
                 <Link

@@ -89,6 +89,40 @@ $titleClr: peru;
       font-size: 1rem;
       color: #dedede;
     }
+    &-seasons-and-episodes {
+      display: grid;
+      grid-column: 1 / 3;
+      grid-template-columns: 1fr;
+      grid-auto-rows: minmax(50px, max-content);
+    }
+    &-season {
+      position: relative;
+      border-bottom: 1px solid getColor(orangeClr, $mainPalette);
+
+      &:last-child {
+        border-bottom: none;
+      }
+      &-number {
+        padding: 10px;
+        cursor: pointer;
+        &:after {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: #1d1d1d;
+          opacity: 0;
+          transition: 0.2s;
+          z-index: -1;
+        }
+
+        &:hover:after {
+          opacity: 1;
+        }
+      }
+    }
     &-no-info {
       color: #ffffffb3;
       font-size: 1rem;

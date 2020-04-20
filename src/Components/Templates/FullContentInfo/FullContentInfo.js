@@ -1,3 +1,6 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable react/self-closing-comp */
 /* eslint-disable no-prototype-builtins */
 /* eslint-disable no-use-before-define */
 import React, { useState, useEffect, useContext } from "react"
@@ -7,6 +10,7 @@ import { API_KEY } from "../../../Utils"
 import "./FullContentInfo.scss"
 import PlaceholderLoadingFullInfo from "../../Placeholders/PlaceholderLoadingFullInfo"
 import Header from "../../Header/Header"
+import Loader from "../../Placeholders/Loader"
 
 const todayDate = new Date()
 
@@ -27,7 +31,8 @@ export default function FullContentInfo({
     productionCompany: "",
     rating: "",
     description: "",
-    seasons: "",
+    numberOfSeasons: "",
+    seasonsArr: [],
     tagline: "",
     budget: ""
   })
@@ -35,11 +40,17 @@ export default function FullContentInfo({
   const [loading, setLoading] = useState(true)
 
   const [infoToPass, setInfoToPass] = useState([])
+
   const [movieTorrents, setMovieTorrents] = useState({
     title: "",
     hash1080p: "",
     hash720p: ""
   })
+
+  const [tvShowEpisodes, setTvShowEpisodes] = useState([])
+  const [openSeasons, setOpenSeasons] = useState([])
+  const [loadingEpisodesIds, setLoadingEpisodesIds] = useState([])
+
   const [error, setError] = useState()
 
   const { selectedContent, toggleContent } = useContext(SelectedContentContext)
@@ -75,7 +86,8 @@ export default function FullContentInfo({
             status,
             networks,
             last_air_date,
-            number_of_seasons
+            number_of_seasons,
+            seasons
           }
         }) => {
           const genreIds =
@@ -114,7 +126,8 @@ export default function FullContentInfo({
             network: networkNames || "-",
             rating: vote_average || "-",
             description: overview || "-",
-            seasons: number_of_seasons || "-"
+            numberOfSeasons: number_of_seasons || "-",
+            seasonsArr: seasons
           })
           setLoading(false)
         }
@@ -122,88 +135,31 @@ export default function FullContentInfo({
       .catch(() => {
         setError("Something went wrong, sorry")
       })
+  }
 
-    // const getExternalId = axios.get(
-    //   `https://api.themoviedb.org/3/tv/${id}/external_ids?api_key=${API_KEY}&language=en-US`
-    // )
+  const showSeasonsEpisode = (seasonId, seasonNum) => {
+    if (openSeasons.includes(seasonId)) {
+      setOpenSeasons(prevState => [
+        ...prevState.filter(item => item !== seasonId)
+      ])
+    } else {
+      setOpenSeasons(prevState => [...prevState, seasonId])
+    }
 
-    // const getInfoToPass = axios.get(
-    //   `https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}&language=en-US`
-    // )
+    if (tvShowEpisodes.some(item => item.seasonId === seasonId)) return
 
-    // axios
-    //   .all([getExternalId, getInfoToPass])
-    //   .then(
-    //     axios.spread((...responses) => {
-    //       const externalId = !responses[0].data.tvdb_id
-    //         ? `imdb=${responses[0].data.imdb_id}`
-    //         : `thetvdb=${responses[0].data.tvdb_id}`
-    //       const showsInfo = responses[1].data
+    setLoadingEpisodesIds(prevState => [...prevState, seasonId])
 
-    //       const genreIds = showsInfo.genres.map(item => item.id)
-
-    // setInfoToPass([
-    //   {
-    //     original_name: showsInfo.original_name,
-    //     id: showsInfo.id,
-    //     first_air_date: showsInfo.first_air_date,
-    //     vote_average: showsInfo.vote_average,
-    //     genre_ids: genreIds,
-    //     overview: showsInfo.overview,
-    //     backdrop_path: showsInfo.backdrop_path,
-    //     poster_path: showsInfo.poster_path,
-    //     vote_count: showsInfo.vote_count
-    //   }
-    // ])
-
-    //       return axios.get(
-    //         `https://api.tvmaze.com/lookup/shows?${externalId}&embed=episodes`
-    //       )
-    //     })
-    //   )
-    //   .then(({ data }) => {
-    //     const tvmazeId = data.id
-    //     return axios.get(
-    //       `https://api.tvmaze.com/shows/${tvmazeId}?embed[]=episodes&embed[]=seasons&embed[]=previousepisode`
-    //     )
-    //   })
-    //   .then(
-    //     ({
-    //       data: {
-    //         name,
-    //         image,
-    //         premiered,
-    //         runtime,
-    //         status,
-    //         genres,
-    //         network,
-    //         webChannel,
-    //         rating,
-    //         summary,
-    //         _embedded
-    //       }
-    //     }) => {
-    // setOptions({
-    //   poster: image.medium,
-    //   title: name,
-    //   releaseDate: premiered,
-    //   lastAirDate: _embedded.previousepisode.airdate,
-    //   runtime,
-    //   status,
-    //   genres,
-    //   network: network ? network.name : false,
-    //   webChannel: webChannel ? webChannel.name : false,
-    //   rating,
-    //   description: summary,
-    //   seasons: _embedded.seasons.length
-    // })
-
-    // setLoading(false)
-    //     }
-    //   )
-    // .catch(() => {
-    //   setError("Something went wrong, sorry")
-    // })
+    axios
+      .get(
+        `https://api.themoviedb.org/3/tv/${id}/season/${seasonNum}?api_key=c5e3186413780c3aeec39b0767a6ec99&language=en-US`
+      )
+      .then(({ data: { episodes } }) => {
+        setTvShowEpisodes(prevState => [...prevState, { seasonId, episodes }])
+        setLoadingEpisodesIds(prevState => [
+          ...prevState.filter(item => item !== seasonId)
+        ])
+      })
   }
 
   const getFullMovieInfo = () => {
@@ -310,7 +266,9 @@ export default function FullContentInfo({
     rating,
     description,
     tagline,
-    budget
+    budget,
+    numberOfSeasons,
+    seasonsArr
   } = options
 
   const yearRelease = releaseDate.slice(0, 4)
@@ -506,6 +464,52 @@ export default function FullContentInfo({
               </div>
             </div>
             <div className="full-detailes__info-description">{description}</div>
+            <div className="full-detailes__info-seasons-and-episodes">
+              {mediaType === "show" &&
+                seasonsArr.map(item => {
+                  if (item.season_number === 0 || item.name === "Specials")
+                    return
+                  const seasonId = item.id
+                  console.log(loadingEpisodesIds)
+
+                  return (
+                    <div key={seasonId} className="full-detailes__info-season">
+                      <div
+                        className="full-detailes__info-season-number"
+                        onClick={() =>
+                          showSeasonsEpisode(seasonId, item.season_number)
+                        }
+                      >
+                        Season {item.season_number}
+                      </div>
+
+                      {openSeasons.includes(seasonId) &&
+                        (!loadingEpisodesIds.includes(seasonId) ? (
+                          <div className="full-detailes__info-episodes">
+                            {tvShowEpisodes.map(season => {
+                              if (season.seasonId !== seasonId) return
+
+                              return season.episodes.map(episode => (
+                                <div
+                                  key={episode.id}
+                                  className="full-detailes__info-episode"
+                                >
+                                  <div>{episode.name}</div>
+                                </div>
+                              ))
+                            })}
+                          </div>
+                        ) : (
+                          <div className="full-detailes__info-episodes">
+                            <div className="full-detailes__info-episode">
+                              <Loader className="loader--show-links" />
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  )
+                })}
+            </div>
           </div>
         ) : (
           <PlaceholderLoadingFullInfo delayAnimation="0.4s" />
