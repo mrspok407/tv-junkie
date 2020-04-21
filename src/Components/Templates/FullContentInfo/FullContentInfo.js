@@ -4,6 +4,7 @@
 /* eslint-disable no-prototype-builtins */
 /* eslint-disable no-use-before-define */
 import React, { useState, useEffect, useContext } from "react"
+import { useLocation } from "react-router-dom"
 import axios from "axios"
 import { SelectedContentContext } from "../../Context/SelectedContentContext"
 import { API_KEY } from "../../../Utils"
@@ -21,6 +22,7 @@ export default function FullContentInfo({
 }) {
   const [options, setOptions] = useState({
     poster: "",
+    posterMobile: "",
     title: "",
     releaseDate: "",
     lastAirDate: "",
@@ -50,10 +52,17 @@ export default function FullContentInfo({
   const [tvShowEpisodes, setTvShowEpisodes] = useState([])
   const [openSeasons, setOpenSeasons] = useState([])
   const [loadingEpisodesIds, setLoadingEpisodesIds] = useState([])
+  const [detailEpisodeInfo, setDetailEpisodeInfo] = useState([])
 
   const [error, setError] = useState()
 
   const { selectedContent, toggleContent } = useContext(SelectedContentContext)
+
+  const { pathname } = useLocation()
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
 
   useEffect(() => {
     if (mediaType === "show") {
@@ -117,6 +126,7 @@ export default function FullContentInfo({
 
           setOptions({
             poster: poster_path,
+            posterMobile: backdrop_path,
             title: original_name || "-",
             releaseDate: first_air_date || "-",
             lastAirDate: last_air_date || "-",
@@ -127,7 +137,7 @@ export default function FullContentInfo({
             rating: vote_average || "-",
             description: overview || "-",
             numberOfSeasons: number_of_seasons || "-",
-            seasonsArr: seasons
+            seasonsArr: seasons.reverse()
           })
           setLoading(false)
         }
@@ -160,6 +170,16 @@ export default function FullContentInfo({
           ...prevState.filter(item => item !== seasonId)
         ])
       })
+  }
+
+  const showEpisodeInfo = episodeId => {
+    if (detailEpisodeInfo.includes(episodeId)) {
+      setDetailEpisodeInfo(prevState => [
+        ...prevState.filter(item => item !== episodeId)
+      ])
+    } else {
+      setDetailEpisodeInfo(prevState => [...prevState, episodeId])
+    }
   }
 
   const getFullMovieInfo = () => {
@@ -212,6 +232,7 @@ export default function FullContentInfo({
 
           setOptions({
             poster: poster_path,
+            posterMobile: backdrop_path,
             title: original_title || "-",
             releaseDate: release_date || "-",
             runtime: runtime || "-",
@@ -255,6 +276,7 @@ export default function FullContentInfo({
 
   const {
     poster,
+    posterMobile,
     title,
     releaseDate,
     lastAirDate,
@@ -267,7 +289,6 @@ export default function FullContentInfo({
     description,
     tagline,
     budget,
-    numberOfSeasons,
     seasonsArr
   } = options
 
@@ -295,6 +316,8 @@ export default function FullContentInfo({
       <span className="full-detailes__info-no-info">-</span>
     )
 
+  const urlShowTitle = title.split(" ").join("+")
+
   return (
     <>
       <Header isLogoVisible={false} />
@@ -313,11 +336,7 @@ export default function FullContentInfo({
               <div
                 className="full-detailes__poster"
                 style={
-                  mediaType === "show"
-                    ? {
-                        backgroundImage: `url(https://image.tmdb.org/t/p/w500/${poster})`
-                      }
-                    : mediaType === "movie"
+                  poster
                     ? {
                         backgroundImage: `url(https://image.tmdb.org/t/p/w500/${poster})`
                       }
@@ -326,10 +345,19 @@ export default function FullContentInfo({
                       }
                 }
               />
+              {posterMobile && (
+                <div
+                  className="full-detailes__poster full-detailes__poster--mobile"
+                  style={{
+                    backgroundImage: `url(https://image.tmdb.org/t/p/w500/${posterMobile})`
+                  }}
+                />
+              )}
+
               {mediaType === "movie" &&
               yearReleaseAsDateObj.getTime() < todayDate.getTime() ? (
                 <div className="full-detailes__links">
-                  <div className="full-detailes__links-torrents">
+                  <div className="torrent-links">
                     <a
                       target="_blank"
                       rel="noopener noreferrer"
@@ -466,43 +494,165 @@ export default function FullContentInfo({
             <div className="full-detailes__info-description">{description}</div>
             <div className="full-detailes__info-seasons-and-episodes">
               {mediaType === "show" &&
-                seasonsArr.map(item => {
-                  if (item.season_number === 0 || item.name === "Specials")
+                seasonsArr.map(season => {
+                  if (season.season_number === 0 || season.name === "Specials")
                     return
-                  const seasonId = item.id
-                  console.log(loadingEpisodesIds)
+                  const seasonId = season.id
 
                   return (
                     <div key={seasonId} className="full-detailes__info-season">
                       <div
-                        className="full-detailes__info-season-number"
+                        className={
+                          !openSeasons.includes(seasonId)
+                            ? "full-detailes__info-season-info"
+                            : "full-detailes__info-season-info full-detailes__info-season-info--open"
+                        }
                         onClick={() =>
-                          showSeasonsEpisode(seasonId, item.season_number)
+                          showSeasonsEpisode(seasonId, season.season_number)
                         }
                       >
-                        Season {item.season_number}
+                        <div className="full-detailes__info-season-number">
+                          Season {season.season_number}
+                        </div>
+                        <div className="full-detailes__info-season-date">
+                          {season.air_date && season.air_date.slice(0, 4)}
+                        </div>
                       </div>
 
                       {openSeasons.includes(seasonId) &&
                         (!loadingEpisodesIds.includes(seasonId) ? (
-                          <div className="full-detailes__info-episodes">
-                            {tvShowEpisodes.map(season => {
-                              if (season.seasonId !== seasonId) return
+                          <>
+                            <div
+                              className="full-detailes__info-season-poster"
+                              style={{
+                                backgroundImage: `url(https://image.tmdb.org/t/p/w500/${season.poster_path})`
+                              }}
+                            />
+                            <div className="full-detailes__info-episodes">
+                              {tvShowEpisodes.map(item => {
+                                if (item.seasonId !== seasonId) return
 
-                              return season.episodes.map(episode => (
-                                <div
-                                  key={episode.id}
-                                  className="full-detailes__info-episode"
-                                >
-                                  <div>{episode.name}</div>
-                                </div>
-                              ))
-                            })}
-                          </div>
+                                return item.episodes.map(episode => {
+                                  // Format Date //
+                                  const airDateISO = new Date(
+                                    episode.air_date
+                                  ).toISOString()
+
+                                  const optionss = {
+                                    month: "long",
+                                    day: "numeric",
+                                    year: "numeric"
+                                  }
+
+                                  const formatedDate = new Date(airDateISO)
+
+                                  const episodeAirDate = new Intl.DateTimeFormat(
+                                    "en-US",
+                                    optionss
+                                  ).format(formatedDate)
+                                  // Format Date End //
+
+                                  // Format Seasons And Episode Numbers //
+                                  const seasonToString = season.season_number.toString()
+                                  const episodeToString = episode.episode_number.toString()
+
+                                  const seasonNumber =
+                                    seasonToString.length === 1
+                                      ? "s0".concat(seasonToString)
+                                      : "s".concat(seasonToString)
+                                  const episodeNumber =
+                                    episodeToString.length === 1
+                                      ? "e0".concat(episodeToString)
+                                      : "e".concat(episodeToString)
+                                  // Format Seasons And Episode Numbers End //
+
+                                  const episodeAirDateAsDateObj = new Date(
+                                    episode.air_date
+                                  )
+
+                                  return (
+                                    <div
+                                      key={episode.id}
+                                      className={
+                                        !detailEpisodeInfo.includes(episode.id)
+                                          ? "full-detailes__info-episode"
+                                          : "full-detailes__info-episode full-detailes__info-episode--open"
+                                      }
+                                      onClick={() =>
+                                        showEpisodeInfo(episode.id)
+                                      }
+                                    >
+                                      <div className="full-detailes__info-episode-wrapper">
+                                        <div className="full-detailes__info-episode-date">
+                                          {episodeAirDate}
+                                        </div>
+                                        <div className="full-detailes__info-episode-name">
+                                          <span className="full-detailes__info-episode-number">
+                                            {episode.episode_number}.
+                                          </span>
+                                          {episode.name}
+                                        </div>
+                                      </div>
+
+                                      {detailEpisodeInfo.includes(
+                                        episode.id
+                                      ) && (
+                                        <div
+                                          className={
+                                            episode.still_path
+                                              ? "full-detailes__info-episode-detailes"
+                                              : "full-detailes__info-episode-detailes full-detailes__info-episode-detailes--no-image"
+                                          }
+                                        >
+                                          {episode.still_path && (
+                                            <div
+                                              className="full-detailes__info-episode-detailes-image"
+                                              style={{
+                                                backgroundImage: `url(https://image.tmdb.org/t/p/w500${episode.still_path})`
+                                              }}
+                                            ></div>
+                                          )}
+                                          <div className="full-detailes__info-episode-detailes-overview">
+                                            {episode.overview}
+                                          </div>
+                                          {episodeAirDateAsDateObj <
+                                            todayDate.getTime() && (
+                                            <div className="torrent-links torrent-links--full-content-info">
+                                              <a
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}+1080p&cat=41`}
+                                              >
+                                                1080p
+                                              </a>
+                                              <a
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}+720p&cat=41`}
+                                              >
+                                                720p
+                                              </a>
+                                              <a
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}&cat=5`}
+                                              >
+                                                480p
+                                              </a>
+                                            </div>
+                                          )}
+                                        </div>
+                                      )}
+                                    </div>
+                                  )
+                                })
+                              })}
+                            </div>
+                          </>
                         ) : (
-                          <div className="full-detailes__info-episodes">
-                            <div className="full-detailes__info-episode">
-                              <Loader className="loader--show-links" />
+                          <div className="full-detailes__info-episodes full-detailes__info-episodes--loading">
+                            <div className="full-detailes__info-episode full-detailes__info-episode--loading">
+                              <Loader className="loader--show-links loader--show-links-detailes" />
                             </div>
                           </div>
                         ))}

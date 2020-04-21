@@ -185,7 +185,6 @@ export default function ContentResults({
                   : "e".concat(episodeToString)
             }
             // Shows end //
-            console.log(loadingIds)
             return (
               <div key={id} className="content-results__item">
                 <Link
@@ -268,7 +267,7 @@ export default function ContentResults({
                           <div className="content-results__item-links-episode">
                             {`${lastSeason}${lastEpisode} ${lastAirDate}`}
                           </div>
-                          <div className="content-results__item-links-torrents">
+                          <div className="torrent-links">
                             <a
                               target="_blank"
                               rel="noopener noreferrer"
@@ -329,7 +328,7 @@ export default function ContentResults({
 
                     {movie && (
                       <div className="content-results__item-links-wrapper">
-                        <div className="content-results__item-links-torrents">
+                        <div className="torrent-links">
                           <a
                             target="_blank"
                             rel="noopener noreferrer"

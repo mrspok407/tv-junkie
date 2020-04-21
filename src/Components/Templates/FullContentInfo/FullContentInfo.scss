@@ -7,6 +7,9 @@ $titleClr: peru;
   width: 100%;
   color: #fff;
   padding-bottom: 100px;
+  @include mediaMaxW(1000px) {
+    padding: 0px 15px 100px 15px;
+  }
 }
 
 .full-detailes {
@@ -16,6 +19,9 @@ $titleClr: peru;
   grid-gap: 40px;
   padding-top: 50px;
   font-size: 1.3rem;
+  @include mediaMaxW(800px) {
+    grid-template-columns: 1fr;
+  }
 
   &__poster {
     background-position: center top;
@@ -23,6 +29,19 @@ $titleClr: peru;
     background-size: cover;
     border-radius: 5px;
     height: 100%;
+    @include mediaMaxW(800px) {
+      display: none;
+    }
+    &--mobile {
+      display: none;
+      @include mediaMaxW(800px) {
+        display: inherit;
+        justify-self: center;
+        width: 100%;
+        max-width: 400px;
+        height: 200px;
+      }
+    }
 
     &-wrapper {
       display: grid;
@@ -31,22 +50,6 @@ $titleClr: peru;
     }
     &--movie {
       grid-template-rows: 90% 10%;
-    }
-  }
-
-  &__links-torrents {
-    display: grid;
-    grid-template-columns: repeat(2, 48%);
-    grid-template-rows: minmax(40px, max-content);
-    justify-content: space-between;
-
-    a {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-decoration: none;
-      color: #fff;
-      background-color: getColor(orangeClr, $mainPalette);
     }
   }
 
@@ -75,6 +78,9 @@ $titleClr: peru;
       padding-bottom: 30px;
       font-size: 2.5rem;
       color: $titleClr;
+      @include mediaMaxW(430px) {
+        font-size: 2rem;
+      }
 
       span {
         padding-left: 5px;
@@ -88,38 +94,208 @@ $titleClr: peru;
       line-height: 26px;
       font-size: 1rem;
       color: #dedede;
+      @include mediaMaxW(800px) {
+        grid-column: inherit;
+      }
     }
     &-seasons-and-episodes {
       display: grid;
       grid-column: 1 / 3;
       grid-template-columns: 1fr;
+      grid-row-gap: 10px;
       grid-auto-rows: minmax(50px, max-content);
+      @include mediaMaxW(800px) {
+        grid-column: inherit;
+      }
     }
     &-season {
       position: relative;
-      border-bottom: 1px solid getColor(orangeClr, $mainPalette);
+      display: grid;
+      grid-template-columns: 1fr 3fr;
+      grid-column-gap: 30px;
+      grid-row-gap: 10px;
+      @include mediaMaxW(800px) {
+        grid-template-columns: 1fr;
+      }
 
       &:last-child {
         border-bottom: none;
       }
-      &-number {
-        padding: 10px;
+      &-poster {
+        background-position: center top;
+        background-repeat: no-repeat;
+        background-size: cover;
+        border-radius: 5px;
+        height: 363px;
+        @include mediaMaxW(800px) {
+          display: none;
+        }
+      }
+      &-info {
+        position: relative;
+        display: flex;
+        justify-content: space-between;
+        grid-column: 1 / 3;
+        height: 50px;
+        background-color: #1d1d1d96;
         cursor: pointer;
+        @include mediaMaxW(800px) {
+          grid-column: inherit;
+        }
         &:after {
+          content: "";
+          position: absolute;
+          right: 10px;
+          top: 18px;
+          width: 0;
+          height: 0;
+          border-style: solid;
+          border-width: 8px 6px 0 6px;
+          border-color: #ffffff transparent transparent transparent;
+          z-index: -1;
+        }
+        &:before {
           content: "";
           position: absolute;
           top: 0;
           left: 0;
           width: 100%;
           height: 100%;
-          background-color: #1d1d1d;
+          background-color: #252525;
           opacity: 0;
           transition: 0.2s;
           z-index: -1;
         }
 
-        &:hover:after {
+        &:hover:before {
           opacity: 1;
+        }
+        &--open {
+          &:after {
+            transform: scale(-1);
+          }
+          &:before {
+            opacity: 1;
+          }
+        }
+      }
+      &-date {
+        padding: 10px 35px 10px 10px;
+      }
+      &-number {
+        padding: 10px;
+      }
+    }
+    &-episodes {
+      display: grid;
+      grid-row-gap: 5px;
+      cursor: pointer;
+      &--loading {
+        grid-column: 1 / 3;
+      }
+    }
+    &-episode {
+      position: relative;
+      display: grid;
+      grid-template-columns: 25% 45% 30%;
+      grid-template-rows: minmax(33px, max-content);
+      padding-top: 5px;
+      font-size: 1rem;
+      &:after {
+        content: "";
+        position: absolute;
+        right: 10px;
+        top: 18px;
+        width: 0;
+        height: 0;
+        border-style: solid;
+        border-width: 8px 6px 0 6px;
+        border-color: #ffffff transparent transparent transparent;
+        z-index: -1;
+      }
+
+      &--open {
+        &:after {
+          transform: scale(-1);
+        }
+        &:before {
+          opacity: 1;
+        }
+      }
+      @include mediaMaxW(580px) {
+        grid-column-gap: 5px;
+        grid-template-columns: 7fr 7fr 6fr;
+      }
+      @include mediaMaxW(430px) {
+        font-size: 0.9rem;
+      }
+      &-wrapper {
+        position: relative;
+        display: grid;
+        grid-column: 1 / 4;
+        grid-template-columns: 1fr 3fr;
+        height: 40px;
+        padding-top: 5px;
+        background-color: #1d1d1d96;
+        &:before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: #252525;
+          opacity: 0;
+          transition: 0.2s;
+          z-index: -1;
+        }
+
+        &:hover:before {
+          opacity: 1;
+        }
+      }
+      &-date {
+        padding-left: 5px;
+      }
+      &-number {
+        padding-right: 7px;
+      }
+      &-links {
+        position: relative;
+        cursor: pointer;
+        &-show {
+          display: none;
+          text-align: center;
+          padding: 5px 0px 5px 0px;
+          background-color: peru;
+          color: #fff;
+          text-decoration: none;
+          transition: 0.3s;
+          @include mediaMaxW(580px) {
+            display: inherit;
+          }
+        }
+      }
+      &--loading {
+        grid-template-columns: 1fr;
+      }
+      &-detailes {
+        display: grid;
+        grid-template-columns: 11fr 39fr;
+        grid-gap: 10px;
+        grid-column: 1 / 4;
+        padding: 10px 0 10px 0;
+
+        &-image {
+          grid-row: 1 / 3;
+          min-height: 90px;
+          background-position: center top;
+          background-repeat: no-repeat;
+          background-size: cover;
+          border-radius: 5px;
+        }
+        &--no-image {
+          grid-template-columns: 1fr;
         }
       }
     }

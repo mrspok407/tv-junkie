@@ -40,21 +40,19 @@ export default class Header extends Component {
             </NavLink>
           </ul>
         </nav>
-        <div className="logo">
-          <img
-            style={
-              isLogoVisible
-                ? {
-                    display: "inherit"
-                  }
-                : {
-                    display: "none"
-                  }
-            }
-            className="logo__img"
-            src={logo}
-            alt="logo"
-          />
+        <div
+          className="logo"
+          style={
+            isLogoVisible
+              ? {
+                  display: "inherit"
+                }
+              : {
+                  display: "none"
+                }
+          }
+        >
+          <img className="logo__img" src={logo} alt="logo" />
         </div>
       </header>
     )
