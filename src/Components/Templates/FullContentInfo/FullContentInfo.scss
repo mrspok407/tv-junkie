@@ -46,7 +46,7 @@ $titleClr: peru;
     &-wrapper {
       display: grid;
       grid-template-rows: 1fr;
-      grid-row-gap: 5px;
+      row-gap: 5px;
     }
     &--movie {
       grid-template-rows: 90% 10%;
@@ -102,7 +102,7 @@ $titleClr: peru;
       display: grid;
       grid-column: 1 / 3;
       grid-template-columns: 1fr;
-      grid-row-gap: 10px;
+      row-gap: 10px;
       grid-auto-rows: minmax(50px, max-content);
       @include mediaMaxW(800px) {
         grid-column: inherit;
@@ -112,8 +112,8 @@ $titleClr: peru;
       position: relative;
       display: grid;
       grid-template-columns: 1fr 3fr;
-      grid-column-gap: 30px;
-      grid-row-gap: 10px;
+      column-gap: 30px;
+      row-gap: 10px;
       @include mediaMaxW(800px) {
         grid-template-columns: 1fr;
       }
@@ -121,12 +121,16 @@ $titleClr: peru;
       &:last-child {
         border-bottom: none;
       }
+      &--no-poster {
+        grid-template-columns: 1fr;
+        column-gap: 0px;
+      }
       &-poster {
         background-position: center top;
         background-repeat: no-repeat;
         background-size: cover;
         border-radius: 5px;
-        height: 363px;
+        max-height: 363px;
         @include mediaMaxW(800px) {
           display: none;
         }
@@ -185,21 +189,22 @@ $titleClr: peru;
       &-number {
         padding: 10px;
       }
+      &-when-new-season {
+        padding-left: 50px;
+      }
     }
     &-episodes {
       display: grid;
       grid-row-gap: 5px;
-      cursor: pointer;
       &--loading {
         grid-column: 1 / 3;
+        @include mediaMaxW(800px) {
+          grid-column: inherit;
+        }
       }
     }
     &-episode {
       position: relative;
-      display: grid;
-      grid-template-columns: 25% 45% 30%;
-      grid-template-rows: minmax(33px, max-content);
-      padding-top: 5px;
       font-size: 1rem;
       &:after {
         content: "";
@@ -233,10 +238,12 @@ $titleClr: peru;
         position: relative;
         display: grid;
         grid-column: 1 / 4;
-        grid-template-columns: 1fr 3fr;
-        height: 40px;
-        padding-top: 5px;
+        column-gap: 8px;
+        grid-template-columns: minmax(100px, 1.1fr) 3fr 0.8fr;
+        grid-template-rows: minmax(34px, max-content);
+        padding: 3px 0 3px 0;
         background-color: #1d1d1d96;
+        cursor: pointer;
         &:before {
           content: "";
           position: absolute;
@@ -255,10 +262,22 @@ $titleClr: peru;
         }
       }
       &-date {
-        padding-left: 5px;
+        padding-left: 10px;
+        align-self: center;
+      }
+      &-name {
+        align-self: center;
       }
       &-number {
         padding-right: 7px;
+      }
+      &-when-new-episode {
+        align-self: center;
+        justify-self: end;
+        padding-right: 30px;
+        @include mediaMaxW(650px) {
+          text-align: center;
+        }
       }
       &-links {
         position: relative;
@@ -277,14 +296,19 @@ $titleClr: peru;
         }
       }
       &--loading {
-        grid-template-columns: 1fr;
+        &:after {
+          display: none;
+        }
       }
       &-detailes {
         display: grid;
         grid-template-columns: 11fr 39fr;
-        grid-gap: 10px;
+        column-gap: 10px;
         grid-column: 1 / 4;
-        padding: 10px 0 10px 0;
+
+        &-overview {
+          padding: 10px 0 10px 0;
+        }
 
         &-image {
           grid-row: 1 / 3;
@@ -293,6 +317,7 @@ $titleClr: peru;
           background-repeat: no-repeat;
           background-size: cover;
           border-radius: 5px;
+          margin: 10px 0 10px 0;
         }
         &--no-image {
           grid-template-columns: 1fr;

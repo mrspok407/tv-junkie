@@ -7,11 +7,11 @@ import React, { useState, useEffect, useContext } from "react"
 import { useLocation } from "react-router-dom"
 import axios from "axios"
 import { SelectedContentContext } from "../../Context/SelectedContentContext"
-import { API_KEY } from "../../../Utils"
-import "./FullContentInfo.scss"
 import PlaceholderLoadingFullInfo from "../../Placeholders/PlaceholderLoadingFullInfo"
 import Header from "../../Header/Header"
 import Loader from "../../Placeholders/Loader"
+import { API_KEY, differenceBtwDatesInDays } from "../../../Utils"
+import "./FullContentInfo.scss"
 
 const todayDate = new Date()
 
@@ -495,17 +495,42 @@ export default function FullContentInfo({
             <div className="full-detailes__info-seasons-and-episodes">
               {mediaType === "show" &&
                 seasonsArr.map(season => {
-                  if (season.season_number === 0 || season.name === "Specials")
+                  if (
+                    season.season_number === 0 ||
+                    season.name === "Specials" ||
+                    !season.air_date
+                  )
                     return
                   const seasonId = season.id
 
+                  const daysToNewSeason = differenceBtwDatesInDays(
+                    season.air_date,
+                    todayDate
+                  )
+
                   return (
-                    <div key={seasonId} className="full-detailes__info-season">
+                    <div
+                      key={seasonId}
+                      className={
+                        !season.poster_path
+                          ? "full-detailes__info-season full-detailes__info-season--no-poster"
+                          : "full-detailes__info-season"
+                      }
+                    >
                       <div
                         className={
                           !openSeasons.includes(seasonId)
                             ? "full-detailes__info-season-info"
                             : "full-detailes__info-season-info full-detailes__info-season-info--open"
+                        }
+                        style={
+                          daysToNewSeason > 0
+                            ? {
+                                backgroundColor: "rgba(132, 90, 90, 0.3)"
+                              }
+                            : {
+                                backgroundColor: "#1d1d1d96"
+                              }
                         }
                         onClick={() =>
                           showSeasonsEpisode(seasonId, season.season_number)
@@ -513,6 +538,11 @@ export default function FullContentInfo({
                       >
                         <div className="full-detailes__info-season-number">
                           Season {season.season_number}
+                          {daysToNewSeason > 0 && (
+                            <span className="full-detailes__info-season-when-new-season">
+                              {daysToNewSeason} days to air
+                            </span>
+                          )}
                         </div>
                         <div className="full-detailes__info-season-date">
                           {season.air_date && season.air_date.slice(0, 4)}
@@ -522,17 +552,21 @@ export default function FullContentInfo({
                       {openSeasons.includes(seasonId) &&
                         (!loadingEpisodesIds.includes(seasonId) ? (
                           <>
-                            <div
-                              className="full-detailes__info-season-poster"
-                              style={{
-                                backgroundImage: `url(https://image.tmdb.org/t/p/w500/${season.poster_path})`
-                              }}
-                            />
+                            {season.poster_path && (
+                              <div
+                                className="full-detailes__info-season-poster"
+                                style={{
+                                  backgroundImage: `url(https://image.tmdb.org/t/p/w500/${season.poster_path})`
+                                }}
+                              />
+                            )}
+
                             <div className="full-detailes__info-episodes">
                               {tvShowEpisodes.map(item => {
                                 if (item.seasonId !== seasonId) return
 
                                 return item.episodes.map(episode => {
+                                  // if (!episode.air_date) return
                                   // Format Date //
                                   const airDateISO = new Date(
                                     episode.air_date
@@ -546,10 +580,12 @@ export default function FullContentInfo({
 
                                   const formatedDate = new Date(airDateISO)
 
-                                  const episodeAirDate = new Intl.DateTimeFormat(
-                                    "en-US",
-                                    optionss
-                                  ).format(formatedDate)
+                                  const episodeAirDate = episode.air_date
+                                    ? new Intl.DateTimeFormat(
+                                        "en-US",
+                                        optionss
+                                      ).format(formatedDate)
+                                    : "No date available"
                                   // Format Date End //
 
                                   // Format Seasons And Episode Numbers //
@@ -570,6 +606,11 @@ export default function FullContentInfo({
                                     episode.air_date
                                   )
 
+                                  const daysToNewEpisode = differenceBtwDatesInDays(
+                                    episode.air_date,
+                                    todayDate
+                                  )
+
                                   return (
                                     <div
                                       key={episode.id}
@@ -578,11 +619,23 @@ export default function FullContentInfo({
                                           ? "full-detailes__info-episode"
                                           : "full-detailes__info-episode full-detailes__info-episode--open"
                                       }
-                                      onClick={() =>
-                                        showEpisodeInfo(episode.id)
-                                      }
                                     >
-                                      <div className="full-detailes__info-episode-wrapper">
+                                      <div
+                                        className="full-detailes__info-episode-wrapper"
+                                        onClick={() =>
+                                          showEpisodeInfo(episode.id)
+                                        }
+                                        style={
+                                          daysToNewEpisode > 0
+                                            ? {
+                                                backgroundColor:
+                                                  "rgba(132, 90, 90, 0.3)"
+                                              }
+                                            : {
+                                                backgroundColor: "#1d1d1d96"
+                                              }
+                                        }
+                                      >
                                         <div className="full-detailes__info-episode-date">
                                           {episodeAirDate}
                                         </div>
@@ -592,6 +645,11 @@ export default function FullContentInfo({
                                           </span>
                                           {episode.name}
                                         </div>
+                                        {daysToNewEpisode > 0 && (
+                                          <div className="full-detailes__info-episode-when-new-episode">
+                                            {daysToNewEpisode} days
+                                          </div>
+                                        )}
                                       </div>
 
                                       {detailEpisodeInfo.includes(
@@ -612,35 +670,39 @@ export default function FullContentInfo({
                                               }}
                                             ></div>
                                           )}
-                                          <div className="full-detailes__info-episode-detailes-overview">
-                                            {episode.overview}
-                                          </div>
-                                          {episodeAirDateAsDateObj <
-                                            todayDate.getTime() && (
-                                            <div className="torrent-links torrent-links--full-content-info">
-                                              <a
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}+1080p&cat=41`}
-                                              >
-                                                1080p
-                                              </a>
-                                              <a
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}+720p&cat=41`}
-                                              >
-                                                720p
-                                              </a>
-                                              <a
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}&cat=5`}
-                                              >
-                                                480p
-                                              </a>
+                                          {episode.overview && (
+                                            <div className="full-detailes__info-episode-detailes-overview">
+                                              {episode.overview}
                                             </div>
                                           )}
+
+                                          {episodeAirDateAsDateObj <
+                                            todayDate.getTime() &&
+                                            episode.air_date && (
+                                              <div className="torrent-links torrent-links--full-content-info">
+                                                <a
+                                                  target="_blank"
+                                                  rel="noopener noreferrer"
+                                                  href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}+1080p&cat=41`}
+                                                >
+                                                  1080p
+                                                </a>
+                                                <a
+                                                  target="_blank"
+                                                  rel="noopener noreferrer"
+                                                  href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}+720p&cat=41`}
+                                                >
+                                                  720p
+                                                </a>
+                                                <a
+                                                  target="_blank"
+                                                  rel="noopener noreferrer"
+                                                  href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}&cat=5`}
+                                                >
+                                                  480p
+                                                </a>
+                                              </div>
+                                            )}
                                         </div>
                                       )}
                                     </div>

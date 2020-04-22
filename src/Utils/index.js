@@ -6,6 +6,12 @@ import iconMediaTypeTv from "../assets/images/icons/media-type-tv.png"
 export const range = (start, stop, step) =>
   Array.from({ length: (stop - start) / step + 1 }, (_, i) => start + i * step)
 
+export const differenceBtwDatesInDays = (firstDate, secondDate) => {
+  const diffInTime = new Date(firstDate) - new Date(secondDate)
+  const diffInDays = Math.ceil(diffInTime / (1000 * 3600 * 24))
+  return diffInDays
+}
+
 export const sortBy = [
   { name: "Most vote count", codeName: "vote_count.desc" },
   { name: "Most popular", codeName: "popularity.desc" },

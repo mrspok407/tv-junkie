@@ -8,8 +8,6 @@ import PlaceholderNoResults from "../Placeholders/PlaceholderNoResults"
 import { SelectedContentContext } from "../Context/SelectedContentContext"
 import ScrollToTop from "../../Utils/ScrollToTop"
 import Header from "../Header/Header"
-// import Footer from "../Footer/Footer"
-// import ScrollToTop from "../../Utils/ScrollToTop"
 
 const API_KEY = "c5e3186413780c3aeec39b0767a6ec99"
 
