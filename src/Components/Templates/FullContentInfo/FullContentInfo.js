@@ -16,6 +16,8 @@ import "./FullContentInfo.scss"
 
 const todayDate = new Date()
 
+console.log("test")
+
 export default function FullContentInfo({
   match: {
     params: { id, mediaType }
