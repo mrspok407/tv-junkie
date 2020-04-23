@@ -16,7 +16,7 @@ import "./FullContentInfo.scss"
 
 const todayDate = new Date()
 
-console.log("vrrrrrrrrrrr")
+console.log("gus'")
 
 export default function FullContentInfo({
   match: {
