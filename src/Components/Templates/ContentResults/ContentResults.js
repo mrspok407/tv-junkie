@@ -267,7 +267,7 @@ export default function ContentResults({
                           <div className="content-results__item-links-episode">
                             {`${lastSeason}${lastEpisode} ${lastAirDate}`}
                           </div>
-                          <div className="torrent-links">
+                          <div className="torrent-links torrent-links--content-results">
                             <a
                               target="_blank"
                               rel="noopener noreferrer"

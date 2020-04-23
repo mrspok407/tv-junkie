@@ -8,6 +8,7 @@ import { useLocation } from "react-router-dom"
 import axios from "axios"
 import { SelectedContentContext } from "../../Context/SelectedContentContext"
 import PlaceholderLoadingFullInfo from "../../Placeholders/PlaceholderLoadingFullInfo"
+import ScrollToTop from "../../../Utils/ScrollToTop"
 import Header from "../../Header/Header"
 import Loader from "../../Placeholders/Loader"
 import { API_KEY, differenceBtwDatesInDays } from "../../../Utils"
@@ -55,6 +56,7 @@ export default function FullContentInfo({
   const [detailEpisodeInfo, setDetailEpisodeInfo] = useState([])
 
   const [error, setError] = useState()
+  const [errorShowEpisodes, setErrorShowEpisodes] = useState()
 
   const { selectedContent, toggleContent } = useContext(SelectedContentContext)
 
@@ -165,10 +167,21 @@ export default function FullContentInfo({
         `https://api.themoviedb.org/3/tv/${id}/season/${seasonNum}?api_key=c5e3186413780c3aeec39b0767a6ec99&language=en-US`
       )
       .then(({ data: { episodes } }) => {
-        setTvShowEpisodes(prevState => [...prevState, { seasonId, episodes }])
+        // console.log(episodes)
+        const episodesReverese = episodes.reverse()
+        // console.log(episodesReverese)
+        setTvShowEpisodes(prevState => [
+          ...prevState,
+          { seasonId, episodes: episodesReverese }
+        ])
         setLoadingEpisodesIds(prevState => [
           ...prevState.filter(item => item !== seasonId)
         ])
+        setErrorShowEpisodes("")
+      })
+      .catch(() => {
+        setErrorShowEpisodes("Something went wrong, sorry")
+        setLoadingEpisodesIds([])
       })
   }
 
@@ -626,7 +639,8 @@ export default function FullContentInfo({
                                           showEpisodeInfo(episode.id)
                                         }
                                         style={
-                                          daysToNewEpisode > 0
+                                          daysToNewEpisode > 0 ||
+                                          !episode.air_date
                                             ? {
                                                 backgroundColor:
                                                   "rgba(132, 90, 90, 0.3)"
@@ -714,7 +728,11 @@ export default function FullContentInfo({
                         ) : (
                           <div className="full-detailes__info-episodes full-detailes__info-episodes--loading">
                             <div className="full-detailes__info-episode full-detailes__info-episode--loading">
-                              <Loader className="loader--show-links loader--show-links-detailes" />
+                              {!errorShowEpisodes ? (
+                                <Loader className="loader--show-links loader--show-links-detailes" />
+                              ) : (
+                                <div>{errorShowEpisodes}</div>
+                              )}
                             </div>
                           </div>
                         ))}
@@ -727,6 +745,7 @@ export default function FullContentInfo({
           <PlaceholderLoadingFullInfo delayAnimation="0.4s" />
         )}
       </div>
+      <ScrollToTop />
     </>
   )
 }

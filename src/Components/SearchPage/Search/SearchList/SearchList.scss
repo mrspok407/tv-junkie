@@ -50,6 +50,10 @@
     }
   }
 
+  &__buttons {
+    align-self: end;
+  }
+
   &__image {
     min-width: 100px;
     height: 132px;
