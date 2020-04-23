@@ -284,22 +284,6 @@ $titleClr: peru;
         text-align: center;
       }
     }
-    // &-links {
-    //   position: relative;
-    //   cursor: pointer;
-    //   &-show {
-    //     display: none;
-    //     text-align: center;
-    //     padding: 5px 0px 5px 0px;
-    //     background-color: peru;
-    //     color: #fff;
-    //     text-decoration: none;
-    //     transition: 0.3s;
-    //     @include mediaMaxW(580px) {
-    //       display: inherit;
-    //     }
-    //   }
-    // }
     &--loading {
       &:after {
         display: none;

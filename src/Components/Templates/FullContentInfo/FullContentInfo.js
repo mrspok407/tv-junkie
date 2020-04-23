@@ -16,8 +16,6 @@ import "./FullContentInfo.scss"
 
 const todayDate = new Date()
 
-console.log("ffffffffffffffff")
-
 export default function FullContentInfo({
   match: {
     params: { id, mediaType }
@@ -74,6 +72,7 @@ export default function FullContentInfo({
     } else if (mediaType === "movie") {
       getFullMovieInfo()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mediaType])
 
   const getFullShowInfo = () => {
@@ -515,7 +514,7 @@ export default function FullContentInfo({
                     season.name === "Specials" ||
                     !season.air_date
                   )
-                    return
+                    return null
                   const seasonId = season.id
 
                   const daysToNewSeason = differenceBtwDatesInDays(
@@ -578,7 +577,7 @@ export default function FullContentInfo({
 
                             <div className="full-detailes__episodes-list">
                               {tvShowEpisodes.map(item => {
-                                if (item.seasonId !== seasonId) return
+                                if (item.seasonId !== seasonId) return null
 
                                 return item.episodes.map(episode => {
                                   // Format Date //
