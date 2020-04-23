@@ -506,8 +506,8 @@ export default function FullContentInfo({
                 )}
               </div>
             </div>
-            <div className="full-detailes__info-description">{description}</div>
-            <div className="full-detailes__info-seasons-and-episodes">
+            <div className="full-detailes__description">{description}</div>
+            <div className="full-detailes__seasons-and-episodes">
               {mediaType === "show" &&
                 seasonsArr.map(season => {
                   if (
@@ -528,15 +528,15 @@ export default function FullContentInfo({
                       key={seasonId}
                       className={
                         !season.poster_path
-                          ? "full-detailes__info-season full-detailes__info-season--no-poster"
-                          : "full-detailes__info-season"
+                          ? "full-detailes__season full-detailes__season--no-poster"
+                          : "full-detailes__season"
                       }
                     >
                       <div
                         className={
                           !openSeasons.includes(seasonId)
-                            ? "full-detailes__info-season-info"
-                            : "full-detailes__info-season-info full-detailes__info-season-info--open"
+                            ? "full-detailes__season-info"
+                            : "full-detailes__season-info full-detailes__season-info--open"
                         }
                         style={
                           daysToNewSeason > 0
@@ -551,15 +551,15 @@ export default function FullContentInfo({
                           showSeasonsEpisode(seasonId, season.season_number)
                         }
                       >
-                        <div className="full-detailes__info-season-number">
+                        <div className="full-detailes__season-number">
                           Season {season.season_number}
                           {daysToNewSeason > 0 && (
-                            <span className="full-detailes__info-season-when-new-season">
+                            <span className="full-detailes__season-when-new-season">
                               {daysToNewSeason} days to air
                             </span>
                           )}
                         </div>
-                        <div className="full-detailes__info-season-date">
+                        <div className="full-detailes__season-date">
                           {season.air_date && season.air_date.slice(0, 4)}
                         </div>
                       </div>
@@ -569,19 +569,18 @@ export default function FullContentInfo({
                           <>
                             {season.poster_path && (
                               <div
-                                className="full-detailes__info-season-poster"
+                                className="full-detailes__season-poster"
                                 style={{
                                   backgroundImage: `url(https://image.tmdb.org/t/p/w500/${season.poster_path})`
                                 }}
                               />
                             )}
 
-                            <div className="full-detailes__info-episodes">
+                            <div className="full-detailes__episodes-list">
                               {tvShowEpisodes.map(item => {
                                 if (item.seasonId !== seasonId) return
 
                                 return item.episodes.map(episode => {
-                                  // if (!episode.air_date) return
                                   // Format Date //
                                   const airDateISO = new Date(
                                     episode.air_date
@@ -631,12 +630,12 @@ export default function FullContentInfo({
                                       key={episode.id}
                                       className={
                                         !detailEpisodeInfo.includes(episode.id)
-                                          ? "full-detailes__info-episode"
-                                          : "full-detailes__info-episode full-detailes__info-episode--open"
+                                          ? "full-detailes__episode"
+                                          : "full-detailes__episode full-detailes__episode--open"
                                       }
                                     >
                                       <div
-                                        className="full-detailes__info-episode-wrapper"
+                                        className="full-detailes__episode-wrapper"
                                         onClick={() =>
                                           showEpisodeInfo(episode.id)
                                         }
@@ -652,17 +651,17 @@ export default function FullContentInfo({
                                               }
                                         }
                                       >
-                                        <div className="full-detailes__info-episode-date">
+                                        <div className="full-detailes__episode-date">
                                           {episodeAirDate}
                                         </div>
-                                        <div className="full-detailes__info-episode-name">
-                                          <span className="full-detailes__info-episode-number">
+                                        <div className="full-detailes__episode-name">
+                                          <span className="full-detailes__episode-number">
                                             {episode.episode_number}.
                                           </span>
                                           {episode.name}
                                         </div>
                                         {daysToNewEpisode > 0 && (
-                                          <div className="full-detailes__info-episode-when-new-episode">
+                                          <div className="full-detailes__episode-when-new-episode">
                                             {daysToNewEpisode} days
                                           </div>
                                         )}
@@ -674,20 +673,20 @@ export default function FullContentInfo({
                                         <div
                                           className={
                                             episode.still_path
-                                              ? "full-detailes__info-episode-detailes"
-                                              : "full-detailes__info-episode-detailes full-detailes__info-episode-detailes--no-image"
+                                              ? "full-detailes__episode-detailes"
+                                              : "full-detailes__episode-detailes full-detailes__episode-detailes--no-image"
                                           }
                                         >
                                           {episode.still_path && (
                                             <div
-                                              className="full-detailes__info-episode-detailes-image"
+                                              className="full-detailes__episode-detailes-image"
                                               style={{
                                                 backgroundImage: `url(https://image.tmdb.org/t/p/w500${episode.still_path})`
                                               }}
                                             ></div>
                                           )}
                                           {episode.overview && (
-                                            <div className="full-detailes__info-episode-detailes-overview">
+                                            <div className="full-detailes__episode-detailes-overview">
                                               {episode.overview}
                                             </div>
                                           )}
@@ -695,7 +694,7 @@ export default function FullContentInfo({
                                           {episodeAirDateAsDateObj <
                                             todayDate.getTime() &&
                                             episode.air_date && (
-                                              <div className="torrent-links torrent-links--full-content-info">
+                                              <div className="torrent-links torrent-links--full-content">
                                                 <a
                                                   target="_blank"
                                                   rel="noopener noreferrer"
@@ -728,8 +727,8 @@ export default function FullContentInfo({
                             </div>
                           </>
                         ) : (
-                          <div className="full-detailes__info-episodes full-detailes__info-episodes--loading">
-                            <div className="full-detailes__info-episode full-detailes__info-episode--loading">
+                          <div className="full-detailes__episodes-list full-detailes__episodes-list--loading">
+                            <div className="full-detailes__episode full-detailes__episode--loading">
                               {!errorShowEpisodes ? (
                                 <Loader className="loader--show-links loader--show-links-detailes" />
                               ) : (
