@@ -16,7 +16,7 @@ import "./FullContentInfo.scss"
 
 const todayDate = new Date()
 
-console.log("test2")
+console.log("test3")
 
 export default function FullContentInfo({
   match: {
