@@ -131,7 +131,9 @@ export default class Input extends Component {
           onKeyDown={this.handleKeyDown}
           onFocus={this.props.onFocus}
         />
-        {this.props.isSearchingList && <Loader className="loader--input" />}
+        {this.props.isSearchingList && (
+          <Loader className="loader--small-pink" />
+        )}
         {this.state.query && (
           <button
             type="button"

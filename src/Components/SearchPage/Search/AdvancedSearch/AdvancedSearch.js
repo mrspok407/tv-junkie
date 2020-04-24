@@ -139,11 +139,18 @@ export default function AdvancedSearch({
 
                 <div className="inputs__buttons">
                   <div className="inputs__buttons--search">
-                    <button className="button button--search-adv" type="submit">
+                    <button
+                      className={
+                        !searchingAdvancedSearch
+                          ? "button button--search-adv"
+                          : "button button--search-adv button--search-adv--loading"
+                      }
+                      type="submit"
+                    >
                       Search
                     </button>
                     {searchingAdvancedSearch && (
-                      <Loader className="loader--adv-results" />
+                      <Loader className="loader--small-pink" />
                     )}
                   </div>
                   <div className="inputs__buttons--reset">

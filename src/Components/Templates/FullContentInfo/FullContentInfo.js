@@ -398,7 +398,7 @@ export default function FullContentInfo({
                       )}
                     </div>
                   ) : (
-                    <Loader className="loader--show-links" />
+                    <Loader className="loader--small-pink" />
                   )}
                 </div>
               ) : (
@@ -543,6 +543,11 @@ export default function FullContentInfo({
                           ? "full-detailes__season full-detailes__season--no-poster"
                           : "full-detailes__season"
                       }
+                      style={
+                        !loadingEpisodesIds.includes(seasonId)
+                          ? { rowGap: "10px" }
+                          : { rowGap: "0px" }
+                      }
                     >
                       <div
                         className={
@@ -577,7 +582,7 @@ export default function FullContentInfo({
                       </div>
 
                       {openSeasons.includes(seasonId) &&
-                        (loadingEpisodesIds.includes(seasonId) ? (
+                        (!loadingEpisodesIds.includes(seasonId) ? (
                           <>
                             {season.poster_path && (
                               <div
@@ -738,16 +743,10 @@ export default function FullContentInfo({
                               })}
                             </div>
                           </>
+                        ) : !errorShowEpisodes ? (
+                          <Loader className="loader--small-pink" />
                         ) : (
-                          <div className="full-detailes__episodes-list full-detailes__episodes-list--loading">
-                            <div className="full-detailes__episode full-detailes__episode--loading">
-                              {!errorShowEpisodes ? (
-                                <Loader className="loader--show-links loader--show-links-detailes" />
-                              ) : (
-                                <div>{errorShowEpisodes}</div>
-                              )}
-                            </div>
-                          </div>
+                          <div>{errorShowEpisodes}</div>
                         ))}
                     </div>
                   )

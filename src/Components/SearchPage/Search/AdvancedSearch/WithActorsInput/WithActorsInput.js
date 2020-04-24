@@ -89,7 +89,7 @@ export default class WithActorsInput extends Component {
         ({ name, profile_path, id, known_for, known_for_department }) => (
           <div key={id} className="search-card">
             <div
-              className="search-card__image"
+              className="search-card__image search-card__image--person"
               style={
                 profile_path !== null
                   ? {
@@ -136,26 +136,25 @@ export default class WithActorsInput extends Component {
                   </div>
                 )}
               </div>
-
-              <div className="search-card__buttons search-card__buttons--person">
-                {withActors.some(e => e.id === id) ? (
-                  <button
-                    className="button button--searchlist button--pressed"
-                    onClick={() => toggleActor(id, name)}
-                    type="button"
-                  >
-                    Remove
-                  </button>
-                ) : (
-                  <button
-                    className="button button--searchlist"
-                    onClick={() => toggleActor(id, name)}
-                    type="button"
-                  >
-                    Add
-                  </button>
-                )}
-              </div>
+            </div>
+            <div className="search-card__buttons search-card__buttons--person">
+              {withActors.some(e => e.id === id) ? (
+                <button
+                  className="button button--searchlist button--pressed"
+                  onClick={() => toggleActor(id, name)}
+                  type="button"
+                >
+                  Remove
+                </button>
+              ) : (
+                <button
+                  className="button button--searchlist"
+                  onClick={() => toggleActor(id, name)}
+                  type="button"
+                >
+                  Add
+                </button>
+              )}
             </div>
           </div>
         )
@@ -209,7 +208,9 @@ export default class WithActorsInput extends Component {
             onKeyDown={this.handleKeyDown}
             onFocus={this.onFocus}
           />
-          {this.state.isSearchingActors && <Loader className="loader--input" />}
+          {this.state.isSearchingActors && (
+            <Loader className="loader--small-pink" />
+          )}
           {this.state.query && (
             <button
               type="button"

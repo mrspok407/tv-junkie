@@ -259,7 +259,7 @@ export default function ContentResults({
                         </button>
                       ) : loadingIds.includes(id) && !error ? (
                         <div>
-                          <Loader className="loader--show-links" />
+                          <Loader className="loader--small-pink" />
                         </div>
                       ) : (
                         loadingIds.includes(id) && (
@@ -318,7 +318,7 @@ export default function ContentResults({
                       </button>
                     ) : loadingIds.includes(id) && !error.includes(id) ? (
                       <div>
-                        <Loader className="loader--show-links" />
+                        <Loader className="loader--small-pink" />
                       </div>
                     ) : (
                       loadingIds.includes(id) && (

@@ -186,6 +186,11 @@
 
 .button--search-adv {
   background-color: getColor(blueClr, $mainPalette);
+  &--loading {
+    @include mediaMaxW(500px) {
+      font-size: 0;
+    }
+  }
 }
 
 .button--selected-content {
@@ -446,40 +451,7 @@
   }
 }
 
-.loader--new-page {
-  margin-top: 50px;
-  .loader-dots {
-    div {
-      background-color: #fff;
-    }
-  }
-  .loader-shadow {
-    div {
-      box-shadow: 0px 0px 15px 3px rgb(238, 54, 106);
-    }
-  }
-}
-
-.loader--search {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 140px;
-  margin: 0;
-  background-color: #fff;
-  animation-delay: 0.4s;
-
-  .loader-shadow {
-    top: 50%;
-    transform: translate(-50%, -50%);
-  }
-}
-
-.loader--input,
-.loader--adv-results,
-.loader--show-links,
-.loader--full-info {
+.loader--small-pink {
   position: absolute;
   top: 16px;
   right: 60px;
@@ -502,7 +474,7 @@
   }
 }
 
-.loader--full-info {
+.full-detailes__info .loader--small-pink {
   top: 50%;
   left: 30%;
   transform: translateY(-50%);
@@ -521,7 +493,7 @@
   }
 }
 
-.loader--full-info-poster {
+.full-detailes__poster .loader {
   .loader-dots {
     div {
       background-color: #fff;
@@ -534,7 +506,7 @@
   }
 }
 
-.loader--show-links {
+.content-results__item-links .loader--small-pink {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -548,16 +520,34 @@
   }
 }
 
-.loader--show-links-detailes {
-  position: relative;
-  top: 0;
+.full-detailes__season .loader--small-pink {
+  position: absolute;
+  top: 50%;
   left: 0;
   right: 0;
-  transform: translate(0, 0);
-  animation-delay: 0.1s;
+  transform: translate(0, -50%);
+  animation-delay: 0.25s;
+  .loader-shadow {
+    top: 50%;
+    transform: translate(-50%, -50%);
+    div {
+      @include mediaMaxW(500px) {
+        width: 18px;
+        height: 18px;
+      }
+    }
+  }
+  .loader-dots {
+    div {
+      @include mediaMaxW(500px) {
+        width: 18px;
+        height: 18px;
+      }
+    }
+  }
 }
 
-.full-detailes__links .loader--show-links {
+.full-detailes__links .loader--small-pink {
   position: static;
   display: flex;
   justify-content: center;
@@ -573,10 +563,17 @@
   }
 }
 
-.loader--adv-results {
+.advanced-search__cont .loader--small-pink {
   position: absolute;
   right: 11px;
   top: 14px;
+  @include mediaMaxW(500px) {
+    right: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    animation-delay: 0s;
+  }
 }
 
 .logo {
