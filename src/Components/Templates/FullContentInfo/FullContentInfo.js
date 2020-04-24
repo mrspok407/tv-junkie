@@ -40,15 +40,17 @@ export default function FullContentInfo({
     budget: ""
   })
 
-  const [loading, setLoading] = useState(true)
+  const [loadingPage, setLoadingPage] = useState(true)
 
   const [infoToPass, setInfoToPass] = useState([])
 
   const [movieTorrents, setMovieTorrents] = useState({
     title: "",
-    hash1080p: "",
-    hash720p: ""
+    hash1080p: true,
+    hash720p: true,
+    movieAvailable: true
   })
+  const [loadingTorrentLinks, setLoadingTorrentLinks] = useState(false)
 
   const [tvShowEpisodes, setTvShowEpisodes] = useState([])
   const [openSeasons, setOpenSeasons] = useState([])
@@ -76,7 +78,7 @@ export default function FullContentInfo({
   }, [mediaType])
 
   const getFullShowInfo = () => {
-    setLoading(true)
+    setLoadingPage(true)
 
     axios
       .get(
@@ -142,11 +144,12 @@ export default function FullContentInfo({
             numberOfSeasons: number_of_seasons || "-",
             seasonsArr: seasons.reverse()
           })
-          setLoading(false)
+          setLoadingPage(false)
         }
       )
       .catch(() => {
         setError("Something went wrong, sorry")
+        setLoadingPage(false)
       })
   }
 
@@ -165,12 +168,10 @@ export default function FullContentInfo({
 
     axios
       .get(
-        `https://api.themoviedb.org/3/tv/${id}/season/${seasonNum}?api_key=c5e3186413780c3aeec39b0767a6ec99&language=en-US`
+        `https://api.themoviedb.org/3/tv/${id}/season/${seasonNum}?api_key=${API_KEY}&language=en-US`
       )
       .then(({ data: { episodes } }) => {
-        // console.log(episodes)
         const episodesReverese = episodes.reverse()
-        // console.log(episodesReverese)
         setTvShowEpisodes(prevState => [
           ...prevState,
           { seasonId, episodes: episodesReverese }
@@ -197,7 +198,7 @@ export default function FullContentInfo({
   }
 
   const getFullMovieInfo = () => {
-    setLoading(true)
+    setLoadingPage(true)
     axios
       .get(
         `https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=en-US`
@@ -259,7 +260,8 @@ export default function FullContentInfo({
             budget: budget || "-"
           })
 
-          setLoading(false)
+          setLoadingPage(false)
+          setLoadingTorrentLinks(true)
 
           return axios.get(
             `https://yts.mx/api/v2/list_movies.json?query_term=${original_title} ${yearRelease}`
@@ -267,21 +269,29 @@ export default function FullContentInfo({
         }
       )
       .then(res => {
-        if (!res.data.data.hasOwnProperty("movies")) return
+        if (!res.data.data.hasOwnProperty("movies")) {
+          setMovieTorrents({
+            movieAvailable: false
+          })
+          return
+        }
+
         const movie = res.data.data.movies[0]
         const movieHash1080p = movie.torrents.find(
           item => item.quality === "1080p"
-        ).hash
+        )
 
         const movieHash720p = movie.torrents.find(
           item => item.quality === "720p"
-        ).hash
+        )
 
         setMovieTorrents({
           title: movie.title,
-          hash1080p: movieHash1080p,
-          hash720p: movieHash720p
+          hash1080p: movieHash1080p && movieHash1080p.hash,
+          hash720p: movieHash720p && movieHash720p.hash,
+          movieAvailable: true
         })
+        setLoadingTorrentLinks(false)
       })
       .catch(() => {
         setError("Something went wrong, sorry")
@@ -338,15 +348,9 @@ export default function FullContentInfo({
       <div className="full-detailes-container">
         {error ? (
           <span style={{ textAlign: "center", width: "100%" }}>{error}</span>
-        ) : !loading ? (
+        ) : !loadingPage ? (
           <div className="full-detailes">
-            <div
-              className={
-                mediaType === "show"
-                  ? "full-detailes__poster-wrapper"
-                  : "full-detailes__poster-wrapper full-detailes__poster-wrapper--movie"
-              }
-            >
+            <div className="full-detailes__poster-wrapper">
               <div
                 className="full-detailes__poster"
                 style={
@@ -369,24 +373,33 @@ export default function FullContentInfo({
               )}
 
               {mediaType === "movie" &&
-              yearReleaseAsDateObj.getTime() < todayDate.getTime() ? (
+              yearReleaseAsDateObj.getTime() < todayDate.getTime() &&
+              movieTorrents.movieAvailable ? (
                 <div className="full-detailes__links">
-                  <div className="torrent-links">
-                    <a
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      href={`magnet:?xt=urn:btih:${movieTorrents.hash1080p}&dn=${movieTorrents.title}&xl=310660222&tr=udp%3A%2F%2Ftracker.coppersurfer.tk:6969/announce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org:6969/announce&tr=udp%3A%2F%2Ftracker.pirateparty.gr:6969/announce&tr=udp%3A%2F%2Fexodus.desync.com:6969/announce&tr=udp%3A%2F%2Ftracker.opentrackr.org:1337/announce&tr=udp%3A%2F%2Ftracker.internetwarriors.net:1337/announce&tr=udp%3A%2F%2Ftracker.torrent.eu.org:451&tr=udp%3A%2F%2Ftracker.cyberia.is:6969/announce&tr=udp%3A%2F%2Fopen.demonii.si:1337/announce&tr=udp%3A%2F%2Fopen.stealth.si:80/announce&tr=udp%3A%2F%2Ftracker.tiny-vps.com:6969/announce&tr=udp%3A%2F%2Ftracker.iamhansen.xyz:2000/announce&tr=udp%3A%2F%2Fexplodie.org:6969/announce&tr=udp%3A%2F%2Fdenis.stalker.upeer.me:6969/announce&tr=udp%3A%2F%2Fipv4.tracker.harry.lu:80/announce`}
-                    >
-                      1080p
-                    </a>
-                    <a
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      href={`magnet:?xt=urn:btih:${movieTorrents.hash720p}&dn=${movieTorrents.title}&xl=310660222&tr=udp%3A%2F%2Ftracker.coppersurfer.tk:6969/announce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org:6969/announce&tr=udp%3A%2F%2Ftracker.pirateparty.gr:6969/announce&tr=udp%3A%2F%2Fexodus.desync.com:6969/announce&tr=udp%3A%2F%2Ftracker.opentrackr.org:1337/announce&tr=udp%3A%2F%2Ftracker.internetwarriors.net:1337/announce&tr=udp%3A%2F%2Ftracker.torrent.eu.org:451&tr=udp%3A%2F%2Ftracker.cyberia.is:6969/announce&tr=udp%3A%2F%2Fopen.demonii.si:1337/announce&tr=udp%3A%2F%2Fopen.stealth.si:80/announce&tr=udp%3A%2F%2Ftracker.tiny-vps.com:6969/announce&tr=udp%3A%2F%2Ftracker.iamhansen.xyz:2000/announce&tr=udp%3A%2F%2Fexplodie.org:6969/announce&tr=udp%3A%2F%2Fdenis.stalker.upeer.me:6969/announce&tr=udp%3A%2F%2Fipv4.tracker.harry.lu:80/announce`}
-                    >
-                      720p
-                    </a>
-                  </div>
+                  {!loadingTorrentLinks ? (
+                    <div className="torrent-links">
+                      {movieTorrents.hash1080p && (
+                        <a
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          href={`magnet:?xt=urn:btih:${movieTorrents.hash1080p}&dn=${movieTorrents.title}&xl=310660222&tr=udp%3A%2F%2Ftracker.coppersurfer.tk:6969/announce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org:6969/announce&tr=udp%3A%2F%2Ftracker.pirateparty.gr:6969/announce&tr=udp%3A%2F%2Fexodus.desync.com:6969/announce&tr=udp%3A%2F%2Ftracker.opentrackr.org:1337/announce&tr=udp%3A%2F%2Ftracker.internetwarriors.net:1337/announce&tr=udp%3A%2F%2Ftracker.torrent.eu.org:451&tr=udp%3A%2F%2Ftracker.cyberia.is:6969/announce&tr=udp%3A%2F%2Fopen.demonii.si:1337/announce&tr=udp%3A%2F%2Fopen.stealth.si:80/announce&tr=udp%3A%2F%2Ftracker.tiny-vps.com:6969/announce&tr=udp%3A%2F%2Ftracker.iamhansen.xyz:2000/announce&tr=udp%3A%2F%2Fexplodie.org:6969/announce&tr=udp%3A%2F%2Fdenis.stalker.upeer.me:6969/announce&tr=udp%3A%2F%2Fipv4.tracker.harry.lu:80/announce`}
+                        >
+                          1080p
+                        </a>
+                      )}
+                      {movieTorrents.hash720p && (
+                        <a
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          href={`magnet:?xt=urn:btih:${movieTorrents.hash720p}&dn=${movieTorrents.title}&xl=310660222&tr=udp%3A%2F%2Ftracker.coppersurfer.tk:6969/announce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org:6969/announce&tr=udp%3A%2F%2Ftracker.pirateparty.gr:6969/announce&tr=udp%3A%2F%2Fexodus.desync.com:6969/announce&tr=udp%3A%2F%2Ftracker.opentrackr.org:1337/announce&tr=udp%3A%2F%2Ftracker.internetwarriors.net:1337/announce&tr=udp%3A%2F%2Ftracker.torrent.eu.org:451&tr=udp%3A%2F%2Ftracker.cyberia.is:6969/announce&tr=udp%3A%2F%2Fopen.demonii.si:1337/announce&tr=udp%3A%2F%2Fopen.stealth.si:80/announce&tr=udp%3A%2F%2Ftracker.tiny-vps.com:6969/announce&tr=udp%3A%2F%2Ftracker.iamhansen.xyz:2000/announce&tr=udp%3A%2F%2Fexplodie.org:6969/announce&tr=udp%3A%2F%2Fdenis.stalker.upeer.me:6969/announce&tr=udp%3A%2F%2Fipv4.tracker.harry.lu:80/announce`}
+                        >
+                          720p
+                        </a>
+                      )}
+                    </div>
+                  ) : (
+                    <Loader className="loader--show-links" />
+                  )}
                 </div>
               ) : (
                 ""
@@ -564,7 +577,7 @@ export default function FullContentInfo({
                       </div>
 
                       {openSeasons.includes(seasonId) &&
-                        (!loadingEpisodesIds.includes(seasonId) ? (
+                        (loadingEpisodesIds.includes(seasonId) ? (
                           <>
                             {season.poster_path && (
                               <div

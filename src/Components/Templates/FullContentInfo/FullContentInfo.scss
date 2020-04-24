@@ -52,6 +52,9 @@ $titleClr: peru;
       grid-template-rows: 90% 10%;
     }
   }
+  &__links {
+    position: relative;
+  }
 
   &__info {
     &-title {
@@ -90,6 +93,7 @@ $titleClr: peru;
     &--button {
       grid-template-columns: 1fr;
       padding-top: 5px;
+      padding-bottom: 0;
     }
   }
 

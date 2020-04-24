@@ -557,6 +557,22 @@
   animation-delay: 0.1s;
 }
 
+.full-detailes__links .loader--show-links {
+  position: static;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 58px;
+  transform: translate(0, 0);
+  .loader-shadow {
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
+
 .loader--adv-results {
   position: absolute;
   right: 11px;

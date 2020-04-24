@@ -20,7 +20,7 @@ export default class Movies extends Component {
     }
   }
 
-  getEpisodeInfo = (id, showAllLinksPressed = false, title, date) => {
+  getMovieLinks = (id, showAllLinksPressed = false, title, date) => {
     if (this.state.moviesIds.includes(id) || this.state.showAllLinksPressed)
       return
 
@@ -62,7 +62,7 @@ export default class Movies extends Component {
             moviesArr={this.state.moviesArr}
             loadingIds={this.state.loadingIds}
             moviesIds={this.state.moviesIds}
-            getEpisodeInfo={this.getEpisodeInfo}
+            getMovieLinks={this.getMovieLinks}
             showAllLinksPressed={this.state.showAllLinksPressed}
             error={this.state.error}
             className="content-results__wrapper--movies-page"
