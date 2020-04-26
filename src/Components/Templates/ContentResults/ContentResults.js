@@ -4,7 +4,6 @@ import { listOfGenres } from "../../../Utils"
 import { SelectedContentContext } from "../../Context/SelectedContentContext"
 import "./ContentResults.scss"
 import Loader from "../../Placeholders/Loader"
-import PlaceholderNoResults from "../../Placeholders/PlaceholderNoResults"
 
 const todayDate = new Date()
 const currentYear = todayDate.getFullYear()
@@ -58,27 +57,27 @@ export default function ContentResults({
       }
     >
       {contentType !== "adv-search" ? (
-        <div className="content-results__button--clear-searched">
+        <div className="content-results__button-top">
           <button
-            className="button button--show-all-links"
+            className="button"
             type="button"
             onClick={() => showLinksToAll()}
           >
             Show Links To All
           </button>
         </div>
-      ) : advancedSearchContent.length > 0 ? (
-        <div className="content-results__button--clear-searched">
-          <button
-            type="button"
-            className="button button--clear-movies"
-            onClick={() => clearAdvSearchMovies()}
-          >
-            Clear Searched
-          </button>
-        </div>
       ) : (
-        <PlaceholderNoResults message="No content found" />
+        advancedSearchContent.length > 0 && (
+          <div className="content-results__button-top">
+            <button
+              type="button"
+              className="button"
+              onClick={() => clearAdvSearchMovies()}
+            >
+              Clear Searched
+            </button>
+          </div>
+        )
       )}
 
       <div
@@ -259,7 +258,7 @@ export default function ContentResults({
                       {!showsIds.includes(id) ? (
                         <button
                           type="button"
-                          className="button button--content-results button--show-links"
+                          className="button button--content-results"
                           onClick={() => getLastEpisodeLinks(id)}
                         >
                           Show Last Episode Links
@@ -316,7 +315,7 @@ export default function ContentResults({
                     {!moviesIds.includes(id) ? (
                       <button
                         type="button"
-                        className="button button--content-results button--show-links"
+                        className="button"
                         onClick={() =>
                           getMovieLinks(id, false, original_title, release_date)
                         }
@@ -365,29 +364,33 @@ export default function ContentResults({
                 {selectedContent.some(e => e.id === id) ? (
                   <>
                     {contentType === "adv-search" ? (
-                      <button
-                        className="button button--content-results button--pressed"
-                        onClick={() => toggleContent(id, contentArr)}
-                        type="button"
-                      >
-                        Remove {original_title ? "movie" : "show"}
-                      </button>
+                      <div className="content-results__item-links content-results__item-links--adv-search">
+                        <button
+                          className="button button--pressed"
+                          onClick={() => toggleContent(id, contentArr)}
+                          type="button"
+                        >
+                          Remove {original_title ? "movie" : "show"}
+                        </button>
+                      </div>
                     ) : (
                       <button
-                        className="button--del-content-results"
+                        className="button--del-item"
                         onClick={() => toggleContent(id, contentArr)}
                         type="button"
                       />
                     )}
                   </>
                 ) : (
-                  <button
-                    className="button button--content-results"
-                    onClick={() => toggleContent(id, contentArr)}
-                    type="button"
-                  >
-                    Add {original_title ? "movie" : "show"}
-                  </button>
+                  <div className="content-results__item-links content-results__item-links--adv-search">
+                    <button
+                      className="button"
+                      onClick={() => toggleContent(id, contentArr)}
+                      type="button"
+                    >
+                      Add {original_title ? "movie" : "show"}
+                    </button>
+                  </div>
                 )}
               </div>
             )

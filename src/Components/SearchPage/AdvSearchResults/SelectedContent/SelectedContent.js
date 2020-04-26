@@ -51,10 +51,10 @@ export default class MovieResultsSelected extends React.PureComponent {
         </button>
         {this.state.showSelected && (
           <div className="selected-content__list">
-            <div className="selected-content__clear">
+            <div className="selected-content__button-clear">
               <button
                 type="button"
-                className="button button--clear-selected-content"
+                className="button"
                 onClick={() => this.context.clearSelectedContent()}
               >
                 Clear Selected
@@ -103,7 +103,7 @@ export default class MovieResultsSelected extends React.PureComponent {
                           : overview}
                       </div>
                       <button
-                        className="button button--selected-content"
+                        className="button"
                         type="button"
                         onClick={() => this.context.toggleContent(id)}
                       >

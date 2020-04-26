@@ -153,3 +153,7 @@
   height: 30px;
   color: getColor(textColor, $inputPalette);
 }
+
+.button--input-clear {
+  @include buttonCross;
+}
