@@ -6,6 +6,18 @@
 .advanced-search__cont {
   width: 100%;
   z-index: 0;
+  .loader--small-pink {
+    position: absolute;
+    right: 11px;
+    top: 14px;
+    @include mediaMaxW(500px) {
+      right: 0;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      top: 50%;
+      animation-delay: 0s;
+    }
+  }
 }
 
 .inputs__cont {

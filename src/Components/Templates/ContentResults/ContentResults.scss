@@ -43,6 +43,13 @@ $gridGap: 10px;
     margin-top: 50px;
     color: rgb(32, 32, 32);
   }
+  &--adv-search {
+    .placeholder--no-results {
+      position: static;
+      color: getColor(orangeClr, $mainPalette);
+      background-color: inherit;
+    }
+  }
 }
 
 .content-results__wrapper {
@@ -153,6 +160,20 @@ $gridGap: 10px;
     height: 75px;
     padding: 0 15px 10px 15px;
     margin-top: auto;
+
+    .loader--small-pink {
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation-delay: 0.15s;
+      .loader-dots,
+      .loader-shadow {
+        div {
+          width: 25px;
+          height: 25px;
+        }
+      }
+    }
 
     &--error {
       display: flex;

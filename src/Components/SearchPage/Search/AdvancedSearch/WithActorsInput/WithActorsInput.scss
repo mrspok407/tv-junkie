@@ -5,6 +5,9 @@
 .inputs__with-actors {
   position: relative;
   margin-top: 5px;
+  .placeholder--no-results {
+    height: 70px;
+  }
 }
 
 .actors-input {

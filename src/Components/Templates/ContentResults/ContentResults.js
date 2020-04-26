@@ -4,6 +4,7 @@ import { listOfGenres } from "../../../Utils"
 import { SelectedContentContext } from "../../Context/SelectedContentContext"
 import "./ContentResults.scss"
 import Loader from "../../Placeholders/Loader"
+import PlaceholderNoResults from "../../Placeholders/PlaceholderNoResults"
 
 const todayDate = new Date()
 const currentYear = todayDate.getFullYear()
@@ -49,7 +50,13 @@ export default function ContentResults({
     contentArr.length <= maxColumns - 1 ? contentArr.length : maxColumns
 
   return (
-    <div className="content-results">
+    <div
+      className={
+        contentType === "adv-search"
+          ? "content-results content-results--adv-search"
+          : "content-results"
+      }
+    >
       {contentType !== "adv-search" ? (
         <div className="content-results__button--clear-searched">
           <button
@@ -60,18 +67,18 @@ export default function ContentResults({
             Show Links To All
           </button>
         </div>
+      ) : advancedSearchContent.length > 0 ? (
+        <div className="content-results__button--clear-searched">
+          <button
+            type="button"
+            className="button button--clear-movies"
+            onClick={() => clearAdvSearchMovies()}
+          >
+            Clear Searched
+          </button>
+        </div>
       ) : (
-        advancedSearchContent.length > 0 && (
-          <div className="content-results__button--clear-searched">
-            <button
-              type="button"
-              className="button button--clear-movies"
-              onClick={() => clearAdvSearchMovies()}
-            >
-              Clear Searched
-            </button>
-          </div>
-        )
+        <PlaceholderNoResults message="No content found" />
       )}
 
       <div

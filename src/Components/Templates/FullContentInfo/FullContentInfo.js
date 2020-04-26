@@ -7,7 +7,7 @@ import React, { useState, useEffect, useContext } from "react"
 import { useLocation } from "react-router-dom"
 import axios from "axios"
 import { SelectedContentContext } from "../../Context/SelectedContentContext"
-import PlaceholderLoadingFullInfo from "../../Placeholders/PlaceholderLoadingFullInfo"
+import PlaceholderLoadingFullInfo from "../../Placeholders/PlaceholderLoadingFullInfo/PlaceholderLoadingFullInfo"
 import ScrollToTop from "../../../Utils/ScrollToTop"
 import Header from "../../Header/Header"
 import Loader from "../../Placeholders/Loader"
@@ -375,7 +375,7 @@ export default function FullContentInfo({
               {mediaType === "movie" &&
               yearReleaseAsDateObj.getTime() < todayDate.getTime() &&
               movieTorrents.movieAvailable ? (
-                <div className="full-detailes__links">
+                <div className="full-detailes__movie-links">
                   {!loadingTorrentLinks ? (
                     <div className="torrent-links">
                       {movieTorrents.hash1080p && (

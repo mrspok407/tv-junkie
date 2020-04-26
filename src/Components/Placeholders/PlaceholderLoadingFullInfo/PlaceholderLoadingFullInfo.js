@@ -1,5 +1,6 @@
 import React from "react"
-import Loader from "./Loader"
+import Loader from "../Loader"
+import "./PlaceholderLoadingFullInfo.scss"
 
 export default ({ delayAnimation }) => (
   <div

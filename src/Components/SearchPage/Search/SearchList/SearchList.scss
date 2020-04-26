@@ -25,6 +25,7 @@
   overflow: hidden;
   cursor: pointer;
   background-color: getColor(backgroundColor, $movieListPalette);
+  transition: 0.2s;
 
   @mixin cardHovered {
     #{$parentRef}:hover & {
@@ -73,10 +74,6 @@
   &__info {
     display: flex;
     flex-direction: column;
-
-    &-link {
-      // grid-row: 1 / 3;
-    }
 
     &-title {
       margin-bottom: 5px;

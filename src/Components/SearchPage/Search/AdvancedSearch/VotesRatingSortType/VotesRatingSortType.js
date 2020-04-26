@@ -1,5 +1,5 @@
 import React from "react"
-import SelectInput from "../InputTemplates/SelectInput"
+import SelectInput from "../InputTemplates/SelectInput/SelectInput"
 import { range, sortBy } from "../../../../../Utils"
 
 export default function VotesRatingSort({ handleChange }) {

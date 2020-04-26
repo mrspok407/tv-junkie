@@ -311,10 +311,7 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
     const { advancedSearchContent, totalPagesAdvMovies } = this.state
     return !Array.isArray(advancedSearchContent) ||
       totalPagesAdvMovies === 0 ? (
-      <PlaceholderNoResults
-        message="No movies found"
-        className="placeholder--no-results__adv-movies"
-      />
+      <PlaceholderNoResults message="No movies found" />
     ) : (
       <ContentResultsAdvSearch
         advancedSearchContent={this.state.advancedSearchContent}

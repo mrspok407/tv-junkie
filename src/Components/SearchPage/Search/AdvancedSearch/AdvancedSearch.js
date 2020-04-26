@@ -22,7 +22,6 @@ export default function AdvancedSearch({
 }) {
   const [advSearchOpen, setAdvSearchOpen] = useState(false)
   const [genres, setGenres] = useState(listOfGenres)
-  // const [year, setYear] = useState("")
 
   function toggleGenre(e) {
     const newGenres = [...genres]

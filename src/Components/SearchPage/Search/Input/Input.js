@@ -57,7 +57,11 @@ export default class Input extends Component {
       <>
         <div
           ref={this.mediaTypeRef}
-          className="search__media-type"
+          className={
+            !this.state.mediaTypesIsOpen
+              ? "search__media-type"
+              : "search__media-type search__media-type--is-open"
+          }
           style={{
             backgroundImage: `url(${this.state.mediaType.icon})`
           }}
