@@ -82,11 +82,4 @@
   &:before {
     transform: translate(0, -50%) rotate(-45deg);
   }
-
-  &__withactors {
-    opacity: 1;
-    width: 30px;
-    height: 30px;
-    animation: initial;
-  }
 }

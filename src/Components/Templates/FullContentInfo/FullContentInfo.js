@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/anchor-has-content */
+/* eslint-disable jsx-a11y/anchor-is-valid */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable react/self-closing-comp */
@@ -219,7 +221,8 @@ export default function FullContentInfo({
             vote_count,
             overview,
             tagline,
-            budget
+            budget,
+            imdb_id
           }
         }) => {
           const movieGenres = genres.map(item => item.name).join(", ")
@@ -257,7 +260,8 @@ export default function FullContentInfo({
             rating: vote_average || "-",
             description: overview || "-",
             tagline: tagline || "-",
-            budget: budget || "-"
+            budget: budget || "-",
+            imdbId: imdb_id || ""
           })
 
           setLoadingPage(false)
@@ -313,7 +317,8 @@ export default function FullContentInfo({
     description,
     tagline,
     budget,
-    seasonsArr
+    seasonsArr,
+    imdbId
   } = options
 
   const yearRelease = releaseDate.slice(0, 4)
@@ -493,6 +498,19 @@ export default function FullContentInfo({
                     <div className="full-detailes__info-option">Budget</div>
                     <div className="full-detailes__info-value">
                       {formatedBudget}
+                    </div>
+                  </div>
+                  <div className="full-detailes__info-row">
+                    <div className="full-detailes__info-option">
+                      External links
+                    </div>
+                    <div className="full-detailes__info-value">
+                      <a
+                        href={`https://www.imdb.com/title/${imdbId}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="full-detailes__info-imdb"
+                      />
                     </div>
                   </div>
                 </>

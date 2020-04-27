@@ -2,20 +2,25 @@
 
 $gridGap: 10px;
 
-:content-results {
-  --num-of-columns: 4;
-  --container-width: 100%;
-}
+$font-sizes: (
+  year: 1rem,
+  rating: 1.3rem,
+  vote-count: 0.6rem,
+  genres: 0.7rem,
+  show-links-button: 1.35rem,
+  top-button: 1rem,
+  last-episode: 1.2rem,
+  error: 1.5rem
+);
 
 .content-results {
   display: flex;
   flex-direction: column;
   padding-bottom: 100px;
-  width: var(--container-width);
-  min-width: 350px;
   width: 100%;
+  min-width: 350px;
   padding-bottom: 100px;
-  @include mediaMaxW(1424px) {
+  @include mediaMaxW(1450px) {
     padding: 0 38px 100px 38px;
   }
   @include mediaMaxW(850px) {
@@ -25,12 +30,6 @@ $gridGap: 10px;
     min-width: 300px;
   }
 
-  &--no-movies {
-    text-align: center;
-    font-size: 2rem;
-    margin-top: 50px;
-    color: rgb(32, 32, 32);
-  }
   &--adv-search {
     .placeholder--no-results {
       position: static;
@@ -45,7 +44,7 @@ $gridGap: 10px;
 
     .button {
       max-width: 200px;
-      font-size: 1rem;
+      font-size: map-get($font-sizes, top-button);
       background-color: getColor(blueClr, $mainPalette);
     }
   }
@@ -63,7 +62,6 @@ $gridGap: 10px;
   display: flex;
   position: relative;
   flex-direction: column;
-  background-color: rgb(61, 61, 61);
   background-color: #171717;
   box-shadow: 0 3px 9px rgba(0, 0, 0, 0.884);
   opacity: 0;
@@ -104,21 +102,21 @@ $gridGap: 10px;
   }
   &-year {
     text-align: center;
-    font-size: 1rem;
+    font-size: map-get($font-sizes, year);
     color: rgb(224, 224, 224);
   }
 
   &-rating {
     text-align: center;
-    font-size: 1.3rem;
+    font-size: map-get($font-sizes, rating);
     color: rgb(247, 247, 247);
     &-vote-count {
       margin-left: 2px;
-      font-size: 0.6rem;
+      font-size: map-get($font-sizes, vote-count);
       color: rgb(218, 218, 218);
     }
     span:first-child {
-      font-size: 0.8rem;
+      font-size: map-get($font-sizes, rating) * 0.6;
       color: rgb(177, 177, 177);
     }
   }
@@ -126,7 +124,7 @@ $gridGap: 10px;
     display: flex;
     justify-content: space-evenly;
     margin-bottom: 10px;
-    font-size: 0.7rem;
+    font-size: map-get($font-sizes, genres);
     color: rgb(218, 218, 218);
   }
   &-overview {
@@ -168,7 +166,7 @@ $gridGap: 10px;
       width: 100%;
       height: 100%;
       align-self: center;
-      font-size: 1.35rem;
+      font-size: map-get($font-sizes, show-links-button);
       margin: 0;
     }
 
@@ -192,7 +190,7 @@ $gridGap: 10px;
       align-items: center;
       height: 100%;
       color: getColor(orangeClr, $mainPalette);
-      font-size: 1.5rem;
+      font-size: map-get($font-sizes, error);
     }
 
     &-wrapper {
@@ -208,7 +206,7 @@ $gridGap: 10px;
     &-episode {
       text-align: center;
       color: #e3e3e3;
-      font-size: 1.2rem;
+      font-size: map-get($font-sizes, last-episode);
       font-weight: bold;
       letter-spacing: 1px;
     }
