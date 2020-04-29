@@ -13,6 +13,7 @@ import PlaceholderLoadingFullInfo from "../../Placeholders/PlaceholderLoadingFul
 import ScrollToTop from "../../../Utils/ScrollToTop"
 import Header from "../../Header/Header"
 import Loader from "../../Placeholders/Loader"
+import Slider from "../../../Utils/Slider/Slider"
 import { API_KEY, differenceBtwDatesInDays } from "../../../Utils"
 import "./FullContentInfo.scss"
 
@@ -41,6 +42,8 @@ export default function FullContentInfo({
     tagline: "",
     budget: ""
   })
+
+  const [similarContent, setSimilarContent] = useState([])
 
   const [loadingPage, setLoadingPage] = useState(true)
 
@@ -77,14 +80,14 @@ export default function FullContentInfo({
       getFullMovieInfo()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mediaType])
+  }, [mediaType, id])
 
   const getFullShowInfo = () => {
     setLoadingPage(true)
 
     axios
       .get(
-        `https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}&language=en-US`
+        `https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}&language=en-US&append_to_response=similar`
       )
       .then(
         ({
@@ -103,7 +106,8 @@ export default function FullContentInfo({
             networks,
             last_air_date,
             number_of_seasons,
-            seasons
+            seasons,
+            similar
           }
         }) => {
           const genreIds =
@@ -116,6 +120,11 @@ export default function FullContentInfo({
             networks && networks.length
               ? networks.map(item => item.name).join(", ")
               : "-"
+
+          const similarShows = similar.results
+          const similarShowsSortByVotes = similarShows.sort(
+            (a, b) => b.vote_count - a.vote_count
+          )
 
           setInfoToPass([
             {
@@ -146,6 +155,7 @@ export default function FullContentInfo({
             numberOfSeasons: number_of_seasons || "-",
             seasonsArr: seasons.reverse()
           })
+          setSimilarContent(similarShowsSortByVotes)
           setLoadingPage(false)
         }
       )
@@ -203,7 +213,7 @@ export default function FullContentInfo({
     setLoadingPage(true)
     axios
       .get(
-        `https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=en-US`
+        `https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=en-US&append_to_response=similar_movies`
       )
       .then(
         ({
@@ -222,7 +232,8 @@ export default function FullContentInfo({
             overview,
             tagline,
             budget,
-            imdb_id
+            imdb_id,
+            similar_movies
           }
         }) => {
           const movieGenres = genres.map(item => item.name).join(", ")
@@ -233,6 +244,11 @@ export default function FullContentInfo({
             production_companies.length === 0 || !production_companies
               ? "-"
               : production_companies[0].name
+
+          const similarMovies = similar_movies.results
+          const similarMoviesSortByVotes = similarMovies.sort(
+            (a, b) => b.vote_count - a.vote_count
+          )
 
           setInfoToPass([
             {
@@ -263,6 +279,8 @@ export default function FullContentInfo({
             budget: budget || "-",
             imdbId: imdb_id || ""
           })
+
+          setSimilarContent(similarMoviesSortByVotes)
 
           setLoadingPage(false)
           setLoadingTorrentLinks(true)
@@ -537,9 +555,10 @@ export default function FullContentInfo({
               </div>
             </div>
             <div className="full-detailes__description">{description}</div>
-            <div className="full-detailes__seasons-and-episodes">
-              {mediaType === "show" &&
-                seasonsArr.map(season => {
+
+            {mediaType === "show" && (
+              <div className="full-detailes__seasons-and-episodes">
+                {seasonsArr.map(season => {
                   if (
                     season.season_number === 0 ||
                     season.name === "Specials" ||
@@ -769,7 +788,9 @@ export default function FullContentInfo({
                     </div>
                   )
                 })}
-            </div>
+              </div>
+            )}
+            <Slider listOfContent={similarContent} />
           </div>
         ) : (
           <PlaceholderLoadingFullInfo delayAnimation="0.4s" />
