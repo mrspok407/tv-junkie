@@ -20,11 +20,14 @@ export default class SearchCard extends Component {
       mediaTypeSearching
     } = this.props
 
-    const type = movieTitle ? "movie" : "show"
+    const type = movieTitle ? "movie" : showTitle && "show"
 
     return (
       <div key={id} className="search-card">
-        <Link className="search-card__image-link" to={`/${type}/${id}`}>
+        <Link
+          className="search-card__image-link"
+          to={mediaType !== "person" ? `/${type}/${id}` : ""}
+        >
           <div
             className="search-card__image"
             style={
@@ -40,7 +43,10 @@ export default class SearchCard extends Component {
             }
           />
         </Link>
-        <Link className="search-card__info-link" to={`/${type}/${id}`}>
+        <Link
+          className="search-card__info-link"
+          to={mediaType !== "person" ? `/${type}/${id}` : ""}
+        >
           <div className="search-card__info">
             <div className="search-card__info-title">
               {movieTitle || showTitle || personName}

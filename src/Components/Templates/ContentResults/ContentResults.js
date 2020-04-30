@@ -19,7 +19,8 @@ export default function ContentResults({
   className = "",
   showsArr,
   moviesArr,
-  getEpisodeInfo,
+  getLastEpisodeLinks,
+  getMovieLinks,
   loadingIds,
   showsIds,
   moviesIds,
@@ -29,14 +30,18 @@ export default function ContentResults({
 
   function showLinksToAll() {
     const showAllLinksPressed = true
-    contentArr.map(item =>
-      getEpisodeInfo(
-        item.id,
-        showAllLinksPressed,
-        item.original_title,
-        item.release_date
+    if (contentType === "shows") {
+      contentArr.map(item => getLastEpisodeLinks(item.id, showAllLinksPressed))
+    } else if (contentType === "movies") {
+      contentArr.map(item =>
+        getMovieLinks(
+          item.id,
+          showAllLinksPressed,
+          item.original_title,
+          item.release_date
+        )
       )
-    )
+    }
   }
 
   const maxColumns = 4
@@ -44,11 +49,17 @@ export default function ContentResults({
     contentArr.length <= maxColumns - 1 ? contentArr.length : maxColumns
 
   return (
-    <div className="content-results">
+    <div
+      className={
+        contentType === "adv-search"
+          ? "content-results content-results--adv-search"
+          : "content-results"
+      }
+    >
       {contentType !== "adv-search" ? (
-        <div className="content-results__button--clear-searched">
+        <div className="content-results__button-top">
           <button
-            className="button button--show-all-links"
+            className="button"
             type="button"
             onClick={() => showLinksToAll()}
           >
@@ -57,10 +68,10 @@ export default function ContentResults({
         </div>
       ) : (
         advancedSearchContent.length > 0 && (
-          <div className="content-results__button--clear-searched">
+          <div className="content-results__button-top">
             <button
               type="button"
-              className="button button--clear-movies"
+              className="button"
               onClick={() => clearAdvSearchMovies()}
             >
               Clear Searched
@@ -117,13 +128,15 @@ export default function ContentResults({
             }
 
             if (movie) {
-              movieHash1080p = movie.torrents.find(
+              const hash1080p = movie.torrents.find(
                 item => item.quality === "1080p"
-              ).hash
+              )
+              movieHash1080p = hash1080p && hash1080p.hash
 
-              movieHash720p = movie.torrents.find(
+              const hash720p = movie.torrents.find(
                 item => item.quality === "720p"
-              ).hash
+              )
+              movieHash720p = hash720p && hash720p.hash
 
               urlMovieTitle = movie.title.split(" ").join("+")
             }
@@ -245,14 +258,14 @@ export default function ContentResults({
                       {!showsIds.includes(id) ? (
                         <button
                           type="button"
-                          className="button button--content-results button--show-links"
-                          onClick={() => getEpisodeInfo(id)}
+                          className="button button--content-results"
+                          onClick={() => getLastEpisodeLinks(id)}
                         >
                           Show Last Episode Links
                         </button>
                       ) : loadingIds.includes(id) && !error ? (
                         <div>
-                          <Loader className="loader--show-links" />
+                          <Loader className="loader--small-pink" />
                         </div>
                       ) : (
                         loadingIds.includes(id) && (
@@ -302,21 +315,16 @@ export default function ContentResults({
                     {!moviesIds.includes(id) ? (
                       <button
                         type="button"
-                        className="button button--content-results button--show-links"
+                        className="button"
                         onClick={() =>
-                          getEpisodeInfo(
-                            id,
-                            false,
-                            original_title,
-                            release_date
-                          )
+                          getMovieLinks(id, false, original_title, release_date)
                         }
                       >
                         Show Links
                       </button>
                     ) : loadingIds.includes(id) && !error.includes(id) ? (
                       <div>
-                        <Loader className="loader--show-links" />
+                        <Loader className="loader--small-pink" />
                       </div>
                     ) : (
                       loadingIds.includes(id) && (
@@ -329,20 +337,24 @@ export default function ContentResults({
                     {movie && (
                       <div className="content-results__item-links-wrapper">
                         <div className="torrent-links">
-                          <a
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            href={`magnet:?xt=urn:btih:${movieHash1080p}&dn=${urlMovieTitle}&xl=310660222&tr=udp%3A%2F%2Ftracker.coppersurfer.tk:6969/announce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org:6969/announce&tr=udp%3A%2F%2Ftracker.pirateparty.gr:6969/announce&tr=udp%3A%2F%2Fexodus.desync.com:6969/announce&tr=udp%3A%2F%2Ftracker.opentrackr.org:1337/announce&tr=udp%3A%2F%2Ftracker.internetwarriors.net:1337/announce&tr=udp%3A%2F%2Ftracker.torrent.eu.org:451&tr=udp%3A%2F%2Ftracker.cyberia.is:6969/announce&tr=udp%3A%2F%2Fopen.demonii.si:1337/announce&tr=udp%3A%2F%2Fopen.stealth.si:80/announce&tr=udp%3A%2F%2Ftracker.tiny-vps.com:6969/announce&tr=udp%3A%2F%2Ftracker.iamhansen.xyz:2000/announce&tr=udp%3A%2F%2Fexplodie.org:6969/announce&tr=udp%3A%2F%2Fdenis.stalker.upeer.me:6969/announce&tr=udp%3A%2F%2Fipv4.tracker.harry.lu:80/announce`}
-                          >
-                            1080p
-                          </a>
-                          <a
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            href={`magnet:?xt=urn:btih:${movieHash720p}&dn=${urlMovieTitle}&xl=310660222&tr=udp%3A%2F%2Ftracker.coppersurfer.tk:6969/announce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org:6969/announce&tr=udp%3A%2F%2Ftracker.pirateparty.gr:6969/announce&tr=udp%3A%2F%2Fexodus.desync.com:6969/announce&tr=udp%3A%2F%2Ftracker.opentrackr.org:1337/announce&tr=udp%3A%2F%2Ftracker.internetwarriors.net:1337/announce&tr=udp%3A%2F%2Ftracker.torrent.eu.org:451&tr=udp%3A%2F%2Ftracker.cyberia.is:6969/announce&tr=udp%3A%2F%2Fopen.demonii.si:1337/announce&tr=udp%3A%2F%2Fopen.stealth.si:80/announce&tr=udp%3A%2F%2Ftracker.tiny-vps.com:6969/announce&tr=udp%3A%2F%2Ftracker.iamhansen.xyz:2000/announce&tr=udp%3A%2F%2Fexplodie.org:6969/announce&tr=udp%3A%2F%2Fdenis.stalker.upeer.me:6969/announce&tr=udp%3A%2F%2Fipv4.tracker.harry.lu:80/announce`}
-                          >
-                            720p
-                          </a>
+                          {movieHash1080p && (
+                            <a
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              href={`magnet:?xt=urn:btih:${movieHash1080p}&dn=${urlMovieTitle}&xl=310660222&tr=udp%3A%2F%2Ftracker.coppersurfer.tk:6969/announce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org:6969/announce&tr=udp%3A%2F%2Ftracker.pirateparty.gr:6969/announce&tr=udp%3A%2F%2Fexodus.desync.com:6969/announce&tr=udp%3A%2F%2Ftracker.opentrackr.org:1337/announce&tr=udp%3A%2F%2Ftracker.internetwarriors.net:1337/announce&tr=udp%3A%2F%2Ftracker.torrent.eu.org:451&tr=udp%3A%2F%2Ftracker.cyberia.is:6969/announce&tr=udp%3A%2F%2Fopen.demonii.si:1337/announce&tr=udp%3A%2F%2Fopen.stealth.si:80/announce&tr=udp%3A%2F%2Ftracker.tiny-vps.com:6969/announce&tr=udp%3A%2F%2Ftracker.iamhansen.xyz:2000/announce&tr=udp%3A%2F%2Fexplodie.org:6969/announce&tr=udp%3A%2F%2Fdenis.stalker.upeer.me:6969/announce&tr=udp%3A%2F%2Fipv4.tracker.harry.lu:80/announce`}
+                            >
+                              1080p
+                            </a>
+                          )}
+                          {movieHash720p && (
+                            <a
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              href={`magnet:?xt=urn:btih:${movieHash720p}&dn=${urlMovieTitle}&xl=310660222&tr=udp%3A%2F%2Ftracker.coppersurfer.tk:6969/announce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org:6969/announce&tr=udp%3A%2F%2Ftracker.pirateparty.gr:6969/announce&tr=udp%3A%2F%2Fexodus.desync.com:6969/announce&tr=udp%3A%2F%2Ftracker.opentrackr.org:1337/announce&tr=udp%3A%2F%2Ftracker.internetwarriors.net:1337/announce&tr=udp%3A%2F%2Ftracker.torrent.eu.org:451&tr=udp%3A%2F%2Ftracker.cyberia.is:6969/announce&tr=udp%3A%2F%2Fopen.demonii.si:1337/announce&tr=udp%3A%2F%2Fopen.stealth.si:80/announce&tr=udp%3A%2F%2Ftracker.tiny-vps.com:6969/announce&tr=udp%3A%2F%2Ftracker.iamhansen.xyz:2000/announce&tr=udp%3A%2F%2Fexplodie.org:6969/announce&tr=udp%3A%2F%2Fdenis.stalker.upeer.me:6969/announce&tr=udp%3A%2F%2Fipv4.tracker.harry.lu:80/announce`}
+                            >
+                              720p
+                            </a>
+                          )}
                         </div>
                       </div>
                     )}
@@ -352,29 +364,33 @@ export default function ContentResults({
                 {selectedContent.some(e => e.id === id) ? (
                   <>
                     {contentType === "adv-search" ? (
-                      <button
-                        className="button button--content-results button--pressed"
-                        onClick={() => toggleContent(id, contentArr)}
-                        type="button"
-                      >
-                        Remove {original_title ? "movie" : "show"}
-                      </button>
+                      <div className="content-results__item-links content-results__item-links--adv-search">
+                        <button
+                          className="button button--pressed"
+                          onClick={() => toggleContent(id, contentArr)}
+                          type="button"
+                        >
+                          Remove {original_title ? "movie" : "show"}
+                        </button>
+                      </div>
                     ) : (
                       <button
-                        className="button--del-content-results"
+                        className="button--del-item"
                         onClick={() => toggleContent(id, contentArr)}
                         type="button"
                       />
                     )}
                   </>
                 ) : (
-                  <button
-                    className="button button--content-results"
-                    onClick={() => toggleContent(id, contentArr)}
-                    type="button"
-                  >
-                    Add {original_title ? "movie" : "show"}
-                  </button>
+                  <div className="content-results__item-links content-results__item-links--adv-search">
+                    <button
+                      className="button"
+                      onClick={() => toggleContent(id, contentArr)}
+                      type="button"
+                    >
+                      Add {original_title ? "movie" : "show"}
+                    </button>
+                  </div>
                 )}
               </div>
             )

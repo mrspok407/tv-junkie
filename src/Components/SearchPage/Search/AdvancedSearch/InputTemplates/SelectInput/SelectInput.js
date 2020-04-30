@@ -1,5 +1,6 @@
 import React from "react"
 import { useField } from "formik"
+import "./SelectInput.scss"
 
 export default function SelectInput({ label, className = "", ...props }) {
   const [field, meta] = useField(props)

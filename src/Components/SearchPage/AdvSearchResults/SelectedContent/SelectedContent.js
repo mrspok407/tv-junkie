@@ -1,4 +1,5 @@
 import React from "react"
+import { Link } from "react-router-dom"
 import "./SelectedContent.scss"
 import { SelectedContentContext } from "../../../Context/SelectedContentContext"
 
@@ -51,10 +52,10 @@ export default class MovieResultsSelected extends React.PureComponent {
         </button>
         {this.state.showSelected && (
           <div className="selected-content__list">
-            <div className="selected-content__clear">
+            <div className="selected-content__button-clear">
               <button
                 type="button"
-                className="button button--clear-selected-content"
+                className="button"
                 onClick={() => this.context.clearSelectedContent()}
               >
                 Clear Selected
@@ -75,35 +76,51 @@ export default class MovieResultsSelected extends React.PureComponent {
                 const title = original_title || original_name
                 const date = release_date || first_air_date
 
+                const type = original_title ? "movie" : original_name && "show"
+
                 return (
                   <div key={id} className="selected-content__item">
-                    <div
-                      className="selected-content__item-poster"
-                      style={
-                        poster_path !== null
-                          ? {
-                              backgroundImage: `url(https://image.tmdb.org/t/p/w500/${poster_path ||
-                                backdrop_path})`
-                            }
-                          : {
-                              backgroundImage: `url(https://d32qys9a6wm9no.cloudfront.net/images/movies/poster/500x735.png)`
-                            }
-                      }
-                    />
-                    <div className="selected-content__item-info">
-                      <div className="selected-content__item-title">
-                        {title.length > 65
-                          ? `${title.substring(0, 65)}...`
-                          : title}
+                    <Link
+                      className="selected-content__item-poster-link"
+                      to={`/${type}/${id}`}
+                    >
+                      <div
+                        className="selected-content__item-poster"
+                        style={
+                          poster_path !== null
+                            ? {
+                                backgroundImage: `url(https://image.tmdb.org/t/p/w500/${poster_path ||
+                                  backdrop_path})`
+                              }
+                            : {
+                                backgroundImage: `url(https://d32qys9a6wm9no.cloudfront.net/images/movies/poster/500x735.png)`
+                              }
+                        }
+                      />
+                    </Link>
+                    <Link
+                      className="selected-content__item-info-link"
+                      to={`/${type}/${id}`}
+                    >
+                      <div className="selected-content__item-info">
+                        <div className="selected-content__item-title">
+                          {title.length > 65
+                            ? `${title.substring(0, 65)}...`
+                            : title}
+                        </div>
+                        <div className="selected-content__item-year">
+                          {date}
+                        </div>
+                        <div className="selected-content__item-overview">
+                          {overview && overview.length > 120
+                            ? `${overview.substring(0, 120)}...`
+                            : overview}
+                        </div>
                       </div>
-                      <div className="selected-content__item-year">{date}</div>
-                      <div className="selected-content__item-overview">
-                        {overview && overview.length > 120
-                          ? `${overview.substring(0, 120)}...`
-                          : overview}
-                      </div>
+                    </Link>
+                    <div className="selected-content__item-button">
                       <button
-                        className="button button--selected-content"
+                        className="button"
                         type="button"
                         onClick={() => this.context.toggleContent(id)}
                       >

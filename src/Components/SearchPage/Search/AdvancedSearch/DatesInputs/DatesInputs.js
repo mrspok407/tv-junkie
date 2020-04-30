@@ -1,5 +1,5 @@
 import React from "react"
-import SelectInput from "../InputTemplates/SelectInput"
+import SelectInput from "../InputTemplates/SelectInput/SelectInput"
 import { range } from "../../../../../Utils"
 
 export default function DatesInputs({

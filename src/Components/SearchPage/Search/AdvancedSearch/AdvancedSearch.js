@@ -22,7 +22,6 @@ export default function AdvancedSearch({
 }) {
   const [advSearchOpen, setAdvSearchOpen] = useState(false)
   const [genres, setGenres] = useState(listOfGenres)
-  // const [year, setYear] = useState("")
 
   function toggleGenre(e) {
     const newGenres = [...genres]
@@ -103,7 +102,7 @@ export default function AdvancedSearch({
       {({ setFieldValue, handleChange, values }) => (
         <div className="advanced-search__cont">
           <button
-            className="button button--advanced-search"
+            className="button button--adv-search-form"
             onClick={() => setAdvSearchOpen(!advSearchOpen)}
           >
             {!advSearchOpen ? "Open Advanced Search" : "Close Advanced Search"}
@@ -139,11 +138,18 @@ export default function AdvancedSearch({
 
                 <div className="inputs__buttons">
                   <div className="inputs__buttons--search">
-                    <button className="button button--search-adv" type="submit">
+                    <button
+                      className={
+                        !searchingAdvancedSearch
+                          ? "button"
+                          : "button button--loading"
+                      }
+                      type="submit"
+                    >
                       Search
                     </button>
                     {searchingAdvancedSearch && (
-                      <Loader className="loader--adv-results" />
+                      <Loader className="loader--small-pink" />
                     )}
                   </div>
                   <div className="inputs__buttons--reset">

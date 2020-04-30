@@ -2,9 +2,19 @@
   @return map-get($palette, $colorName);
 }
 
+$bodyBackgroundClr: #131313;
+$mainContainerMaxWidth: 1350px;
+
 $mainPalette: (
   orangeClr: peru,
   blueClr: #66b4e6
+);
+
+$btnPalette: (
+  textColor: #fff,
+  bgColor: peru,
+  pressedBgColor: #66b4e6,
+  hoverEffectBgColor: #fff
 );
 
 $inputPalette: (
@@ -14,7 +24,7 @@ $inputPalette: (
 
 $movieListPalette: (
   backgroundColor: #fdfdfd,
-  backgroundColorHover: rgb(39, 39, 39),
+  backgroundColorHover: #212121,
   separatorColor: #d0d0d0,
   titleColor: #000000,
   overviewColor: #1b1b1b,

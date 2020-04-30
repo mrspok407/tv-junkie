@@ -1,9 +1,9 @@
-@import "./styles/_globals";
-@import "./styles/global-layout";
+@import "./styles/globals";
+@import "./styles/global-layout/global-layout.scss";
 
 body {
   font-family: "Open Sans", sans-serif;
-  background-color: #131313;
+  background-color: $bodyBackgroundClr;
   @include scrollbar(5px, getColor(blueClr, $mainPalette), #c5bbb1);
 }
 
@@ -24,7 +24,7 @@ a {
   flex-direction: column;
   align-items: center;
   min-height: 100vh;
-  max-width: 1350px;
+  max-width: $mainContainerMaxWidth;
   margin: auto;
 }
 

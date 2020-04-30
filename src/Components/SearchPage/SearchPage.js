@@ -190,6 +190,7 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
       .then(({ data: { results: movies, total_pages: totalPages } }) => {
         this.setState({
           advancedSearchContent: movies,
+          advSearchNoResults: movies.length === 0,
           searchingAdvancedSearch: false,
           numOfPagesLoaded: 1,
           totalPagesAdvMovies: totalPages
@@ -279,7 +280,7 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
   })
 
   clearAdvSearchMovies = () => {
-    this.setState({ advancedSearchContent: [] })
+    this.setState({ advancedSearchContent: [], advSearchNoResults: false })
   }
 
   clearWithActors = () => {
@@ -311,10 +312,9 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
     const { advancedSearchContent, totalPagesAdvMovies } = this.state
     return !Array.isArray(advancedSearchContent) ||
       totalPagesAdvMovies === 0 ? (
-      <PlaceholderNoResults
-        message="No movies found"
-        className="placeholder--no-results__adv-movies"
-      />
+      <div className="content-results content-results--adv-search">
+        <PlaceholderNoResults message="No content found" />
+      </div>
     ) : (
       <ContentResultsAdvSearch
         advancedSearchContent={this.state.advancedSearchContent}
