@@ -8,17 +8,6 @@ export default class MovieResultsAdvSearch extends React.PureComponent {
   render() {
     return (
       <>
-        {/* {this.props.advancedSearchContent.length > 0 && (
-          <div className="content-results__button--clear-searched">
-            <button
-              type="button"
-              className="button button--clear-movies"
-              onClick={() => this.props.clearAdvSearchMovies()}
-            >
-              Clear Searched
-            </button>
-          </div>
-        )} */}
         <ContentResults
           contentArr={this.props.advancedSearchContent}
           toggleContentArr={this.props.advancedSearchContent}

@@ -21,7 +21,7 @@ export default class Shows extends Component {
     }
   }
 
-  getEpisodeInfo = (id, showAllLinksPressed) => {
+  getLastEpisodeLinks = (id, showAllLinksPressed) => {
     if (this.state.showsIds.includes(id) || this.state.showAllLinksPressed)
       return
 
@@ -60,7 +60,7 @@ export default class Shows extends Component {
           <ContentResults
             contentType="shows"
             contentArr={onlyShows}
-            getEpisodeInfo={this.getEpisodeInfo}
+            getLastEpisodeLinks={this.getLastEpisodeLinks}
             showsArr={this.state.showsArr}
             loadingIds={this.state.loadingIds}
             showsIds={this.state.showsIds}

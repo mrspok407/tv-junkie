@@ -40,6 +40,11 @@
   @include mediaMaxW(560px) {
     background-position: 15px 13px;
   }
+  &--is-open {
+    &:after {
+      transform: scale(-1);
+    }
+  }
 
   &:after {
     content: "";
@@ -147,4 +152,8 @@
   width: 30px;
   height: 30px;
   color: getColor(textColor, $inputPalette);
+}
+
+.button--input-clear {
+  @include buttonCross;
 }
