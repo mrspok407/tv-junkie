@@ -10,15 +10,17 @@ export default function Slider({ listOfContent }) {
   const arrowLeft = useRef()
   const arrowRight = useRef()
 
-  const itemsInRow = 5
+  const itemsInRow = window.innerWidth <= 500 ? 3 : 5
   const itemsInSlider = listOfContent.length
   const nonVisibleItems = itemsInSlider - itemsInRow
-  const widthOfTheContainer = 1000
+  const widthOfTheContainer =
+    window.innerWidth >= 1000 ? 1000 : window.innerWidth - 30
   const itemWidth = widthOfTheContainer / itemsInRow
   const dragСoefficient = 1.25
   const thresholdToSlide = itemWidth / 2
   const widthOfSlider = nonVisibleItems * itemWidth * dragСoefficient
-  const transition = 0.5
+  const transition = 500
+  const sliderAvailable = itemsInSlider > itemsInRow
 
   let currentItem = 0
   let startDragPoint = 0
@@ -39,12 +41,13 @@ export default function Slider({ listOfContent }) {
 
     slider.current.style.transform = `translate3d(-${currentItem *
       itemWidth}px, 0, 0)`
-    slider.current.style.transition = `${transition}s`
+    slider.current.style.transition = `${transition}ms`
 
     toggleArrows()
   }
 
   const onMouseDown = e => {
+    if (!sliderAvailable) return
     e.preventDefault()
     startDragPoint = e.pageX
 
@@ -55,8 +58,10 @@ export default function Slider({ listOfContent }) {
   }
 
   const onMouseMove = e => {
-    dragging = true
+    if (!sliderAvailable) return
     e.preventDefault()
+    dragging = true
+
     const slideDistance = (startDragPoint - e.pageX) * -1
     const maxDragDistance =
       endDragPoint >= widthOfSlider ? widthOfSlider : endDragPoint
@@ -79,6 +84,7 @@ export default function Slider({ listOfContent }) {
   }
 
   const onMouseUp = e => {
+    if (!sliderAvailable) return
     e.preventDefault()
     const slideDistance = (startDragPoint - e.pageX) * -1
     const diffFromEndPoint = endDragPoint - slideDistance
@@ -92,11 +98,11 @@ export default function Slider({ listOfContent }) {
 
     slider.current.style.transform = `translate3d(-${currentItem *
       itemWidth}px, 0, 0)`
-    slider.current.style.transition = `${transition}s`
+    slider.current.style.transition = `${transition}ms`
 
     setTimeout(() => {
       dragging = false
-    }, 400)
+    }, transition)
 
     toggleArrows()
     removeDragListeners()
@@ -108,6 +114,8 @@ export default function Slider({ listOfContent }) {
   }
 
   const toggleArrows = () => {
+    if (!sliderAvailable) return
+
     arrowLeft.current.style.display = currentItem <= 0 ? "none" : "inherit"
     arrowRight.current.style.display =
       currentItem === nonVisibleItems ? "none" : "inherit"
@@ -120,9 +128,6 @@ export default function Slider({ listOfContent }) {
         onMouseUp={e => onMouseUp(e)}
         className="slider"
         ref={slider}
-        style={{
-          gridTemplateColumns: `repeat(${itemsInSlider}, calc(100% / ${itemsInRow}))`
-        }}
       >
         {listOfContent.map(({ poster_path, original_title, id }) => {
           const mediaType = original_title ? "movie" : "show"
@@ -136,9 +141,7 @@ export default function Slider({ listOfContent }) {
             >
               <Link
                 onClick={e => {
-                  if (dragging) {
-                    e.preventDefault()
-                  }
+                  if (dragging) e.preventDefault()
                 }}
                 to={{
                   pathname: `/${mediaType}/${id}`
@@ -155,7 +158,7 @@ export default function Slider({ listOfContent }) {
           )
         })}
       </div>
-      {itemsInSlider > itemsInRow && (
+      {sliderAvailable && (
         <>
           <div
             ref={arrowLeft}

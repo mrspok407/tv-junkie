@@ -3,19 +3,22 @@
 $columnGap: 10px;
 $arrowSize: 50px;
 
+$containerWidth: 1000;
+$itemsInRow: 5;
+$itemsInSlider: 20;
+
 .slider-container {
   position: relative;
-  grid-column: 1 / 3;
-  overflow: hidden;
-  @include mediaMaxW(800px) {
-    grid-column: inherit;
-  }
 }
 
 .slider {
   position: relative;
   display: grid;
+  grid-template-columns: repeat($itemsInSlider, calc(100% / #{$itemsInRow}));
   transform: translate(0, 0);
+  @include mediaMaxW(500px) {
+    grid-template-columns: repeat($itemsInSlider, calc(100% / 3));
+  }
   cursor: pointer;
   &__item-wrapper {
     padding: 5px;

@@ -8,7 +8,8 @@ $colors: (
   infoValue: #fff,
   infoOption: #ffffffb3,
   description: #dedede,
-  seasonInfo: #fff
+  seasonInfo: #fff,
+  similarContentTitle: #dedede
 );
 
 $font-sizes: (
@@ -391,6 +392,18 @@ $font-sizes: (
       &-overview {
         padding: 10px 0 10px 0;
       }
+    }
+  }
+  &__slider {
+    grid-column: 1 / 3;
+    overflow: hidden;
+    @include mediaMaxW(800px) {
+      grid-column: inherit;
+    }
+    &-title {
+      padding: 10px 5px 10px 10px;
+      font-size: 1.6rem;
+      color: map-get($colors, similarContentTitle);
     }
   }
 }
