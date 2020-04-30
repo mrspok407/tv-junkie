@@ -25,6 +25,7 @@ export default function Slider({ listOfContent }) {
   let currentItem = 0
   let startDragPoint = 0
   let endDragPoint = 0
+
   let dragging = false
 
   useEffect(() => {
