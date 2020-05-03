@@ -1,11 +1,14 @@
 @import "../../styles/globals";
 
 $columnGap: 10px;
-$arrowSize: 50px;
+$arrowSize: 75px;
 
-$containerWidth: 1000;
-$itemsInRow: 5;
 $itemsInSlider: 20;
+
+:root {
+  --sliderWidth: calc(1000px * 0.95);
+  --itemsInRow: 5;
+}
 
 .slider-container {
   position: relative;
@@ -14,15 +17,15 @@ $itemsInSlider: 20;
 .slider {
   position: relative;
   display: grid;
-  grid-template-columns: repeat($itemsInSlider, calc(100% / #{$itemsInRow}));
-  transform: translate(0, 0);
-  @include mediaMaxW(500px) {
-    grid-template-columns: repeat($itemsInSlider, calc(100% / 3));
-  }
+  grid-template-columns: repeat(
+    $itemsInSlider,
+    calc(var(--sliderWidth) / var(--itemsInRow))
+  );
+  transform: translate3d(0, 0, 0);
   cursor: pointer;
   &__item-wrapper {
     padding: 5px;
-    height: 300px;
+    height: calc(var(--sliderWidth) / var(--itemsInRow) * 1.5);
     align-self: center;
   }
   &__item {
@@ -52,8 +55,12 @@ $itemsInSlider: 20;
   height: $arrowSize;
   border-radius: 50%;
   background-color: #fff;
+  opacity: 0.75;
   transition: 0.2s;
-  opacity: 0.5;
+  @include mediaMaxW(750px) {
+    width: 50px;
+    height: 50px;
+  }
   cursor: pointer;
   &:hover {
     opacity: 1 !important;
@@ -63,12 +70,17 @@ $itemsInSlider: 20;
     content: "";
     position: absolute;
     top: 63%;
-    left: 15px;
+    left: 18px;
     transform: translate(0, -50%) rotate(45deg);
-    width: 20px;
-    height: 4px;
+    width: 33px;
+    height: 12px;
     border-radius: 5px;
     background-color: #000;
+    @include mediaMaxW(750px) {
+      width: 24px;
+      height: 9px;
+      left: 12px;
+    }
   }
   &:before {
     top: 42%;
@@ -76,15 +88,18 @@ $itemsInSlider: 20;
   }
   &--left {
     display: none;
-    left: 15px;
+    left: 8px;
   }
   &--right {
-    right: 15px;
+    right: 8px;
     &:after,
     &:before {
       left: initial;
-      right: 15px;
+      right: 18px;
       transform: translate(0, -50%) rotate(-45deg);
+      @include mediaMaxW(750px) {
+        right: 12px;
+      }
     }
     &:before {
       transform: translate(0, -50%) rotate(45deg);

@@ -790,12 +790,15 @@ export default function FullContentInfo({
                 })}
               </div>
             )}
-            <div className="full-detailes__slider">
-              <div className="full-detailes__slider-title">
-                {mediaType === "movie" ? "Similar movies" : "Similar shows"}
+            {similarContent.length > 0 && (
+              <div className="full-detailes__slider">
+                <div className="full-detailes__slider-title">
+                  {mediaType === "movie" ? "Similar movies" : "Similar shows"}
+                </div>
+
+                <Slider listOfContent={similarContent} />
               </div>
-              <Slider listOfContent={similarContent} />
-            </div>
+            )}
           </div>
         ) : (
           <PlaceholderLoadingFullInfo delayAnimation="0.4s" />
