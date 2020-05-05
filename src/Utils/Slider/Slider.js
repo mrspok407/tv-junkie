@@ -1,14 +1,15 @@
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-use-before-define */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import React, { useRef, useEffect, useState } from "react"
-import debounce from "debounce"
+import React, { useRef, useEffect, useState, useCallback } from "react"
 import { Link } from "react-router-dom"
+import debounce from "debounce"
+import UseRect from "./UseRect"
 import "./Slider.scss"
 
 export default function Slider({ listOfContent }) {
-  const slider = useRef()
   const arrowLeft = useRef()
   const arrowRight = useRef()
   const rootNode = document.documentElement
@@ -27,8 +28,13 @@ export default function Slider({ listOfContent }) {
     }
   }
 
-  const [itemWidth, setItemWidth] = useState()
+  const [slider, setSlider] = useState()
   const [itemsInRow, setItemsInRow] = useState()
+
+  const sliderWidth = UseRect(slider).width
+  const itemWidth = sliderWidth / itemsInRow
+
+  rootNode.style.setProperty("--sliderWidth", `${sliderWidth}px`)
 
   const itemsInSlider = listOfContent.length
   const nonVisibleItems = itemsInSlider - itemsInRow
@@ -40,30 +46,41 @@ export default function Slider({ listOfContent }) {
 
   const [currentItem, setCurrentItem] = useState(0)
   const [mouseUp, setMouseUp] = useState()
+  const [dragging, setDragging] = useState(false)
 
   let startDragPoint = 0
 
-  const [dragging, setDragging] = useState(false)
+  const sliderRef = useCallback(node => {
+    if (node !== null) {
+      setSlider(node)
+    }
+  }, [])
 
   useEffect(() => {
-    updateDimensions()
-
+    itemsInRowUpdater()
     window.addEventListener("resize", resizeHandler)
-
-    return removeDragListeners()
-  })
+    return () => {
+      removeDragListeners()
+      window.removeEventListener("resize", resizeHandler)
+    }
+  }, [])
 
   useEffect(() => {
-    slider.current.style.transform = `translate3d(-${currentItem *
-      itemWidth}px, 0, 0)`
-    slider.current.style.transition = `${transition}ms`
+    if (slider !== undefined) {
+      slider.style.transform = `translate3d(-${currentItem *
+        itemWidth}px, 0, 0)`
+      slider.style.transition = `${transition}ms`
 
-    toggleArrows()
+      toggleArrows()
+    }
   }, [currentItem, mouseUp])
 
   useEffect(() => {
-    slider.current.style.transform = `translate3d(-${currentItem *
-      itemWidth}px, 0, 0)`
+    if (slider !== undefined) {
+      slider.style.transform = `translate3d(-${currentItem *
+        itemWidth}px, 0, 0)`
+      slider.style.transition = "0s"
+    }
   }, [itemWidth])
 
   useEffect(() => {
@@ -73,20 +90,7 @@ export default function Slider({ listOfContent }) {
     toggleArrows()
   }, [itemsInRow])
 
-  const resizeHandler = debounce(() => updateDimensions(), 300)
-
-  const updateDimensions = () => {
-    const slideWrapper = document.querySelector(".slider__item-wrapper")
-    const sliderCont = document.querySelector(".slider")
-    const sliderContWidth = sliderCont.offsetWidth
-
-    setItemWidth(slideWrapper.offsetWidth)
-    rootNode.style.setProperty("--sliderWidth", `${sliderContWidth}px`)
-
-    sliderCont.style.transition = "0s"
-
-    itemsInRowUpdater()
-  }
+  const resizeHandler = debounce(() => itemsInRowUpdater(), 300)
 
   const itemsInRowUpdater = () => {
     const windowWidth = window.innerWidth
@@ -129,7 +133,7 @@ export default function Slider({ listOfContent }) {
     e.preventDefault()
 
     startDragPoint = e.pageX
-    slider.current.style.transition = "0s"
+    slider.style.transition = "0s"
 
     document.addEventListener("mousemove", onMouseMove)
     document.addEventListener("mouseup", onMouseUp)
@@ -160,9 +164,9 @@ export default function Slider({ listOfContent }) {
 
     setCurrentItem(currentItemStorage < 0 ? 0 : currentItemStorage)
 
-    slider.current.style.transform = `translate3d(-${translateX /
+    slider.style.transform = `translate3d(-${translateX /
       dragСoefficient}px, 0, 0)`
-    slider.current.style.transition = "0s"
+    slider.style.transition = "0s"
   }
 
   const onMouseUp = e => {
@@ -197,7 +201,7 @@ export default function Slider({ listOfContent }) {
         onMouseDown={e => onMouseDown(e)}
         onMouseUp={e => onMouseUp(e)}
         className="slider"
-        ref={slider}
+        ref={sliderRef}
       >
         {listOfContent.map(({ poster_path, original_title, id }) => {
           const mediaType = original_title ? "movie" : "show"
