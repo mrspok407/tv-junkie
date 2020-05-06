@@ -7,7 +7,7 @@
 /* eslint-disable no-use-before-define */
 import React, { useState, useEffect, useContext } from "react"
 import { useLocation } from "react-router-dom"
-import axios from "axios"
+import axios, { CancelToken } from "axios"
 import { SelectedContentContext } from "../../Context/SelectedContentContext"
 import PlaceholderLoadingFullInfo from "../../Placeholders/PlaceholderLoadingFullInfo/PlaceholderLoadingFullInfo"
 import ScrollToTop from "../../../Utils/ScrollToTop"
@@ -18,6 +18,7 @@ import { API_KEY, differenceBtwDatesInDays } from "../../../Utils"
 import "./FullContentInfo.scss"
 
 const todayDate = new Date()
+let cancelRequest
 
 export default function FullContentInfo({
   match: {
@@ -79,6 +80,11 @@ export default function FullContentInfo({
     } else if (mediaType === "movie") {
       getFullMovieInfo()
     }
+    return () => {
+      if (cancelRequest !== undefined) {
+        cancelRequest()
+      }
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mediaType, id])
 
@@ -87,7 +93,12 @@ export default function FullContentInfo({
 
     axios
       .get(
-        `https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}&language=en-US&append_to_response=similar`
+        `https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}&language=en-US&append_to_response=similar`,
+        {
+          cancelToken: new CancelToken(function executor(c) {
+            cancelRequest = c
+          })
+        }
       )
       .then(
         ({
@@ -159,7 +170,8 @@ export default function FullContentInfo({
           setLoadingPage(false)
         }
       )
-      .catch(() => {
+      .catch(err => {
+        if (axios.isCancel(err)) return
         setError("Something went wrong, sorry")
         setLoadingPage(false)
       })
@@ -180,7 +192,12 @@ export default function FullContentInfo({
 
     axios
       .get(
-        `https://api.themoviedb.org/3/tv/${id}/season/${seasonNum}?api_key=${API_KEY}&language=en-US`
+        `https://api.themoviedb.org/3/tv/${id}/season/${seasonNum}?api_key=${API_KEY}&language=en-US`,
+        {
+          cancelToken: new CancelToken(function executor(c) {
+            cancelRequest = c
+          })
+        }
       )
       .then(({ data: { episodes } }) => {
         const episodesReverese = episodes.reverse()
@@ -193,7 +210,8 @@ export default function FullContentInfo({
         ])
         setErrorShowEpisodes("")
       })
-      .catch(() => {
+      .catch(err => {
+        if (axios.isCancel(err)) return
         setErrorShowEpisodes("Something went wrong, sorry")
         setLoadingEpisodesIds([])
       })
@@ -213,7 +231,12 @@ export default function FullContentInfo({
     setLoadingPage(true)
     axios
       .get(
-        `https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=en-US&append_to_response=similar_movies`
+        `https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=en-US&append_to_response=similar_movies`,
+        {
+          cancelToken: new CancelToken(function executor(c) {
+            cancelRequest = c
+          })
+        }
       )
       .then(
         ({
@@ -286,7 +309,12 @@ export default function FullContentInfo({
           setLoadingTorrentLinks(true)
 
           return axios.get(
-            `https://yts.mx/api/v2/list_movies.json?query_term=${original_title} ${yearRelease}`
+            `https://yts.mx/api/v2/list_movies.json?query_term=${original_title} ${yearRelease}`,
+            {
+              cancelToken: new CancelToken(function executor(c) {
+                cancelRequest = c
+              })
+            }
           )
         }
       )
@@ -315,7 +343,8 @@ export default function FullContentInfo({
         })
         setLoadingTorrentLinks(false)
       })
-      .catch(() => {
+      .catch(err => {
+        if (axios.isCancel(err)) return
         setError("Something went wrong, sorry")
       })
   }

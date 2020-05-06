@@ -1,12 +1,18 @@
+/* eslint-disable no-else-return */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-use-before-define */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import React, { useRef, useEffect, useState, useCallback } from "react"
+import React, {
+  useRef,
+  useEffect,
+  useState,
+  useCallback,
+  useLayoutEffect
+} from "react"
 import { Link } from "react-router-dom"
 import debounce from "debounce"
-import UseRect from "./UseRect"
 import "./Slider.scss"
 
 export default function Slider({ listOfContent }) {
@@ -29,12 +35,20 @@ export default function Slider({ listOfContent }) {
   }
 
   const [slider, setSlider] = useState()
+  const [sliderRect, setSliderRect] = useState({
+    bottom: 0,
+    height: 0,
+    left: 0,
+    right: 0,
+    top: 0,
+    width: 0
+  })
+
   const [itemsInRow, setItemsInRow] = useState()
 
-  const sliderWidth = UseRect(slider).width
-  const itemWidth = sliderWidth / itemsInRow
+  const itemWidth = sliderRect.width / itemsInRow
 
-  rootNode.style.setProperty("--sliderWidth", `${sliderWidth}px`)
+  rootNode.style.setProperty("--sliderWidth", `${sliderRect.width}px`)
 
   const itemsInSlider = listOfContent.length
   const nonVisibleItems = itemsInSlider - itemsInRow
@@ -56,14 +70,39 @@ export default function Slider({ listOfContent }) {
     }
   }, [])
 
-  useEffect(() => {
+  const handleResize = useCallback(() => {
+    if (!slider) return
     itemsInRowUpdater()
-    window.addEventListener("resize", resizeHandler)
-    return () => {
-      removeDragListeners()
-      window.removeEventListener("resize", resizeHandler)
+
+    setSliderRect(slider.getBoundingClientRect())
+  }, [slider])
+
+  const handleResizeDeb = debounce(() => handleResize(), 200)
+
+  useLayoutEffect(() => {
+    if (!slider) return
+
+    handleResize()
+
+    if (window.ResizeObserver) {
+      let resizeObserver = new ResizeObserver(() => handleResizeDeb())
+      resizeObserver.observe(slider)
+
+      return () => {
+        if (!resizeObserver) return
+
+        resizeObserver.disconnect()
+        resizeObserver = null
+        removeDragListeners()
+      }
+    } else {
+      window.addEventListener("resize", handleResizeDeb)
+
+      return () => {
+        window.removeEventListener("resize", handleResizeDeb)
+      }
     }
-  }, [])
+  }, [slider])
 
   useEffect(() => {
     if (slider !== undefined) {
@@ -89,8 +128,6 @@ export default function Slider({ listOfContent }) {
     }
     toggleArrows()
   }, [itemsInRow])
-
-  const resizeHandler = debounce(() => itemsInRowUpdater(), 300)
 
   const itemsInRowUpdater = () => {
     const windowWidth = window.innerWidth

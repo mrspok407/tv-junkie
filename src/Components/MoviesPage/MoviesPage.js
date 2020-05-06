@@ -1,11 +1,13 @@
 import React, { Component } from "react"
-import axios from "axios"
+import axios, { CancelToken } from "axios"
 import ContentResults from "../Templates/ContentResults/ContentResults"
 import PlaceholderNoSelectedContent from "../Placeholders/PlaceholderNoSelectedContent"
 import { SelectedContentContext } from "../Context/SelectedContentContext"
 import ScrollToTop from "../../Utils/ScrollToTop"
 import "./MoviesPage.scss"
 import Header from "../Header/Header"
+
+let cancelRequest
 
 export default class Movies extends Component {
   constructor(props) {
@@ -20,6 +22,12 @@ export default class Movies extends Component {
     }
   }
 
+  componentWillUnmount() {
+    if (cancelRequest !== undefined) {
+      cancelRequest()
+    }
+  }
+
   getMovieLinks = (id, showAllLinksPressed = false, title, date) => {
     if (this.state.moviesIds.includes(id) || this.state.showAllLinksPressed)
       return
@@ -31,7 +39,11 @@ export default class Movies extends Component {
     }))
 
     axios
-      .get(`https://yts.mx/api/v2/list_movies.json?query_term=${title}`)
+      .get(`https://yts.mx/api/v2/list_movies.json?query_term=${title}`, {
+        cancelToken: new CancelToken(function executor(c) {
+          cancelRequest = c
+        })
+      })
       .then(res => {
         const year = Number(date.slice(0, 4))
         const movie = res.data.data.movies.find(item => item.year === year)
@@ -41,7 +53,8 @@ export default class Movies extends Component {
           loadingIds: [...prevState.loadingIds.filter(item => item !== id)]
         }))
       })
-      .catch(() => {
+      .catch(err => {
+        if (axios.isCancel(err)) return
         this.setState(prevState => ({
           error: [...prevState.error, id]
         }))

@@ -1,5 +1,5 @@
 import React, { Component } from "react"
-import axios from "axios"
+import axios, { CancelToken } from "axios"
 import ContentResults from "../Templates/ContentResults/ContentResults"
 import PlaceholderNoSelectedContent from "../Placeholders/PlaceholderNoSelectedContent"
 import { SelectedContentContext } from "../Context/SelectedContentContext"
@@ -7,6 +7,8 @@ import ScrollToTop from "../../Utils/ScrollToTop"
 import { API_KEY } from "../../Utils"
 import "./ShowsPage.scss"
 import Header from "../Header/Header"
+
+let cancelRequest
 
 export default class Shows extends Component {
   constructor(props) {
@@ -18,6 +20,12 @@ export default class Shows extends Component {
       showsIds: [],
       showAllLinksPressed: false,
       error: ""
+    }
+  }
+
+  componentWillUnmount() {
+    if (cancelRequest !== undefined) {
+      cancelRequest()
     }
   }
 
@@ -33,7 +41,12 @@ export default class Shows extends Component {
 
     axios
       .get(
-        `https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}&language=en-US`
+        `https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}&language=en-US`,
+        {
+          cancelToken: new CancelToken(function executor(c) {
+            cancelRequest = c
+          })
+        }
       )
       .then(res => {
         const tvShow = res.data
@@ -42,7 +55,8 @@ export default class Shows extends Component {
           loadingIds: [...prevState.loadingIds.filter(item => item !== id)]
         }))
       })
-      .catch(() => {
+      .catch(err => {
+        if (axios.isCancel(err)) return
         this.setState({
           error: "Something went wrong, sorry"
         })
