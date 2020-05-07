@@ -47,6 +47,9 @@ export default class MainPage extends Component {
   }
 
   componentWillUnmount() {
+    if (cancelRequestAdvSearch !== undefined) {
+      cancelRequestAdvSearch()
+    }
     window.removeEventListener("scroll", this.handleScroll)
   }
 
@@ -211,7 +214,11 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
     })
 
     axios
-      .get(getMovies || getTvShows)
+      .get(getMovies || getTvShows, {
+        cancelToken: new CancelToken(function executor(c) {
+          cancelRequestAdvSearch = c
+        })
+      })
       .then(({ data: { results: movies, total_pages: totalPages } }) => {
         this.setState({
           advancedSearchContent: [...advancedSearchContent, ...movies],
