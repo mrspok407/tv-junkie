@@ -1,9 +1,3 @@
-/* eslint-disable no-else-return */
-/* eslint-disable no-restricted-syntax */
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable no-use-before-define */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable jsx-a11y/no-static-element-interactions */
 import React, {
   useRef,
   useEffect,
