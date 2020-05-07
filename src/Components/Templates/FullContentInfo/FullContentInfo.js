@@ -121,21 +121,14 @@ export default function FullContentInfo({
             similar
           }
         }) => {
-          const genreIds =
-            genres && genres.length ? genres.map(item => item.id) : "-"
+          const genreIds = genres && genres.length ? genres.map(item => item.id) : "-"
           const genreNames =
-            genres && genres.length
-              ? genres.map(item => item.name).join(", ")
-              : "-"
+            genres && genres.length ? genres.map(item => item.name).join(", ") : "-"
           const networkNames =
-            networks && networks.length
-              ? networks.map(item => item.name).join(", ")
-              : "-"
+            networks && networks.length ? networks.map(item => item.name).join(", ") : "-"
 
           const similarShows = similar.results
-          const similarShowsSortByVotes = similarShows.sort(
-            (a, b) => b.vote_count - a.vote_count
-          )
+          const similarShowsSortByVotes = similarShows.sort((a, b) => b.vote_count - a.vote_count)
 
           setInfoToPass([
             {
@@ -179,9 +172,7 @@ export default function FullContentInfo({
 
   const showSeasonsEpisode = (seasonId, seasonNum) => {
     if (openSeasons.includes(seasonId)) {
-      setOpenSeasons(prevState => [
-        ...prevState.filter(item => item !== seasonId)
-      ])
+      setOpenSeasons(prevState => [...prevState.filter(item => item !== seasonId)])
     } else {
       setOpenSeasons(prevState => [...prevState, seasonId])
     }
@@ -201,13 +192,8 @@ export default function FullContentInfo({
       )
       .then(({ data: { episodes } }) => {
         const episodesReverese = episodes.reverse()
-        setTvShowEpisodes(prevState => [
-          ...prevState,
-          { seasonId, episodes: episodesReverese }
-        ])
-        setLoadingEpisodesIds(prevState => [
-          ...prevState.filter(item => item !== seasonId)
-        ])
+        setTvShowEpisodes(prevState => [...prevState, { seasonId, episodes: episodesReverese }])
+        setLoadingEpisodesIds(prevState => [...prevState.filter(item => item !== seasonId)])
         setErrorShowEpisodes("")
       })
       .catch(err => {
@@ -219,9 +205,7 @@ export default function FullContentInfo({
 
   const showEpisodeInfo = episodeId => {
     if (detailEpisodeInfo.includes(episodeId)) {
-      setDetailEpisodeInfo(prevState => [
-        ...prevState.filter(item => item !== episodeId)
-      ])
+      setDetailEpisodeInfo(prevState => [...prevState.filter(item => item !== episodeId)])
     } else {
       setDetailEpisodeInfo(prevState => [...prevState, episodeId])
     }
@@ -269,9 +253,7 @@ export default function FullContentInfo({
               : production_companies[0].name
 
           const similarMovies = similar_movies.results
-          const similarMoviesSortByVotes = similarMovies.sort(
-            (a, b) => b.vote_count - a.vote_count
-          )
+          const similarMoviesSortByVotes = similarMovies.sort((a, b) => b.vote_count - a.vote_count)
 
           setInfoToPass([
             {
@@ -327,13 +309,9 @@ export default function FullContentInfo({
         }
 
         const movie = res.data.data.movies[0]
-        const movieHash1080p = movie.torrents.find(
-          item => item.quality === "1080p"
-        )
+        const movieHash1080p = movie.torrents.find(item => item.quality === "1080p")
 
-        const movieHash720p = movie.torrents.find(
-          item => item.quality === "720p"
-        )
+        const movieHash720p = movie.torrents.find(item => item.quality === "720p")
 
         setMovieTorrents({
           title: movie.title,
@@ -373,10 +351,7 @@ export default function FullContentInfo({
 
   const yearReleaseAsDateObj = new Date(releaseDate)
 
-  const yearRange =
-    status !== "Ended"
-      ? `${yearRelease} - ...`
-      : `${yearRelease} - ${yearEnded}`
+  const yearRange = status !== "Ended" ? `${yearRelease} - ...` : `${yearRelease} - ${yearEnded}`
 
   const formatedBudget =
     budget !== 0 && budget !== "-" ? (
@@ -434,8 +409,7 @@ export default function FullContentInfo({
                         <a
                           target="_blank"
                           rel="noopener noreferrer"
-                          href={`magnet:?xt=urn:btih:${movieTorrents.hash1080p}&dn=${movieTorrents.title}&xl=310660222&tr=udp%3A%2F%2Ftracker.coppersurfer.tk:6969/announce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org:6969/announce&tr=udp%3A%2F%2Ftracker.pirateparty.gr:6969/announce&tr=udp%3A%2F%2Fexodus.desync.com:6969/announce&tr=udp%3A%2F%2Ftracker.opentrackr.org:1337/announce&tr=udp%3A%2F%2Ftracker.internetwarriors.net:1337/announce&tr=udp%3A%2F%2Ftracker.torrent.eu.org:451&tr=udp%3A%2F%2Ftracker.cyberia.is:6969/announce&tr=udp%3A%2F%2Fopen.demonii.si:1337/announce&tr=udp%3A%2F%2Fopen.stealth.si:80/announce&tr=udp%3A%2F%2Ftracker.tiny-vps.com:6969/announce&tr=udp%3A%2F%2Ftracker.iamhansen.xyz:2000/announce&tr=udp%3A%2F%2Fexplodie.org:6969/announce&tr=udp%3A%2F%2Fdenis.stalker.upeer.me:6969/announce&tr=udp%3A%2F%2Fipv4.tracker.harry.lu:80/announce`}
-                        >
+                          href={`magnet:?xt=urn:btih:${movieTorrents.hash1080p}&dn=${movieTorrents.title}&xl=310660222&tr=udp%3A%2F%2Ftracker.coppersurfer.tk:6969/announce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org:6969/announce&tr=udp%3A%2F%2Ftracker.pirateparty.gr:6969/announce&tr=udp%3A%2F%2Fexodus.desync.com:6969/announce&tr=udp%3A%2F%2Ftracker.opentrackr.org:1337/announce&tr=udp%3A%2F%2Ftracker.internetwarriors.net:1337/announce&tr=udp%3A%2F%2Ftracker.torrent.eu.org:451&tr=udp%3A%2F%2Ftracker.cyberia.is:6969/announce&tr=udp%3A%2F%2Fopen.demonii.si:1337/announce&tr=udp%3A%2F%2Fopen.stealth.si:80/announce&tr=udp%3A%2F%2Ftracker.tiny-vps.com:6969/announce&tr=udp%3A%2F%2Ftracker.iamhansen.xyz:2000/announce&tr=udp%3A%2F%2Fexplodie.org:6969/announce&tr=udp%3A%2F%2Fdenis.stalker.upeer.me:6969/announce&tr=udp%3A%2F%2Fipv4.tracker.harry.lu:80/announce`}>
                           1080p
                         </a>
                       )}
@@ -443,8 +417,7 @@ export default function FullContentInfo({
                         <a
                           target="_blank"
                           rel="noopener noreferrer"
-                          href={`magnet:?xt=urn:btih:${movieTorrents.hash720p}&dn=${movieTorrents.title}&xl=310660222&tr=udp%3A%2F%2Ftracker.coppersurfer.tk:6969/announce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org:6969/announce&tr=udp%3A%2F%2Ftracker.pirateparty.gr:6969/announce&tr=udp%3A%2F%2Fexodus.desync.com:6969/announce&tr=udp%3A%2F%2Ftracker.opentrackr.org:1337/announce&tr=udp%3A%2F%2Ftracker.internetwarriors.net:1337/announce&tr=udp%3A%2F%2Ftracker.torrent.eu.org:451&tr=udp%3A%2F%2Ftracker.cyberia.is:6969/announce&tr=udp%3A%2F%2Fopen.demonii.si:1337/announce&tr=udp%3A%2F%2Fopen.stealth.si:80/announce&tr=udp%3A%2F%2Ftracker.tiny-vps.com:6969/announce&tr=udp%3A%2F%2Ftracker.iamhansen.xyz:2000/announce&tr=udp%3A%2F%2Fexplodie.org:6969/announce&tr=udp%3A%2F%2Fdenis.stalker.upeer.me:6969/announce&tr=udp%3A%2F%2Fipv4.tracker.harry.lu:80/announce`}
-                        >
+                          href={`magnet:?xt=urn:btih:${movieTorrents.hash720p}&dn=${movieTorrents.title}&xl=310660222&tr=udp%3A%2F%2Ftracker.coppersurfer.tk:6969/announce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org:6969/announce&tr=udp%3A%2F%2Ftracker.pirateparty.gr:6969/announce&tr=udp%3A%2F%2Fexodus.desync.com:6969/announce&tr=udp%3A%2F%2Ftracker.opentrackr.org:1337/announce&tr=udp%3A%2F%2Ftracker.internetwarriors.net:1337/announce&tr=udp%3A%2F%2Ftracker.torrent.eu.org:451&tr=udp%3A%2F%2Ftracker.cyberia.is:6969/announce&tr=udp%3A%2F%2Fopen.demonii.si:1337/announce&tr=udp%3A%2F%2Fopen.stealth.si:80/announce&tr=udp%3A%2F%2Ftracker.tiny-vps.com:6969/announce&tr=udp%3A%2F%2Ftracker.iamhansen.xyz:2000/announce&tr=udp%3A%2F%2Fexplodie.org:6969/announce&tr=udp%3A%2F%2Fdenis.stalker.upeer.me:6969/announce&tr=udp%3A%2F%2Fipv4.tracker.harry.lu:80/announce`}>
                           720p
                         </a>
                       )}
@@ -461,11 +434,7 @@ export default function FullContentInfo({
             <div className="full-detailes__info">
               <div className="full-detailes__info-title">
                 {title}
-                <span>
-                  {mediaType === "show" && yearRelease !== "-"
-                    ? ` (${yearRange})`
-                    : ""}
-                </span>
+                <span>{mediaType === "show" && yearRelease !== "-" ? ` (${yearRange})` : ""}</span>
               </div>
               <div className="full-detailes__info-row">
                 <div className="full-detailes__info-option">Year</div>
@@ -473,9 +442,7 @@ export default function FullContentInfo({
                   {yearRelease !== "-" ? (
                     `${yearRelease}`
                   ) : (
-                    <span className="full-detailes__info-no-info">
-                      {yearRelease}
-                    </span>
+                    <span className="full-detailes__info-no-info">{yearRelease}</span>
                   )}
                 </div>
               </div>
@@ -509,9 +476,7 @@ export default function FullContentInfo({
                   {rating !== "-" ? (
                     rating
                   ) : (
-                    <span className="full-detailes__info-no-info">
-                      {rating}
-                    </span>
+                    <span className="full-detailes__info-no-info">{rating}</span>
                   )}
                 </div>
               </div>
@@ -521,9 +486,7 @@ export default function FullContentInfo({
                   {runtime !== "-" ? (
                     `${runtime} min`
                   ) : (
-                    <span className="full-detailes__info-no-info">
-                      {runtime}
-                    </span>
+                    <span className="full-detailes__info-no-info">{runtime}</span>
                   )}
                 </div>
               </div>
@@ -535,22 +498,16 @@ export default function FullContentInfo({
                       {tagline !== "-" ? (
                         `${tagline}`
                       ) : (
-                        <span className="full-detailes__info-no-info">
-                          {tagline}
-                        </span>
+                        <span className="full-detailes__info-no-info">{tagline}</span>
                       )}
                     </div>
                   </div>
                   <div className="full-detailes__info-row">
                     <div className="full-detailes__info-option">Budget</div>
-                    <div className="full-detailes__info-value">
-                      {formatedBudget}
-                    </div>
+                    <div className="full-detailes__info-value">{formatedBudget}</div>
                   </div>
                   <div className="full-detailes__info-row">
-                    <div className="full-detailes__info-option">
-                      External links
-                    </div>
+                    <div className="full-detailes__info-option">External links</div>
                     <div className="full-detailes__info-value">
                       <a
                         href={`https://www.imdb.com/title/${imdbId}`}
@@ -568,16 +525,14 @@ export default function FullContentInfo({
                   <button
                     className="button button--searchlist button--pressed"
                     onClick={() => toggleContent(Number(id), infoToPass)}
-                    type="button"
-                  >
+                    type="button">
                     Remove {mediaType === "movie" ? "movie" : "show"}
                   </button>
                 ) : (
                   <button
                     className="button button--searchlist"
                     onClick={() => toggleContent(Number(id), infoToPass)}
-                    type="button"
-                  >
+                    type="button">
                     Add {mediaType === "movie" ? "movie" : "show"}
                   </button>
                 )}
@@ -588,18 +543,11 @@ export default function FullContentInfo({
             {mediaType === "show" && (
               <div className="full-detailes__seasons-and-episodes">
                 {seasonsArr.map(season => {
-                  if (
-                    season.season_number === 0 ||
-                    season.name === "Specials" ||
-                    !season.air_date
-                  )
+                  if (season.season_number === 0 || season.name === "Specials" || !season.air_date)
                     return null
                   const seasonId = season.id
 
-                  const daysToNewSeason = differenceBtwDatesInDays(
-                    season.air_date,
-                    todayDate
-                  )
+                  const daysToNewSeason = differenceBtwDatesInDays(season.air_date, todayDate)
 
                   return (
                     <div
@@ -613,8 +561,7 @@ export default function FullContentInfo({
                         !loadingEpisodesIds.includes(seasonId)
                           ? { rowGap: "10px" }
                           : { rowGap: "0px" }
-                      }
-                    >
+                      }>
                       <div
                         className={
                           !openSeasons.includes(seasonId)
@@ -630,10 +577,7 @@ export default function FullContentInfo({
                                 backgroundColor: "#1d1d1d96"
                               }
                         }
-                        onClick={() =>
-                          showSeasonsEpisode(seasonId, season.season_number)
-                        }
-                      >
+                        onClick={() => showSeasonsEpisode(seasonId, season.season_number)}>
                         <div className="full-detailes__season-number">
                           Season {season.season_number}
                           {daysToNewSeason > 0 && (
@@ -665,9 +609,7 @@ export default function FullContentInfo({
 
                                 return item.episodes.map(episode => {
                                   // Format Date //
-                                  const airDateISO = new Date(
-                                    episode.air_date
-                                  ).toISOString()
+                                  const airDateISO = new Date(episode.air_date).toISOString()
 
                                   const optionss = {
                                     month: "long",
@@ -678,10 +620,9 @@ export default function FullContentInfo({
                                   const formatedDate = new Date(airDateISO)
 
                                   const episodeAirDate = episode.air_date
-                                    ? new Intl.DateTimeFormat(
-                                        "en-US",
-                                        optionss
-                                      ).format(formatedDate)
+                                    ? new Intl.DateTimeFormat("en-US", optionss).format(
+                                        formatedDate
+                                      )
                                     : "No date available"
                                   // Format Date End //
 
@@ -699,9 +640,7 @@ export default function FullContentInfo({
                                       : "e".concat(episodeToString)
                                   // Format Seasons And Episode Numbers End //
 
-                                  const episodeAirDateAsDateObj = new Date(
-                                    episode.air_date
-                                  )
+                                  const episodeAirDateAsDateObj = new Date(episode.air_date)
 
                                   const daysToNewEpisode = differenceBtwDatesInDays(
                                     episode.air_date,
@@ -715,25 +654,19 @@ export default function FullContentInfo({
                                         !detailEpisodeInfo.includes(episode.id)
                                           ? "full-detailes__episode"
                                           : "full-detailes__episode full-detailes__episode--open"
-                                      }
-                                    >
+                                      }>
                                       <div
                                         className="full-detailes__episode-wrapper"
-                                        onClick={() =>
-                                          showEpisodeInfo(episode.id)
-                                        }
+                                        onClick={() => showEpisodeInfo(episode.id)}
                                         style={
-                                          daysToNewEpisode > 0 ||
-                                          !episode.air_date
+                                          daysToNewEpisode > 0 || !episode.air_date
                                             ? {
-                                                backgroundColor:
-                                                  "rgba(132, 90, 90, 0.3)"
+                                                backgroundColor: "rgba(132, 90, 90, 0.3)"
                                               }
                                             : {
                                                 backgroundColor: "#1d1d1d96"
                                               }
-                                        }
-                                      >
+                                        }>
                                         <div className="full-detailes__episode-date">
                                           {episodeAirDate}
                                         </div>
@@ -750,23 +683,19 @@ export default function FullContentInfo({
                                         )}
                                       </div>
 
-                                      {detailEpisodeInfo.includes(
-                                        episode.id
-                                      ) && (
+                                      {detailEpisodeInfo.includes(episode.id) && (
                                         <div
                                           className={
                                             episode.still_path
                                               ? "full-detailes__episode-detailes"
                                               : "full-detailes__episode-detailes full-detailes__episode-detailes--no-image"
-                                          }
-                                        >
+                                          }>
                                           {episode.still_path && (
                                             <div
                                               className="full-detailes__episode-detailes-image"
                                               style={{
                                                 backgroundImage: `url(https://image.tmdb.org/t/p/w500${episode.still_path})`
-                                              }}
-                                            ></div>
+                                              }}></div>
                                           )}
                                           {episode.overview && (
                                             <div className="full-detailes__episode-detailes-overview">
@@ -774,29 +703,25 @@ export default function FullContentInfo({
                                             </div>
                                           )}
 
-                                          {episodeAirDateAsDateObj <
-                                            todayDate.getTime() &&
+                                          {episodeAirDateAsDateObj < todayDate.getTime() &&
                                             episode.air_date && (
                                               <div className="torrent-links torrent-links--full-content">
                                                 <a
                                                   target="_blank"
                                                   rel="noopener noreferrer"
-                                                  href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}+1080p&cat=41`}
-                                                >
+                                                  href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}+1080p&cat=41`}>
                                                   1080p
                                                 </a>
                                                 <a
                                                   target="_blank"
                                                   rel="noopener noreferrer"
-                                                  href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}+720p&cat=41`}
-                                                >
+                                                  href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}+720p&cat=41`}>
                                                   720p
                                                 </a>
                                                 <a
                                                   target="_blank"
                                                   rel="noopener noreferrer"
-                                                  href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}&cat=5`}
-                                                >
+                                                  href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}&cat=5`}>
                                                   480p
                                                 </a>
                                               </div>

@@ -15,10 +15,17 @@ $mobileLayout: 850px;
   @include mediaMaxW($mobileLayout) {
     --itemWidth: var(--itemsInRow) * 0.9;
   }
+  @include mediaMaxW(800px) {
+    --itemsInRow: 4;
+  }
+  @include mediaMaxW(500px) {
+    --itemsInRow: 3;
+  }
 }
 
 .slider-container {
   position: relative;
+
   @include mediaMaxW($mobileLayout) {
     overflow-x: auto;
   }
@@ -27,20 +34,21 @@ $mobileLayout: 850px;
 .slider {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(
-    $itemsInSlider,
-    calc(var(--sliderWidth) / var(--itemWidth))
-  );
+  grid-template-columns: repeat($itemsInSlider, calc(var(--sliderWidth) / var(--itemWidth)));
   transform: translate3d(0, 0, 0);
+  transition: 500ms;
   cursor: pointer;
+
   @include mediaMaxW($mobileLayout) {
     cursor: inherit;
   }
+
   &__item-wrapper {
     padding: 5px;
     height: calc(var(--sliderWidth) / var(--itemWidth) * 1.5);
     align-self: center;
   }
+
   &__item {
     position: relative;
     height: 100%;
@@ -53,6 +61,7 @@ $mobileLayout: 850px;
       @include hoverBoxShadow(5px, 0.4s);
       box-shadow: inset 0px 0px 58px 14px black;
       z-index: 1;
+
       @include mediaMaxW($mobileLayout) {
         display: none;
       }
@@ -61,6 +70,10 @@ $mobileLayout: 850px;
       opacity: 1;
     }
   }
+}
+
+.s--dragging {
+  transition: 0ms;
 }
 
 .arrow {
@@ -73,6 +86,7 @@ $mobileLayout: 850px;
   background-color: #fff;
   opacity: 0.75;
   transition: 0.2s;
+
   @include mediaMaxW($mobileLayout) {
     display: none !important;
   }

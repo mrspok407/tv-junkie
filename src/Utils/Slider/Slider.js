@@ -1,10 +1,5 @@
-import React, {
-  useRef,
-  useEffect,
-  useState,
-  useCallback,
-  useLayoutEffect
-} from "react"
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useRef, useEffect, useState, useCallback, useLayoutEffect } from "react"
 import { Link } from "react-router-dom"
 import debounce from "debounce"
 import "./Slider.scss"
@@ -14,47 +9,27 @@ export default function Slider({ listOfContent }) {
   const arrowRight = useRef()
   const rootNode = document.documentElement
 
-  const itemsInRowData = {
-    desktop: {
-      windowSize: 800,
-      items: 5
-    },
-    tablet: {
-      windowSize: 500,
-      items: 4
-    },
-    mobile: {
-      items: 3
-    }
-  }
-
   const [slider, setSlider] = useState()
-  const [sliderRect, setSliderRect] = useState({
-    bottom: 0,
-    height: 0,
-    left: 0,
-    right: 0,
-    top: 0,
-    width: 0
-  })
+  const [sliderWidth, setSliderWidth] = useState()
 
-  const [itemsInRow, setItemsInRow] = useState()
+  rootNode.style.setProperty("--sliderWidth", `${sliderWidth}px`)
 
-  const itemWidth = sliderRect.width / itemsInRow
+  const itemsInRow = Number(getComputedStyle(rootNode).getPropertyValue("--itemsInRow"))
 
-  rootNode.style.setProperty("--sliderWidth", `${sliderRect.width}px`)
+  const itemWidth = sliderWidth / itemsInRow
 
   const itemsInSlider = listOfContent.length
   const nonVisibleItems = itemsInSlider - itemsInRow
   const dragСoefficient = 1.25
   const thresholdToSlide = itemWidth / 2
   const widthOfSlider = nonVisibleItems * itemWidth * dragСoefficient
-  const transition = 500
   const sliderAvailable = itemsInSlider > itemsInRow
 
   const [currentItem, setCurrentItem] = useState(0)
   const [mouseUp, setMouseUp] = useState()
+
   const [dragging, setDragging] = useState(false)
+  const [blockLinks, setBlockLinks] = useState(false)
 
   let startDragPoint = 0
 
@@ -66,9 +41,8 @@ export default function Slider({ listOfContent }) {
 
   const handleResize = useCallback(() => {
     if (!slider) return
-    itemsInRowUpdater()
 
-    setSliderRect(slider.getBoundingClientRect())
+    setSliderWidth(slider.getBoundingClientRect().width)
   }, [slider])
 
   const handleResizeDeb = debounce(() => handleResize(), 200)
@@ -102,7 +76,6 @@ export default function Slider({ listOfContent }) {
     if (slider === undefined) return
 
     slider.style.transform = `translate3d(-${currentItem * itemWidth}px, 0, 0)`
-    slider.style.transition = `${transition}ms`
 
     toggleArrows()
   }, [currentItem, mouseUp])
@@ -111,7 +84,6 @@ export default function Slider({ listOfContent }) {
     if (slider === undefined) return
 
     slider.style.transform = `translate3d(-${currentItem * itemWidth}px, 0, 0)`
-    slider.style.transition = "0s"
   }, [itemWidth])
 
   useEffect(() => {
@@ -120,23 +92,6 @@ export default function Slider({ listOfContent }) {
     }
     toggleArrows()
   }, [itemsInRow])
-
-  const itemsInRowUpdater = () => {
-    const windowWidth = window.innerWidth
-    const itemData = itemsInRowData
-
-    const itemsInRowStorage =
-      windowWidth >= itemData.desktop.windowSize
-        ? itemData.desktop.items
-        : windowWidth >= itemData.tablet.windowSize &&
-          windowWidth < itemData.desktop.windowSize
-        ? itemData.tablet.items
-        : itemData.mobile.items
-
-    rootNode.style.setProperty("--itemsInRow", `${itemsInRowStorage}`)
-
-    setItemsInRow(itemsInRowStorage)
-  }
 
   const pagination = direction => {
     if (currentItem === 0 && direction === "left") return
@@ -161,24 +116,24 @@ export default function Slider({ listOfContent }) {
     if (!sliderAvailable) return
     e.preventDefault()
 
+    setDragging(true)
+
     startDragPoint = e.pageX
-    slider.style.transition = "0s"
 
     document.addEventListener("mousemove", onMouseMove)
     document.addEventListener("mouseup", onMouseUp)
   }
 
   const onMouseMove = e => {
-    if (!sliderAvailable) return
+    if (!sliderAvailable || window.innerWidth <= 850) return
     e.preventDefault()
 
-    setDragging(true)
+    setBlockLinks(true)
 
     const slideDistance = (startDragPoint - e.pageX) * -1
     const sliderPosition = currentItem * itemWidth * dragСoefficient
 
-    const maxDragDistance =
-      sliderPosition >= widthOfSlider ? widthOfSlider : sliderPosition
+    const maxDragDistance = sliderPosition >= widthOfSlider ? widthOfSlider : sliderPosition
 
     const translateX =
       maxDragDistance - slideDistance >= widthOfSlider
@@ -186,16 +141,12 @@ export default function Slider({ listOfContent }) {
         : maxDragDistance - slideDistance
 
     const currentItemStorage = Math.ceil(
-      (translateX - thresholdToSlide * dragСoefficient) /
-        dragСoefficient /
-        itemWidth
+      (translateX - thresholdToSlide * dragСoefficient) / dragСoefficient / itemWidth
     )
 
     setCurrentItem(currentItemStorage < 0 ? 0 : currentItemStorage)
 
-    slider.style.transform = `translate3d(-${translateX /
-      dragСoefficient}px, 0, 0)`
-    slider.style.transition = "0s"
+    slider.style.transform = `translate3d(-${translateX / dragСoefficient}px, 0, 0)`
   }
 
   const onMouseUp = e => {
@@ -204,11 +155,16 @@ export default function Slider({ listOfContent }) {
 
     setMouseUp(e.pageX)
 
-    setTimeout(() => {
-      setDragging(false)
-    }, transition)
+    setDragging(false)
+
+    slider.addEventListener("transitionend", blockLinksHandler)
 
     removeDragListeners()
+  }
+
+  const blockLinksHandler = () => {
+    setBlockLinks(false)
+    slider.removeEventListener("transitionend", blockLinksHandler)
   }
 
   const removeDragListeners = () => {
@@ -220,8 +176,7 @@ export default function Slider({ listOfContent }) {
     if (!sliderAvailable) return
 
     arrowLeft.current.style.display = currentItem <= 0 ? "none" : "inherit"
-    arrowRight.current.style.display =
-      currentItem >= nonVisibleItems ? "none" : "inherit"
+    arrowRight.current.style.display = currentItem >= nonVisibleItems ? "none" : "inherit"
   }
 
   return (
@@ -229,7 +184,7 @@ export default function Slider({ listOfContent }) {
       <div
         onMouseDown={e => onMouseDown(e)}
         onMouseUp={e => onMouseUp(e)}
-        className="slider"
+        className={dragging ? "slider s--dragging" : "slider"}
         ref={sliderRef}
       >
         {listOfContent.map(({ poster_path, original_title, id }) => {
@@ -238,7 +193,7 @@ export default function Slider({ listOfContent }) {
             <div key={id} className="slider__item-wrapper">
               <Link
                 onClick={e => {
-                  if (dragging) e.preventDefault()
+                  if (blockLinks) e.preventDefault()
                 }}
                 to={{
                   pathname: `/${mediaType}/${id}`
@@ -257,11 +212,7 @@ export default function Slider({ listOfContent }) {
       </div>
       {sliderAvailable && (
         <>
-          <div
-            ref={arrowLeft}
-            onClick={() => pagination("left")}
-            className="arrow arrow--left"
-          />
+          <div ref={arrowLeft} onClick={() => pagination("left")} className="arrow arrow--left" />
           <div
             ref={arrowRight}
             onClick={() => pagination("right")}
