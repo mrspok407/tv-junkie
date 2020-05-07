@@ -8,7 +8,7 @@ $itemsInSlider: 20;
 $mobileLayout: 1000px;
 
 :root {
-  --sliderWidth: calc($mobileLayout * 0.95);
+  --sliderWidth: calc(1000px * 0.95);
   --itemsInRow: 5;
   --itemWidth: var(--itemsInRow);
 
