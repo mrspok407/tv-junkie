@@ -5,13 +5,23 @@ $arrowSize: 75px;
 
 $itemsInSlider: 20;
 
+$mobileLayout: 1000px;
+
 :root {
-  --sliderWidth: calc(1000px * 0.95);
+  --sliderWidth: calc($mobileLayout * 0.95);
   --itemsInRow: 5;
+  --itemWidth: var(--itemsInRow);
+
+  @include mediaMaxW($mobileLayout) {
+    --itemWidth: var(--itemsInRow) * 0.9;
+  }
 }
 
 .slider-container {
   position: relative;
+  @include mediaMaxW($mobileLayout) {
+    overflow-x: auto;
+  }
 }
 
 .slider {
@@ -19,13 +29,16 @@ $itemsInSlider: 20;
   display: grid;
   grid-template-columns: repeat(
     $itemsInSlider,
-    calc(var(--sliderWidth) / var(--itemsInRow))
+    calc(var(--sliderWidth) / var(--itemWidth))
   );
   transform: translate3d(0, 0, 0);
   cursor: pointer;
+  @include mediaMaxW($mobileLayout) {
+    cursor: inherit;
+  }
   &__item-wrapper {
     padding: 5px;
-    height: calc(var(--sliderWidth) / var(--itemsInRow) * 1.5);
+    height: calc(var(--sliderWidth) / var(--itemWidth) * 1.5);
     align-self: center;
   }
   &__item {
@@ -40,6 +53,9 @@ $itemsInSlider: 20;
       @include hoverBoxShadow(5px, 0.4s);
       box-shadow: inset 0px 0px 58px 14px black;
       z-index: 1;
+      @include mediaMaxW($mobileLayout) {
+        display: none;
+      }
     }
     &:hover:after {
       opacity: 1;
@@ -57,9 +73,8 @@ $itemsInSlider: 20;
   background-color: #fff;
   opacity: 0.75;
   transition: 0.2s;
-  @include mediaMaxW(750px) {
-    width: 50px;
-    height: 50px;
+  @include mediaMaxW($mobileLayout) {
+    display: none !important;
   }
   cursor: pointer;
   &:hover {
@@ -76,11 +91,6 @@ $itemsInSlider: 20;
     height: 12px;
     border-radius: 5px;
     background-color: #000;
-    @include mediaMaxW(750px) {
-      width: 23px;
-      height: 9px;
-      left: 12px;
-    }
   }
   &:before {
     top: 42%;
@@ -97,9 +107,6 @@ $itemsInSlider: 20;
       left: initial;
       right: 18px;
       transform: translate(0, -50%) rotate(-45deg);
-      @include mediaMaxW(750px) {
-        right: 12px;
-      }
     }
     &:before {
       transform: translate(0, -50%) rotate(45deg);
