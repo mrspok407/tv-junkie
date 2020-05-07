@@ -1,0 +1,108 @@
+@import "../../styles/globals";
+
+$columnGap: 10px;
+$arrowSize: 75px;
+
+$itemsInSlider: 20;
+
+:root {
+  --sliderWidth: calc(1000px * 0.95);
+  --itemsInRow: 5;
+}
+
+.slider-container {
+  position: relative;
+}
+
+.slider {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(
+    $itemsInSlider,
+    calc(var(--sliderWidth) / var(--itemsInRow))
+  );
+  transform: translate3d(0, 0, 0);
+  cursor: pointer;
+  &__item-wrapper {
+    padding: 5px;
+    height: calc(var(--sliderWidth) / var(--itemsInRow) * 1.5);
+    align-self: center;
+  }
+  &__item {
+    position: relative;
+    height: 100%;
+    background-position: center top;
+    background-repeat: no-repeat;
+    background-size: cover;
+    border-radius: 5px;
+    transition: 0.2s;
+    &:after {
+      @include hoverBoxShadow(5px, 0.4s);
+      box-shadow: inset 0px 0px 58px 14px black;
+      z-index: 1;
+    }
+    &:hover:after {
+      opacity: 1;
+    }
+  }
+}
+
+.arrow {
+  position: absolute;
+  top: 50%;
+  transform: translate(0, -50%);
+  width: $arrowSize;
+  height: $arrowSize;
+  border-radius: 50%;
+  background-color: #fff;
+  opacity: 0.75;
+  transition: 0.2s;
+  @include mediaMaxW(750px) {
+    width: 50px;
+    height: 50px;
+  }
+  cursor: pointer;
+  &:hover {
+    opacity: 1 !important;
+  }
+  &:after,
+  &:before {
+    content: "";
+    position: absolute;
+    top: 63%;
+    left: 18px;
+    transform: translate(0, -50%) rotate(45deg);
+    width: 33px;
+    height: 12px;
+    border-radius: 5px;
+    background-color: #000;
+    @include mediaMaxW(750px) {
+      width: 24px;
+      height: 9px;
+      left: 12px;
+    }
+  }
+  &:before {
+    top: 42%;
+    transform: translate(0, -50%) rotate(-45deg);
+  }
+  &--left {
+    display: none;
+    left: 8px;
+  }
+  &--right {
+    right: 8px;
+    &:after,
+    &:before {
+      left: initial;
+      right: 18px;
+      transform: translate(0, -50%) rotate(-45deg);
+      @include mediaMaxW(750px) {
+        right: 12px;
+      }
+    }
+    &:before {
+      transform: translate(0, -50%) rotate(45deg);
+    }
+  }
+}
