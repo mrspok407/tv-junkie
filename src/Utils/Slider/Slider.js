@@ -105,21 +105,19 @@ export default function Slider({ listOfContent }) {
   }, [slider])
 
   useEffect(() => {
-    if (slider !== undefined) {
-      slider.style.transform = `translate3d(-${currentItem *
-        itemWidth}px, 0, 0)`
-      slider.style.transition = `${transition}ms`
+    if (slider === undefined) return
 
-      toggleArrows()
-    }
+    slider.style.transform = `translate3d(-${currentItem * itemWidth}px, 0, 0)`
+    slider.style.transition = `${transition}ms`
+
+    toggleArrows()
   }, [currentItem, mouseUp])
 
   useEffect(() => {
-    if (slider !== undefined) {
-      slider.style.transform = `translate3d(-${currentItem *
-        itemWidth}px, 0, 0)`
-      slider.style.transition = "0s"
-    }
+    if (slider === undefined) return
+
+    slider.style.transform = `translate3d(-${currentItem * itemWidth}px, 0, 0)`
+    slider.style.transition = "0s"
   }, [itemWidth])
 
   useEffect(() => {
