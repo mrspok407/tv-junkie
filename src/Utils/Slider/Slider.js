@@ -1,14 +1,21 @@
+/* eslint-disable no-else-return */
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-use-before-define */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import React, { useRef, useEffect, useState } from "react"
-import debounce from "debounce"
+import React, {
+  useRef,
+  useEffect,
+  useState,
+  useCallback,
+  useLayoutEffect
+} from "react"
 import { Link } from "react-router-dom"
+import debounce from "debounce"
 import "./Slider.scss"
 
 export default function Slider({ listOfContent }) {
-  const slider = useRef()
   const arrowLeft = useRef()
   const arrowRight = useRef()
   const rootNode = document.documentElement
@@ -27,12 +34,25 @@ export default function Slider({ listOfContent }) {
     }
   }
 
-  const [itemWidth, setItemWidth] = useState()
+  const [slider, setSlider] = useState()
+  const [sliderRect, setSliderRect] = useState({
+    bottom: 0,
+    height: 0,
+    left: 0,
+    right: 0,
+    top: 0,
+    width: 0
+  })
+
   const [itemsInRow, setItemsInRow] = useState()
+
+  const itemWidth = sliderRect.width / itemsInRow
+
+  rootNode.style.setProperty("--sliderWidth", `${sliderRect.width}px`)
 
   const itemsInSlider = listOfContent.length
   const nonVisibleItems = itemsInSlider - itemsInRow
-  const dragСoefficient = 1.25 // Это чтобы translate3d(*значение*, 0, 0) по факту было на 25% меньше, чем реальная дистанция курсора. хз как назвать
+  const dragСoefficient = 1.25
   const thresholdToSlide = itemWidth / 2
   const widthOfSlider = nonVisibleItems * itemWidth * dragСoefficient
   const transition = 500
@@ -40,59 +60,72 @@ export default function Slider({ listOfContent }) {
 
   const [currentItem, setCurrentItem] = useState(0)
   const [mouseUp, setMouseUp] = useState()
+  const [dragging, setDragging] = useState(false)
 
   let startDragPoint = 0
 
-  const [dragging, setDragging] = useState(false)
+  const sliderRef = useCallback(node => {
+    if (node !== null) {
+      setSlider(node)
+    }
+  }, [])
+
+  const handleResize = useCallback(() => {
+    if (!slider) return
+    itemsInRowUpdater()
+
+    setSliderRect(slider.getBoundingClientRect())
+  }, [slider])
+
+  const handleResizeDeb = debounce(() => handleResize(), 200)
+
+  useLayoutEffect(() => {
+    if (!slider) return
+
+    handleResize()
+
+    if (window.ResizeObserver) {
+      let resizeObserver = new ResizeObserver(() => handleResizeDeb())
+      resizeObserver.observe(slider)
+
+      return () => {
+        if (!resizeObserver) return
+
+        resizeObserver.disconnect()
+        resizeObserver = null
+        removeDragListeners()
+      }
+    } else {
+      window.addEventListener("resize", handleResizeDeb)
+
+      return () => {
+        window.removeEventListener("resize", handleResizeDeb)
+      }
+    }
+  }, [slider])
 
   useEffect(() => {
-    updateDimensions()
+    if (slider === undefined) return
 
-    window.addEventListener("resize", resizeHandler)
-
-    return removeDragListeners()
-  })
-
-  useEffect(() => {
-    slider.current.style.transform = `translate3d(-${currentItem *
-      itemWidth}px, 0, 0)`
-    slider.current.style.transition = `${transition}ms`
+    slider.style.transform = `translate3d(-${currentItem * itemWidth}px, 0, 0)`
+    slider.style.transition = `${transition}ms`
 
     toggleArrows()
   }, [currentItem, mouseUp])
 
   useEffect(() => {
-    // Чтобы при изменение ширины слайда, слайдер переехал куда надо ровно. А то ширина изменится, но слайдер останется в том же положение
-    slider.current.style.transform = `translate3d(-${currentItem *
-      itemWidth}px, 0, 0)`
+    if (slider === undefined) return
+
+    slider.style.transform = `translate3d(-${currentItem * itemWidth}px, 0, 0)`
+    slider.style.transition = "0s"
   }, [itemWidth])
 
   useEffect(() => {
-    // Если допустим при itemsInRow = 4 (nonVisibleItems при этом будет 16), ты находишься на последнем слайде (currentItem будет равен 16)
-    // и увеличиваешь ширину окна, чтобы itemsInRow стало 5 (nonVisibleItems при этом будет 15), то currentItem по-прежнему 16 останется
-    // слайдер будет смещён на 16 позиций грубо говоря, хотя их максимум 15 (при itemsInRow = 5). Поэтому обоновляю currentItem на основе изменения
-    // itemsInRow, только если curItem больше nonVisibleItems (а он обновится за счёт изменения itemsInRow).
     if (currentItem > nonVisibleItems) {
       setCurrentItem(nonVisibleItems)
     }
     toggleArrows()
   }, [itemsInRow])
-
-  const resizeHandler = debounce(() => updateDimensions(), 300)
-
-  const updateDimensions = () => {
-    // Вот это говно если не тут деклерить, а вне функции то там рофлы иногда появляются с тем что undefined хз
-    const slideWrapper = document.querySelector(".slider__item-wrapper")
-    const sliderCont = document.querySelector(".slider")
-    const sliderContWidth = sliderCont.offsetWidth
-
-    setItemWidth(slideWrapper.offsetWidth)
-    rootNode.style.setProperty("--sliderWidth", `${sliderContWidth}px`)
-
-    sliderCont.style.transition = "0s"
-
-    itemsInRowUpdater()
-  }
 
   const itemsInRowUpdater = () => {
     const windowWidth = window.innerWidth
@@ -115,9 +148,6 @@ export default function Slider({ listOfContent }) {
     if (currentItem === 0 && direction === "left") return
     if (nonVisibleItems === currentItem && direction === "right") return
 
-    // Это всё, чтобы если ты драгом перешел на допустим 3й с конца слайд (то есть справа еще 2 слайда спрятаны)
-    // то контейнер не прыгнул на itemsInRow, а прыгнул на 2 (столько сколько скрыто еще).
-    // Тоже самое с обратной стороны
     if (direction === "right") {
       if (currentItem > nonVisibleItems - itemsInRow) {
         setCurrentItem(nonVisibleItems)
@@ -138,7 +168,7 @@ export default function Slider({ listOfContent }) {
     e.preventDefault()
 
     startDragPoint = e.pageX
-    slider.current.style.transition = "0s"
+    slider.style.transition = "0s"
 
     document.addEventListener("mousemove", onMouseMove)
     document.addEventListener("mouseup", onMouseUp)
@@ -161,25 +191,24 @@ export default function Slider({ listOfContent }) {
         ? widthOfSlider
         : maxDragDistance - slideDistance
 
-    // Высчитываю на каком слайде нахожусь на основе общей пройденной дистанции слайдера (прошлое положение и плюс текущий маус эвент скоко он прошел)
     const currentItemStorage = Math.ceil(
       (translateX - thresholdToSlide * dragСoefficient) /
         dragСoefficient /
         itemWidth
     )
 
-    setCurrentItem(currentItemStorage < 0 ? 0 : currentItemStorage) // Там иногда -1 получается, рофланПоминки
+    setCurrentItem(currentItemStorage < 0 ? 0 : currentItemStorage)
 
-    slider.current.style.transform = `translate3d(-${translateX /
+    slider.style.transform = `translate3d(-${translateX /
       dragСoefficient}px, 0, 0)`
-    slider.current.style.transition = "0s"
+    slider.style.transition = "0s"
   }
 
   const onMouseUp = e => {
     if (!sliderAvailable) return
     e.preventDefault()
 
-    setMouseUp(e.pageX) // Запихиваю в стейт хуйню уникальную, чтобы в useEffect определять, что был маусАп и сделай необходимую хуйню. Строка 56
+    setMouseUp(e.pageX)
 
     setTimeout(() => {
       setDragging(false)
@@ -207,7 +236,7 @@ export default function Slider({ listOfContent }) {
         onMouseDown={e => onMouseDown(e)}
         onMouseUp={e => onMouseUp(e)}
         className="slider"
-        ref={slider}
+        ref={sliderRef}
       >
         {listOfContent.map(({ poster_path, original_title, id }) => {
           const mediaType = original_title ? "movie" : "show"
@@ -215,7 +244,7 @@ export default function Slider({ listOfContent }) {
             <div key={id} className="slider__item-wrapper">
               <Link
                 onClick={e => {
-                  if (dragging) e.preventDefault() // Чтобы драгинге и маусАп не было рандомных нажатий
+                  if (dragging) e.preventDefault()
                 }}
                 to={{
                   pathname: `/${mediaType}/${id}`
