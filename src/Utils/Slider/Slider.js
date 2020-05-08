@@ -1,12 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useRef, useEffect, useState, useCallback, useLayoutEffect } from "react"
+import React, { useEffect, useState, useCallback, useLayoutEffect } from "react"
 import { Link } from "react-router-dom"
 import debounce from "debounce"
 import "./Slider.scss"
 
+const POSTER_PATH = "https://image.tmdb.org/t/p/w500/"
+
 export default function Slider({ listOfContent }) {
-  const arrowLeft = useRef()
-  const arrowRight = useRef()
   const rootNode = document.documentElement
 
   const [slider, setSlider] = useState()
@@ -14,15 +14,16 @@ export default function Slider({ listOfContent }) {
 
   rootNode.style.setProperty("--sliderWidth", `${sliderWidth}px`)
 
-  const itemsInRow = Number(getComputedStyle(rootNode).getPropertyValue("--itemsInRow"))
+  const mobileLayout = Number(getComputedStyle(rootNode).getPropertyValue("--mobileLayout"))
 
+  const itemsInRow = Number(getComputedStyle(rootNode).getPropertyValue("--itemsInRow"))
   const itemWidth = sliderWidth / itemsInRow
 
   const itemsInSlider = listOfContent.length
   const nonVisibleItems = itemsInSlider - itemsInRow
   const dragСoefficient = 1.25
   const thresholdToSlide = itemWidth / 2
-  const widthOfSlider = nonVisibleItems * itemWidth * dragСoefficient
+  const sliderRange = nonVisibleItems * itemWidth * dragСoefficient
   const sliderAvailable = itemsInSlider > itemsInRow
 
   const [currentItem, setCurrentItem] = useState(0)
@@ -30,6 +31,9 @@ export default function Slider({ listOfContent }) {
 
   const [dragging, setDragging] = useState(false)
   const [blockLinks, setBlockLinks] = useState(false)
+
+  const [leftArrowVisible, setLeftArrowVisible] = useState(true)
+  const [rightArrowVisible, setrightArrowVisible] = useState(true)
 
   let startDragPoint = 0
 
@@ -41,6 +45,11 @@ export default function Slider({ listOfContent }) {
 
   const handleResize = useCallback(() => {
     if (!slider) return
+
+    if (window.innerWidth <= mobileLayout) {
+      slider.classList.add("s--mobile")
+      slider.style.cssText = ""
+    }
 
     setSliderWidth(slider.getBoundingClientRect().width)
   }, [slider])
@@ -113,7 +122,7 @@ export default function Slider({ listOfContent }) {
   }
 
   const onMouseDown = e => {
-    if (!sliderAvailable) return
+    if (!sliderAvailable || window.innerWidth <= mobileLayout) return
     e.preventDefault()
 
     setDragging(true)
@@ -125,20 +134,20 @@ export default function Slider({ listOfContent }) {
   }
 
   const onMouseMove = e => {
-    if (!sliderAvailable || window.innerWidth <= 850) return
+    if (!sliderAvailable || window.innerWidth <= mobileLayout) return
     e.preventDefault()
 
     setBlockLinks(true)
 
-    const slideDistance = (startDragPoint - e.pageX) * -1
+    const diffFromStartPoint = (startDragPoint - e.pageX) * -1
     const sliderPosition = currentItem * itemWidth * dragСoefficient
 
-    const maxDragDistance = sliderPosition >= widthOfSlider ? widthOfSlider : sliderPosition
+    const maxDragDistance = sliderPosition >= sliderRange ? sliderRange : sliderPosition
 
     const translateX =
-      maxDragDistance - slideDistance >= widthOfSlider
-        ? widthOfSlider
-        : maxDragDistance - slideDistance
+      maxDragDistance - diffFromStartPoint >= sliderRange
+        ? sliderRange
+        : maxDragDistance - diffFromStartPoint
 
     const currentItemStorage = Math.ceil(
       (translateX - thresholdToSlide * dragСoefficient) / dragСoefficient / itemWidth
@@ -150,11 +159,10 @@ export default function Slider({ listOfContent }) {
   }
 
   const onMouseUp = e => {
-    if (!sliderAvailable) return
+    if (!sliderAvailable || window.innerWidth <= mobileLayout) return
     e.preventDefault()
 
     setMouseUp(e.pageX)
-
     setDragging(false)
 
     slider.addEventListener("transitionend", blockLinksHandler)
@@ -175,8 +183,8 @@ export default function Slider({ listOfContent }) {
   const toggleArrows = () => {
     if (!sliderAvailable) return
 
-    arrowLeft.current.style.display = currentItem <= 0 ? "none" : "inherit"
-    arrowRight.current.style.display = currentItem >= nonVisibleItems ? "none" : "inherit"
+    setLeftArrowVisible(!(currentItem <= 0))
+    setrightArrowVisible(!(currentItem >= nonVisibleItems))
   }
 
   return (
@@ -202,7 +210,7 @@ export default function Slider({ listOfContent }) {
                 <div
                   className="slider__item"
                   style={{
-                    backgroundImage: `url(https://image.tmdb.org/t/p/w500/${poster_path})`
+                    backgroundImage: `url(${POSTER_PATH}${poster_path})`
                   }}
                 />
               </Link>
@@ -212,11 +220,17 @@ export default function Slider({ listOfContent }) {
       </div>
       {sliderAvailable && (
         <>
-          <div ref={arrowLeft} onClick={() => pagination("left")} className="arrow arrow--left" />
           <div
-            ref={arrowRight}
+            onClick={() => pagination("left")}
+            className={
+              leftArrowVisible ? "arrow arrow--left" : "arrow arrow--left arrow--non-visible"
+            }
+          />
+          <div
             onClick={() => pagination("right")}
-            className="arrow arrow--right"
+            className={
+              rightArrowVisible ? "arrow arrow--right" : "arrow arrow--right arrow--non-visible"
+            }
           />
         </>
       )}

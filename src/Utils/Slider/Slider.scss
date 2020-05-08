@@ -11,6 +11,7 @@ $mobileLayout: 850px;
   --sliderWidth: calc(1000px * 0.95);
   --itemsInRow: 5;
   --itemWidth: var(--itemsInRow);
+  --mobileLayout: 850;
 
   @include mediaMaxW($mobileLayout) {
     --itemWidth: var(--itemsInRow) * 0.9;
@@ -39,10 +40,6 @@ $mobileLayout: 850px;
   transition: 500ms;
   cursor: pointer;
 
-  @include mediaMaxW($mobileLayout) {
-    cursor: inherit;
-  }
-
   &__item-wrapper {
     padding: 5px;
     height: calc(var(--sliderWidth) / var(--itemWidth) * 1.5);
@@ -57,6 +54,7 @@ $mobileLayout: 850px;
     background-size: cover;
     border-radius: 5px;
     transition: 0.2s;
+
     &:after {
       @include hoverBoxShadow(5px, 0.4s);
       box-shadow: inset 0px 0px 58px 14px black;
@@ -66,6 +64,7 @@ $mobileLayout: 850px;
         display: none;
       }
     }
+
     &:hover:after {
       opacity: 1;
     }
@@ -74,6 +73,12 @@ $mobileLayout: 850px;
 
 .s--dragging {
   transition: 0ms;
+  user-select: none;
+}
+
+.s--mobile {
+  transform: translate3d(0, 0, 0);
+  cursor: inherit;
 }
 
 .arrow {
@@ -86,14 +91,16 @@ $mobileLayout: 850px;
   background-color: #fff;
   opacity: 0.75;
   transition: 0.2s;
+  cursor: pointer;
 
   @include mediaMaxW($mobileLayout) {
     display: none !important;
   }
-  cursor: pointer;
+
   &:hover {
     opacity: 1 !important;
   }
+
   &:after,
   &:before {
     content: "";
@@ -106,14 +113,16 @@ $mobileLayout: 850px;
     border-radius: 5px;
     background-color: #000;
   }
+
   &:before {
     top: 42%;
     transform: translate(0, -50%) rotate(-45deg);
   }
+
   &--left {
-    display: none;
     left: 8px;
   }
+
   &--right {
     right: 8px;
     &:after,
@@ -125,5 +134,9 @@ $mobileLayout: 850px;
     &:before {
       transform: translate(0, -50%) rotate(45deg);
     }
+  }
+
+  &--non-visible {
+    display: none;
   }
 }
