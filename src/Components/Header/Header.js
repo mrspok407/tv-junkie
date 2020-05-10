@@ -9,33 +9,20 @@ export default class Header extends Component {
   render() {
     const { isLogoVisible = true } = this.props
 
+    console.log(this.props.firebase)
+
     return (
       <header className="header">
         <nav className="nav">
           <ul className="nav__list">
-            <NavLink
-              exact
-              to="/"
-              activeClassName="nav__item--active"
-              className="nav__item"
-            >
+            <NavLink exact to="/" activeClassName="nav__item--active" className="nav__item">
               <li data-item="1">Search</li>
             </NavLink>
 
-            <NavLink
-              exact
-              to="/shows"
-              activeClassName="nav__item--active"
-              className="nav__item"
-            >
+            <NavLink exact to="/shows" activeClassName="nav__item--active" className="nav__item">
               <li data-item="2">Your Shows</li>
             </NavLink>
-            <NavLink
-              exact
-              to="/movies"
-              activeClassName="nav__item--active"
-              className="nav__item"
-            >
+            <NavLink exact to="/movies" activeClassName="nav__item--active" className="nav__item">
               <li data-item="3">Your Movies</li>
             </NavLink>
           </ul>

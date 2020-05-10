@@ -5,9 +5,12 @@ import PlaceholderNoSelectedContent from "../Placeholders/PlaceholderNoSelectedC
 import { SelectedContentContext } from "../Context/SelectedContentContext"
 import ScrollToTop from "../../Utils/ScrollToTop"
 import "./ShowsPage.scss"
-import Header from "../Header/Header"
+import HeaderBase from "../Header/Header"
+import { withFirebase } from "../Firebase/FirebaseContext"
 
 let cancelRequest
+
+const Header = withFirebase(HeaderBase)
 
 export default class Shows extends Component {
   constructor(props) {

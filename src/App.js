@@ -5,6 +5,7 @@ import ShowsPage from "./Components/ShowsPage/ShowsPage"
 import MoviesPage from "./Components/MoviesPage/MoviesPage"
 import FullContentInfo from "./Components/Templates/FullContentInfo/FullContentInfo"
 import GridTests from "./Utils/GridTests/GridTests"
+import SignUp from "./Components/SignUp/SignUp"
 import { SelectedContentContext } from "./Components/Context/SelectedContentContext"
 
 const LOCAL_STORAGE_KEY_CONTENT = "selectedContent"
@@ -73,9 +74,9 @@ export default class App extends Component {
               <Route path="/shows" exact component={ShowsPage} />
               <Route path="/:mediaType/:id" component={FullContentInfo} />
               <Route path="/movies" component={MoviesPage} />
+              <Route path="/signup" component={SignUp} />
               <Route path="/grid-tests" component={GridTests} />
             </Switch>
-            {/* <ScrollToTop /> */}
           </div>
         </Router>
       </SelectedContentContext.Provider>
