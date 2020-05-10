@@ -4,6 +4,7 @@ import SearchPage from "./Components/SearchPage/SearchPage"
 import ShowsPage from "./Components/ShowsPage/ShowsPage"
 import MoviesPage from "./Components/MoviesPage/MoviesPage"
 import FullContentInfo from "./Components/Templates/FullContentInfo/FullContentInfo"
+import GridTests from "./Utils/GridTests/GridTests"
 import { SelectedContentContext } from "./Components/Context/SelectedContentContext"
 
 const LOCAL_STORAGE_KEY_CONTENT = "selectedContent"
@@ -49,8 +50,7 @@ export default class App extends Component {
     }
 
     this.state = {
-      selectedContent:
-        JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_CONTENT)) || [],
+      selectedContent: JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_CONTENT)) || [],
       toggleContent: this.toggleContent,
       clearSelectedContent: this.clearSelectedContent,
       isActiveLink: false,
@@ -60,10 +60,7 @@ export default class App extends Component {
   }
 
   componentDidUpdate() {
-    localStorage.setItem(
-      LOCAL_STORAGE_KEY_CONTENT,
-      JSON.stringify(this.state.selectedContent)
-    )
+    localStorage.setItem(LOCAL_STORAGE_KEY_CONTENT, JSON.stringify(this.state.selectedContent))
   }
 
   render() {
@@ -76,6 +73,7 @@ export default class App extends Component {
               <Route path="/shows" exact component={ShowsPage} />
               <Route path="/:mediaType/:id" component={FullContentInfo} />
               <Route path="/movies" component={MoviesPage} />
+              <Route path="/grid-tests" component={GridTests} />
             </Switch>
             {/* <ScrollToTop /> */}
           </div>

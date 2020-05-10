@@ -14,7 +14,7 @@ import ScrollToTop from "../../../Utils/ScrollToTop"
 import Header from "../../Header/Header"
 import Loader from "../../Placeholders/Loader"
 import Slider from "../../../Utils/Slider/Slider"
-import { API_KEY, differenceBtwDatesInDays } from "../../../Utils"
+import { differenceBtwDatesInDays } from "../../../Utils"
 import "./FullContentInfo.scss"
 
 const todayDate = new Date()
@@ -93,7 +93,7 @@ export default function FullContentInfo({
 
     axios
       .get(
-        `https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}&language=en-US&append_to_response=similar`,
+        `https://api.themoviedb.org/3/tv/${id}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US&append_to_response=similar`,
         {
           cancelToken: new CancelToken(function executor(c) {
             cancelRequest = c
@@ -183,7 +183,7 @@ export default function FullContentInfo({
 
     axios
       .get(
-        `https://api.themoviedb.org/3/tv/${id}/season/${seasonNum}?api_key=${API_KEY}&language=en-US`,
+        `https://api.themoviedb.org/3/tv/${id}/season/${seasonNum}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US`,
         {
           cancelToken: new CancelToken(function executor(c) {
             cancelRequest = c
@@ -215,7 +215,7 @@ export default function FullContentInfo({
     setLoadingPage(true)
     axios
       .get(
-        `https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=en-US&append_to_response=similar_movies`,
+        `https://api.themoviedb.org/3/movie/${id}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US&append_to_response=similar_movies`,
         {
           cancelToken: new CancelToken(function executor(c) {
             cancelRequest = c
@@ -409,7 +409,8 @@ export default function FullContentInfo({
                         <a
                           target="_blank"
                           rel="noopener noreferrer"
-                          href={`magnet:?xt=urn:btih:${movieTorrents.hash1080p}&dn=${movieTorrents.title}&xl=310660222&tr=udp%3A%2F%2Ftracker.coppersurfer.tk:6969/announce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org:6969/announce&tr=udp%3A%2F%2Ftracker.pirateparty.gr:6969/announce&tr=udp%3A%2F%2Fexodus.desync.com:6969/announce&tr=udp%3A%2F%2Ftracker.opentrackr.org:1337/announce&tr=udp%3A%2F%2Ftracker.internetwarriors.net:1337/announce&tr=udp%3A%2F%2Ftracker.torrent.eu.org:451&tr=udp%3A%2F%2Ftracker.cyberia.is:6969/announce&tr=udp%3A%2F%2Fopen.demonii.si:1337/announce&tr=udp%3A%2F%2Fopen.stealth.si:80/announce&tr=udp%3A%2F%2Ftracker.tiny-vps.com:6969/announce&tr=udp%3A%2F%2Ftracker.iamhansen.xyz:2000/announce&tr=udp%3A%2F%2Fexplodie.org:6969/announce&tr=udp%3A%2F%2Fdenis.stalker.upeer.me:6969/announce&tr=udp%3A%2F%2Fipv4.tracker.harry.lu:80/announce`}>
+                          href={`magnet:?xt=urn:btih:${movieTorrents.hash1080p}&dn=${movieTorrents.title}&xl=310660222&tr=udp%3A%2F%2Ftracker.coppersurfer.tk:6969/announce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org:6969/announce&tr=udp%3A%2F%2Ftracker.pirateparty.gr:6969/announce&tr=udp%3A%2F%2Fexodus.desync.com:6969/announce&tr=udp%3A%2F%2Ftracker.opentrackr.org:1337/announce&tr=udp%3A%2F%2Ftracker.internetwarriors.net:1337/announce&tr=udp%3A%2F%2Ftracker.torrent.eu.org:451&tr=udp%3A%2F%2Ftracker.cyberia.is:6969/announce&tr=udp%3A%2F%2Fopen.demonii.si:1337/announce&tr=udp%3A%2F%2Fopen.stealth.si:80/announce&tr=udp%3A%2F%2Ftracker.tiny-vps.com:6969/announce&tr=udp%3A%2F%2Ftracker.iamhansen.xyz:2000/announce&tr=udp%3A%2F%2Fexplodie.org:6969/announce&tr=udp%3A%2F%2Fdenis.stalker.upeer.me:6969/announce&tr=udp%3A%2F%2Fipv4.tracker.harry.lu:80/announce`}
+                        >
                           1080p
                         </a>
                       )}
@@ -417,7 +418,8 @@ export default function FullContentInfo({
                         <a
                           target="_blank"
                           rel="noopener noreferrer"
-                          href={`magnet:?xt=urn:btih:${movieTorrents.hash720p}&dn=${movieTorrents.title}&xl=310660222&tr=udp%3A%2F%2Ftracker.coppersurfer.tk:6969/announce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org:6969/announce&tr=udp%3A%2F%2Ftracker.pirateparty.gr:6969/announce&tr=udp%3A%2F%2Fexodus.desync.com:6969/announce&tr=udp%3A%2F%2Ftracker.opentrackr.org:1337/announce&tr=udp%3A%2F%2Ftracker.internetwarriors.net:1337/announce&tr=udp%3A%2F%2Ftracker.torrent.eu.org:451&tr=udp%3A%2F%2Ftracker.cyberia.is:6969/announce&tr=udp%3A%2F%2Fopen.demonii.si:1337/announce&tr=udp%3A%2F%2Fopen.stealth.si:80/announce&tr=udp%3A%2F%2Ftracker.tiny-vps.com:6969/announce&tr=udp%3A%2F%2Ftracker.iamhansen.xyz:2000/announce&tr=udp%3A%2F%2Fexplodie.org:6969/announce&tr=udp%3A%2F%2Fdenis.stalker.upeer.me:6969/announce&tr=udp%3A%2F%2Fipv4.tracker.harry.lu:80/announce`}>
+                          href={`magnet:?xt=urn:btih:${movieTorrents.hash720p}&dn=${movieTorrents.title}&xl=310660222&tr=udp%3A%2F%2Ftracker.coppersurfer.tk:6969/announce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org:6969/announce&tr=udp%3A%2F%2Ftracker.pirateparty.gr:6969/announce&tr=udp%3A%2F%2Fexodus.desync.com:6969/announce&tr=udp%3A%2F%2Ftracker.opentrackr.org:1337/announce&tr=udp%3A%2F%2Ftracker.internetwarriors.net:1337/announce&tr=udp%3A%2F%2Ftracker.torrent.eu.org:451&tr=udp%3A%2F%2Ftracker.cyberia.is:6969/announce&tr=udp%3A%2F%2Fopen.demonii.si:1337/announce&tr=udp%3A%2F%2Fopen.stealth.si:80/announce&tr=udp%3A%2F%2Ftracker.tiny-vps.com:6969/announce&tr=udp%3A%2F%2Ftracker.iamhansen.xyz:2000/announce&tr=udp%3A%2F%2Fexplodie.org:6969/announce&tr=udp%3A%2F%2Fdenis.stalker.upeer.me:6969/announce&tr=udp%3A%2F%2Fipv4.tracker.harry.lu:80/announce`}
+                        >
                           720p
                         </a>
                       )}
@@ -525,14 +527,16 @@ export default function FullContentInfo({
                   <button
                     className="button button--searchlist button--pressed"
                     onClick={() => toggleContent(Number(id), infoToPass)}
-                    type="button">
+                    type="button"
+                  >
                     Remove {mediaType === "movie" ? "movie" : "show"}
                   </button>
                 ) : (
                   <button
                     className="button button--searchlist"
                     onClick={() => toggleContent(Number(id), infoToPass)}
-                    type="button">
+                    type="button"
+                  >
                     Add {mediaType === "movie" ? "movie" : "show"}
                   </button>
                 )}
@@ -561,7 +565,8 @@ export default function FullContentInfo({
                         !loadingEpisodesIds.includes(seasonId)
                           ? { rowGap: "10px" }
                           : { rowGap: "0px" }
-                      }>
+                      }
+                    >
                       <div
                         className={
                           !openSeasons.includes(seasonId)
@@ -577,7 +582,8 @@ export default function FullContentInfo({
                                 backgroundColor: "#1d1d1d96"
                               }
                         }
-                        onClick={() => showSeasonsEpisode(seasonId, season.season_number)}>
+                        onClick={() => showSeasonsEpisode(seasonId, season.season_number)}
+                      >
                         <div className="full-detailes__season-number">
                           Season {season.season_number}
                           {daysToNewSeason > 0 && (
@@ -654,7 +660,8 @@ export default function FullContentInfo({
                                         !detailEpisodeInfo.includes(episode.id)
                                           ? "full-detailes__episode"
                                           : "full-detailes__episode full-detailes__episode--open"
-                                      }>
+                                      }
+                                    >
                                       <div
                                         className="full-detailes__episode-wrapper"
                                         onClick={() => showEpisodeInfo(episode.id)}
@@ -666,7 +673,8 @@ export default function FullContentInfo({
                                             : {
                                                 backgroundColor: "#1d1d1d96"
                                               }
-                                        }>
+                                        }
+                                      >
                                         <div className="full-detailes__episode-date">
                                           {episodeAirDate}
                                         </div>
@@ -689,13 +697,15 @@ export default function FullContentInfo({
                                             episode.still_path
                                               ? "full-detailes__episode-detailes"
                                               : "full-detailes__episode-detailes full-detailes__episode-detailes--no-image"
-                                          }>
+                                          }
+                                        >
                                           {episode.still_path && (
                                             <div
                                               className="full-detailes__episode-detailes-image"
                                               style={{
                                                 backgroundImage: `url(https://image.tmdb.org/t/p/w500${episode.still_path})`
-                                              }}></div>
+                                              }}
+                                            ></div>
                                           )}
                                           {episode.overview && (
                                             <div className="full-detailes__episode-detailes-overview">
@@ -709,19 +719,22 @@ export default function FullContentInfo({
                                                 <a
                                                   target="_blank"
                                                   rel="noopener noreferrer"
-                                                  href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}+1080p&cat=41`}>
+                                                  href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}+1080p&cat=41`}
+                                                >
                                                   1080p
                                                 </a>
                                                 <a
                                                   target="_blank"
                                                   rel="noopener noreferrer"
-                                                  href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}+720p&cat=41`}>
+                                                  href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}+720p&cat=41`}
+                                                >
                                                   720p
                                                 </a>
                                                 <a
                                                   target="_blank"
                                                   rel="noopener noreferrer"
-                                                  href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}&cat=5`}>
+                                                  href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}&cat=5`}
+                                                >
                                                   480p
                                                 </a>
                                               </div>

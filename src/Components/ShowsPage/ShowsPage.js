@@ -4,7 +4,6 @@ import ContentResults from "../Templates/ContentResults/ContentResults"
 import PlaceholderNoSelectedContent from "../Placeholders/PlaceholderNoSelectedContent"
 import { SelectedContentContext } from "../Context/SelectedContentContext"
 import ScrollToTop from "../../Utils/ScrollToTop"
-import { API_KEY } from "../../Utils"
 import "./ShowsPage.scss"
 import Header from "../Header/Header"
 
@@ -30,8 +29,7 @@ export default class Shows extends Component {
   }
 
   getLastEpisodeLinks = (id, showAllLinksPressed) => {
-    if (this.state.showsIds.includes(id) || this.state.showAllLinksPressed)
-      return
+    if (this.state.showsIds.includes(id) || this.state.showAllLinksPressed) return
 
     this.setState(prevState => ({
       loadingIds: [...prevState.loadingIds, id],
@@ -41,7 +39,7 @@ export default class Shows extends Component {
 
     axios
       .get(
-        `https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}&language=en-US`,
+        `https://api.themoviedb.org/3/tv/${id}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US`,
         {
           cancelToken: new CancelToken(function executor(c) {
             cancelRequest = c
@@ -64,9 +62,7 @@ export default class Shows extends Component {
   }
 
   render() {
-    const onlyShows = this.context.selectedContent.filter(
-      item => item.original_name
-    )
+    const onlyShows = this.context.selectedContent.filter(item => item.original_name)
     return (
       <>
         <Header />

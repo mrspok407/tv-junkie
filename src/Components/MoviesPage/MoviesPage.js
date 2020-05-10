@@ -29,8 +29,7 @@ export default class Movies extends Component {
   }
 
   getMovieLinks = (id, showAllLinksPressed = false, title, date) => {
-    if (this.state.moviesIds.includes(id) || this.state.showAllLinksPressed)
-      return
+    if (this.state.moviesIds.includes(id) || this.state.showAllLinksPressed) return
 
     this.setState(prevState => ({
       loadingIds: [...prevState.loadingIds, id],
@@ -62,9 +61,7 @@ export default class Movies extends Component {
   }
 
   render() {
-    const onlyMovies = this.context.selectedContent.filter(
-      item => item.original_title
-    )
+    const onlyMovies = this.context.selectedContent.filter(item => item.original_title)
     return (
       <>
         <Header />
