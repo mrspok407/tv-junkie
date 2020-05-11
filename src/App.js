@@ -5,7 +5,8 @@ import ShowsPage from "./Components/ShowsPage/ShowsPage"
 import MoviesPage from "./Components/MoviesPage/MoviesPage"
 import FullContentInfo from "./Components/Templates/FullContentInfo/FullContentInfo"
 import GridTests from "./Utils/GridTests/GridTests"
-import SignUp from "./Components/SignUp/SignUp"
+import SignUp from "./Components/UserAuth/SignUp/SignUp"
+import SignIn from "./Components/UserAuth/SignIn/SignIn"
 import { SelectedContentContext } from "./Components/Context/SelectedContentContext"
 
 const LOCAL_STORAGE_KEY_CONTENT = "selectedContent"
@@ -56,7 +57,8 @@ export default class App extends Component {
       clearSelectedContent: this.clearSelectedContent,
       isActiveLink: false,
       deleteActiveLink: this.deleteActiveLink,
-      addActiveLink: this.addActiveLink
+      addActiveLink: this.addActiveLink,
+      authUser: null
     }
   }
 
@@ -75,6 +77,7 @@ export default class App extends Component {
               <Route path="/:mediaType/:id" component={FullContentInfo} />
               <Route path="/movies" component={MoviesPage} />
               <Route path="/signup" component={SignUp} />
+              <Route path="/signin" component={SignIn} />
               <Route path="/grid-tests" component={GridTests} />
             </Switch>
           </div>

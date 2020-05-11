@@ -1,14 +1,9 @@
 import React, { Component } from "react"
 import { Link, withRouter } from "react-router-dom"
 import { compose } from "recompose"
-import { withFirebase } from "../Firebase"
-
-const SignUpPage = () => (
-  <div>
-    <h1>SignUp</h1>
-    <SignUpForm />
-  </div>
-)
+import { withFirebase } from "../../Firebase"
+import "./SignUp.scss"
+import Header from "../../Header/Header"
 
 const INITIAL_STATE = {
   username: "",
@@ -26,7 +21,7 @@ class SignUpFormBase extends Component {
   }
 
   onSubmit = event => {
-    const { username, email, password } = this.state
+    const { email, password } = this.state
     const firebase = this.props.firebase
     const history = this.props.history
 
@@ -94,9 +89,17 @@ class SignUpFormBase extends Component {
   }
 }
 
-// const SignUpForm = withRouter(withFirebase(SignUpFormBase))
-
 const SignUpForm = compose(withRouter, withFirebase)(SignUpFormBase)
+
+const SignUpPage = () => (
+  <>
+    <Header />
+    <div className="sign-up">
+      <h1>SignUp</h1>
+      <SignUpForm />
+    </div>
+  </>
+)
 
 const SignUpLink = () => (
   <p>
