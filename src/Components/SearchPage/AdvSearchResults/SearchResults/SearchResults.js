@@ -1,7 +1,7 @@
 import React from "react"
 import Loader from "../../../Placeholders/Loader"
 import ContentResults from "../../../Templates/ContentResults/ContentResults"
-import { SelectedContentContext } from "../../../Context/SelectedContentContext"
+import { Context } from "../../../Context/Context"
 import "./SearchResults.scss"
 
 export default class MovieResultsAdvSearch extends React.PureComponent {
@@ -21,4 +21,4 @@ export default class MovieResultsAdvSearch extends React.PureComponent {
   }
 }
 
-MovieResultsAdvSearch.contextType = SelectedContentContext
+MovieResultsAdvSearch.contextType = Context

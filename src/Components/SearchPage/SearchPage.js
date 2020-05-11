@@ -5,7 +5,7 @@ import Search from "./Search/Search"
 import ContentResultsAdvSearch from "./AdvSearchResults/SearchResults/SearchResults"
 import ContentResultsSelected from "./AdvSearchResults/SelectedContent/SelectedContent"
 import PlaceholderNoResults from "../Placeholders/PlaceholderNoResults"
-import { SelectedContentContext } from "../Context/SelectedContentContext"
+import { Context } from "../Context/Context"
 import ScrollToTop from "../../Utils/ScrollToTop"
 import Header from "../Header/Header"
 
@@ -331,4 +331,4 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
   }
 }
 
-MainPage.contextType = SelectedContentContext
+MainPage.contextType = Context

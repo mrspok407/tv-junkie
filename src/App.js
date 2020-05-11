@@ -7,11 +7,15 @@ import FullContentInfo from "./Components/Templates/FullContentInfo/FullContentI
 import GridTests from "./Utils/GridTests/GridTests"
 import SignUp from "./Components/UserAuth/SignUp/SignUp"
 import SignIn from "./Components/UserAuth/SignIn/SignIn"
-import { SelectedContentContext } from "./Components/Context/SelectedContentContext"
+import { Context } from "./Components/Context/Context"
+import {
+  WithAuthenticationProvider,
+  WithAuthenticationConsumer
+} from "./Components/UserAuth/Session"
 
 const LOCAL_STORAGE_KEY_CONTENT = "selectedContent"
 
-export default class App extends Component {
+class App extends Component {
   constructor(props) {
     super(props)
 
@@ -57,8 +61,7 @@ export default class App extends Component {
       clearSelectedContent: this.clearSelectedContent,
       isActiveLink: false,
       deleteActiveLink: this.deleteActiveLink,
-      addActiveLink: this.addActiveLink,
-      authUser: null
+      addActiveLink: this.addActiveLink
     }
   }
 
@@ -68,7 +71,7 @@ export default class App extends Component {
 
   render() {
     return (
-      <SelectedContentContext.Provider value={this.state}>
+      <Context.Provider value={this.state}>
         <Router basename="/">
           <div className="container">
             <Switch>
@@ -82,7 +85,9 @@ export default class App extends Component {
             </Switch>
           </div>
         </Router>
-      </SelectedContentContext.Provider>
+      </Context.Provider>
     )
   }
 }
+
+export default WithAuthenticationProvider(App)

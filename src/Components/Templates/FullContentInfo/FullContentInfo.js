@@ -1,14 +1,8 @@
-/* eslint-disable jsx-a11y/anchor-has-content */
-/* eslint-disable jsx-a11y/anchor-is-valid */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable react/self-closing-comp */
 /* eslint-disable no-prototype-builtins */
-/* eslint-disable no-use-before-define */
 import React, { useState, useEffect, useContext } from "react"
 import { useLocation } from "react-router-dom"
 import axios, { CancelToken } from "axios"
-import { SelectedContentContext } from "../../Context/SelectedContentContext"
+import { Context } from "../../Context/Context"
 import PlaceholderLoadingFullInfo from "../../Placeholders/PlaceholderLoadingFullInfo/PlaceholderLoadingFullInfo"
 import ScrollToTop from "../../../Utils/ScrollToTop"
 import Header from "../../Header/Header"
@@ -20,11 +14,11 @@ import "./FullContentInfo.scss"
 const todayDate = new Date()
 let cancelRequest
 
-export default function FullContentInfo({
+const FullContentInfo = ({
   match: {
     params: { id, mediaType }
   }
-}) {
+}) => {
   const [options, setOptions] = useState({
     poster: "",
     posterMobile: "",
@@ -66,7 +60,7 @@ export default function FullContentInfo({
   const [error, setError] = useState()
   const [errorShowEpisodes, setErrorShowEpisodes] = useState()
 
-  const { selectedContent, toggleContent } = useContext(SelectedContentContext)
+  const { selectedContent, toggleContent } = useContext(Context)
 
   const { pathname } = useLocation()
 
@@ -705,7 +699,7 @@ export default function FullContentInfo({
                                               style={{
                                                 backgroundImage: `url(https://image.tmdb.org/t/p/w500${episode.still_path})`
                                               }}
-                                            ></div>
+                                            />
                                           )}
                                           {episode.overview && (
                                             <div className="full-detailes__episode-detailes-overview">
@@ -775,3 +769,5 @@ export default function FullContentInfo({
     </>
   )
 }
+
+export default FullContentInfo

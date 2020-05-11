@@ -2,7 +2,7 @@ import React, { Component } from "react"
 import axios, { CancelToken } from "axios"
 import ContentResults from "../Templates/ContentResults/ContentResults"
 import PlaceholderNoSelectedContent from "../Placeholders/PlaceholderNoSelectedContent"
-import { SelectedContentContext } from "../Context/SelectedContentContext"
+import { Context } from "../Context/Context"
 import ScrollToTop from "../../Utils/ScrollToTop"
 import "./ShowsPage.scss"
 import HeaderBase from "../Header/Header"
@@ -89,4 +89,4 @@ export default class Shows extends Component {
   }
 }
 
-Shows.contextType = SelectedContentContext
+Shows.contextType = Context

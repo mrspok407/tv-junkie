@@ -21,6 +21,7 @@
     "no-use-before-define": 0,
     "no-restricted-syntax": 0,
     "react/no-unescaped-entities": 0,
+    "jsx-a11y/anchor-has-content": 0,
     "no-else-return": 0,
     "semi": 0,
     "react/jsx-props-no-spreading": 0,

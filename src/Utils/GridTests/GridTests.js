@@ -1,5 +1,5 @@
 import React, { Component } from "react"
-import { SelectedContentContext } from "../../Components/Context/SelectedContentContext"
+import { Context } from "../../Components/Context/Context"
 import "./GridTests.scss"
 
 const POSTER_URL = "https://image.tmdb.org/t/p/w500"
@@ -43,4 +43,4 @@ export default class GridTests extends Component {
   }
 }
 
-GridTests.contextType = SelectedContentContext
+GridTests.contextType = Context

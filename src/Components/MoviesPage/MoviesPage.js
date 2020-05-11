@@ -2,7 +2,7 @@ import React, { Component } from "react"
 import axios, { CancelToken } from "axios"
 import ContentResults from "../Templates/ContentResults/ContentResults"
 import PlaceholderNoSelectedContent from "../Placeholders/PlaceholderNoSelectedContent"
-import { SelectedContentContext } from "../Context/SelectedContentContext"
+import { Context } from "../Context/Context"
 import ScrollToTop from "../../Utils/ScrollToTop"
 import "./MoviesPage.scss"
 import Header from "../Header/Header"
@@ -86,4 +86,4 @@ export default class Movies extends Component {
   }
 }
 
-Movies.contextType = SelectedContentContext
+Movies.contextType = Context

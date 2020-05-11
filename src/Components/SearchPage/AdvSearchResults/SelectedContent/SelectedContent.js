@@ -1,7 +1,7 @@
 import React from "react"
 import { Link } from "react-router-dom"
 import "./SelectedContent.scss"
-import { SelectedContentContext } from "../../../Context/SelectedContentContext"
+import { Context } from "../../../Context/Context"
 
 export default class MovieResultsSelected extends React.PureComponent {
   constructor(props) {
@@ -23,10 +23,7 @@ export default class MovieResultsSelected extends React.PureComponent {
   }
 
   handleClickOutside = e => {
-    if (
-      this.selectedContentRef.current &&
-      !this.selectedContentRef.current.contains(e.target)
-    ) {
+    if (this.selectedContentRef.current && !this.selectedContentRef.current.contains(e.target)) {
       this.setState({
         showSelected: false
       })
@@ -35,10 +32,7 @@ export default class MovieResultsSelected extends React.PureComponent {
 
   render() {
     return (
-      <div
-        ref={this.selectedContentRef}
-        className="selected-content__container"
-      >
+      <div ref={this.selectedContentRef} className="selected-content__container">
         <button
           type="button"
           className="button--show-selected"
@@ -80,10 +74,7 @@ export default class MovieResultsSelected extends React.PureComponent {
 
                 return (
                   <div key={id} className="selected-content__item">
-                    <Link
-                      className="selected-content__item-poster-link"
-                      to={`/${type}/${id}`}
-                    >
+                    <Link className="selected-content__item-poster-link" to={`/${type}/${id}`}>
                       <div
                         className="selected-content__item-poster"
                         style={
@@ -98,19 +89,12 @@ export default class MovieResultsSelected extends React.PureComponent {
                         }
                       />
                     </Link>
-                    <Link
-                      className="selected-content__item-info-link"
-                      to={`/${type}/${id}`}
-                    >
+                    <Link className="selected-content__item-info-link" to={`/${type}/${id}`}>
                       <div className="selected-content__item-info">
                         <div className="selected-content__item-title">
-                          {title.length > 65
-                            ? `${title.substring(0, 65)}...`
-                            : title}
+                          {title.length > 65 ? `${title.substring(0, 65)}...` : title}
                         </div>
-                        <div className="selected-content__item-year">
-                          {date}
-                        </div>
+                        <div className="selected-content__item-year">{date}</div>
                         <div className="selected-content__item-overview">
                           {overview && overview.length > 120
                             ? `${overview.substring(0, 120)}...`
@@ -138,4 +122,4 @@ export default class MovieResultsSelected extends React.PureComponent {
   }
 }
 
-MovieResultsSelected.contextType = SelectedContentContext
+MovieResultsSelected.contextType = Context

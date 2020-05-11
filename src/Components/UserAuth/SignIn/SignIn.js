@@ -1,4 +1,4 @@
-import React, { Component, useState, useEffect } from "react"
+import React, { Component } from "react"
 import { withRouter } from "react-router-dom"
 import { compose } from "recompose"
 import { withFirebase } from "../../Firebase"

@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import { Link } from "react-router-dom"
-import { SelectedContentContext } from "../../../Context/SelectedContentContext"
+import { Context } from "../../../Context/Context"
 
 export default class SearchCard extends Component {
   render() {
@@ -48,18 +48,14 @@ export default class SearchCard extends Component {
           to={mediaType !== "person" ? `/${type}/${id}` : ""}
         >
           <div className="search-card__info">
-            <div className="search-card__info-title">
-              {movieTitle || showTitle || personName}
-            </div>
+            <div className="search-card__info-title">{movieTitle || showTitle || personName}</div>
 
             <div className="search-card__info-description">
               {mediaTypeSearching === "movie" ||
               mediaTypeSearching === "tv" ||
               mediaTypeSearching === "multi" ? (
                 <div className="search-card__info-description--movie">
-                  {overview.length > 150
-                    ? `${overview.substring(0, 150)}...`
-                    : overview}
+                  {overview.length > 150 ? `${overview.substring(0, 150)}...` : overview}
                 </div>
               ) : (
                 ""
@@ -119,9 +115,7 @@ export default class SearchCard extends Component {
                   type="button"
                 >
                   Remove{" "}
-                  {mediaType === "movie" || mediaTypeSearching === "movie"
-                    ? "movie"
-                    : "show"}
+                  {mediaType === "movie" || mediaTypeSearching === "movie" ? "movie" : "show"}
                 </button>
               ) : (
                 <button
@@ -129,10 +123,7 @@ export default class SearchCard extends Component {
                   onClick={() => this.context.toggleContent(id, searchResults)}
                   type="button"
                 >
-                  Add{" "}
-                  {mediaType === "movie" || mediaTypeSearching === "movie"
-                    ? "movie"
-                    : "show"}
+                  Add {mediaType === "movie" || mediaTypeSearching === "movie" ? "movie" : "show"}
                 </button>
               )}
             </div>
@@ -151,4 +142,4 @@ export default class SearchCard extends Component {
   }
 }
 
-SearchCard.contextType = SelectedContentContext
+SearchCard.contextType = Context

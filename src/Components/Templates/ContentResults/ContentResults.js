@@ -1,7 +1,7 @@
 import React, { useContext } from "react"
 import { Link } from "react-router-dom"
 import { listOfGenres } from "../../../Utils"
-import { SelectedContentContext } from "../../Context/SelectedContentContext"
+import { Context } from "../../Context/Context"
 import "./ContentResults.scss"
 import Loader from "../../Placeholders/Loader"
 
@@ -26,7 +26,7 @@ export default function ContentResults({
   moviesIds,
   error
 }) {
-  const { selectedContent, toggleContent } = useContext(SelectedContentContext)
+  const { selectedContent, toggleContent } = useContext(Context)
 
   function showLinksToAll() {
     const showAllLinksPressed = true
