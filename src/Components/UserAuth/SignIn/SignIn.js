@@ -2,13 +2,15 @@ import React, { Component } from "react"
 import { withRouter } from "react-router-dom"
 import { compose } from "recompose"
 import { withFirebase } from "../../Firebase"
-import { SignUpLink } from "../SignUp/SignUp"
-import Header from "../../Header/Header"
+import Input from "../Input/Input"
 import "./SignIn.scss"
 
 const INITIAL_STATE = {
   email: "",
-  password: ""
+  password: "",
+  emailError: "",
+  passwordError: "",
+  error: ""
 }
 
 class SignInFormBase extends Component {
@@ -38,35 +40,69 @@ class SignInFormBase extends Component {
     event.preventDefault()
   }
 
-  onChange = event => {
+  handleOnChange = event => {
     this.setState({ [event.target.name]: event.target.value })
+    this.setState({ error: event.target.value === "" && "" })
+  }
+
+  handleBlur = event => {
+    this.setState(prevState => ({
+      emailError: prevState.email.includes("@") ? "" : "Invalid email"
+    }))
+
+    if (event.target.value === "") {
+      this.setState({
+        [`${event.target.name}Error`]: ""
+      })
+    }
   }
 
   render() {
-    const { email, password, error } = this.state
-    const isInvalid = password === "" || email === ""
+    const { email, password, error, emailError } = this.state
+    const isInvalid = !!emailError
 
     return (
-      <form onSubmit={this.onSubmit}>
-        <input
+      <form className="form-auth" onSubmit={this.onSubmit}>
+        <Input
+          classNameInput={
+            emailError ? "form-auth__input form-auth__input--error" : "form-auth__input"
+          }
+          classNameLabel="form-auth__label"
           name="email"
           value={email}
-          onChange={this.onChange}
+          handleOnChange={this.handleOnChange}
+          handleBlur={this.handleBlur}
           type="text"
           placeholder="Email Address"
+          labelText="Email"
+          withLabel
         />
-        <input
+        <div className="form-auth__error">{this.state.emailError}</div>
+
+        <Input
+          classNameInput="form-auth__input"
+          classNameLabel="form-auth__label"
           name="password"
           value={password}
-          onChange={this.onChange}
+          handleOnChange={this.handleOnChange}
           type="password"
           placeholder="Password"
+          labelText="Password"
+          withLabel
         />
-        <button disabled={isInvalid} type="submit">
+
+        {!isInvalid && error && <div className="form-auth__error">{error.message}</div>}
+
+        <button
+          className={
+            isInvalid ? "button button--form-auth button--disabled" : "button button--form-auth"
+          }
+          onClick={() => console.log("Test")}
+          disabled={isInvalid}
+          type="submit"
+        >
           Sign In
         </button>
-
-        {error && <p>{error.message}</p>}
       </form>
     )
   }
@@ -74,17 +110,4 @@ class SignInFormBase extends Component {
 
 const SignInForm = compose(withRouter, withFirebase)(SignInFormBase)
 
-const SignInPage = () => (
-  <>
-    <Header />
-    <div className="sign-in">
-      <h1>SignIn</h1>
-      <SignInForm />
-      <SignUpLink />
-    </div>
-  </>
-)
-
-export default SignInPage
-
-export { SignInForm }
+export default SignInForm

@@ -5,7 +5,7 @@ import Search from "./Search/Search"
 import ContentResultsAdvSearch from "./AdvSearchResults/SearchResults/SearchResults"
 import ContentResultsSelected from "./AdvSearchResults/SelectedContent/SelectedContent"
 import PlaceholderNoResults from "../Placeholders/PlaceholderNoResults"
-import { Context } from "../Context/Context"
+import { withSelectedContextConsumer } from "../SelectedContentContext"
 import ScrollToTop from "../../Utils/ScrollToTop"
 import Header from "../Header/Header"
 
@@ -18,8 +18,7 @@ const LOCAL_STORAGE_KEY_TOTALPAGES = "totalPages"
 const currentYear = new Date().getFullYear()
 
 let cancelRequestAdvSearch
-
-export default class MainPage extends Component {
+class MainPage extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -323,7 +322,7 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
           clearWithActors={this.clearWithActors}
         />
         {this.renderAdvMovies()}
-        {this.context.selectedContent.length > 0 && <ContentResultsSelected />}
+        {this.props.selectedContentState.selectedContent.length > 0 && <ContentResultsSelected />}
         <ScrollToTop />
         {/* <Footer /> */}
       </>
@@ -331,4 +330,4 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
   }
 }
 
-MainPage.contextType = Context
+export default withSelectedContextConsumer(MainPage)

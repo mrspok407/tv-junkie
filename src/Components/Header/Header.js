@@ -2,8 +2,8 @@
 import React, { Component } from "react"
 import { NavLink } from "react-router-dom"
 import logo from "../../assets/images/main-page-logo.png"
+import Login from "./Login"
 import "./Header.scss"
-import SignOutButton from "../UserAuth/SignOut/SignOutButton"
 import { WithAuthenticationConsumer } from "../UserAuth/Session"
 
 class Header extends Component {
@@ -15,42 +15,32 @@ class Header extends Component {
       <header className="header">
         <nav className="nav">
           <ul className="nav__list">
-            <NavLink exact to="/" activeClassName="nav__item--active" className="nav__item">
-              <li data-item="1">Search</li>
+            <NavLink exact to="/" activeClassName="nav__item--active">
+              <li data-item="1" className="nav__item">
+                Search
+              </li>
             </NavLink>
 
-            <NavLink exact to="/shows" activeClassName="nav__item--active" className="nav__item">
-              <li data-item="2">Your Shows</li>
+            <NavLink exact to="/shows" activeClassName="nav__item--active">
+              <li data-item="2" className="nav__item">
+                Your Shows
+              </li>
             </NavLink>
-            <NavLink exact to="/movies" activeClassName="nav__item--active" className="nav__item">
-              <li data-item="3">Your Movies</li>
+
+            <NavLink exact to="/movies" activeClassName="nav__item--active">
+              <li data-item="3" className="nav__item">
+                Your Movies
+              </li>
             </NavLink>
 
             {isSignedIn ? (
-              <div className="nav__item">
-                <li data-item="5">
-                  <SignOutButton />
+              <NavLink exact to="/profile">
+                <li data-item="4" className="nav__item">
+                  Profile
                 </li>
-              </div>
+              </NavLink>
             ) : (
-              <>
-                <NavLink
-                  exact
-                  to="/signin"
-                  activeClassName="nav__item--active"
-                  className="nav__item"
-                >
-                  <li data-item="4">Sign In</li>
-                </NavLink>
-                <NavLink
-                  exact
-                  to="/signup"
-                  activeClassName="nav__item--active"
-                  className="nav__item"
-                >
-                  <li data-item="4">Sign Up</li>
-                </NavLink>
-              </>
+              <Login />
             )}
           </ul>
         </nav>

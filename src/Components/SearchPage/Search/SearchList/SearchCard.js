@@ -1,8 +1,8 @@
 import React, { Component } from "react"
 import { Link } from "react-router-dom"
-import { Context } from "../../../Context/Context"
+import { withSelectedContextConsumer } from "../../../SelectedContentContext"
 
-export default class SearchCard extends Component {
+class SearchCard extends Component {
   render() {
     const {
       movieTitle,
@@ -108,10 +108,10 @@ export default class SearchCard extends Component {
           mediaTypeSearching === "tv" ||
           (mediaTypeSearching === "multi" && mediaType !== "person") ? (
             <div className="search-card__add-movie-btn">
-              {this.context.selectedContent.some(e => e.id === id) ? (
+              {this.props.selectedContentState.selectedContent.some(e => e.id === id) ? (
                 <button
                   className="button button--searchlist button--pressed"
-                  onClick={() => this.context.toggleContent(id, searchResults)}
+                  onClick={() => this.props.toggleContent(id, searchResults)}
                   type="button"
                 >
                   Remove{" "}
@@ -120,7 +120,7 @@ export default class SearchCard extends Component {
               ) : (
                 <button
                   className="button button--searchlist"
-                  onClick={() => this.context.toggleContent(id, searchResults)}
+                  onClick={() => this.props.toggleContent(id, searchResults)}
                   type="button"
                 >
                   Add {mediaType === "movie" || mediaTypeSearching === "movie" ? "movie" : "show"}
@@ -142,4 +142,4 @@ export default class SearchCard extends Component {
   }
 }
 
-SearchCard.contextType = Context
+export default withSelectedContextConsumer(SearchCard)

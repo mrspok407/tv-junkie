@@ -1,12 +1,12 @@
 import React, { Component } from "react"
-import { Link, withRouter } from "react-router-dom"
+import { withRouter } from "react-router-dom"
 import { compose } from "recompose"
 import { withFirebase } from "../../Firebase"
 import "./SignUp.scss"
-import Header from "../../Header/Header"
+import Input from "../Input/Input"
 
 const INITIAL_STATE = {
-  username: "",
+  login: "",
   email: "",
   password: "",
   passwordConfirm: "",
@@ -40,50 +40,76 @@ class SignUpFormBase extends Component {
     event.preventDefault()
   }
 
-  onChange = event => {
+  handleOnChange = event => {
     this.setState({ [event.target.name]: event.target.value })
   }
 
   render() {
-    const { username, email, password, passwordConfirm, error } = this.state
+    const { login, email, password, passwordConfirm, error } = this.state
     const isInvalid =
-      password !== passwordConfirm || password === "" || email === "" || username === ""
+      password !== passwordConfirm || password === "" || email === "" || login === ""
 
     return (
-      <form onSubmit={this.onSubmit}>
-        <input
-          name="username"
-          value={username}
-          onChange={this.onChange}
+      <form className="form-auth" onSubmit={this.onSubmit}>
+        <Input
+          classNameInput="form-auth__input"
+          classNameLabel="form-auth__label"
+          name="login"
+          value={login}
+          handleOnChange={this.handleOnChange}
           type="text"
-          placeholder="Full Name"
+          placeholder="Login"
+          labelText="Login"
+          withLabel
         />
-        <input
+
+        <Input
+          classNameInput="form-auth__input"
+          classNameLabel="form-auth__label"
           name="email"
           value={email}
-          onChange={this.onChange}
+          handleOnChange={this.handleOnChange}
           type="text"
           placeholder="Email Address"
+          labelText="Email"
+          withLabel
         />
-        <input
+
+        <Input
+          classNameInput="form-auth__input"
+          classNameLabel="form-auth__label"
           name="password"
           value={password}
-          onChange={this.onChange}
+          handleOnChange={this.handleOnChange}
           type="password"
           placeholder="Password"
+          labelText="Password"
+          withLabel
         />
-        <input
+
+        <Input
+          classNameInput="form-auth__input"
+          classNameLabel="form-auth__label"
           name="passwordConfirm"
           value={passwordConfirm}
-          onChange={this.onChange}
+          handleOnChange={this.handleOnChange}
           type="password"
-          placeholder="Confirm Password"
+          placeholder="Password"
+          labelText="Confirm Password"
+          withLabel
         />
-        <button disabled={isInvalid} type="submit">
-          Sign Up
-        </button>
 
-        {error && <p>{error.message}</p>}
+        {!isInvalid && error && <div className="form-auth__error">{error.message}</div>}
+
+        <button
+          className={
+            isInvalid ? "button button--form-auth button--disabled" : "button button--form-auth"
+          }
+          disabled={isInvalid}
+          type="submit"
+        >
+          Sign In
+        </button>
       </form>
     )
   }
@@ -91,22 +117,4 @@ class SignUpFormBase extends Component {
 
 const SignUpForm = compose(withRouter, withFirebase)(SignUpFormBase)
 
-const SignUpPage = () => (
-  <>
-    <Header />
-    <div className="sign-up">
-      <h1>SignUp</h1>
-      <SignUpForm />
-    </div>
-  </>
-)
-
-const SignUpLink = () => (
-  <p>
-    Don't have an account? <Link to="/signup">Sign Up</Link>
-  </p>
-)
-
-export default SignUpPage
-
-export { SignUpForm, SignUpLink }
+export default SignUpForm

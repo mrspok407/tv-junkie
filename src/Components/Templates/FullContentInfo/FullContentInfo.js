@@ -1,8 +1,10 @@
 /* eslint-disable no-prototype-builtins */
-import React, { useState, useEffect, useContext } from "react"
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable jsx-a11y/anchor-has-content */
+import React, { useState, useEffect } from "react"
 import { useLocation } from "react-router-dom"
 import axios, { CancelToken } from "axios"
-import { Context } from "../../Context/Context"
+import { withSelectedContextConsumer } from "../../SelectedContentContext"
 import PlaceholderLoadingFullInfo from "../../Placeholders/PlaceholderLoadingFullInfo/PlaceholderLoadingFullInfo"
 import ScrollToTop from "../../../Utils/ScrollToTop"
 import Header from "../../Header/Header"
@@ -17,7 +19,8 @@ let cancelRequest
 const FullContentInfo = ({
   match: {
     params: { id, mediaType }
-  }
+  },
+  selectedContentState
 }) => {
   const [options, setOptions] = useState({
     poster: "",
@@ -60,7 +63,7 @@ const FullContentInfo = ({
   const [error, setError] = useState()
   const [errorShowEpisodes, setErrorShowEpisodes] = useState()
 
-  const { selectedContent, toggleContent } = useContext(Context)
+  const { selectedContent, toggleContent } = selectedContentState
 
   const { pathname } = useLocation()
 
@@ -79,7 +82,6 @@ const FullContentInfo = ({
         cancelRequest()
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mediaType, id])
 
   const getFullShowInfo = () => {
@@ -770,4 +772,4 @@ const FullContentInfo = ({
   )
 }
 
-export default FullContentInfo
+export default withSelectedContextConsumer(FullContentInfo)

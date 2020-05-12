@@ -1,9 +1,9 @@
 import React from "react"
 import { Link } from "react-router-dom"
 import "./SelectedContent.scss"
-import { Context } from "../../../Context/Context"
+import { withSelectedContextConsumer } from "../../../SelectedContentContext"
 
-export default class MovieResultsSelected extends React.PureComponent {
+class MovieResultsSelected extends React.PureComponent {
   constructor(props) {
     super(props)
 
@@ -42,7 +42,7 @@ export default class MovieResultsSelected extends React.PureComponent {
             }))
           }
         >
-          {this.context.selectedContent.length}
+          {this.props.selectedContentState.selectedContent.length}
         </button>
         {this.state.showSelected && (
           <div className="selected-content__list">
@@ -50,13 +50,13 @@ export default class MovieResultsSelected extends React.PureComponent {
               <button
                 type="button"
                 className="button"
-                onClick={() => this.context.clearSelectedContent()}
+                onClick={() => this.props.clearSelectedContent()}
               >
                 Clear Selected
               </button>
             </div>
 
-            {this.context.selectedContent.map(
+            {this.props.selectedContentState.selectedContent.map(
               ({
                 original_title = "",
                 original_name = "",
@@ -106,7 +106,7 @@ export default class MovieResultsSelected extends React.PureComponent {
                       <button
                         className="button"
                         type="button"
-                        onClick={() => this.context.toggleContent(id)}
+                        onClick={() => this.props.selectedContentState.toggleContent(id)}
                       >
                         Remove
                       </button>
@@ -122,4 +122,4 @@ export default class MovieResultsSelected extends React.PureComponent {
   }
 }
 
-MovieResultsSelected.contextType = Context
+export default withSelectedContextConsumer(MovieResultsSelected)

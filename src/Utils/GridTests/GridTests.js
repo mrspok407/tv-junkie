@@ -1,10 +1,10 @@
 import React, { Component } from "react"
-import { Context } from "../../Components/Context/Context"
+import { withSelectedContextConsumer } from "../../Components/SelectedContentContext"
 import "./GridTests.scss"
 
 const POSTER_URL = "https://image.tmdb.org/t/p/w500"
 
-export default class GridTests extends Component {
+class GridTests extends Component {
   constructor(props) {
     super(props)
 
@@ -14,7 +14,7 @@ export default class GridTests extends Component {
   }
 
   componentDidMount() {
-    this.setState({ content: this.context.selectedContent.slice(0, 10) })
+    this.setState({ content: this.props.selectedContentState.selectedContent.slice(0, 10) })
   }
 
   deleteItem = id => {
@@ -43,4 +43,4 @@ export default class GridTests extends Component {
   }
 }
 
-GridTests.contextType = Context
+export default withSelectedContextConsumer(GridTests)

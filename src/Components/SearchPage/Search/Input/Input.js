@@ -42,10 +42,7 @@ export default class Input extends Component {
   }
 
   handleClickOutside = e => {
-    if (
-      this.mediaTypeRef.current &&
-      !this.mediaTypeRef.current.contains(e.target)
-    ) {
+    if (this.mediaTypeRef.current && !this.mediaTypeRef.current.contains(e.target)) {
       this.setState({
         mediaTypesIsOpen: false
       })
@@ -75,11 +72,7 @@ export default class Input extends Component {
             }
             className="media-type__button media-type__selected-value"
           >
-            <span>
-              {this.state.mediaType.type === "Multi"
-                ? "All"
-                : this.state.mediaType.type}
-            </span>
+            <span>{this.state.mediaType.type === "Multi" ? "All" : this.state.mediaType.type}</span>
           </button>
           {this.state.mediaTypesIsOpen && (
             <div className="media-type__options">
@@ -135,15 +128,9 @@ export default class Input extends Component {
           onKeyDown={this.handleKeyDown}
           onFocus={this.props.onFocus}
         />
-        {this.props.isSearchingList && (
-          <Loader className="loader--small-pink" />
-        )}
+        {this.props.isSearchingList && <Loader className="loader--small-pink" />}
         {this.state.query && (
-          <button
-            type="button"
-            className="button--input-clear"
-            onClick={this.resetSearch}
-          />
+          <button type="button" className="button--input-clear" onClick={this.resetSearch} />
         )}
       </>
     )

@@ -1,3 +1,5 @@
+@import "../globals";
+
 .button {
   position: relative;
   background-color: getColor(bgColor, $btnPalette);
@@ -40,6 +42,26 @@
   }
   &:hover:before {
     transform: translate(3px, -3px);
+  }
+}
+
+.button--form-auth {
+  margin: 10px 0 10px 0;
+  transition: 0.2s;
+
+  &:before,
+  &:after {
+    display: none;
+  }
+  &:hover {
+    background-color: #e89340;
+  }
+}
+
+.button--disabled {
+  background-color: rgba(205, 133, 63, 0.7);
+  &:hover {
+    background-color: rgba(205, 133, 63, 0.7);
   }
 }
 

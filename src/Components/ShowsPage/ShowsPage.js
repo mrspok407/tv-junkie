@@ -2,7 +2,7 @@ import React, { Component } from "react"
 import axios, { CancelToken } from "axios"
 import ContentResults from "../Templates/ContentResults/ContentResults"
 import PlaceholderNoSelectedContent from "../Placeholders/PlaceholderNoSelectedContent"
-import { Context } from "../Context/Context"
+import { withSelectedContextConsumer } from "../SelectedContentContext"
 import ScrollToTop from "../../Utils/ScrollToTop"
 import "./ShowsPage.scss"
 import HeaderBase from "../Header/Header"
@@ -12,7 +12,7 @@ let cancelRequest
 
 const Header = withFirebase(HeaderBase)
 
-export default class Shows extends Component {
+class Shows extends Component {
   constructor(props) {
     super(props)
 
@@ -65,7 +65,9 @@ export default class Shows extends Component {
   }
 
   render() {
-    const onlyShows = this.context.selectedContent.filter(item => item.original_name)
+    const onlyShows = this.props.selectedContentState.selectedContent.filter(
+      item => item.original_name
+    )
     return (
       <>
         <Header />
@@ -89,4 +91,4 @@ export default class Shows extends Component {
   }
 }
 
-Shows.contextType = Context
+export default withSelectedContextConsumer(Shows)

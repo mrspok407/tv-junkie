@@ -1,7 +1,7 @@
-import React, { useContext } from "react"
+import React from "react"
 import { Link } from "react-router-dom"
 import { listOfGenres } from "../../../Utils"
-import { Context } from "../../Context/Context"
+import { withSelectedContextConsumer } from "../../SelectedContentContext"
 import "./ContentResults.scss"
 import Loader from "../../Placeholders/Loader"
 
@@ -11,7 +11,7 @@ const todayDayOfTheMonth = todayDate.getDate()
 const yesterdayDayOfTheMonth = new Date()
 yesterdayDayOfTheMonth.setDate(yesterdayDayOfTheMonth.getDate() - 1)
 
-export default function ContentResults({
+const ContentResults = ({
   contentType,
   advancedSearchContent,
   clearAdvSearchMovies,
@@ -24,9 +24,10 @@ export default function ContentResults({
   loadingIds,
   showsIds,
   moviesIds,
-  error
-}) {
-  const { selectedContent, toggleContent } = useContext(Context)
+  error,
+  selectedContentState
+}) => {
+  const { selectedContent, toggleContent } = selectedContentState
 
   function showLinksToAll() {
     const showAllLinksPressed = true
@@ -366,3 +367,5 @@ export default function ContentResults({
     </div>
   )
 }
+
+export default withSelectedContextConsumer(ContentResults)
