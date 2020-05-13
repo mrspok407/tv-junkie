@@ -109,7 +109,6 @@
   right: 0;
   top: 0;
   color: #fff;
-  user-select: none;
 }
 
 .nav__login-auth-container {
@@ -174,6 +173,10 @@
   &:hover:after {
     background-color: getColor(orangeClr, $mainPalette);
   }
+}
+
+.nav__login-button {
+  user-select: none;
 }
 
 .nav__login-form {

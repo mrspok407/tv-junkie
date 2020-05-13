@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 import iconMediaTypeMulti from "../assets/images/icons/media-type-multi.png"
 import iconMediaTypeMovie from "../assets/images/icons/media-type-movie.png"
 import iconMediaTypePerson from "../assets/images/icons/media-type-person.png"
@@ -163,3 +164,7 @@ export const mediaTypesArr = [
   { type: "TV", icon: iconMediaTypeTv, id: 24 },
   { type: "Person", icon: iconMediaTypePerson, id: 21 }
 ]
+
+export const validEmailRegex = RegExp(
+  /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
+)

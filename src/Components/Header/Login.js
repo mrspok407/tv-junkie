@@ -9,7 +9,7 @@ export default class Login extends Component {
 
     this.state = {
       authContOpen: true,
-      signInOpen: true
+      signInOpen: false
     }
 
     this.authContRef = React.createRef()

@@ -2,6 +2,7 @@ import React, { Component } from "react"
 import { withRouter } from "react-router-dom"
 import { compose } from "recompose"
 import { withFirebase } from "../../Firebase"
+import { validEmailRegex } from "../../../Utils"
 import Input from "../Input/Input"
 import "./SignIn.scss"
 
@@ -43,23 +44,29 @@ class SignInFormBase extends Component {
   handleOnChange = event => {
     this.setState({ [event.target.name]: event.target.value })
     this.setState({ error: event.target.value === "" && "" })
+
+    event.preventDefault()
   }
 
-  handleBlur = event => {
+  handleValidation = event => {
+    const { value, name } = event.target
+
     this.setState(prevState => ({
-      emailError: prevState.email.includes("@") ? "" : "Invalid email"
+      emailError: validEmailRegex.test(prevState.email) ? "" : "Invalid email"
     }))
 
-    if (event.target.value === "") {
+    if (value === "") {
       this.setState({
-        [`${event.target.name}Error`]: ""
+        [`${name}Error`]: ""
       })
     }
+
+    event.preventDefault()
   }
 
   render() {
     const { email, password, error, emailError } = this.state
-    const isInvalid = !!emailError
+    const isInvalid = !!(emailError || !email)
 
     return (
       <form className="form-auth" onSubmit={this.onSubmit}>
@@ -71,7 +78,7 @@ class SignInFormBase extends Component {
           name="email"
           value={email}
           handleOnChange={this.handleOnChange}
-          handleBlur={this.handleBlur}
+          handleValidation={this.handleValidation}
           type="text"
           placeholder="Email Address"
           labelText="Email"

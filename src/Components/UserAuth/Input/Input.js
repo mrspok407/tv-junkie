@@ -8,7 +8,7 @@ export default class Input extends Component {
       name,
       value,
       handleOnChange,
-      handleBlur,
+      handleValidation,
       type,
       placeholder,
       labelText,
@@ -26,7 +26,7 @@ export default class Input extends Component {
           name={name}
           value={value}
           onChange={handleOnChange}
-          onBlur={handleBlur}
+          onBlur={handleValidation}
           type={type}
           placeholder={placeholder}
         />
