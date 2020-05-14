@@ -225,6 +225,7 @@ const FullContentInfo = ({
             poster_path,
             backdrop_path,
             original_title,
+            title,
             release_date,
             runtime,
             status,
@@ -287,7 +288,8 @@ const FullContentInfo = ({
           setLoadingTorrentLinks(true)
 
           return axios.get(
-            `https://yts.mx/api/v2/list_movies.json?query_term=${original_title} ${yearRelease}`,
+            `https://yts.mx/api/v2/list_movies.json?query_term=${title ||
+              original_title} ${yearRelease}`,
             {
               cancelToken: new CancelToken(function executor(c) {
                 cancelRequest = c

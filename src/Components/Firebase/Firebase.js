@@ -23,6 +23,8 @@ class Firebase {
   signInWithEmailAndPassword = (email, password) =>
     this.auth.signInWithEmailAndPassword(email, password)
 
+  sendEmailVerification = () => this.auth.currentUser.sendEmailVerification()
+
   signOut = () => this.auth.signOut()
 
   passwordReset = email => this.auth.sendPasswordResetEmail(email)

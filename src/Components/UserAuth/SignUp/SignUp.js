@@ -3,23 +3,28 @@ import React, { Component } from "react"
 import { withRouter } from "react-router-dom"
 import { compose } from "recompose"
 import { withFirebase } from "../../Firebase"
-import "./SignUp.scss"
 import Input from "../Input/Input"
+import "./SignUp.scss"
 
 const INITIAL_STATE = {
   inputs: {
-    login: "",
+    login: ""
+  },
+  requiredInputs: {
     email: "",
     password: "",
     passwordConfirm: ""
   },
   errors: {
     emailError: "",
+    emailOnBlur: false,
     passwordError: "",
     passwordOnBlur: false,
     passwordConfirmError: "",
+    passwordConfirmOnblur: false,
     error: ""
-  }
+  },
+  submitClicked: false
 }
 
 class SignUpFormBase extends Component {
@@ -30,10 +35,25 @@ class SignUpFormBase extends Component {
   }
 
   onSubmit = event => {
+    event.preventDefault()
+    const requiredInputs = { ...this.state.requiredInputs }
+    const { email, password } = requiredInputs
     const errors = { ...this.state.errors }
-    const { email, password } = this.state.inputs
     const firebase = this.props.firebase
     const history = this.props.history
+
+    if (!this.isFormValid(errors, requiredInputs)) {
+      for (const [key, value] of Object.entries(requiredInputs)) {
+        if (value.length === 0) {
+          errors[`${key}Error`] = "Required"
+        }
+      }
+      this.setState({
+        errors,
+        submitClicked: true
+      })
+      return
+    }
 
     firebase
       .createUserWithEmailAndPassword(email, password)
@@ -44,39 +64,75 @@ class SignUpFormBase extends Component {
       })
       .catch(error => {
         errors.error = error
-        this.setState({
-          errors
-        })
-        console.log("error")
+        this.setState({ errors })
       })
-
-    event.preventDefault()
   }
 
   handleOnChange = event => {
+    event.preventDefault()
     const { value, name } = event.target
 
-    const testFun = () => {
-      const { email, password, passwordConfirm } = this.state.inputs
+    const validation = () => {
+      const { email, password, passwordConfirm } = this.state.requiredInputs
       const errors = { ...this.state.errors }
-      console.log(this.state.inputs)
-      console.log(errors)
 
-      if (name === "email") {
-        if (errors[`${name}Error`].length !== 0) {
+      if (errors[`${name}OnBlur`] || this.state.submitClicked) {
+        if (name === "email") {
           errors[`${name}Error`] = email.includes("@") ? "" : "Invalid email"
         }
-      }
 
-      if (name === "password") {
-        if (errors.passwordOnBlur) {
-          // TODO поместить всё под этот кондишен errors[`${name}OnBlur`]
+        if (name === "password") {
           errors[`${name}Error`] =
             password.length >= 6 ? "" : "Password should be at least 6 characters"
 
           errors.passwordConfirmError =
             password !== passwordConfirm && password.length >= 6 ? "Passwords are not the same" : ""
         }
+
+        if (name === "passwordConfirm") {
+          if (password.length >= 6)
+            errors[`${name}Error`] =
+              password !== passwordConfirm ? "Passwords are not the same" : ""
+        }
+      }
+
+      if (value === "") {
+        errors[`${name}Error`] = ""
+        errors[`${name}OnBlur`] = false
+        errors.error = ""
+      }
+
+      this.setState({
+        errors
+      })
+    }
+
+    this.setState(
+      prevState => ({
+        requiredInputs: { ...prevState.requiredInputs, [name]: value },
+        inputs: { ...prevState.inputs, [name]: value }
+      }),
+      validation
+    )
+  }
+
+  handleValidationOnblur = event => {
+    event.preventDefault()
+
+    const { value, name } = event.target
+    const { email, password, passwordConfirm } = this.state.requiredInputs
+    const errors = { ...this.state.errors }
+
+    errors[`${name}OnBlur`] = true
+
+    if (!this.state.submitClicked) {
+      if (name === "email") {
+        errors[`${name}Error`] = email.includes("@") ? "" : "Invalid email"
+      }
+
+      if (name === "password") {
+        errors[`${name}Error`] =
+          password.length >= 6 ? "" : "Password should be at least 6 characters"
       }
 
       if (name === "passwordConfirm") {
@@ -88,81 +144,38 @@ class SignUpFormBase extends Component {
         errors[`${name}Error`] = ""
         errors[`${name}OnBlur`] = false
       }
-
-      this.setState({
-        errors
-      })
-    }
-
-    this.setState(prevState => ({ inputs: { ...prevState.inputs, [name]: value } }), testFun)
-
-    event.preventDefault()
-  }
-
-  handleValidation = event => {
-    const { value, name } = event.target
-
-    const { email, password, passwordConfirm } = this.state.inputs
-    const errors = { ...this.state.errors }
-
-    if (name === "email") {
-      errors[`${name}Error`] = email.includes("@") ? "" : "Invalid email"
-    }
-
-    if (name === "password") {
-      errors.passwordOnBlur = true // TODO переместить из кондишена errors[`${name}OnBlur`], универсальным сделать
-      errors[`${name}Error`] =
-        password.length >= 6 ? "" : "Password should be at least 6 characters"
-    }
-
-    if (name === "passwordConfirm") {
-      if (password.length >= 6)
-        errors[`${name}Error`] = password !== passwordConfirm ? "Passwords are not the same" : ""
-    }
-
-    if (value === "") {
-      errors[`${name}Error`] = ""
-      errors[`${name}OnBlur`] = false
     }
 
     this.setState({
       errors
     })
-
-    event.preventDefault()
   }
 
-  isFormValid = (errors, inputs) => {
-    // TODO тут ничё не сделано
+  isFormValid = (errors, requiredInputs) => {
     let isValid = true
 
-    for (const value of Object.values(inputs)) {
+    for (const value of Object.values(requiredInputs)) {
       if (value.length === 0) {
         isValid = false
-        return
       }
     }
 
     for (const value of Object.values(errors)) {
       if (value.length > 0) {
         isValid = false
-        return
       }
     }
-
-    // isValid = inputs.password === inputs.passwordConfirm
 
     return isValid
   }
 
   render() {
-    const { errors, inputs } = this.state
-    const { login, email, password, passwordConfirm } = this.state.inputs
+    const { errors, requiredInputs } = this.state
+    const { login } = this.state.inputs
+    const { email, password, passwordConfirm } = this.state.requiredInputs
     const { error, emailError, passwordError, passwordConfirmError } = this.state.errors
 
-    const isValid = this.isFormValid(errors, inputs)
-
-    console.log(isValid)
+    const isValid = this.isFormValid(errors, requiredInputs)
 
     return (
       <form className="form-auth" onSubmit={this.onSubmit}>
@@ -186,7 +199,7 @@ class SignUpFormBase extends Component {
           name="email"
           value={email}
           handleOnChange={this.handleOnChange}
-          handleValidation={this.handleValidation}
+          handleValidation={this.handleValidationOnblur}
           type="text"
           placeholder="Email Address"
           labelText="Email"
@@ -202,7 +215,7 @@ class SignUpFormBase extends Component {
           name="password"
           value={password}
           handleOnChange={this.handleOnChange}
-          handleValidation={this.handleValidation}
+          handleValidation={this.handleValidationOnblur}
           type="text"
           placeholder="Password"
           labelText="Password"
@@ -218,7 +231,7 @@ class SignUpFormBase extends Component {
           name="passwordConfirm"
           value={passwordConfirm}
           handleOnChange={this.handleOnChange}
-          handleValidation={this.handleValidation}
+          handleValidation={this.handleValidationOnblur}
           type="text"
           placeholder="Password"
           labelText="Confirm Password"
@@ -232,10 +245,9 @@ class SignUpFormBase extends Component {
           className={
             !isValid ? "button button--form-auth button--disabled" : "button button--form-auth"
           }
-          disabled={!isValid}
           type="submit"
         >
-          Sign In
+          Sign Up
         </button>
       </form>
     )
