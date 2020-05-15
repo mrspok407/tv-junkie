@@ -7,7 +7,8 @@ import MoviesPage from "./Components/MoviesPage/MoviesPage"
 import FullContentInfo from "./Components/Templates/FullContentInfo/FullContentInfo"
 import GridTests from "./Utils/GridTests/GridTests"
 import Profile from "./Components/UserProfile/Profile"
-import { WithAuthenticationProvider } from "./Components/UserAuth/Session"
+import * as ROUTES from "./Utils/Constants/routes"
+import { WithAuthenticationProvider } from "./Components/UserAuth/Session/WithAuthentication"
 import { withSelectedContextProvider } from "./Components/SelectedContentContext"
 
 class App extends Component {
@@ -16,12 +17,12 @@ class App extends Component {
       <Router basename="/">
         <div className="container">
           <Switch>
-            <Route path="/" exact component={SearchPage} />
-            <Route path="/shows" exact component={ShowsPage} />
-            <Route path="/:mediaType/:id" component={FullContentInfo} />
-            <Route path="/movies" component={MoviesPage} />
-            <Route path="/profile" component={Profile} />
-            <Route path="/grid-tests" component={GridTests} />
+            <Route path={ROUTES.SEARCH_PAGE} exact component={SearchPage} />
+            <Route path={ROUTES.SHOWS} exact component={ShowsPage} />
+            <Route path={ROUTES.MOVIES} component={MoviesPage} />
+            <Route path={ROUTES.FULL_CONTENT_INFO} component={FullContentInfo} />
+            <Route path={ROUTES.PROFILE} component={Profile} />
+            <Route path={ROUTES.GRID_TESTS} component={GridTests} />
           </Switch>
         </div>
       </Router>

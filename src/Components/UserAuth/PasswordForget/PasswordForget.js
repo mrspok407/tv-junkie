@@ -4,24 +4,19 @@ import { withRouter } from "react-router-dom"
 import { compose } from "recompose"
 import { withFirebase } from "../../Firebase"
 import Input from "../Input/Input"
-import "./SignIn.scss"
 
 const INITIAL_STATE = {
   requiredInputs: {
-    email: "",
-    password: ""
+    email: ""
   },
   errors: {
     emailError: "",
     emailOnBlur: false,
-    passwordError: "",
-    passwordOnBlur: false,
     error: ""
-  },
-  submitClicked: false
+  }
 }
 
-class SignInFormBase extends Component {
+class PasswordForgetFormBase extends Component {
   constructor(props) {
     super(props)
 
@@ -31,10 +26,9 @@ class SignInFormBase extends Component {
   onSubmit = event => {
     event.preventDefault()
     const requiredInputs = { ...this.state.requiredInputs }
-    const { email, password } = requiredInputs
+    const { email } = requiredInputs
     const errors = { ...this.state.errors }
     const firebase = this.props.firebase
-    const history = this.props.history
 
     if (!this.isFormValid(errors, requiredInputs)) {
       for (const [key, value] of Object.entries(requiredInputs)) {
@@ -50,11 +44,9 @@ class SignInFormBase extends Component {
     }
 
     firebase
-      .signInWithEmailAndPassword(email, password)
-      .then(authUser => {
-        this.setState({ ...INITIAL_STATE })
-        history.push("/")
-        console.log(`user sign in: ${authUser}`)
+      .passwordReset(email)
+      .then(() => {
+        this.setState({ ...INITIAL_STATE, emailSentSuccess: true })
       })
       .catch(error => {
         errors.error = error
@@ -67,17 +59,12 @@ class SignInFormBase extends Component {
     const { value, name } = event.target
 
     const validation = () => {
-      const { email, password } = this.state.requiredInputs
+      const { email } = this.state.requiredInputs
       const errors = { ...this.state.errors }
 
       if (errors[`${name}OnBlur`] || this.state.submitClicked) {
         if (name === "email") {
           errors[`${name}Error`] = email.includes("@") ? "" : "Invalid email"
-        }
-
-        if (name === "password") {
-          errors[`${name}Error`] =
-            password.length >= 6 ? "" : "Password should be at least 6 characters"
         }
       }
 
@@ -104,7 +91,7 @@ class SignInFormBase extends Component {
     event.preventDefault()
 
     const { value, name } = event.target
-    const { email, password } = this.state.requiredInputs
+    const { email } = this.state.requiredInputs
     const errors = { ...this.state.errors }
 
     errors[`${name}OnBlur`] = true
@@ -112,11 +99,6 @@ class SignInFormBase extends Component {
     if (!this.state.submitClicked) {
       if (name === "email") {
         errors[`${name}Error`] = email.includes("@") ? "" : "Invalid email"
-      }
-
-      if (name === "password") {
-        errors[`${name}Error`] =
-          password.length >= 6 ? "" : "Password should be at least 6 characters"
       }
 
       if (value === "") {
@@ -133,30 +115,20 @@ class SignInFormBase extends Component {
   isFormValid = (errors, requiredInputs) => {
     let isValid = true
 
-    for (const value of Object.values(requiredInputs)) {
-      if (value.length === 0) {
-        isValid = false
-      }
-    }
-
-    for (const value of Object.values(errors)) {
-      if (value.length > 0) {
-        isValid = false
-      }
-    }
+    isValid = !(requiredInputs.email.length === 0 || errors.emailError.length > 0)
 
     return isValid
   }
 
   render() {
-    const { errors, requiredInputs } = this.state
-    const { email, password } = this.state.requiredInputs
-    const { error, emailError, passwordError } = this.state.errors
+    const { errors, requiredInputs, emailSentSuccess } = this.state
+    const { email } = this.state.requiredInputs
+    const { error, emailError } = this.state.errors
 
     const isValid = this.isFormValid(errors, requiredInputs)
 
     return (
-      <form className="form-auth" onSubmit={this.onSubmit}>
+      <form className="form-auth form-auth--password-forget" onSubmit={this.onSubmit}>
         <Input
           classNameInput={
             emailError ? "form-auth__input form-auth__input--error" : "form-auth__input"
@@ -171,27 +143,10 @@ class SignInFormBase extends Component {
           labelText="Email"
           withLabel
         />
-        <div className="form-auth__error">{emailError}</div>
-
-        <Input
-          classNameInput={
-            passwordError ? "form-auth__input form-auth__input--error" : "form-auth__input"
-          }
-          classNameLabel="form-auth__label"
-          name="password"
-          value={password}
-          handleOnChange={this.handleOnChange}
-          handleValidation={this.handleValidationOnblur}
-          type="password"
-          placeholder="Password"
-          labelText="Password"
-          withLabel
-        />
-        <span onClick={this.props.togglePasswordForget} className="password-forget-link">
-          Forget password?
-        </span>
-        <div className="form-auth__error">{passwordError}</div>
-
+        {emailSentSuccess && (
+          <div className="password-forget-message">Password reset link sent to your email</div>
+        )}
+        {emailError && <div className="form-auth__error">{emailError}</div>}
         {error && <div className="form-auth__error">{error.message}</div>}
 
         <button
@@ -200,13 +155,13 @@ class SignInFormBase extends Component {
           }
           type="submit"
         >
-          Sign In
+          Reset password
         </button>
       </form>
     )
   }
 }
 
-const SignInForm = compose(withRouter, withFirebase)(SignInFormBase)
+const PasswordForget = compose(withRouter, withFirebase)(PasswordForgetFormBase)
 
-export default SignInForm
+export default PasswordForget

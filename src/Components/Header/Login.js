@@ -2,6 +2,7 @@
 import React, { Component } from "react"
 import SignUpForm from "../UserAuth/SignUp/SignUp"
 import SignInForm from "../UserAuth/SignIn/SignIn"
+import PasswordForget from "../UserAuth/PasswordForget/PasswordForget"
 
 export default class Login extends Component {
   constructor(props) {
@@ -9,7 +10,8 @@ export default class Login extends Component {
 
     this.state = {
       authContOpen: true,
-      signInOpen: false
+      signInOpen: false,
+      passwordForgetFormOpen: false
     }
 
     this.authContRef = React.createRef()
@@ -35,6 +37,12 @@ export default class Login extends Component {
         authContOpen: false
       })
     }
+  }
+
+  togglePasswordForget = () => {
+    this.setState(prevState => ({
+      passwordForgetFormOpen: !prevState.passwordForgetFormOpen
+    }))
   }
 
   render() {
@@ -68,9 +76,18 @@ export default class Login extends Component {
               </div>
             </div>
             {this.state.signInOpen ? (
-              <div className="nav__login-form nav__login-form--signin">
-                <SignInForm />
-              </div>
+              <>
+                <div className="nav__login-form nav__login-form--signin">
+                  <SignInForm togglePasswordForget={this.togglePasswordForget} />
+                </div>
+                {this.state.passwordForgetFormOpen ? (
+                  <div className="nav__login-form nav__login-form--password-forget">
+                    <PasswordForget />
+                  </div>
+                ) : (
+                  ""
+                )}
+              </>
             ) : (
               <div className="nav__login-form nav__login-form--signin">
                 <SignUpForm />

@@ -1,5 +1,5 @@
 import React from "react"
-import { withFirebase } from "../../Firebase/FirebaseContext"
+import { withFirebase } from "../../../Firebase/FirebaseContext"
 import AuthUserContext from "./AuthUserContext"
 
 const withAuthenticationProvider = Component => {

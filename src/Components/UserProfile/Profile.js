@@ -1,12 +1,22 @@
 import React, { Component } from "react"
+import { compose } from "recompose"
 import SignOutButton from "../UserAuth/SignOut/SignOutButton"
+import WithAuthorization from "../UserAuth/Session/WithAuthorization/WithAuthorization"
+import { WithAuthenticationConsumer } from "../UserAuth/Session/WithAuthentication"
 
-export default class Profile extends Component {
+class Profile extends Component {
   render() {
+    const userEmail = this.props.authUser.email
+    console.log(this.props.authUser)
     return (
       <div>
         <SignOutButton />
+        {userEmail}
       </div>
     )
   }
 }
+
+const condition = authUser => authUser !== null
+
+export default compose(WithAuthenticationConsumer, WithAuthorization(condition))(Profile)
