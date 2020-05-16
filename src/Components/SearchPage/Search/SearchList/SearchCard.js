@@ -1,8 +1,8 @@
 import React, { Component } from "react"
 import { Link } from "react-router-dom"
-import { SelectedContentContext } from "../../../Context/SelectedContentContext"
+import { withSelectedContextConsumer } from "../../../SelectedContentContext"
 
-export default class SearchCard extends Component {
+class SearchCard extends Component {
   render() {
     const {
       movieTitle,
@@ -48,18 +48,14 @@ export default class SearchCard extends Component {
           to={mediaType !== "person" ? `/${type}/${id}` : ""}
         >
           <div className="search-card__info">
-            <div className="search-card__info-title">
-              {movieTitle || showTitle || personName}
-            </div>
+            <div className="search-card__info-title">{movieTitle || showTitle || personName}</div>
 
             <div className="search-card__info-description">
               {mediaTypeSearching === "movie" ||
               mediaTypeSearching === "tv" ||
               mediaTypeSearching === "multi" ? (
                 <div className="search-card__info-description--movie">
-                  {overview.length > 150
-                    ? `${overview.substring(0, 150)}...`
-                    : overview}
+                  {overview.length > 150 ? `${overview.substring(0, 150)}...` : overview}
                 </div>
               ) : (
                 ""
@@ -112,27 +108,22 @@ export default class SearchCard extends Component {
           mediaTypeSearching === "tv" ||
           (mediaTypeSearching === "multi" && mediaType !== "person") ? (
             <div className="search-card__add-movie-btn">
-              {this.context.selectedContent.some(e => e.id === id) ? (
+              {this.props.selectedContentState.selectedContent.some(e => e.id === id) ? (
                 <button
                   className="button button--searchlist button--pressed"
-                  onClick={() => this.context.toggleContent(id, searchResults)}
+                  onClick={() => this.props.toggleContent(id, searchResults)}
                   type="button"
                 >
                   Remove{" "}
-                  {mediaType === "movie" || mediaTypeSearching === "movie"
-                    ? "movie"
-                    : "show"}
+                  {mediaType === "movie" || mediaTypeSearching === "movie" ? "movie" : "show"}
                 </button>
               ) : (
                 <button
                   className="button button--searchlist"
-                  onClick={() => this.context.toggleContent(id, searchResults)}
+                  onClick={() => this.props.toggleContent(id, searchResults)}
                   type="button"
                 >
-                  Add{" "}
-                  {mediaType === "movie" || mediaTypeSearching === "movie"
-                    ? "movie"
-                    : "show"}
+                  Add {mediaType === "movie" || mediaTypeSearching === "movie" ? "movie" : "show"}
                 </button>
               )}
             </div>
@@ -151,4 +142,4 @@ export default class SearchCard extends Component {
   }
 }
 
-SearchCard.contextType = SelectedContentContext
+export default withSelectedContextConsumer(SearchCard)

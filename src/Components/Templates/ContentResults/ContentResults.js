@@ -1,7 +1,7 @@
-import React, { useContext } from "react"
+import React from "react"
 import { Link } from "react-router-dom"
 import { listOfGenres } from "../../../Utils"
-import { SelectedContentContext } from "../../Context/SelectedContentContext"
+import { withSelectedContextConsumer } from "../../SelectedContentContext"
 import "./ContentResults.scss"
 import Loader from "../../Placeholders/Loader"
 
@@ -11,7 +11,7 @@ const todayDayOfTheMonth = todayDate.getDate()
 const yesterdayDayOfTheMonth = new Date()
 yesterdayDayOfTheMonth.setDate(yesterdayDayOfTheMonth.getDate() - 1)
 
-export default function ContentResults({
+const ContentResults = ({
   contentType,
   advancedSearchContent,
   clearAdvSearchMovies,
@@ -24,9 +24,10 @@ export default function ContentResults({
   loadingIds,
   showsIds,
   moviesIds,
-  error
-}) {
-  const { selectedContent, toggleContent } = useContext(SelectedContentContext)
+  error,
+  selectedContentState
+}) => {
+  const { selectedContent, toggleContent } = selectedContentState
 
   function showLinksToAll() {
     const showAllLinksPressed = true
@@ -34,19 +35,13 @@ export default function ContentResults({
       contentArr.map(item => getLastEpisodeLinks(item.id, showAllLinksPressed))
     } else if (contentType === "movies") {
       contentArr.map(item =>
-        getMovieLinks(
-          item.id,
-          showAllLinksPressed,
-          item.original_title,
-          item.release_date
-        )
+        getMovieLinks(item.id, showAllLinksPressed, item.original_title, item.release_date)
       )
     }
   }
 
   const maxColumns = 4
-  const currentNumOfColumns =
-    contentArr.length <= maxColumns - 1 ? contentArr.length : maxColumns
+  const currentNumOfColumns = contentArr.length <= maxColumns - 1 ? contentArr.length : maxColumns
 
   return (
     <div
@@ -58,22 +53,14 @@ export default function ContentResults({
     >
       {contentType !== "adv-search" ? (
         <div className="content-results__button-top">
-          <button
-            className="button"
-            type="button"
-            onClick={() => showLinksToAll()}
-          >
+          <button className="button" type="button" onClick={() => showLinksToAll()}>
             Show Links To All
           </button>
         </div>
       ) : (
         advancedSearchContent.length > 0 && (
           <div className="content-results__button-top">
-            <button
-              type="button"
-              className="button"
-              onClick={() => clearAdvSearchMovies()}
-            >
+            <button type="button" className="button" onClick={() => clearAdvSearchMovies()}>
               Clear Searched
             </button>
           </div>
@@ -128,14 +115,10 @@ export default function ContentResults({
             }
 
             if (movie) {
-              const hash1080p = movie.torrents.find(
-                item => item.quality === "1080p"
-              )
+              const hash1080p = movie.torrents.find(item => item.quality === "1080p")
               movieHash1080p = hash1080p && hash1080p.hash
 
-              const hash720p = movie.torrents.find(
-                item => item.quality === "720p"
-              )
+              const hash720p = movie.torrents.find(item => item.quality === "720p")
               movieHash720p = hash720p && hash720p.hash
 
               urlMovieTitle = movie.title.split(" ").join("+")
@@ -168,17 +151,10 @@ export default function ContentResults({
                     ? "Air today"
                     : airDateOfTheMonth === yesterdayDayOfTheMonth.getDate()
                     ? "Aired yesterday"
-                    : new Intl.DateTimeFormat("en-US", options).format(
-                        formatedDate
-                      )
-                  : new Intl.DateTimeFormat("en-US", options).format(
-                      formatedDate
-                    )
+                    : new Intl.DateTimeFormat("en-US", options).format(formatedDate)
+                  : new Intl.DateTimeFormat("en-US", options).format(formatedDate)
 
-              const {
-                season_number,
-                episode_number
-              } = tvShow.last_episode_to_air
+              const { season_number, episode_number } = tvShow.last_episode_to_air
                 ? tvShow.last_episode_to_air
                 : {
                     season_number: "",
@@ -244,16 +220,13 @@ export default function ContentResults({
                       />
                     </div>
                     <div className="content-results__item-description">
-                      {overview.length > 150
-                        ? `${overview.substring(0, 150)}...`
-                        : overview}
+                      {overview.length > 150 ? `${overview.substring(0, 150)}...` : overview}
                     </div>
                   </div>
                 </Link>
 
                 {contentType === "shows" &&
-                  (first_air_date &&
-                  releaseDateAsDateObj.getTime() < todayDate.getTime() ? (
+                  (first_air_date && releaseDateAsDateObj.getTime() < todayDate.getTime() ? (
                     <div className="content-results__item-links">
                       {!showsIds.includes(id) ? (
                         <button
@@ -269,9 +242,7 @@ export default function ContentResults({
                         </div>
                       ) : (
                         loadingIds.includes(id) && (
-                          <div className="content-results__item-links--error">
-                            {error}
-                          </div>
+                          <div className="content-results__item-links--error">{error}</div>
                         )
                       )}
 
@@ -316,9 +287,7 @@ export default function ContentResults({
                       <button
                         type="button"
                         className="button"
-                        onClick={() =>
-                          getMovieLinks(id, false, original_title, release_date)
-                        }
+                        onClick={() => getMovieLinks(id, false, original_title, release_date)}
                       >
                         Show Links
                       </button>
@@ -328,9 +297,7 @@ export default function ContentResults({
                       </div>
                     ) : (
                       loadingIds.includes(id) && (
-                        <div className="content-results__item-links--error">
-                          No links available
-                        </div>
+                        <div className="content-results__item-links--error">No links available</div>
                       )
                     )}
 
@@ -400,3 +367,5 @@ export default function ContentResults({
     </div>
   )
 }
+
+export default withSelectedContextConsumer(ContentResults)

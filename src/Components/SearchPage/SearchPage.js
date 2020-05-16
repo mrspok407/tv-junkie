@@ -5,11 +5,9 @@ import Search from "./Search/Search"
 import ContentResultsAdvSearch from "./AdvSearchResults/SearchResults/SearchResults"
 import ContentResultsSelected from "./AdvSearchResults/SelectedContent/SelectedContent"
 import PlaceholderNoResults from "../Placeholders/PlaceholderNoResults"
-import { SelectedContentContext } from "../Context/SelectedContentContext"
+import { withSelectedContextConsumer } from "../SelectedContentContext"
 import ScrollToTop from "../../Utils/ScrollToTop"
 import Header from "../Header/Header"
-
-const API_KEY = "c5e3186413780c3aeec39b0767a6ec99"
 
 const LOCAL_STORAGE_KEY_ADV = "advancedSearchContent"
 const LOCAL_STORAGE_KEY_ACTORS = "addedActors"
@@ -20,21 +18,15 @@ const LOCAL_STORAGE_KEY_TOTALPAGES = "totalPages"
 const currentYear = new Date().getFullYear()
 
 let cancelRequestAdvSearch
-
-export default class MainPage extends Component {
+class MainPage extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      advancedSearchContent:
-        JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_ADV)) || [],
-      numOfPagesLoaded:
-        JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_PAGENUMBER)) || 1,
-      advSearchInputValues:
-        JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_INPUTS)) || {},
-      withActors:
-        JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_ACTORS)) || [],
-      totalPagesAdvMovies:
-        JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_TOTALPAGES)) || null,
+      advancedSearchContent: JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_ADV)) || [],
+      numOfPagesLoaded: JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_PAGENUMBER)) || 1,
+      advSearchInputValues: JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_INPUTS)) || {},
+      withActors: JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_ACTORS)) || [],
+      totalPagesAdvMovies: JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_TOTALPAGES)) || null,
       searchingMovie: false,
       searchingAdvancedSearch: false,
       loadingNewPage: false,
@@ -54,22 +46,10 @@ export default class MainPage extends Component {
   }
 
   componentDidUpdate() {
-    localStorage.setItem(
-      LOCAL_STORAGE_KEY_ADV,
-      JSON.stringify(this.state.advancedSearchContent)
-    )
-    localStorage.setItem(
-      LOCAL_STORAGE_KEY_ACTORS,
-      JSON.stringify(this.state.withActors)
-    )
-    localStorage.setItem(
-      LOCAL_STORAGE_KEY_INPUTS,
-      JSON.stringify(this.state.advSearchInputValues)
-    )
-    localStorage.setItem(
-      LOCAL_STORAGE_KEY_PAGENUMBER,
-      JSON.stringify(this.state.numOfPagesLoaded)
-    )
+    localStorage.setItem(LOCAL_STORAGE_KEY_ADV, JSON.stringify(this.state.advancedSearchContent))
+    localStorage.setItem(LOCAL_STORAGE_KEY_ACTORS, JSON.stringify(this.state.withActors))
+    localStorage.setItem(LOCAL_STORAGE_KEY_INPUTS, JSON.stringify(this.state.advSearchInputValues))
+    localStorage.setItem(LOCAL_STORAGE_KEY_PAGENUMBER, JSON.stringify(this.state.numOfPagesLoaded))
     localStorage.setItem(
       LOCAL_STORAGE_KEY_TOTALPAGES,
       JSON.stringify(this.state.totalPagesAdvMovies)
@@ -133,11 +113,9 @@ export default class MainPage extends Component {
 
     const getActors = withActors.map(item => item.id).join()
 
-    const voteCountMoreThan =
-      parseInt(voteCount, 10) <= 100 || voteCount === "" ? "25" : voteCount
+    const voteCountMoreThan = parseInt(voteCount, 10) <= 100 || voteCount === "" ? "25" : voteCount
 
-    const sortTvDate =
-      sortBy === "primary_release_date.desc" ? "first_air_date.desc" : sortBy
+    const sortTvDate = sortBy === "primary_release_date.desc" ? "first_air_date.desc" : sortBy
 
     this.setState({
       advSearchInputValues: {
@@ -171,7 +149,7 @@ export default class MainPage extends Component {
 
     const getMovies =
       mediaType === "movie" &&
-      `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US\
+      `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US\
 &include_adult=false&include_video=true&page=${this.state.numOfPagesLoaded}&primary_release_year=${year}&\
 primary_release_date.gte=${yearRange.start}&primary_release_date.lte=${yearRange.finish}\
 &with_genres=${getWithGenres}&without_genres=${getWithoutGenres}&vote_average.gte=${rating}&\
@@ -179,7 +157,7 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
 
     const getTvShows =
       mediaType === "tv" &&
-      `https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}\
+      `https://api.themoviedb.org/3/discover/tv?api_key=${process.env.REACT_APP_TMDB_API}\
 &language=en-US&page=${this.state.numOfPagesLoaded}&sort_by=${sortTvDate}&first_air_date.gte=${yearRange.start}&first_air_date.lte=${yearRange.finish}\
 &first_air_date_year=${year}&vote_average.gte=${rating}&vote_count.gte=${voteCountMoreThan}&include_null_first_air_dates=false\
 &with_genres=${getWithGenres}&without_genres=${getWithoutGenres}`
@@ -245,10 +223,7 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
     )
       return
 
-    if (
-      window.innerHeight + window.scrollY >=
-      document.body.scrollHeight - 850
-    ) {
+    if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 850) {
       const {
         year,
         yearRangeStart,
@@ -269,7 +244,7 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
 
       const getMovies =
         mediaType === "movie" &&
-        `https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&language=en-US\
+        `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US\
 &include_adult=false&include_video=true&page=${pageNum}&primary_release_year=${year}&\
 primary_release_date.gte=${yearRangeStart}&primary_release_date.lte=${yearRangeFinish}\
 &with_genres=${getWithGenres}&without_genres=${getWithoutGenres}&vote_average.gte=${rating}&\
@@ -277,7 +252,7 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
 
       const getTvShows =
         mediaType === "tv" &&
-        `https://api.themoviedb.org/3/discover/tv?api_key=${API_KEY}\
+        `https://api.themoviedb.org/3/discover/tv?api_key=${process.env.REACT_APP_TMDB_API}\
 &language=en-US&page=${pageNum}&sort_by=${sortTvDate}&first_air_date.gte=${yearRangeStart}&first_air_date.lte=${yearRangeFinish}\
 &first_air_date_year=${year}&vote_average.gte=${rating}&vote_count.gte=${voteCountMoreThan}&include_null_first_air_dates=false\
 &with_genres=${getWithGenres}&without_genres=${getWithoutGenres}`
@@ -317,8 +292,7 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
 
   renderAdvMovies = () => {
     const { advancedSearchContent, totalPagesAdvMovies } = this.state
-    return !Array.isArray(advancedSearchContent) ||
-      totalPagesAdvMovies === 0 ? (
+    return !Array.isArray(advancedSearchContent) || totalPagesAdvMovies === 0 ? (
       <div className="content-results content-results--adv-search">
         <PlaceholderNoResults message="No content found" />
       </div>
@@ -346,10 +320,9 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
           randomMovies={this.randomMovies}
           advancedSearch={this.advancedSearch}
           clearWithActors={this.clearWithActors}
-          API_KEY={API_KEY}
         />
         {this.renderAdvMovies()}
-        {this.context.selectedContent.length > 0 && <ContentResultsSelected />}
+        {this.props.selectedContentState.selectedContent.length > 0 && <ContentResultsSelected />}
         <ScrollToTop />
         {/* <Footer /> */}
       </>
@@ -357,4 +330,4 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
   }
 }
 
-MainPage.contextType = SelectedContentContext
+export default withSelectedContextConsumer(MainPage)

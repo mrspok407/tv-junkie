@@ -15,7 +15,6 @@ import "./AdvancedSearch.scss"
 export default function AdvancedSearch({
   advancedSearch,
   searchingAdvancedSearch,
-  API_KEY,
   withActors,
   toggleActor,
   clearWithActors
@@ -25,9 +24,7 @@ export default function AdvancedSearch({
 
   function toggleGenre(e) {
     const newGenres = [...genres]
-    const genre = newGenres.find(
-      item => item.name.toLowerCase() === e.target.value
-    )
+    const genre = newGenres.find(item => item.name.toLowerCase() === e.target.value)
     const data = e.target.getAttribute("data")
 
     genre.isChecked = !genre.isChecked
@@ -126,11 +123,7 @@ export default function AdvancedSearch({
                     <VotesRatingSortType handleChange={handleChange} />
                   </div>
                   {values.mediaType === "movie" ? (
-                    <WithActorsInput
-                      API_KEY={API_KEY}
-                      toggleActor={toggleActor}
-                      withActors={withActors}
-                    />
+                    <WithActorsInput toggleActor={toggleActor} withActors={withActors} />
                   ) : (
                     ""
                   )}
@@ -139,18 +132,12 @@ export default function AdvancedSearch({
                 <div className="inputs__buttons">
                   <div className="inputs__buttons--search">
                     <button
-                      className={
-                        !searchingAdvancedSearch
-                          ? "button"
-                          : "button button--loading"
-                      }
+                      className={!searchingAdvancedSearch ? "button" : "button button--loading"}
                       type="submit"
                     >
                       Search
                     </button>
-                    {searchingAdvancedSearch && (
-                      <Loader className="loader--small-pink" />
-                    )}
+                    {searchingAdvancedSearch && <Loader className="loader--small-pink" />}
                   </div>
                   <div className="inputs__buttons--reset">
                     <button

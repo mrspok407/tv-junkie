@@ -34,14 +34,12 @@ export default class WithActorsInput extends Component {
       cancelRequest()
     }
 
-    if (!query)
-      return this.setState({ actors: [], isSearchingActors: false, error: "" })
+    if (!query) return this.setState({ actors: [], isSearchingActors: false, error: "" })
 
     this.setState({ error: "", isSearchingActors: true })
-    const { API_KEY } = this.props
     axios
       .get(
-        `https://api.tmdb.org/3/search/person?api_key=${API_KEY}&query=${query}`,
+        `https://api.tmdb.org/3/search/person?api_key=${process.env.REACT_APP_TMDB_API}&query=${query}`,
         {
           cancelToken: new CancelToken(function executor(c) {
             cancelRequest = c
@@ -85,88 +83,81 @@ export default class WithActorsInput extends Component {
         <p>{error || "Something gone terrible wrong"}</p>
       </div>
     ) : (
-      actors.map(
-        ({ name, profile_path, id, known_for, known_for_department }) => (
-          <div key={id} className="search-card">
-            <div
-              className="search-card__image search-card__image--person"
-              style={
-                profile_path !== null
-                  ? {
-                      backgroundImage: `url(https://image.tmdb.org/t/p/w500/${profile_path})`
-                    }
-                  : {
-                      backgroundImage: `url(https://d32qys9a6wm9no.cloudfront.net/images/movies/poster/500x735.png)`
-                    }
-              }
-            />
-            <div className="search-card__info">
-              <div className="search-card__info-title">{name}</div>
+      actors.map(({ name, profile_path, id, known_for, known_for_department }) => (
+        <div key={id} className="search-card">
+          <div
+            className="search-card__image search-card__image--person"
+            style={
+              profile_path !== null
+                ? {
+                    backgroundImage: `url(https://image.tmdb.org/t/p/w500/${profile_path})`
+                  }
+                : {
+                    backgroundImage: `url(https://d32qys9a6wm9no.cloudfront.net/images/movies/poster/500x735.png)`
+                  }
+            }
+          />
+          <div className="search-card__info">
+            <div className="search-card__info-title">{name}</div>
 
-              <div className="search-card__info-description">
-                {known_for && (
-                  <div className="search-card__info-description--person">
-                    <div className="search-card__info-activity">
-                      Main activity: {known_for_department}
-                    </div>
-                    <div className="search-card__info-person-movies">
-                      {known_for.map((item, i) => {
-                        const mediaType = item.media_type
-
-                        const title =
-                          mediaType === "movie"
-                            ? item.original_title || "No title"
-                            : item.name || "No title"
-
-                        const releaseDate =
-                          mediaType === "movie"
-                            ? item.release_date || ""
-                            : item.first_air_date || ""
-
-                        return (
-                          <span key={item.id}>
-                            {title}
-                            {known_for.length - 1 !== i
-                              ? ` (${releaseDate.slice(0, 4)}), `
-                              : ` (${releaseDate.slice(0, 4)})`}
-                          </span>
-                        )
-                      })}
-                    </div>
+            <div className="search-card__info-description">
+              {known_for && (
+                <div className="search-card__info-description--person">
+                  <div className="search-card__info-activity">
+                    Main activity: {known_for_department}
                   </div>
-                )}
-              </div>
-            </div>
-            <div className="search-card__buttons search-card__buttons--person">
-              {withActors.some(e => e.id === id) ? (
-                <button
-                  className="button button--searchlist button--pressed"
-                  onClick={() => toggleActor(id, name)}
-                  type="button"
-                >
-                  Remove
-                </button>
-              ) : (
-                <button
-                  className="button button--searchlist"
-                  onClick={() => toggleActor(id, name)}
-                  type="button"
-                >
-                  Add
-                </button>
+                  <div className="search-card__info-person-movies">
+                    {known_for.map((item, i) => {
+                      const mediaType = item.media_type
+
+                      const title =
+                        mediaType === "movie"
+                          ? item.original_title || "No title"
+                          : item.name || "No title"
+
+                      const releaseDate =
+                        mediaType === "movie" ? item.release_date || "" : item.first_air_date || ""
+
+                      return (
+                        <span key={item.id}>
+                          {title}
+                          {known_for.length - 1 !== i
+                            ? ` (${releaseDate.slice(0, 4)}), `
+                            : ` (${releaseDate.slice(0, 4)})`}
+                        </span>
+                      )
+                    })}
+                  </div>
+                </div>
               )}
             </div>
           </div>
-        )
-      )
+          <div className="search-card__buttons search-card__buttons--person">
+            {withActors.some(e => e.id === id) ? (
+              <button
+                className="button button--searchlist button--pressed"
+                onClick={() => toggleActor(id, name)}
+                type="button"
+              >
+                Remove
+              </button>
+            ) : (
+              <button
+                className="button button--searchlist"
+                onClick={() => toggleActor(id, name)}
+                type="button"
+              >
+                Add
+              </button>
+            )}
+          </div>
+        </div>
+      ))
     )
   }
 
   handleClickOutside = e => {
-    if (
-      this.searchContRef.current &&
-      !this.searchContRef.current.contains(e.target)
-    ) {
+    if (this.searchContRef.current && !this.searchContRef.current.contains(e.target)) {
       this.setState({
         listIsOpen: false
       })
@@ -208,28 +199,18 @@ export default class WithActorsInput extends Component {
             onKeyDown={this.handleKeyDown}
             onFocus={this.onFocus}
           />
-          {this.state.isSearchingActors && (
-            <Loader className="loader--small-pink" />
-          )}
+          {this.state.isSearchingActors && <Loader className="loader--small-pink" />}
           {this.state.query && (
-            <button
-              type="button"
-              className="button--input-clear"
-              onClick={this.resetSearch}
-            />
+            <button type="button" className="button--input-clear" onClick={this.resetSearch} />
           )}
         </div>
-        {this.state.totalPages === 0 &&
-        this.state.query !== "" &&
-        this.state.listIsOpen ? (
+        {this.state.totalPages === 0 && this.state.query !== "" && this.state.listIsOpen ? (
           <PlaceholderNoResults
             message="No results found"
             handleClickOutside={this.handleClickOutside}
           />
         ) : (
-          this.state.listIsOpen && (
-            <div className="search-list">{this.renderActors()}</div>
-          )
+          this.state.listIsOpen && <div className="search-list">{this.renderActors()}</div>
         )}
         <div className="actors-added">
           {this.props.withActors.map(item => (

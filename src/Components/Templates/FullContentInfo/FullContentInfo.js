@@ -1,30 +1,27 @@
-/* eslint-disable jsx-a11y/anchor-has-content */
-/* eslint-disable jsx-a11y/anchor-is-valid */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable react/self-closing-comp */
 /* eslint-disable no-prototype-builtins */
-/* eslint-disable no-use-before-define */
-import React, { useState, useEffect, useContext } from "react"
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable jsx-a11y/anchor-has-content */
+import React, { useState, useEffect } from "react"
 import { useLocation } from "react-router-dom"
 import axios, { CancelToken } from "axios"
-import { SelectedContentContext } from "../../Context/SelectedContentContext"
+import { withSelectedContextConsumer } from "../../SelectedContentContext"
 import PlaceholderLoadingFullInfo from "../../Placeholders/PlaceholderLoadingFullInfo/PlaceholderLoadingFullInfo"
 import ScrollToTop from "../../../Utils/ScrollToTop"
 import Header from "../../Header/Header"
 import Loader from "../../Placeholders/Loader"
 import Slider from "../../../Utils/Slider/Slider"
-import { API_KEY, differenceBtwDatesInDays } from "../../../Utils"
+import { differenceBtwDatesInDays } from "../../../Utils"
 import "./FullContentInfo.scss"
 
 const todayDate = new Date()
 let cancelRequest
 
-export default function FullContentInfo({
+const FullContentInfo = ({
   match: {
     params: { id, mediaType }
-  }
-}) {
+  },
+  selectedContentState
+}) => {
   const [options, setOptions] = useState({
     poster: "",
     posterMobile: "",
@@ -66,7 +63,7 @@ export default function FullContentInfo({
   const [error, setError] = useState()
   const [errorShowEpisodes, setErrorShowEpisodes] = useState()
 
-  const { selectedContent, toggleContent } = useContext(SelectedContentContext)
+  const { selectedContent, toggleContent } = selectedContentState
 
   const { pathname } = useLocation()
 
@@ -85,7 +82,6 @@ export default function FullContentInfo({
         cancelRequest()
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mediaType, id])
 
   const getFullShowInfo = () => {
@@ -93,7 +89,7 @@ export default function FullContentInfo({
 
     axios
       .get(
-        `https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}&language=en-US&append_to_response=similar`,
+        `https://api.themoviedb.org/3/tv/${id}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US&append_to_response=similar`,
         {
           cancelToken: new CancelToken(function executor(c) {
             cancelRequest = c
@@ -121,21 +117,14 @@ export default function FullContentInfo({
             similar
           }
         }) => {
-          const genreIds =
-            genres && genres.length ? genres.map(item => item.id) : "-"
+          const genreIds = genres && genres.length ? genres.map(item => item.id) : "-"
           const genreNames =
-            genres && genres.length
-              ? genres.map(item => item.name).join(", ")
-              : "-"
+            genres && genres.length ? genres.map(item => item.name).join(", ") : "-"
           const networkNames =
-            networks && networks.length
-              ? networks.map(item => item.name).join(", ")
-              : "-"
+            networks && networks.length ? networks.map(item => item.name).join(", ") : "-"
 
           const similarShows = similar.results
-          const similarShowsSortByVotes = similarShows.sort(
-            (a, b) => b.vote_count - a.vote_count
-          )
+          const similarShowsSortByVotes = similarShows.sort((a, b) => b.vote_count - a.vote_count)
 
           setInfoToPass([
             {
@@ -179,9 +168,7 @@ export default function FullContentInfo({
 
   const showSeasonsEpisode = (seasonId, seasonNum) => {
     if (openSeasons.includes(seasonId)) {
-      setOpenSeasons(prevState => [
-        ...prevState.filter(item => item !== seasonId)
-      ])
+      setOpenSeasons(prevState => [...prevState.filter(item => item !== seasonId)])
     } else {
       setOpenSeasons(prevState => [...prevState, seasonId])
     }
@@ -192,7 +179,7 @@ export default function FullContentInfo({
 
     axios
       .get(
-        `https://api.themoviedb.org/3/tv/${id}/season/${seasonNum}?api_key=${API_KEY}&language=en-US`,
+        `https://api.themoviedb.org/3/tv/${id}/season/${seasonNum}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US`,
         {
           cancelToken: new CancelToken(function executor(c) {
             cancelRequest = c
@@ -201,13 +188,8 @@ export default function FullContentInfo({
       )
       .then(({ data: { episodes } }) => {
         const episodesReverese = episodes.reverse()
-        setTvShowEpisodes(prevState => [
-          ...prevState,
-          { seasonId, episodes: episodesReverese }
-        ])
-        setLoadingEpisodesIds(prevState => [
-          ...prevState.filter(item => item !== seasonId)
-        ])
+        setTvShowEpisodes(prevState => [...prevState, { seasonId, episodes: episodesReverese }])
+        setLoadingEpisodesIds(prevState => [...prevState.filter(item => item !== seasonId)])
         setErrorShowEpisodes("")
       })
       .catch(err => {
@@ -219,9 +201,7 @@ export default function FullContentInfo({
 
   const showEpisodeInfo = episodeId => {
     if (detailEpisodeInfo.includes(episodeId)) {
-      setDetailEpisodeInfo(prevState => [
-        ...prevState.filter(item => item !== episodeId)
-      ])
+      setDetailEpisodeInfo(prevState => [...prevState.filter(item => item !== episodeId)])
     } else {
       setDetailEpisodeInfo(prevState => [...prevState, episodeId])
     }
@@ -231,7 +211,7 @@ export default function FullContentInfo({
     setLoadingPage(true)
     axios
       .get(
-        `https://api.themoviedb.org/3/movie/${id}?api_key=${API_KEY}&language=en-US&append_to_response=similar_movies`,
+        `https://api.themoviedb.org/3/movie/${id}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US&append_to_response=similar_movies`,
         {
           cancelToken: new CancelToken(function executor(c) {
             cancelRequest = c
@@ -245,6 +225,7 @@ export default function FullContentInfo({
             poster_path,
             backdrop_path,
             original_title,
+            title,
             release_date,
             runtime,
             status,
@@ -269,9 +250,7 @@ export default function FullContentInfo({
               : production_companies[0].name
 
           const similarMovies = similar_movies.results
-          const similarMoviesSortByVotes = similarMovies.sort(
-            (a, b) => b.vote_count - a.vote_count
-          )
+          const similarMoviesSortByVotes = similarMovies.sort((a, b) => b.vote_count - a.vote_count)
 
           setInfoToPass([
             {
@@ -309,7 +288,8 @@ export default function FullContentInfo({
           setLoadingTorrentLinks(true)
 
           return axios.get(
-            `https://yts.mx/api/v2/list_movies.json?query_term=${original_title} ${yearRelease}`,
+            `https://yts.mx/api/v2/list_movies.json?query_term=${title ||
+              original_title} ${yearRelease}`,
             {
               cancelToken: new CancelToken(function executor(c) {
                 cancelRequest = c
@@ -327,13 +307,9 @@ export default function FullContentInfo({
         }
 
         const movie = res.data.data.movies[0]
-        const movieHash1080p = movie.torrents.find(
-          item => item.quality === "1080p"
-        )
+        const movieHash1080p = movie.torrents.find(item => item.quality === "1080p")
 
-        const movieHash720p = movie.torrents.find(
-          item => item.quality === "720p"
-        )
+        const movieHash720p = movie.torrents.find(item => item.quality === "720p")
 
         setMovieTorrents({
           title: movie.title,
@@ -373,10 +349,7 @@ export default function FullContentInfo({
 
   const yearReleaseAsDateObj = new Date(releaseDate)
 
-  const yearRange =
-    status !== "Ended"
-      ? `${yearRelease} - ...`
-      : `${yearRelease} - ${yearEnded}`
+  const yearRange = status !== "Ended" ? `${yearRelease} - ...` : `${yearRelease} - ${yearEnded}`
 
   const formatedBudget =
     budget !== 0 && budget !== "-" ? (
@@ -461,11 +434,7 @@ export default function FullContentInfo({
             <div className="full-detailes__info">
               <div className="full-detailes__info-title">
                 {title}
-                <span>
-                  {mediaType === "show" && yearRelease !== "-"
-                    ? ` (${yearRange})`
-                    : ""}
-                </span>
+                <span>{mediaType === "show" && yearRelease !== "-" ? ` (${yearRange})` : ""}</span>
               </div>
               <div className="full-detailes__info-row">
                 <div className="full-detailes__info-option">Year</div>
@@ -473,9 +442,7 @@ export default function FullContentInfo({
                   {yearRelease !== "-" ? (
                     `${yearRelease}`
                   ) : (
-                    <span className="full-detailes__info-no-info">
-                      {yearRelease}
-                    </span>
+                    <span className="full-detailes__info-no-info">{yearRelease}</span>
                   )}
                 </div>
               </div>
@@ -509,9 +476,7 @@ export default function FullContentInfo({
                   {rating !== "-" ? (
                     rating
                   ) : (
-                    <span className="full-detailes__info-no-info">
-                      {rating}
-                    </span>
+                    <span className="full-detailes__info-no-info">{rating}</span>
                   )}
                 </div>
               </div>
@@ -521,9 +486,7 @@ export default function FullContentInfo({
                   {runtime !== "-" ? (
                     `${runtime} min`
                   ) : (
-                    <span className="full-detailes__info-no-info">
-                      {runtime}
-                    </span>
+                    <span className="full-detailes__info-no-info">{runtime}</span>
                   )}
                 </div>
               </div>
@@ -535,22 +498,16 @@ export default function FullContentInfo({
                       {tagline !== "-" ? (
                         `${tagline}`
                       ) : (
-                        <span className="full-detailes__info-no-info">
-                          {tagline}
-                        </span>
+                        <span className="full-detailes__info-no-info">{tagline}</span>
                       )}
                     </div>
                   </div>
                   <div className="full-detailes__info-row">
                     <div className="full-detailes__info-option">Budget</div>
-                    <div className="full-detailes__info-value">
-                      {formatedBudget}
-                    </div>
+                    <div className="full-detailes__info-value">{formatedBudget}</div>
                   </div>
                   <div className="full-detailes__info-row">
-                    <div className="full-detailes__info-option">
-                      External links
-                    </div>
+                    <div className="full-detailes__info-option">External links</div>
                     <div className="full-detailes__info-value">
                       <a
                         href={`https://www.imdb.com/title/${imdbId}`}
@@ -588,18 +545,11 @@ export default function FullContentInfo({
             {mediaType === "show" && (
               <div className="full-detailes__seasons-and-episodes">
                 {seasonsArr.map(season => {
-                  if (
-                    season.season_number === 0 ||
-                    season.name === "Specials" ||
-                    !season.air_date
-                  )
+                  if (season.season_number === 0 || season.name === "Specials" || !season.air_date)
                     return null
                   const seasonId = season.id
 
-                  const daysToNewSeason = differenceBtwDatesInDays(
-                    season.air_date,
-                    todayDate
-                  )
+                  const daysToNewSeason = differenceBtwDatesInDays(season.air_date, todayDate)
 
                   return (
                     <div
@@ -630,9 +580,7 @@ export default function FullContentInfo({
                                 backgroundColor: "#1d1d1d96"
                               }
                         }
-                        onClick={() =>
-                          showSeasonsEpisode(seasonId, season.season_number)
-                        }
+                        onClick={() => showSeasonsEpisode(seasonId, season.season_number)}
                       >
                         <div className="full-detailes__season-number">
                           Season {season.season_number}
@@ -665,9 +613,7 @@ export default function FullContentInfo({
 
                                 return item.episodes.map(episode => {
                                   // Format Date //
-                                  const airDateISO = new Date(
-                                    episode.air_date
-                                  ).toISOString()
+                                  const airDateISO = new Date(episode.air_date).toISOString()
 
                                   const optionss = {
                                     month: "long",
@@ -678,10 +624,9 @@ export default function FullContentInfo({
                                   const formatedDate = new Date(airDateISO)
 
                                   const episodeAirDate = episode.air_date
-                                    ? new Intl.DateTimeFormat(
-                                        "en-US",
-                                        optionss
-                                      ).format(formatedDate)
+                                    ? new Intl.DateTimeFormat("en-US", optionss).format(
+                                        formatedDate
+                                      )
                                     : "No date available"
                                   // Format Date End //
 
@@ -699,9 +644,7 @@ export default function FullContentInfo({
                                       : "e".concat(episodeToString)
                                   // Format Seasons And Episode Numbers End //
 
-                                  const episodeAirDateAsDateObj = new Date(
-                                    episode.air_date
-                                  )
+                                  const episodeAirDateAsDateObj = new Date(episode.air_date)
 
                                   const daysToNewEpisode = differenceBtwDatesInDays(
                                     episode.air_date,
@@ -719,15 +662,11 @@ export default function FullContentInfo({
                                     >
                                       <div
                                         className="full-detailes__episode-wrapper"
-                                        onClick={() =>
-                                          showEpisodeInfo(episode.id)
-                                        }
+                                        onClick={() => showEpisodeInfo(episode.id)}
                                         style={
-                                          daysToNewEpisode > 0 ||
-                                          !episode.air_date
+                                          daysToNewEpisode > 0 || !episode.air_date
                                             ? {
-                                                backgroundColor:
-                                                  "rgba(132, 90, 90, 0.3)"
+                                                backgroundColor: "rgba(132, 90, 90, 0.3)"
                                               }
                                             : {
                                                 backgroundColor: "#1d1d1d96"
@@ -750,9 +689,7 @@ export default function FullContentInfo({
                                         )}
                                       </div>
 
-                                      {detailEpisodeInfo.includes(
-                                        episode.id
-                                      ) && (
+                                      {detailEpisodeInfo.includes(episode.id) && (
                                         <div
                                           className={
                                             episode.still_path
@@ -766,7 +703,7 @@ export default function FullContentInfo({
                                               style={{
                                                 backgroundImage: `url(https://image.tmdb.org/t/p/w500${episode.still_path})`
                                               }}
-                                            ></div>
+                                            />
                                           )}
                                           {episode.overview && (
                                             <div className="full-detailes__episode-detailes-overview">
@@ -774,8 +711,7 @@ export default function FullContentInfo({
                                             </div>
                                           )}
 
-                                          {episodeAirDateAsDateObj <
-                                            todayDate.getTime() &&
+                                          {episodeAirDateAsDateObj < todayDate.getTime() &&
                                             episode.air_date && (
                                               <div className="torrent-links torrent-links--full-content">
                                                 <a
@@ -837,3 +773,5 @@ export default function FullContentInfo({
     </>
   )
 }
+
+export default withSelectedContextConsumer(FullContentInfo)

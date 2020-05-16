@@ -12,6 +12,7 @@
     "debounce": "^1.2.0",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.2",
+    "firebase": "^7.14.3",
     "formik": "^2.1.4",
     "formik-persist": "^1.1.0",
     "normalize.css": "^8.0.1",
@@ -21,6 +22,7 @@
     "react-router-dom": "^5.1.2",
     "react-scripts": "3.4.0",
     "react-transition-group": "^1.2.1",
+    "recompose": "^0.30.0",
     "throttle-debounce": "^2.1.0",
     "yup": "^0.28.1"
   },

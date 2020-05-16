@@ -1,0 +1,6 @@
+export const SEARCH_PAGE = "/"
+export const SHOWS = "/shows"
+export const MOVIES = "/movies"
+export const FULL_CONTENT_INFO = "/:mediaType/:id"
+export const PROFILE = "/profile"
+export const GRID_TESTS = "/grid-tests"

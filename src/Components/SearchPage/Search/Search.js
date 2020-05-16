@@ -38,11 +38,11 @@ export default class MovieSearch extends Component {
 
     this.setState({ query, error: "", isSearchingList: true })
 
-    const { API_KEY } = this.props
-
     axios
       .get(
-        `https://api.tmdb.org/3/search/${mediatype.type.toLowerCase()}?api_key=${API_KEY}&query=${query}`,
+        `https://api.tmdb.org/3/search/${mediatype.type.toLowerCase()}?api_key=${
+          process.env.REACT_APP_TMDB_API
+        }&query=${query}`,
         {
           cancelToken: new CancelToken(function executor(c) {
             cancelRequest = c
@@ -88,10 +88,7 @@ export default class MovieSearch extends Component {
   }
 
   handleClickOutside = e => {
-    if (
-      this.searchContRef.current &&
-      !this.searchContRef.current.contains(e.target)
-    ) {
+    if (this.searchContRef.current && !this.searchContRef.current.contains(e.target)) {
       this.setState({
         listIsOpen: false
       })
@@ -114,9 +111,7 @@ export default class MovieSearch extends Component {
               onFocus={this.onFocus}
               isSearchingList={this.state.isSearchingList}
             />
-            {this.state.totalPages === 0 &&
-            this.state.query !== "" &&
-            this.state.listIsOpen ? (
+            {this.state.totalPages === 0 && this.state.query !== "" && this.state.listIsOpen ? (
               <PlaceholderNoResults
                 message="No results found"
                 handleClickOutside={this.handleClickOutside}
@@ -137,7 +132,6 @@ export default class MovieSearch extends Component {
           <AdvancedSearch
             advancedSearch={this.props.advancedSearch}
             searchingAdvancedSearch={this.props.searchingAdvancedSearch}
-            API_KEY={this.props.API_KEY}
             toggleActor={this.props.toggleActor}
             withActors={this.props.withActors}
             clearWithActors={this.props.clearWithActors}

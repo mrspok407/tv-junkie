@@ -2,14 +2,14 @@ import React, { Component } from "react"
 import axios, { CancelToken } from "axios"
 import ContentResults from "../Templates/ContentResults/ContentResults"
 import PlaceholderNoSelectedContent from "../Placeholders/PlaceholderNoSelectedContent"
-import { SelectedContentContext } from "../Context/SelectedContentContext"
+import { withSelectedContextConsumer } from "../SelectedContentContext"
 import ScrollToTop from "../../Utils/ScrollToTop"
 import "./MoviesPage.scss"
 import Header from "../Header/Header"
 
 let cancelRequest
 
-export default class Movies extends Component {
+class Movies extends Component {
   constructor(props) {
     super(props)
 
@@ -29,8 +29,7 @@ export default class Movies extends Component {
   }
 
   getMovieLinks = (id, showAllLinksPressed = false, title, date) => {
-    if (this.state.moviesIds.includes(id) || this.state.showAllLinksPressed)
-      return
+    if (this.state.moviesIds.includes(id) || this.state.showAllLinksPressed) return
 
     this.setState(prevState => ({
       loadingIds: [...prevState.loadingIds, id],
@@ -62,7 +61,7 @@ export default class Movies extends Component {
   }
 
   render() {
-    const onlyMovies = this.context.selectedContent.filter(
+    const onlyMovies = this.props.selectedContentState.selectedContent.filter(
       item => item.original_title
     )
     return (
@@ -89,4 +88,4 @@ export default class Movies extends Component {
   }
 }
 
-Movies.contextType = SelectedContentContext
+export default withSelectedContextConsumer(Movies)

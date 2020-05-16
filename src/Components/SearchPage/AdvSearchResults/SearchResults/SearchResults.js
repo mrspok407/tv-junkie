@@ -1,7 +1,6 @@
 import React from "react"
 import Loader from "../../../Placeholders/Loader"
 import ContentResults from "../../../Templates/ContentResults/ContentResults"
-import { SelectedContentContext } from "../../../Context/SelectedContentContext"
 import "./SearchResults.scss"
 
 export default class MovieResultsAdvSearch extends React.PureComponent {
@@ -20,5 +19,3 @@ export default class MovieResultsAdvSearch extends React.PureComponent {
     )
   }
 }
-
-MovieResultsAdvSearch.contextType = SelectedContentContext

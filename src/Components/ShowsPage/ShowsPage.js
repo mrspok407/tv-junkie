@@ -2,15 +2,17 @@ import React, { Component } from "react"
 import axios, { CancelToken } from "axios"
 import ContentResults from "../Templates/ContentResults/ContentResults"
 import PlaceholderNoSelectedContent from "../Placeholders/PlaceholderNoSelectedContent"
-import { SelectedContentContext } from "../Context/SelectedContentContext"
+import { withSelectedContextConsumer } from "../SelectedContentContext"
 import ScrollToTop from "../../Utils/ScrollToTop"
-import { API_KEY } from "../../Utils"
 import "./ShowsPage.scss"
-import Header from "../Header/Header"
+import HeaderBase from "../Header/Header"
+import { withFirebase } from "../Firebase/FirebaseContext"
 
 let cancelRequest
 
-export default class Shows extends Component {
+const Header = withFirebase(HeaderBase)
+
+class Shows extends Component {
   constructor(props) {
     super(props)
 
@@ -30,8 +32,7 @@ export default class Shows extends Component {
   }
 
   getLastEpisodeLinks = (id, showAllLinksPressed) => {
-    if (this.state.showsIds.includes(id) || this.state.showAllLinksPressed)
-      return
+    if (this.state.showsIds.includes(id) || this.state.showAllLinksPressed) return
 
     this.setState(prevState => ({
       loadingIds: [...prevState.loadingIds, id],
@@ -41,7 +42,7 @@ export default class Shows extends Component {
 
     axios
       .get(
-        `https://api.themoviedb.org/3/tv/${id}?api_key=${API_KEY}&language=en-US`,
+        `https://api.themoviedb.org/3/tv/${id}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US`,
         {
           cancelToken: new CancelToken(function executor(c) {
             cancelRequest = c
@@ -64,7 +65,7 @@ export default class Shows extends Component {
   }
 
   render() {
-    const onlyShows = this.context.selectedContent.filter(
+    const onlyShows = this.props.selectedContentState.selectedContent.filter(
       item => item.original_name
     )
     return (
@@ -90,4 +91,4 @@ export default class Shows extends Component {
   }
 }
 
-Shows.contextType = SelectedContentContext
+export default withSelectedContextConsumer(Shows)
