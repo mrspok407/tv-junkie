@@ -1,4 +1,3 @@
-/* eslint-disable import/no-cycle */
 import React, { Component } from "react"
 import SignUpForm from "../UserAuth/SignUp/SignUp"
 import SignInForm from "../UserAuth/SignIn/SignIn"
@@ -9,8 +8,8 @@ export default class Login extends Component {
     super(props)
 
     this.state = {
-      authContOpen: true,
-      signInOpen: false,
+      authContOpen: false,
+      signInOpen: true,
       passwordForgetFormOpen: false
     }
 

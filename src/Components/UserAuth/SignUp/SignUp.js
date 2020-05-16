@@ -36,6 +36,7 @@ class SignUpFormBase extends Component {
 
   onSubmit = event => {
     event.preventDefault()
+
     const requiredInputs = { ...this.state.requiredInputs }
     const { email, password } = requiredInputs
     const errors = { ...this.state.errors }
