@@ -1,7 +1,7 @@
 import React from "react"
 import { Link } from "react-router-dom"
 import "./SelectedContent.scss"
-import { withSelectedContextConsumer } from "../../../SelectedContentContext"
+import { withSelectedContextConsumer } from "Components/SelectedContentContext"
 
 class MovieResultsSelected extends React.PureComponent {
   constructor(props) {
@@ -31,6 +31,7 @@ class MovieResultsSelected extends React.PureComponent {
   }
 
   render() {
+    const { toggleContent, clearSelectedContent } = this.props.selectedContentState
     return (
       <div ref={this.selectedContentRef} className="selected-content__container">
         <button
@@ -47,11 +48,7 @@ class MovieResultsSelected extends React.PureComponent {
         {this.state.showSelected && (
           <div className="selected-content__list">
             <div className="selected-content__button-clear">
-              <button
-                type="button"
-                className="button"
-                onClick={() => this.props.clearSelectedContent()}
-              >
+              <button type="button" className="button" onClick={() => clearSelectedContent()}>
                 Clear Selected
               </button>
             </div>
@@ -103,11 +100,7 @@ class MovieResultsSelected extends React.PureComponent {
                       </div>
                     </Link>
                     <div className="selected-content__item-button">
-                      <button
-                        className="button"
-                        type="button"
-                        onClick={() => this.props.selectedContentState.toggleContent(id)}
-                      >
+                      <button className="button" type="button" onClick={() => toggleContent(id)}>
                         Remove
                       </button>
                     </div>

@@ -1,10 +1,10 @@
 /* eslint-disable jsx-a11y/mouse-events-have-key-events */
 import React, { Component } from "react"
 import { NavLink } from "react-router-dom"
-import logo from "../../assets/images/main-page-logo.png"
+import logo from "assets/images/main-page-logo.png"
 import Login from "./Login"
-import * as ROUTES from "../../Utils/Constants/routes"
-import { WithAuthenticationConsumer } from "../UserAuth/Session/WithAuthentication"
+import * as ROUTES from "Utils/Constants/routes"
+import { WithAuthenticationConsumer } from "Components/UserAuth/Session/WithAuthentication"
 import "./Header.scss"
 import "../UserAuth/UserAuth.scss"
 

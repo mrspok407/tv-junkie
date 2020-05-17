@@ -2,7 +2,7 @@
 import React, { Component } from "react"
 import { withRouter } from "react-router-dom"
 import { compose } from "recompose"
-import { withFirebase } from "../../Firebase"
+import { withFirebase } from "Components/Firebase"
 import Input from "../Input/Input"
 import "./SignUp.scss"
 
@@ -217,7 +217,7 @@ class SignUpFormBase extends Component {
           value={password}
           handleOnChange={this.handleOnChange}
           handleValidation={this.handleValidationOnblur}
-          type="text"
+          type="password"
           placeholder="Password"
           labelText="Password"
           withLabel
@@ -233,7 +233,7 @@ class SignUpFormBase extends Component {
           value={passwordConfirm}
           handleOnChange={this.handleOnChange}
           handleValidation={this.handleValidationOnblur}
-          type="text"
+          type="password"
           placeholder="Password"
           labelText="Confirm Password"
           withLabel

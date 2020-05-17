@@ -1,7 +1,7 @@
 import React, { Component } from "react"
-import SignUpForm from "../UserAuth/SignUp/SignUp"
-import SignInForm from "../UserAuth/SignIn/SignIn"
-import PasswordForget from "../UserAuth/PasswordForget/PasswordForget"
+import SignUpForm from "Components/UserAuth/SignUp/SignUp"
+import SignInForm from "Components/UserAuth/SignIn/SignIn"
+import PasswordForget from "Components/UserAuth/PasswordForget/PasswordForget"
 
 export default class Login extends Component {
   constructor(props) {

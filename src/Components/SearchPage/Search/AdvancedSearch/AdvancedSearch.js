@@ -8,8 +8,8 @@ import DatesInputs from "./DatesInputs/DatesInputs"
 import GenreInputs from "./GenreInputs/GenreInputs"
 import VotesRatingSortType from "./VotesRatingSortType/VotesRatingSortType"
 import WithActorsInput from "./WithActorsInput/WithActorsInput"
-import Loader from "../../../Placeholders/Loader"
-import { listOfGenres } from "../../../../Utils"
+import Loader from "Components/Placeholders/Loader"
+import { listOfGenres } from "Utils"
 import "./AdvancedSearch.scss"
 
 export default function AdvancedSearch({

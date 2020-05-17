@@ -1,6 +1,6 @@
 import React from "react"
-import Loader from "../../../Placeholders/Loader"
-import ContentResults from "../../../Templates/ContentResults/ContentResults"
+import Loader from "Components/Placeholders/Loader"
+import ContentResults from "Components/Templates/ContentResults/ContentResults"
 import "./SearchResults.scss"
 
 export default class MovieResultsAdvSearch extends React.PureComponent {

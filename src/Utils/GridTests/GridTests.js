@@ -1,5 +1,5 @@
 import React, { Component } from "react"
-import { withSelectedContextConsumer } from "../../Components/SelectedContentContext"
+import { withSelectedContextConsumer } from "Components/SelectedContentContext"
 import "./GridTests.scss"
 
 const POSTER_URL = "https://image.tmdb.org/t/p/w500"

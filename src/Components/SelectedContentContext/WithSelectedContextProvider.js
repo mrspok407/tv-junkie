@@ -32,25 +32,10 @@ const withSelectedContextProvider = Component => {
         })
       }
 
-      this.deleteActiveLink = () => {
-        this.setState({
-          isActiveLink: true
-        })
-      }
-
-      this.addActiveLink = () => {
-        this.setState({
-          isActiveLink: false
-        })
-      }
-
       this.state = {
         selectedContent: JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_CONTENT)) || [],
         toggleContent: this.toggleContent,
-        clearSelectedContent: this.clearSelectedContent,
-        isActiveLink: false,
-        deleteActiveLink: this.deleteActiveLink,
-        addActiveLink: this.addActiveLink
+        clearSelectedContent: this.clearSelectedContent
       }
     }
 

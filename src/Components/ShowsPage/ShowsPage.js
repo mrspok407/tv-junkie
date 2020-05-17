@@ -1,12 +1,12 @@
 import React, { Component } from "react"
 import axios, { CancelToken } from "axios"
-import ContentResults from "../Templates/ContentResults/ContentResults"
-import PlaceholderNoSelectedContent from "../Placeholders/PlaceholderNoSelectedContent"
-import { withSelectedContextConsumer } from "../SelectedContentContext"
-import ScrollToTop from "../../Utils/ScrollToTop"
+import ContentResults from "Components/Templates/ContentResults/ContentResults"
+import PlaceholderNoSelectedContent from "Components/Placeholders/PlaceholderNoSelectedContent"
+import { withSelectedContextConsumer } from "Components/SelectedContentContext"
+import ScrollToTop from "Utils/ScrollToTop"
 import "./ShowsPage.scss"
-import HeaderBase from "../Header/Header"
-import { withFirebase } from "../Firebase/FirebaseContext"
+import HeaderBase from "Components/Header/Header"
+import { withFirebase } from "Components/Firebase/FirebaseContext"
 
 let cancelRequest
 

@@ -4,13 +4,13 @@
 import React, { useState, useEffect } from "react"
 import { useLocation } from "react-router-dom"
 import axios, { CancelToken } from "axios"
-import { withSelectedContextConsumer } from "../../SelectedContentContext"
-import PlaceholderLoadingFullInfo from "../../Placeholders/PlaceholderLoadingFullInfo/PlaceholderLoadingFullInfo"
-import ScrollToTop from "../../../Utils/ScrollToTop"
-import Header from "../../Header/Header"
-import Loader from "../../Placeholders/Loader"
-import Slider from "../../../Utils/Slider/Slider"
-import { differenceBtwDatesInDays } from "../../../Utils"
+import { withSelectedContextConsumer } from "Components/SelectedContentContext"
+import PlaceholderLoadingFullInfo from "Components/Placeholders/PlaceholderLoadingFullInfo/PlaceholderLoadingFullInfo"
+import ScrollToTop from "Utils/ScrollToTop"
+import Header from "Components/Header/Header"
+import Loader from "Components//Placeholders/Loader"
+import Slider from "Utils/Slider/Slider"
+import { differenceBtwDatesInDays } from "Utils"
 import "./FullContentInfo.scss"
 
 const todayDate = new Date()
@@ -100,6 +100,7 @@ const FullContentInfo = ({
         ({
           data,
           data: {
+            name,
             original_name,
             first_air_date,
             vote_average,
@@ -128,6 +129,7 @@ const FullContentInfo = ({
 
           setInfoToPass([
             {
+              name,
               original_name,
               id: data.id,
               first_air_date,
@@ -143,7 +145,7 @@ const FullContentInfo = ({
           setOptions({
             poster: poster_path,
             posterMobile: backdrop_path,
-            title: original_name || "-",
+            title: name || original_name || "-",
             releaseDate: first_air_date || "-",
             lastAirDate: last_air_date || "-",
             runtime: episode_run_time[0] || "-",
@@ -242,7 +244,7 @@ const FullContentInfo = ({
         }) => {
           const movieGenres = genres.map(item => item.name).join(", ")
           const genresIds = genres.map(item => item.id)
-          const yearRelease = release_date.slice(0, 4)
+          // const yearRelease = release_date.slice(0, 4)
 
           const prodComp =
             production_companies.length === 0 || !production_companies
@@ -254,6 +256,7 @@ const FullContentInfo = ({
 
           setInfoToPass([
             {
+              title,
               original_title,
               id: data.id,
               release_date,
@@ -269,7 +272,7 @@ const FullContentInfo = ({
           setOptions({
             poster: poster_path,
             posterMobile: backdrop_path,
-            title: original_title || "-",
+            title: title || original_title || "-",
             releaseDate: release_date || "-",
             runtime: runtime || "-",
             status: status || "-",
@@ -288,8 +291,9 @@ const FullContentInfo = ({
           setLoadingTorrentLinks(true)
 
           return axios.get(
-            `https://yts.mx/api/v2/list_movies.json?query_term=${title ||
-              original_title} ${yearRelease}`,
+            `https://yts.mx/api/v2/list_movies.json?query_term=${imdb_id ||
+              title ||
+              original_title}`,
             {
               cancelToken: new CancelToken(function executor(c) {
                 cancelRequest = c

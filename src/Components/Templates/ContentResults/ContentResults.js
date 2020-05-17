@@ -1,9 +1,9 @@
 import React from "react"
 import { Link } from "react-router-dom"
-import { listOfGenres } from "../../../Utils"
-import { withSelectedContextConsumer } from "../../SelectedContentContext"
+import { listOfGenres } from "Utils"
+import { withSelectedContextConsumer } from "Components/SelectedContentContext"
 import "./ContentResults.scss"
-import Loader from "../../Placeholders/Loader"
+import Loader from "Components/Placeholders/Loader"
 
 const todayDate = new Date()
 const currentYear = todayDate.getFullYear()
@@ -28,6 +28,8 @@ const ContentResults = ({
   selectedContentState
 }) => {
   const { selectedContent, toggleContent } = selectedContentState
+
+  console.log(contentArr)
 
   function showLinksToAll() {
     const showAllLinksPressed = true
@@ -81,7 +83,9 @@ const ContentResults = ({
       >
         {contentArr.map(
           ({
+            title,
             original_title,
+            name,
             original_name,
             id,
             release_date,
@@ -99,7 +103,7 @@ const ContentResults = ({
               listOfGenres.filter(item => item.id === genreId)
             )
 
-            const title = original_title || original_name
+            const contentTitle = title || original_title || name || original_name
             const releaseDate = release_date || first_air_date
 
             const releaseDateAsDateObj = new Date(first_air_date)
@@ -184,7 +188,7 @@ const ContentResults = ({
                 >
                   <div className="content-results__item-main-info">
                     <div className="content-results__item-title">
-                      {!title ? "No title available" : title}
+                      {!contentTitle ? "No title available" : contentTitle}
                     </div>
                     <div className="content-results__item-year">
                       {!releaseDate ? "" : `(${releaseDate.slice(0, 4)})`}

@@ -2,7 +2,7 @@
 import React, { Component } from "react"
 import { withRouter } from "react-router-dom"
 import { compose } from "recompose"
-import { withFirebase } from "../../Firebase"
+import { withFirebase } from "Components/Firebase"
 import Input from "../Input/Input"
 
 const INITIAL_STATE = {

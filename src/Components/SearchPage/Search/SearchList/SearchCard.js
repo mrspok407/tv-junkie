@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import { Link } from "react-router-dom"
-import { withSelectedContextConsumer } from "../../../SelectedContentContext"
+import { withSelectedContextConsumer } from "Components/SelectedContentContext"
 
 class SearchCard extends Component {
   render() {
@@ -17,10 +17,13 @@ class SearchCard extends Component {
       known_for_department,
       searchResults,
       mediaType,
-      mediaTypeSearching
+      mediaTypeSearching,
+      selectedContentState
     } = this.props
 
     const type = movieTitle ? "movie" : showTitle && "show"
+
+    const { toggleContent } = selectedContentState
 
     return (
       <div key={id} className="search-card">
@@ -111,7 +114,7 @@ class SearchCard extends Component {
               {this.props.selectedContentState.selectedContent.some(e => e.id === id) ? (
                 <button
                   className="button button--searchlist button--pressed"
-                  onClick={() => this.props.toggleContent(id, searchResults)}
+                  onClick={() => toggleContent(id, searchResults)}
                   type="button"
                 >
                   Remove{" "}
@@ -120,7 +123,7 @@ class SearchCard extends Component {
               ) : (
                 <button
                   className="button button--searchlist"
-                  onClick={() => this.props.toggleContent(id, searchResults)}
+                  onClick={() => toggleContent(id, searchResults)}
                   type="button"
                 >
                   Add {mediaType === "movie" || mediaTypeSearching === "movie" ? "movie" : "show"}

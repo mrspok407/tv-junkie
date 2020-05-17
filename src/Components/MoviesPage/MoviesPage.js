@@ -1,9 +1,9 @@
 import React, { Component } from "react"
 import axios, { CancelToken } from "axios"
-import ContentResults from "../Templates/ContentResults/ContentResults"
-import PlaceholderNoSelectedContent from "../Placeholders/PlaceholderNoSelectedContent"
-import { withSelectedContextConsumer } from "../SelectedContentContext"
-import ScrollToTop from "../../Utils/ScrollToTop"
+import ContentResults from "Components/Templates/ContentResults/ContentResults"
+import PlaceholderNoSelectedContent from "Components/Placeholders/PlaceholderNoSelectedContent"
+import { withSelectedContextConsumer } from "Components/SelectedContentContext"
+import ScrollToTop from "Utils/ScrollToTop"
 import "./MoviesPage.scss"
 import Header from "../Header/Header"
 

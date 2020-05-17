@@ -4,7 +4,7 @@ import SearchList from "./SearchList/SearchList"
 import Input from "./Input/Input"
 import AdvancedSearch from "./AdvancedSearch/AdvancedSearch"
 import "./Search.scss"
-import PlaceholderNoResults from "../../Placeholders/PlaceholderNoResults"
+import PlaceholderNoResults from "Components/Placeholders/PlaceholderNoResults"
 
 let cancelRequest
 
