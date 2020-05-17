@@ -4,14 +4,13 @@ import { NavLink } from "react-router-dom"
 import logo from "assets/images/main-page-logo.png"
 import Login from "./Login"
 import * as ROUTES from "Utils/Constants/routes"
-import { WithAuthenticationConsumer } from "Components/UserAuth/Session/WithAuthentication"
+import { AuthUserContext } from "Components/UserAuth/Session/WithAuthentication"
 import "./Header.scss"
 import "../UserAuth/UserAuth.scss"
 
-class Header extends Component {
+export default class Header extends Component {
   render() {
     const { isLogoVisible = true } = this.props
-    const isSignedIn = this.props.authUser
 
     return (
       <header className="header">
@@ -35,7 +34,7 @@ class Header extends Component {
               </li>
             </NavLink>
 
-            {isSignedIn ? (
+            {this.context ? (
               <NavLink exact to={ROUTES.PROFILE}>
                 <li data-item="4" className="nav__item">
                   Profile
@@ -65,4 +64,4 @@ class Header extends Component {
   }
 }
 
-export default WithAuthenticationConsumer(Header)
+Header.contextType = AuthUserContext

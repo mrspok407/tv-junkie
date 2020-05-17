@@ -1,4 +1,5 @@
 import WithAuthenticationProvider from "./WithAuthenticationProvider"
 import WithAuthenticationConsumer from "./WithAuthenticationConsumer"
+import AuthUserContext from "./AuthUserContext"
 
-export { WithAuthenticationProvider, WithAuthenticationConsumer }
+export { AuthUserContext, WithAuthenticationProvider, WithAuthenticationConsumer }

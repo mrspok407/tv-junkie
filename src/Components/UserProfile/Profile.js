@@ -7,7 +7,6 @@ import { WithAuthenticationConsumer } from "Components/UserAuth/Session/WithAuth
 class Profile extends Component {
   render() {
     const userEmail = this.props.authUser.email
-    console.log(this.props.authUser)
     return (
       <div>
         <SignOutButton />

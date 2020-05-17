@@ -1,3 +1,3 @@
-import WithAuthorizationProvider from "./WithAuthorization"
+import WithAuthorization from "./WithAuthorization"
 
-export { WithAuthorizationProvider }
+export { WithAuthorization }
