@@ -1,5 +1,8 @@
 import React from "react"
 import SelectedContentContext from "./SelectedContentContext"
+import { compose } from "recompose"
+import { withFirebase } from "Components/Firebase"
+import { WithAuthenticationProvider } from "Components/UserAuth/Session/WithAuthentication"
 
 const LOCAL_STORAGE_KEY_CONTENT = "selectedContent"
 
@@ -24,6 +27,37 @@ const withSelectedContextProvider = Component => {
             selectedContent: [content, ...newSelectedContent]
           })
         }
+
+        this.props.firebase.auth.onAuthStateChanged(authUser => {
+          const item = contentArr.find(item => item.id === id)
+          let movieExist
+
+          this.props.firebase
+            .userMovies(authUser.uid)
+            .orderByChild("id")
+            .equalTo(id)
+            .once("value", snapshot => {
+              movieExist = snapshot.val() !== null
+            })
+            .then(() => {
+              if (movieExist) {
+                this.props.firebase
+                  .userMovies(authUser.uid)
+                  .orderByChild("id")
+                  .equalTo(id)
+                  .once("value", snapshot => {
+                    const updates = {}
+                    snapshot.forEach(child => (updates[child.key] = null))
+                    this.props.firebase.userMovies(authUser.uid).update(updates)
+                  })
+              } else {
+                this.props.firebase
+                  .userMovies(authUser.uid)
+                  .push()
+                  .set(item)
+              }
+            })
+        })
       }
 
       this.clearSelectedContent = () => {
@@ -51,7 +85,7 @@ const withSelectedContextProvider = Component => {
       )
     }
   }
-  return WithSelectedContextProvider
+  return compose(withFirebase)(WithSelectedContextProvider)
 }
 
 export default withSelectedContextProvider

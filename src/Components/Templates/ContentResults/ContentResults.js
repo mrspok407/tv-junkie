@@ -1,6 +1,7 @@
 import React from "react"
 import { Link } from "react-router-dom"
 import { listOfGenres } from "Utils"
+import classNames from "classnames"
 import { withSelectedContextConsumer } from "Components/SelectedContentContext"
 import "./ContentResults.scss"
 import Loader from "Components/Placeholders/Loader"
@@ -29,8 +30,6 @@ const ContentResults = ({
 }) => {
   const { selectedContent, toggleContent } = selectedContentState
 
-  console.log(contentArr)
-
   function showLinksToAll() {
     const showAllLinksPressed = true
     if (contentType === "shows") {
@@ -47,11 +46,9 @@ const ContentResults = ({
 
   return (
     <div
-      className={
-        contentType === "adv-search"
-          ? "content-results content-results--adv-search"
-          : "content-results"
-      }
+      className={classNames("content-results", {
+        "content-results--adv-search": contentType === "adv-search"
+      })}
     >
       {contentType !== "adv-search" ? (
         <div className="content-results__button-top">
@@ -99,9 +96,7 @@ const ContentResults = ({
           }) => {
             const mediaType = original_title ? "movie" : "show"
 
-            const filteredGenres = genre_ids.map(genreId =>
-              listOfGenres.filter(item => item.id === genreId)
-            )
+            const filteredGenres = genre_ids.map(genreId => listOfGenres.filter(item => item.id === genreId))
 
             const contentTitle = title || original_title || name || original_name
             const releaseDate = release_date || first_air_date
@@ -169,13 +164,9 @@ const ContentResults = ({
               const episodeToString = episode_number.toString()
 
               lastSeason =
-                seasonToString.length === 1
-                  ? "s0".concat(seasonToString)
-                  : "s".concat(seasonToString)
+                seasonToString.length === 1 ? "s0".concat(seasonToString) : "s".concat(seasonToString)
               lastEpisode =
-                episodeToString.length === 1
-                  ? "e0".concat(episodeToString)
-                  : "e".concat(episodeToString)
+                episodeToString.length === 1 ? "e0".concat(episodeToString) : "e".concat(episodeToString)
             }
             // Shows end //
             return (
@@ -197,9 +188,7 @@ const ContentResults = ({
                       <div className="content-results__item-rating">
                         {vote_average}
                         <span>/10</span>
-                        <span className="content-results__item-rating-vote-count">
-                          ({vote_count})
-                        </span>
+                        <span className="content-results__item-rating-vote-count">({vote_count})</span>
                       </div>
                     )}
                   </div>
@@ -354,11 +343,7 @@ const ContentResults = ({
                   </>
                 ) : (
                   <div className="content-results__item-links content-results__item-links--adv-search">
-                    <button
-                      className="button"
-                      onClick={() => toggleContent(id, contentArr)}
-                      type="button"
-                    >
+                    <button className="button" onClick={() => toggleContent(id, contentArr)} type="button">
                       Add {original_title ? "movie" : "show"}
                     </button>
                   </div>

@@ -70,6 +70,17 @@
   }
 }
 
+.login__container {
+  position: absolute;
+  right: 0;
+  top: 0;
+  color: #fff;
+}
+
+.nav__item--login {
+  user-select: none;
+}
+
 .nav__hover-line {
   display: none;
   position: absolute;
@@ -102,84 +113,4 @@
     top: initial;
     bottom: 0;
   }
-}
-
-.nav__item--login {
-  position: absolute;
-  right: 0;
-  top: 0;
-  color: #fff;
-}
-
-.nav__login-auth-container {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  width: 300px;
-  color: #000;
-  background-color: #fff;
-  border-radius: 10px;
-  transform: translate(0, -10px);
-  opacity: 0;
-  z-index: 10;
-  animation: showAuthContainer 0.35s forwards;
-  @keyframes showAuthContainer {
-    to {
-      opacity: 1;
-      transform: translate(0, 0);
-    }
-  }
-}
-
-.nav__login-auth {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: 50px;
-}
-
-.nav__login--sign {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #1f1f1f;
-  cursor: pointer;
-
-  &:after {
-    content: "";
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
-    height: 3px;
-    border-radius: 5px;
-    opacity: 0;
-    transition: 0.2s;
-  }
-
-  &:hover:after {
-    opacity: 1;
-    background-color: getColor(blueClr, $mainPalette);
-  }
-}
-
-.sign--active {
-  &:after {
-    opacity: 1;
-    background-color: getColor(orangeClr, $mainPalette);
-  }
-  &:hover:after {
-    background-color: getColor(orangeClr, $mainPalette);
-  }
-}
-
-.nav__login-button {
-  user-select: none;
-}
-
-.nav__login-form {
-  display: flex;
-  justify-content: center;
 }

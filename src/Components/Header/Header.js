@@ -4,6 +4,7 @@ import { NavLink } from "react-router-dom"
 import logo from "assets/images/main-page-logo.png"
 import Login from "./Login"
 import * as ROUTES from "Utils/Constants/routes"
+import * as ROLES from "Utils/Constants/roles"
 import { AuthUserContext } from "Components/UserAuth/Session/WithAuthentication"
 import "./Header.scss"
 import "../UserAuth/UserAuth.scss"
@@ -11,6 +12,7 @@ import "../UserAuth/UserAuth.scss"
 export default class Header extends Component {
   render() {
     const { isLogoVisible = true } = this.props
+    const authUser = this.context
 
     return (
       <header className="header">
@@ -34,12 +36,22 @@ export default class Header extends Component {
               </li>
             </NavLink>
 
-            {this.context ? (
-              <NavLink exact to={ROUTES.PROFILE}>
-                <li data-item="4" className="nav__item">
-                  Profile
-                </li>
-              </NavLink>
+            {authUser ? (
+              <>
+                <NavLink exact to={ROUTES.PROFILE}>
+                  <li data-item="4" className="nav__item">
+                    Profile
+                  </li>
+                </NavLink>
+
+                {!!authUser.roles[ROLES.ADMIN] && (
+                  <NavLink exact to={ROUTES.ADMIN}>
+                    <li data-item="4" className="nav__item">
+                      Admin
+                    </li>
+                  </NavLink>
+                )}
+              </>
             ) : (
               <Login />
             )}

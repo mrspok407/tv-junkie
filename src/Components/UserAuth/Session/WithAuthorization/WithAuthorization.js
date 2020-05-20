@@ -16,11 +16,14 @@ const withAuthorization = condition => Component => {
     }
 
     authorizationListener = () => {
-      this.props.firebase.auth.onAuthStateChanged(authUser => {
-        if (!condition(authUser)) {
-          this.props.history.push(ROUTES.SEARCH_PAGE)
-        }
-      })
+      this.props.firebase.onAuthUserListener(
+        authUser => {
+          if (!condition(authUser)) {
+            this.props.history.push(ROUTES.SEARCH_PAGE)
+          }
+        },
+        () => this.props.history.push(ROUTES.SEARCH_PAGE)
+      )
     }
 
     render() {

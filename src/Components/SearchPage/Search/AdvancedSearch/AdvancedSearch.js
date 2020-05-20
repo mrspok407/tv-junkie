@@ -4,6 +4,7 @@ import React, { useState } from "react"
 import { Formik, Form } from "formik"
 import { Persist } from "formik-persist"
 import * as Yup from "yup"
+import classNames from "classnames"
 import DatesInputs from "./DatesInputs/DatesInputs"
 import GenreInputs from "./GenreInputs/GenreInputs"
 import VotesRatingSortType from "./VotesRatingSortType/VotesRatingSortType"
@@ -98,10 +99,7 @@ export default function AdvancedSearch({
     >
       {({ setFieldValue, handleChange, values }) => (
         <div className="advanced-search__cont">
-          <button
-            className="button button--adv-search-form"
-            onClick={() => setAdvSearchOpen(!advSearchOpen)}
-          >
+          <button className="button button--adv-search-form" onClick={() => setAdvSearchOpen(!advSearchOpen)}>
             {!advSearchOpen ? "Open Advanced Search" : "Close Advanced Search"}
           </button>
           {advSearchOpen && (
@@ -132,7 +130,9 @@ export default function AdvancedSearch({
                 <div className="inputs__buttons">
                   <div className="inputs__buttons--search">
                     <button
-                      className={!searchingAdvancedSearch ? "button" : "button button--loading"}
+                      className={classNames("button", {
+                        "button--loading": searchingAdvancedSearch
+                      })}
                       type="submit"
                     >
                       Search

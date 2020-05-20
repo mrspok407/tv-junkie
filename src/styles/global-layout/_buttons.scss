@@ -45,8 +45,13 @@
   }
 }
 
-.button--form-auth {
+.button--auth__form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
   margin: 10px 0 10px 0;
+  border-radius: 5px;
   transition: 0.2s;
 
   &:before,

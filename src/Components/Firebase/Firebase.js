@@ -1,5 +1,6 @@
 import app from "firebase/app"
 import "firebase/auth"
+import "firebase/database"
 
 const config = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -15,13 +16,13 @@ class Firebase {
     app.initializeApp(config)
 
     this.auth = app.auth()
+    this.db = app.database()
   }
 
   createUserWithEmailAndPassword = (email, password) =>
     this.auth.createUserWithEmailAndPassword(email, password)
 
-  signInWithEmailAndPassword = (email, password) =>
-    this.auth.signInWithEmailAndPassword(email, password)
+  signInWithEmailAndPassword = (email, password) => this.auth.signInWithEmailAndPassword(email, password)
 
   sendEmailVerification = () => this.auth.currentUser.sendEmailVerification()
 
@@ -30,6 +31,33 @@ class Firebase {
   passwordReset = email => this.auth.sendPasswordResetEmail(email)
 
   passwordUpdate = password => this.auth.currentUser.updatePassword(password)
+
+  user = uid => this.db.ref(`users/${uid}`)
+
+  userMovies = uid => this.db.ref(`users/${uid}/movies`)
+
+  users = () => this.db.ref("users")
+
+  onAuthUserListener = (next, fallback) => {
+    this.auth.onAuthStateChanged(authUser => {
+      if (authUser) {
+        this.user(authUser.uid)
+          .once("value")
+          .then(snapshot => {
+            const dbUser = snapshot.val()
+
+            authUser = {
+              uid: authUser.uid,
+              email: authUser.email,
+              roles: dbUser.roles || {}
+            }
+            next(authUser)
+          })
+      } else {
+        fallback()
+      }
+    })
+  }
 }
 
 export default Firebase

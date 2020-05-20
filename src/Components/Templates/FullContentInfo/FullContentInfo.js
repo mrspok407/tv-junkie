@@ -4,6 +4,7 @@
 import React, { useState, useEffect } from "react"
 import { useLocation } from "react-router-dom"
 import axios, { CancelToken } from "axios"
+import classNames from "classnames"
 import { withSelectedContextConsumer } from "Components/SelectedContentContext"
 import PlaceholderLoadingFullInfo from "Components/Placeholders/PlaceholderLoadingFullInfo/PlaceholderLoadingFullInfo"
 import ScrollToTop from "Utils/ScrollToTop"
@@ -119,10 +120,8 @@ const FullContentInfo = ({
           }
         }) => {
           const genreIds = genres && genres.length ? genres.map(item => item.id) : "-"
-          const genreNames =
-            genres && genres.length ? genres.map(item => item.name).join(", ") : "-"
-          const networkNames =
-            networks && networks.length ? networks.map(item => item.name).join(", ") : "-"
+          const genreNames = genres && genres.length ? genres.map(item => item.name).join(", ") : "-"
+          const networkNames = networks && networks.length ? networks.map(item => item.name).join(", ") : "-"
 
           const similarShows = similar.results
           const similarShowsSortByVotes = similarShows.sort((a, b) => b.vote_count - a.vote_count)
@@ -247,9 +246,7 @@ const FullContentInfo = ({
           // const yearRelease = release_date.slice(0, 4)
 
           const prodComp =
-            production_companies.length === 0 || !production_companies
-              ? "-"
-              : production_companies[0].name
+            production_companies.length === 0 || !production_companies ? "-" : production_companies[0].name
 
           const similarMovies = similar_movies.results
           const similarMoviesSortByVotes = similarMovies.sort((a, b) => b.vote_count - a.vote_count)
@@ -291,9 +288,7 @@ const FullContentInfo = ({
           setLoadingTorrentLinks(true)
 
           return axios.get(
-            `https://yts.mx/api/v2/list_movies.json?query_term=${imdb_id ||
-              title ||
-              original_title}`,
+            `https://yts.mx/api/v2/list_movies.json?query_term=${imdb_id || title || original_title}`,
             {
               cancelToken: new CancelToken(function executor(c) {
                 cancelRequest = c
@@ -477,11 +472,7 @@ const FullContentInfo = ({
               <div className="full-detailes__info-row">
                 <div className="full-detailes__info-option">Rating</div>
                 <div className="full-detailes__info-value">
-                  {rating !== "-" ? (
-                    rating
-                  ) : (
-                    <span className="full-detailes__info-no-info">{rating}</span>
-                  )}
+                  {rating !== "-" ? rating : <span className="full-detailes__info-no-info">{rating}</span>}
                 </div>
               </div>
               <div className="full-detailes__info-row">
@@ -558,23 +549,15 @@ const FullContentInfo = ({
                   return (
                     <div
                       key={seasonId}
-                      className={
-                        !season.poster_path
-                          ? "full-detailes__season full-detailes__season--no-poster"
-                          : "full-detailes__season"
-                      }
-                      style={
-                        !loadingEpisodesIds.includes(seasonId)
-                          ? { rowGap: "10px" }
-                          : { rowGap: "0px" }
-                      }
+                      className={classNames("full-detailes__season", {
+                        "full-detailes__season--no-poster": !season.poster_path
+                      })}
+                      style={!loadingEpisodesIds.includes(seasonId) ? { rowGap: "10px" } : { rowGap: "0px" }}
                     >
                       <div
-                        className={
-                          !openSeasons.includes(seasonId)
-                            ? "full-detailes__season-info"
-                            : "full-detailes__season-info full-detailes__season-info--open"
-                        }
+                        className={classNames("full-detailes__season-info", {
+                          "full-detailes__season-info--open": openSeasons.includes(seasonId)
+                        })}
                         style={
                           daysToNewSeason > 0
                             ? {
@@ -628,9 +611,7 @@ const FullContentInfo = ({
                                   const formatedDate = new Date(airDateISO)
 
                                   const episodeAirDate = episode.air_date
-                                    ? new Intl.DateTimeFormat("en-US", optionss).format(
-                                        formatedDate
-                                      )
+                                    ? new Intl.DateTimeFormat("en-US", optionss).format(formatedDate)
                                     : "No date available"
                                   // Format Date End //
 
@@ -658,11 +639,9 @@ const FullContentInfo = ({
                                   return (
                                     <div
                                       key={episode.id}
-                                      className={
-                                        !detailEpisodeInfo.includes(episode.id)
-                                          ? "full-detailes__episode"
-                                          : "full-detailes__episode full-detailes__episode--open"
-                                      }
+                                      className={classNames("full-detailes__episode", {
+                                        "full-detailes__episode--open": detailEpisodeInfo.includes(episode.id)
+                                      })}
                                     >
                                       <div
                                         className="full-detailes__episode-wrapper"
@@ -677,9 +656,7 @@ const FullContentInfo = ({
                                               }
                                         }
                                       >
-                                        <div className="full-detailes__episode-date">
-                                          {episodeAirDate}
-                                        </div>
+                                        <div className="full-detailes__episode-date">{episodeAirDate}</div>
                                         <div className="full-detailes__episode-name">
                                           <span className="full-detailes__episode-number">
                                             {episode.episode_number}.
@@ -695,11 +672,9 @@ const FullContentInfo = ({
 
                                       {detailEpisodeInfo.includes(episode.id) && (
                                         <div
-                                          className={
-                                            episode.still_path
-                                              ? "full-detailes__episode-detailes"
-                                              : "full-detailes__episode-detailes full-detailes__episode-detailes--no-image"
-                                          }
+                                          className={classNames("full-detailes__episode-detailes", {
+                                            "full-detailes__episode-detailes--no-image": !episode.still_path
+                                          })}
                                         >
                                           {episode.still_path && (
                                             <div
@@ -715,32 +690,31 @@ const FullContentInfo = ({
                                             </div>
                                           )}
 
-                                          {episodeAirDateAsDateObj < todayDate.getTime() &&
-                                            episode.air_date && (
-                                              <div className="torrent-links torrent-links--full-content">
-                                                <a
-                                                  target="_blank"
-                                                  rel="noopener noreferrer"
-                                                  href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}+1080p&cat=41`}
-                                                >
-                                                  1080p
-                                                </a>
-                                                <a
-                                                  target="_blank"
-                                                  rel="noopener noreferrer"
-                                                  href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}+720p&cat=41`}
-                                                >
-                                                  720p
-                                                </a>
-                                                <a
-                                                  target="_blank"
-                                                  rel="noopener noreferrer"
-                                                  href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}&cat=5`}
-                                                >
-                                                  480p
-                                                </a>
-                                              </div>
-                                            )}
+                                          {episodeAirDateAsDateObj < todayDate.getTime() && episode.air_date && (
+                                            <div className="torrent-links torrent-links--full-content">
+                                              <a
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}+1080p&cat=41`}
+                                              >
+                                                1080p
+                                              </a>
+                                              <a
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}+720p&cat=41`}
+                                              >
+                                                720p
+                                              </a>
+                                              <a
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}&cat=5`}
+                                              >
+                                                480p
+                                              </a>
+                                            </div>
+                                          )}
                                         </div>
                                       )}
                                     </div>

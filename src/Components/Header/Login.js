@@ -1,7 +1,9 @@
 import React, { Component } from "react"
-import SignUpForm from "Components/UserAuth/SignUp/SignUp"
+import classNames from "classnames"
+import Register from "Components/UserAuth/Register/Register"
 import SignInForm from "Components/UserAuth/SignIn/SignIn"
 import PasswordForget from "Components/UserAuth/PasswordForget/PasswordForget"
+import "../UserAuth/UserAuth.scss"
 
 export default class Login extends Component {
   constructor(props) {
@@ -9,12 +11,9 @@ export default class Login extends Component {
 
     this.state = {
       authContOpen: false,
-      signInOpen: true,
+      activeSection: "signIn",
       passwordForgetFormOpen: false
     }
-
-    this.authContRef = React.createRef()
-    this.loginButtonRef = React.createRef()
   }
 
   componentDidMount() {
@@ -25,75 +24,86 @@ export default class Login extends Component {
     document.removeEventListener("mousedown", this.handleClickOutside)
   }
 
-  toggleAuthContainer = () => {
-    this.setState(prevState => ({ authContOpen: !prevState.authContOpen }))
-  }
-
   handleClickOutside = e => {
-    if (this.loginButtonRef.current === e.target) return
-    if (this.authContRef.current && !this.authContRef.current.contains(e.target)) {
-      this.setState({
-        authContOpen: false
-      })
-    }
+    if (this.loginButtonRef === e.target || !this.authContRef || this.authContRef.contains(e.target)) return
+    this.setState({
+      authContOpen: false
+    })
   }
 
   togglePasswordForget = () => {
-    this.setState(prevState => ({
-      passwordForgetFormOpen: !prevState.passwordForgetFormOpen
-    }))
+    this.setState({ passwordForgetFormOpen: !this.state.passwordForgetFormOpen })
+  }
+
+  renderSection = () => {
+    return this.state.activeSection === "signIn" ? (
+      <>
+        <div className="auth__section">
+          <SignInForm togglePasswordForget={this.togglePasswordForget} />
+        </div>
+        {this.state.passwordForgetFormOpen ? (
+          <div className="auth__section">
+            <PasswordForget />
+          </div>
+        ) : (
+          ""
+        )}
+      </>
+    ) : (
+      this.state.activeSection === "Register" && (
+        <div className="auth__section">
+          <Register />
+        </div>
+      )
+    )
+  }
+
+  renderAuthContainer = () => {
+    if (!this.state.authContOpen) return null
+
+    return (
+      <div
+        ref={_authCont => {
+          this.authContRef = _authCont
+        }}
+        className="auth"
+      >
+        <div className="auth__nav">
+          <div
+            onClick={() => this.setState({ activeSection: "signIn" })}
+            className={classNames("auth__nav-btn", {
+              "auth__nav-btn--active": this.state.activeSection === "signIn"
+            })}
+          >
+            Sign In
+          </div>
+          <div
+            onClick={() => this.setState({ activeSection: "Register" })}
+            className={classNames("auth__nav-btn", {
+              "auth__nav-btn--active": this.state.activeSection === "Register"
+            })}
+          >
+            Register
+          </div>
+        </div>
+        {this.renderSection()}
+      </div>
+    )
   }
 
   render() {
     return (
-      <div className="nav__item--login">
+      <div className="login__container">
         <div
-          ref={this.loginButtonRef}
-          onClick={() => this.toggleAuthContainer()}
-          className="nav__item nav__login-button"
+          ref={_loginButton => {
+            this.loginButtonRef = _loginButton
+          }}
+          onClick={() => this.setState({ authContOpen: !this.state.authContOpen })}
+          className="nav__item nav__item--login"
         >
           Login
         </div>
-        {this.state.authContOpen && (
-          <div ref={this.authContRef} className="nav__login-auth-container">
-            <div className="nav__login-auth">
-              <div
-                onClick={() => this.setState({ signInOpen: true })}
-                className={
-                  this.state.signInOpen ? "nav__login--sign sign--active" : "nav__login--sign"
-                }
-              >
-                Sign In
-              </div>
-              <div
-                onClick={() => this.setState({ signInOpen: false })}
-                className={
-                  !this.state.signInOpen ? "nav__login--sign sign--active" : "nav__login--sign"
-                }
-              >
-                Sign Up
-              </div>
-            </div>
-            {this.state.signInOpen ? (
-              <>
-                <div className="nav__login-form nav__login-form--signin">
-                  <SignInForm togglePasswordForget={this.togglePasswordForget} />
-                </div>
-                {this.state.passwordForgetFormOpen ? (
-                  <div className="nav__login-form nav__login-form--password-forget">
-                    <PasswordForget />
-                  </div>
-                ) : (
-                  ""
-                )}
-              </>
-            ) : (
-              <div className="nav__login-form nav__login-form--signin">
-                <SignUpForm />
-              </div>
-            )}
-          </div>
-        )}
+        {this.renderAuthContainer()}
       </div>
     )
   }

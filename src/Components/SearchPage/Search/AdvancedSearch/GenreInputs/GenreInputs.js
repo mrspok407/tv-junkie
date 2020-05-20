@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react"
+import classNames from "classnames"
 import CheckboxInput from "../InputTemplates/CheckboxInput"
 
 export default function GenreInputs({ toggleGenre, genres }) {
@@ -45,11 +46,9 @@ export default function GenreInputs({ toggleGenre, genres }) {
                     onChange={toggleGenre}
                     data="withGenre"
                     disabled={!!withoutGenre}
-                    className={
-                      withoutGenre
-                        ? "checkbox-genre checkbox-genre--disabled"
-                        : "checkbox-genre"
-                    }
+                    className={classNames("checkbox-genre", {
+                      "checkbox-genre--disabled": withoutGenre
+                    })}
                   />
                 )
               })}
@@ -79,11 +78,9 @@ export default function GenreInputs({ toggleGenre, genres }) {
                     onChange={toggleGenre}
                     data="withoutGenre"
                     disabled={!!withGenre}
-                    className={
-                      withGenre
-                        ? "checkbox-genre checkbox-genre--disabled"
-                        : "checkbox-genre"
-                    }
+                    className={classNames("checkbox-genre", {
+                      "checkbox-genre--disabled": withGenre
+                    })}
                   />
                 )
               })}

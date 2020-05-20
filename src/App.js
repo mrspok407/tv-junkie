@@ -2,6 +2,7 @@ import React, { Component } from "react"
 import { HashRouter as Router, Switch, Route } from "react-router-dom"
 import { compose } from "recompose"
 import Profile from "Components/UserProfile/Profile"
+import Admin from "Components/Admin/Admin"
 import SearchPage from "Components/SearchPage/SearchPage"
 import ShowsPage from "Components/ShowsPage/ShowsPage"
 import MoviesPage from "Components/MoviesPage/MoviesPage"
@@ -22,6 +23,7 @@ class App extends Component {
             <Route path={ROUTES.MOVIES} component={MoviesPage} />
             <Route path={ROUTES.FULL_CONTENT_INFO} component={FullContentInfo} />
             <Route path={ROUTES.PROFILE} component={Profile} />
+            <Route path={ROUTES.ADMIN} component={Admin} />
             <Route path={ROUTES.GRID_TESTS} component={GridTests} />
           </Switch>
         </div>

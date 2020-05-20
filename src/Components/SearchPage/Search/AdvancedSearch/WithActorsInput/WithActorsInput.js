@@ -38,14 +38,11 @@ export default class WithActorsInput extends Component {
 
     this.setState({ error: "", isSearchingActors: true })
     axios
-      .get(
-        `https://api.tmdb.org/3/search/person?api_key=${process.env.REACT_APP_TMDB_API}&query=${query}`,
-        {
-          cancelToken: new CancelToken(function executor(c) {
-            cancelRequest = c
-          })
-        }
-      )
+      .get(`https://api.tmdb.org/3/search/person?api_key=${process.env.REACT_APP_TMDB_API}&query=${query}`, {
+        cancelToken: new CancelToken(function executor(c) {
+          cancelRequest = c
+        })
+      })
       .then(({ data: { results: actors, total_pages: totalPages } }) => {
         this.setState({
           actors,
@@ -84,7 +81,7 @@ export default class WithActorsInput extends Component {
       </div>
     ) : (
       actors.map(({ name, profile_path, id, known_for, known_for_department }) => (
-        <div key={id} className="search-card">
+        <div key={id} className="search-card search-card--person">
           <div
             className="search-card__image search-card__image--person"
             style={
@@ -103,17 +100,13 @@ export default class WithActorsInput extends Component {
             <div className="search-card__info-description">
               {known_for && (
                 <div className="search-card__info-description--person">
-                  <div className="search-card__info-activity">
-                    Main activity: {known_for_department}
-                  </div>
+                  <div className="search-card__info-activity">Main activity: {known_for_department}</div>
                   <div className="search-card__info-person-movies">
                     {known_for.map((item, i) => {
                       const mediaType = item.media_type
 
                       const title =
-                        mediaType === "movie"
-                          ? item.original_title || "No title"
-                          : item.name || "No title"
+                        mediaType === "movie" ? item.original_title || "No title" : item.name || "No title"
 
                       const releaseDate =
                         mediaType === "movie" ? item.release_date || "" : item.first_air_date || ""
@@ -205,10 +198,7 @@ export default class WithActorsInput extends Component {
           )}
         </div>
         {this.state.totalPages === 0 && this.state.query !== "" && this.state.listIsOpen ? (
-          <PlaceholderNoResults
-            message="No results found"
-            handleClickOutside={this.handleClickOutside}
-          />
+          <PlaceholderNoResults message="No results found" handleClickOutside={this.handleClickOutside} />
         ) : (
           this.state.listIsOpen && <div className="search-list">{this.renderActors()}</div>
         )}

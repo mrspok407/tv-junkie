@@ -3,8 +3,10 @@ import React, { Component } from "react"
 import { withRouter } from "react-router-dom"
 import { compose } from "recompose"
 import { withFirebase } from "Components/Firebase"
+import { validEmailRegex } from "Utils"
+import * as ROLES from "Utils/Constants/roles"
+import classNames from "classnames"
 import Input from "../Input/Input"
-import "./SignUp.scss"
 
 const INITIAL_STATE = {
   inputs: {
@@ -24,10 +26,12 @@ const INITIAL_STATE = {
     passwordConfirmOnblur: false,
     error: ""
   },
-  submitClicked: false
+  isAdmin: false,
+  submitClicked: false,
+  submitRequestLoading: false
 }
 
-class SignUpFormBase extends Component {
+class RegisterBase extends Component {
   constructor(props) {
     super(props)
 
@@ -37,14 +41,12 @@ class SignUpFormBase extends Component {
   onSubmit = event => {
     event.preventDefault()
 
-    const requiredInputs = { ...this.state.requiredInputs }
-    const { email, password } = requiredInputs
+    const { email, password } = this.state.requiredInputs
     const errors = { ...this.state.errors }
-    const firebase = this.props.firebase
-    const history = this.props.history
+    const roles = {}
 
-    if (!this.isFormValid(errors, requiredInputs)) {
-      for (const [key, value] of Object.entries(requiredInputs)) {
+    if (!this.isFormValid(errors, this.state.requiredInputs)) {
+      for (const [key, value] of Object.entries(this.state.requiredInputs)) {
         if (value.length === 0) {
           errors[`${key}Error`] = "Required"
         }
@@ -56,16 +58,32 @@ class SignUpFormBase extends Component {
       return
     }
 
-    firebase
+    this.setState({ submitRequestLoading: true })
+
+    this.props.firebase
       .createUserWithEmailAndPassword(email, password)
       .then(authUser => {
+        if (email === "mr.spok407@gmail.com") roles[ROLES.ADMIN] = ROLES.ADMIN
+
+        this.props.firebase
+          .user(authUser.user.uid)
+          .set({
+            username: this.state.inputs.login,
+            email,
+            roles
+          })
+          .then(() => {
+            console.log("sync ok")
+          })
+      })
+      .then(authUser => {
         this.setState({ ...INITIAL_STATE })
-        history.push("/")
+        this.props.history.push("/")
         console.log(`user created: ${authUser}`)
       })
       .catch(error => {
         errors.error = error
-        this.setState({ errors })
+        this.setState({ errors, submitRequestLoading: false })
       })
   }
 
@@ -79,12 +97,11 @@ class SignUpFormBase extends Component {
 
       if (errors[`${name}OnBlur`] || this.state.submitClicked) {
         if (name === "email") {
-          errors[`${name}Error`] = email.includes("@") ? "" : "Invalid email"
+          errors[`${name}Error`] = validEmailRegex.test(email) ? "" : "Invalid email"
         }
 
         if (name === "password") {
-          errors[`${name}Error`] =
-            password.length >= 6 ? "" : "Password should be at least 6 characters"
+          errors[`${name}Error`] = password.length >= 6 ? "" : "Password should be at least 6 characters"
 
           errors.passwordConfirmError =
             password !== passwordConfirm && password.length >= 6 ? "Passwords are not the same" : ""
@@ -92,8 +109,7 @@ class SignUpFormBase extends Component {
 
         if (name === "passwordConfirm") {
           if (password.length >= 6)
-            errors[`${name}Error`] =
-              password !== passwordConfirm ? "Passwords are not the same" : ""
+            errors[`${name}Error`] = password !== passwordConfirm ? "Passwords are not the same" : ""
         }
       }
 
@@ -128,12 +144,11 @@ class SignUpFormBase extends Component {
 
     if (!this.state.submitClicked) {
       if (name === "email") {
-        errors[`${name}Error`] = email.includes("@") ? "" : "Invalid email"
+        errors[`${name}Error`] = validEmailRegex.test(email) ? "" : "Invalid email"
       }
 
       if (name === "password") {
-        errors[`${name}Error`] =
-          password.length >= 6 ? "" : "Password should be at least 6 characters"
+        errors[`${name}Error`] = password.length >= 6 ? "" : "Password should be at least 6 characters"
       }
 
       if (name === "passwordConfirm") {
@@ -149,6 +164,16 @@ class SignUpFormBase extends Component {
 
     this.setState({
       errors
+    })
+  }
+
+  handleKeyDown = e => e.which === 27 && this.resetInput(e.target.name)
+
+  resetInput = name => {
+    this.setState({
+      inputs: { ...this.state.inputs, [`${name}`]: "" },
+      requiredInputs: { ...this.state.requiredInputs, [`${name}`]: "" },
+      errors: { ...this.state.errors, [`${name}Error`]: "" }
     })
   }
 
@@ -179,13 +204,14 @@ class SignUpFormBase extends Component {
     const isValid = this.isFormValid(errors, requiredInputs)
 
     return (
-      <form className="form-auth" onSubmit={this.onSubmit}>
+      <form className="auth__form" onSubmit={this.onSubmit}>
         <Input
-          classNameInput="form-auth__input"
-          classNameLabel="form-auth__label"
+          classNameInput="auth__form-input"
+          classNameLabel="auth__form-label"
           name="login"
           value={login}
           handleOnChange={this.handleOnChange}
+          handleKeyDown={this.handleKeyDown}
           type="text"
           placeholder="Login"
           labelText="Login"
@@ -193,68 +219,71 @@ class SignUpFormBase extends Component {
         />
 
         <Input
-          classNameInput={
-            emailError ? "form-auth__input form-auth__input--error" : "form-auth__input"
-          }
-          classNameLabel="form-auth__label"
+          classNameInput={classNames("auth__form-input", {
+            "auth__form-input--error": emailError
+          })}
+          classNameLabel="auth__form-label"
           name="email"
           value={email}
           handleOnChange={this.handleOnChange}
           handleValidation={this.handleValidationOnblur}
+          handleKeyDown={this.handleKeyDown}
           type="text"
           placeholder="Email Address"
           labelText="Email"
           withLabel
         />
-        <div className="form-auth__error">{emailError}</div>
+        <div className="auth__form-error">{emailError}</div>
 
         <Input
-          classNameInput={
-            passwordError ? "form-auth__input form-auth__input--error" : "form-auth__input"
-          }
-          classNameLabel="form-auth__label"
+          classNameInput={classNames("auth__form-input", {
+            "auth__form-input--error": passwordError
+          })}
+          classNameLabel="auth__form-label"
           name="password"
           value={password}
           handleOnChange={this.handleOnChange}
           handleValidation={this.handleValidationOnblur}
+          handleKeyDown={this.handleKeyDown}
           type="password"
           placeholder="Password"
           labelText="Password"
           withLabel
         />
-        <div className="form-auth__error">{passwordError}</div>
+        <div className="auth__form-error">{passwordError}</div>
 
         <Input
-          classNameInput={
-            passwordConfirmError ? "form-auth__input form-auth__input--error" : "form-auth__input"
-          }
-          classNameLabel="form-auth__label"
+          classNameInput={classNames("auth__form-input", {
+            "auth__form-input--error": passwordConfirmError
+          })}
+          classNameLabel="auth__form-label"
           name="passwordConfirm"
           value={passwordConfirm}
           handleOnChange={this.handleOnChange}
           handleValidation={this.handleValidationOnblur}
+          handleKeyDown={this.handleKeyDown}
           type="password"
           placeholder="Password"
           labelText="Confirm Password"
           withLabel
         />
-        <div className="form-auth__error">{passwordConfirmError}</div>
+        <div className="auth__form-error">{passwordConfirmError}</div>
 
-        {error && <div className="form-auth__error">{error.message}</div>}
+        {error && <div className="auth__form-error">{error.message}</div>}
 
         <button
-          className={
-            !isValid ? "button button--form-auth button--disabled" : "button button--form-auth"
-          }
+          className={classNames("button button--auth__form", {
+            "button--disabled": !isValid
+          })}
           type="submit"
         >
-          Sign Up
+          {this.state.submitRequestLoading ? <span className="auth__form-loading"></span> : "Register"}
         </button>
       </form>
     )
   }
 }
 
-const SignUpForm = compose(withRouter, withFirebase)(SignUpFormBase)
+const Register = compose(withRouter, withFirebase)(RegisterBase)
 
-export default SignUpForm
+export default Register

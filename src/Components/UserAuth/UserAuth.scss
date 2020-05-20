@@ -1,9 +1,80 @@
-.form-auth {
+@import "../../styles/globals";
+
+.auth {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 300px;
+  color: #000;
+  background-color: #fff;
+  border-radius: 10px;
+  transform: translate(0, -10px);
+  opacity: 0;
+  z-index: 10;
+  animation: showAuthContainer 0.35s forwards;
+  @keyframes showAuthContainer {
+    to {
+      opacity: 1;
+      transform: translate(0, 0);
+    }
+  }
+}
+
+.auth__nav {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: 50px;
+
+  &-btn {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1f1f1f;
+    cursor: pointer;
+
+    &:after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      border-radius: 5px;
+      opacity: 0;
+      transition: 0.2s;
+    }
+
+    &:hover:after {
+      opacity: 1;
+      background-color: getColor(blueClr, $mainPalette);
+    }
+
+    &--active {
+      &:after {
+        opacity: 1;
+        background-color: getColor(orangeClr, $mainPalette);
+      }
+      &:hover:after {
+        background-color: getColor(orangeClr, $mainPalette);
+      }
+    }
+  }
+}
+
+.auth__section {
+  display: flex;
+  justify-content: center;
+}
+
+.auth__form {
   display: flex;
   flex-direction: column;
   width: 90%;
 
-  &__input {
+  &-input {
     border: 1px solid #ececec;
     line-height: 20px;
     padding: 10px;
@@ -19,13 +90,44 @@
     }
   }
 
-  &__label {
+  &-label {
     font-weight: 600;
     padding-top: 10px;
     padding-bottom: 7px;
   }
 
-  &__error {
+  &-error {
     padding: 5px 5px 0 5px;
+  }
+
+  &-password-link {
+    padding-top: 5px;
+    padding-left: 1px;
+    width: 115px;
+    font-size: 0.8rem;
+    color: getColor(blueClr, $mainPalette);
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &-password-message {
+    padding: 4px;
+  }
+}
+
+.auth__form-loading {
+  width: 27px;
+  height: 27px;
+  border-radius: 50%;
+  border: 4px solid #fff;
+  border-left-color: transparent;
+  animation: authFormLoading 0.5s linear infinite;
+  @keyframes authFormLoading {
+    to {
+      transform: rotate(360deg);
+    }
   }
 }

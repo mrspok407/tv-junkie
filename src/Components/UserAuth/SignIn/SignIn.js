@@ -3,8 +3,9 @@ import React, { Component } from "react"
 import { withRouter } from "react-router-dom"
 import { compose } from "recompose"
 import { withFirebase } from "Components/Firebase"
+import { validEmailRegex } from "Utils"
+import classNames from "classnames"
 import Input from "../Input/Input"
-import "./SignIn.scss"
 
 const INITIAL_STATE = {
   requiredInputs: {
@@ -15,10 +16,11 @@ const INITIAL_STATE = {
     emailError: "",
     emailOnBlur: false,
     passwordError: "",
-    passwordOnBlur: false,
     error: ""
   },
-  submitClicked: false
+  submitClicked: false,
+  submitRequestLoading: false,
+  prevMovies: []
 }
 
 class SignInFormBase extends Component {
@@ -30,14 +32,11 @@ class SignInFormBase extends Component {
 
   onSubmit = event => {
     event.preventDefault()
-    const requiredInputs = { ...this.state.requiredInputs }
-    const { email, password } = requiredInputs
+    const { email, password } = this.state.requiredInputs
     const errors = { ...this.state.errors }
-    const firebase = this.props.firebase
-    const history = this.props.history
 
-    if (!this.isFormValid(errors, requiredInputs)) {
-      for (const [key, value] of Object.entries(requiredInputs)) {
+    if (!this.isFormValid(errors, this.state.requiredInputs)) {
+      for (const [key, value] of Object.entries(this.state.requiredInputs)) {
         if (value.length === 0) {
           errors[`${key}Error`] = "Required"
         }
@@ -49,16 +48,18 @@ class SignInFormBase extends Component {
       return
     }
 
-    firebase
+    this.setState({ submitRequestLoading: true })
+
+    this.props.firebase
       .signInWithEmailAndPassword(email, password)
       .then(authUser => {
         this.setState({ ...INITIAL_STATE })
-        history.push("/")
+        this.props.history.push("/")
         console.log(`user sign in: ${authUser}`)
       })
       .catch(error => {
         errors.error = error
-        this.setState({ errors })
+        this.setState({ errors, submitRequestLoading: false })
       })
   }
 
@@ -67,17 +68,15 @@ class SignInFormBase extends Component {
     const { value, name } = event.target
 
     const validation = () => {
-      const { email, password } = this.state.requiredInputs
+      const { email } = this.state.requiredInputs
       const errors = { ...this.state.errors }
 
       if (errors[`${name}OnBlur`] || this.state.submitClicked) {
         if (name === "email") {
-          errors[`${name}Error`] = email.includes("@") ? "" : "Invalid email"
+          errors[`${name}Error`] = validEmailRegex.test(email) ? "" : "Invalid email"
         }
-
         if (name === "password") {
-          errors[`${name}Error`] =
-            password.length >= 6 ? "" : "Password should be at least 6 characters"
+          errors.passwordError = ""
         }
       }
 
@@ -104,19 +103,18 @@ class SignInFormBase extends Component {
     event.preventDefault()
 
     const { value, name } = event.target
-    const { email, password } = this.state.requiredInputs
+    const { email } = this.state.requiredInputs
     const errors = { ...this.state.errors }
 
     errors[`${name}OnBlur`] = true
 
     if (!this.state.submitClicked) {
       if (name === "email") {
-        errors[`${name}Error`] = email.includes("@") ? "" : "Invalid email"
+        errors[`${name}Error`] = validEmailRegex.test(email) ? "" : "Invalid email"
       }
 
       if (name === "password") {
-        errors[`${name}Error`] =
-          password.length >= 6 ? "" : "Password should be at least 6 characters"
+        errors.passwordError = ""
       }
 
       if (value === "") {
@@ -127,6 +125,15 @@ class SignInFormBase extends Component {
 
     this.setState({
       errors
+    })
+  }
+
+  handleKeyDown = e => e.which === 27 && this.resetInput(e.target.name)
+
+  resetInput = name => {
+    this.setState({
+      requiredInputs: { ...this.state.requiredInputs, [`${name}`]: "" },
+      errors: { ...this.state.errors, [`${name}Error`]: "" }
     })
   }
 
@@ -156,51 +163,54 @@ class SignInFormBase extends Component {
     const isValid = this.isFormValid(errors, requiredInputs)
 
     return (
-      <form className="form-auth" onSubmit={this.onSubmit}>
+      <form className="auth__form" onSubmit={this.onSubmit}>
         <Input
-          classNameInput={
-            emailError ? "form-auth__input form-auth__input--error" : "form-auth__input"
-          }
-          classNameLabel="form-auth__label"
+          classNameInput={classNames("auth__form-input", {
+            "auth__form-input--error": emailError
+          })}
+          classNameLabel="auth__form-label"
           name="email"
           value={email}
           handleOnChange={this.handleOnChange}
           handleValidation={this.handleValidationOnblur}
+          handleKeyDown={this.handleKeyDown}
           type="text"
           placeholder="Email Address"
           labelText="Email"
           withLabel
         />
-        <div className="form-auth__error">{emailError}</div>
+        <div className="auth__form-error">{emailError}</div>
 
         <Input
-          classNameInput={
-            passwordError ? "form-auth__input form-auth__input--error" : "form-auth__input"
-          }
-          classNameLabel="form-auth__label"
+          classNameInput={classNames("auth__form-input", {
+            "auth__form-input--error": passwordError
+          })}
+          classNameLabel="auth__form-label"
           name="password"
           value={password}
           handleOnChange={this.handleOnChange}
-          handleValidation={this.handleValidationOnblur}
+          handleKeyDown={this.handleKeyDown}
           type="password"
           placeholder="Password"
           labelText="Password"
           withLabel
         />
-        <span onClick={this.props.togglePasswordForget} className="password-forget-link">
+
+        <div className="auth__form-error">{passwordError}</div>
+
+        {error && <div className="auth__form-error">{error.message}</div>}
+
+        <span onClick={this.props.togglePasswordForget} className="auth__form-password-link">
           Forget password?
         </span>
-        <div className="form-auth__error">{passwordError}</div>
-
-        {error && <div className="form-auth__error">{error.message}</div>}
 
         <button
-          className={
-            !isValid ? "button button--form-auth button--disabled" : "button button--form-auth"
-          }
+          className={classNames("button button--auth__form", {
+            "button--disabled": !isValid
+          })}
           type="submit"
         >
-          Sign In
+          {this.state.submitRequestLoading ? <span className="auth__form-loading"></span> : "Sign In"}
         </button>
       </form>
     )
