@@ -1,7 +1,7 @@
 import React from "react"
 import { Link } from "react-router-dom"
 import "./SelectedContent.scss"
-import { withSelectedContextConsumer } from "Components/SelectedContentContext"
+import { withUserContent } from "Components/UserContent"
 import { compose } from "recompose"
 
 class MovieResultsSelected extends React.PureComponent {
@@ -17,28 +17,10 @@ class MovieResultsSelected extends React.PureComponent {
   }
 
   componentDidMount() {
-    // const firebase = this.props.firebase
-
-    // firebase.auth.onAuthStateChanged(authUser => {
-    //   firebase.userWatchingTvShows(authUser.uid).on("value", snapshot => {
-    //     const watchingTvShows = snapshot.val() || {}
-
-    //     const watchingTvShowsList = Object.keys(watchingTvShows).map(key => ({
-    //       ...watchingTvShows[key],
-    //       uid: key
-    //     }))
-
-    //     this.setState({
-    //       watchingTvShows: watchingTvShowsList
-    //     })
-    //   })
-    // })
-
     document.addEventListener("mousedown", this.handleClickOutside)
   }
 
   componentWillUnmount() {
-    // this.props.firebase.userWatchingTvShows().off()
     document.removeEventListener("mousedown", this.handleClickOutside)
   }
 
@@ -51,10 +33,10 @@ class MovieResultsSelected extends React.PureComponent {
   }
 
   render() {
-    const { toggleContent, clearSelectedContent } = this.props.selectedContentState
+    const watchingTvShows = this.props.userContent.watchingTvShows.filter(item => item.userWatching && item)
     return (
       <>
-        {this.props.watchingTvShows.length > 0 && (
+        {watchingTvShows.length > 0 && (
           <div ref={this.selectedContentRef} className="selected-content__container">
             <button
               type="button"
@@ -65,17 +47,13 @@ class MovieResultsSelected extends React.PureComponent {
                 }))
               }
             >
-              {this.props.watchingTvShows.length}
+              {watchingTvShows.length}
             </button>
             {this.state.showSelected && (
               <div className="selected-content__list">
-                <div className="selected-content__button-clear">
-                  <button type="button" className="button" onClick={() => clearSelectedContent()}>
-                    Clear Selected
-                  </button>
-                </div>
+                <div className="selected-content__button-clear"></div>
 
-                {this.props.watchingTvShows.map(
+                {watchingTvShows.map(
                   ({
                     original_title = "",
                     original_name = "",
@@ -122,7 +100,11 @@ class MovieResultsSelected extends React.PureComponent {
                           </div>
                         </Link>
                         <div className="selected-content__item-button">
-                          <button className="button" type="button" onClick={() => toggleContent(id)}>
+                          <button
+                            className="button"
+                            type="button"
+                            onClick={() => this.props.userContent.toggleContent(id)}
+                          >
                             Remove
                           </button>
                         </div>
@@ -139,4 +121,4 @@ class MovieResultsSelected extends React.PureComponent {
   }
 }
 
-export default compose(withSelectedContextConsumer)(MovieResultsSelected)
+export default compose(withUserContent)(MovieResultsSelected)

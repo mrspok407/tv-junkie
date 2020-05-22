@@ -1,7 +1,7 @@
 import React, { Component } from "react"
 import { Link } from "react-router-dom"
 import classNames from "classnames"
-import { withSelectedContextConsumer } from "Components/SelectedContentContext"
+import { withUserContent } from "Components/UserContent"
 
 class SearchCard extends Component {
   render() {
@@ -18,13 +18,10 @@ class SearchCard extends Component {
       known_for_department,
       searchResults,
       mediaType,
-      mediaTypeSearching,
-      selectedContentState
+      mediaTypeSearching
     } = this.props
 
     const type = movieTitle ? "movie" : showTitle && "show"
-
-    const { toggleContent } = selectedContentState
 
     return (
       <div
@@ -62,10 +59,10 @@ class SearchCard extends Component {
             </Link>
             <div className="search-card__buttons">
               <div className="search-card__add-movie-btn">
-                {this.props.selectedContentState.selectedContent.some(e => e.id === id) ? (
+                {this.props.userContent.watchingTvShows.some(e => e.id === id) ? (
                   <button
                     className="button button--searchlist button--pressed"
-                    onClick={() => toggleContent(id, searchResults)}
+                    onClick={() => this.props.userContent.toggleContent(id, searchResults)}
                     type="button"
                   >
                     Remove {mediaType === "movie" || mediaTypeSearching === "movie" ? "movie" : "show"}
@@ -73,7 +70,7 @@ class SearchCard extends Component {
                 ) : (
                   <button
                     className="button button--searchlist"
-                    onClick={() => toggleContent(id, searchResults)}
+                    onClick={() => this.props.userContent.toggleContent(id, searchResults)}
                     type="button"
                   >
                     Add {mediaType === "movie" || mediaTypeSearching === "movie" ? "movie" : "show"}
@@ -138,4 +135,4 @@ class SearchCard extends Component {
   }
 }
 
-export default withSelectedContextConsumer(SearchCard)
+export default withUserContent(SearchCard)

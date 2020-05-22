@@ -2,7 +2,7 @@ import React from "react"
 import { Link } from "react-router-dom"
 import { listOfGenres } from "Utils"
 import classNames from "classnames"
-import { withSelectedContextConsumer } from "Components/SelectedContentContext"
+import { withUserContent } from "Components/UserContent"
 import "./ContentResults.scss"
 import Loader from "Components/Placeholders/Loader"
 
@@ -27,10 +27,8 @@ const ContentResults = ({
   showsIds,
   moviesIds,
   error,
-  selectedContentState
+  userContent
 }) => {
-  const { toggleContent, addToDroppedShows } = selectedContentState
-
   function showLinksToAll() {
     const showAllLinksPressed = true
     if (contentType === "shows") {
@@ -326,16 +324,23 @@ const ContentResults = ({
                   <>
                     {contentType === "adv-search" ? (
                       <div className="content-results__item-links content-results__item-links--adv-search">
+                        {/* <button
+                          className="button button--pressed"
+                          onClick={() => userContent.toggleContent(id, watchingTvShows)}
+                          type="button"
+                        >
+                          Remove {original_title ? "movie" : "show"}
+                        </button> */}
                         <button
                           className="button button--pressed"
-                          onClick={() => toggleContent(id, watchingTvShows)}
+                          onClick={() => userContent.removeWatchingTvShow(id)}
                           type="button"
                         >
                           Remove {original_title ? "movie" : "show"}
                         </button>
                         <button
                           className="button"
-                          onClick={() => addToDroppedShows(id, contentArr)}
+                          onClick={() => userContent.addToDroppedShows(id, contentArr)}
                           type="button"
                         >
                           Add to dropped {original_title ? "movie" : "show"}
@@ -344,19 +349,30 @@ const ContentResults = ({
                     ) : (
                       <button
                         className="button--del-item"
-                        onClick={() => toggleContent(id, watchingTvShows)}
+                        onClick={() => userContent.toggleContent(id, watchingTvShows)}
                         type="button"
                       />
                     )}
                   </>
                 ) : (
                   <div className="content-results__item-links content-results__item-links--adv-search">
-                    <button className="button" onClick={() => toggleContent(id, contentArr)} type="button">
+                    {/* <button
+                      className="button"
+                      onClick={() => userContent.toggleContent(id, contentArr)}
+                      type="button"
+                    >
+                      Add {original_title ? "movie" : "show"}
+                    </button> */}
+                    <button
+                      className="button"
+                      onClick={() => userContent.addWatchingTvShow(id, contentArr)}
+                      type="button"
+                    >
                       Add {original_title ? "movie" : "show"}
                     </button>
                     <button
                       className="button"
-                      onClick={() => addToDroppedShows(id, contentArr)}
+                      onClick={() => userContent.addToDroppedShows(id, contentArr)}
                       type="button"
                     >
                       Add to dropped {original_title ? "movie" : "show"}
@@ -372,4 +388,4 @@ const ContentResults = ({
   )
 }
 
-export default withSelectedContextConsumer(ContentResults)
+export default withUserContent(ContentResults)

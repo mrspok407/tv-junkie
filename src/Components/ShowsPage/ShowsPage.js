@@ -2,13 +2,12 @@ import React, { Component } from "react"
 import axios, { CancelToken } from "axios"
 import ContentResults from "Components/Templates/ContentResults/ContentResults"
 import PlaceholderNoSelectedContent from "Components/Placeholders/PlaceholderNoSelectedContent"
-import { withSelectedContextConsumer } from "Components/SelectedContentContext"
+import { withUserContent } from "Components/UserContent"
 import ScrollToTop from "Utils/ScrollToTop"
 import "./ShowsPage.scss"
 import HeaderBase from "Components/Header/Header"
 import { withFirebase } from "Components/Firebase/FirebaseContext"
 import { compose } from "recompose"
-import { WithAuthenticationConsumer } from "Components/UserAuth/Session/WithAuthentication"
 
 let cancelRequest
 
@@ -23,36 +22,14 @@ class Shows extends Component {
       loadingIds: [],
       showsIds: [],
       showAllLinksPressed: false,
-      error: "",
-      watchingTvShows: []
+      error: ""
     }
-  }
-
-  componentDidMount() {
-    // const firebase = this.props.firebase
-    // firebase.auth.onAuthStateChanged(authUser => {
-    //   firebase.userWatchingTvShows(authUser.uid).on("value", snapshot => {
-    //     const watchingTvShows = snapshot.val() || {}
-    //     const watchingTvShowsList = Object.keys(watchingTvShows).map(key => ({
-    //       ...watchingTvShows[key],
-    //       uid: key
-    //     }))
-    //     this.setState({
-    //       watchingTvShows: watchingTvShowsList
-    //     })
-    //   })
-    // })
-    // this.props.selectedContentState.getContent()
   }
 
   componentWillUnmount() {
     if (cancelRequest !== undefined) {
       cancelRequest()
     }
-
-    // this.props.selectedContentState.unmountFirebaseListener(this.props.authUser)
-
-    // this.props.firebase.userWatchingTvShows(this.props.authUser.uid).off()
   }
 
   getLastEpisodeLinks = (id, showAllLinksPressed) => {
@@ -86,19 +63,15 @@ class Shows extends Component {
   }
 
   render() {
-    console.log(this.props.droppedTvShows)
-    // const onlyShows = this.props.selectedContentState.selectedContent.filter(item => item.original_name)
-    // const onlyShows = this.state.watchingTvShows
+    const watchingTvShows = this.props.userContent.watchingTvShows.filter(item => item.userWatching && item)
     return (
       <>
         <Header />
-        {this.props.watchingTvShows.length ? (
+        {watchingTvShows.length ? (
           <ContentResults
             contentType="shows"
-            // contentArr={this.state.watchingTvShows}
-            contentArr={this.props.watchingTvShows}
-            // watchingTvShows={this.state.watchingTvShows}
-            watchingTvShows={this.props.watchingTvShows}
+            contentArr={watchingTvShows}
+            watchingTvShows={watchingTvShows}
             getLastEpisodeLinks={this.getLastEpisodeLinks}
             showsArr={this.state.showsArr}
             loadingIds={this.state.loadingIds}
@@ -115,4 +88,4 @@ class Shows extends Component {
   }
 }
 
-export default compose(withSelectedContextConsumer)(Shows)
+export default compose(withUserContent)(Shows)

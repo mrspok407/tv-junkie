@@ -10,7 +10,6 @@ import FullContentInfo from "Components/Templates/FullContentInfo/FullContentInf
 import GridTests from "Utils/GridTests/GridTests"
 import * as ROUTES from "Utils/Constants/routes"
 import { WithAuthenticationProvider } from "Components/UserAuth/Session/WithAuthentication"
-import { withSelectedContextProvider } from "Components/SelectedContentContext"
 
 class App extends Component {
   render() {
@@ -32,4 +31,4 @@ class App extends Component {
   }
 }
 
-export default compose(withSelectedContextProvider, WithAuthenticationProvider)(App)
+export default compose(WithAuthenticationProvider)(App)

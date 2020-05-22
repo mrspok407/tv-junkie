@@ -1,5 +1,5 @@
 import React, { Component } from "react"
-import { withSelectedContextConsumer } from "Components/SelectedContentContext"
+import { withUserContent } from "Components/UserContent"
 import "./GridTests.scss"
 
 const POSTER_URL = "https://image.tmdb.org/t/p/w500"
@@ -14,7 +14,7 @@ class GridTests extends Component {
   }
 
   componentDidMount() {
-    this.setState({ content: this.props.selectedContentState.selectedContent.slice(0, 10) })
+    this.setState({ content: this.props.userContent.watchingTvShows.slice(0, 10) })
   }
 
   deleteItem = id => {
@@ -43,4 +43,4 @@ class GridTests extends Component {
   }
 }
 
-export default withSelectedContextConsumer(GridTests)
+export default withUserContent(GridTests)

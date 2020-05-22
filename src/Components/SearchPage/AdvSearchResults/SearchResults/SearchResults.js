@@ -1,10 +1,9 @@
 import React from "react"
-import { withFirebase } from "Components/Firebase/FirebaseContext"
 import { compose } from "recompose"
 import Loader from "Components/Placeholders/Loader"
 import ContentResults from "Components/Templates/ContentResults/ContentResults"
 import "./SearchResults.scss"
-import { withSelectedContextConsumer } from "Components/SelectedContentContext"
+import { withUserContent } from "Components/UserContent"
 
 class MovieResultsAdvSearch extends React.PureComponent {
   constructor(props) {
@@ -42,7 +41,7 @@ class MovieResultsAdvSearch extends React.PureComponent {
       <>
         <ContentResults
           contentArr={this.props.advancedSearchContent}
-          watchingTvShows={this.props.watchingTvShows}
+          watchingTvShows={this.props.userContent.watchingTvShows}
           toggleContentArr={this.props.advancedSearchContent}
           advancedSearchContent={this.props.advancedSearchContent}
           clearAdvSearchMovies={this.props.clearAdvSearchMovies}
@@ -54,4 +53,4 @@ class MovieResultsAdvSearch extends React.PureComponent {
   }
 }
 
-export default compose(withSelectedContextConsumer)(MovieResultsAdvSearch)
+export default compose(withUserContent)(MovieResultsAdvSearch)

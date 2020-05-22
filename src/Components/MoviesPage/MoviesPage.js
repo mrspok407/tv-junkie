@@ -2,7 +2,7 @@ import React, { Component } from "react"
 import axios, { CancelToken } from "axios"
 import ContentResults from "Components/Templates/ContentResults/ContentResults"
 import PlaceholderNoSelectedContent from "Components/Placeholders/PlaceholderNoSelectedContent"
-import { withSelectedContextConsumer } from "Components/SelectedContentContext"
+import { withUserContent } from "Components/UserContent"
 import ScrollToTop from "Utils/ScrollToTop"
 import "./MoviesPage.scss"
 import Header from "../Header/Header"
@@ -61,9 +61,7 @@ class Movies extends Component {
   }
 
   render() {
-    const onlyMovies = this.props.selectedContentState.selectedContent.filter(
-      item => item.original_title
-    )
+    const onlyMovies = this.props.selectedContentState.selectedContent.filter(item => item.original_title)
     return (
       <>
         <Header />
@@ -88,4 +86,4 @@ class Movies extends Component {
   }
 }
 
-export default withSelectedContextConsumer(Movies)
+export default withUserContent(Movies)

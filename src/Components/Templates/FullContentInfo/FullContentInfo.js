@@ -5,7 +5,7 @@ import React, { useState, useEffect } from "react"
 import { useLocation } from "react-router-dom"
 import axios, { CancelToken } from "axios"
 import classNames from "classnames"
-import { withSelectedContextConsumer } from "Components/SelectedContentContext"
+import { withUserContent } from "Components/UserContent"
 import PlaceholderLoadingFullInfo from "Components/Placeholders/PlaceholderLoadingFullInfo/PlaceholderLoadingFullInfo"
 import ScrollToTop from "Utils/ScrollToTop"
 import Header from "Components/Header/Header"
@@ -21,7 +21,7 @@ const FullContentInfo = ({
   match: {
     params: { id, mediaType }
   },
-  selectedContentState
+  userContent
 }) => {
   const [options, setOptions] = useState({
     poster: "",
@@ -64,7 +64,9 @@ const FullContentInfo = ({
   const [error, setError] = useState()
   const [errorShowEpisodes, setErrorShowEpisodes] = useState()
 
-  const { selectedContent, toggleContent } = selectedContentState
+  // const { selectedContent, toggleContent } = selectedContentState
+
+  const watchingTvShows = userContent.watchingTvShows.filter(item => item.userWatching && item)
 
   const { pathname } = useLocation()
 
@@ -516,10 +518,10 @@ const FullContentInfo = ({
               )}
 
               <div className="full-detailes__info-row full-detailes__info--button">
-                {selectedContent.some(e => e.id === Number(id)) ? (
+                {watchingTvShows.some(e => e.id === Number(id)) ? (
                   <button
                     className="button button--searchlist button--pressed"
-                    onClick={() => toggleContent(Number(id), infoToPass)}
+                    onClick={() => userContent.toggleContent(Number(id), infoToPass)}
                     type="button"
                   >
                     Remove {mediaType === "movie" ? "movie" : "show"}
@@ -527,7 +529,7 @@ const FullContentInfo = ({
                 ) : (
                   <button
                     className="button button--searchlist"
-                    onClick={() => toggleContent(Number(id), infoToPass)}
+                    onClick={() => userContent.toggleContent(Number(id), infoToPass)}
                     type="button"
                   >
                     Add {mediaType === "movie" ? "movie" : "show"}
@@ -752,4 +754,4 @@ const FullContentInfo = ({
   )
 }
 
-export default withSelectedContextConsumer(FullContentInfo)
+export default withUserContent(FullContentInfo)

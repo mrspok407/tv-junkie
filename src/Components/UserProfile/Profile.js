@@ -1,12 +1,10 @@
 import React, { Component } from "react"
 import { compose } from "recompose"
-import { withFirebase } from "Components/Firebase"
 import SignOutButton from "Components/UserAuth/SignOut/SignOutButton"
 import WithAuthorization from "Components/UserAuth/Session/WithAuthorization/WithAuthorization"
-import { WithAuthenticationConsumer } from "Components/UserAuth/Session/WithAuthentication"
 import "./Profile.scss"
 import Header from "Components/Header/Header"
-import { withSelectedContextConsumer } from "Components/SelectedContentContext"
+import { withUserContent } from "Components/UserContent"
 
 class Profile extends Component {
   constructor(props) {
@@ -56,7 +54,7 @@ class Profile extends Component {
         <div className="user-profile">
           <SignOutButton />
           {userEmail}
-          {this.props.watchingTvShows.map(({ title, name, id }) => (
+          {this.props.userContent.watchingTvShows.map(({ title, name, id }) => (
             <div key={id}>{title || name}</div>
           ))}
           <div>
@@ -79,4 +77,4 @@ class Profile extends Component {
 
 const condition = authUser => authUser !== null
 
-export default compose(withSelectedContextConsumer, WithAuthorization(condition))(Profile)
+export default compose(withUserContent, WithAuthorization(condition))(Profile)

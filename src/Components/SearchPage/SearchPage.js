@@ -6,7 +6,7 @@ import Search from "./Search/Search"
 import ContentResultsAdvSearch from "./AdvSearchResults/SearchResults/SearchResults"
 import ContentResultsSelected from "./AdvSearchResults/SelectedContent/SelectedContent"
 import PlaceholderNoResults from "Components/Placeholders/PlaceholderNoResults"
-import { withSelectedContextConsumer } from "Components/SelectedContentContext"
+import { withUserContent } from "Components/UserContent"
 import ScrollToTop from "Utils/ScrollToTop"
 import Header from "Components/Header/Header"
 
@@ -321,7 +321,6 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
         />
         {this.renderAdvMovies()}
         <ContentResultsSelected />
-        {/* {this.props.watchingTvShows.length > 0 && } */}
         <ScrollToTop />
         {/* <Footer /> */}
       </>
@@ -329,4 +328,4 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
   }
 }
 
-export default compose(withSelectedContextConsumer)(MainPage)
+export default compose(withUserContent)(MainPage)
