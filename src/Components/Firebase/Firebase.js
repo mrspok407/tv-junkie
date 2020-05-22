@@ -34,7 +34,12 @@ class Firebase {
 
   user = uid => this.db.ref(`users/${uid}`)
 
-  userMovies = uid => this.db.ref(`users/${uid}/movies`)
+  // userWatchingTvShows = uid => this.db.ref(`users/${uid}/watchingtvshows`)
+  userContent = uid => this.db.ref(`users/${uid}/content`)
+
+  userWatchingTvShows = uid => this.db.ref(`users/${uid}/content/watchingtvshows`)
+
+  userDroppedTvShows = uid => this.db.ref(`users/${uid}/content/droppedtvshows`)
 
   users = () => this.db.ref("users")
 
@@ -49,7 +54,8 @@ class Firebase {
             authUser = {
               uid: authUser.uid,
               email: authUser.email,
-              roles: dbUser.roles || {}
+              roles: dbUser.roles || {},
+              emailVerified: authUser.emailVerified
             }
             next(authUser)
           })

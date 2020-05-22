@@ -11,70 +11,104 @@ const withSelectedContextProvider = Component => {
     constructor(props) {
       super(props)
 
-      this.toggleContent = (id, contentArr) => {
-        const newSelectedContent = [...this.state.selectedContent]
-        const indexInSelected = newSelectedContent.findIndex(e => e.id === id)
-
-        if (indexInSelected !== -1) {
-          newSelectedContent.splice(indexInSelected, 1)
-          this.setState({
-            selectedContent: newSelectedContent
-          })
-        } else {
-          const indexInContentArr = contentArr.findIndex(e => e.id === id)
-          const content = contentArr[indexInContentArr]
-          this.setState({
-            selectedContent: [content, ...newSelectedContent]
-          })
-        }
-
-        this.props.firebase.auth.onAuthStateChanged(authUser => {
-          const item = contentArr.find(item => item.id === id)
-          let movieExist
-
-          this.props.firebase
-            .userMovies(authUser.uid)
-            .orderByChild("id")
-            .equalTo(id)
-            .once("value", snapshot => {
-              movieExist = snapshot.val() !== null
-            })
-            .then(() => {
-              if (movieExist) {
-                this.props.firebase
-                  .userMovies(authUser.uid)
-                  .orderByChild("id")
-                  .equalTo(id)
-                  .once("value", snapshot => {
-                    const updates = {}
-                    snapshot.forEach(child => (updates[child.key] = null))
-                    this.props.firebase.userMovies(authUser.uid).update(updates)
-                  })
-              } else {
-                this.props.firebase
-                  .userMovies(authUser.uid)
-                  .push()
-                  .set(item)
-              }
-            })
-        })
-      }
-
-      this.clearSelectedContent = () => {
-        this.setState({
-          selectedContent: []
-        })
-      }
-
       this.state = {
-        selectedContent: JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_CONTENT)) || [],
         toggleContent: this.toggleContent,
-        clearSelectedContent: this.clearSelectedContent
+        addToDroppedShows: this.addToDroppedShows
       }
     }
 
-    componentDidUpdate() {
-      localStorage.setItem(LOCAL_STORAGE_KEY_CONTENT, JSON.stringify(this.state.selectedContent))
+    toggleContent = (id, contentArr) => {
+      const firebase = this.props.firebase
+
+      firebase.auth.onAuthStateChanged(authUser => {
+        const item = contentArr && contentArr.find(item => item.id === id)
+        const itemUpdated = { ...item, userWatching: true }
+        let movieExist
+
+        firebase
+          .userWatchingTvShows(authUser.uid)
+          .orderByChild("id")
+          .equalTo(id)
+          .once("value", snapshot => {
+            movieExist = snapshot.val() !== null
+          })
+          .then(() => {
+            if (movieExist) {
+              firebase
+                .userWatchingTvShows(authUser.uid)
+                .orderByChild("id")
+                .equalTo(id)
+                .once("value", snapshot => {
+                  const updates = {}
+                  snapshot.forEach(
+                    child =>
+                      (updates[child.key] = {
+                        ...snapshot.val()[child.key],
+                        userWatching: !snapshot.val()[child.key].userWatching
+                      })
+                  )
+                  firebase.userWatchingTvShows(authUser.uid).update(updates)
+                })
+            } else {
+              firebase
+                .userDroppedTvShows(authUser.uid)
+                .orderByChild("id")
+                .equalTo(id)
+                .once("value", snapshot => {
+                  const updates = {}
+                  snapshot.forEach(child => (updates[child.key] = null))
+                  firebase.userDroppedTvShows(authUser.uid).update(updates)
+                })
+                .then(() => {
+                  firebase
+                    .userWatchingTvShows(authUser.uid)
+                    .push()
+                    .set(itemUpdated)
+                })
+            }
+          })
+      })
+    }
+
+    addToDroppedShows = (id, contentArr) => {
+      const firebase = this.props.firebase
+
+      firebase.auth.onAuthStateChanged(authUser => {
+        const item = contentArr && contentArr.find(item => item.id === id)
+        const itemUpdated = { ...item, userWatching: true }
+        let itemExist
+
+        firebase
+          .userContent(authUser.uid)
+          .once("value", snapshot => {
+            const userContent = snapshot.val()
+            const userWatchingTvShows = userContent.watchingtvshows
+            const watchingTvShowsList = Object.keys(userWatchingTvShows).map(key => ({
+              ...userWatchingTvShows[key],
+              uid: key
+            }))
+
+            itemExist = watchingTvShowsList.some(item => item.id === id)
+
+            if (itemExist) {
+              firebase
+                .userWatchingTvShows(authUser.uid)
+                .orderByChild("id")
+                .equalTo(id)
+                .once("value", snapshot => {
+                  const updates = {}
+                  snapshot.forEach(child => (updates[child.key] = null))
+                  firebase.userWatchingTvShows(authUser.uid).update(updates)
+                })
+            }
+          })
+          .then(() => {
+            firebase
+              .userDroppedTvShows(authUser.uid)
+              .push()
+              .set(itemUpdated)
+          })
+      })
     }
 
     render() {

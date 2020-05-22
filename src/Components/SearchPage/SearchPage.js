@@ -1,6 +1,7 @@
 import React, { Component } from "react"
 import axios, { CancelToken } from "axios"
 import { throttle } from "throttle-debounce"
+import { compose } from "recompose"
 import Search from "./Search/Search"
 import ContentResultsAdvSearch from "./AdvSearchResults/SearchResults/SearchResults"
 import ContentResultsSelected from "./AdvSearchResults/SelectedContent/SelectedContent"
@@ -50,10 +51,7 @@ class MainPage extends Component {
     localStorage.setItem(LOCAL_STORAGE_KEY_ACTORS, JSON.stringify(this.state.withActors))
     localStorage.setItem(LOCAL_STORAGE_KEY_INPUTS, JSON.stringify(this.state.advSearchInputValues))
     localStorage.setItem(LOCAL_STORAGE_KEY_PAGENUMBER, JSON.stringify(this.state.numOfPagesLoaded))
-    localStorage.setItem(
-      LOCAL_STORAGE_KEY_TOTALPAGES,
-      JSON.stringify(this.state.totalPagesAdvMovies)
-    )
+    localStorage.setItem(LOCAL_STORAGE_KEY_TOTALPAGES, JSON.stringify(this.state.totalPagesAdvMovies))
   }
 
   advancedSearch = (
@@ -322,7 +320,8 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
           clearWithActors={this.clearWithActors}
         />
         {this.renderAdvMovies()}
-        {this.props.selectedContentState.selectedContent.length > 0 && <ContentResultsSelected />}
+        <ContentResultsSelected />
+        {/* {this.props.watchingTvShows.length > 0 && } */}
         <ScrollToTop />
         {/* <Footer /> */}
       </>
@@ -330,4 +329,4 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
   }
 }
 
-export default withSelectedContextConsumer(MainPage)
+export default compose(withSelectedContextConsumer)(MainPage)

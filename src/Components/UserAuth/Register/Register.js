@@ -76,6 +76,9 @@ class RegisterBase extends Component {
             console.log("sync ok")
           })
       })
+      .then(() => {
+        return this.props.firebase.sendEmailVerification()
+      })
       .then(authUser => {
         this.setState({ ...INITIAL_STATE })
         this.props.history.push("/")

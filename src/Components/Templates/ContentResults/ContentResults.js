@@ -17,6 +17,7 @@ const ContentResults = ({
   advancedSearchContent,
   clearAdvSearchMovies,
   contentArr,
+  watchingTvShows,
   className = "",
   showsArr,
   moviesArr,
@@ -28,7 +29,7 @@ const ContentResults = ({
   error,
   selectedContentState
 }) => {
-  const { selectedContent, toggleContent } = selectedContentState
+  const { toggleContent, addToDroppedShows } = selectedContentState
 
   function showLinksToAll() {
     const showAllLinksPressed = true
@@ -321,22 +322,29 @@ const ContentResults = ({
                   </div>
                 )}
 
-                {selectedContent.some(e => e.id === id) ? (
+                {watchingTvShows.some(e => e.id === id && e.userWatching === true) ? (
                   <>
                     {contentType === "adv-search" ? (
                       <div className="content-results__item-links content-results__item-links--adv-search">
                         <button
                           className="button button--pressed"
-                          onClick={() => toggleContent(id, contentArr)}
+                          onClick={() => toggleContent(id, watchingTvShows)}
                           type="button"
                         >
                           Remove {original_title ? "movie" : "show"}
+                        </button>
+                        <button
+                          className="button"
+                          onClick={() => addToDroppedShows(id, contentArr)}
+                          type="button"
+                        >
+                          Add to dropped {original_title ? "movie" : "show"}
                         </button>
                       </div>
                     ) : (
                       <button
                         className="button--del-item"
-                        onClick={() => toggleContent(id, contentArr)}
+                        onClick={() => toggleContent(id, watchingTvShows)}
                         type="button"
                       />
                     )}
@@ -345,6 +353,13 @@ const ContentResults = ({
                   <div className="content-results__item-links content-results__item-links--adv-search">
                     <button className="button" onClick={() => toggleContent(id, contentArr)} type="button">
                       Add {original_title ? "movie" : "show"}
+                    </button>
+                    <button
+                      className="button"
+                      onClick={() => addToDroppedShows(id, contentArr)}
+                      type="button"
+                    >
+                      Add to dropped {original_title ? "movie" : "show"}
                     </button>
                   </div>
                 )}

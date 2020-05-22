@@ -6,39 +6,46 @@ import WithAuthorization from "Components/UserAuth/Session/WithAuthorization/Wit
 import { WithAuthenticationConsumer } from "Components/UserAuth/Session/WithAuthentication"
 import "./Profile.scss"
 import Header from "Components/Header/Header"
+import { withSelectedContextConsumer } from "Components/SelectedContentContext"
 
 class Profile extends Component {
   constructor(props) {
     super(props)
 
     this.state = {
-      loading: false,
-      users: []
+      // tvShows: []
     }
   }
 
-  componentDidMount() {
-    this.setState({ loading: true })
+  // componentDidMount() {
+  //   this.setState({ loading: true })
 
-    this.props.firebase.auth.onAuthStateChanged(authUser => {
-      this.props.firebase.userMovies(authUser.uid).on("value", snapshot => {
-        const usersObject = snapshot.val() ? snapshot.val() : {}
+  //   this.props.firebase.auth.onAuthStateChanged(authUser => {
+  //     this.props.firebase.userWatchingTvShows(authUser.uid).on("value", snapshot => {
+  //       const tvShowsObject = snapshot.val() || {}
 
-        const userList = Object.keys(usersObject).map(key => ({
-          ...usersObject[key],
-          uid: key
-        }))
+  //       const tvShowsList = Object.keys(tvShowsObject).map(key => ({
+  //         ...tvShowsObject[key],
+  //         uid: key
+  //       }))
 
-        this.setState({
-          users: userList,
-          loading: false
-        })
-      })
-    })
-  }
+  //       this.setState({
+  //         tvShows: tvShowsList,
+  //         loading: false
+  //       })
+  //     })
+  //   })
+  // }
 
-  componentWillUnmount() {
-    this.props.firebase.users().off()
+  // componentWillUnmount() {
+  //   // this.props.firebase.userWatchingTvShows().off()
+  //   this.props.firebase.auth.onAuthStateChanged(authUser => {
+  //     this.props.firebase.userWatchingTvShows(authUser.uid).off()
+  //   })
+  // }
+
+  sendEmailVerification = () => {
+    this.props.firebase.sendEmailVerification()
   }
 
   render() {
@@ -49,9 +56,21 @@ class Profile extends Component {
         <div className="user-profile">
           <SignOutButton />
           {userEmail}
-          {this.state.users.map(({ title, id }) => (
-            <div key={id}>{title}</div>
+          {this.props.watchingTvShows.map(({ title, name, id }) => (
+            <div key={id}>{title || name}</div>
           ))}
+          <div>
+            {this.props.authUser.emailVerified ? (
+              "Email verified"
+            ) : (
+              <div>
+                Email not verified{" "}
+                <button onClick={this.sendEmailVerification} type="button">
+                  Send email verification
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </>
     )
@@ -60,4 +79,4 @@ class Profile extends Component {
 
 const condition = authUser => authUser !== null
 
-export default compose(withFirebase, WithAuthenticationConsumer, WithAuthorization(condition))(Profile)
+export default compose(withSelectedContextConsumer, WithAuthorization(condition))(Profile)

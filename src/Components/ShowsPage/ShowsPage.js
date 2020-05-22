@@ -7,6 +7,8 @@ import ScrollToTop from "Utils/ScrollToTop"
 import "./ShowsPage.scss"
 import HeaderBase from "Components/Header/Header"
 import { withFirebase } from "Components/Firebase/FirebaseContext"
+import { compose } from "recompose"
+import { WithAuthenticationConsumer } from "Components/UserAuth/Session/WithAuthentication"
 
 let cancelRequest
 
@@ -21,14 +23,36 @@ class Shows extends Component {
       loadingIds: [],
       showsIds: [],
       showAllLinksPressed: false,
-      error: ""
+      error: "",
+      watchingTvShows: []
     }
+  }
+
+  componentDidMount() {
+    // const firebase = this.props.firebase
+    // firebase.auth.onAuthStateChanged(authUser => {
+    //   firebase.userWatchingTvShows(authUser.uid).on("value", snapshot => {
+    //     const watchingTvShows = snapshot.val() || {}
+    //     const watchingTvShowsList = Object.keys(watchingTvShows).map(key => ({
+    //       ...watchingTvShows[key],
+    //       uid: key
+    //     }))
+    //     this.setState({
+    //       watchingTvShows: watchingTvShowsList
+    //     })
+    //   })
+    // })
+    // this.props.selectedContentState.getContent()
   }
 
   componentWillUnmount() {
     if (cancelRequest !== undefined) {
       cancelRequest()
     }
+
+    // this.props.selectedContentState.unmountFirebaseListener(this.props.authUser)
+
+    // this.props.firebase.userWatchingTvShows(this.props.authUser.uid).off()
   }
 
   getLastEpisodeLinks = (id, showAllLinksPressed) => {
@@ -41,14 +65,11 @@ class Shows extends Component {
     }))
 
     axios
-      .get(
-        `https://api.themoviedb.org/3/tv/${id}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US`,
-        {
-          cancelToken: new CancelToken(function executor(c) {
-            cancelRequest = c
-          })
-        }
-      )
+      .get(`https://api.themoviedb.org/3/tv/${id}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US`, {
+        cancelToken: new CancelToken(function executor(c) {
+          cancelRequest = c
+        })
+      })
       .then(res => {
         const tvShow = res.data
         this.setState(prevState => ({
@@ -65,16 +86,19 @@ class Shows extends Component {
   }
 
   render() {
-    const onlyShows = this.props.selectedContentState.selectedContent.filter(
-      item => item.original_name
-    )
+    console.log(this.props.droppedTvShows)
+    // const onlyShows = this.props.selectedContentState.selectedContent.filter(item => item.original_name)
+    // const onlyShows = this.state.watchingTvShows
     return (
       <>
         <Header />
-        {onlyShows.length ? (
+        {this.props.watchingTvShows.length ? (
           <ContentResults
             contentType="shows"
-            contentArr={onlyShows}
+            // contentArr={this.state.watchingTvShows}
+            contentArr={this.props.watchingTvShows}
+            // watchingTvShows={this.state.watchingTvShows}
+            watchingTvShows={this.props.watchingTvShows}
             getLastEpisodeLinks={this.getLastEpisodeLinks}
             showsArr={this.state.showsArr}
             loadingIds={this.state.loadingIds}
@@ -91,4 +115,4 @@ class Shows extends Component {
   }
 }
 
-export default withSelectedContextConsumer(Shows)
+export default compose(withSelectedContextConsumer)(Shows)
