@@ -62,7 +62,7 @@ class SearchCard extends Component {
                 {this.props.userContent.watchingTvShows.some(e => e.id === id) ? (
                   <button
                     className="button button--searchlist button--pressed"
-                    onClick={() => this.props.userContent.toggleContent(id, searchResults)}
+                    onClick={() => this.props.userContent.removeWatchingTvShow(id, searchResults)}
                     type="button"
                   >
                     Remove {mediaType === "movie" || mediaTypeSearching === "movie" ? "movie" : "show"}
@@ -70,7 +70,7 @@ class SearchCard extends Component {
                 ) : (
                   <button
                     className="button button--searchlist"
-                    onClick={() => this.props.userContent.toggleContent(id, searchResults)}
+                    onClick={() => this.props.userContent.addWatchingTvShow(id, searchResults)}
                     type="button"
                   >
                     Add {mediaType === "movie" || mediaTypeSearching === "movie" ? "movie" : "show"}

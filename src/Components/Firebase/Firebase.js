@@ -32,16 +32,15 @@ class Firebase {
 
   passwordUpdate = password => this.auth.currentUser.updatePassword(password)
 
+  /// Users API ///
   user = uid => this.db.ref(`users/${uid}`)
-
-  // userWatchingTvShows = uid => this.db.ref(`users/${uid}/watchingtvshows`)
-  userContent = uid => this.db.ref(`users/${uid}/content`)
-
-  userWatchingTvShows = uid => this.db.ref(`users/${uid}/content/watchingtvshows`)
-
-  userDroppedTvShows = uid => this.db.ref(`users/${uid}/content/droppedtvshows`)
-
   users = () => this.db.ref("users")
+
+  /// User Content API ///
+  userContent = uid => this.db.ref(`users/${uid}/content`)
+  userWatchingTvShows = uid => this.db.ref(`users/${uid}/content/watchingtvshows`)
+  userDroppedTvShows = uid => this.db.ref(`users/${uid}/content/droppedtvshows`)
+  userWillBeWatchingTvShows = uid => this.db.ref(`users/${uid}/content/willbewatchingtvshows`)
 
   onAuthUserListener = (next, fallback) => {
     this.auth.onAuthStateChanged(authUser => {

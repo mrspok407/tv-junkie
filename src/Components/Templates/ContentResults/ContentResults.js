@@ -320,7 +320,7 @@ const ContentResults = ({
                   </div>
                 )}
 
-                {watchingTvShows.some(e => e.id === id && e.userWatching === true) ? (
+                {userContent.watchingTvShows.some(e => e.id === id && e.userWatching === true) ? (
                   <>
                     {contentType === "adv-search" ? (
                       <div className="content-results__item-links content-results__item-links--adv-search">
@@ -339,17 +339,28 @@ const ContentResults = ({
                           Remove {original_title ? "movie" : "show"}
                         </button>
                         <button
-                          className="button"
-                          onClick={() => userContent.addToDroppedShows(id, contentArr)}
+                          className={classNames("button", {
+                            "button--pressed": userContent.droppedTvShows.some(e => e.id === id)
+                          })}
+                          onClick={() => userContent.addDroppedShows(id, contentArr)}
                           type="button"
                         >
                           Add to dropped {original_title ? "movie" : "show"}
+                        </button>
+                        <button
+                          className={classNames("button", {
+                            "button--pressed": userContent.willBeWatchingTvShows.some(e => e.id === id)
+                          })}
+                          onClick={() => userContent.addWillBeWatchingTvShows(id, contentArr)}
+                          type="button"
+                        >
+                          Will watch {original_title ? "movie" : "show"}
                         </button>
                       </div>
                     ) : (
                       <button
                         className="button--del-item"
-                        onClick={() => userContent.toggleContent(id, watchingTvShows)}
+                        onClick={() => userContent.removeWatchingTvShow(id, watchingTvShows)}
                         type="button"
                       />
                     )}
@@ -358,7 +369,7 @@ const ContentResults = ({
                   <div className="content-results__item-links content-results__item-links--adv-search">
                     {/* <button
                       className="button"
-                      onClick={() => userContent.toggleContent(id, contentArr)}
+                      onClick={() => userContent.removeWatchingTvShow(id, contentArr)}
                       type="button"
                     >
                       Add {original_title ? "movie" : "show"}
@@ -371,11 +382,22 @@ const ContentResults = ({
                       Add {original_title ? "movie" : "show"}
                     </button>
                     <button
-                      className="button"
-                      onClick={() => userContent.addToDroppedShows(id, contentArr)}
+                      className={classNames("button", {
+                        "button--pressed": userContent.droppedTvShows.some(e => e.id === id)
+                      })}
+                      onClick={() => userContent.addDroppedShows(id, contentArr)}
                       type="button"
                     >
                       Add to dropped {original_title ? "movie" : "show"}
+                    </button>
+                    <button
+                      className={classNames("button", {
+                        "button--pressed": userContent.willBeWatchingTvShows.some(e => e.id === id)
+                      })}
+                      onClick={() => userContent.addWillBeWatchingTvShows(id, contentArr)}
+                      type="button"
+                    >
+                      Will watch {original_title ? "movie" : "show"}
                     </button>
                   </div>
                 )}

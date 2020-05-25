@@ -103,7 +103,7 @@ class MovieResultsSelected extends React.PureComponent {
                           <button
                             className="button"
                             type="button"
-                            onClick={() => this.props.userContent.toggleContent(id)}
+                            onClick={() => this.props.userContent.removeWatchingTvShow(id)}
                           >
                             Remove
                           </button>
