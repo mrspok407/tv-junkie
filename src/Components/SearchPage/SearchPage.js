@@ -305,6 +305,7 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
   }
 
   render() {
+    const watchingShows = this.props.userContent.watchingShows.filter(item => item.userWatching && item)
     return (
       <>
         <Header />
@@ -320,7 +321,8 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
           clearWithActors={this.clearWithActors}
         />
         {this.renderAdvMovies()}
-        <ContentResultsSelected />
+        {watchingShows.length > 0 && <ContentResultsSelected />}
+
         <ScrollToTop />
         {/* <Footer /> */}
       </>

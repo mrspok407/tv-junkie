@@ -19,6 +19,8 @@ class Firebase {
     this.db = app.database()
   }
 
+  /// Auth API ///
+
   createUserWithEmailAndPassword = (email, password) =>
     this.auth.createUserWithEmailAndPassword(email, password)
 
@@ -31,16 +33,6 @@ class Firebase {
   passwordReset = email => this.auth.sendPasswordResetEmail(email)
 
   passwordUpdate = password => this.auth.currentUser.updatePassword(password)
-
-  /// Users API ///
-  user = uid => this.db.ref(`users/${uid}`)
-  users = () => this.db.ref("users")
-
-  /// User Content API ///
-  userContent = uid => this.db.ref(`users/${uid}/content`)
-  userWatchingTvShows = uid => this.db.ref(`users/${uid}/content/watchingtvshows`)
-  userDroppedTvShows = uid => this.db.ref(`users/${uid}/content/droppedtvshows`)
-  userWillBeWatchingTvShows = uid => this.db.ref(`users/${uid}/content/willbewatchingtvshows`)
 
   onAuthUserListener = (next, fallback) => {
     this.auth.onAuthStateChanged(authUser => {
@@ -63,6 +55,16 @@ class Firebase {
       }
     })
   }
+
+  /// Users API ///
+  user = uid => this.db.ref(`users/${uid}`)
+  users = () => this.db.ref("users")
+
+  /// User Content API ///
+  userContent = uid => this.db.ref(`users/${uid}/content`)
+  watchingShows = uid => this.db.ref(`users/${uid}/content/watchingShows`)
+  droppedShows = uid => this.db.ref(`users/${uid}/content/droppedShows`)
+  willWatchShows = uid => this.db.ref(`users/${uid}/content/willWatchShows`)
 }
 
 export default Firebase

@@ -10,7 +10,7 @@ class MovieResultsSelected extends React.PureComponent {
 
     this.state = {
       showSelected: false
-      // watchingTvShows: []
+      // watchingShows: []
     }
 
     this.selectedContentRef = React.createRef()
@@ -33,89 +33,87 @@ class MovieResultsSelected extends React.PureComponent {
   }
 
   render() {
-    const watchingTvShows = this.props.userContent.watchingTvShows.filter(item => item.userWatching && item)
+    const watchingShows = this.props.userContent.watchingShows.filter(item => item.userWatching && item)
     return (
       <>
-        {watchingTvShows.length > 0 && (
-          <div ref={this.selectedContentRef} className="selected-content__container">
-            <button
-              type="button"
-              className="button--show-selected"
-              onClick={() =>
-                this.setState(prevState => ({
-                  showSelected: !prevState.showSelected
-                }))
-              }
-            >
-              {watchingTvShows.length}
-            </button>
-            {this.state.showSelected && (
-              <div className="selected-content__list">
-                <div className="selected-content__button-clear"></div>
+        <div ref={this.selectedContentRef} className="selected-content__container">
+          <button
+            type="button"
+            className="button--show-selected"
+            onClick={() =>
+              this.setState(prevState => ({
+                showSelected: !prevState.showSelected
+              }))
+            }
+          >
+            {watchingShows.length}
+          </button>
+          {this.state.showSelected && (
+            <div className="selected-content__list">
+              <div className="selected-content__button-clear"></div>
 
-                {watchingTvShows.map(
-                  ({
-                    original_title = "",
-                    original_name = "",
-                    id,
-                    release_date = "",
-                    first_air_date = "",
-                    poster_path,
-                    backdrop_path,
-                    overview = ""
-                  }) => {
-                    const title = original_title || original_name
-                    const date = release_date || first_air_date
+              {watchingShows.map(
+                ({
+                  original_title = "",
+                  original_name = "",
+                  id,
+                  release_date = "",
+                  first_air_date = "",
+                  poster_path,
+                  backdrop_path,
+                  overview = ""
+                }) => {
+                  const title = original_title || original_name
+                  const date = release_date || first_air_date
 
-                    const type = original_title ? "movie" : original_name && "show"
+                  const type = original_title ? "movie" : original_name && "show"
 
-                    return (
-                      <div key={id} className="selected-content__item">
-                        <Link className="selected-content__item-poster-link" to={`/${type}/${id}`}>
-                          <div
-                            className="selected-content__item-poster"
-                            style={
-                              poster_path !== null
-                                ? {
-                                    backgroundImage: `url(https://image.tmdb.org/t/p/w500/${poster_path ||
-                                      backdrop_path})`
-                                  }
-                                : {
-                                    backgroundImage: `url(https://d32qys9a6wm9no.cloudfront.net/images/movies/poster/500x735.png)`
-                                  }
-                            }
-                          />
-                        </Link>
-                        <Link className="selected-content__item-info-link" to={`/${type}/${id}`}>
-                          <div className="selected-content__item-info">
-                            <div className="selected-content__item-title">
-                              {title.length > 65 ? `${title.substring(0, 65)}...` : title}
-                            </div>
-                            <div className="selected-content__item-year">{date}</div>
-                            <div className="selected-content__item-overview">
-                              {overview && overview.length > 120
-                                ? `${overview.substring(0, 120)}...`
-                                : overview}
-                            </div>
+                  return (
+                    <div key={id} className="selected-content__item">
+                      <Link className="selected-content__item-poster-link" to={`/${type}/${id}`}>
+                        <div
+                          className="selected-content__item-poster"
+                          style={
+                            poster_path !== null
+                              ? {
+                                  backgroundImage: `url(https://image.tmdb.org/t/p/w500/${poster_path ||
+                                    backdrop_path})`
+                                }
+                              : {
+                                  backgroundImage: `url(https://d32qys9a6wm9no.cloudfront.net/images/movies/poster/500x735.png)`
+                                }
+                          }
+                        />
+                      </Link>
+                      <Link className="selected-content__item-info-link" to={`/${type}/${id}`}>
+                        <div className="selected-content__item-info">
+                          <div className="selected-content__item-title">
+                            {title.length > 65 ? `${title.substring(0, 65)}...` : title}
                           </div>
-                        </Link>
-                        <div className="selected-content__item-button">
-                          <button
-                            className="button"
-                            type="button"
-                            onClick={() => this.props.userContent.removeWatchingTvShow(id)}
-                          >
-                            Remove
-                          </button>
+                          <div className="selected-content__item-year">{date}</div>
+                          <div className="selected-content__item-overview">
+                            {overview && overview.length > 120
+                              ? `${overview.substring(0, 120)}...`
+                              : overview}
+                          </div>
                         </div>
+                      </Link>
+                      <div className="selected-content__item-button">
+                        <button
+                          className="button"
+                          type="button"
+                          onClick={() => this.props.userContent.removeWatchingShow(id)}
+                        >
+                          Remove
+                        </button>
                       </div>
-                    )
-                  }
-                )}
-              </div>
-            )}
-          </div>
-        )}
+                    </div>
+                  )
+                }
+              )}
+            </div>
+          )}
+        </div>
       </>
     )
   }

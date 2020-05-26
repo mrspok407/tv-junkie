@@ -14,7 +14,7 @@ class GridTests extends Component {
   }
 
   componentDidMount() {
-    this.setState({ content: this.props.userContent.watchingTvShows.slice(0, 10) })
+    this.setState({ content: this.props.userContent.watchingShows.slice(0, 10) })
   }
 
   deleteItem = id => {

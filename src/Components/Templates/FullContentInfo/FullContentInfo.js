@@ -64,7 +64,7 @@ const FullContentInfo = ({
   const [error, setError] = useState()
   const [errorShowEpisodes, setErrorShowEpisodes] = useState()
 
-  const watchingTvShows = userContent.watchingTvShows.filter(item => item.userWatching && item)
+  const watchingShows = userContent.watchingShows.filter(item => item.userWatching && item)
 
   const { pathname } = useLocation()
 
@@ -516,10 +516,10 @@ const FullContentInfo = ({
               )}
 
               <div className="full-detailes__info-row full-detailes__info--button">
-                {watchingTvShows.some(e => e.id === Number(id)) ? (
+                {watchingShows.some(e => e.id === Number(id)) ? (
                   <button
                     className="button button--searchlist button--pressed"
-                    onClick={() => userContent.removeWatchingTvShow(Number(id), infoToPass)}
+                    onClick={() => userContent.removeWatchingShow(Number(id), infoToPass)}
                     type="button"
                   >
                     Remove {mediaType === "movie" ? "movie" : "show"}
@@ -527,7 +527,7 @@ const FullContentInfo = ({
                 ) : (
                   <button
                     className="button button--searchlist"
-                    onClick={() => userContent.addWatchingTvShow(Number(id), infoToPass)}
+                    onClick={() => userContent.addWatchingShow(Number(id), infoToPass)}
                     type="button"
                   >
                     Add {mediaType === "movie" ? "movie" : "show"}

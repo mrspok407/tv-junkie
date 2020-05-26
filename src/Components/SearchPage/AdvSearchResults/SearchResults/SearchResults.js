@@ -10,21 +10,21 @@ class MovieResultsAdvSearch extends React.PureComponent {
     super(props)
 
     this.state = {
-      // watchingTvShows: []
+      // watchingShows: []
     }
   }
 
   componentDidMount() {
     // const firebase = this.props.firebase
     // firebase.auth.onAuthStateChanged(authUser => {
-    //   firebase.userWatchingTvShows(authUser.uid).on("value", snapshot => {
-    //     const watchingTvShows = snapshot.val() || {}
-    //     const watchingTvShowsList = Object.keys(watchingTvShows).map(key => ({
-    //       ...watchingTvShows[key],
+    //   firebase.watchingShows(authUser.uid).on("value", snapshot => {
+    //     const watchingShows = snapshot.val() || {}
+    //     const watchingTvShowsList = Object.keys(watchingShows).map(key => ({
+    //       ...watchingShows[key],
     //       uid: key
     //     }))
     //     this.setState({
-    //       watchingTvShows: watchingTvShowsList
+    //       watchingShows: watchingTvShowsList
     //     })
     //   })
     // })
@@ -32,7 +32,7 @@ class MovieResultsAdvSearch extends React.PureComponent {
 
   componentWillUnmount() {
     // this.props.firebase.auth.onAuthStateChanged(authUser => {
-    //   this.props.firebase.userWatchingTvShows(authUser.uid).off()
+    //   this.props.firebase.watchingShows(authUser.uid).off()
     // })
   }
 
@@ -41,7 +41,7 @@ class MovieResultsAdvSearch extends React.PureComponent {
       <>
         <ContentResults
           contentArr={this.props.advancedSearchContent}
-          watchingTvShows={this.props.userContent.watchingTvShows}
+          watchingShows={this.props.userContent.watchingShows}
           toggleContentArr={this.props.advancedSearchContent}
           advancedSearchContent={this.props.advancedSearchContent}
           clearAdvSearchMovies={this.props.clearAdvSearchMovies}

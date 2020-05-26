@@ -1,22 +1,11 @@
-export const toggleWatchingTvShowDataBase = (firebase, showId, userUid, userWatching) => {
+export const toggleWatchingShowsDatabase = (firebase, userUid, key, userWatching) => {
   firebase
-    .userWatchingTvShows(userUid)
-    .orderByChild("id")
-    .equalTo(showId)
-    .once("value", snapshot => {
-      const updates = {}
-      snapshot.forEach(
-        child =>
-          (updates[child.key] = {
-            ...snapshot.val()[child.key],
-            userWatching: userWatching
-          })
-      )
-      firebase.userWatchingTvShows(userUid).update(updates)
-    })
+    .watchingShows(userUid)
+    .child(key)
+    .update({ userWatching: userWatching })
 }
 
-export const deleteTvShowFromSubDataBase = (firebase, userUid, dataBase, key) => {
+export const deleteShowFromSubDatabase = (firebase, userUid, dataBase, key) => {
   if (!key) return Promise.resolve()
 
   const promises = []
@@ -35,6 +24,5 @@ export const deleteTvShowFromSubDataBase = (firebase, userUid, dataBase, key) =>
     promises.push(promise)
   })
 
-  console.log(promises)
   return Promise.all(promises)
 }

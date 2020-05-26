@@ -19,7 +19,7 @@ class Profile extends Component {
   //   this.setState({ loading: true })
 
   //   this.props.firebase.auth.onAuthStateChanged(authUser => {
-  //     this.props.firebase.userWatchingTvShows(authUser.uid).on("value", snapshot => {
+  //     this.props.firebase.watchingShows(authUser.uid).on("value", snapshot => {
   //       const tvShowsObject = snapshot.val() || {}
 
   //       const tvShowsList = Object.keys(tvShowsObject).map(key => ({
@@ -36,9 +36,9 @@ class Profile extends Component {
   // }
 
   // componentWillUnmount() {
-  //   // this.props.firebase.userWatchingTvShows().off()
+  //   // this.props.firebase.watchingShows().off()
   //   this.props.firebase.auth.onAuthStateChanged(authUser => {
-  //     this.props.firebase.userWatchingTvShows(authUser.uid).off()
+  //     this.props.firebase.watchingShows(authUser.uid).off()
   //   })
   // }
 
@@ -54,7 +54,7 @@ class Profile extends Component {
         <div className="user-profile">
           <SignOutButton />
           {userEmail}
-          {this.props.userContent.watchingTvShows.map(({ title, name, id }) => (
+          {this.props.userContent.watchingShows.map(({ title, name, id }) => (
             <div key={id}>{title || name}</div>
           ))}
           <div>

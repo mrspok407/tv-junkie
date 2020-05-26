@@ -63,15 +63,15 @@ class Shows extends Component {
   }
 
   render() {
-    const watchingTvShows = this.props.userContent.watchingTvShows.filter(item => item.userWatching && item)
+    const watchingShows = this.props.userContent.watchingShows.filter(item => item.userWatching && item)
     return (
       <>
         <Header />
-        {watchingTvShows.length ? (
+        {watchingShows.length ? (
           <ContentResults
             contentType="shows"
-            contentArr={watchingTvShows}
-            watchingTvShows={watchingTvShows}
+            contentArr={watchingShows}
+            watchingShows={watchingShows}
             getLastEpisodeLinks={this.getLastEpisodeLinks}
             showsArr={this.state.showsArr}
             loadingIds={this.state.loadingIds}

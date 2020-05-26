@@ -17,7 +17,7 @@ const ContentResults = ({
   advancedSearchContent,
   clearAdvSearchMovies,
   contentArr,
-  watchingTvShows,
+  watchingShows,
   className = "",
   showsArr,
   moviesArr,
@@ -320,38 +320,38 @@ const ContentResults = ({
                   </div>
                 )}
 
-                {userContent.watchingTvShows.some(e => e.id === id && e.userWatching === true) ? (
+                {userContent.watchingShows.some(e => e.id === id && e.userWatching === true) ? (
                   <>
                     {contentType === "adv-search" ? (
                       <div className="content-results__item-links content-results__item-links--adv-search">
                         {/* <button
                           className="button button--pressed"
-                          onClick={() => userContent.toggleContent(id, watchingTvShows)}
+                          onClick={() => userContent.toggleContent(id, watchingShows)}
                           type="button"
                         >
                           Remove {original_title ? "movie" : "show"}
                         </button> */}
                         <button
                           className="button button--pressed"
-                          onClick={() => userContent.removeWatchingTvShow(id)}
+                          onClick={() => userContent.removeWatchingShow(id)}
                           type="button"
                         >
                           Remove {original_title ? "movie" : "show"}
                         </button>
                         <button
                           className={classNames("button", {
-                            "button--pressed": userContent.droppedTvShows.some(e => e.id === id)
+                            "button--pressed": userContent.droppedShows.some(e => e.id === id)
                           })}
-                          onClick={() => userContent.addDroppedShows(id, contentArr)}
+                          onClick={() => userContent.addShowToSubDatabase(id, contentArr, "droppedShows")}
                           type="button"
                         >
                           Add to dropped {original_title ? "movie" : "show"}
                         </button>
                         <button
                           className={classNames("button", {
-                            "button--pressed": userContent.willBeWatchingTvShows.some(e => e.id === id)
+                            "button--pressed": userContent.willWatchShows.some(e => e.id === id)
                           })}
-                          onClick={() => userContent.addWillBeWatchingTvShows(id, contentArr)}
+                          onClick={() => userContent.addShowToSubDatabase(id, contentArr, "willWatchShows")}
                           type="button"
                         >
                           Will watch {original_title ? "movie" : "show"}
@@ -360,7 +360,7 @@ const ContentResults = ({
                     ) : (
                       <button
                         className="button--del-item"
-                        onClick={() => userContent.removeWatchingTvShow(id, watchingTvShows)}
+                        onClick={() => userContent.removeWatchingShow(id, watchingShows)}
                         type="button"
                       />
                     )}
@@ -369,32 +369,32 @@ const ContentResults = ({
                   <div className="content-results__item-links content-results__item-links--adv-search">
                     {/* <button
                       className="button"
-                      onClick={() => userContent.removeWatchingTvShow(id, contentArr)}
+                      onClick={() => userContent.removeWatchingShow(id, contentArr)}
                       type="button"
                     >
                       Add {original_title ? "movie" : "show"}
                     </button> */}
                     <button
                       className="button"
-                      onClick={() => userContent.addWatchingTvShow(id, contentArr)}
+                      onClick={() => userContent.addWatchingShow(id, contentArr)}
                       type="button"
                     >
                       Add {original_title ? "movie" : "show"}
                     </button>
                     <button
                       className={classNames("button", {
-                        "button--pressed": userContent.droppedTvShows.some(e => e.id === id)
+                        "button--pressed": userContent.droppedShows.some(e => e.id === id)
                       })}
-                      onClick={() => userContent.addDroppedShows(id, contentArr)}
+                      onClick={() => userContent.addShowToSubDatabase(id, contentArr, "droppedShows")}
                       type="button"
                     >
                       Add to dropped {original_title ? "movie" : "show"}
                     </button>
                     <button
                       className={classNames("button", {
-                        "button--pressed": userContent.willBeWatchingTvShows.some(e => e.id === id)
+                        "button--pressed": userContent.willWatchShows.some(e => e.id === id)
                       })}
-                      onClick={() => userContent.addWillBeWatchingTvShows(id, contentArr)}
+                      onClick={() => userContent.addShowToSubDatabase(id, contentArr, "willWatchShows")}
                       type="button"
                     >
                       Will watch {original_title ? "movie" : "show"}
