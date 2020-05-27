@@ -65,6 +65,8 @@ class Firebase {
   watchingShows = uid => this.db.ref(`users/${uid}/content/watchingShows`)
   droppedShows = uid => this.db.ref(`users/${uid}/content/droppedShows`)
   willWatchShows = uid => this.db.ref(`users/${uid}/content/willWatchShows`)
+
+  watchLaterMovies = uid => this.db.ref(`users/${uid}/content/watchLaterMovies`)
 }
 
 export default Firebase

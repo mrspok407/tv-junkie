@@ -1,0 +1,13 @@
+@import "../../styles/globals";
+
+.content-results__sections {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  column-gap: 5px;
+  padding-bottom: 25px;
+
+  @include mediaMaxW(650px) {
+    grid-template-columns: 1fr;
+    row-gap: 5px;
+  }
+}

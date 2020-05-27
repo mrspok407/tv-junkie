@@ -64,7 +64,7 @@ const FullContentInfo = ({
   const [error, setError] = useState()
   const [errorShowEpisodes, setErrorShowEpisodes] = useState()
 
-  const watchingShows = userContent.watchingShows.filter(item => item.userWatching && item)
+  // const watchingShows = userContent.watchingShows.filter(item => item.userWatching && item)
 
   const { pathname } = useLocation()
 
@@ -515,25 +515,74 @@ const FullContentInfo = ({
                 </>
               )}
 
-              <div className="full-detailes__info-row full-detailes__info--button">
-                {watchingShows.some(e => e.id === Number(id)) ? (
+              {mediaType === "show" && (
+                <div className="full-detailes__info-row full-detailes__info--button">
+                  <div className="content-results__sections">
+                    <div className="content-results__section">
+                      {userContent.watchingShows.some(item => item.id === Number(id) && item.userWatching) ? (
+                        <button
+                          className="button button--pressed"
+                          type="button"
+                          onClick={() => userContent.removeWatchingShow(Number(id))}
+                        >
+                          Not watching
+                        </button>
+                      ) : (
+                        <button
+                          className="button"
+                          type="button"
+                          onClick={() => userContent.addWatchingShow(Number(id), infoToPass)}
+                        >
+                          Watching
+                        </button>
+                      )}
+                    </div>
+                    <div className="content-results__section">
+                      <button
+                        className={classNames("button", {
+                          "button--pressed": userContent.droppedShows.some(item => item.id === Number(id))
+                        })}
+                        type="button"
+                        onClick={() =>
+                          userContent.addShowToSubDatabase(Number(id), infoToPass, "droppedShows")
+                        }
+                      >
+                        Drop
+                      </button>
+                    </div>
+                    <div className="content-results__section">
+                      <button
+                        className={classNames("button", {
+                          "button--pressed": userContent.willWatchShows.some(item => item.id === Number(id))
+                        })}
+                        type="button"
+                        onClick={() =>
+                          userContent.addShowToSubDatabase(Number(id), infoToPass, "willWatchShows")
+                        }
+                      >
+                        Will Watch
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {mediaType === "movie" && (
+                <div className="full-detailes__info-row full-detailes__info--button">
                   <button
-                    className="button button--searchlist button--pressed"
-                    onClick={() => userContent.removeWatchingShow(Number(id), infoToPass)}
+                    className="button"
+                    className={classNames("button", {
+                      "button--pressed": userContent.watchLaterMovies.some(item => item.id === Number(id))
+                    })}
+                    onClick={() => userContent.toggleWatchLaterMovie(Number(id), infoToPass)}
                     type="button"
                   >
-                    Remove {mediaType === "movie" ? "movie" : "show"}
+                    {userContent.watchLaterMovies.some(item => item.id === Number(id))
+                      ? "Remove"
+                      : "Watch later"}
                   </button>
-                ) : (
-                  <button
-                    className="button button--searchlist"
-                    onClick={() => userContent.addWatchingShow(Number(id), infoToPass)}
-                    type="button"
-                  >
-                    Add {mediaType === "movie" ? "movie" : "show"}
-                  </button>
-                )}
-              </div>
+                </div>
+              )}
             </div>
             <div className="full-detailes__description">{description}</div>
 

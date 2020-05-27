@@ -1,13 +1,13 @@
 import React, { Component } from "react"
 import axios, { CancelToken } from "axios"
-import ContentResults from "Components/Templates/ContentResults/ContentResults"
-import PlaceholderNoSelectedContent from "Components/Placeholders/PlaceholderNoSelectedContent"
-import { withUserContent } from "Components/UserContent"
+// import ContentResults from "Components/Templates/ContentResults/ContentResults"
+// import PlaceholderNoSelectedContent from "Components/Placeholders/PlaceholderNoSelectedContent"
 import ScrollToTop from "Utils/ScrollToTop"
 import "./ShowsPage.scss"
 import HeaderBase from "Components/Header/Header"
 import { withFirebase } from "Components/Firebase/FirebaseContext"
 import { compose } from "recompose"
+import ShowsContent from "./ShowsContent"
 
 let cancelRequest
 
@@ -63,11 +63,12 @@ class Shows extends Component {
   }
 
   render() {
-    const watchingShows = this.props.userContent.watchingShows.filter(item => item.userWatching && item)
     return (
       <>
         <Header />
-        {watchingShows.length ? (
+        <ShowsContent />
+
+        {/* {watchingShows.length ? (
           <ContentResults
             contentType="shows"
             contentArr={watchingShows}
@@ -81,11 +82,11 @@ class Shows extends Component {
           />
         ) : (
           <PlaceholderNoSelectedContent />
-        )}
+        )} */}
         <ScrollToTop />
       </>
     )
   }
 }
 
-export default compose(withUserContent)(Shows)
+export default Shows

@@ -1,11 +1,11 @@
 import React, { Component } from "react"
 import axios, { CancelToken } from "axios"
-import ContentResults from "Components/Templates/ContentResults/ContentResults"
-import PlaceholderNoSelectedContent from "Components/Placeholders/PlaceholderNoSelectedContent"
-import { withUserContent } from "Components/UserContent"
+// import ContentResults from "Components/Templates/ContentResults/ContentResults"
+// import PlaceholderNoSelectedContent from "Components/Placeholders/PlaceholderNoSelectedContent"
 import ScrollToTop from "Utils/ScrollToTop"
 import "./MoviesPage.scss"
 import Header from "../Header/Header"
+import MoviesContent from "./MoviesContent"
 
 let cancelRequest
 
@@ -61,14 +61,21 @@ class Movies extends Component {
   }
 
   render() {
-    const onlyMovies = this.props.selectedContentState.selectedContent.filter(item => item.original_title)
     return (
       <>
         <Header />
-        {onlyMovies.length ? (
+        <MoviesContent
+          moviesArr={this.state.moviesArr}
+          getMovieLinks={this.getMovieLinks}
+          loadingIds={this.state.loadingIds}
+          moviesIds={this.state.moviesIds}
+          showAllLinksPressed={this.state.showAllLinksPressed}
+          error={this.state.error}
+        />
+        {/* {onlyMovies.length ? (
           <ContentResults
             contentType="movies"
-            contentArr={onlyMovies}
+            contentArr={watchLaterMovies}
             moviesArr={this.state.moviesArr}
             loadingIds={this.state.loadingIds}
             moviesIds={this.state.moviesIds}
@@ -79,11 +86,11 @@ class Movies extends Component {
           />
         ) : (
           <PlaceholderNoSelectedContent />
-        )}
+        )} */}
         <ScrollToTop />
       </>
     )
   }
 }
 
-export default withUserContent(Movies)
+export default Movies

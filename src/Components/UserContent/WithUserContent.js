@@ -13,9 +13,11 @@ const withUserContent = Component => {
         watchingShows: [],
         droppedShows: [],
         willWatchShows: [],
+        watchLaterMovies: [],
         addWatchingShow: this.addWatchingShow,
         removeWatchingShow: this.removeWatchingShow,
         addShowToSubDatabase: this.addShowToSubDatabase,
+        toggleWatchLaterMovie: this.toggleWatchLaterMovie,
         subDatabases: ["droppedShows", "willWatchShows"]
       }
 
@@ -54,7 +56,9 @@ const withUserContent = Component => {
             const newShowRef = this.firebase.watchingShows(this.userUid).push()
             const key = newShowRef.key
 
-            newShowRef.set({ ...showToAdd, key, userWatching: true })
+            const showInfo = showToAdd || showInSubDatabases
+
+            newShowRef.set({ ...showInfo, key, userWatching: true })
           } else {
             const key = showIsWatching.key
             const userWatchingShow = true
@@ -106,6 +110,25 @@ const withUserContent = Component => {
       })
     }
 
+    toggleWatchLaterMovie = (id, contentArr) => {
+      const movieExists = this.state.watchLaterMovies.find(show => show.id === id)
+      const movieToAdd = contentArr && contentArr.find(item => item.id === id)
+
+      if (!movieExists) {
+        const newMovieRef = this.firebase.watchLaterMovies(this.userUid).push()
+        const key = newMovieRef.key
+
+        newMovieRef.set({ ...movieToAdd, key })
+      } else {
+        const key = movieExists.key
+
+        this.firebase
+          .watchLaterMovies(this.userUid)
+          .child(key)
+          .remove()
+      }
+    }
+
     // addDroppedShow = (id, contentArr) => {
     //   const userUid = this.props.authUser.uid
     //   const contentExists = this.state.watchingShows.some(show => show.id === id)
@@ -155,7 +178,7 @@ const withUserContent = Component => {
 
       this.firebase.userContent(this.userUid).on("value", snapshot => {
         const userContent = snapshot.val() || {}
-        const { watchingShows, droppedShows, willWatchShows } = userContent
+        const { watchingShows, droppedShows, willWatchShows, watchLaterMovies } = userContent
 
         const watchingTvShowsList = watchingShows
           ? Object.keys(watchingShows).map(key => ({
@@ -178,11 +201,19 @@ const withUserContent = Component => {
             }))
           : []
 
+        const watchLaterMoviesList = watchLaterMovies
+          ? Object.keys(watchLaterMovies).map(key => ({
+              ...watchLaterMovies[key],
+              uid: key
+            }))
+          : []
+
         if (this._isMounted) {
           this.setState({
             watchingShows: watchingTvShowsList,
             droppedShows: droppedTvShowsList,
-            willWatchShows: willBeWatchingTvShowsList
+            willWatchShows: willBeWatchingTvShowsList,
+            watchLaterMovies: watchLaterMoviesList
           })
         }
       })
