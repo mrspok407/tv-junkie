@@ -121,8 +121,8 @@ export default class Search extends Component {
                     searchResults={this.state.searchResults}
                     mediaTypeSearching={this.state.mediaTypeSearching}
                     handleClickOutside={this.handleClickOutside}
-                    toggleCurrentlyChoosenContent={this.props.toggleCurrentlyChoosenContent}
-                    currentlyChoosenContent={this.props.currentlyChoosenContent}
+                    toggleCurrentlyChosenContent={this.props.toggleCurrentlyChosenContent}
+                    currentlyChosenContent={this.props.currentlyChosenContent}
                   />
                 </div>
               )

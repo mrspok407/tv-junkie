@@ -17,9 +17,9 @@ class SearchCard extends Component {
               this.props.userContent.toggleWatchLaterMovie(id, searchResults)
               if (
                 !this.props.userContent.watchLaterMovies.find(item => item.id === id) ||
-                this.props.currentlyChoosenContent.find(item => item.id === id)
+                this.props.currentlyChosenContent.find(item => item.id === id)
               ) {
-                this.props.toggleCurrentlyChoosenContent(id, searchResults)
+                this.props.toggleCurrentlyChosenContent(id, searchResults)
               }
             }}
             type="button"
@@ -43,7 +43,7 @@ class SearchCard extends Component {
                 className="button button--searchlist"
                 onClick={() => {
                   this.props.userContent.addWatchingShow(id, searchResults)
-                  this.props.toggleCurrentlyChoosenContent(id, searchResults)
+                  this.props.toggleCurrentlyChosenContent(id, searchResults)
                 }}
                 type="button"
               >

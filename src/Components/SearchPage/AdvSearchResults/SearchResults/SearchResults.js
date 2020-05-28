@@ -131,9 +131,9 @@ class AdvSearchResults extends Component {
                             this.props.userContent.toggleWatchLaterMovie(id, this.props.advancedSearchContent)
                             if (
                               !this.props.userContent.watchLaterMovies.find(item => item.id === id) ||
-                              this.props.currentlyChoosenContent.find(item => item.id === id)
+                              this.props.currentlyChosenContent.find(item => item.id === id)
                             ) {
-                              this.props.toggleCurrentlyChoosenContent(id, this.props.advancedSearchContent)
+                              this.props.toggleCurrentlyChosenContent(id, this.props.advancedSearchContent)
                             }
                           }}
                           type="button"
@@ -160,7 +160,7 @@ class AdvSearchResults extends Component {
                                 className="button"
                                 onClick={() => {
                                   this.props.userContent.addWatchingShow(id, this.props.advancedSearchContent)
-                                  this.props.toggleCurrentlyChoosenContent(
+                                  this.props.toggleCurrentlyChosenContent(
                                     id,
                                     this.props.advancedSearchContent
                                   )

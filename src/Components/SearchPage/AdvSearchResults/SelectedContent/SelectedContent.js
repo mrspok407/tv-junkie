@@ -44,13 +44,13 @@ class MovieResultsSelected extends React.PureComponent {
               }))
             }
           >
-            {this.props.currentlyChoosenContent.length}
+            {this.props.currentlyChosenContent.length}
           </button>
           {this.state.showSelected && (
             <div className="selected-content__list">
               <div className="selected-content__button-clear"></div>
 
-              {this.props.currentlyChoosenContent.map(
+              {this.props.currentlyChosenContent.map(
                 ({
                   original_title = "",
                   original_name = "",
@@ -102,7 +102,7 @@ class MovieResultsSelected extends React.PureComponent {
                             className="button"
                             onClick={() => {
                               this.props.userContent.toggleWatchLaterMovie(id)
-                              this.props.toggleCurrentlyChoosenContent(id)
+                              this.props.toggleCurrentlyChosenContent(id)
                             }}
                             type="button"
                           >
@@ -114,7 +114,7 @@ class MovieResultsSelected extends React.PureComponent {
                             type="button"
                             onClick={() => {
                               this.props.userContent.removeWatchingShow(id)
-                              this.props.toggleCurrentlyChoosenContent(id)
+                              this.props.toggleCurrentlyChosenContent(id)
                             }}
                           >
                             Remove

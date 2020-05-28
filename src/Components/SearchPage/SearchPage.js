@@ -32,7 +32,7 @@ class MainPage extends Component {
       searchingAdvancedSearch: false,
       loadingNewPage: false,
       error: "",
-      currentlyChoosenContent: []
+      currentlyChosenContent: []
     }
   }
 
@@ -289,17 +289,17 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
     }
   }
 
-  toggleCurrentlyChoosenContent = (id, content) => {
-    const itemExists = this.state.currentlyChoosenContent.find(item => item.id === id)
-    const newItem = content && content.find(item => item.id === id)
+  toggleCurrentlyChosenContent = (id, content) => {
+    const contentExists = this.state.currentlyChosenContent.find(item => item.id === id)
+    const newContent = content && content.find(item => item.id === id)
 
-    if (itemExists) {
+    if (contentExists) {
       this.setState(prevState => ({
-        currentlyChoosenContent: [...prevState.currentlyChoosenContent.filter(item => item.id !== id)]
+        currentlyChosenContent: [...prevState.currentlyChosenContent.filter(item => item.id !== id)]
       }))
     } else {
       this.setState(prevState => ({
-        currentlyChoosenContent: [...prevState.currentlyChoosenContent, newItem]
+        currentlyChosenContent: [...prevState.currentlyChosenContent, newContent]
       }))
     }
   }
@@ -315,14 +315,14 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
         advancedSearchContent={this.state.advancedSearchContent}
         loadingNewPage={this.state.loadingNewPage}
         clearAdvSearchMovies={this.clearAdvSearchMovies}
-        toggleCurrentlyChoosenContent={this.toggleCurrentlyChoosenContent}
-        currentlyChoosenContent={this.state.currentlyChoosenContent}
+        toggleCurrentlyChosenContent={this.toggleCurrentlyChosenContent}
+        currentlyChosenContent={this.state.currentlyChosenContent}
       />
     )
   }
 
   render() {
-    console.log(this.state.currentlyChoosenContent)
+    console.log(this.state.currentlyChosenContent)
     return (
       <>
         <Header />
@@ -334,14 +334,14 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
           withActors={this.state.withActors}
           advancedSearch={this.advancedSearch}
           clearWithActors={this.clearWithActors}
-          toggleCurrentlyChoosenContent={this.toggleCurrentlyChoosenContent}
-          currentlyChoosenContent={this.state.currentlyChoosenContent}
+          toggleCurrentlyChosenContent={this.toggleCurrentlyChosenContent}
+          currentlyChosenContent={this.state.currentlyChosenContent}
         />
         {this.renderAdvMovies()}
-        {this.state.currentlyChoosenContent.length > 0 && (
+        {this.state.currentlyChosenContent.length > 0 && (
           <ContentResultsSelected
-            currentlyChoosenContent={this.state.currentlyChoosenContent}
-            toggleCurrentlyChoosenContent={this.toggleCurrentlyChoosenContent}
+            currentlyChosenContent={this.state.currentlyChosenContent}
+            toggleCurrentlyChosenContent={this.toggleCurrentlyChosenContent}
           />
         )}
 

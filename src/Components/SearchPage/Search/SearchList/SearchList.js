@@ -45,8 +45,8 @@ export default class MovieList extends Component {
             searchResults={searchResults}
             mediaType={media_type}
             mediaTypeSearching={mediaTypeSearching}
-            toggleCurrentlyChoosenContent={this.props.toggleCurrentlyChoosenContent}
-            currentlyChoosenContent={this.props.currentlyChoosenContent}
+            toggleCurrentlyChosenContent={this.props.toggleCurrentlyChosenContent}
+            currentlyChosenContent={this.props.currentlyChosenContent}
           />
         )
       }

@@ -31,6 +31,8 @@ const withUserContent = Component => {
     }
 
     addWatchingShow = (id, contentArr) => {
+      if (this.props.authUser === null) return
+
       const showIsWatching = this.state.watchingShows.find(show => show.id === id)
       const showToAdd = contentArr && contentArr.find(item => item.id === id)
       const notWatchingShows = this.state.subDatabases
@@ -65,6 +67,8 @@ const withUserContent = Component => {
     }
 
     removeWatchingShow = id => {
+      if (this.props.authUser === null) return
+
       const showIsWatching = this.state.watchingShows.find(show => show.id === id)
 
       if (showIsWatching) {
@@ -75,6 +79,8 @@ const withUserContent = Component => {
     }
 
     addShowToSubDatabase = (id, contentArr, database) => {
+      if (this.props.authUser === null) return
+
       const showIsWatching = this.state.watchingShows.find(show => show.id === id)
       const showInDatabase = this.state[database].some(show => show.id === id)
       const showToAdd = contentArr && contentArr.find(item => item.id === id)
@@ -107,6 +113,8 @@ const withUserContent = Component => {
     }
 
     toggleWatchLaterMovie = (id, contentArr) => {
+      if (this.props.authUser === null) return
+
       const movieExists = this.state.watchLaterMovies.find(show => show.id === id)
       const movieToAdd = contentArr && contentArr.find(item => item.id === id)
 
@@ -124,50 +132,6 @@ const withUserContent = Component => {
           .remove()
       }
     }
-
-    // addDroppedShow = (id, contentArr) => {
-    //   const userUid = this.props.authUser.uid
-    //   const contentExists = this.state.watchingShows.some(show => show.id === id)
-    //   const allreadyDropped = this.state.droppedShows.some(show => show.id === id)
-    //   const item = contentArr && contentArr.find(item => item.id === id)
-
-    //   if (allreadyDropped) return
-    //   if (contentExists) {
-    //     toggleWatchingShowsDatabase(this.firebase, id, userUid, false)
-    //   }
-
-    //   const tvShow = this.state.willWatchShows.find(item => item.id === id)
-    //   const key = tvShow ? tvShow.key : null
-
-    //   deleteShowFromSubDatabase(this.firebase, userUid, ["willWatchShows"], key).then(() => {
-    //     const newTvShowRef = this.firebase.droppedShows(userUid).push()
-    //     const key = newTvShowRef.key
-
-    //     newTvShowRef.set({ ...item, key })
-    //   })
-    // }
-
-    // addWillWatchShow = (id, contentArr) => {
-    //   const userUid = this.props.authUser.uid
-    //   const contentExists = this.state.watchingShows.some(show => show.id === id)
-    //   const allreadyWillBeWatching = this.state.willWatchShows.some(show => show.id === id)
-    //   const item = contentArr && contentArr.find(item => item.id === id)
-
-    //   if (allreadyWillBeWatching) return
-    //   if (contentExists) {
-    //     toggleWatchingShowsDatabase(this.firebase, id, userUid, false)
-    //   }
-
-    //   const tvShow = this.state.droppedShows.find(item => item.id === id)
-    //   const key = tvShow ? tvShow.key : null
-
-    //   deleteShowFromSubDatabase(this.firebase, userUid, ["droppedShows"], key).then(() => {
-    //     const newTvShowRef = this.firebase.willWatchShows(userUid).push()
-    //     const key = newTvShowRef.key
-
-    //     newTvShowRef.set({ ...item, key })
-    //   })
-    // }
 
     getContent = () => {
       if (this.props.authUser === null) return
