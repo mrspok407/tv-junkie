@@ -72,21 +72,6 @@ class Movies extends Component {
           showAllLinksPressed={this.state.showAllLinksPressed}
           error={this.state.error}
         />
-        {/* {onlyMovies.length ? (
-          <ContentResults
-            contentType="movies"
-            contentArr={watchLaterMovies}
-            moviesArr={this.state.moviesArr}
-            loadingIds={this.state.loadingIds}
-            moviesIds={this.state.moviesIds}
-            getMovieLinks={this.getMovieLinks}
-            showAllLinksPressed={this.state.showAllLinksPressed}
-            error={this.state.error}
-            className="content-results__wrapper--movies-page"
-          />
-        ) : (
-          <PlaceholderNoSelectedContent />
-        )} */}
         <ScrollToTop />
       </>
     )

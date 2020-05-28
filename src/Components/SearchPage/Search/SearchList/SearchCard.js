@@ -4,6 +4,58 @@ import classNames from "classnames"
 import { withUserContent } from "Components/UserContent"
 
 class SearchCard extends Component {
+  renderButtons = () => {
+    const { id, searchResults, mediaType } = this.props
+    return (
+      <div className="search-card__buttons">
+        {mediaType === "movie" ? (
+          <button
+            className={classNames("button", {
+              "button--pressed": this.props.userContent.watchLaterMovies.find(item => item.id === id)
+            })}
+            onClick={() => {
+              this.props.userContent.toggleWatchLaterMovie(id, searchResults)
+              if (
+                !this.props.userContent.watchLaterMovies.find(item => item.id === id) ||
+                this.props.currentlyChoosenContent.find(item => item.id === id)
+              ) {
+                this.props.toggleCurrentlyChoosenContent(id, searchResults)
+              }
+            }}
+            type="button"
+          >
+            {this.props.userContent.watchLaterMovies.find(item => item.id === id) ? "Remove" : "Watch later"}
+          </button>
+        ) : (
+          <>
+            {this.props.userContent.watchingShows.find(
+              item => item.id === id && item.userWatching === true
+            ) ? (
+              <button
+                className="button button--searchlist button--pressed"
+                onClick={() => this.props.userContent.removeWatchingShow(id, searchResults)}
+                type="button"
+              >
+                Not watching
+              </button>
+            ) : (
+              <button
+                className="button button--searchlist"
+                onClick={() => {
+                  this.props.userContent.addWatchingShow(id, searchResults)
+                  this.props.toggleCurrentlyChoosenContent(id, searchResults)
+                }}
+                type="button"
+              >
+                Watching
+              </button>
+            )}
+          </>
+        )}
+      </div>
+    )
+  }
+
   render() {
     const {
       movieTitle,
@@ -16,7 +68,6 @@ class SearchCard extends Component {
       id,
       known_for,
       known_for_department,
-      searchResults,
       mediaType,
       mediaTypeSearching
     } = this.props
@@ -57,7 +108,8 @@ class SearchCard extends Component {
                 </div>
               </div>
             </Link>
-            <div className="search-card__buttons">
+            {this.renderButtons()}
+            {/* <div className="search-card__buttons">
               <div className="search-card__add-movie-btn">
                 {this.props.userContent.watchingShows.some(e => e.id === id && e.userWatching === true) ? (
                   <button
@@ -77,7 +129,7 @@ class SearchCard extends Component {
                   </button>
                 )}
               </div>
-            </div>
+            </div> */}
           </>
         ) : (
           <>

@@ -570,7 +570,6 @@ const FullContentInfo = ({
               {mediaType === "movie" && (
                 <div className="full-detailes__info-row full-detailes__info--button">
                   <button
-                    className="button"
                     className={classNames("button", {
                       "button--pressed": userContent.watchLaterMovies.some(item => item.id === Number(id))
                     })}

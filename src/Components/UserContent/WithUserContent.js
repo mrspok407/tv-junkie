@@ -30,10 +30,6 @@ const withUserContent = Component => {
       this.getContent()
     }
 
-    componentDidUpdate() {
-      // console.log(this.state.watchingShows)
-    }
-
     addWatchingShow = (id, contentArr) => {
       const showIsWatching = this.state.watchingShows.find(show => show.id === id)
       const showToAdd = contentArr && contentArr.find(item => item.id === id)

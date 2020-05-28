@@ -1,12 +1,9 @@
 import React, { Component } from "react"
 import axios, { CancelToken } from "axios"
-// import ContentResults from "Components/Templates/ContentResults/ContentResults"
-// import PlaceholderNoSelectedContent from "Components/Placeholders/PlaceholderNoSelectedContent"
 import ScrollToTop from "Utils/ScrollToTop"
 import "./ShowsPage.scss"
 import HeaderBase from "Components/Header/Header"
 import { withFirebase } from "Components/Firebase/FirebaseContext"
-import { compose } from "recompose"
 import ShowsContent from "./ShowsContent"
 
 let cancelRequest
@@ -67,22 +64,6 @@ class Shows extends Component {
       <>
         <Header />
         <ShowsContent />
-
-        {/* {watchingShows.length ? (
-          <ContentResults
-            contentType="shows"
-            contentArr={watchingShows}
-            watchingShows={watchingShows}
-            getLastEpisodeLinks={this.getLastEpisodeLinks}
-            showsArr={this.state.showsArr}
-            loadingIds={this.state.loadingIds}
-            showsIds={this.state.showsIds}
-            error={this.state.error}
-            className="content-results__wrapper--shows-page"
-          />
-        ) : (
-          <PlaceholderNoSelectedContent />
-        )} */}
         <ScrollToTop />
       </>
     )

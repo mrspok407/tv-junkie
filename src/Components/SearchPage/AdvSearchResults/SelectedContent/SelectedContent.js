@@ -10,7 +10,6 @@ class MovieResultsSelected extends React.PureComponent {
 
     this.state = {
       showSelected: false
-      // watchingShows: []
     }
 
     this.selectedContentRef = React.createRef()
@@ -33,7 +32,6 @@ class MovieResultsSelected extends React.PureComponent {
   }
 
   render() {
-    const watchingShows = this.props.userContent.watchingShows.filter(item => item.userWatching && item)
     return (
       <>
         <div ref={this.selectedContentRef} className="selected-content__container">
@@ -46,13 +44,13 @@ class MovieResultsSelected extends React.PureComponent {
               }))
             }
           >
-            {watchingShows.length}
+            {this.props.currentlyChoosenContent.length}
           </button>
           {this.state.showSelected && (
             <div className="selected-content__list">
               <div className="selected-content__button-clear"></div>
 
-              {watchingShows.map(
+              {this.props.currentlyChoosenContent.map(
                 ({
                   original_title = "",
                   original_name = "",
@@ -99,13 +97,29 @@ class MovieResultsSelected extends React.PureComponent {
                         </div>
                       </Link>
                       <div className="selected-content__item-button">
-                        <button
-                          className="button"
-                          type="button"
-                          onClick={() => this.props.userContent.removeWatchingShow(id)}
-                        >
-                          Remove
-                        </button>
+                        {type === "movie" ? (
+                          <button
+                            className="button"
+                            onClick={() => {
+                              this.props.userContent.toggleWatchLaterMovie(id)
+                              this.props.toggleCurrentlyChoosenContent(id)
+                            }}
+                            type="button"
+                          >
+                            Remove
+                          </button>
+                        ) : (
+                          <button
+                            className="button"
+                            type="button"
+                            onClick={() => {
+                              this.props.userContent.removeWatchingShow(id)
+                              this.props.toggleCurrentlyChoosenContent(id)
+                            }}
+                          >
+                            Remove
+                          </button>
+                        )}
                       </div>
                     </div>
                   )

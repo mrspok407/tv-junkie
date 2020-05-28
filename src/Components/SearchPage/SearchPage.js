@@ -3,7 +3,7 @@ import axios, { CancelToken } from "axios"
 import { throttle } from "throttle-debounce"
 import { compose } from "recompose"
 import Search from "./Search/Search"
-import ContentResultsAdvSearch from "./AdvSearchResults/SearchResults/SearchResults"
+import AdvSearchResults from "./AdvSearchResults/SearchResults/SearchResults"
 import ContentResultsSelected from "./AdvSearchResults/SelectedContent/SelectedContent"
 import PlaceholderNoResults from "Components/Placeholders/PlaceholderNoResults"
 import { withUserContent } from "Components/UserContent"
@@ -31,7 +31,8 @@ class MainPage extends Component {
       searchingMovie: false,
       searchingAdvancedSearch: false,
       loadingNewPage: false,
-      error: ""
+      error: "",
+      currentlyChoosenContent: []
     }
   }
 
@@ -288,6 +289,21 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
     }
   }
 
+  toggleCurrentlyChoosenContent = (id, content) => {
+    const itemExists = this.state.currentlyChoosenContent.find(item => item.id === id)
+    const newItem = content && content.find(item => item.id === id)
+
+    if (itemExists) {
+      this.setState(prevState => ({
+        currentlyChoosenContent: [...prevState.currentlyChoosenContent.filter(item => item.id !== id)]
+      }))
+    } else {
+      this.setState(prevState => ({
+        currentlyChoosenContent: [...prevState.currentlyChoosenContent, newItem]
+      }))
+    }
+  }
+
   renderAdvMovies = () => {
     const { advancedSearchContent, totalPagesAdvMovies } = this.state
     return !Array.isArray(advancedSearchContent) || totalPagesAdvMovies === 0 ? (
@@ -295,17 +311,18 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
         <PlaceholderNoResults message="No content found" />
       </div>
     ) : (
-      <ContentResultsAdvSearch
+      <AdvSearchResults
         advancedSearchContent={this.state.advancedSearchContent}
-        searchingAdvancedSearch={this.state.searchingAdvancedSearch}
         loadingNewPage={this.state.loadingNewPage}
         clearAdvSearchMovies={this.clearAdvSearchMovies}
+        toggleCurrentlyChoosenContent={this.toggleCurrentlyChoosenContent}
+        currentlyChoosenContent={this.state.currentlyChoosenContent}
       />
     )
   }
 
   render() {
-    const watchingShows = this.props.userContent.watchingShows.filter(item => item.userWatching && item)
+    console.log(this.state.currentlyChoosenContent)
     return (
       <>
         <Header />
@@ -315,13 +332,18 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
           searchingAdvancedSearch={this.state.searchingAdvancedSearch}
           toggleActor={this.toggleActor}
           withActors={this.state.withActors}
-          renderMovies={this.renderMovies}
-          randomMovies={this.randomMovies}
           advancedSearch={this.advancedSearch}
           clearWithActors={this.clearWithActors}
+          toggleCurrentlyChoosenContent={this.toggleCurrentlyChoosenContent}
+          currentlyChoosenContent={this.state.currentlyChoosenContent}
         />
         {this.renderAdvMovies()}
-        {watchingShows.length > 0 && <ContentResultsSelected />}
+        {this.state.currentlyChoosenContent.length > 0 && (
+          <ContentResultsSelected
+            currentlyChoosenContent={this.state.currentlyChoosenContent}
+            toggleCurrentlyChoosenContent={this.toggleCurrentlyChoosenContent}
+          />
+        )}
 
         <ScrollToTop />
         {/* <Footer /> */}

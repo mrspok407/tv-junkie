@@ -15,7 +15,7 @@ class ShowsContent extends Component {
     }
   }
 
-  toggleContent = content => {
+  toggleSection = content => {
     this.setState({
       activeSection: content
     })
@@ -137,7 +137,7 @@ class ShowsContent extends Component {
                 "button--pressed": this.state.activeSection === "watchingShows"
               })}
               type="button"
-              onClick={() => this.toggleContent("watchingShows")}
+              onClick={() => this.toggleSection("watchingShows")}
             >
               Watching
             </button>
@@ -148,7 +148,7 @@ class ShowsContent extends Component {
                 "button--pressed": this.state.activeSection === "droppedShows"
               })}
               type="button"
-              onClick={() => this.toggleContent("droppedShows")}
+              onClick={() => this.toggleSection("droppedShows")}
             >
               Dropped
             </button>
@@ -159,7 +159,7 @@ class ShowsContent extends Component {
                 "button--pressed": this.state.activeSection === "willWatchShows"
               })}
               type="button"
-              onClick={() => this.toggleContent("willWatchShows")}
+              onClick={() => this.toggleSection("willWatchShows")}
             >
               Will Watch
             </button>
