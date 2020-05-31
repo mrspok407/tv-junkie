@@ -6,6 +6,10 @@ import { withFirebase } from "Components/Firebase"
 import { validEmailRegex } from "Utils"
 import classNames from "classnames"
 import Input from "../Input/Input"
+import { WithAuthenticationConsumer } from "../Session/WithAuthentication"
+
+const LOCAL_STORAGE_KEY_WATCHING_SHOWS = "watchingShowsLocalS"
+const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = "watchLaterMoviesLocalS"
 
 const INITIAL_STATE = {
   requiredInputs: {
@@ -53,6 +57,9 @@ class SignInFormBase extends Component {
     this.props.firebase
       .signInWithEmailAndPassword(email, password)
       .then(authUser => {
+        localStorage.removeItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)
+        localStorage.removeItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)
+
         this.setState({ ...INITIAL_STATE })
         this.props.history.push("/")
         console.log(`user sign in: ${authUser}`)
@@ -217,6 +224,6 @@ class SignInFormBase extends Component {
   }
 }
 
-const SignInForm = compose(withRouter, withFirebase)(SignInFormBase)
+const SignInForm = compose(WithAuthenticationConsumer, withRouter, withFirebase)(SignInFormBase)
 
 export default SignInForm

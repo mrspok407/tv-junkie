@@ -4,14 +4,14 @@
 import React, { useState, useEffect } from "react"
 import { useLocation } from "react-router-dom"
 import axios, { CancelToken } from "axios"
-import classNames from "classnames"
 import { withUserContent } from "Components/UserContent"
 import PlaceholderLoadingFullInfo from "Components/Placeholders/PlaceholderLoadingFullInfo/PlaceholderLoadingFullInfo"
 import ScrollToTop from "Utils/ScrollToTop"
 import Header from "Components/Header/Header"
-import Loader from "Components//Placeholders/Loader"
 import Slider from "Utils/Slider/Slider"
-import { differenceBtwDatesInDays } from "Utils"
+import MainInfo from "./Components/MainInfo"
+import ShowsEpisodes from "./Components/ShowsEpisodes"
+import PosterWrapper from "./Components/PosterWrapper"
 import "./FullContentInfo.scss"
 
 const todayDate = new Date()
@@ -21,9 +21,10 @@ const FullContentInfo = ({
   match: {
     params: { id, mediaType }
   },
-  userContent
+  userContent,
+  authUser
 }) => {
-  const [options, setOptions] = useState({
+  const [detailes, setDetailes] = useState({
     poster: "",
     posterMobile: "",
     title: "",
@@ -39,7 +40,8 @@ const FullContentInfo = ({
     numberOfSeasons: "",
     seasonsArr: [],
     tagline: "",
-    budget: ""
+    budget: "",
+    imdbId: ""
   })
 
   const [similarContent, setSimilarContent] = useState([])
@@ -48,23 +50,7 @@ const FullContentInfo = ({
 
   const [infoToPass, setInfoToPass] = useState([])
 
-  const [movieTorrents, setMovieTorrents] = useState({
-    title: "",
-    hash1080p: true,
-    hash720p: true,
-    movieAvailable: true
-  })
-  const [loadingTorrentLinks, setLoadingTorrentLinks] = useState(false)
-
-  const [tvShowEpisodes, setTvShowEpisodes] = useState([])
-  const [openSeasons, setOpenSeasons] = useState([])
-  const [loadingEpisodesIds, setLoadingEpisodesIds] = useState([])
-  const [detailEpisodeInfo, setDetailEpisodeInfo] = useState([])
-
   const [error, setError] = useState()
-  const [errorShowEpisodes, setErrorShowEpisodes] = useState()
-
-  // const watchingShows = userContent.watchingShows.filter(item => item.userWatching && item)
 
   const { pathname } = useLocation()
 
@@ -73,11 +59,14 @@ const FullContentInfo = ({
   }, [pathname])
 
   useEffect(() => {
+    // getFullContentInfo(mediaType)
+
     if (mediaType === "show") {
       getFullShowInfo()
     } else if (mediaType === "movie") {
       getFullMovieInfo()
     }
+
     return () => {
       if (cancelRequest !== undefined) {
         cancelRequest()
@@ -85,9 +74,121 @@ const FullContentInfo = ({
     }
   }, [mediaType, id])
 
+  // const getFullContentInfo = mediaType => {
+  //   const contentType = mediaType === "show" ? "tv" : "movie"
+  //   setLoadingPage(true)
+
+  //   axios
+  //     .get(
+  //       `https://api.themoviedb.org/3/${contentType}/${id}?api_key=${
+  //         process.env.REACT_APP_TMDB_API
+  //       }&language=en-US&append_to_response=${contentType === "tv" ? "similar" : "similar_movies"}`,
+  //       {
+  //         cancelToken: new CancelToken(function executor(c) {
+  //           cancelRequest = c
+  //         })
+  //       }
+  //     )
+  //     .then(
+  //       ({
+  //         data,
+  //         data: {
+  //           poster_path,
+  //           backdrop_path,
+  //           original_title,
+  //           original_name,
+  //           title,
+  //           name,
+  //           release_date,
+  //           first_air_date,
+  //           last_air_date,
+  //           runtime,
+  //           episode_run_rime,
+  //           status,
+  //           genres,
+  //           production_companies,
+  //           networks,
+  //           number_of_seasons,
+  //           seasons,
+  //           vote_average,
+  //           vote_count,
+  //           overview,
+  //           tagline,
+  //           budget,
+  //           imdb_id,
+  //           similar_movies,
+  //           similar
+  //         }
+  //       }) => {
+  //         const contentGenres =
+  //           contentType === "movie" ? genres.map(item => item.name).join(", ") : genres.map(item => item.id)
+
+  //         const genresIds = contentGenres.map(item => item.id) || []
+
+  //         const prodComp =
+  //           production_companies.length === 0 || !production_companies ? "-" : production_companies[0].name
+
+  //         const networkNames = networks && networks.length ? networks.map(item => item.name).join(", ") : "-"
+
+  //         // const similarContent = similar_movies.results
+  //         //   .filter(item => item.poster_path)
+  //         //   .sort((a, b) => b.vote_count - a.vote_count)
+
+  //         console.log(similarContent)
+
+  //         // setInfoToPass([
+  //         //   {
+  //         //     title,
+  //         //     name,
+  //         //     original_title,
+  //         //     original_name,
+  //         //     id: data.id,
+  //         //     release_date,
+  //         //     first_air_date,
+  //         //     vote_average,
+  //         //     genre_ids: genresIds,
+  //         //     overview,
+  //         //     backdrop_path,
+  //         //     poster_path,
+  //         //     vote_count
+  //         //   }
+  //         // ])
+
+  //         setDetailes({
+  //           poster: poster_path,
+  //           posterMobile: backdrop_path,
+  //           title: title || original_title || name || original_name || "-",
+  //           releaseDate: release_date || first_air_date || "-",
+  //           lastAirDate: last_air_date || "-",
+  //           runtime: runtime || episode_run_rime[0] || "-",
+  //           status: status || "-",
+  //           genres: contentGenres || "-",
+  //           productionCompany: prodComp,
+  //           network: networkNames || "-",
+  //           rating: vote_average || "-",
+  //           description: overview || "-",
+  //           numberOfSeasons: number_of_seasons || "-",
+  //           tagline: tagline || "-",
+  //           budget: budget || "-",
+  //           imdbId: imdb_id || "",
+  //           seasonsArr: seasons.reverse()
+  //         })
+
+  //         console.log("test")
+
+  //         setSimilarContent(similarContent)
+  //         setLoadingPage(false)
+  //       }
+  //     )
+  //     .catch(err => {
+  //       if (axios.isCancel(err)) return
+  //       setError("Something went wrong, sorry")
+  //       setLoadingPage(false)
+  //     })
+  // }
+
   const getFullShowInfo = () => {
     setLoadingPage(true)
-
     axios
       .get(
         `https://api.themoviedb.org/3/tv/${id}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US&append_to_response=similar`,
@@ -123,7 +224,7 @@ const FullContentInfo = ({
           const genreNames = genres && genres.length ? genres.map(item => item.name).join(", ") : "-"
           const networkNames = networks && networks.length ? networks.map(item => item.name).join(", ") : "-"
 
-          const similarShows = similar.results
+          const similarShows = similar.results.filter(item => item.poster_path)
           const similarShowsSortByVotes = similarShows.sort((a, b) => b.vote_count - a.vote_count)
 
           setInfoToPass([
@@ -141,7 +242,7 @@ const FullContentInfo = ({
             }
           ])
 
-          setOptions({
+          setDetailes({
             poster: poster_path,
             posterMobile: backdrop_path,
             title: name || original_name || "-",
@@ -165,47 +266,6 @@ const FullContentInfo = ({
         setError("Something went wrong, sorry")
         setLoadingPage(false)
       })
-  }
-
-  const showSeasonsEpisode = (seasonId, seasonNum) => {
-    if (openSeasons.includes(seasonId)) {
-      setOpenSeasons(prevState => [...prevState.filter(item => item !== seasonId)])
-    } else {
-      setOpenSeasons(prevState => [...prevState, seasonId])
-    }
-
-    if (tvShowEpisodes.some(item => item.seasonId === seasonId)) return
-
-    setLoadingEpisodesIds(prevState => [...prevState, seasonId])
-
-    axios
-      .get(
-        `https://api.themoviedb.org/3/tv/${id}/season/${seasonNum}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US`,
-        {
-          cancelToken: new CancelToken(function executor(c) {
-            cancelRequest = c
-          })
-        }
-      )
-      .then(({ data: { episodes } }) => {
-        const episodesReverese = episodes.reverse()
-        setTvShowEpisodes(prevState => [...prevState, { seasonId, episodes: episodesReverese }])
-        setLoadingEpisodesIds(prevState => [...prevState.filter(item => item !== seasonId)])
-        setErrorShowEpisodes("")
-      })
-      .catch(err => {
-        if (axios.isCancel(err)) return
-        setErrorShowEpisodes("Something went wrong, sorry")
-        setLoadingEpisodesIds([])
-      })
-  }
-
-  const showEpisodeInfo = episodeId => {
-    if (detailEpisodeInfo.includes(episodeId)) {
-      setDetailEpisodeInfo(prevState => [...prevState.filter(item => item !== episodeId)])
-    } else {
-      setDetailEpisodeInfo(prevState => [...prevState, episodeId])
-    }
   }
 
   const getFullMovieInfo = () => {
@@ -243,12 +303,11 @@ const FullContentInfo = ({
         }) => {
           const movieGenres = genres.map(item => item.name).join(", ")
           const genresIds = genres.map(item => item.id)
-          // const yearRelease = release_date.slice(0, 4)
 
           const prodComp =
             production_companies.length === 0 || !production_companies ? "-" : production_companies[0].name
 
-          const similarMovies = similar_movies.results
+          const similarMovies = similar_movies.results.filter(item => item.poster_path)
           const similarMoviesSortByVotes = similarMovies.sort((a, b) => b.vote_count - a.vote_count)
 
           setInfoToPass([
@@ -266,7 +325,7 @@ const FullContentInfo = ({
             }
           ])
 
-          setOptions({
+          setDetailes({
             poster: poster_path,
             posterMobile: backdrop_path,
             title: title || original_title || "-",
@@ -283,88 +342,15 @@ const FullContentInfo = ({
           })
 
           setSimilarContent(similarMoviesSortByVotes)
-
           setLoadingPage(false)
-          setLoadingTorrentLinks(true)
-
-          return axios.get(
-            `https://yts.mx/api/v2/list_movies.json?query_term=${imdb_id || title || original_title}`,
-            {
-              cancelToken: new CancelToken(function executor(c) {
-                cancelRequest = c
-              })
-            }
-          )
         }
       )
-      .then(res => {
-        if (!res.data.data.hasOwnProperty("movies")) {
-          setMovieTorrents({
-            movieAvailable: false
-          })
-          return
-        }
-
-        const movie = res.data.data.movies[0]
-        const movieHash1080p = movie.torrents.find(item => item.quality === "1080p")
-
-        const movieHash720p = movie.torrents.find(item => item.quality === "720p")
-
-        setMovieTorrents({
-          title: movie.title,
-          hash1080p: movieHash1080p && movieHash1080p.hash,
-          hash720p: movieHash720p && movieHash720p.hash,
-          movieAvailable: true
-        })
-        setLoadingTorrentLinks(false)
-      })
       .catch(err => {
         if (axios.isCancel(err)) return
         setError("Something went wrong, sorry")
+        setLoadingPage(false)
       })
   }
-
-  const {
-    poster,
-    posterMobile,
-    title,
-    releaseDate,
-    lastAirDate,
-    runtime,
-    status,
-    genres,
-    network,
-    productionCompany,
-    rating,
-    description,
-    tagline,
-    budget,
-    seasonsArr,
-    imdbId
-  } = options
-
-  const yearRelease = releaseDate.slice(0, 4)
-  const yearEnded = mediaType === "show" && lastAirDate.slice(0, 4)
-
-  const yearReleaseAsDateObj = new Date(releaseDate)
-
-  const yearRange = status !== "Ended" ? `${yearRelease} - ...` : `${yearRelease} - ${yearEnded}`
-
-  const formatedBudget =
-    budget !== 0 && budget !== "-" ? (
-      new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD"
-      })
-        .format(budget)
-        .slice(0, -3)
-        .split(",")
-        .join(".")
-    ) : (
-      <span className="full-detailes__info-no-info">-</span>
-    )
-
-  const urlShowTitle = title.split(" ").join("+")
 
   return (
     <>
@@ -374,412 +360,44 @@ const FullContentInfo = ({
           <span style={{ textAlign: "center", width: "100%" }}>{error}</span>
         ) : !loadingPage ? (
           <div className="full-detailes">
-            <div className="full-detailes__poster-wrapper">
-              <div
-                className="full-detailes__poster"
-                style={
-                  poster
-                    ? {
-                        backgroundImage: `url(https://image.tmdb.org/t/p/w500/${poster})`
-                      }
-                    : {
-                        backgroundImage: `url(https://homestaymatch.com/images/no-image-available.png)`
-                      }
-                }
-              />
-              {posterMobile && (
-                <div
-                  className="full-detailes__poster full-detailes__poster--mobile"
-                  style={{
-                    backgroundImage: `url(https://image.tmdb.org/t/p/w500/${posterMobile})`
-                  }}
-                />
-              )}
+            <PosterWrapper
+              poster={detailes.poster}
+              posterMobile={detailes.posterMobile}
+              imdbId={detailes.imdbId}
+              releaseDate={detailes.releaseDate}
+              todayDate={todayDate}
+              mediaType={mediaType}
+            />
 
-              {mediaType === "movie" &&
-              yearReleaseAsDateObj.getTime() < todayDate.getTime() &&
-              movieTorrents.movieAvailable ? (
-                <div className="full-detailes__movie-links">
-                  {!loadingTorrentLinks ? (
-                    <div className="torrent-links">
-                      {movieTorrents.hash1080p && (
-                        <a
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          href={`magnet:?xt=urn:btih:${movieTorrents.hash1080p}&dn=${movieTorrents.title}&xl=310660222&tr=udp%3A%2F%2Ftracker.coppersurfer.tk:6969/announce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org:6969/announce&tr=udp%3A%2F%2Ftracker.pirateparty.gr:6969/announce&tr=udp%3A%2F%2Fexodus.desync.com:6969/announce&tr=udp%3A%2F%2Ftracker.opentrackr.org:1337/announce&tr=udp%3A%2F%2Ftracker.internetwarriors.net:1337/announce&tr=udp%3A%2F%2Ftracker.torrent.eu.org:451&tr=udp%3A%2F%2Ftracker.cyberia.is:6969/announce&tr=udp%3A%2F%2Fopen.demonii.si:1337/announce&tr=udp%3A%2F%2Fopen.stealth.si:80/announce&tr=udp%3A%2F%2Ftracker.tiny-vps.com:6969/announce&tr=udp%3A%2F%2Ftracker.iamhansen.xyz:2000/announce&tr=udp%3A%2F%2Fexplodie.org:6969/announce&tr=udp%3A%2F%2Fdenis.stalker.upeer.me:6969/announce&tr=udp%3A%2F%2Fipv4.tracker.harry.lu:80/announce`}
-                        >
-                          1080p
-                        </a>
-                      )}
-                      {movieTorrents.hash720p && (
-                        <a
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          href={`magnet:?xt=urn:btih:${movieTorrents.hash720p}&dn=${movieTorrents.title}&xl=310660222&tr=udp%3A%2F%2Ftracker.coppersurfer.tk:6969/announce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org:6969/announce&tr=udp%3A%2F%2Ftracker.pirateparty.gr:6969/announce&tr=udp%3A%2F%2Fexodus.desync.com:6969/announce&tr=udp%3A%2F%2Ftracker.opentrackr.org:1337/announce&tr=udp%3A%2F%2Ftracker.internetwarriors.net:1337/announce&tr=udp%3A%2F%2Ftracker.torrent.eu.org:451&tr=udp%3A%2F%2Ftracker.cyberia.is:6969/announce&tr=udp%3A%2F%2Fopen.demonii.si:1337/announce&tr=udp%3A%2F%2Fopen.stealth.si:80/announce&tr=udp%3A%2F%2Ftracker.tiny-vps.com:6969/announce&tr=udp%3A%2F%2Ftracker.iamhansen.xyz:2000/announce&tr=udp%3A%2F%2Fexplodie.org:6969/announce&tr=udp%3A%2F%2Fdenis.stalker.upeer.me:6969/announce&tr=udp%3A%2F%2Fipv4.tracker.harry.lu:80/announce`}
-                        >
-                          720p
-                        </a>
-                      )}
-                    </div>
-                  ) : (
-                    <Loader className="loader--small-pink" />
-                  )}
-                </div>
-              ) : (
-                ""
-              )}
-            </div>
+            <MainInfo
+              title={detailes.title}
+              mediaType={mediaType}
+              releaseDate={detailes.releaseDate}
+              lastAirDate={detailes.lastAirDate}
+              status={detailes.status}
+              genres={detailes.genres}
+              network={detailes.network}
+              productionCompany={detailes.productionCompany}
+              rating={detailes.rating}
+              runtime={detailes.runtime}
+              tagline={detailes.tagline}
+              budget={detailes.budget}
+              imdbId={detailes.imdbId}
+              id={id}
+              authUser={authUser}
+              infoToPass={infoToPass}
+              userContent={userContent}
+            />
 
-            <div className="full-detailes__info">
-              <div className="full-detailes__info-title">
-                {title}
-                <span>{mediaType === "show" && yearRelease !== "-" ? ` (${yearRange})` : ""}</span>
-              </div>
-              <div className="full-detailes__info-row">
-                <div className="full-detailes__info-option">Year</div>
-                <div className="full-detailes__info-value">
-                  {yearRelease !== "-" ? (
-                    `${yearRelease}`
-                  ) : (
-                    <span className="full-detailes__info-no-info">{yearRelease}</span>
-                  )}
-                </div>
-              </div>
-              {status !== "Released" && (
-                <div className="full-detailes__info-row">
-                  <div className="full-detailes__info-option">Status</div>
-                  <div className="full-detailes__info-value">{status}</div>
-                </div>
-              )}
-
-              <div className="full-detailes__info-row">
-                <div className="full-detailes__info-option">Genres</div>
-                <div className="full-detailes__info-value">{genres}</div>
-              </div>
-              <div className="full-detailes__info-row">
-                <div className="full-detailes__info-option">Company</div>
-                <div className="full-detailes__info-value">
-                  {mediaType === "show"
-                    ? network
-                    : mediaType === "movie" &&
-                      (productionCompany !== "-" ? (
-                        productionCompany
-                      ) : (
-                        <span className="full-detailes__info-no-info">-</span>
-                      ))}
-                </div>
-              </div>
-              <div className="full-detailes__info-row">
-                <div className="full-detailes__info-option">Rating</div>
-                <div className="full-detailes__info-value">
-                  {rating !== "-" ? rating : <span className="full-detailes__info-no-info">{rating}</span>}
-                </div>
-              </div>
-              <div className="full-detailes__info-row">
-                <div className="full-detailes__info-option">Runtime</div>
-                <div className="full-detailes__info-value">
-                  {runtime !== "-" ? (
-                    `${runtime} min`
-                  ) : (
-                    <span className="full-detailes__info-no-info">{runtime}</span>
-                  )}
-                </div>
-              </div>
-              {mediaType === "movie" && (
-                <>
-                  <div className="full-detailes__info-row">
-                    <div className="full-detailes__info-option">Tagline</div>
-                    <div className="full-detailes__info-value">
-                      {tagline !== "-" ? (
-                        `${tagline}`
-                      ) : (
-                        <span className="full-detailes__info-no-info">{tagline}</span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="full-detailes__info-row">
-                    <div className="full-detailes__info-option">Budget</div>
-                    <div className="full-detailes__info-value">{formatedBudget}</div>
-                  </div>
-                  <div className="full-detailes__info-row">
-                    <div className="full-detailes__info-option">External links</div>
-                    <div className="full-detailes__info-value">
-                      <a
-                        href={`https://www.imdb.com/title/${imdbId}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="full-detailes__info-imdb"
-                      />
-                    </div>
-                  </div>
-                </>
-              )}
-
-              {mediaType === "show" && (
-                <div className="full-detailes__info-row full-detailes__info--button">
-                  <div className="content-results__sections">
-                    <div className="content-results__section">
-                      {userContent.watchingShows.some(item => item.id === Number(id) && item.userWatching) ? (
-                        <button
-                          className="button button--pressed"
-                          type="button"
-                          onClick={() => userContent.removeWatchingShow(Number(id))}
-                        >
-                          Not watching
-                        </button>
-                      ) : (
-                        <button
-                          className="button"
-                          type="button"
-                          onClick={() => userContent.addWatchingShow(Number(id), infoToPass)}
-                        >
-                          Watching
-                        </button>
-                      )}
-                    </div>
-                    <div className="content-results__section">
-                      <button
-                        className={classNames("button", {
-                          "button--pressed": userContent.droppedShows.some(item => item.id === Number(id))
-                        })}
-                        type="button"
-                        onClick={() =>
-                          userContent.addShowToSubDatabase(Number(id), infoToPass, "droppedShows")
-                        }
-                      >
-                        Drop
-                      </button>
-                    </div>
-                    <div className="content-results__section">
-                      <button
-                        className={classNames("button", {
-                          "button--pressed": userContent.willWatchShows.some(item => item.id === Number(id))
-                        })}
-                        type="button"
-                        onClick={() =>
-                          userContent.addShowToSubDatabase(Number(id), infoToPass, "willWatchShows")
-                        }
-                      >
-                        Will Watch
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {mediaType === "movie" && (
-                <div className="full-detailes__info-row full-detailes__info--button">
-                  <button
-                    className={classNames("button", {
-                      "button--pressed": userContent.watchLaterMovies.some(item => item.id === Number(id))
-                    })}
-                    onClick={() => userContent.toggleWatchLaterMovie(Number(id), infoToPass)}
-                    type="button"
-                  >
-                    {userContent.watchLaterMovies.some(item => item.id === Number(id))
-                      ? "Remove"
-                      : "Watch later"}
-                  </button>
-                </div>
-              )}
-            </div>
-            <div className="full-detailes__description">{description}</div>
+            <div className="full-detailes__description">{detailes.description}</div>
 
             {mediaType === "show" && (
-              <div className="full-detailes__seasons-and-episodes">
-                {seasonsArr.map(season => {
-                  if (season.season_number === 0 || season.name === "Specials" || !season.air_date)
-                    return null
-                  const seasonId = season.id
-
-                  const daysToNewSeason = differenceBtwDatesInDays(season.air_date, todayDate)
-
-                  return (
-                    <div
-                      key={seasonId}
-                      className={classNames("full-detailes__season", {
-                        "full-detailes__season--no-poster": !season.poster_path
-                      })}
-                      style={!loadingEpisodesIds.includes(seasonId) ? { rowGap: "10px" } : { rowGap: "0px" }}
-                    >
-                      <div
-                        className={classNames("full-detailes__season-info", {
-                          "full-detailes__season-info--open": openSeasons.includes(seasonId)
-                        })}
-                        style={
-                          daysToNewSeason > 0
-                            ? {
-                                backgroundColor: "rgba(132, 90, 90, 0.3)"
-                              }
-                            : {
-                                backgroundColor: "#1d1d1d96"
-                              }
-                        }
-                        onClick={() => showSeasonsEpisode(seasonId, season.season_number)}
-                      >
-                        <div className="full-detailes__season-number">
-                          Season {season.season_number}
-                          {daysToNewSeason > 0 && (
-                            <span className="full-detailes__season-when-new-season">
-                              {daysToNewSeason} days to air
-                            </span>
-                          )}
-                        </div>
-                        <div className="full-detailes__season-date">
-                          {season.air_date && season.air_date.slice(0, 4)}
-                        </div>
-                      </div>
-
-                      {openSeasons.includes(seasonId) &&
-                        (!loadingEpisodesIds.includes(seasonId) ? (
-                          <>
-                            {season.poster_path && (
-                              <div
-                                className="full-detailes__season-poster"
-                                style={{
-                                  backgroundImage: `url(https://image.tmdb.org/t/p/w500/${season.poster_path})`
-                                }}
-                              />
-                            )}
-
-                            <div className="full-detailes__episodes-list">
-                              {tvShowEpisodes.map(item => {
-                                if (item.seasonId !== seasonId) return null
-
-                                return item.episodes.map(episode => {
-                                  // Format Date //
-                                  const airDateISO = new Date(episode.air_date).toISOString()
-
-                                  const optionss = {
-                                    month: "long",
-                                    day: "numeric",
-                                    year: "numeric"
-                                  }
-
-                                  const formatedDate = new Date(airDateISO)
-
-                                  const episodeAirDate = episode.air_date
-                                    ? new Intl.DateTimeFormat("en-US", optionss).format(formatedDate)
-                                    : "No date available"
-                                  // Format Date End //
-
-                                  // Format Seasons And Episode Numbers //
-                                  const seasonToString = season.season_number.toString()
-                                  const episodeToString = episode.episode_number.toString()
-
-                                  const seasonNumber =
-                                    seasonToString.length === 1
-                                      ? "s0".concat(seasonToString)
-                                      : "s".concat(seasonToString)
-                                  const episodeNumber =
-                                    episodeToString.length === 1
-                                      ? "e0".concat(episodeToString)
-                                      : "e".concat(episodeToString)
-                                  // Format Seasons And Episode Numbers End //
-
-                                  const episodeAirDateAsDateObj = new Date(episode.air_date)
-
-                                  const daysToNewEpisode = differenceBtwDatesInDays(
-                                    episode.air_date,
-                                    todayDate
-                                  )
-
-                                  return (
-                                    <div
-                                      key={episode.id}
-                                      className={classNames("full-detailes__episode", {
-                                        "full-detailes__episode--open": detailEpisodeInfo.includes(episode.id)
-                                      })}
-                                    >
-                                      <div
-                                        className="full-detailes__episode-wrapper"
-                                        onClick={() => showEpisodeInfo(episode.id)}
-                                        style={
-                                          daysToNewEpisode > 0 || !episode.air_date
-                                            ? {
-                                                backgroundColor: "rgba(132, 90, 90, 0.3)"
-                                              }
-                                            : {
-                                                backgroundColor: "#1d1d1d96"
-                                              }
-                                        }
-                                      >
-                                        <div className="full-detailes__episode-date">{episodeAirDate}</div>
-                                        <div className="full-detailes__episode-name">
-                                          <span className="full-detailes__episode-number">
-                                            {episode.episode_number}.
-                                          </span>
-                                          {episode.name}
-                                        </div>
-                                        {daysToNewEpisode > 0 && (
-                                          <div className="full-detailes__episode-when-new-episode">
-                                            {daysToNewEpisode} days
-                                          </div>
-                                        )}
-                                      </div>
-
-                                      {detailEpisodeInfo.includes(episode.id) && (
-                                        <div
-                                          className={classNames("full-detailes__episode-detailes", {
-                                            "full-detailes__episode-detailes--no-image": !episode.still_path
-                                          })}
-                                        >
-                                          {episode.still_path && (
-                                            <div
-                                              className="full-detailes__episode-detailes-image"
-                                              style={{
-                                                backgroundImage: `url(https://image.tmdb.org/t/p/w500${episode.still_path})`
-                                              }}
-                                            />
-                                          )}
-                                          {episode.overview && (
-                                            <div className="full-detailes__episode-detailes-overview">
-                                              {episode.overview}
-                                            </div>
-                                          )}
-
-                                          {episodeAirDateAsDateObj < todayDate.getTime() && episode.air_date && (
-                                            <div className="torrent-links torrent-links--full-content">
-                                              <a
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}+1080p&cat=41`}
-                                              >
-                                                1080p
-                                              </a>
-                                              <a
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}+720p&cat=41`}
-                                              >
-                                                720p
-                                              </a>
-                                              <a
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}&cat=5`}
-                                              >
-                                                480p
-                                              </a>
-                                            </div>
-                                          )}
-                                        </div>
-                                      )}
-                                    </div>
-                                  )
-                                })
-                              })}
-                            </div>
-                          </>
-                        ) : !errorShowEpisodes ? (
-                          <Loader className="loader--small-pink" />
-                        ) : (
-                          <div>{errorShowEpisodes}</div>
-                        ))}
-                    </div>
-                  )
-                })}
-              </div>
+              <ShowsEpisodes
+                seasonsArr={detailes.seasonsArr}
+                todayDate={todayDate}
+                id={id}
+                showTitle={detailes.title}
+              />
             )}
             {similarContent.length > 0 && (
               <div className="full-detailes__slider">

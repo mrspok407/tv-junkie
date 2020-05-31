@@ -1,7 +1,6 @@
 import React, { Component } from "react"
 import axios, { CancelToken } from "axios"
 import ScrollToTop from "Utils/ScrollToTop"
-import "./ShowsPage.scss"
 import HeaderBase from "Components/Header/Header"
 import { withFirebase } from "Components/Firebase/FirebaseContext"
 import ShowsContent from "./ShowsContent"

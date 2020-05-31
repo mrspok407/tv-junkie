@@ -4,16 +4,19 @@ import { compose } from "recompose"
 import { WithAuthenticationConsumer } from "Components/UserAuth/Session/WithAuthentication"
 import { toggleWatchingShowsDatabase, deleteShowFromSubDatabase } from "./FirebaseHelpers"
 
+const LOCAL_STORAGE_KEY_WATCHING_SHOWS = "watchingShowsLocalS"
+const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = "watchLaterMoviesLocalS"
+
 const withUserContent = Component => {
   class WithUserContent extends React.Component {
     constructor(props) {
       super(props)
 
       this.state = {
-        watchingShows: [],
+        watchingShows: JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)) || [],
         droppedShows: [],
         willWatchShows: [],
-        watchLaterMovies: [],
+        watchLaterMovies: JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)) || [],
         addWatchingShow: this.addWatchingShow,
         removeWatchingShow: this.removeWatchingShow,
         addShowToSubDatabase: this.addShowToSubDatabase,
@@ -23,6 +26,7 @@ const withUserContent = Component => {
 
       this.firebase = this.props.firebase
       this.userUid = this.props.authUser && this.props.authUser.uid
+      this.authUser = this.props.authUser
     }
 
     componentDidMount() {
@@ -30,11 +34,32 @@ const withUserContent = Component => {
       this.getContent()
     }
 
+    componentDidUpdate(prevProps) {
+      if (this.props.authUser && this.props.authUser !== prevProps.authUser) {
+        this.authUser = this.props.authUser
+        this.userUid = this.props.authUser.uid
+
+        this.getContent()
+      }
+    }
+
     addWatchingShow = (id, contentArr) => {
-      if (this.props.authUser === null) return
+      const showToAdd = contentArr && contentArr.find(item => item.id === id)
+
+      if (this.authUser === null) {
+        showToAdd.userWatching = true
+        this.setState(
+          {
+            watchingShows: [...this.state.watchingShows, showToAdd]
+          },
+          () => {
+            localStorage.setItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS, JSON.stringify(this.state.watchingShows))
+          }
+        )
+        return
+      }
 
       const showIsWatching = this.state.watchingShows.find(show => show.id === id)
-      const showToAdd = contentArr && contentArr.find(item => item.id === id)
       const notWatchingShows = this.state.subDatabases
 
       let mergedDatabases = []
@@ -47,6 +72,8 @@ const withUserContent = Component => {
 
       const showInSubDatabases = mergedDatabases.find(item => item.id === id)
       const keyShowInSubDb = showInSubDatabases ? showInSubDatabases.key : null
+
+      console.log(this.userUid)
 
       deleteShowFromSubDatabase(this.firebase, this.userUid, this.state.subDatabases, keyShowInSubDb).then(
         () => {
@@ -67,7 +94,17 @@ const withUserContent = Component => {
     }
 
     removeWatchingShow = id => {
-      if (this.props.authUser === null) return
+      if (this.authUser === null) {
+        this.setState(
+          {
+            watchingShows: [...this.state.watchingShows.filter(item => item.id !== id)]
+          },
+          () => {
+            localStorage.setItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS, JSON.stringify(this.state.watchingShows))
+          }
+        )
+        return
+      }
 
       const showIsWatching = this.state.watchingShows.find(show => show.id === id)
 
@@ -79,7 +116,7 @@ const withUserContent = Component => {
     }
 
     addShowToSubDatabase = (id, contentArr, database) => {
-      if (this.props.authUser === null) return
+      if (this.authUser === null) return
 
       const showIsWatching = this.state.watchingShows.find(show => show.id === id)
       const showInDatabase = this.state[database].some(show => show.id === id)
@@ -113,10 +150,37 @@ const withUserContent = Component => {
     }
 
     toggleWatchLaterMovie = (id, contentArr) => {
-      if (this.props.authUser === null) return
-
       const movieExists = this.state.watchLaterMovies.find(show => show.id === id)
       const movieToAdd = contentArr && contentArr.find(item => item.id === id)
+
+      if (this.authUser === null) {
+        if (!movieExists) {
+          this.setState(
+            {
+              watchLaterMovies: [...this.state.watchLaterMovies, movieToAdd]
+            },
+            () => {
+              localStorage.setItem(
+                LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES,
+                JSON.stringify(this.state.watchLaterMovies)
+              )
+            }
+          )
+        } else {
+          this.setState(
+            {
+              watchLaterMovies: [...this.state.watchLaterMovies.filter(item => item.id !== id)]
+            },
+            () => {
+              localStorage.setItem(
+                LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES,
+                JSON.stringify(this.state.watchLaterMovies)
+              )
+            }
+          )
+        }
+        return
+      }
 
       if (!movieExists) {
         const newMovieRef = this.firebase.watchLaterMovies(this.userUid).push()
@@ -134,7 +198,15 @@ const withUserContent = Component => {
     }
 
     getContent = () => {
-      if (this.props.authUser === null) return
+      if (this.userUid === null) {
+        this.setState({
+          watchingShows: JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)) || [],
+          droppedShows: [],
+          willWatchShows: [],
+          watchLaterMovies: JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)) || []
+        })
+        return
+      }
 
       this.firebase.userContent(this.userUid).on("value", snapshot => {
         const userContent = snapshot.val() || {}

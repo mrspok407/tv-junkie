@@ -109,27 +109,6 @@ class SearchCard extends Component {
               </div>
             </Link>
             {this.renderButtons()}
-            {/* <div className="search-card__buttons">
-              <div className="search-card__add-movie-btn">
-                {this.props.userContent.watchingShows.some(e => e.id === id && e.userWatching === true) ? (
-                  <button
-                    className="button button--searchlist button--pressed"
-                    onClick={() => this.props.userContent.removeWatchingShow(id, searchResults)}
-                    type="button"
-                  >
-                    Remove {mediaType === "movie" || mediaTypeSearching === "movie" ? "movie" : "show"}
-                  </button>
-                ) : (
-                  <button
-                    className="button button--searchlist"
-                    onClick={() => this.props.userContent.addWatchingShow(id, searchResults)}
-                    type="button"
-                  >
-                    Add {mediaType === "movie" || mediaTypeSearching === "movie" ? "movie" : "show"}
-                  </button>
-                )}
-              </div>
-            </div> */}
           </>
         ) : (
           <>

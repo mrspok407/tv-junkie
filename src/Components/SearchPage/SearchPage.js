@@ -322,7 +322,6 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
   }
 
   render() {
-    console.log(this.state.currentlyChosenContent)
     return (
       <>
         <Header />

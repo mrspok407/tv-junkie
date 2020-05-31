@@ -149,7 +149,15 @@ class AdvSearchResults extends Component {
                           ) ? (
                             <button
                               className="button button--pressed"
-                              onClick={() => this.props.userContent.removeWatchingShow(id)}
+                              onClick={() => {
+                                this.props.userContent.removeWatchingShow(id)
+                                if (this.props.currentlyChosenContent.find(item => item.id === id)) {
+                                  this.props.toggleCurrentlyChosenContent(
+                                    id,
+                                    this.props.advancedSearchContent
+                                  )
+                                }
+                              }}
                               type="button"
                             >
                               Not watching

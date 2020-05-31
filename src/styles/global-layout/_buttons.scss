@@ -87,3 +87,73 @@
     transform: translate(3px, 3px);
   }
 }
+
+.button--not-logged-in {
+  background-color: #5f442a;
+  color: #ffffff7a;
+
+  &:after,
+  &:before {
+    display: none;
+  }
+}
+
+.buttons__row {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  column-gap: 5px;
+
+  &--shows-page {
+    padding-bottom: 25px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+
+  @include mediaMaxW(800px) {
+    padding: 0;
+  }
+
+  @include mediaMaxW(650px) {
+    grid-template-columns: 1fr;
+    row-gap: 5px;
+  }
+}
+
+.buttons__col {
+  position: relative;
+
+  &-wrapper {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: 5px;
+  }
+
+  &-warning {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    padding: 5px;
+    text-align: center;
+    font-size: 0.9rem;
+    background-color: #fff;
+    border-radius: 5px;
+    opacity: 0;
+    animation: showNotAuthWarning 0.5s forwards;
+    @keyframes showNotAuthWarning {
+      to {
+        opacity: 1;
+      }
+    }
+
+    &:after {
+      $dimensions: 10px;
+      content: "";
+      position: absolute;
+      top: -$dimensions / 2;
+      left: 50%;
+      transform: translateX(-50%) rotate(45deg);
+      width: $dimensions;
+      height: $dimensions;
+      background-color: #fff;
+    }
+  }
+}

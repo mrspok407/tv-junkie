@@ -8,6 +8,9 @@ import * as ROLES from "Utils/Constants/roles"
 import classNames from "classnames"
 import Input from "../Input/Input"
 
+const LOCAL_STORAGE_KEY_WATCHING_SHOWS = "watchingShowsLocalS"
+const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = "watchLaterMoviesLocalS"
+
 const INITIAL_STATE = {
   inputs: {
     login: ""
@@ -63,7 +66,11 @@ class RegisterBase extends Component {
     this.props.firebase
       .createUserWithEmailAndPassword(email, password)
       .then(authUser => {
-        if (email === "mr.spok407@gmail.com") roles[ROLES.ADMIN] = ROLES.ADMIN
+        if (email === "mr.spok407@gmail.com") {
+          roles[ROLES.ADMIN] = ROLES.ADMIN
+        } else {
+          roles[ROLES.ADMIN] = ROLES.USER
+        }
 
         this.props.firebase
           .user(authUser.user.uid)
@@ -73,7 +80,18 @@ class RegisterBase extends Component {
             roles
           })
           .then(() => {
-            console.log("sync ok")
+            const watchingShows = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS))
+
+            watchingShows.forEach(item => {
+              const newShowRef = this.props.firebase.watchingShows(authUser.user.uid).push()
+              const key = newShowRef.key
+
+              newShowRef.set({ ...item, key, userWatching: true })
+            })
+          })
+          .then(() => {
+            localStorage.removeItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)
+            localStorage.removeItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)
           })
       })
       .then(() => {

@@ -3,7 +3,6 @@ import { Link } from "react-router-dom"
 import { withUserContent } from "Components/UserContent"
 import { listOfGenres } from "Utils"
 import classNames from "classnames"
-import "./ShowsPage.scss"
 import PlaceholderNoShows from "Components/Placeholders/PlaceholderNoShows"
 
 class ShowsContent extends Component {
@@ -130,8 +129,8 @@ class ShowsContent extends Component {
 
     return (
       <div className="content-results">
-        <div className="content-results__sections">
-          <div className="content-results__section">
+        <div className="buttons__row buttons__row--shows-page">
+          <div className="buttons__col">
             <button
               className={classNames("button", {
                 "button--pressed": this.state.activeSection === "watchingShows"
@@ -142,7 +141,7 @@ class ShowsContent extends Component {
               Watching
             </button>
           </div>
-          <div className="content-results__section">
+          <div className="buttons__col">
             <button
               className={classNames("button", {
                 "button--pressed": this.state.activeSection === "droppedShows"
@@ -153,7 +152,7 @@ class ShowsContent extends Component {
               Dropped
             </button>
           </div>
-          <div className="content-results__section">
+          <div className="buttons__col">
             <button
               className={classNames("button", {
                 "button--pressed": this.state.activeSection === "willWatchShows"
@@ -178,7 +177,11 @@ class ShowsContent extends Component {
           }
         >
           {content.length === 0 ? (
-            <PlaceholderNoShows section={this.state.activeSection} />
+            <PlaceholderNoShows
+              section={this.state.activeSection}
+              authUser={this.props.authUser}
+              activeSection={this.state.activeSection}
+            />
           ) : (
             this.renderContent(this.state.activeSection)
           )}
