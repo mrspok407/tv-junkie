@@ -2,25 +2,31 @@ import React, { Component } from "react"
 import { Link } from "react-router-dom"
 import { withUserContent } from "Components/UserContent"
 import { listOfGenres } from "Utils"
+import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
 import Loader from "Components/Placeholders/Loader"
 import PlaceholderNoMovies from "Components/Placeholders/PlaceholderNoMovies"
 import "./MoviesPage.scss"
 
 class MoviesContent extends Component {
   showLinksToAll() {
+    const watchLaterMovies = this.props.authUser
+      ? this.props.userContent.watchLaterMovies
+      : this.context.watchLaterMovies
     const showAllLinksPressed = true
 
-    this.props.userContent.watchLaterMovies.map(item =>
+    watchLaterMovies.map(item =>
       this.props.getMovieLinks(item.id, showAllLinksPressed, item.original_title, item.release_date)
     )
   }
 
   renderContent = () => {
-    const content = this.props.userContent.watchLaterMovies
+    const watchLaterMovies = this.props.authUser
+      ? this.props.userContent.watchLaterMovies
+      : this.context.watchLaterMovies
 
     return (
       <>
-        {content.map(
+        {watchLaterMovies.map(
           ({
             title,
             original_title,
@@ -152,9 +158,13 @@ class MoviesContent extends Component {
                 </div>
                 <button
                   className="button--del-item"
-                  onClick={() =>
-                    this.props.userContent.toggleWatchLaterMovie(id, this.props.userContent.watchLaterMovies)
-                  }
+                  onClick={() => {
+                    if (this.props.authUser) {
+                      this.props.userContent.toggleWatchLaterMovie(id, watchLaterMovies)
+                    } else {
+                      this.context.toggleContentLS(id, "watchLaterMovies", watchLaterMovies)
+                    }
+                  }}
                   type="button"
                 />
               </div>
@@ -166,7 +176,9 @@ class MoviesContent extends Component {
   }
 
   render() {
-    const watchLaterMovies = this.props.userContent.watchLaterMovies
+    const watchLaterMovies = this.props.authUser
+      ? this.props.userContent.watchLaterMovies
+      : this.context.watchLaterMovies
     const maxColumns = 4
     const currentNumOfColumns =
       watchLaterMovies.length <= maxColumns - 1 ? watchLaterMovies.length : maxColumns
@@ -200,3 +212,5 @@ class MoviesContent extends Component {
 }
 
 export default withUserContent(MoviesContent)
+
+MoviesContent.contextType = UserContentLocalStorageContext

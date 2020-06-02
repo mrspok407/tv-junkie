@@ -10,6 +10,7 @@ import FullContentInfo from "Components/Templates/FullContentInfo/FullContentInf
 import GridTests from "Utils/GridTests/GridTests"
 import * as ROUTES from "Utils/Constants/routes"
 import { WithAuthenticationProvider } from "Components/UserAuth/Session/WithAuthentication"
+import userContentLocalStorageProvider from "Components/UserContent/UserContentLocalStorageContext"
 
 class App extends Component {
   render() {
@@ -31,4 +32,4 @@ class App extends Component {
   }
 }
 
-export default compose(WithAuthenticationProvider)(App)
+export default compose(WithAuthenticationProvider, userContentLocalStorageProvider)(App)

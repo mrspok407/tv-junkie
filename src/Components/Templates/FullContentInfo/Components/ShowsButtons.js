@@ -1,5 +1,6 @@
 import React, { Component } from "react"
 import classNames from "classnames"
+import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
 
 export default class ShowsButtons extends Component {
   constructor(props) {
@@ -36,14 +37,23 @@ export default class ShowsButtons extends Component {
 
   render() {
     const { userContent, id, authUser, infoToPass } = this.props
+    const watchingShows = this.props.authUser
+      ? this.props.userContent.watchingShows.filter(item => item.userWatching && item)
+      : this.context.watchingShows
     return (
       <div className="buttons__row">
         <div className="buttons__col">
-          {this.props.userContent.watchingShows.some(item => item.id === Number(id) && item.userWatching) ? (
+          {watchingShows.some(item => item.id === Number(id) && item.userWatching) ? (
             <button
               className="button button--pressed"
               type="button"
-              onClick={() => userContent.removeWatchingShow(Number(id))}
+              onClick={() => {
+                if (this.props.authUser) {
+                  userContent.removeWatchingShow(Number(id))
+                } else {
+                  this.context.toggleContentLS(Number(id), "watchingShows")
+                }
+              }}
             >
               Not watching
             </button>
@@ -51,7 +61,13 @@ export default class ShowsButtons extends Component {
             <button
               className="button"
               type="button"
-              onClick={() => userContent.addWatchingShow(Number(id), infoToPass)}
+              onClick={() => {
+                if (this.props.authUser) {
+                  userContent.addWatchingShow(Number(id), infoToPass)
+                } else {
+                  this.context.toggleContentLS(Number(id), "watchingShows", infoToPass)
+                }
+              }}
             >
               Watching
             </button>
@@ -109,3 +125,5 @@ export default class ShowsButtons extends Component {
     )
   }
 }
+
+ShowsButtons.contextType = UserContentLocalStorageContext

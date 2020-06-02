@@ -2,6 +2,7 @@
 import React, { Component } from "react"
 import ShowsButtons from "./ShowsButtons"
 import classNames from "classnames"
+import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
 
 export default class MainInfo extends Component {
   render() {
@@ -23,6 +24,10 @@ export default class MainInfo extends Component {
       ) : (
         <span className="full-detailes__info-no-info">-</span>
       )
+
+    const watchLaterMovies = this.props.authUser
+      ? this.props.userContent.watchLaterMovies
+      : this.context.watchLaterMovies
 
     return (
       <div className="full-detailes__info">
@@ -127,18 +132,22 @@ export default class MainInfo extends Component {
           {this.props.mediaType === "movie" && (
             <button
               className={classNames("button", {
-                "button--pressed": this.props.userContent.watchLaterMovies.some(
-                  item => item.id === Number(this.props.id)
-                )
+                "button--pressed": watchLaterMovies.some(item => item.id === Number(this.props.id))
               })}
-              onClick={() =>
-                this.props.userContent.toggleWatchLaterMovie(Number(this.props.id), this.props.infoToPass)
-              }
+              onClick={() => {
+                if (this.props.authUser) {
+                  this.props.userContent.toggleWatchLaterMovie(Number(this.props.id), this.props.infoToPass)
+                } else {
+                  this.context.toggleContentLS(
+                    Number(this.props.id),
+                    "watchLaterMovies",
+                    this.props.infoToPass
+                  )
+                }
+              }}
               type="button"
             >
-              {this.props.userContent.watchLaterMovies.some(item => item.id === Number(this.props.id))
-                ? "Remove"
-                : "Watch later"}
+              {watchLaterMovies.some(item => item.id === Number(this.props.id)) ? "Remove" : "Watch later"}
             </button>
           )}
         </div>
@@ -146,3 +155,5 @@ export default class MainInfo extends Component {
     )
   }
 }
+
+MainInfo.contextType = UserContentLocalStorageContext

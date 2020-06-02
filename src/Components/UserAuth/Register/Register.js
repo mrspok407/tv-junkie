@@ -7,6 +7,7 @@ import { validEmailRegex } from "Utils"
 import * as ROLES from "Utils/Constants/roles"
 import classNames from "classnames"
 import Input from "../Input/Input"
+import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
 
 const LOCAL_STORAGE_KEY_WATCHING_SHOWS = "watchingShowsLocalS"
 const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = "watchLaterMoviesLocalS"
@@ -69,7 +70,7 @@ class RegisterBase extends Component {
         if (email === "mr.spok407@gmail.com") {
           roles[ROLES.ADMIN] = ROLES.ADMIN
         } else {
-          roles[ROLES.ADMIN] = ROLES.USER
+          roles[ROLES.USER] = ROLES.USER
         }
 
         this.props.firebase
@@ -80,7 +81,9 @@ class RegisterBase extends Component {
             roles
           })
           .then(() => {
-            const watchingShows = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS))
+            const watchingShows = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)) || []
+            const watchLaterMovies =
+              JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)) || []
 
             watchingShows.forEach(item => {
               const newShowRef = this.props.firebase.watchingShows(authUser.user.uid).push()
@@ -88,19 +91,28 @@ class RegisterBase extends Component {
 
               newShowRef.set({ ...item, key, userWatching: true })
             })
+
+            watchLaterMovies.forEach(item => {
+              const newShowRef = this.props.firebase.watchLaterMovies(authUser.user.uid).push()
+              const key = newShowRef.key
+
+              newShowRef.set({ ...item, key })
+            })
           })
           .then(() => {
             localStorage.removeItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)
             localStorage.removeItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)
+
+            this.context.clearContentState()
+            this.props.clearCurrentlyChosenContent()
           })
       })
       .then(() => {
         return this.props.firebase.sendEmailVerification()
       })
-      .then(authUser => {
+      .then(() => {
         this.setState({ ...INITIAL_STATE })
         this.props.history.push("/")
-        console.log(`user created: ${authUser}`)
       })
       .catch(error => {
         errors.error = error
@@ -308,3 +320,5 @@ class RegisterBase extends Component {
 const Register = compose(withRouter, withFirebase)(RegisterBase)
 
 export default Register
+
+RegisterBase.contextType = UserContentLocalStorageContext

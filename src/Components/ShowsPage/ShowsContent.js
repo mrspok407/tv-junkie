@@ -4,6 +4,7 @@ import { withUserContent } from "Components/UserContent"
 import { listOfGenres } from "Utils"
 import classNames from "classnames"
 import PlaceholderNoShows from "Components/Placeholders/PlaceholderNoShows"
+import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
 
 class ShowsContent extends Component {
   constructor(props) {
@@ -26,9 +27,11 @@ class ShowsContent extends Component {
         ? this.props.userContent[section].filter(item => item.userWatching && item)
         : this.props.userContent[section]
 
+    const watchingShows = this.props.authUser ? content : this.context.watchingShows
+
     return (
       <>
-        {content.map(
+        {watchingShows.map(
           ({
             name,
             original_name,
@@ -93,7 +96,13 @@ class ShowsContent extends Component {
                   <div className="content-results__item-links content-results__item-links--adv-search">
                     <button
                       className="button"
-                      onClick={() => this.props.userContent.removeWatchingShow(id)}
+                      onClick={() => {
+                        if (this.props.authUser) {
+                          this.props.userContent.removeWatchingShow(id)
+                        } else {
+                          this.context.toggleContentLS(id, "watchingShows")
+                        }
+                      }}
                       type="button"
                     >
                       Not watching
@@ -192,3 +201,5 @@ class ShowsContent extends Component {
 }
 
 export default withUserContent(ShowsContent)
+
+ShowsContent.contextType = UserContentLocalStorageContext

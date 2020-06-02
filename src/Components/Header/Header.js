@@ -53,7 +53,7 @@ export default class Header extends Component {
                 )}
               </>
             ) : (
-              <Login />
+              <Login clearCurrentlyChosenContent={this.props.clearCurrentlyChosenContent} />
             )}
           </ul>
         </nav>

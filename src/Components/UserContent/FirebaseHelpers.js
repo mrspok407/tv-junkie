@@ -5,12 +5,12 @@ export const toggleWatchingShowsDatabase = (firebase, userUid, key, userWatching
     .update({ userWatching: userWatching })
 }
 
-export const deleteShowFromSubDatabase = (firebase, userUid, dataBase, key) => {
+export const deleteShowFromSubDatabase = (firebase, userUid, dataBases, key) => {
   if (!key) return Promise.resolve()
 
   const promises = []
 
-  dataBase.forEach(item => {
+  dataBases.forEach(item => {
     const promise = firebase[item](userUid)
       .child(key)
       .once("value", snapshot => {

@@ -39,7 +39,10 @@ export default class Login extends Component {
     return this.state.activeSection === "signIn" ? (
       <>
         <div className="auth__section">
-          <SignInForm togglePasswordForget={this.togglePasswordForget} />
+          <SignInForm
+            togglePasswordForget={this.togglePasswordForget}
+            clearCurrentlyChosenContent={this.props.clearCurrentlyChosenContent}
+          />
         </div>
         {this.state.passwordForgetFormOpen ? (
           <div className="auth__section">
@@ -52,7 +55,7 @@ export default class Login extends Component {
     ) : (
       this.state.activeSection === "Register" && (
         <div className="auth__section">
-          <Register />
+          <Register clearCurrentlyChosenContent={this.props.clearCurrentlyChosenContent} />
         </div>
       )
     )

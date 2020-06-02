@@ -7,6 +7,7 @@ import { validEmailRegex } from "Utils"
 import classNames from "classnames"
 import Input from "../Input/Input"
 import { WithAuthenticationConsumer } from "../Session/WithAuthentication"
+import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
 
 const LOCAL_STORAGE_KEY_WATCHING_SHOWS = "watchingShowsLocalS"
 const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = "watchLaterMoviesLocalS"
@@ -59,6 +60,9 @@ class SignInFormBase extends Component {
       .then(authUser => {
         localStorage.removeItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)
         localStorage.removeItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)
+
+        this.context.clearContentState()
+        this.props.clearCurrentlyChosenContent()
 
         this.setState({ ...INITIAL_STATE })
         this.props.history.push("/")
@@ -227,3 +231,5 @@ class SignInFormBase extends Component {
 const SignInForm = compose(WithAuthenticationConsumer, withRouter, withFirebase)(SignInFormBase)
 
 export default SignInForm
+
+SignInFormBase.contextType = UserContentLocalStorageContext

@@ -2,21 +2,35 @@ import React, { Component } from "react"
 import { Link } from "react-router-dom"
 import classNames from "classnames"
 import { withUserContent } from "Components/UserContent"
+import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
 
 class SearchCard extends Component {
   renderButtons = () => {
     const { id, searchResults, mediaType } = this.props
+
+    const watchLaterMovies = this.props.authUser
+      ? this.props.userContent.watchLaterMovies
+      : this.context.watchLaterMovies
+
+    const watchingShows = this.props.authUser
+      ? this.props.userContent.watchingShows
+      : this.context.watchingShows
     return (
       <div className="search-card__buttons">
         {mediaType === "movie" ? (
           <button
             className={classNames("button", {
-              "button--pressed": this.props.userContent.watchLaterMovies.find(item => item.id === id)
+              "button--pressed": watchLaterMovies.find(item => item.id === id)
             })}
             onClick={() => {
-              this.props.userContent.toggleWatchLaterMovie(id, searchResults)
+              if (this.props.authUser) {
+                this.props.userContent.toggleWatchLaterMovie(id, searchResults)
+              } else {
+                this.context.toggleContentLS(id, "watchLaterMovies", searchResults)
+              }
+
               if (
-                !this.props.userContent.watchLaterMovies.find(item => item.id === id) ||
+                !watchLaterMovies.find(item => item.id === id) ||
                 this.props.currentlyChosenContent.find(item => item.id === id)
               ) {
                 this.props.toggleCurrentlyChosenContent(id, searchResults)
@@ -24,16 +38,20 @@ class SearchCard extends Component {
             }}
             type="button"
           >
-            {this.props.userContent.watchLaterMovies.find(item => item.id === id) ? "Remove" : "Watch later"}
+            {watchLaterMovies.find(item => item.id === id) ? "Remove" : "Watch later"}
           </button>
         ) : (
           <>
-            {this.props.userContent.watchingShows.find(
-              item => item.id === id && item.userWatching === true
-            ) ? (
+            {watchingShows.find(item => item.id === id && item.userWatching === true) ? (
               <button
                 className="button button--searchlist button--pressed"
-                onClick={() => this.props.userContent.removeWatchingShow(id, searchResults)}
+                onClick={() => {
+                  if (this.props.authUser) {
+                    this.props.userContent.removeWatchingShow(id)
+                  } else {
+                    this.context.toggleContentLS(id, "watchingShows")
+                  }
+                }}
                 type="button"
               >
                 Not watching
@@ -42,7 +60,12 @@ class SearchCard extends Component {
               <button
                 className="button button--searchlist"
                 onClick={() => {
-                  this.props.userContent.addWatchingShow(id, searchResults)
+                  if (this.props.authUser) {
+                    this.props.userContent.addWatchingShow(id, searchResults)
+                  } else {
+                    this.context.toggleContentLS(id, "watchingShows", searchResults)
+                  }
+
                   this.props.toggleCurrentlyChosenContent(id, searchResults)
                 }}
                 type="button"
@@ -167,3 +190,5 @@ class SearchCard extends Component {
 }
 
 export default withUserContent(SearchCard)
+
+SearchCard.contextType = UserContentLocalStorageContext

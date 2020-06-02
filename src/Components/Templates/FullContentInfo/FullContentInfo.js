@@ -347,7 +347,7 @@ const FullContentInfo = ({
       )
       .catch(err => {
         if (axios.isCancel(err)) return
-        setError("Something went wrong, sorry")
+        setError("Something went wrong, sorry. Try to reload the page.")
         setLoadingPage(false)
       })
   }
@@ -357,7 +357,9 @@ const FullContentInfo = ({
       <Header isLogoVisible={false} />
       <div className="full-detailes-container">
         {error ? (
-          <span style={{ textAlign: "center", width: "100%" }}>{error}</span>
+          <div className="full-detailes__error">
+            <h1>{error}</h1>
+          </div>
         ) : !loadingPage ? (
           <div className="full-detailes">
             <PosterWrapper

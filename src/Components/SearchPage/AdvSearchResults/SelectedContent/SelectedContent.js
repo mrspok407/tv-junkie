@@ -3,6 +3,7 @@ import { Link } from "react-router-dom"
 import "./SelectedContent.scss"
 import { withUserContent } from "Components/UserContent"
 import { compose } from "recompose"
+import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
 
 class MovieResultsSelected extends React.PureComponent {
   constructor(props) {
@@ -17,6 +18,10 @@ class MovieResultsSelected extends React.PureComponent {
 
   componentDidMount() {
     document.addEventListener("mousedown", this.handleClickOutside)
+  }
+
+  componentDidUpdate() {
+    // console.log(this.props.currentlyChosenContent)
   }
 
   componentWillUnmount() {
@@ -101,7 +106,11 @@ class MovieResultsSelected extends React.PureComponent {
                           <button
                             className="button"
                             onClick={() => {
-                              this.props.userContent.toggleWatchLaterMovie(id)
+                              if (this.props.authUser) {
+                                this.props.userContent.toggleWatchLaterMovie(id)
+                              } else {
+                                this.context.toggleContentLS(id, "watchLaterMovies")
+                              }
                               this.props.toggleCurrentlyChosenContent(id)
                             }}
                             type="button"
@@ -113,7 +122,11 @@ class MovieResultsSelected extends React.PureComponent {
                             className="button"
                             type="button"
                             onClick={() => {
-                              this.props.userContent.removeWatchingShow(id)
+                              if (this.props.authUser) {
+                                this.props.userContent.removeWatchingShow(id)
+                              } else {
+                                this.context.toggleContentLS(id, "watchingShows")
+                              }
                               this.props.toggleCurrentlyChosenContent(id)
                             }}
                           >
@@ -134,3 +147,5 @@ class MovieResultsSelected extends React.PureComponent {
 }
 
 export default compose(withUserContent)(MovieResultsSelected)
+
+MovieResultsSelected.contextType = UserContentLocalStorageContext

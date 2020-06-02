@@ -4,19 +4,16 @@ import { compose } from "recompose"
 import { WithAuthenticationConsumer } from "Components/UserAuth/Session/WithAuthentication"
 import { toggleWatchingShowsDatabase, deleteShowFromSubDatabase } from "./FirebaseHelpers"
 
-const LOCAL_STORAGE_KEY_WATCHING_SHOWS = "watchingShowsLocalS"
-const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = "watchLaterMoviesLocalS"
-
 const withUserContent = Component => {
   class WithUserContent extends React.Component {
     constructor(props) {
       super(props)
 
       this.state = {
-        watchingShows: JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)) || [],
+        watchingShows: [],
         droppedShows: [],
         willWatchShows: [],
-        watchLaterMovies: JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)) || [],
+        watchLaterMovies: [],
         addWatchingShow: this.addWatchingShow,
         removeWatchingShow: this.removeWatchingShow,
         addShowToSubDatabase: this.addShowToSubDatabase,
@@ -25,8 +22,8 @@ const withUserContent = Component => {
       }
 
       this.firebase = this.props.firebase
-      this.userUid = this.props.authUser && this.props.authUser.uid
       this.authUser = this.props.authUser
+      this.userUid = this.authUser && this.props.authUser.uid
     }
 
     componentDidMount() {
@@ -46,18 +43,7 @@ const withUserContent = Component => {
     addWatchingShow = (id, contentArr) => {
       const showToAdd = contentArr && contentArr.find(item => item.id === id)
 
-      if (this.authUser === null) {
-        showToAdd.userWatching = true
-        this.setState(
-          {
-            watchingShows: [...this.state.watchingShows, showToAdd]
-          },
-          () => {
-            localStorage.setItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS, JSON.stringify(this.state.watchingShows))
-          }
-        )
-        return
-      }
+      if (this.authUser === null) return
 
       const showIsWatching = this.state.watchingShows.find(show => show.id === id)
       const notWatchingShows = this.state.subDatabases
@@ -72,8 +58,6 @@ const withUserContent = Component => {
 
       const showInSubDatabases = mergedDatabases.find(item => item.id === id)
       const keyShowInSubDb = showInSubDatabases ? showInSubDatabases.key : null
-
-      console.log(this.userUid)
 
       deleteShowFromSubDatabase(this.firebase, this.userUid, this.state.subDatabases, keyShowInSubDb).then(
         () => {
@@ -94,17 +78,7 @@ const withUserContent = Component => {
     }
 
     removeWatchingShow = id => {
-      if (this.authUser === null) {
-        this.setState(
-          {
-            watchingShows: [...this.state.watchingShows.filter(item => item.id !== id)]
-          },
-          () => {
-            localStorage.setItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS, JSON.stringify(this.state.watchingShows))
-          }
-        )
-        return
-      }
+      if (this.authUser === null) return
 
       const showIsWatching = this.state.watchingShows.find(show => show.id === id)
 
@@ -153,34 +127,7 @@ const withUserContent = Component => {
       const movieExists = this.state.watchLaterMovies.find(show => show.id === id)
       const movieToAdd = contentArr && contentArr.find(item => item.id === id)
 
-      if (this.authUser === null) {
-        if (!movieExists) {
-          this.setState(
-            {
-              watchLaterMovies: [...this.state.watchLaterMovies, movieToAdd]
-            },
-            () => {
-              localStorage.setItem(
-                LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES,
-                JSON.stringify(this.state.watchLaterMovies)
-              )
-            }
-          )
-        } else {
-          this.setState(
-            {
-              watchLaterMovies: [...this.state.watchLaterMovies.filter(item => item.id !== id)]
-            },
-            () => {
-              localStorage.setItem(
-                LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES,
-                JSON.stringify(this.state.watchLaterMovies)
-              )
-            }
-          )
-        }
-        return
-      }
+      if (this.authUser === null) return
 
       if (!movieExists) {
         const newMovieRef = this.firebase.watchLaterMovies(this.userUid).push()
@@ -198,56 +145,66 @@ const withUserContent = Component => {
     }
 
     getContent = () => {
-      if (this.userUid === null) {
-        this.setState({
-          watchingShows: JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)) || [],
-          droppedShows: [],
-          willWatchShows: [],
-          watchLaterMovies: JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)) || []
-        })
-        return
-      }
+      if (this.userUid === null) return
 
       this.firebase.userContent(this.userUid).on("value", snapshot => {
         const userContent = snapshot.val() || {}
-        const { watchingShows, droppedShows, willWatchShows, watchLaterMovies } = userContent
+        const databases = ["watchingShows", "droppedShows", "willWatchShows", "watchLaterMovies"]
 
-        const watchingTvShowsList = watchingShows
-          ? Object.keys(watchingShows).map(key => ({
-              ...watchingShows[key],
-              uid: key
-            }))
-          : []
+        databases.forEach(item => {
+          if (!userContent.hasOwnProperty(item)) userContent[item] = {}
+        })
 
-        const droppedTvShowsList = droppedShows
-          ? Object.keys(droppedShows).map(key => ({
-              ...droppedShows[key],
-              uid: key
-            }))
-          : []
+        Object.entries(userContent).forEach(([key, value]) => {
+          const content =
+            Object.keys(value).map(key => ({
+              ...value[key],
+              key
+            })) || []
 
-        const willBeWatchingTvShowsList = willWatchShows
-          ? Object.keys(willWatchShows).map(key => ({
-              ...willWatchShows[key],
-              uid: key
-            }))
-          : []
+          if (this._isMounted) {
+            this.setState({
+              [key]: content
+            })
+          }
+        })
 
-        const watchLaterMoviesList = watchLaterMovies
-          ? Object.keys(watchLaterMovies).map(key => ({
-              ...watchLaterMovies[key],
-              uid: key
-            }))
-          : []
+        // const watchingTvShowsList = watchingShows
+        //   ? Object.keys(watchingShows).map(key => ({
+        //       ...watchingShows[key],
+        //       key
+        //     }))
+        //   : []
 
-        if (this._isMounted) {
-          this.setState({
-            watchingShows: watchingTvShowsList,
-            droppedShows: droppedTvShowsList,
-            willWatchShows: willBeWatchingTvShowsList,
-            watchLaterMovies: watchLaterMoviesList
-          })
-        }
+        // const droppedTvShowsList = droppedShows
+        //   ? Object.keys(droppedShows).map(key => ({
+        //       ...droppedShows[key],
+        //       key
+        //     }))
+        //   : []
+
+        // const willBeWatchingTvShowsList = willWatchShows
+        //   ? Object.keys(willWatchShows).map(key => ({
+        //       ...willWatchShows[key],
+        //       key
+        //     }))
+        //   : []
+
+        // const watchLaterMoviesList = watchLaterMovies
+        //   ? Object.keys(watchLaterMovies).map(key => ({
+        //       ...watchLaterMovies[key],
+        //       key
+        //     }))
+        //   : []
+
+        // if (this._isMounted) {
+        //   this.setState({
+        //     watchingShows: watchingTvShowsList,
+        //     droppedShows: droppedTvShowsList,
+        //     willWatchShows: willBeWatchingTvShowsList,
+        //     watchLaterMovies: watchLaterMoviesList
+        //   })
+        // }
       })
     }
 

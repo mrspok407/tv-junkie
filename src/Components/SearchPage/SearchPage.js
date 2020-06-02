@@ -1,12 +1,12 @@
 import React, { Component } from "react"
 import axios, { CancelToken } from "axios"
 import { throttle } from "throttle-debounce"
-import { compose } from "recompose"
+// import { compose } from "recompose"
 import Search from "./Search/Search"
 import AdvSearchResults from "./AdvSearchResults/SearchResults/SearchResults"
 import ContentResultsSelected from "./AdvSearchResults/SelectedContent/SelectedContent"
 import PlaceholderNoResults from "Components/Placeholders/PlaceholderNoResults"
-import { withUserContent } from "Components/UserContent"
+// import { withUserContent } from "Components/UserContent"
 import ScrollToTop from "Utils/ScrollToTop"
 import Header from "Components/Header/Header"
 
@@ -304,6 +304,12 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
     }
   }
 
+  clearCurrentlyChosenContent = () => {
+    this.setState({
+      currentlyChosenContent: []
+    })
+  }
+
   renderAdvMovies = () => {
     const { advancedSearchContent, totalPagesAdvMovies } = this.state
     return !Array.isArray(advancedSearchContent) || totalPagesAdvMovies === 0 ? (
@@ -324,7 +330,7 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
   render() {
     return (
       <>
-        <Header />
+        <Header clearCurrentlyChosenContent={this.clearCurrentlyChosenContent} />
         <Search
           handleClickOutside={this.handleClickOutside}
           onSearch={this.handleSearch}
@@ -351,4 +357,4 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
   }
 }
 
-export default compose(withUserContent)(MainPage)
+export default MainPage
