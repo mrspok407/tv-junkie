@@ -165,13 +165,6 @@ const withUserContent = Component => {
           }
         })
 
-        // const watchingTvShowsList = watchingShows
-        //   ? Object.keys(watchingShows).map(key => ({
-        //       ...watchingShows[key],
-        //       key
-        //     }))
-        //   : []
-
         // const droppedTvShowsList = droppedShows
         //   ? Object.keys(droppedShows).map(key => ({
         //       ...droppedShows[key],
