@@ -145,7 +145,7 @@ const withUserContent = Component => {
 
       this.firebase.userContent(this.userUid).on("value", snapshot => {
         const userContent = snapshot.val() || {}
-        const databases = ["watchingShows", "droppedShows", "willWatchShows", "watchLaterMovies"]
+        const databases = ["watchingShows", "droppedhows", "willWatchShows", "watchLaterMovies"]
 
         databases.forEach(item => {
           if (!userContent.hasOwnProperty(item)) userContent[item] = {}
