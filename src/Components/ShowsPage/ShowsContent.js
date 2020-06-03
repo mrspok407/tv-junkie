@@ -27,7 +27,11 @@ class ShowsContent extends Component {
         ? this.props.userContent[section].filter(item => item.userWatching && item)
         : this.props.userContent[section]
 
-    const watchingShows = this.props.authUser ? content : this.context.watchingShows
+    const watchingShows = this.props.authUser
+      ? content
+      : section !== "watchingShows"
+      ? content
+      : this.context.watchingShows
 
     return (
       <>
@@ -133,6 +137,12 @@ class ShowsContent extends Component {
         ? this.props.userContent[this.state.activeSection].filter(item => item.userWatching && item)
         : this.props.userContent[this.state.activeSection]
 
+    const watchingShows = this.props.authUser
+      ? content
+      : this.state.activeSection !== "watchingShows"
+      ? content
+      : this.context.watchingShows
+
     const maxColumns = 4
     const currentNumOfColumns = content.length <= maxColumns - 1 ? content.length : maxColumns
 
@@ -185,7 +195,7 @@ class ShowsContent extends Component {
                 }
           }
         >
-          {content.length === 0 ? (
+          {watchingShows.length === 0 ? (
             <PlaceholderNoShows
               section={this.state.activeSection}
               authUser={this.props.authUser}

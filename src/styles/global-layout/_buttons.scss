@@ -109,7 +109,7 @@
   }
 
   @include mediaMaxW(800px) {
-    padding: 0;
+    padding-bottom: 15px;
   }
 
   @include mediaMaxW(650px) {

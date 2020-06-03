@@ -20,10 +20,6 @@ class MovieResultsSelected extends React.PureComponent {
     document.addEventListener("mousedown", this.handleClickOutside)
   }
 
-  componentDidUpdate() {
-    // console.log(this.props.currentlyChosenContent)
-  }
-
   componentWillUnmount() {
     document.removeEventListener("mousedown", this.handleClickOutside)
   }

@@ -41,16 +41,14 @@ const withUserContent = Component => {
     }
 
     addWatchingShow = (id, contentArr) => {
-      const showToAdd = contentArr && contentArr.find(item => item.id === id)
-
       if (this.authUser === null) return
 
+      const showToAdd = contentArr && contentArr.find(item => item.id === id)
       const showIsWatching = this.state.watchingShows.find(show => show.id === id)
-      const notWatchingShows = this.state.subDatabases
 
       let mergedDatabases = []
 
-      notWatchingShows.forEach(item => {
+      this.state.subDatabases.forEach(item => {
         const db = this.state[item]
 
         mergedDatabases.push(...db)
@@ -90,13 +88,11 @@ const withUserContent = Component => {
     }
 
     addShowToSubDatabase = (id, contentArr, database) => {
-      if (this.authUser === null) return
+      if (this.authUser === null || this.state[database].some(show => show.id === id)) return
 
       const showIsWatching = this.state.watchingShows.find(show => show.id === id)
-      const showInDatabase = this.state[database].some(show => show.id === id)
       const showToAdd = contentArr && contentArr.find(item => item.id === id)
 
-      if (showInDatabase) return
       if (showIsWatching) {
         const key = showIsWatching.key
         const userWatchingShow = false
@@ -124,10 +120,10 @@ const withUserContent = Component => {
     }
 
     toggleWatchLaterMovie = (id, contentArr) => {
+      if (this.authUser === null) return
+
       const movieExists = this.state.watchLaterMovies.find(show => show.id === id)
       const movieToAdd = contentArr && contentArr.find(item => item.id === id)
-
-      if (this.authUser === null) return
 
       if (!movieExists) {
         const newMovieRef = this.firebase.watchLaterMovies(this.userUid).push()
