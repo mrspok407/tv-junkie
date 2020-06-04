@@ -1,7 +1,7 @@
 import React from "react"
 
 export default () => (
-  <div className="no-selected-content">
+  <div className="placeholder--no-movies">
     <h1>Very empty</h1>
   </div>
 )

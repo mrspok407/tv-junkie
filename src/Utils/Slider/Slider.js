@@ -2,6 +2,7 @@
 import React, { useEffect, useState, useCallback, useLayoutEffect } from "react"
 import { Link } from "react-router-dom"
 import debounce from "debounce"
+import classNames from "classnames"
 import "./Slider.scss"
 
 const POSTER_PATH = "https://image.tmdb.org/t/p/w500/"
@@ -85,6 +86,7 @@ export default function Slider({ listOfContent }) {
     if (slider === undefined) return
 
     slider.style.transform = `translate3d(-${currentItem * itemWidth}px, 0, 0)`
+    slider.style.transition = "500ms"
 
     toggleArrows()
   }, [currentItem, mouseUp])
@@ -122,7 +124,7 @@ export default function Slider({ listOfContent }) {
   }
 
   const onMouseDown = e => {
-    if (!sliderAvailable || window.innerWidth <= mobileLayout) return
+    if (!sliderAvailable || window.innerWidth <= mobileLayout || e.button !== 0) return
     e.preventDefault()
 
     setDragging(true)
@@ -145,9 +147,7 @@ export default function Slider({ listOfContent }) {
     const maxDragDistance = sliderPosition >= sliderRange ? sliderRange : sliderPosition
 
     const translateX =
-      maxDragDistance - diffFromStartPoint >= sliderRange
-        ? sliderRange
-        : maxDragDistance - diffFromStartPoint
+      maxDragDistance - diffFromStartPoint >= sliderRange ? sliderRange : maxDragDistance - diffFromStartPoint
 
     const currentItemStorage = Math.ceil(
       (translateX - thresholdToSlide * dragСoefficient) / dragСoefficient / itemWidth
@@ -156,6 +156,7 @@ export default function Slider({ listOfContent }) {
     setCurrentItem(currentItemStorage < 0 ? 0 : currentItemStorage)
 
     slider.style.transform = `translate3d(-${translateX / dragСoefficient}px, 0, 0)`
+    slider.style.transition = "0ms"
   }
 
   const onMouseUp = e => {
@@ -192,7 +193,9 @@ export default function Slider({ listOfContent }) {
       <div
         onMouseDown={e => onMouseDown(e)}
         onMouseUp={e => onMouseUp(e)}
-        className={dragging ? "slider s--dragging" : "slider"}
+        className={classNames("slider", {
+          "s--dragging": dragging
+        })}
         ref={sliderRef}
       >
         {listOfContent.map(({ poster_path, original_title, id }) => {
@@ -222,15 +225,15 @@ export default function Slider({ listOfContent }) {
         <>
           <div
             onClick={() => pagination("left")}
-            className={
-              leftArrowVisible ? "arrow arrow--left" : "arrow arrow--left arrow--non-visible"
-            }
+            className={classNames("arrow arrow--left", {
+              "arrow--non-visible": !leftArrowVisible
+            })}
           />
           <div
             onClick={() => pagination("right")}
-            className={
-              rightArrowVisible ? "arrow arrow--right" : "arrow arrow--right arrow--non-visible"
-            }
+            className={classNames("arrow arrow--right", {
+              "arrow--non-visible": !rightArrowVisible
+            })}
           />
         </>
       )}

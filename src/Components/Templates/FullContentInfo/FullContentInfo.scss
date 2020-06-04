@@ -43,6 +43,11 @@ $font-sizes: (
     grid-template-columns: 1fr;
   }
 
+  &__error {
+    text-align: center;
+    color: getColor(orangeClr, $mainPalette);
+  }
+
   &__poster {
     background-position: center top;
     background-repeat: no-repeat;

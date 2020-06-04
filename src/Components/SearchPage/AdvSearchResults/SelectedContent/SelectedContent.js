@@ -1,7 +1,9 @@
 import React from "react"
 import { Link } from "react-router-dom"
 import "./SelectedContent.scss"
-import { withSelectedContextConsumer } from "../../../SelectedContentContext"
+import { withUserContent } from "Components/UserContent"
+import { compose } from "recompose"
+import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
 
 class MovieResultsSelected extends React.PureComponent {
   constructor(props) {
@@ -32,94 +34,114 @@ class MovieResultsSelected extends React.PureComponent {
 
   render() {
     return (
-      <div ref={this.selectedContentRef} className="selected-content__container">
-        <button
-          type="button"
-          className="button--show-selected"
-          onClick={() =>
-            this.setState(prevState => ({
-              showSelected: !prevState.showSelected
-            }))
-          }
-        >
-          {this.props.selectedContentState.selectedContent.length}
-        </button>
-        {this.state.showSelected && (
-          <div className="selected-content__list">
-            <div className="selected-content__button-clear">
-              <button
-                type="button"
-                className="button"
-                onClick={() => this.props.clearSelectedContent()}
-              >
-                Clear Selected
-              </button>
-            </div>
+      <>
+        <div ref={this.selectedContentRef} className="selected-content__container">
+          <button
+            type="button"
+            className="button--show-selected"
+            onClick={() =>
+              this.setState(prevState => ({
+                showSelected: !prevState.showSelected
+              }))
+            }
+          >
+            {this.props.currentlyChosenContent.length}
+          </button>
+          {this.state.showSelected && (
+            <div className="selected-content__list">
+              <div className="selected-content__button-clear"></div>
 
-            {this.props.selectedContentState.selectedContent.map(
-              ({
-                original_title = "",
-                original_name = "",
-                id,
-                release_date = "",
-                first_air_date = "",
-                poster_path,
-                backdrop_path,
-                overview = ""
-              }) => {
-                const title = original_title || original_name
-                const date = release_date || first_air_date
+              {this.props.currentlyChosenContent.map(
+                ({
+                  original_title = "",
+                  original_name = "",
+                  id,
+                  release_date = "",
+                  first_air_date = "",
+                  poster_path,
+                  backdrop_path,
+                  overview = ""
+                }) => {
+                  const title = original_title || original_name
+                  const date = release_date || first_air_date
 
-                const type = original_title ? "movie" : original_name && "show"
+                  const type = original_title ? "movie" : original_name && "show"
 
-                return (
-                  <div key={id} className="selected-content__item">
-                    <Link className="selected-content__item-poster-link" to={`/${type}/${id}`}>
-                      <div
-                        className="selected-content__item-poster"
-                        style={
-                          poster_path !== null
-                            ? {
-                                backgroundImage: `url(https://image.tmdb.org/t/p/w500/${poster_path ||
-                                  backdrop_path})`
-                              }
-                            : {
-                                backgroundImage: `url(https://d32qys9a6wm9no.cloudfront.net/images/movies/poster/500x735.png)`
-                              }
-                        }
-                      />
-                    </Link>
-                    <Link className="selected-content__item-info-link" to={`/${type}/${id}`}>
-                      <div className="selected-content__item-info">
-                        <div className="selected-content__item-title">
-                          {title.length > 65 ? `${title.substring(0, 65)}...` : title}
+                  return (
+                    <div key={id} className="selected-content__item">
+                      <Link className="selected-content__item-poster-link" to={`/${type}/${id}`}>
+                        <div
+                          className="selected-content__item-poster"
+                          style={
+                            poster_path !== null
+                              ? {
+                                  backgroundImage: `url(https://image.tmdb.org/t/p/w500/${poster_path ||
+                                    backdrop_path})`
+                                }
+                              : {
+                                  backgroundImage: `url(https://d32qys9a6wm9no.cloudfront.net/images/movies/poster/500x735.png)`
+                                }
+                          }
+                        />
+                      </Link>
+                      <Link className="selected-content__item-info-link" to={`/${type}/${id}`}>
+                        <div className="selected-content__item-info">
+                          <div className="selected-content__item-title">
+                            {title.length > 65 ? `${title.substring(0, 65)}...` : title}
+                          </div>
+                          <div className="selected-content__item-year">{date}</div>
+                          <div className="selected-content__item-overview">
+                            {overview && overview.length > 120
+                              ? `${overview.substring(0, 120)}...`
+                              : overview}
+                          </div>
                         </div>
-                        <div className="selected-content__item-year">{date}</div>
-                        <div className="selected-content__item-overview">
-                          {overview && overview.length > 120
-                            ? `${overview.substring(0, 120)}...`
-                            : overview}
-                        </div>
+                      </Link>
+                      <div className="selected-content__item-button">
+                        {type === "movie" ? (
+                          <button
+                            className="button"
+                            onClick={() => {
+                              if (this.props.authUser) {
+                                this.props.userContent.toggleWatchLaterMovie(id)
+                              } else {
+                                this.context.toggleContentLS(id, "watchLaterMovies")
+                              }
+                              this.props.toggleCurrentlyChosenContent(id)
+                            }}
+                            type="button"
+                          >
+                            Remove
+                          </button>
+                        ) : (
+                          <button
+                            className="button"
+                            type="button"
+                            onClick={() => {
+                              if (this.props.authUser) {
+                                this.props.userContent.removeWatchingShow(id)
+                              } else {
+                                this.context.toggleContentLS(id, "watchingShows")
+                              }
+                              this.props.toggleCurrentlyChosenContent(id)
+                            }}
+                          >
+                            Remove
+                          </button>
+                        )}
                       </div>
-                    </Link>
-                    <div className="selected-content__item-button">
-                      <button
-                        className="button"
-                        type="button"
-                        onClick={() => this.props.selectedContentState.toggleContent(id)}
-                      >
-                        Remove
-                      </button>
                     </div>
-                  </div>
-                )
-              }
-            )}
-          </div>
-        )}
-      </div>
+                  )
+                }
+              )}
+            </div>
+          )}
+        </div>
+      </>
     )
   }
 }
 
-export default withSelectedContextConsumer(MovieResultsSelected)
+export default compose(withUserContent)(MovieResultsSelected)
+
+MovieResultsSelected.contextType = UserContentLocalStorageContext

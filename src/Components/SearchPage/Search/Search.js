@@ -4,11 +4,11 @@ import SearchList from "./SearchList/SearchList"
 import Input from "./Input/Input"
 import AdvancedSearch from "./AdvancedSearch/AdvancedSearch"
 import "./Search.scss"
-import PlaceholderNoResults from "../../Placeholders/PlaceholderNoResults"
+import PlaceholderNoResults from "Components/Placeholders/PlaceholderNoResults"
 
 let cancelRequest
 
-export default class MovieSearch extends Component {
+export default class Search extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -112,10 +112,7 @@ export default class MovieSearch extends Component {
               isSearchingList={this.state.isSearchingList}
             />
             {this.state.totalPages === 0 && this.state.query !== "" && this.state.listIsOpen ? (
-              <PlaceholderNoResults
-                message="No results found"
-                handleClickOutside={this.handleClickOutside}
-              />
+              <PlaceholderNoResults message="No results found" handleClickOutside={this.handleClickOutside} />
             ) : (
               this.state.listIsOpen &&
               this.renderSearch(
@@ -124,6 +121,8 @@ export default class MovieSearch extends Component {
                     searchResults={this.state.searchResults}
                     mediaTypeSearching={this.state.mediaTypeSearching}
                     handleClickOutside={this.handleClickOutside}
+                    toggleCurrentlyChosenContent={this.props.toggleCurrentlyChosenContent}
+                    currentlyChosenContent={this.props.currentlyChosenContent}
                   />
                 </div>
               )

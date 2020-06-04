@@ -1,15 +1,89 @@
 @import "../../styles/globals";
 
 .header {
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 100%;
+
+  &__show-nav {
+    display: none;
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    width: 50px;
+    height: 30px;
+    background-color: transparent;
+    border: none;
+    opacity: 0;
+    z-index: 10;
+    animation: showNavBtn 0.5s forwards;
+    @keyframes showNavBtn {
+      to {
+        opacity: 1;
+      }
+    }
+    &:focus {
+      outline: none;
+    }
+
+    @include mediaMaxW(560px) {
+      display: initial;
+    }
+
+    @for $i from 1 through 3 {
+      span:nth-child(#{$i}) {
+        position: absolute;
+        left: 0;
+        top: 50% * ($i - 1);
+        width: 100%;
+        height: 6px;
+        border-radius: 5px;
+        background-color: #fff;
+        transition: 0.25s;
+        transform-origin: center left;
+      }
+    }
+
+    &--open {
+      span:nth-child(2) {
+        opacity: 0;
+      }
+
+      span:nth-child(1) {
+        transform: rotate(37deg);
+      }
+      span:nth-child(3) {
+        transform: rotate(-37deg);
+      }
+    }
+  }
 }
 
 .nav {
   display: flex;
   justify-content: center;
   padding-top: 15px;
+
+  @include mediaMaxW(560px) {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    padding-top: 5px;
+    padding-bottom: 20px;
+    transform: translate(0, 0);
+    background-color: #000;
+    transition: transform 0.25s;
+    z-index: 5;
+  }
+
+  &--mobile-open {
+    @include mediaMaxW(560px) {
+      transform: translate(100%, 0);
+    }
+  }
+
   &__list {
     position: relative;
     display: inline-flex;
@@ -18,8 +92,20 @@
     list-style-type: none;
     color: #fff;
 
+    @include mediaMaxW(560px) {
+      align-items: center;
+      flex-direction: column;
+      justify-content: start;
+    }
+
     a {
       color: #fff;
+
+      @include mediaMaxW(560px) {
+        display: flex;
+        justify-content: center;
+        width: 60%;
+      }
     }
   }
 
@@ -55,9 +141,13 @@
       opacity: 1;
     }
     @include mediaMaxW(1000px) {
-      width: 102px;
+      width: 100px;
       padding: 14px 5px 14px 5px;
-      font-size: 1rem;
+      font-size: 0.95rem;
+    }
+
+    @include mediaMaxW(560px) {
+      width: 100%;
     }
 
     &--active li {
@@ -68,6 +158,24 @@
       }
     }
   }
+}
+
+.login__container {
+  position: absolute;
+  right: 0;
+  top: 0;
+  color: #fff;
+
+  @include mediaMaxW(560px) {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    width: 60%;
+  }
+}
+
+.nav__item--login {
+  user-select: none;
 }
 
 .nav__hover-line {
@@ -102,84 +210,4 @@
     top: initial;
     bottom: 0;
   }
-}
-
-.nav__item--login {
-  position: absolute;
-  right: 0;
-  top: 0;
-  color: #fff;
-}
-
-.nav__login-auth-container {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  width: 300px;
-  color: #000;
-  background-color: #fff;
-  border-radius: 10px;
-  transform: translate(0, -10px);
-  opacity: 0;
-  z-index: 10;
-  animation: showAuthContainer 0.35s forwards;
-  @keyframes showAuthContainer {
-    to {
-      opacity: 1;
-      transform: translate(0, 0);
-    }
-  }
-}
-
-.nav__login-auth {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: 50px;
-}
-
-.nav__login--sign {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #1f1f1f;
-  cursor: pointer;
-
-  &:after {
-    content: "";
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
-    height: 3px;
-    border-radius: 5px;
-    opacity: 0;
-    transition: 0.2s;
-  }
-
-  &:hover:after {
-    opacity: 1;
-    background-color: getColor(blueClr, $mainPalette);
-  }
-}
-
-.sign--active {
-  &:after {
-    opacity: 1;
-    background-color: getColor(orangeClr, $mainPalette);
-  }
-  &:hover:after {
-    background-color: getColor(orangeClr, $mainPalette);
-  }
-}
-
-.nav__login-button {
-  user-select: none;
-}
-
-.nav__login-form {
-  display: flex;
-  justify-content: center;
 }

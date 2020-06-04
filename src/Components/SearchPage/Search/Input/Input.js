@@ -1,8 +1,9 @@
 import React, { Component } from "react"
 import debounce from "debounce"
+import classNames from "classnames"
 import "./Input.scss"
-import Loader from "../../../Placeholders/Loader"
-import { mediaTypesArr } from "../../../../Utils"
+import Loader from "Components/Placeholders/Loader"
+import { mediaTypesArr } from "Utils"
 
 export default class Input extends Component {
   constructor(props) {
@@ -54,11 +55,9 @@ export default class Input extends Component {
       <>
         <div
           ref={this.mediaTypeRef}
-          className={
-            !this.state.mediaTypesIsOpen
-              ? "search__media-type"
-              : "search__media-type search__media-type--is-open"
-          }
+          className={classNames("search__media-type", {
+            "search__media-type--is-open": this.state.mediaTypesIsOpen
+          })}
           style={{
             backgroundImage: `url(${this.state.mediaType.icon})`
           }}
@@ -82,11 +81,9 @@ export default class Input extends Component {
                   return (
                     <li
                       key={item.id}
-                      className={
-                        item.type === this.state.mediaType.type
-                          ? "media-type__item media-type__item--selected"
-                          : "media-type__item"
-                      }
+                      className={classNames("media-type__item", {
+                        "media-type__item--selected": item.type === this.state.mediaType.type
+                      })}
                       style={{ backgroundImage: `url(${item.icon})` }}
                     >
                       <button

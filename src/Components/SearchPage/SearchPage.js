@@ -1,13 +1,14 @@
 import React, { Component } from "react"
 import axios, { CancelToken } from "axios"
 import { throttle } from "throttle-debounce"
+// import { compose } from "recompose"
 import Search from "./Search/Search"
-import ContentResultsAdvSearch from "./AdvSearchResults/SearchResults/SearchResults"
+import AdvSearchResults from "./AdvSearchResults/SearchResults/SearchResults"
 import ContentResultsSelected from "./AdvSearchResults/SelectedContent/SelectedContent"
-import PlaceholderNoResults from "../Placeholders/PlaceholderNoResults"
-import { withSelectedContextConsumer } from "../SelectedContentContext"
-import ScrollToTop from "../../Utils/ScrollToTop"
-import Header from "../Header/Header"
+import PlaceholderNoResults from "Components/Placeholders/PlaceholderNoResults"
+// import { withUserContent } from "Components/UserContent"
+import ScrollToTop from "Utils/ScrollToTop"
+import Header from "Components/Header/Header"
 
 const LOCAL_STORAGE_KEY_ADV = "advancedSearchContent"
 const LOCAL_STORAGE_KEY_ACTORS = "addedActors"
@@ -30,7 +31,8 @@ class MainPage extends Component {
       searchingMovie: false,
       searchingAdvancedSearch: false,
       loadingNewPage: false,
-      error: ""
+      error: "",
+      currentlyChosenContent: []
     }
   }
 
@@ -50,10 +52,7 @@ class MainPage extends Component {
     localStorage.setItem(LOCAL_STORAGE_KEY_ACTORS, JSON.stringify(this.state.withActors))
     localStorage.setItem(LOCAL_STORAGE_KEY_INPUTS, JSON.stringify(this.state.advSearchInputValues))
     localStorage.setItem(LOCAL_STORAGE_KEY_PAGENUMBER, JSON.stringify(this.state.numOfPagesLoaded))
-    localStorage.setItem(
-      LOCAL_STORAGE_KEY_TOTALPAGES,
-      JSON.stringify(this.state.totalPagesAdvMovies)
-    )
+    localStorage.setItem(LOCAL_STORAGE_KEY_TOTALPAGES, JSON.stringify(this.state.totalPagesAdvMovies))
   }
 
   advancedSearch = (
@@ -290,6 +289,27 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
     }
   }
 
+  toggleCurrentlyChosenContent = (id, content) => {
+    const contentExists = this.state.currentlyChosenContent.find(item => item.id === id)
+    const newContent = content && content.find(item => item.id === id)
+
+    if (contentExists) {
+      this.setState(prevState => ({
+        currentlyChosenContent: [...prevState.currentlyChosenContent.filter(item => item.id !== id)]
+      }))
+    } else {
+      this.setState(prevState => ({
+        currentlyChosenContent: [...prevState.currentlyChosenContent, newContent]
+      }))
+    }
+  }
+
+  clearCurrentlyChosenContent = () => {
+    this.setState({
+      currentlyChosenContent: []
+    })
+  }
+
   renderAdvMovies = () => {
     const { advancedSearchContent, totalPagesAdvMovies } = this.state
     return !Array.isArray(advancedSearchContent) || totalPagesAdvMovies === 0 ? (
@@ -297,11 +317,12 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
         <PlaceholderNoResults message="No content found" />
       </div>
     ) : (
-      <ContentResultsAdvSearch
+      <AdvSearchResults
         advancedSearchContent={this.state.advancedSearchContent}
-        searchingAdvancedSearch={this.state.searchingAdvancedSearch}
         loadingNewPage={this.state.loadingNewPage}
         clearAdvSearchMovies={this.clearAdvSearchMovies}
+        toggleCurrentlyChosenContent={this.toggleCurrentlyChosenContent}
+        currentlyChosenContent={this.state.currentlyChosenContent}
       />
     )
   }
@@ -309,20 +330,26 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
   render() {
     return (
       <>
-        <Header />
+        <Header clearCurrentlyChosenContent={this.clearCurrentlyChosenContent} />
         <Search
           handleClickOutside={this.handleClickOutside}
           onSearch={this.handleSearch}
           searchingAdvancedSearch={this.state.searchingAdvancedSearch}
           toggleActor={this.toggleActor}
           withActors={this.state.withActors}
-          renderMovies={this.renderMovies}
-          randomMovies={this.randomMovies}
           advancedSearch={this.advancedSearch}
           clearWithActors={this.clearWithActors}
+          toggleCurrentlyChosenContent={this.toggleCurrentlyChosenContent}
+          currentlyChosenContent={this.state.currentlyChosenContent}
         />
         {this.renderAdvMovies()}
-        {this.props.selectedContentState.selectedContent.length > 0 && <ContentResultsSelected />}
+        {this.state.currentlyChosenContent.length > 0 && (
+          <ContentResultsSelected
+            currentlyChosenContent={this.state.currentlyChosenContent}
+            toggleCurrentlyChosenContent={this.toggleCurrentlyChosenContent}
+          />
+        )}
+
         <ScrollToTop />
         {/* <Footer /> */}
       </>
@@ -330,4 +357,4 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
   }
 }
 
-export default withSelectedContextConsumer(MainPage)
+export default MainPage

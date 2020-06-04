@@ -1,12 +1,9 @@
 import React, { Component } from "react"
 import axios, { CancelToken } from "axios"
-import ContentResults from "../Templates/ContentResults/ContentResults"
-import PlaceholderNoSelectedContent from "../Placeholders/PlaceholderNoSelectedContent"
-import { withSelectedContextConsumer } from "../SelectedContentContext"
-import ScrollToTop from "../../Utils/ScrollToTop"
-import "./ShowsPage.scss"
-import HeaderBase from "../Header/Header"
-import { withFirebase } from "../Firebase/FirebaseContext"
+import ScrollToTop from "Utils/ScrollToTop"
+import HeaderBase from "Components/Header/Header"
+import { withFirebase } from "Components/Firebase/FirebaseContext"
+import ShowsContent from "./ShowsContent"
 
 let cancelRequest
 
@@ -41,14 +38,11 @@ class Shows extends Component {
     }))
 
     axios
-      .get(
-        `https://api.themoviedb.org/3/tv/${id}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US`,
-        {
-          cancelToken: new CancelToken(function executor(c) {
-            cancelRequest = c
-          })
-        }
-      )
+      .get(`https://api.themoviedb.org/3/tv/${id}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US`, {
+        cancelToken: new CancelToken(function executor(c) {
+          cancelRequest = c
+        })
+      })
       .then(res => {
         const tvShow = res.data
         this.setState(prevState => ({
@@ -65,30 +59,14 @@ class Shows extends Component {
   }
 
   render() {
-    const onlyShows = this.props.selectedContentState.selectedContent.filter(
-      item => item.original_name
-    )
     return (
       <>
         <Header />
-        {onlyShows.length ? (
-          <ContentResults
-            contentType="shows"
-            contentArr={onlyShows}
-            getLastEpisodeLinks={this.getLastEpisodeLinks}
-            showsArr={this.state.showsArr}
-            loadingIds={this.state.loadingIds}
-            showsIds={this.state.showsIds}
-            error={this.state.error}
-            className="content-results__wrapper--shows-page"
-          />
-        ) : (
-          <PlaceholderNoSelectedContent />
-        )}
+        <ShowsContent />
         <ScrollToTop />
       </>
     )
   }
 }
 
-export default withSelectedContextConsumer(Shows)
+export default Shows

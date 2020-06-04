@@ -1,11 +1,11 @@
 import React, { Component } from "react"
 import axios, { CancelToken } from "axios"
-import ContentResults from "../Templates/ContentResults/ContentResults"
-import PlaceholderNoSelectedContent from "../Placeholders/PlaceholderNoSelectedContent"
-import { withSelectedContextConsumer } from "../SelectedContentContext"
-import ScrollToTop from "../../Utils/ScrollToTop"
+// import ContentResults from "Components/Templates/ContentResults/ContentResults"
+// import PlaceholderNoSelectedContent from "Components/Placeholders/PlaceholderNoSelectedContent"
+import ScrollToTop from "Utils/ScrollToTop"
 import "./MoviesPage.scss"
 import Header from "../Header/Header"
+import MoviesContent from "./MoviesContent"
 
 let cancelRequest
 
@@ -61,31 +61,21 @@ class Movies extends Component {
   }
 
   render() {
-    const onlyMovies = this.props.selectedContentState.selectedContent.filter(
-      item => item.original_title
-    )
     return (
       <>
         <Header />
-        {onlyMovies.length ? (
-          <ContentResults
-            contentType="movies"
-            contentArr={onlyMovies}
-            moviesArr={this.state.moviesArr}
-            loadingIds={this.state.loadingIds}
-            moviesIds={this.state.moviesIds}
-            getMovieLinks={this.getMovieLinks}
-            showAllLinksPressed={this.state.showAllLinksPressed}
-            error={this.state.error}
-            className="content-results__wrapper--movies-page"
-          />
-        ) : (
-          <PlaceholderNoSelectedContent />
-        )}
+        <MoviesContent
+          moviesArr={this.state.moviesArr}
+          getMovieLinks={this.getMovieLinks}
+          loadingIds={this.state.loadingIds}
+          moviesIds={this.state.moviesIds}
+          showAllLinksPressed={this.state.showAllLinksPressed}
+          error={this.state.error}
+        />
         <ScrollToTop />
       </>
     )
   }
 }
 
-export default withSelectedContextConsumer(Movies)
+export default Movies

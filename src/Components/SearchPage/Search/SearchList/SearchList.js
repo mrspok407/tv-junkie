@@ -16,9 +16,10 @@ export default class MovieList extends Component {
     const { searchResults, mediaTypeSearching } = this.props
     return searchResults.map(
       ({
+        title = "",
         original_title = "",
-        original_name = "",
         name = "",
+        original_name = "",
         poster_path = "",
         profile_path = "",
         backdrop_path = "",
@@ -31,8 +32,8 @@ export default class MovieList extends Component {
         return (
           <SearchCard
             key={id}
-            movieTitle={original_title}
-            showTitle={original_name}
+            movieTitle={title || original_title}
+            showTitle={name || original_name}
             personName={name}
             poster={poster_path}
             personImage={profile_path}
@@ -44,6 +45,8 @@ export default class MovieList extends Component {
             searchResults={searchResults}
             mediaType={media_type}
             mediaTypeSearching={mediaTypeSearching}
+            toggleCurrentlyChosenContent={this.props.toggleCurrentlyChosenContent}
+            currentlyChosenContent={this.props.currentlyChosenContent}
           />
         )
       }
