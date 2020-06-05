@@ -1,4 +1,4 @@
-@import "../../../styles/mixins";
+@import "../../../styles/globals";
 
 .search {
   display: flex;
@@ -6,7 +6,7 @@
   width: 600px;
   padding: 15px;
   z-index: 1;
-  @include mediaMaxW(700px) {
+  @include mediaMaxW(#{$mobileViewPort}) {
     width: 100%;
   }
 

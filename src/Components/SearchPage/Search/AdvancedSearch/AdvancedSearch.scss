@@ -10,7 +10,7 @@
     position: absolute;
     right: 11px;
     top: 14px;
-    @include mediaMaxW(500px) {
+    @include mediaMaxW(#{$mobileViewPort}) {
       right: 0;
       left: 50%;
       transform: translate(-50%, -50%);
@@ -62,7 +62,7 @@
       background-color: getColor(blueClr, $mainPalette);
     }
     .button--loading {
-      @include mediaMaxW(500px) {
+      @include mediaMaxW(#{$mobileViewPort}) {
         font-size: 0;
       }
     }

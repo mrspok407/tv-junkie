@@ -14,10 +14,10 @@ const withUserContent = Component => {
         droppedShows: [],
         willWatchShows: [],
         watchLaterMovies: [],
-        addWatchingShow: this.addWatchingShow,
-        removeWatchingShow: this.removeWatchingShow,
-        addShowToSubDatabase: this.addShowToSubDatabase,
-        toggleWatchLaterMovie: this.toggleWatchLaterMovie,
+        // addWatchingShow: this.addWatchingShow,
+        // removeWatchingShow: this.removeWatchingShow,
+        // addShowToSubDatabase: this.addShowToSubDatabase,
+        // toggleWatchLaterMovie: this.toggleWatchLaterMovie,
         subDatabases: ["droppedShows", "willWatchShows"]
       }
 
@@ -203,7 +203,16 @@ const withUserContent = Component => {
     }
 
     render() {
-      return <Component {...this.props} userContent={this.state} />
+      return (
+        <Component
+          {...this.props}
+          userContent={this.state}
+          addWatchingShow={this.addWatchingShow}
+          removeWatchingShow={this.removeWatchingShow}
+          addShowToSubDatabase={this.addShowToSubDatabase}
+          toggleWatchLaterMovie={this.toggleWatchLaterMovie}
+        />
+      )
     }
   }
   return compose(withFirebase, WithAuthenticationConsumer)(WithUserContent)

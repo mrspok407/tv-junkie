@@ -108,7 +108,7 @@
         grid-template-columns: 50%;
         justify-content: center;
       }
-      @include mediaMaxW(450px) {
+      @include mediaMaxW(#{$mobileViewPort}) {
         grid-template-columns: 1fr;
       }
     }

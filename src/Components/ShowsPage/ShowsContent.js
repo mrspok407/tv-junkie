@@ -102,7 +102,7 @@ class ShowsContent extends Component {
                       className="button"
                       onClick={() => {
                         if (this.props.authUser) {
-                          this.props.userContent.removeWatchingShow(id)
+                          this.props.removeWatchingShow(id)
                         } else {
                           this.context.toggleContentLS(id, "watchingShows")
                         }
@@ -114,11 +114,7 @@ class ShowsContent extends Component {
                   </div>
                 ) : (
                   <div className="content-results__item-links content-results__item-links--adv-search">
-                    <button
-                      className="button"
-                      onClick={() => this.props.userContent.addWatchingShow(id)}
-                      type="button"
-                    >
+                    <button className="button" onClick={() => this.props.addWatchingShow(id)} type="button">
                       Watching
                     </button>
                   </div>

@@ -103,7 +103,7 @@ class MovieResultsSelected extends React.PureComponent {
                             className="button"
                             onClick={() => {
                               if (this.props.authUser) {
-                                this.props.userContent.toggleWatchLaterMovie(id)
+                                this.props.toggleWatchLaterMovie(id)
                               } else {
                                 this.context.toggleContentLS(id, "watchLaterMovies")
                               }
@@ -119,7 +119,7 @@ class MovieResultsSelected extends React.PureComponent {
                             type="button"
                             onClick={() => {
                               if (this.props.authUser) {
-                                this.props.userContent.removeWatchingShow(id)
+                                this.props.removeWatchingShow(id)
                               } else {
                                 this.context.toggleContentLS(id, "watchingShows")
                               }

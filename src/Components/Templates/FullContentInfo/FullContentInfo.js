@@ -4,7 +4,6 @@
 import React, { useState, useEffect } from "react"
 import { useLocation } from "react-router-dom"
 import axios, { CancelToken } from "axios"
-import { withUserContent } from "Components/UserContent"
 import PlaceholderLoadingFullInfo from "Components/Placeholders/PlaceholderLoadingFullInfo/PlaceholderLoadingFullInfo"
 import ScrollToTop from "Utils/ScrollToTop"
 import Header from "Components/Header/Header"
@@ -17,13 +16,11 @@ import "./FullContentInfo.scss"
 const todayDate = new Date()
 let cancelRequest
 
-const FullContentInfo = ({
+export default function FullContentInfo({
   match: {
     params: { id, mediaType }
-  },
-  userContent,
-  authUser
-}) => {
+  }
+}) {
   const [detailes, setDetailes] = useState({
     poster: "",
     posterMobile: "",
@@ -59,8 +56,6 @@ const FullContentInfo = ({
   }, [pathname])
 
   useEffect(() => {
-    // getFullContentInfo(mediaType)
-
     if (mediaType === "show") {
       getFullShowInfo()
     } else if (mediaType === "movie") {
@@ -386,9 +381,7 @@ const FullContentInfo = ({
               budget={detailes.budget}
               imdbId={detailes.imdbId}
               id={id}
-              authUser={authUser}
               infoToPass={infoToPass}
-              userContent={userContent}
             />
 
             <div className="full-detailes__description">{detailes.description}</div>
@@ -419,5 +412,3 @@ const FullContentInfo = ({
     </>
   )
 }
-
-export default withUserContent(FullContentInfo)

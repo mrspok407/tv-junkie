@@ -8,16 +8,14 @@ import "./Slider.scss"
 const POSTER_PATH = "https://image.tmdb.org/t/p/w500/"
 
 export default function Slider({ listOfContent }) {
-  const rootNode = document.documentElement
-
   const [slider, setSlider] = useState()
   const [sliderWidth, setSliderWidth] = useState()
 
-  rootNode.style.setProperty("--sliderWidth", `${sliderWidth}px`)
+  if (slider) slider.style.setProperty("--sliderWidth", `${sliderWidth}px`)
 
-  const mobileLayout = Number(getComputedStyle(rootNode).getPropertyValue("--mobileLayout"))
+  const mobileLayout = slider && Number(getComputedStyle(slider).getPropertyValue("--mobileLayout"))
 
-  const itemsInRow = Number(getComputedStyle(rootNode).getPropertyValue("--itemsInRow"))
+  const itemsInRow = slider && Number(getComputedStyle(slider).getPropertyValue("--itemsInRow"))
   const itemWidth = sliderWidth / itemsInRow
 
   const itemsInSlider = listOfContent.length

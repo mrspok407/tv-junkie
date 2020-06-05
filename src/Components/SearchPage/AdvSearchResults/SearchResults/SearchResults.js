@@ -136,10 +136,7 @@ class AdvSearchResults extends Component {
                           })}
                           onClick={() => {
                             if (this.props.authUser) {
-                              this.props.userContent.toggleWatchLaterMovie(
-                                id,
-                                this.props.advancedSearchContent
-                              )
+                              this.props.toggleWatchLaterMovie(id, this.props.advancedSearchContent)
                             } else {
                               this.context.toggleContentLS(
                                 id,
@@ -166,7 +163,7 @@ class AdvSearchResults extends Component {
                               className="button button--pressed"
                               onClick={() => {
                                 if (this.props.authUser) {
-                                  this.props.userContent.removeWatchingShow(id)
+                                  this.props.removeWatchingShow(id)
                                 } else {
                                   this.context.toggleContentLS(id, "watchingShows")
                                 }
@@ -188,10 +185,7 @@ class AdvSearchResults extends Component {
                                 className="button"
                                 onClick={() => {
                                   if (this.props.authUser) {
-                                    this.props.userContent.addWatchingShow(
-                                      id,
-                                      this.props.advancedSearchContent
-                                    )
+                                    this.props.addWatchingShow(id, this.props.advancedSearchContent)
                                   } else {
                                     this.context.toggleContentLS(
                                       id,

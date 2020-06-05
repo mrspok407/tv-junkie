@@ -49,7 +49,7 @@ export default class ShowsButtons extends Component {
               type="button"
               onClick={() => {
                 if (this.props.authUser) {
-                  userContent.removeWatchingShow(Number(id))
+                  this.props.removeWatchingShow(Number(id))
                 } else {
                   this.context.toggleContentLS(Number(id), "watchingShows")
                 }
@@ -63,7 +63,7 @@ export default class ShowsButtons extends Component {
               type="button"
               onClick={() => {
                 if (this.props.authUser) {
-                  userContent.addWatchingShow(Number(id), infoToPass)
+                  this.props.addWatchingShow(Number(id), infoToPass)
                 } else {
                   this.context.toggleContentLS(Number(id), "watchingShows", infoToPass)
                 }
@@ -87,7 +87,8 @@ export default class ShowsButtons extends Component {
               })}
               type="button"
               onClick={() => {
-                userContent.addShowToSubDatabase(Number(id), infoToPass, "droppedShows")
+                this.props.addShowToSubDatabase(Number(id), infoToPass, "droppedShows")
+
                 this.showDissableBtnWarning("dropBtn")
               }}
             >
@@ -108,7 +109,7 @@ export default class ShowsButtons extends Component {
               })}
               type="button"
               onClick={() => {
-                userContent.addShowToSubDatabase(Number(id), infoToPass, "willWatchShows")
+                this.props.addShowToSubDatabase(Number(id), infoToPass, "willWatchShows")
                 this.showDissableBtnWarning("willWatchBtn")
               }}
             >

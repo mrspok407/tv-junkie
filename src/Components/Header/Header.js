@@ -72,7 +72,7 @@ export default class Header extends Component {
                   </li>
                 </NavLink>
 
-                {!!authUser.roles[ROLES.ADMIN] && (
+                {authUser.roles && !!authUser.roles[ROLES.ADMIN] && (
                   <NavLink exact to={ROUTES.ADMIN}>
                     <li data-item="4" className="nav__item" onClick={() => this.closeNavMobile()}>
                       Admin

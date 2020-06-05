@@ -24,7 +24,7 @@ class SearchCard extends Component {
             })}
             onClick={() => {
               if (this.props.authUser) {
-                this.props.userContent.toggleWatchLaterMovie(id, searchResults)
+                this.props.toggleWatchLaterMovie(id, searchResults)
               } else {
                 this.context.toggleContentLS(id, "watchLaterMovies", searchResults)
               }
@@ -47,7 +47,7 @@ class SearchCard extends Component {
                 className="button button--searchlist button--pressed"
                 onClick={() => {
                   if (this.props.authUser) {
-                    this.props.userContent.removeWatchingShow(id)
+                    this.props.removeWatchingShow(id)
                   } else {
                     this.context.toggleContentLS(id, "watchingShows")
                   }
@@ -61,7 +61,7 @@ class SearchCard extends Component {
                 className="button button--searchlist"
                 onClick={() => {
                   if (this.props.authUser) {
-                    this.props.userContent.addWatchingShow(id, searchResults)
+                    this.props.addWatchingShow(id, searchResults)
                   } else {
                     this.context.toggleContentLS(id, "watchingShows", searchResults)
                   }

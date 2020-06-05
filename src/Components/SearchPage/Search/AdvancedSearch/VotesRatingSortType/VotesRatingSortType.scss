@@ -5,7 +5,7 @@
   grid-template-columns: 0.8fr 1fr 1.8fr 1fr;
   // grid-template-columns: repeat(4, 1fr);
   margin-top: 8px;
-  @include mediaMaxW(470px) {
+  @include mediaMaxW(#{$mobileViewPort}) {
     grid-template-columns: 1fr 1fr;
   }
 
@@ -22,7 +22,7 @@
 }
 
 .inputs__vote-count {
-  @include mediaMaxW(470px) {
+  @include mediaMaxW(#{$mobileViewPort}) {
     select {
       border: 0;
     }

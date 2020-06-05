@@ -327,7 +327,7 @@ const ContentResults = ({
                       className={classNames("button", {
                         "button--pressed": userContent.watchLaterMovies.some(item => item.id === id)
                       })}
-                      onClick={() => userContent.toggleWatchLaterMovie(id, contentArr)}
+                      onClick={() => toggleWatchLaterMovie(id, contentArr)}
                       type="button"
                     >
                       {userContent.watchLaterMovies.some(item => item.id === id) ? "Remove" : "Watch later"}
@@ -338,7 +338,7 @@ const ContentResults = ({
                         <>
                           <button
                             className="button button--pressed"
-                            onClick={() => userContent.removeWatchingShow(id)}
+                            onClick={() => this.props.removeWatchingShow(id)}
                             type="button"
                           >
                             Not watching
@@ -347,7 +347,7 @@ const ContentResults = ({
                             className={classNames("button", {
                               "button--pressed": userContent.droppedShows.some(e => e.id === id)
                             })}
-                            onClick={() => userContent.addShowToSubDatabase(id, contentArr, "droppedShows")}
+                            onClick={() => this.props.addShowToSubDatabase(id, contentArr, "droppedShows")}
                             type="button"
                           >
                             Drop
@@ -356,7 +356,7 @@ const ContentResults = ({
                             className={classNames("button", {
                               "button--pressed": userContent.willWatchShows.some(e => e.id === id)
                             })}
-                            onClick={() => userContent.addShowToSubDatabase(id, contentArr, "willWatchShows")}
+                            onClick={() => this.props.addShowToSubDatabase(id, contentArr, "willWatchShows")}
                             type="button"
                           >
                             Will watch
@@ -366,7 +366,7 @@ const ContentResults = ({
                         <>
                           <button
                             className="button"
-                            onClick={() => userContent.addWatchingShow(id, contentArr)}
+                            onClick={() => this.props.addWatchingShow(id, contentArr)}
                             type="button"
                           >
                             Watching
@@ -375,7 +375,7 @@ const ContentResults = ({
                             className={classNames("button", {
                               "button--pressed": userContent.droppedShows.some(e => e.id === id)
                             })}
-                            onClick={() => userContent.addShowToSubDatabase(id, contentArr, "droppedShows")}
+                            onClick={() => this.props.addShowToSubDatabase(id, contentArr, "droppedShows")}
                             type="button"
                           >
                             Add to dropped {original_title ? "movie" : "show"}
@@ -384,7 +384,7 @@ const ContentResults = ({
                             className={classNames("button", {
                               "button--pressed": userContent.willWatchShows.some(e => e.id === id)
                             })}
-                            onClick={() => userContent.addShowToSubDatabase(id, contentArr, "willWatchShows")}
+                            onClick={() => this.props.addShowToSubDatabase(id, contentArr, "willWatchShows")}
                             type="button"
                           >
                             Will watch
@@ -401,7 +401,7 @@ const ContentResults = ({
                       <div className="content-results__item-links content-results__item-links--adv-search">
                         <button
                           className="button button--pressed"
-                          onClick={() => userContent.removeWatchingShow(id)}
+                          onClick={() => this.props.removeWatchingShow(id)}
                           type="button"
                         >
                           Remove {original_title ? "movie" : "show"}
@@ -410,7 +410,7 @@ const ContentResults = ({
                           className={classNames("button", {
                             "button--pressed": userContent.droppedShows.some(e => e.id === id)
                           })}
-                          onClick={() => userContent.addShowToSubDatabase(id, contentArr, "droppedShows")}
+                          onClick={() => this.props.addShowToSubDatabase(id, contentArr, "droppedShows")}
                           type="button"
                         >
                           Add to dropped {original_title ? "movie" : "show"}
@@ -419,7 +419,7 @@ const ContentResults = ({
                           className={classNames("button", {
                             "button--pressed": userContent.willWatchShows.some(e => e.id === id)
                           })}
-                          onClick={() => userContent.addShowToSubDatabase(id, contentArr, "willWatchShows")}
+                          onClick={() => this.props.addShowToSubDatabase(id, contentArr, "willWatchShows")}
                           type="button"
                         >
                           Will watch {original_title ? "movie" : "show"}
@@ -428,7 +428,7 @@ const ContentResults = ({
                     ) : (
                       <button
                         className="button--del-item"
-                        onClick={() => userContent.removeWatchingShow(id, watchingShows)}
+                        onClick={() => this.props.removeWatchingShow(id, watchingShows)}
                         type="button"
                       />
                     )}
@@ -437,7 +437,7 @@ const ContentResults = ({
                   <div className="content-results__item-links content-results__item-links--adv-search">
                     <button
                       className="button"
-                      onClick={() => userContent.addWatchingShow(id, contentArr)}
+                      onClick={() => this.props.addWatchingShow(id, contentArr)}
                       type="button"
                     >
                       Add {original_title ? "movie" : "show"}
@@ -446,7 +446,7 @@ const ContentResults = ({
                       className={classNames("button", {
                         "button--pressed": userContent.droppedShows.some(e => e.id === id)
                       })}
-                      onClick={() => userContent.addShowToSubDatabase(id, contentArr, "droppedShows")}
+                      onClick={() => this.props.addShowToSubDatabase(id, contentArr, "droppedShows")}
                       type="button"
                     >
                       Add to dropped {original_title ? "movie" : "show"}
@@ -455,7 +455,7 @@ const ContentResults = ({
                       className={classNames("button", {
                         "button--pressed": userContent.willWatchShows.some(e => e.id === id)
                       })}
-                      onClick={() => userContent.addShowToSubDatabase(id, contentArr, "willWatchShows")}
+                      onClick={() => this.props.addShowToSubDatabase(id, contentArr, "willWatchShows")}
                       type="button"
                     >
                       Will watch {original_title ? "movie" : "show"}

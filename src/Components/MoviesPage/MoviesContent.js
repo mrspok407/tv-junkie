@@ -5,7 +5,6 @@ import { listOfGenres } from "Utils"
 import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
 import Loader from "Components/Placeholders/Loader"
 import PlaceholderNoMovies from "Components/Placeholders/PlaceholderNoMovies"
-import "./MoviesPage.scss"
 
 class MoviesContent extends Component {
   showLinksToAll() {
@@ -68,7 +67,7 @@ class MoviesContent extends Component {
                 <Link
                   to={{
                     pathname: `/movie/${id}`,
-                    state: { logoDisable: true }
+                    state: { logoDisable: true, y: 300 }
                   }}
                 >
                   <div className="content-results__item-main-info">
@@ -160,7 +159,7 @@ class MoviesContent extends Component {
                   className="button--del-item"
                   onClick={() => {
                     if (this.props.authUser) {
-                      this.props.userContent.toggleWatchLaterMovie(id, watchLaterMovies)
+                      this.props.toggleWatchLaterMovie(id, watchLaterMovies)
                     } else {
                       this.context.toggleContentLS(id, "watchLaterMovies", watchLaterMovies)
                     }

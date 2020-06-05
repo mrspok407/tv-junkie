@@ -28,7 +28,7 @@
     transition: 0.3s;
     background-color: getColor(hoverEffectBgColor, $btnPalette);
     z-index: -1;
-    @include mediaMaxW(1000px) {
+    @include mediaMaxW(#{$mobileViewPort}) {
       display: none;
     }
   }
@@ -108,11 +108,11 @@
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   }
 
-  @include mediaMaxW(800px) {
+  @include mediaMaxW(#{$mobileViewPort}) {
     padding-bottom: 15px;
   }
 
-  @include mediaMaxW(650px) {
+  @include mediaMaxW(#{$mobileViewPort}) {
     grid-template-columns: 1fr;
     row-gap: 5px;
   }

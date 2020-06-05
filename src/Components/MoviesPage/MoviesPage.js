@@ -1,11 +1,9 @@
 import React, { Component } from "react"
 import axios, { CancelToken } from "axios"
-// import ContentResults from "Components/Templates/ContentResults/ContentResults"
-// import PlaceholderNoSelectedContent from "Components/Placeholders/PlaceholderNoSelectedContent"
-import ScrollToTop from "Utils/ScrollToTop"
-import "./MoviesPage.scss"
+import { withRouter } from "react-router-dom"
 import Header from "../Header/Header"
 import MoviesContent from "./MoviesContent"
+import ScrollToTop from "Utils/ScrollToTop"
 
 let cancelRequest
 
@@ -30,6 +28,7 @@ class Movies extends Component {
 
   getMovieLinks = (id, showAllLinksPressed = false, title, date) => {
     if (this.state.moviesIds.includes(id) || this.state.showAllLinksPressed) return
+    console.log(document.body.scrollHeight)
 
     this.setState(prevState => ({
       loadingIds: [...prevState.loadingIds, id],
@@ -64,6 +63,8 @@ class Movies extends Component {
     return (
       <>
         <Header />
+        {/* <ScrollToTopOnMount /> */}
+        {/* <ScrollToTopOnUpdate /> */}
         <MoviesContent
           moviesArr={this.state.moviesArr}
           getMovieLinks={this.getMovieLinks}
@@ -78,4 +79,4 @@ class Movies extends Component {
   }
 }
 
-export default Movies
+export default withRouter(Movies)

@@ -51,7 +51,7 @@
       transition: 0.3s;
       background-color: #fff;
       z-index: -1;
-      @include mediaMaxW(1000px) {
+      @include mediaMaxW(#{$mobileViewPort}) {
         display: none;
       }
     }
@@ -85,7 +85,7 @@
       justify-content: center;
       align-items: center;
       align-self: end;
-      @include mediaMaxW(1000px) {
+      @include mediaMaxW(#{$mobileViewPort}) {
         padding: 5px 0px 5px 0px;
       }
       &:hover:after {
@@ -97,7 +97,7 @@
     }
     &--mobile {
       display: none;
-      @include mediaMaxW(580px) {
+      @include mediaMaxW(#{$mobileViewPort}) {
         display: flex;
         position: absolute;
         top: 0;
@@ -106,7 +106,7 @@
         z-index: 9999;
       }
       * {
-        @include mediaMaxW(580px) {
+        @include mediaMaxW(#{$mobileViewPort}) {
           padding: 5px 10px 5px 10px;
           background-color: getColor(blueClr, $mainPalette);
         }
@@ -149,10 +149,10 @@ $font-sizes: (
   width: 100%;
   min-width: 350px;
   padding-bottom: 100px;
-  @include mediaMaxW(1450px) {
+  @include mediaMaxW($mainContainerMaxWidth) {
     padding: 0 38px 100px 38px;
   }
-  @include mediaMaxW(850px) {
+  @include mediaMaxW(#{$mobileViewPort}) {
     padding: 0 8px 100px 8px;
   }
   @include mediaMaxW(400px) {
@@ -204,7 +204,7 @@ $font-sizes: (
     @include hoverBoxShadow(0px, 0.2s);
     z-index: -9999;
     box-shadow: 0px 0px 6px 1px #66b4e6;
-    @include mediaMaxW(1000px) {
+    @include mediaMaxW(#{$mobileViewPort}) {
       display: none;
     }
   }

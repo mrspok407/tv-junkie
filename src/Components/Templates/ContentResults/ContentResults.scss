@@ -23,7 +23,7 @@ $font-sizes: (
   @include mediaMaxW(1450px) {
     padding: 0 38px 100px 38px;
   }
-  @include mediaMaxW(850px) {
+  @include mediaMaxW(#{$mobileViewPort}) {
     padding: 0 8px 100px 8px;
   }
   @include mediaMaxW(400px) {
@@ -75,7 +75,7 @@ $font-sizes: (
     @include hoverBoxShadow(0px, 0.2s);
     z-index: -9999;
     box-shadow: 0px 0px 6px 1px #66b4e6;
-    @include mediaMaxW(1000px) {
+    @include mediaMaxW(#{$mobileViewPort}) {
       display: none;
     }
   }

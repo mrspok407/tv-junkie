@@ -3,8 +3,9 @@ import React, { Component } from "react"
 import ShowsButtons from "./ShowsButtons"
 import classNames from "classnames"
 import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
+import { withUserContent } from "Components/UserContent"
 
-export default class MainInfo extends Component {
+class MainInfo extends Component {
   render() {
     const yearRelease = this.props.releaseDate.slice(0, 4)
     const yearEnded = this.props.mediaType === "show" && this.props.lastAirDate.slice(0, 4)
@@ -125,6 +126,9 @@ export default class MainInfo extends Component {
               id={this.props.id}
               userContent={this.props.userContent}
               authUser={this.props.authUser}
+              addWatchingShow={this.props.addWatchingShow}
+              removeWatchingShow={this.props.removeWatchingShow}
+              addShowToSubDatabase={this.props.addShowToSubDatabase}
               infoToPass={this.props.infoToPass}
             />
           )}
@@ -136,7 +140,7 @@ export default class MainInfo extends Component {
               })}
               onClick={() => {
                 if (this.props.authUser) {
-                  this.props.userContent.toggleWatchLaterMovie(Number(this.props.id), this.props.infoToPass)
+                  this.props.toggleWatchLaterMovie(Number(this.props.id), this.props.infoToPass)
                 } else {
                   this.context.toggleContentLS(
                     Number(this.props.id),
@@ -155,5 +159,7 @@ export default class MainInfo extends Component {
     )
   }
 }
+
+export default withUserContent(MainInfo)
 
 MainInfo.contextType = UserContentLocalStorageContext

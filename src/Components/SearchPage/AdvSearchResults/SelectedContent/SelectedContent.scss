@@ -7,7 +7,7 @@
   width: 400px;
   max-height: calc(100vh - 100px);
   z-index: 1;
-  @include mediaMaxW(500px) {
+  @include mediaMaxW(#{$mobileViewPort}) {
     right: 33px;
     width: 85%;
   }
@@ -100,7 +100,7 @@
   }
 
   &-button {
-    @include mediaMaxW(450px) {
+    @include mediaMaxW(#{$mobileViewPort}) {
       grid-column: 1 / 3;
       padding-top: 5px;
     }

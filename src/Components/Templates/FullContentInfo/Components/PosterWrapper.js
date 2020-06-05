@@ -19,6 +19,7 @@ export default class PosterWrapper extends Component {
   }
 
   componentDidMount() {
+    this._isMounted = true
     this.getMovieTorrents()
   }
 
@@ -52,21 +53,23 @@ export default class PosterWrapper extends Component {
 
         const movieHash720p = movie.torrents.find(item => item.quality === "720p")
 
-        this.setState({
-          movieTitle: movie.title,
-          movieHash1080p: movieHash1080p && movieHash1080p.hash,
-          movieHash720p: movieHash720p && movieHash720p.hash,
-          movieAvailable: true
-        })
-        this.setState({
-          loadingTorrentLinks: false
-        })
+        if (this._isMounted) {
+          this.setState({
+            movieTitle: movie.title,
+            movieHash1080p: movieHash1080p && movieHash1080p.hash,
+            movieHash720p: movieHash720p && movieHash720p.hash,
+            movieAvailable: true,
+            loadingTorrentLinks: false
+          })
+        }
       })
       .catch(err => {
         if (axios.isCancel(err)) return
-        this.setState({
-          error: "Something went wrong, sorry"
-        })
+        if (this._isMounted) {
+          this.setState({
+            error: "Something went wrong, sorry"
+          })
+        }
       })
   }
 

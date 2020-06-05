@@ -19,14 +19,13 @@
     }
   }
 
-  @include mediaMaxW(1360px) {
+  @include mediaMaxW($mainContainerMaxWidth) {
     right: 10px;
   }
 
-  @include mediaMaxW(560px) {
-    left: 50%;
-    right: 0;
-    transform: translate(-50%, 0);
+  @include mediaMaxW(#{$mobileViewPort}) {
+    position: static;
+    transform: translate(0, 0);
     animation: initial;
     opacity: 1;
   }

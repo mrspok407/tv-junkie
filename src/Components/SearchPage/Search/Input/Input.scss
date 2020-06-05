@@ -37,7 +37,7 @@
   background-repeat: no-repeat;
   background-size: 25px;
   background-position: 3px 13px;
-  @include mediaMaxW(560px) {
+  @include mediaMaxW(#{$mobileViewPort}) {
     background-position: 15px 13px;
   }
   &--is-open {
@@ -92,7 +92,7 @@
   padding-left: 40px;
 
   span {
-    @include mediaMaxW(560px) {
+    @include mediaMaxW(#{$mobileViewPort}) {
       display: none;
     }
   }
