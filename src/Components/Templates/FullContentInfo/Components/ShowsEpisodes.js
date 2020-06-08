@@ -1,12 +1,14 @@
 import React, { Component } from "react"
 import { differenceBtwDatesInDays } from "Utils"
-import Loader from "Components//Placeholders/Loader"
+import { withUserContent } from "Components/UserContent"
 import axios, { CancelToken } from "axios"
 import classNames from "classnames"
+import ShowsEpisodesAuthUser from "./ShowsEpisodesAuthUser"
+import ShowsEpisodesNotAuthUser from "./ShowsEpisodesNotAuthUser"
 
 let cancelRequest
 
-export default class ShowsEpisodes extends Component {
+class ShowsEpisodes extends Component {
   constructor(props) {
     super(props)
 
@@ -88,207 +90,65 @@ export default class ShowsEpisodes extends Component {
     }
   }
 
+  showSeasonsEpisodeAuthUser = seasonId => {
+    if (this.state.openSeasons.includes(seasonId)) {
+      this.setState(prevState => ({
+        openSeasons: [...prevState.openSeasons.filter(item => item !== seasonId)]
+      }))
+    } else {
+      this.setState(prevState => ({
+        openSeasons: [...prevState.openSeasons, seasonId]
+      }))
+    }
+  }
+
+  toggleWatchedEpisode = (showId, seasonNum, episodeNum) => {
+    const watchingShows = this.props.userContent.watchingShows
+    const show = watchingShows.find(item => item.id === Number(showId)) || {}
+    const showEpisode = show.episodes[seasonNum - 1][episodeNum - 1]
+
+    this.props.firebase
+      .watchingShowsEpisode(this.props.authUser.uid, show.key, seasonNum - 1, episodeNum - 1)
+      .update({ watched: !showEpisode.watched })
+  }
+
   render() {
+    const showInDb = this.props.userContent.watchingShows.find(item => item.id === Number(this.props.id))
+
     return (
-      <div className="full-detailes__seasons-and-episodes">
-        {this.props.seasonsArr.map(season => {
-          if (season.season_number === 0 || season.name === "Specials" || !season.air_date) return null
-          const seasonId = season.id
-
-          const daysToNewSeason = differenceBtwDatesInDays(season.air_date, this.props.todayDate)
-
-          return (
-            <div
-              key={seasonId}
-              className={classNames("full-detailes__season", {
-                "full-detailes__season--no-poster": !season.poster_path
-              })}
-              style={
-                !this.state.loadingEpisodesIds.includes(seasonId) ? { rowGap: "10px" } : { rowGap: "0px" }
-              }
-            >
-              <div
-                className={classNames("full-detailes__season-info", {
-                  "full-detailes__season-info--open": this.state.openSeasons.includes(seasonId)
-                })}
-                style={
-                  daysToNewSeason > 0
-                    ? {
-                        backgroundColor: "rgba(132, 90, 90, 0.3)"
-                      }
-                    : {
-                        backgroundColor: "#1d1d1d96"
-                      }
-                }
-                onClick={() => this.showSeasonsEpisode(seasonId, season.season_number)}
-              >
-                <div className="full-detailes__season-number">
-                  Season {season.season_number}
-                  {daysToNewSeason > 0 && (
-                    <span className="full-detailes__season-when-new-season">
-                      {daysToNewSeason} days to air
-                    </span>
-                  )}
-                </div>
-                <div className="full-detailes__season-date">
-                  {season.air_date && season.air_date.slice(0, 4)}
-                </div>
-              </div>
-
-              {this.state.openSeasons.includes(seasonId) &&
-                (!this.state.loadingEpisodesIds.includes(seasonId) ? (
-                  <>
-                    {season.poster_path && (
-                      <div
-                        className="full-detailes__season-poster"
-                        style={{
-                          backgroundImage: `url(https://image.tmdb.org/t/p/w500/${season.poster_path})`
-                        }}
-                      />
-                    )}
-
-                    <div className="full-detailes__episodes-list">
-                      {this.state.showEpisodes.map(item => {
-                        if (item.seasonId !== seasonId) return null
-
-                        return item.episodes.map(episode => {
-                          const urlShowTitle = this.props.showTitle.split(" ").join("+")
-                          // Format Date //
-                          const airDateISO = new Date(episode.air_date).toISOString()
-
-                          const optionss = {
-                            month: "long",
-                            day: "numeric",
-                            year: "numeric"
-                          }
-
-                          const formatedDate = new Date(airDateISO)
-
-                          const episodeAirDate = episode.air_date
-                            ? new Intl.DateTimeFormat("en-US", optionss).format(formatedDate)
-                            : "No date available"
-                          // Format Date End //
-
-                          // Format Seasons And Episode Numbers //
-                          const seasonToString = season.season_number.toString()
-                          const episodeToString = episode.episode_number.toString()
-
-                          const seasonNumber =
-                            seasonToString.length === 1
-                              ? "s0".concat(seasonToString)
-                              : "s".concat(seasonToString)
-                          const episodeNumber =
-                            episodeToString.length === 1
-                              ? "e0".concat(episodeToString)
-                              : "e".concat(episodeToString)
-                          // Format Seasons And Episode Numbers End //
-
-                          const episodeAirDateAsDateObj = new Date(episode.air_date)
-
-                          const daysToNewEpisode = differenceBtwDatesInDays(
-                            episode.air_date,
-                            this.props.todayDate
-                          )
-
-                          return (
-                            <div
-                              key={episode.id}
-                              className={classNames("full-detailes__episode", {
-                                "full-detailes__episode--open": this.state.detailEpisodeInfo.includes(
-                                  episode.id
-                                )
-                              })}
-                            >
-                              <div
-                                className="full-detailes__episode-wrapper"
-                                onClick={() => this.showEpisodeInfo(episode.id)}
-                                style={
-                                  daysToNewEpisode > 0 || !episode.air_date
-                                    ? {
-                                        backgroundColor: "rgba(132, 90, 90, 0.3)"
-                                      }
-                                    : {
-                                        backgroundColor: "#1d1d1d96"
-                                      }
-                                }
-                              >
-                                <div className="full-detailes__episode-date">{episodeAirDate}</div>
-                                <div className="full-detailes__episode-name">
-                                  <span className="full-detailes__episode-number">
-                                    {episode.episode_number}.
-                                  </span>
-                                  {episode.name}
-                                </div>
-                                {daysToNewEpisode > 0 && (
-                                  <div className="full-detailes__episode-when-new-episode">
-                                    {daysToNewEpisode} days
-                                  </div>
-                                )}
-                              </div>
-
-                              {this.state.detailEpisodeInfo.includes(episode.id) && (
-                                <div
-                                  className={classNames("full-detailes__episode-detailes", {
-                                    "full-detailes__episode-detailes--no-image": !episode.still_path
-                                  })}
-                                >
-                                  {episode.still_path && (
-                                    <div
-                                      className="full-detailes__episode-detailes-image"
-                                      style={{
-                                        backgroundImage: `url(https://image.tmdb.org/t/p/w500${episode.still_path})`
-                                      }}
-                                    />
-                                  )}
-                                  {episode.overview && (
-                                    <div className="full-detailes__episode-detailes-overview">
-                                      {episode.overview}
-                                    </div>
-                                  )}
-
-                                  {episodeAirDateAsDateObj < this.props.todayDate.getTime() &&
-                                    episode.air_date && (
-                                      <div className="torrent-links torrent-links--full-content">
-                                        <a
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}+1080p&cat=41`}
-                                        >
-                                          1080p
-                                        </a>
-                                        <a
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}+720p&cat=41`}
-                                        >
-                                          720p
-                                        </a>
-                                        <a
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}&cat=5`}
-                                        >
-                                          480p
-                                        </a>
-                                      </div>
-                                    )}
-                                </div>
-                              )}
-                            </div>
-                          )
-                        })
-                      })}
-                    </div>
-                  </>
-                ) : !this.state.errorShowEpisodes ? (
-                  <Loader className="loader--small-pink" />
-                ) : (
-                  <div>{this.state.errorShowEpisodes}</div>
-                ))}
-            </div>
-          )
-        })}
-      </div>
+      <>
+        {showInDb ? (
+          <ShowsEpisodesAuthUser
+            openSeasons={this.state.openSeasons}
+            detailEpisodeInfo={this.state.detailEpisodeInfo}
+            showEpisodeInfo={this.showEpisodeInfo}
+            toggleWatchedEpisode={this.toggleWatchedEpisode}
+            showSeasonsEpisodeAuthUser={this.showSeasonsEpisodeAuthUser}
+            showEpisodes={this.state.showEpisodes}
+            episodes={showInDb.episodes}
+            seasonsArr={this.props.seasonsArr}
+            showTitle={this.props.showTitle}
+            todayDate={this.props.todayDate}
+            id={this.props.id}
+          />
+        ) : (
+          <ShowsEpisodesNotAuthUser
+            openSeasons={this.state.openSeasons}
+            detailEpisodeInfo={this.state.detailEpisodeInfo}
+            loadingEpisodesIds={this.state.loadingEpisodesIds}
+            showEpisodes={this.state.showEpisodes}
+            errorShowEpisodes={this.state.errorShowEpisodes}
+            showEpisodeInfo={this.showEpisodeInfo}
+            showSeasonsEpisode={this.showSeasonsEpisode}
+            seasonsArr={this.props.seasonsArr}
+            showTitle={this.props.showTitle}
+            todayDate={this.props.todayDate}
+            id={this.props.id}
+          />
+        )}
+      </>
     )
   }
 }
+
+export default withUserContent(ShowsEpisodes)

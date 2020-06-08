@@ -14,10 +14,6 @@ const withUserContent = Component => {
         droppedShows: [],
         willWatchShows: [],
         watchLaterMovies: [],
-        // addWatchingShow: this.addWatchingShow,
-        // removeWatchingShow: this.removeWatchingShow,
-        // addShowToSubDatabase: this.addShowToSubDatabase,
-        // toggleWatchLaterMovie: this.toggleWatchLaterMovie,
         subDatabases: ["droppedShows", "willWatchShows"]
       }
 
@@ -63,9 +59,7 @@ const withUserContent = Component => {
             const newShowRef = this.firebase.watchingShows(this.userUid).push()
             const key = newShowRef.key
 
-            const showInfo = showToAdd || showInSubDatabases
-
-            newShowRef.set({ ...showInfo, key, userWatching: true })
+            newShowRef.set({ ...showToAdd, key, userWatching: true })
           } else {
             const key = showIsWatching.key
             const userWatchingShow = true
@@ -97,6 +91,11 @@ const withUserContent = Component => {
         const key = showIsWatching.key
         const userWatchingShow = false
         toggleWatchingShowsDatabase(this.firebase, this.userUid, key, userWatchingShow)
+      } else {
+        const newShowRef = this.firebase.watchingShows(this.userUid).push()
+        const key = newShowRef.key
+
+        newShowRef.set({ ...showToAdd, key, userWatching: false })
       }
 
       const otherDatabases = this.state.subDatabases.filter(item => item !== database)

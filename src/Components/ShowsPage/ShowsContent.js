@@ -33,6 +33,8 @@ class ShowsContent extends Component {
       ? content
       : this.context.watchingShows
 
+    console.log(watchingShows)
+
     return (
       <>
         {watchingShows.map(
@@ -42,13 +44,13 @@ class ShowsContent extends Component {
             id,
             first_air_date,
             vote_average,
-            genre_ids = [],
+            genres = [],
             overview = "",
             backdrop_path,
             poster_path,
             vote_count
           }) => {
-            const filteredGenres = genre_ids.map(genreId => listOfGenres.filter(item => item.id === genreId))
+            const filteredGenres = genres.map(genreId => listOfGenres.filter(item => item.id === genreId))
 
             const showTitle = name || original_name
 

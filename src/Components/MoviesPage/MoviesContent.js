@@ -32,13 +32,13 @@ class MoviesContent extends Component {
             id,
             release_date,
             vote_average,
-            genre_ids = [],
+            genres = [],
             overview = "",
             backdrop_path,
             poster_path,
             vote_count
           }) => {
-            const filteredGenres = genre_ids.map(genreId => listOfGenres.filter(item => item.id === genreId))
+            const filteredGenres = genres.map(genreId => listOfGenres.filter(item => item.id === genreId))
 
             const contentTitle = title || original_title
 

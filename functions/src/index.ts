@@ -19,10 +19,30 @@ export const onAddShow = functions.database
         return axios.get(`http://api.tvmaze.com/shows/${id}?embed=episodes`)
       })
       .then(({ data: { _embedded } }) => {
-        // const jsonData = JSON.parse(JSON.stringify(_embedded.episodes))
         const episodes = _embedded.episodes
-        console.log(episodes)
-        return snapshot.ref.update({ episodes: episodes })
+        const modifiedEpisodes: any[][] = []
+        const mapSeasons = new Map()
+
+        const seasons = episodes.reduce((acc: any[], item: { season: any }) => {
+          if (!mapSeasons.has(item.season)) {
+            mapSeasons.set(item.season, true)
+            acc.push(item.season)
+          }
+          return acc
+        }, [])
+
+        seasons.forEach((season: any) => {
+          const seasonEpisodes: any[] = []
+
+          episodes.forEach((episode: { season: any }) => {
+            if (episode.season === season) seasonEpisodes.push({ ...episode, watched: false })
+          })
+          modifiedEpisodes.push(seasonEpisodes)
+        })
+
+        // const episodes = _embedded.episodes
+        // console.log(episodes)
+        return snapshot.ref.update({ episodes: modifiedEpisodes })
       })
       .catch(err => {
         console.log(err)

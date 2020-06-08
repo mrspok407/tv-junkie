@@ -12,14 +12,18 @@ import MainInfo from "./Components/MainInfo"
 import ShowsEpisodes from "./Components/ShowsEpisodes"
 import PosterWrapper from "./Components/PosterWrapper"
 import "./FullContentInfo.scss"
+import { withUserContent } from "Components/UserContent"
+import ShowsEpisodesAuthUser from "./Components/ShowsEpisodesAuthUser"
 
 const todayDate = new Date()
 let cancelRequest
 
-export default function FullContentInfo({
+function FullContentInfo({
   match: {
     params: { id, mediaType }
-  }
+  },
+  userContent,
+  authUser
 }) {
   const [detailes, setDetailes] = useState({
     poster: "",
@@ -347,6 +351,20 @@ export default function FullContentInfo({
       })
   }
 
+  // const renderTest = id => {
+  //   console.log(userContent)
+  //   const test = userContent.watchingShows
+  //   const fffff = test.find(item => item.id === Number(id)) || {}
+
+  //   // const name = test.name
+
+  //   console.log(fffff)
+
+  //   return <div>{fffff.episodes && fffff.episodes.map(item => item.map(item => <div>{item.name}</div>))}</div>
+  // }
+
+  const showInDb = userContent.watchingShows.find(item => item.id === Number(id))
+
   return (
     <>
       <Header isLogoVisible={false} />
@@ -387,12 +405,32 @@ export default function FullContentInfo({
             <div className="full-detailes__description">{detailes.description}</div>
 
             {mediaType === "show" && (
-              <ShowsEpisodes
-                seasonsArr={detailes.seasonsArr}
-                todayDate={todayDate}
-                id={id}
-                showTitle={detailes.title}
-              />
+              <>
+                <ShowsEpisodes
+                  showInDb={showInDb}
+                  // episodes={showInDb.episodes}
+                  seasonsArr={detailes.seasonsArr}
+                  showTitle={detailes.title}
+                  todayDate={todayDate}
+                  id={id}
+                />
+                {/* {showInDb ? (
+                  <ShowsEpisodesAuthUser
+                    episodes={showInDb.episodes}
+                    seasonsArr={detailes.seasonsArr}
+                    showTitle={detailes.title}
+                    todayDate={todayDate}
+                    id={id}
+                  />
+                ) : (
+                  <ShowsEpisodes
+                    seasonsArr={detailes.seasonsArr}
+                    todayDate={todayDate}
+                    id={id}
+                    showTitle={detailes.title}
+                  />
+                )} */}
+              </>
             )}
             {similarContent.length > 0 && (
               <div className="full-detailes__slider">
@@ -412,3 +450,5 @@ export default function FullContentInfo({
     </>
   )
 }
+
+export default withUserContent(FullContentInfo)
