@@ -203,7 +203,13 @@ class MoviesContent extends Component {
                 }
           }
         >
-          {watchLaterMovies.length === 0 ? <PlaceholderNoMovies /> : this.renderContent()}
+          {this.props.userContent.loadingContent ? (
+            <Loader className="loader--pink" />
+          ) : watchLaterMovies.length === 0 ? (
+            <PlaceholderNoMovies />
+          ) : (
+            this.renderContent()
+          )}
         </div>
       </div>
     )

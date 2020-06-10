@@ -28,7 +28,6 @@ class Movies extends Component {
 
   getMovieLinks = (id, showAllLinksPressed = false, title, date) => {
     if (this.state.moviesIds.includes(id) || this.state.showAllLinksPressed) return
-    console.log(document.body.scrollHeight)
 
     this.setState(prevState => ({
       loadingIds: [...prevState.loadingIds, id],
@@ -37,14 +36,24 @@ class Movies extends Component {
     }))
 
     axios
-      .get(`https://yts.mx/api/v2/list_movies.json?query_term=${title}`, {
-        cancelToken: new CancelToken(function executor(c) {
-          cancelRequest = c
+      .get(
+        `https://api.themoviedb.org/3/movie/${id}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US&append_to_response=similar_movies,external_ids`,
+        {
+          cancelToken: new CancelToken(function executor(c) {
+            cancelRequest = c
+          })
+        }
+      )
+      .then(({ data: { external_ids } }) => {
+        const imdbId = external_ids.imdb_id
+        return axios.get(`https://yts.mx/api/v2/list_movies.json?query_term=${imdbId}`, {
+          cancelToken: new CancelToken(function executor(c) {
+            cancelRequest = c
+          })
         })
       })
       .then(res => {
-        const year = Number(date.slice(0, 4))
-        const movie = res.data.data.movies.find(item => item.year === year)
+        const movie = res.data.data.movies[0]
         movie.id = id
         this.setState(prevState => ({
           moviesArr: [...prevState.moviesArr, movie],

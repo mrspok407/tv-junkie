@@ -162,8 +162,7 @@ class ShowsEpisodes extends Component {
 
                     {this.props.episodes ? (
                       <div className="full-detailes__episodes-list">
-                        {this.props.episodes &&
-                          this.props.episodes[season.season_number - 1] &&
+                        {this.props.episodes[season.season_number - 1] &&
                           this.props.episodes[season.season_number - 1].map(episode => {
                             // if (item.seasonId !== seasonId) return null
 
@@ -243,22 +242,6 @@ class ShowsEpisodes extends Component {
                                         <span className="custom-checkmark" />
                                       </label>
                                     </div>
-                                    {/* <CheckboxInput
-                                  key={episode.id}
-                                  // checked={withoutGenre ? !isChecked : isChecked}
-                                  // label={name}
-                                  // name={name.toLowerCase()}
-                                  // value={name.toLowerCase()}
-                                  onChange={this.toggleWatchedEpisode(
-                                    this.props.id,
-                                    season.season_number,
-                                    episode.episode_number
-                                  )}
-                                  // data="withGenre"
-                                  // className={classNames("checkbox-genre", {
-                                  //   "checkbox-genre--disabled": withoutGenre
-                                  // })}
-                                /> */}
                                   </div>
                                   <div className="full-detailes__episode-date">{episodeAirDate}</div>
                                   <div className="full-detailes__episode-name">
@@ -324,6 +307,8 @@ class ShowsEpisodes extends Component {
                             )
                           })}
                       </div>
+                    ) : this.props.showEpisodes.length === 0 ? (
+                      <Loader className="loader--small-pink" />
                     ) : (
                       <div className="full-detailes__episodes-list">
                         {this.props.showEpisodes.map(item => {
@@ -390,23 +375,9 @@ class ShowsEpisodes extends Component {
                                         }
                                   }
                                 >
-                                  {/* <div className="div">
-            <div className="checkbox-input-container">
-              <label>
-                <input
-                  type="checkbox"
-                  onChange={() =>
-                    this.toggleWatchedEpisode(
-                      this.props.id,
-                      season.season_number,
-                      episode.episode_number
-                    )
-                  }
-                />
-                <span className="custom-checkmark" />
-              </label>
-            </div>
-          </div> */}
+                                  <div className="div">
+                                    <Loader className="loader--small-pink" />
+                                  </div>
                                   <div className="full-detailes__episode-date">{episodeAirDate}</div>
                                   <div className="full-detailes__episode-name">
                                     <span className="full-detailes__episode-number">

@@ -4,6 +4,7 @@ import { withUserContent } from "Components/UserContent"
 import { listOfGenres } from "Utils"
 import classNames from "classnames"
 import PlaceholderNoShows from "Components/Placeholders/PlaceholderNoShows"
+import Loader from "Components/Placeholders/Loader"
 import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
 
 class ShowsContent extends Component {
@@ -193,7 +194,9 @@ class ShowsContent extends Component {
                 }
           }
         >
-          {watchingShows.length === 0 ? (
+          {this.props.userContent.loadingContent ? (
+            <Loader className="loader--pink" />
+          ) : watchingShows.length === 0 ? (
             <PlaceholderNoShows
               section={this.state.activeSection}
               authUser={this.props.authUser}

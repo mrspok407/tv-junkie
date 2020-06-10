@@ -20,7 +20,9 @@ export default class PosterWrapper extends Component {
 
   componentDidMount() {
     this._isMounted = true
-    this.getMovieTorrents()
+    if (this.props.mediaType === "movie") {
+      this.getMovieTorrents()
+    }
   }
 
   componentWillUnmount() {

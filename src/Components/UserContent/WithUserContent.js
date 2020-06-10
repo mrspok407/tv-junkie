@@ -14,7 +14,8 @@ const withUserContent = Component => {
         droppedShows: [],
         willWatchShows: [],
         watchLaterMovies: [],
-        subDatabases: ["droppedShows", "willWatchShows"]
+        subDatabases: ["droppedShows", "willWatchShows"],
+        loadingContent: false
       }
 
       this.firebase = this.props.firebase
@@ -141,6 +142,7 @@ const withUserContent = Component => {
 
     getContent = () => {
       if (this.userUid === null) return
+      this.setState({ loadingContent: true })
 
       this.firebase.userContent(this.userUid).on("value", snapshot => {
         const userContent = snapshot.val() || {}
@@ -159,7 +161,8 @@ const withUserContent = Component => {
 
           if (this._isMounted) {
             this.setState({
-              [key]: content
+              [key]: content,
+              loadingContent: false
             })
           }
         })

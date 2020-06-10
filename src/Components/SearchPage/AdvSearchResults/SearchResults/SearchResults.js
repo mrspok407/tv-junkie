@@ -130,35 +130,41 @@ class AdvSearchResults extends Component {
 
                     <div className="content-results__item-links">
                       {mediaType === "movie" ? (
-                        <button
-                          className={classNames("button", {
-                            "button--pressed": watchLaterMovies.find(item => item.id === id)
-                          })}
-                          onClick={() => {
-                            if (this.props.authUser) {
-                              this.props.toggleWatchLaterMovie(id, this.props.advancedSearchContent)
-                            } else {
-                              this.context.toggleContentLS(
-                                id,
-                                "watchLaterMovies",
-                                this.props.advancedSearchContent
-                              )
-                            }
+                        this.props.userContent.loadingContent ? (
+                          <Loader className="loader--small-pink" />
+                        ) : (
+                          <button
+                            className={classNames("button", {
+                              "button--pressed": watchLaterMovies.find(item => item.id === id)
+                            })}
+                            onClick={() => {
+                              if (this.props.authUser) {
+                                this.props.toggleWatchLaterMovie(id, this.props.advancedSearchContent)
+                              } else {
+                                this.context.toggleContentLS(
+                                  id,
+                                  "watchLaterMovies",
+                                  this.props.advancedSearchContent
+                                )
+                              }
 
-                            if (
-                              !watchLaterMovies.find(item => item.id === id) ||
-                              this.props.currentlyChosenContent.find(item => item.id === id)
-                            ) {
-                              this.props.toggleCurrentlyChosenContent(id, this.props.advancedSearchContent)
-                            }
-                          }}
-                          type="button"
-                        >
-                          {watchLaterMovies.find(item => item.id === id) ? "Remove" : "Watch later"}
-                        </button>
+                              if (
+                                !watchLaterMovies.find(item => item.id === id) ||
+                                this.props.currentlyChosenContent.find(item => item.id === id)
+                              ) {
+                                this.props.toggleCurrentlyChosenContent(id, this.props.advancedSearchContent)
+                              }
+                            }}
+                            type="button"
+                          >
+                            {watchLaterMovies.find(item => item.id === id) ? "Remove" : "Watch later"}
+                          </button>
+                        )
                       ) : (
                         <>
-                          {watchingShows.find(e => e.id === id && e.userWatching === true) ? (
+                          {this.props.userContent.loadingContent ? (
+                            <Loader className="loader--small-pink" />
+                          ) : watchingShows.find(e => e.id === id && e.userWatching === true) ? (
                             <button
                               className="button button--pressed"
                               onClick={() => {
