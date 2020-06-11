@@ -184,12 +184,19 @@ $font-sizes: (
       border-bottom: none;
     }
 
+    &-poster-wrapper {
+      display: grid;
+      grid-template-rows: 80% 10% 10%;
+      row-gap: 10px;
+      max-height: 363px;
+    }
+
     &-poster {
       background-position: center top;
       background-repeat: no-repeat;
       background-size: cover;
+      height: 100%;
       border-radius: 5px;
-      max-height: 363px;
       @include mediaMaxW(#{$mobileViewPort}) {
         display: none;
       }
@@ -353,8 +360,59 @@ $font-sizes: (
         opacity: 1;
       }
     }
+
+    &-checkbox {
+      position: absolute;
+      top: 10px;
+      left: 5px;
+      height: 20px;
+      width: 20px;
+
+      input {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .custom-checkmark {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 20px;
+        width: 20px;
+        background-color: #eee;
+        cursor: pointer;
+
+        &:after {
+          content: "";
+          position: absolute;
+          display: none;
+          left: 8px;
+          top: 3px;
+          width: 6px;
+          height: 11px;
+          border: solid white;
+          border-width: 0 3px 3px 0;
+          transform: rotate(45deg);
+        }
+      }
+
+      &:hover .custom-checkmark {
+        background-color: #9bc5e0;
+      }
+
+      input:checked ~ .custom-checkmark {
+        background-color: getColor(blueClr, $mainPalette);
+
+        &:after {
+          display: block;
+        }
+      }
+    }
+
     &-date {
-      padding-left: 10px;
+      padding-left: 33px;
       align-self: center;
     }
     &-name {

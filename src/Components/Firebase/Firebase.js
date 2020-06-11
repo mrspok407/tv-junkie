@@ -69,6 +69,9 @@ class Firebase {
 
   watchingShowsEpisode = (userUid, showKey, seasonNum, episodeNum) =>
     this.db.ref(`users/${userUid}/content/watchingShows/${showKey}/episodes/${seasonNum}/${episodeNum}`)
+
+  watchingShowsAllEpisodes = (userUid, showKey) =>
+    this.db.ref(`users/${userUid}/content/watchingShows/${showKey}`)
 }
 
 export default Firebase

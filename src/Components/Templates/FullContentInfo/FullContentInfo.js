@@ -9,11 +9,10 @@ import ScrollToTop from "Utils/ScrollToTop"
 import Header from "Components/Header/Header"
 import Slider from "Utils/Slider/Slider"
 import MainInfo from "./Components/MainInfo"
-import ShowsEpisodes from "./Components/ShowsEpisodes"
+import ShowsEpisodes from "./Components/ShowsEpisodes/ShowsEpisodes"
 import PosterWrapper from "./Components/PosterWrapper"
 import "./FullContentInfo.scss"
 import { withUserContent } from "Components/UserContent"
-import ShowsEpisodesAuthUser from "./Components/ShowsEpisodesAuthUser"
 
 const todayDate = new Date()
 let cancelRequest

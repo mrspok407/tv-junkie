@@ -1,8 +1,6 @@
 import React, { Component } from "react"
-import { differenceBtwDatesInDays } from "Utils"
 import { withUserContent } from "Components/UserContent"
 import axios, { CancelToken } from "axios"
-import classNames from "classnames"
 import ShowsEpisodesAuthUser from "./ShowsEpisodesAuthUser"
 import ShowsEpisodesNotAuthUser from "./ShowsEpisodesNotAuthUser"
 
@@ -112,6 +110,47 @@ class ShowsEpisodes extends Component {
       .update({ watched: !showEpisode.watched })
   }
 
+  checkEverySeasonEpisode = (showId, seasonNum, episodesInSeason) => {
+    const show = this.props.userContent.watchingShows.find(item => item.id === Number(showId)) || {}
+    const isAllEpisodesChecked = !show.episodes[seasonNum - 1].some(item => item.watched === false)
+
+    for (let episodeNum = 0; episodeNum < episodesInSeason; episodeNum += 1) {
+      this.props.firebase
+        .watchingShowsEpisode(this.props.authUser.uid, show.key, seasonNum - 1, episodeNum)
+        .update({ watched: !isAllEpisodesChecked })
+    }
+  }
+
+  checkEveryShowEpisode = () => {
+    const show = this.props.userContent.watchingShows.find(item => item.id === Number(this.props.id)) || {}
+    console.log(show.episodes)
+    let isAllEpisodesChecked
+
+    show.episodes.forEach(item => (isAllEpisodesChecked = !item.some(item => item.watched === false)))
+
+    // let newEpisodes = []
+
+    show.episodes.forEach((season, indexSeason) => {
+      season.forEach((episode, indexEpisode) => {
+        show.episodes[indexSeason][indexEpisode].watched = !isAllEpisodesChecked
+      })
+    })
+
+    this.props.firebase
+      .watchingShowsAllEpisodes(this.props.authUser.uid, show.key)
+      .update({ episodes: show.episodes })
+
+    console.log(show.episodes)
+
+    // show.episodes.forEach((season, indexSeason) => {
+    //   season.forEach((episode, indexEpisode) => {
+    //     this.props.firebase
+    //       .watchingShowsEpisode(this.props.authUser.uid, show.key, indexSeason, indexEpisode)
+    //       .update({ watched: !isAllEpisodesChecked })
+    //   })
+    // })
+  }
+
   render() {
     const showInDb = this.props.userContent.watchingShows.find(item => item.id === Number(this.props.id))
 
@@ -123,9 +162,11 @@ class ShowsEpisodes extends Component {
             detailEpisodeInfo={this.state.detailEpisodeInfo}
             showEpisodeInfo={this.showEpisodeInfo}
             toggleWatchedEpisode={this.toggleWatchedEpisode}
+            checkEverySeasonEpisode={this.checkEverySeasonEpisode}
+            checkEveryShowEpisode={this.checkEveryShowEpisode}
             showSeasonsEpisodeAuthUser={this.showSeasonsEpisodeAuthUser}
             showEpisodes={this.state.showEpisodes}
-            episodes={showInDb.episodes}
+            showInDb={showInDb}
             seasonsArr={this.props.seasonsArr}
             showTitle={this.props.showTitle}
             todayDate={this.props.todayDate}

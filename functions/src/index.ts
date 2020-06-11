@@ -35,6 +35,7 @@ export const onAddShow = functions.database
           const seasonEpisodes: any[] = []
 
           episodes.forEach((episode: { season: any }) => {
+            // if (episode.season === season) seasonEpisodes.unshift({ ...episode, watched: false })
             if (episode.season === season) seasonEpisodes.push({ ...episode, watched: false })
           })
           modifiedEpisodes.push(seasonEpisodes)
