@@ -62,16 +62,26 @@ class Firebase {
 
   /// User Content API ///
   userContent = uid => this.db.ref(`users/${uid}/content`)
-  watchingShows = uid => this.db.ref(`users/${uid}/content/watchingShows`)
-  droppedShows = uid => this.db.ref(`users/${uid}/content/droppedShows`)
-  willWatchShows = uid => this.db.ref(`users/${uid}/content/willWatchShows`)
-  watchLaterMovies = uid => this.db.ref(`users/${uid}/content/watchLaterMovies`)
+  userContentShows = uid => this.db.ref(`users/${uid}/content/shows/info`)
+  userContentEpisodes = uid => this.db.ref(`users/${uid}/content/shows/episodes`)
+  watchingShows = uid => this.db.ref(`users/${uid}/content/shows/info/watchingShows/`)
+  droppedShows = uid => this.db.ref(`users/${uid}/content/shows/info/droppedShows`)
+  willWatchShows = uid => this.db.ref(`users/${uid}/content/shows/info/willWatchShows`)
+  watchLaterMovies = uid => this.db.ref(`users/${uid}/content/movies/watchLaterMovies`)
 
   watchingShowsEpisode = (userUid, showKey, seasonNum, episodeNum) =>
-    this.db.ref(`users/${userUid}/content/watchingShows/${showKey}/episodes/${seasonNum}/${episodeNum}`)
+    this.db.ref(
+      `users/${userUid}/content/shows/episodes/${showKey}/list/${seasonNum}/season${seasonNum +
+        1}/episodes/${episodeNum}`
+    )
 
   watchingShowsAllEpisodes = (userUid, showKey) =>
-    this.db.ref(`users/${userUid}/content/watchingShows/${showKey}`)
+    this.db.ref(`users/${userUid}/content/shows/episodes/${showKey}/list`)
+
+  watchingShowsAllSeasonEpisodes = (userUid, showKey, seasonNum) =>
+    this.db.ref(
+      `users/${userUid}/content/shows/episodes/${showKey}/list/${seasonNum}/season${seasonNum + 1}/episodes`
+    )
 }
 
 export default Firebase

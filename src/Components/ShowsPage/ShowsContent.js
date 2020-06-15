@@ -12,8 +12,23 @@ class ShowsContent extends Component {
     super(props)
 
     this.state = {
-      activeSection: "watchingShows"
+      activeSection: "watchingShows",
+      watchingShows: [],
+      droppedShows: [],
+      willWatchShows: [],
+      loadingContent: false
     }
+  }
+
+  componentDidMount() {
+    this.getContent()
+    console.log(this.props)
+  }
+
+  componentWillUnmount() {
+    this.props.firebase.watchingShows(this.props.authUser.uid).off()
+    this.props.firebase.droppedShows(this.props.authUser.uid).off()
+    this.props.firebase.willWatchShows(this.props.authUser.uid).off()
   }
 
   toggleSection = content => {
@@ -22,11 +37,63 @@ class ShowsContent extends Component {
     })
   }
 
+  getContent = () => {
+    if (this.props.authUser === null) return
+    this.setState({ loadingContent: true })
+
+    this.props.firebase
+      .watchingShows(this.props.authUser.uid)
+      .orderByChild("userWatching")
+      .equalTo(true)
+      .limitToFirst(20)
+      .on("value", snapshot => {
+        const watchingShows = snapshot.val()
+          ? Object.keys(snapshot.val()).map(key => ({
+              ...snapshot.val()[key]
+            }))
+          : []
+
+        this.setState({
+          watchingShows,
+          loadingContent: false
+        })
+      })
+
+    this.props.firebase
+      .droppedShows(this.props.authUser.uid)
+      .limitToFirst(20)
+      .on("value", snapshot => {
+        const droppedShows = snapshot.val()
+          ? Object.keys(snapshot.val()).map(key => ({
+              ...snapshot.val()[key]
+            }))
+          : []
+
+        this.setState({
+          droppedShows,
+          loadingContent: false
+        })
+      })
+
+    this.props.firebase
+      .willWatchShows(this.props.authUser.uid)
+      .limitToFirst(20)
+      .on("value", snapshot => {
+        const willWatchShows = snapshot.val()
+          ? Object.keys(snapshot.val()).map(key => ({
+              ...snapshot.val()[key]
+            }))
+          : []
+
+        this.setState({
+          willWatchShows,
+          loadingContent: false
+        })
+      })
+  }
+
   renderContent = section => {
-    const content =
-      section === "watchingShows"
-        ? this.props.userContent[section].filter(item => item.userWatching && item)
-        : this.props.userContent[section]
+    const content = this.state[section]
 
     const watchingShows = this.props.authUser
       ? content
@@ -49,7 +116,8 @@ class ShowsContent extends Component {
             overview = "",
             backdrop_path,
             poster_path,
-            vote_count
+            vote_count,
+            showKey
           }) => {
             const filteredGenres = genres.map(genreId => listOfGenres.filter(item => item.id === genreId))
 
@@ -105,7 +173,8 @@ class ShowsContent extends Component {
                       className="button"
                       onClick={() => {
                         if (this.props.authUser) {
-                          this.props.removeWatchingShow(id)
+                          const show = { showKey: showKey }
+                          this.props.removeWatchingShow(show)
                         } else {
                           this.context.toggleContentLS(id, "watchingShows")
                         }
@@ -131,10 +200,7 @@ class ShowsContent extends Component {
   }
 
   render() {
-    const content =
-      this.state.activeSection === "watchingShows"
-        ? this.props.userContent[this.state.activeSection].filter(item => item.userWatching && item)
-        : this.props.userContent[this.state.activeSection]
+    const content = this.state[this.state.activeSection]
 
     const watchingShows = this.props.authUser
       ? content
@@ -194,7 +260,7 @@ class ShowsContent extends Component {
                 }
           }
         >
-          {this.props.userContent.loadingContent ? (
+          {this.state.loadingContent ? (
             <Loader className="loader--pink" />
           ) : watchingShows.length === 0 ? (
             <PlaceholderNoShows
@@ -211,6 +277,6 @@ class ShowsContent extends Component {
   }
 }
 
-export default withUserContent(ShowsContent)
+export default withUserContent(ShowsContent, "ShowsContent")
 
 ShowsContent.contextType = UserContentLocalStorageContext

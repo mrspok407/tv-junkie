@@ -24,13 +24,14 @@ class AdvSearchResults extends Component {
         ? this.props.advancedSearchContent.length
         : maxColumns
 
-    const watchingShows = this.props.authUser
-      ? this.props.userContent.watchingShows.filter(item => item.userWatching && item)
-      : this.context.watchingShows
+    // const watchingShows = this.props.authUser
+    //   ? this.props.userContent.watchingShows.filter(item => item.userWatching && item)
+    //   : this.context.watchingShows
 
-    const watchLaterMovies = this.props.authUser
-      ? this.props.userContent.watchLaterMovies
-      : this.context.watchLaterMovies
+    // const watchLaterMovies = this.props.authUser
+    //   ? this.props.userContent.watchLaterMovies
+    //   : this.context.watchLaterMovies
+
     return (
       <>
         <div className="content-results">
@@ -123,12 +124,12 @@ class AdvSearchResults extends Component {
                           />
                         </div>
                         <div className="content-results__item-description">
-                          {overview.length > 150 ? `${overview.substring(0, 150)}...` : overview}
+                          {overview.length > 250 ? `${overview.substring(0, 250)}...` : overview}
                         </div>
                       </div>
                     </Link>
 
-                    <div className="content-results__item-links">
+                    {/* <div className="content-results__item-links">
                       {mediaType === "movie" ? (
                         this.props.userContent.loadingContent ? (
                           <Loader className="loader--small-pink" />
@@ -212,7 +213,7 @@ class AdvSearchResults extends Component {
                           )}
                         </>
                       )}
-                    </div>
+                    </div> */}
                   </div>
                 )
               }
@@ -225,6 +226,7 @@ class AdvSearchResults extends Component {
   }
 }
 
-export default compose(withUserContent)(AdvSearchResults)
+// export default compose(withUserContent)(AdvSearchResults, "SearchResults")
+export default AdvSearchResults
 
 AdvSearchResults.contextType = UserContentLocalStorageContext

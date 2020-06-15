@@ -44,13 +44,14 @@ export default class ShowsButtons extends Component {
     return (
       <div className="buttons__row">
         <div className="buttons__col">
-          {watchingShows.some(item => item.id === Number(id) && item.userWatching) ? (
+          {/* {watchingShows.some(item => item.id === Number(id) && item.userWatching) ? ( */}
+          {this.props.showInDatabase && this.props.showInDatabase.userWatching ? (
             <button
               className="button button--pressed"
               type="button"
               onClick={() => {
                 if (this.props.authUser) {
-                  this.props.removeWatchingShow(Number(id))
+                  this.props.removeWatchingShow(this.props.showInDatabase)
                 } else {
                   this.context.toggleContentLS(Number(id), "watchingShows")
                 }
@@ -64,7 +65,7 @@ export default class ShowsButtons extends Component {
               type="button"
               onClick={() => {
                 if (this.props.authUser) {
-                  this.props.addWatchingShow(Number(id), infoToPass)
+                  this.props.addWatchingShow(Number(id), infoToPass, this.props.showInDatabase)
                 } else {
                   this.context.toggleContentLS(Number(id), "watchingShows", infoToPass)
                 }
@@ -83,12 +84,18 @@ export default class ShowsButtons extends Component {
           <div className="buttons__col">
             <button
               className={classNames("button", {
-                "button--pressed": userContent.droppedShows.some(item => item.id === Number(id)),
+                "button--pressed":
+                  this.props.showInDatabase && this.props.showInDatabase.databases.droppedShows,
                 "button--not-logged-in": !authUser
               })}
               type="button"
               onClick={() => {
-                this.props.addShowToSubDatabase(Number(id), infoToPass, "droppedShows")
+                this.props.addShowToSubDatabase(
+                  Number(id),
+                  infoToPass,
+                  "droppedShows",
+                  this.props.showInDatabase
+                )
 
                 this.showDissableBtnWarning("dropBtn")
               }}
@@ -105,12 +112,18 @@ export default class ShowsButtons extends Component {
           <div className="buttons__col">
             <button
               className={classNames("button", {
-                "button--pressed": userContent.willWatchShows.some(item => item.id === Number(id)),
+                "button--pressed":
+                  this.props.showInDatabase && this.props.showInDatabase.databases.willWatchShows,
                 "button--not-logged-in": !authUser
               })}
               type="button"
               onClick={() => {
-                this.props.addShowToSubDatabase(Number(id), infoToPass, "willWatchShows")
+                this.props.addShowToSubDatabase(
+                  Number(id),
+                  infoToPass,
+                  "willWatchShows",
+                  this.props.showInDatabase
+                )
                 this.showDissableBtnWarning("willWatchBtn")
               }}
             >

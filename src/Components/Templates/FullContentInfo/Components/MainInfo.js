@@ -129,17 +129,22 @@ class MainInfo extends Component {
               removeWatchingShow={this.props.removeWatchingShow}
               addShowToSubDatabase={this.props.addShowToSubDatabase}
               infoToPass={this.props.infoToPass}
+              showInDatabase={this.props.showInDatabase}
             />
           )}
 
           {this.props.mediaType === "movie" && (
             <button
               className={classNames("button", {
-                "button--pressed": watchLaterMovies.some(item => item.id === Number(this.props.id))
+                "button--pressed": this.props.movieInDatabase
               })}
               onClick={() => {
                 if (this.props.authUser) {
-                  this.props.toggleWatchLaterMovie(Number(this.props.id), this.props.infoToPass)
+                  this.props.toggleWatchLaterMovie(
+                    Number(this.props.id),
+                    this.props.infoToPass,
+                    this.props.movieInDatabase
+                  )
                 } else {
                   this.context.toggleContentLS(
                     Number(this.props.id),
@@ -150,7 +155,7 @@ class MainInfo extends Component {
               }}
               type="button"
             >
-              {watchLaterMovies.some(item => item.id === Number(this.props.id)) ? "Remove" : "Watch later"}
+              {this.props.movieInDatabase ? "Remove" : "Watch later"}
             </button>
           )}
         </div>

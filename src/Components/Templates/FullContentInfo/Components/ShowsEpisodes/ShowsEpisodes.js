@@ -110,25 +110,24 @@ class ShowsEpisodes extends Component {
       .update({ watched: !showEpisode.watched })
   }
 
-  checkEverySeasonEpisode = (showId, seasonNum, episodesInSeason) => {
-    const show = this.props.userContent.watchingShows.find(item => item.id === Number(showId)) || {}
+  checkEverySeasonEpisode = seasonNum => {
+    const show = this.props.userContent.watchingShows.find(item => item.id === Number(this.props.id)) || {}
     const isAllEpisodesChecked = !show.episodes[seasonNum - 1].some(item => item.watched === false)
 
-    for (let episodeNum = 0; episodeNum < episodesInSeason; episodeNum += 1) {
-      this.props.firebase
-        .watchingShowsEpisode(this.props.authUser.uid, show.key, seasonNum - 1, episodeNum)
-        .update({ watched: !isAllEpisodesChecked })
-    }
+    show.episodes[seasonNum - 1].forEach((episode, index) => {
+      show.episodes[seasonNum - 1][index].watched = !isAllEpisodesChecked
+    })
+
+    this.props.firebase
+      .watchingShowsAllSeasonEpisodes(this.props.authUser.uid, show.key, seasonNum - 1)
+      .set(show.episodes[seasonNum - 1])
   }
 
   checkEveryShowEpisode = () => {
     const show = this.props.userContent.watchingShows.find(item => item.id === Number(this.props.id)) || {}
-    console.log(show.episodes)
     let isAllEpisodesChecked
 
     show.episodes.forEach(item => (isAllEpisodesChecked = !item.some(item => item.watched === false)))
-
-    // let newEpisodes = []
 
     show.episodes.forEach((season, indexSeason) => {
       season.forEach((episode, indexEpisode) => {
@@ -136,19 +135,7 @@ class ShowsEpisodes extends Component {
       })
     })
 
-    this.props.firebase
-      .watchingShowsAllEpisodes(this.props.authUser.uid, show.key)
-      .update({ episodes: show.episodes })
-
-    console.log(show.episodes)
-
-    // show.episodes.forEach((season, indexSeason) => {
-    //   season.forEach((episode, indexEpisode) => {
-    //     this.props.firebase
-    //       .watchingShowsEpisode(this.props.authUser.uid, show.key, indexSeason, indexEpisode)
-    //       .update({ watched: !isAllEpisodesChecked })
-    //   })
-    // })
+    this.props.firebase.watchingShowsAllEpisodes(this.props.authUser.uid, show.key).set(show.episodes)
   }
 
   render() {
@@ -192,4 +179,4 @@ class ShowsEpisodes extends Component {
   }
 }
 
-export default withUserContent(ShowsEpisodes)
+export default withUserContent(ShowsEpisodes, "ShowsEpisodes")

@@ -22,6 +22,7 @@ function FullContentInfo({
     params: { id, mediaType }
   },
   userContent,
+  firebase,
   authUser
 }) {
   const [detailes, setDetailes] = useState({
@@ -44,6 +45,9 @@ function FullContentInfo({
     imdbId: ""
   })
 
+  const [showInDatabase, setShowInDatabase] = useState()
+  const [movieInDatabase, setMovieInDatabase] = useState()
+
   const [similarContent, setSimilarContent] = useState([])
 
   const [loadingPage, setLoadingPage] = useState(true)
@@ -60,15 +64,19 @@ function FullContentInfo({
 
   useEffect(() => {
     if (mediaType === "show") {
+      getShowInDatabase()
       getFullShowInfo()
     } else if (mediaType === "movie") {
       getFullMovieInfo()
+      getMovieInDatabase()
     }
 
     return () => {
       if (cancelRequest !== undefined) {
         cancelRequest()
       }
+      firebase.watchingShows(authUser.uid).off()
+      firebase.watchLaterMovies(authUser.uid).off()
     }
   }, [mediaType, id])
 
@@ -362,7 +370,41 @@ function FullContentInfo({
   //   return <div>{fffff.episodes && fffff.episodes.map(item => item.map(item => <div>{item.name}</div>))}</div>
   // }
 
-  const showInDb = userContent.watchingShows.find(item => item.id === Number(id))
+  // const showInDb = userContent.watchingShows.find(item => item.id === Number(id))
+
+  const getShowInDatabase = () => {
+    firebase
+      .watchingShows(authUser.uid)
+      .orderByChild("id")
+      .equalTo(Number(id))
+      .on("value", snapshot => {
+        const show = snapshot.val()
+          ? Object.keys(snapshot.val()).map(key => ({
+              ...snapshot.val()[key]
+            }))
+          : []
+
+        setShowInDatabase(show[0])
+        console.log(show[0])
+      })
+  }
+
+  const getMovieInDatabase = () => {
+    firebase
+      .watchLaterMovies(authUser.uid)
+      .orderByChild("id")
+      .equalTo(Number(id))
+      .on("value", snapshot => {
+        const movie = snapshot.val()
+          ? Object.keys(snapshot.val()).map(key => ({
+              ...snapshot.val()[key]
+            }))
+          : []
+
+        setMovieInDatabase(movie[0])
+        console.log(movie[0])
+      })
+  }
 
   return (
     <>
@@ -399,6 +441,8 @@ function FullContentInfo({
               imdbId={detailes.imdbId}
               id={id}
               infoToPass={infoToPass}
+              showInDatabase={showInDatabase}
+              movieInDatabase={movieInDatabase}
             />
 
             <div className="full-detailes__description">{detailes.description}</div>
@@ -406,8 +450,7 @@ function FullContentInfo({
             {mediaType === "show" && (
               <>
                 <ShowsEpisodes
-                  showInDb={showInDb}
-                  // episodes={showInDb.episodes}
+                  showInDb={showInDatabase}
                   seasonsArr={detailes.seasonsArr}
                   showTitle={detailes.title}
                   todayDate={todayDate}
@@ -450,4 +493,4 @@ function FullContentInfo({
   )
 }
 
-export default withUserContent(FullContentInfo)
+export default withUserContent(FullContentInfo, "FullContentInfo")
