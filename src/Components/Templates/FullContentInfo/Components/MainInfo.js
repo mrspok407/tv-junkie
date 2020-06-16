@@ -25,10 +25,6 @@ class MainInfo extends Component {
         <span className="full-detailes__info-no-info">-</span>
       )
 
-    const watchLaterMovies = this.props.authUser
-      ? this.props.userContent.watchLaterMovies
-      : this.context.watchLaterMovies
-
     return (
       <div className="full-detailes__info">
         <div className="full-detailes__info-title">

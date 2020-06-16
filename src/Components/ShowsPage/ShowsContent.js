@@ -16,7 +16,10 @@ class ShowsContent extends Component {
       watchingShows: [],
       droppedShows: [],
       willWatchShows: [],
-      loadingContent: false
+      loadingContent: false,
+      indexwatchingShows: 5,
+      indexdroppedShows: 5,
+      indexwillWatchShows: 5
     }
   }
 
@@ -37,6 +40,39 @@ class ShowsContent extends Component {
     })
   }
 
+  loadNewContent = section => {
+    if (this.props.authUser === null) return
+
+    this.setState(prevState => ({
+      [`index${section}`]: prevState[`index${section}`] + 5
+    }))
+
+    // this.props.firebase
+    //   .watchingShows(this.props.authUser.uid)
+    //   .orderByChild("userWatching")
+    //   // .startAt(this.state.watchingShowsLimit)
+    //   // .endAt(this.state.watchingShowsLimit + 5)
+    //   .equalTo(true)
+    //   .limitToLast(this.state.watchingShowsLimit + 5)
+    //   .on("value", snapshot => {
+    //     this.setState(prevState => ({
+    //       watchingShowsLimit: prevState.watchingShowsLimit + 5
+    //     }))
+
+    //     const watchingShows = snapshot.val()
+    //       ? Object.keys(snapshot.val()).map(key => ({
+    //           ...snapshot.val()[key]
+    //         }))
+    //       : []
+
+    //     console.log(watchingShows.slice(0, 5))
+
+    //     this.setState(prevState => ({
+    //       watchingShows: [...prevState.watchingShows, ...watchingShows.slice(0, 5)]
+    //     }))
+    //   })
+  }
+
   getContent = () => {
     if (this.props.authUser === null) return
     this.setState({ loadingContent: true })
@@ -44,8 +80,8 @@ class ShowsContent extends Component {
     this.props.firebase
       .watchingShows(this.props.authUser.uid)
       .orderByChild("userWatching")
-      .equalTo(true)
-      .limitToFirst(20)
+      // .equalTo(true)
+      // .limitToLast(5)
       .on("value", snapshot => {
         const watchingShows = snapshot.val()
           ? Object.keys(snapshot.val()).map(key => ({
@@ -54,42 +90,44 @@ class ShowsContent extends Component {
           : []
 
         this.setState({
-          watchingShows,
+          watchingShows: watchingShows.filter(item => item.userWatching),
+          droppedShows: watchingShows.filter(item => item.databases.droppedShows),
+          willWatchShows: watchingShows.filter(item => item.databases.willWatchShows),
           loadingContent: false
         })
       })
 
-    this.props.firebase
-      .droppedShows(this.props.authUser.uid)
-      .limitToFirst(20)
-      .on("value", snapshot => {
-        const droppedShows = snapshot.val()
-          ? Object.keys(snapshot.val()).map(key => ({
-              ...snapshot.val()[key]
-            }))
-          : []
+    // this.props.firebase
+    //   .droppedShows(this.props.authUser.uid)
+    //   .limitToFirst(20)
+    //   .on("value", snapshot => {
+    //     const droppedShows = snapshot.val()
+    //       ? Object.keys(snapshot.val()).map(key => ({
+    //           ...snapshot.val()[key]
+    //         }))
+    //       : []
 
-        this.setState({
-          droppedShows,
-          loadingContent: false
-        })
-      })
+    //     this.setState({
+    //       droppedShows,
+    //       loadingContent: false
+    //     })
+    //   })
 
-    this.props.firebase
-      .willWatchShows(this.props.authUser.uid)
-      .limitToFirst(20)
-      .on("value", snapshot => {
-        const willWatchShows = snapshot.val()
-          ? Object.keys(snapshot.val()).map(key => ({
-              ...snapshot.val()[key]
-            }))
-          : []
+    // this.props.firebase
+    //   .willWatchShows(this.props.authUser.uid)
+    //   .limitToFirst(20)
+    //   .on("value", snapshot => {
+    //     const willWatchShows = snapshot.val()
+    //       ? Object.keys(snapshot.val()).map(key => ({
+    //           ...snapshot.val()[key]
+    //         }))
+    //       : []
 
-        this.setState({
-          willWatchShows,
-          loadingContent: false
-        })
-      })
+    //     this.setState({
+    //       willWatchShows,
+    //       loadingContent: false
+    //     })
+    //   })
   }
 
   renderContent = section => {
@@ -105,39 +143,31 @@ class ShowsContent extends Component {
 
     return (
       <>
-        {watchingShows.map(
-          ({
-            name,
-            original_name,
-            id,
-            first_air_date,
-            vote_average,
-            genres = [],
-            overview = "",
-            backdrop_path,
-            poster_path,
-            vote_count,
-            showKey
-          }) => {
-            const filteredGenres = genres.map(genreId => listOfGenres.filter(item => item.id === genreId))
+        {watchingShows.map((item, index) => {
+          if (index >= this.state[`index${section}`]) return
 
-            const showTitle = name || original_name
+          const filteredGenres = item.genre_ids.map(genreId =>
+            listOfGenres.filter(item => item.id === genreId)
+          )
 
-            return (
-              <div key={id} className="content-results__item">
-                <Link to={`/show/${id}`}>
+          const showTitle = item.name || item.original_name
+
+          return (
+            <>
+              <div key={item.id} className="content-results__item">
+                <Link to={`/show/${item.id}`}>
                   <div className="content-results__item-main-info">
                     <div className="content-results__item-title">
                       {!showTitle ? "No title available" : showTitle}
                     </div>
                     <div className="content-results__item-year">
-                      {!first_air_date ? "" : `(${first_air_date.slice(0, 4)})`}
+                      {!item.first_air_date ? "" : `(${item.first_air_date.slice(0, 4)})`}
                     </div>
-                    {vote_average !== 0 && (
+                    {item.vote_average !== 0 && (
                       <div className="content-results__item-rating">
-                        {vote_average}
+                        {item.vote_average}
                         <span>/10</span>
-                        <span className="content-results__item-rating-vote-count">({vote_count})</span>
+                        <span className="content-results__item-rating-vote-count">({item.vote_count})</span>
                       </div>
                     )}
                   </div>
@@ -150,10 +180,10 @@ class ShowsContent extends Component {
                     <div className="content-results__item-poster">
                       <div
                         style={
-                          backdrop_path !== null
+                          item.backdrop_path !== null
                             ? {
-                                backgroundImage: `url(https://image.tmdb.org/t/p/w500/${backdrop_path ||
-                                  poster_path})`
+                                backgroundImage: `url(https://image.tmdb.org/t/p/w500/${item.backdrop_path ||
+                                  item.poster_path})`
                               }
                             : {
                                 backgroundImage: `url(https://homestaymatch.com/images/no-image-available.png)`
@@ -162,7 +192,7 @@ class ShowsContent extends Component {
                       />
                     </div>
                     <div className="content-results__item-description">
-                      {overview.length > 150 ? `${overview.substring(0, 150)}...` : overview}
+                      {item.overview.length > 150 ? `${item.overview.substring(0, 150)}...` : item.overview}
                     </div>
                   </div>
                 </Link>
@@ -173,10 +203,9 @@ class ShowsContent extends Component {
                       className="button"
                       onClick={() => {
                         if (this.props.authUser) {
-                          const show = { showKey: showKey }
-                          this.props.removeWatchingShow(show)
+                          this.props.removeWatchingShow(item)
                         } else {
-                          this.context.toggleContentLS(id, "watchingShows")
+                          this.context.toggleContentLS(item.id, "watchingShows")
                         }
                       }}
                       type="button"
@@ -186,15 +215,19 @@ class ShowsContent extends Component {
                   </div>
                 ) : (
                   <div className="content-results__item-links content-results__item-links--adv-search">
-                    <button className="button" onClick={() => this.props.addWatchingShow(id)} type="button">
+                    <button
+                      className="button"
+                      onClick={() => this.props.addWatchingShow(item.id, [], item)}
+                      type="button"
+                    >
                       Watching
                     </button>
                   </div>
                 )}
               </div>
-            )
-          }
-        )}
+            </>
+          )
+        })}
       </>
     )
   }
@@ -269,7 +302,12 @@ class ShowsContent extends Component {
               activeSection={this.state.activeSection}
             />
           ) : (
-            this.renderContent(this.state.activeSection)
+            <>
+              {this.renderContent(this.state.activeSection)}
+              <button type="button" onClick={() => this.loadNewContent(this.state.activeSection)}>
+                Load More
+              </button>
+            </>
           )}
         </div>
       </div>

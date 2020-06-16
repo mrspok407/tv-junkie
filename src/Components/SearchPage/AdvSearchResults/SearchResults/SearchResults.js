@@ -24,13 +24,13 @@ class AdvSearchResults extends Component {
         ? this.props.advancedSearchContent.length
         : maxColumns
 
-    // const watchingShows = this.props.authUser
-    //   ? this.props.userContent.watchingShows.filter(item => item.userWatching && item)
-    //   : this.context.watchingShows
+    const watchingShows = this.props.authUser
+      ? this.props.userContent.watchingShows.filter(item => item.userWatching && item)
+      : this.context.watchingShows
 
-    // const watchLaterMovies = this.props.authUser
-    //   ? this.props.userContent.watchLaterMovies
-    //   : this.context.watchLaterMovies
+    const watchLaterMovies = this.props.authUser
+      ? this.props.userContent.watchLaterMovies
+      : this.context.watchLaterMovies
 
     return (
       <>
@@ -129,7 +129,7 @@ class AdvSearchResults extends Component {
                       </div>
                     </Link>
 
-                    {/* <div className="content-results__item-links">
+                    <div className="content-results__item-links">
                       {mediaType === "movie" ? (
                         this.props.userContent.loadingContent ? (
                           <Loader className="loader--small-pink" />
@@ -213,7 +213,7 @@ class AdvSearchResults extends Component {
                           )}
                         </>
                       )}
-                    </div> */}
+                    </div>
                   </div>
                 )
               }
@@ -226,7 +226,7 @@ class AdvSearchResults extends Component {
   }
 }
 
-// export default compose(withUserContent)(AdvSearchResults, "SearchResults")
-export default AdvSearchResults
+export default compose(withUserContent)(AdvSearchResults, "SearchResults")
+// export default AdvSearchResults
 
 AdvSearchResults.contextType = UserContentLocalStorageContext

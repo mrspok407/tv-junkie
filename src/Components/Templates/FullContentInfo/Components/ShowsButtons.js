@@ -36,10 +36,7 @@ export default class ShowsButtons extends Component {
   }
 
   render() {
-    const { userContent, id, authUser, infoToPass } = this.props
-    const watchingShows = this.props.authUser
-      ? this.props.userContent.watchingShows.filter(item => item.userWatching && item)
-      : this.context.watchingShows
+    const { id, authUser, infoToPass } = this.props
 
     return (
       <div className="buttons__row">

@@ -99,12 +99,12 @@ const withUserContent = (Component, passedComponent) => {
               databases: { droppedShows: false, willWatchShows: false }
             })
 
-            newShowEpisodesRef.set({
-              showName: showToAdd.original_name,
-              episodes: allEpisodes,
-              showKey,
-              showEpisodesKey
-            })
+            // newShowEpisodesRef.set({
+            //   showName: showToAdd.original_name,
+            //   episodes: allEpisodes,
+            //   showKey,
+            //   showEpisodesKey
+            // })
           })
         )
         .catch(err => {
@@ -175,7 +175,6 @@ const withUserContent = (Component, passedComponent) => {
     toggleWatchLaterMovie = (id, contentArr, movieInDatabase) => {
       if (this.authUser === null) return
 
-      // const movieExists = this.state.watchLaterMovies.find(show => show.id === id)
       const movieToAdd = contentArr && contentArr.find(item => item.id === id)
 
       if (!movieInDatabase) {
@@ -194,43 +193,36 @@ const withUserContent = (Component, passedComponent) => {
     }
 
     getContent = () => {
-      if (this.userUid === null) return
-      this.setState({ loadingContent: true })
-
-      this.firebase.userContent(this.userUid).once("value", snapshot => {
-        const userContent = snapshot.val() || {}
-        const databases = ["watchingShows", "droppedShows", "willWatchShows", "watchLaterMovies"]
-
-        databases.forEach(item => {
-          if (!userContent.hasOwnProperty(item)) userContent[item] = {}
-        })
-
-        const test = {}
-
-        Object.entries(userContent).forEach(([key, value]) => {
-          const content =
-            Object.keys(value).map(key => ({
-              ...value[key],
-              key
-            })) || []
-
-          test[key] = content
-        })
-
-        if (this._isMounted) {
-          this.setState({
-            ...test,
-            loadingContent: false
-          })
-        }
-
-        // const droppedTvShowsList = droppedShows
-        //   ? Object.keys(droppedShows).map(key => ({
-        //       ...droppedShows[key],
-        //       key
-        //     }))
-        //   : []
-      })
+      // if (this.userUid === null) return
+      // this.setState({ loadingContent: true })
+      // this.firebase.userContent(this.userUid).once("value", snapshot => {
+      //   const userContent = snapshot.val() || {}
+      //   const databases = ["watchingShows", "droppedShows", "willWatchShows", "watchLaterMovies"]
+      //   databases.forEach(item => {
+      //     if (!userContent.hasOwnProperty(item)) userContent[item] = {}
+      //   })
+      //   const test = {}
+      //   Object.entries(userContent).forEach(([key, value]) => {
+      //     const content =
+      //       Object.keys(value).map(key => ({
+      //         ...value[key],
+      //         key
+      //       })) || []
+      //     test[key] = content
+      //   })
+      //   if (this._isMounted) {
+      //     this.setState({
+      //       ...test,
+      //       loadingContent: false
+      //     })
+      //   }
+      // const droppedTvShowsList = droppedShows
+      //   ? Object.keys(droppedShows).map(key => ({
+      //       ...droppedShows[key],
+      //       key
+      //     }))
+      //   : []
+      // })
     }
 
     componentWillUnmount() {
