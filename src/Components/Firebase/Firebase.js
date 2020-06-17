@@ -65,6 +65,7 @@ class Firebase {
   userContentShows = uid => this.db.ref(`users/${uid}/content/shows/info`)
   userContentEpisodes = uid => this.db.ref(`users/${uid}/content/shows/episodes`)
   watchingShows = uid => this.db.ref(`users/${uid}/content/shows/info/watchingShows/`)
+  notWatchingShows = uid => this.db.ref(`users/${uid}/content/shows/info/notWatchingShows/`)
   droppedShows = uid => this.db.ref(`users/${uid}/content/shows/info/droppedShows`)
   willWatchShows = uid => this.db.ref(`users/${uid}/content/shows/info/willWatchShows`)
   watchLaterMovies = uid => this.db.ref(`users/${uid}/content/movies/watchLaterMovies`)

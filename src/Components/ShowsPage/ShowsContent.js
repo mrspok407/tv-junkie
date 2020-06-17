@@ -17,7 +17,9 @@ class ShowsContent extends Component {
       droppedShows: [],
       willWatchShows: [],
       loadingContent: false,
-      indexwatchingShows: 5,
+      disableLoadNewContent: false,
+      currentLastShow: 5,
+      indexwatchingShows: 20,
       indexdroppedShows: 5,
       indexwillWatchShows: 5
     }
@@ -40,37 +42,43 @@ class ShowsContent extends Component {
     })
   }
 
-  loadNewContent = section => {
+  loadNewContent = () => {
     if (this.props.authUser === null) return
 
-    this.setState(prevState => ({
-      [`index${section}`]: prevState[`index${section}`] + 5
-    }))
+    // this.setState(prevState => ({
+    //   [`index${section}`]: prevState[`index${section}`] + 20
+    // }))
 
-    // this.props.firebase
-    //   .watchingShows(this.props.authUser.uid)
-    //   .orderByChild("userWatching")
-    //   // .startAt(this.state.watchingShowsLimit)
-    //   // .endAt(this.state.watchingShowsLimit + 5)
-    //   .equalTo(true)
-    //   .limitToLast(this.state.watchingShowsLimit + 5)
-    //   .on("value", snapshot => {
-    //     this.setState(prevState => ({
-    //       watchingShowsLimit: prevState.watchingShowsLimit + 5
-    //     }))
+    this.props.firebase
+      .watchingShows(this.props.authUser.uid)
+      .orderByChild("userWatching")
+      //.equalTo(true)
+      .startAt(this.state.currentLastShow)
+      // .endAt(this.state.currentLastShow + 5)
+      .limitToFirst(5)
+      .on("value", snapshot => {
+        this.setState(prevState => ({
+          currentLastShow: prevState.currentLastShow + 5
+        }))
 
-    //     const watchingShows = snapshot.val()
-    //       ? Object.keys(snapshot.val()).map(key => ({
-    //           ...snapshot.val()[key]
-    //         }))
-    //       : []
+        console.log(snapshot.val())
 
-    //     console.log(watchingShows.slice(0, 5))
+        const watchingShows = snapshot.val()
+          ? Object.keys(snapshot.val()).map(key => ({
+              ...snapshot.val()[key]
+            }))
+          : []
 
-    //     this.setState(prevState => ({
-    //       watchingShows: [...prevState.watchingShows, ...watchingShows.slice(0, 5)]
-    //     }))
-    //   })
+        // console.log(watchingShows.slice(0, 5))
+
+        this.setState(prevState => ({
+          watchingShows: [
+            ...prevState.watchingShows,
+            ...watchingShows.filter(item => item.userWatching === true)
+          ],
+          disableLoadNewContent: watchingShows.some(item => item.userWatching === false)
+        }))
+      })
   }
 
   getContent = () => {
@@ -81,7 +89,7 @@ class ShowsContent extends Component {
       .watchingShows(this.props.authUser.uid)
       .orderByChild("userWatching")
       // .equalTo(true)
-      // .limitToLast(5)
+      .limitToFirst(this.state.currentLastShow)
       .on("value", snapshot => {
         const watchingShows = snapshot.val()
           ? Object.keys(snapshot.val()).map(key => ({
@@ -89,45 +97,47 @@ class ShowsContent extends Component {
             }))
           : []
 
+        console.log(snapshot.val())
+
         this.setState({
-          watchingShows: watchingShows.filter(item => item.userWatching),
-          droppedShows: watchingShows.filter(item => item.databases.droppedShows),
-          willWatchShows: watchingShows.filter(item => item.databases.willWatchShows),
+          watchingShows: watchingShows.filter(item => item.userWatching === true),
+          // droppedShows: watchingShows.filter(item => item.databases.droppedShows),
+          // willWatchShows: watchingShows.filter(item => item.databases.willWatchShows),
           loadingContent: false
         })
       })
 
-    // this.props.firebase
-    //   .droppedShows(this.props.authUser.uid)
-    //   .limitToFirst(20)
-    //   .on("value", snapshot => {
-    //     const droppedShows = snapshot.val()
-    //       ? Object.keys(snapshot.val()).map(key => ({
-    //           ...snapshot.val()[key]
-    //         }))
-    //       : []
+    this.props.firebase
+      .droppedShows(this.props.authUser.uid)
+      .limitToFirst(20)
+      .on("value", snapshot => {
+        const droppedShows = snapshot.val()
+          ? Object.keys(snapshot.val()).map(key => ({
+              ...snapshot.val()[key]
+            }))
+          : []
 
-    //     this.setState({
-    //       droppedShows,
-    //       loadingContent: false
-    //     })
-    //   })
+        this.setState({
+          droppedShows,
+          loadingContent: false
+        })
+      })
 
-    // this.props.firebase
-    //   .willWatchShows(this.props.authUser.uid)
-    //   .limitToFirst(20)
-    //   .on("value", snapshot => {
-    //     const willWatchShows = snapshot.val()
-    //       ? Object.keys(snapshot.val()).map(key => ({
-    //           ...snapshot.val()[key]
-    //         }))
-    //       : []
+    this.props.firebase
+      .willWatchShows(this.props.authUser.uid)
+      .limitToFirst(20)
+      .on("value", snapshot => {
+        const willWatchShows = snapshot.val()
+          ? Object.keys(snapshot.val()).map(key => ({
+              ...snapshot.val()[key]
+            }))
+          : []
 
-    //     this.setState({
-    //       willWatchShows,
-    //       loadingContent: false
-    //     })
-    //   })
+        this.setState({
+          willWatchShows,
+          loadingContent: false
+        })
+      })
   }
 
   renderContent = section => {
@@ -139,12 +149,12 @@ class ShowsContent extends Component {
       ? content
       : this.context.watchingShows
 
-    console.log(watchingShows)
+    console.log(this.state.currentLastShow)
 
     return (
       <>
         {watchingShows.map((item, index) => {
-          if (index >= this.state[`index${section}`]) return
+          // if (index >= this.state[`index${section}`]) return
 
           const filteredGenres = item.genre_ids.map(genreId =>
             listOfGenres.filter(item => item.id === genreId)
@@ -304,7 +314,7 @@ class ShowsContent extends Component {
           ) : (
             <>
               {this.renderContent(this.state.activeSection)}
-              <button type="button" onClick={() => this.loadNewContent(this.state.activeSection)}>
+              <button type="button" onClick={() => this.loadNewContent()}>
                 Load More
               </button>
             </>

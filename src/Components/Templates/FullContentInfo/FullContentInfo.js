@@ -375,34 +375,6 @@ function FullContentInfo({
 
   // const showInDb = userContent.watchingShows.find(item => item.id === Number(id))
 
-  const getShowInDatabase = () => {
-    userContent.subDatabases.forEach(item => {
-      firebase[item](authUser.uid)
-        .orderByChild("id")
-        .equalTo(Number(id))
-        .on("value", snapshot => {
-          if (snapshot.val() !== null) {
-            setShowInDatabase(item)
-          }
-        })
-    })
-
-    // firebase
-    //   .watchingShows(authUser.uid)
-    //   .orderByChild("id")
-    //   .equalTo(Number(id))
-    //   .on("value", snapshot => {
-    //     const show = snapshot.val()
-    //       ? Object.keys(snapshot.val()).map(key => ({
-    //           ...snapshot.val()[key]
-    //         }))
-    //       : []
-
-    //     setShowInDatabase(show[0])
-    //     console.log(show[0])
-    //   })
-  }
-
   const getMovieInDatabase = () => {
     firebase
       .watchLaterMovies(authUser.uid)
@@ -455,7 +427,6 @@ function FullContentInfo({
               imdbId={detailes.imdbId}
               id={id}
               infoToPass={infoToPass}
-              showInDatabase={showInDatabase}
               movieInDatabase={movieInDatabase}
             />
 
@@ -464,7 +435,6 @@ function FullContentInfo({
             {mediaType === "show" && (
               <>
                 <ShowsEpisodes
-                  showInDb={showInDatabase}
                   seasonsArr={detailes.seasonsArr}
                   showTitle={detailes.title}
                   todayDate={todayDate}

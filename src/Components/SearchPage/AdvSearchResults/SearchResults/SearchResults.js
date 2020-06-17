@@ -192,7 +192,11 @@ class AdvSearchResults extends Component {
                                 className="button"
                                 onClick={() => {
                                   if (this.props.authUser) {
-                                    this.props.addWatchingShow(id, this.props.advancedSearchContent)
+                                    this.props.handleShowInDatabases(
+                                      id,
+                                      this.props.advancedSearchContent,
+                                      "watchingShows"
+                                    )
                                   } else {
                                     this.context.toggleContentLS(
                                       id,

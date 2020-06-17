@@ -126,6 +126,7 @@ class MainInfo extends Component {
               addShowToSubDatabase={this.props.addShowToSubDatabase}
               infoToPass={this.props.infoToPass}
               showInDatabase={this.props.showInDatabase}
+              handleShowInDatabases={this.props.handleShowInDatabases}
             />
           )}
 
