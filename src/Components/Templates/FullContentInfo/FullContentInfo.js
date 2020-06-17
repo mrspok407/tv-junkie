@@ -45,7 +45,6 @@ function FullContentInfo({
     imdbId: ""
   })
 
-  const [showInDatabase, setShowInDatabase] = useState()
   const [movieInDatabase, setMovieInDatabase] = useState()
 
   const [similarContent, setSimilarContent] = useState([])
@@ -64,8 +63,9 @@ function FullContentInfo({
 
   useEffect(() => {
     if (mediaType === "show") {
-      getShowInDatabase()
+      console.log("test")
       getFullShowInfo()
+      // getShowInDatabase()
     } else if (mediaType === "movie") {
       getFullMovieInfo()
       getMovieInDatabase()
@@ -75,7 +75,10 @@ function FullContentInfo({
       if (cancelRequest !== undefined) {
         cancelRequest()
       }
-      firebase.watchingShows(authUser.uid).off()
+      // firebase.watchingShows(authUser.uid).off()
+      // firebase.notWatchingShows(authUser.uid).off()
+      // firebase.droppedShows(authUser.uid).off()
+      // firebase.willWatchShows(authUser.uid).off()
       firebase.watchLaterMovies(authUser.uid).off()
     }
   }, [mediaType, id])
@@ -373,20 +376,31 @@ function FullContentInfo({
   // const showInDb = userContent.watchingShows.find(item => item.id === Number(id))
 
   const getShowInDatabase = () => {
-    firebase
-      .watchingShows(authUser.uid)
-      .orderByChild("id")
-      .equalTo(Number(id))
-      .on("value", snapshot => {
-        const show = snapshot.val()
-          ? Object.keys(snapshot.val()).map(key => ({
-              ...snapshot.val()[key]
-            }))
-          : []
+    userContent.subDatabases.forEach(item => {
+      firebase[item](authUser.uid)
+        .orderByChild("id")
+        .equalTo(Number(id))
+        .on("value", snapshot => {
+          if (snapshot.val() !== null) {
+            setShowInDatabase(item)
+          }
+        })
+    })
 
-        setShowInDatabase(show[0])
-        console.log(show[0])
-      })
+    // firebase
+    //   .watchingShows(authUser.uid)
+    //   .orderByChild("id")
+    //   .equalTo(Number(id))
+    //   .on("value", snapshot => {
+    //     const show = snapshot.val()
+    //       ? Object.keys(snapshot.val()).map(key => ({
+    //           ...snapshot.val()[key]
+    //         }))
+    //       : []
+
+    //     setShowInDatabase(show[0])
+    //     console.log(show[0])
+    //   })
   }
 
   const getMovieInDatabase = () => {
