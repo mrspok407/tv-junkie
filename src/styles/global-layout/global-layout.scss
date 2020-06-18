@@ -212,6 +212,11 @@ $font-sizes: (
     opacity: 1;
   }
 
+  &--shows {
+    opacity: 1;
+    animation: none;
+  }
+
   &-main-info {
     display: grid;
     grid-template-columns: repeat(2, 1fr);

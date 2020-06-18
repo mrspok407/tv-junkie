@@ -45,8 +45,6 @@ function FullContentInfo({
     imdbId: ""
   })
 
-  const [movieInDatabase, setMovieInDatabase] = useState()
-
   const [similarContent, setSimilarContent] = useState([])
 
   const [loadingPage, setLoadingPage] = useState(true)
@@ -65,10 +63,8 @@ function FullContentInfo({
     if (mediaType === "show") {
       console.log("test")
       getFullShowInfo()
-      // getShowInDatabase()
     } else if (mediaType === "movie") {
       getFullMovieInfo()
-      getMovieInDatabase()
     }
 
     return () => {
@@ -375,22 +371,22 @@ function FullContentInfo({
 
   // const showInDb = userContent.watchingShows.find(item => item.id === Number(id))
 
-  const getMovieInDatabase = () => {
-    firebase
-      .watchLaterMovies(authUser.uid)
-      .orderByChild("id")
-      .equalTo(Number(id))
-      .on("value", snapshot => {
-        const movie = snapshot.val()
-          ? Object.keys(snapshot.val()).map(key => ({
-              ...snapshot.val()[key]
-            }))
-          : []
+  // const getMovieInDatabase = () => {
+  //   firebase
+  //     .watchLaterMovies(authUser.uid)
+  //     .orderByChild("id")
+  //     .equalTo(Number(id))
+  //     .on("value", snapshot => {
+  //       const movie = snapshot.val()
+  //         ? Object.keys(snapshot.val()).map(key => ({
+  //             ...snapshot.val()[key]
+  //           }))
+  //         : []
 
-        setMovieInDatabase(movie[0])
-        console.log(movie[0])
-      })
-  }
+  //       setMovieInDatabase(movie[0])
+  //       console.log(movie[0])
+  //     })
+  // }
 
   return (
     <>
@@ -427,7 +423,6 @@ function FullContentInfo({
               imdbId={detailes.imdbId}
               id={id}
               infoToPass={infoToPass}
-              movieInDatabase={movieInDatabase}
             />
 
             <div className="full-detailes__description">{detailes.description}</div>

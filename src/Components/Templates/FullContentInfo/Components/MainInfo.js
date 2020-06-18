@@ -6,6 +6,36 @@ import { UserContentLocalStorageContext } from "Components/UserContent/UserConte
 import { withUserContent } from "Components/UserContent"
 
 class MainInfo extends Component {
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      movieInDatabase: null
+    }
+  }
+
+  componentDidMount() {
+    this.getMovieInDatabase()
+  }
+
+  getMovieInDatabase = () => {
+    this.props.firebase
+      .watchLaterMovies(this.props.authUser.uid)
+      .orderByChild("id")
+      .equalTo(Number(this.props.id))
+      .on("value", snapshot => {
+        const movie = snapshot.val()
+          ? Object.keys(snapshot.val()).map(key => ({
+              ...snapshot.val()[key]
+            }))
+          : []
+
+        this.setState({
+          movieInDatabase: movie[0]
+        })
+      })
+  }
+
   render() {
     const yearRelease = this.props.releaseDate.slice(0, 4)
     const yearEnded = this.props.mediaType === "show" && this.props.lastAirDate.slice(0, 4)
@@ -133,14 +163,14 @@ class MainInfo extends Component {
           {this.props.mediaType === "movie" && (
             <button
               className={classNames("button", {
-                "button--pressed": this.props.movieInDatabase
+                "button--pressed": this.state.movieInDatabase
               })}
               onClick={() => {
                 if (this.props.authUser) {
                   this.props.toggleWatchLaterMovie(
                     Number(this.props.id),
                     this.props.infoToPass,
-                    this.props.movieInDatabase
+                    this.state.movieInDatabase
                   )
                 } else {
                   this.context.toggleContentLS(
@@ -152,7 +182,7 @@ class MainInfo extends Component {
               }}
               type="button"
             >
-              {this.props.movieInDatabase ? "Remove" : "Watch later"}
+              {this.state.movieInDatabase ? "Remove" : "Watch later"}
             </button>
           )}
         </div>
