@@ -1,4 +1,5 @@
 import app from "firebase/app"
+import { database } from "firebase/app"
 import "firebase/auth"
 import "firebase/database"
 
@@ -55,6 +56,8 @@ class Firebase {
       }
     })
   }
+
+  timeStamp = () => database.ServerValue.TIMESTAMP
 
   /// Users API ///
   user = uid => this.db.ref(`users/${uid}`)

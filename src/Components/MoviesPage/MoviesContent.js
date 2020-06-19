@@ -2,9 +2,12 @@ import React, { Component } from "react"
 import { Link } from "react-router-dom"
 import { withUserContent } from "Components/UserContent"
 import { listOfGenres } from "Utils"
+import { throttle } from "throttle-debounce"
 import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
 import Loader from "Components/Placeholders/Loader"
 import PlaceholderNoMovies from "Components/Placeholders/PlaceholderNoMovies"
+
+const moviesToLoad = 10
 
 class MoviesContent extends Component {
   constructor(props) {
@@ -12,16 +15,21 @@ class MoviesContent extends Component {
 
     this.state = {
       watchLaterMovies: [],
-      loadingContent: false
+      initialLoading: false,
+      loadingContent: false,
+      watchLaterMoviesDisableLoad: false,
+      watchLaterMoviesLastLoaded: moviesToLoad
     }
   }
 
   componentDidMount() {
     this.getContent()
+    window.addEventListener("scroll", this.handleScroll)
   }
 
   componentWillUnmount() {
     this.props.firebase.watchLaterMovies(this.props.authUser.uid).off()
+    window.removeEventListener("scroll", this.handleScroll)
   }
 
   showLinksToAll() {
@@ -33,23 +41,60 @@ class MoviesContent extends Component {
     )
   }
 
-  getContent = () => {
+  loadNewContent = () => {
     if (this.props.authUser === null) return
-    this.setState({ loadingContent: true })
+    this.setState({
+      loadingContent: true
+    })
 
     this.props.firebase
       .watchLaterMovies(this.props.authUser.uid)
-      .limitToFirst(20)
-      .on("value", snapshot => {
-        const watchLaterMovies = snapshot.val()
-          ? Object.keys(snapshot.val()).map(key => ({
-              ...snapshot.val()[key]
-            }))
-          : []
+      .orderByChild("id")
+      .startAt(this.state.watchLaterMoviesLastLoaded + 1)
+      .limitToFirst(moviesToLoad)
+      .once("value", snapshot => {
+        let movies = []
+        snapshot.forEach(item => {
+          movies = [...movies, item.val()]
+        })
+        console.log(movies)
+
+        this.setState(prevState => ({
+          watchLaterMovies: [...prevState.watchLaterMovies, ...movies],
+          watchLaterMoviesLastLoaded: movies.length !== 0 && movies[movies.length - 1].id,
+          watchLaterMoviesDisableLoad: movies.length === 0,
+          loadingContent: false
+        }))
+      })
+  }
+
+  handleScroll = throttle(500, () => {
+    if (this.state.watchLaterMoviesDisableLoad || this.state.loadingContent) return
+
+    if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 800) {
+      this.loadNewContent()
+    }
+  })
+
+  getContent = () => {
+    if (this.props.authUser === null) return
+    this.setState({ initialLoading: true })
+
+    this.props.firebase
+      .watchLaterMovies(this.props.authUser.uid)
+      .orderByChild("id")
+      .limitToFirst(moviesToLoad)
+      .once("value", snapshot => {
+        let watchLaterMovies = []
+        snapshot.forEach(item => {
+          watchLaterMovies = [...watchLaterMovies, item.val()]
+        })
 
         this.setState({
           watchLaterMovies,
-          loadingContent: false
+          initialLoading: false,
+          watchLaterMoviesLastLoaded:
+            watchLaterMovies.length !== 0 && watchLaterMovies[watchLaterMovies.length - 1].id
         })
       })
   }
@@ -228,12 +273,15 @@ class MoviesContent extends Component {
                 }
           }
         >
-          {this.state.loadingContent ? (
+          {this.state.initialLoading ? (
             <Loader className="loader--pink" />
           ) : watchLaterMovies.length === 0 ? (
             <PlaceholderNoMovies />
           ) : (
-            this.renderContent()
+            <>
+              {this.renderContent()}
+              {this.state.loadingContent && <Loader className="loader--pink loader--new-page" />}
+            </>
           )}
         </div>
       </div>

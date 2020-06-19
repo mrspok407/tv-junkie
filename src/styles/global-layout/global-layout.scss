@@ -182,7 +182,7 @@ $font-sizes: (
 .content-results__wrapper {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  grid-auto-rows: minmax(300px, max-content);
+  // grid-auto-rows: minmax(300px, max-content);
   grid-gap: $gridGap;
   justify-content: center;
 }

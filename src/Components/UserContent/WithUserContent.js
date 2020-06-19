@@ -16,7 +16,10 @@ const withUserContent = (Component, passedComponent) => {
         willWatchShows: [],
         watchLaterMovies: [],
         subDatabases: ["watchingShows", "notWatchingShows", "droppedShows", "willWatchShows"],
-        loadingContent: false
+        errorInDatabase: {
+          error: false,
+          message: ""
+        }
       }
 
       this.firebase = this.props.firebase
@@ -83,7 +86,6 @@ const withUserContent = (Component, passedComponent) => {
               }
             })
 
-            console.log(showToAdd)
             const allEpisodes = seasonsData
 
             const newShowRef = this.firebase[database](this.userUid).push()
@@ -94,7 +96,8 @@ const withUserContent = (Component, passedComponent) => {
             newShowRef.set({
               ...showToAdd,
               showKey,
-              showEpisodesKey
+              showEpisodesKey,
+              timeStamp: this.firebase.timeStamp()
             })
 
             // newShowEpisodesRef.set({
@@ -212,23 +215,36 @@ const withUserContent = (Component, passedComponent) => {
         this.firebase[item](this.userUid)
           .orderByChild("id")
           .equalTo(id)
-          .once("value", snapshot => {
-            if (snapshot.val() !== null) {
-              const show = snapshot.val()
-                ? Object.keys(snapshot.val()).map(key => ({
-                    ...snapshot.val()[key]
-                  }))
-                : []
+          .once(
+            "value",
+            snapshot => {
+              if (snapshot.val() !== null) {
+                const show = snapshot.val()
+                  ? Object.keys(snapshot.val()).map(key => ({
+                      ...snapshot.val()[key]
+                    }))
+                  : []
 
-              this.firebase[database](this.userUid)
-                .update(snapshot.val())
-                .then(() => {
-                  this.firebase[item](this.userUid)
-                    .child(show[0].showKey)
-                    .set(null)
-                })
+                this.firebase[database](this.userUid)
+                  .update(snapshot.val())
+                  .then(() => {
+                    this.firebase[item](this.userUid)
+                      .child(show[0].showKey)
+                      .set(null)
+                  })
+              }
+            },
+            error => {
+              console.log(`Error in database occured. ${error}`)
+
+              this.setState({
+                errorInDatabase: {
+                  error: true,
+                  message: `Error in database occured. ${error}`
+                }
+              })
             }
-          })
+          )
       })
 
       this.firebase[database](this.userUid)
@@ -280,7 +296,7 @@ const withUserContent = (Component, passedComponent) => {
         const newMovieRef = this.firebase.watchLaterMovies(this.userUid).push()
         const key = newMovieRef.key
 
-        newMovieRef.set({ ...movieToAdd, key })
+        newMovieRef.set({ ...movieToAdd, key, timeStamp: this.firebase.timeStamp() })
       } else {
         const key = movieInDatabase.key
 

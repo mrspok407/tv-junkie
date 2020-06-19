@@ -222,9 +222,9 @@ class AdvSearchResults extends Component {
                 )
               }
             )}
+            {this.props.loadingNewPage && <Loader className="loader--new-page" />}
           </div>
         </div>
-        {this.props.loadingNewPage && <Loader className="loader--new-page" />}
       </>
     )
   }
