@@ -93,12 +93,23 @@ const withUserContent = (Component, passedComponent) => {
             const showKey = newShowRef.key
             const showEpisodesKey = newShowEpisodesRef.key
 
-            newShowRef.set({
-              ...showToAdd,
-              showKey,
-              showEpisodesKey,
-              timeStamp: this.firebase.timeStamp()
-            })
+            newShowRef
+              .set({
+                ...showToAdd,
+                showKey,
+                showEpisodesKey,
+                timeStamp: this.firebase.timeStamp()
+              })
+              .then(() => {
+                this.firebase[database](this.userUid)
+                  .child(showKey)
+                  .once("value", snapshot => {
+                    const negativeTimestamp = snapshot.val().timeStamp * -1
+                    this.firebase[database](this.userUid)
+                      .child(showKey)
+                      .update({ timeStamp: negativeTimestamp }) // The negative time stamp needed for easier des order, cause firebase only provide as order
+                  })
+              })
 
             // newShowEpisodesRef.set({
             //   showName: showToAdd.original_name,

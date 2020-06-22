@@ -99,6 +99,14 @@ class MoviesContent extends Component {
       })
   }
 
+  handleMoviesOnClient = movieId => {
+    if (this.props.authUser === null) return
+
+    this.setState({
+      watchLaterMovies: this.state.watchLaterMovies.filter(item => item.id !== movieId)
+    })
+  }
+
   renderContent = () => {
     const watchLaterMovies = this.props.authUser ? this.state.watchLaterMovies : this.context.watchLaterMovies
 
@@ -135,110 +143,113 @@ class MoviesContent extends Component {
           // Movies end //
           return (
             <div key={item.id} className="content-results__item">
-              <Link
-                to={{
-                  pathname: `/movie/${item.id}`,
-                  state: { logoDisable: true, y: 300 }
-                }}
-              >
-                <div className="content-results__item-main-info">
-                  <div className="content-results__item-title">
-                    {!contentTitle ? "No title available" : contentTitle}
+              <div className="content-results__item--shows-wrapper">
+                <Link
+                  to={{
+                    pathname: `/movie/${item.id}`,
+                    state: { logoDisable: true, y: 300 }
+                  }}
+                >
+                  <div className="content-results__item-main-info">
+                    <div className="content-results__item-title">
+                      {!contentTitle ? "No title available" : contentTitle}
+                    </div>
+                    <div className="content-results__item-year">
+                      {!item.release_date ? "" : `(${item.release_date.slice(0, 4)})`}
+                    </div>
+                    {item.vote_average !== 0 && (
+                      <div className="content-results__item-rating">
+                        {item.vote_average}
+                        <span>/10</span>
+                        <span className="content-results__item-rating-vote-count">({item.vote_count})</span>
+                      </div>
+                    )}
                   </div>
-                  <div className="content-results__item-year">
-                    {!item.release_date ? "" : `(${item.release_date.slice(0, 4)})`}
+                  <div className="content-results__item-genres">
+                    {filteredGenres.map(item => (
+                      <span key={item[0].id}>{item[0].name}</span>
+                    ))}
                   </div>
-                  {item.vote_average !== 0 && (
-                    <div className="content-results__item-rating">
-                      {item.vote_average}
-                      <span>/10</span>
-                      <span className="content-results__item-rating-vote-count">({item.vote_count})</span>
+                  <div className="content-results__item-overview">
+                    <div className="content-results__item-poster">
+                      <div
+                        style={
+                          item.backdrop_path !== null
+                            ? {
+                                backgroundImage: `url(https://image.tmdb.org/t/p/w500/${item.backdrop_path ||
+                                  item.poster_path})`
+                              }
+                            : {
+                                backgroundImage: `url(https://homestaymatch.com/images/no-image-available.png)`
+                              }
+                        }
+                      />
+                    </div>
+                    <div className="content-results__item-description">
+                      {item.overview.length > 150 ? `${item.overview.substring(0, 150)}...` : item.overview}
+                    </div>
+                  </div>
+                </Link>
+
+                <div className="content-results__item-links">
+                  {!this.props.moviesIds.includes(item.id) ? (
+                    <button
+                      type="button"
+                      className="button"
+                      onClick={() =>
+                        this.props.getMovieLinks(item.id, false, item.original_title, item.release_date)
+                      }
+                    >
+                      Show Links
+                    </button>
+                  ) : this.props.loadingIds.includes(item.id) && !this.props.error.includes(item.id) ? (
+                    <div>
+                      <Loader className="loader--small-pink" />
+                    </div>
+                  ) : (
+                    this.props.loadingIds.includes(item.id) && (
+                      <div className="content-results__item-links--error">No links available</div>
+                    )
+                  )}
+
+                  {movie && (
+                    <div className="content-results__item-links-wrapper">
+                      <div className="torrent-links">
+                        {movieHash1080p && (
+                          <a
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            href={`magnet:?xt=urn:btih:${movieHash1080p}&dn=${urlMovieTitle}&xl=310660222&tr=udp%3A%2F%2Ftracker.coppersurfer.tk:6969/announce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org:6969/announce&tr=udp%3A%2F%2Ftracker.pirateparty.gr:6969/announce&tr=udp%3A%2F%2Fexodus.desync.com:6969/announce&tr=udp%3A%2F%2Ftracker.opentrackr.org:1337/announce&tr=udp%3A%2F%2Ftracker.internetwarriors.net:1337/announce&tr=udp%3A%2F%2Ftracker.torrent.eu.org:451&tr=udp%3A%2F%2Ftracker.cyberia.is:6969/announce&tr=udp%3A%2F%2Fopen.demonii.si:1337/announce&tr=udp%3A%2F%2Fopen.stealth.si:80/announce&tr=udp%3A%2F%2Ftracker.tiny-vps.com:6969/announce&tr=udp%3A%2F%2Ftracker.iamhansen.xyz:2000/announce&tr=udp%3A%2F%2Fexplodie.org:6969/announce&tr=udp%3A%2F%2Fdenis.stalker.upeer.me:6969/announce&tr=udp%3A%2F%2Fipv4.tracker.harry.lu:80/announce`}
+                          >
+                            1080p
+                          </a>
+                        )}
+                        {movieHash720p && (
+                          <a
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            href={`magnet:?xt=urn:btih:${movieHash720p}&dn=${urlMovieTitle}&xl=310660222&tr=udp%3A%2F%2Ftracker.coppersurfer.tk:6969/announce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org:6969/announce&tr=udp%3A%2F%2Ftracker.pirateparty.gr:6969/announce&tr=udp%3A%2F%2Fexodus.desync.com:6969/announce&tr=udp%3A%2F%2Ftracker.opentrackr.org:1337/announce&tr=udp%3A%2F%2Ftracker.internetwarriors.net:1337/announce&tr=udp%3A%2F%2Ftracker.torrent.eu.org:451&tr=udp%3A%2F%2Ftracker.cyberia.is:6969/announce&tr=udp%3A%2F%2Fopen.demonii.si:1337/announce&tr=udp%3A%2F%2Fopen.stealth.si:80/announce&tr=udp%3A%2F%2Ftracker.tiny-vps.com:6969/announce&tr=udp%3A%2F%2Ftracker.iamhansen.xyz:2000/announce&tr=udp%3A%2F%2Fexplodie.org:6969/announce&tr=udp%3A%2F%2Fdenis.stalker.upeer.me:6969/announce&tr=udp%3A%2F%2Fipv4.tracker.harry.lu:80/announce`}
+                          >
+                            720p
+                          </a>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
-                <div className="content-results__item-genres">
-                  {filteredGenres.map(item => (
-                    <span key={item[0].id}>{item[0].name}</span>
-                  ))}
-                </div>
-                <div className="content-results__item-overview">
-                  <div className="content-results__item-poster">
-                    <div
-                      style={
-                        item.backdrop_path !== null
-                          ? {
-                              backgroundImage: `url(https://image.tmdb.org/t/p/w500/${item.backdrop_path ||
-                                item.poster_path})`
-                            }
-                          : {
-                              backgroundImage: `url(https://homestaymatch.com/images/no-image-available.png)`
-                            }
-                      }
-                    />
-                  </div>
-                  <div className="content-results__item-description">
-                    {item.overview.length > 150 ? `${item.overview.substring(0, 150)}...` : item.overview}
-                  </div>
-                </div>
-              </Link>
-
-              <div className="content-results__item-links">
-                {!this.props.moviesIds.includes(item.id) ? (
-                  <button
-                    type="button"
-                    className="button"
-                    onClick={() =>
-                      this.props.getMovieLinks(item.id, false, item.original_title, item.release_date)
+                <button
+                  className="button--del-item"
+                  onClick={() => {
+                    if (this.props.authUser) {
+                      this.handleMoviesOnClient(item.id)
+                      this.props.toggleWatchLaterMovie(item.id, watchLaterMovies, item)
+                    } else {
+                      this.context.toggleContentLS(item.id, "watchLaterMovies", watchLaterMovies)
                     }
-                  >
-                    Show Links
-                  </button>
-                ) : this.props.loadingIds.includes(item.id) && !this.props.error.includes(item.id) ? (
-                  <div>
-                    <Loader className="loader--small-pink" />
-                  </div>
-                ) : (
-                  this.props.loadingIds.includes(item.id) && (
-                    <div className="content-results__item-links--error">No links available</div>
-                  )
-                )}
-
-                {movie && (
-                  <div className="content-results__item-links-wrapper">
-                    <div className="torrent-links">
-                      {movieHash1080p && (
-                        <a
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          href={`magnet:?xt=urn:btih:${movieHash1080p}&dn=${urlMovieTitle}&xl=310660222&tr=udp%3A%2F%2Ftracker.coppersurfer.tk:6969/announce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org:6969/announce&tr=udp%3A%2F%2Ftracker.pirateparty.gr:6969/announce&tr=udp%3A%2F%2Fexodus.desync.com:6969/announce&tr=udp%3A%2F%2Ftracker.opentrackr.org:1337/announce&tr=udp%3A%2F%2Ftracker.internetwarriors.net:1337/announce&tr=udp%3A%2F%2Ftracker.torrent.eu.org:451&tr=udp%3A%2F%2Ftracker.cyberia.is:6969/announce&tr=udp%3A%2F%2Fopen.demonii.si:1337/announce&tr=udp%3A%2F%2Fopen.stealth.si:80/announce&tr=udp%3A%2F%2Ftracker.tiny-vps.com:6969/announce&tr=udp%3A%2F%2Ftracker.iamhansen.xyz:2000/announce&tr=udp%3A%2F%2Fexplodie.org:6969/announce&tr=udp%3A%2F%2Fdenis.stalker.upeer.me:6969/announce&tr=udp%3A%2F%2Fipv4.tracker.harry.lu:80/announce`}
-                        >
-                          1080p
-                        </a>
-                      )}
-                      {movieHash720p && (
-                        <a
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          href={`magnet:?xt=urn:btih:${movieHash720p}&dn=${urlMovieTitle}&xl=310660222&tr=udp%3A%2F%2Ftracker.coppersurfer.tk:6969/announce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org:6969/announce&tr=udp%3A%2F%2Ftracker.pirateparty.gr:6969/announce&tr=udp%3A%2F%2Fexodus.desync.com:6969/announce&tr=udp%3A%2F%2Ftracker.opentrackr.org:1337/announce&tr=udp%3A%2F%2Ftracker.internetwarriors.net:1337/announce&tr=udp%3A%2F%2Ftracker.torrent.eu.org:451&tr=udp%3A%2F%2Ftracker.cyberia.is:6969/announce&tr=udp%3A%2F%2Fopen.demonii.si:1337/announce&tr=udp%3A%2F%2Fopen.stealth.si:80/announce&tr=udp%3A%2F%2Ftracker.tiny-vps.com:6969/announce&tr=udp%3A%2F%2Ftracker.iamhansen.xyz:2000/announce&tr=udp%3A%2F%2Fexplodie.org:6969/announce&tr=udp%3A%2F%2Fdenis.stalker.upeer.me:6969/announce&tr=udp%3A%2F%2Fipv4.tracker.harry.lu:80/announce`}
-                        >
-                          720p
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                )}
+                  }}
+                  type="button"
+                />
               </div>
-              <button
-                className="button--del-item"
-                onClick={() => {
-                  if (this.props.authUser) {
-                    this.props.toggleWatchLaterMovie(item.id, watchLaterMovies, item)
-                  } else {
-                    this.context.toggleContentLS(item.id, "watchLaterMovies", watchLaterMovies)
-                  }
-                }}
-                type="button"
-              />
             </div>
           )
         })}

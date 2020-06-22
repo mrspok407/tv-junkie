@@ -1,7 +1,7 @@
 .loader {
   position: relative;
   opacity: 0;
-  animation: show 0.4s 0.4s forwards;
+  animation: show 0.4s 0s forwards;
   @keyframes show {
     to {
       opacity: 1;
