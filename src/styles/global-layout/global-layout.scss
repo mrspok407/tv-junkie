@@ -234,6 +234,13 @@ $font-sizes: (
       position: relative;
       flex-direction: column;
       height: 100%;
+      opacity: 0;
+      animation: showFullDetailss 0.15s forwards;
+      @keyframes showFullDetailss {
+        to {
+          opacity: 1;
+        }
+      }
 
       &:after {
         @include hoverBoxShadow(0px, 0.2s);
