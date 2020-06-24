@@ -225,7 +225,8 @@ $font-sizes: (
     }
   }
 
-  &--shows {
+  &--shows,
+  &--movies {
     opacity: 1;
     animation: none;
 

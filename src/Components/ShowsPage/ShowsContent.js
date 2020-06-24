@@ -5,9 +5,9 @@ import { listOfGenres } from "Utils"
 import { throttle } from "throttle-debounce"
 import classNames from "classnames"
 import PlaceholderNoShows from "Components/Placeholders/PlaceholderNoShows"
+import PlaceholderLoadingContentResultsItem from "Components/Placeholders/PlaceholderLoadingSortBy/PlaceholderLoadingContentResultsItem"
 import Loader from "Components/Placeholders/Loader"
 import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
-import PlaceholderLoadingContentResultsItem from "Components/Placeholders/PlaceholderLoadingSortBy/PlaceholderLoadingContentResultsItem"
 
 const showsToLoad = 5
 
@@ -17,28 +17,35 @@ class ShowsContent extends Component {
 
     this.state = {
       activeSection: "watchingShows",
-      watchingShows: [],
-      droppedShows: [],
-      willWatchShows: [],
+      sortBy: "name",
       initialLoading: true,
       loadingContent: false,
-      watchingShowsDisableLoad: false,
-      droppedShowsdisableLoad: false,
-      willWatchShowsDisableLoad: false,
-      watchingShowsLastLoaded: showsToLoad,
-      droppedShowsLastLoaded: showsToLoad,
-      willWatchShowsLastLoaded: showsToLoad,
-      currentLastShow: showsToLoad,
-      watchingShowsNumOfLoadedShows: showsToLoad,
-      droppedShowsNumOfLoadedShows: showsToLoad,
-      willWatchShowsNumOfLoadedShows: showsToLoad,
-      sortByShows: "name",
-      sortByShowsLoading: false
+      sortByLoading: false,
+      database: {
+        watchingShows: [],
+        droppedShows: [],
+        willWatchShows: []
+      },
+      disableLoad: {
+        watchingShows: false,
+        droppedShows: false,
+        willWatchShows: false
+      },
+      lastLoadedShow: {
+        watchingShows: showsToLoad,
+        droppedShows: showsToLoad,
+        willWatchShows: showsToLoad
+      },
+      loadedShows: {
+        watchingShows: showsToLoad,
+        droppedShows: showsToLoad,
+        willWatchShows: showsToLoad
+      }
     }
   }
 
   componentDidMount() {
-    this.getContent({ sortByShows: "name", isInitialLoad: true })
+    this.getContent({ sortBy: "name", isInitialLoad: true })
     window.addEventListener("scroll", this.handleScroll)
   }
 
@@ -49,10 +56,53 @@ class ShowsContent extends Component {
     window.removeEventListener("scroll", this.handleScroll)
   }
 
-  toggleSection = content => {
+  toggleSection = section => {
     this.setState({
-      activeSection: content
+      activeSection: section
     })
+  }
+
+  getContent = ({ sortBy = "name", isInitialLoad = true }) => {
+    if (this.props.authUser === null) return
+    if (isInitialLoad) {
+      this.setState({ initialLoading: true })
+    }
+
+    const promises = []
+
+    Object.keys(this.state.database).forEach(database => {
+      const promise = this.props.firebase[database](this.props.authUser.uid)
+        .orderByChild(sortBy)
+        .limitToFirst(this.state.loadedShows[database])
+        .once("value", snapshot => {
+          let shows = []
+          snapshot.forEach(item => {
+            shows = [...shows, item.val()]
+          })
+
+          console.log(shows)
+
+          this.setState({
+            database: {
+              ...this.state.database,
+              [database]: shows
+            },
+            lastLoadedShow: {
+              ...this.state.lastLoadedShow,
+              [database]: shows.length !== 0 && shows[shows.length - 1][sortBy]
+            }
+          })
+        })
+
+      promises.push(promise)
+    })
+
+    Promise.all(promises).then(() =>
+      this.setState({
+        sortByLoading: false,
+        initialLoading: false
+      })
+    )
   }
 
   loadNewContent = () => {
@@ -61,11 +111,9 @@ class ShowsContent extends Component {
       loadingContent: true
     })
 
-    console.log(this.state[`${this.state.activeSection}LastLoaded`])
-
     this.props.firebase[this.state.activeSection](this.props.authUser.uid)
-      .orderByChild(this.state.sortByShows)
-      .startAt(this.state[`${this.state.activeSection}LastLoaded`] + 1)
+      .orderByChild(this.state.sortBy)
+      .startAt(this.state.lastLoadedShow[this.state.activeSection] + 1)
       .limitToFirst(showsToLoad)
       .once("value", snapshot => {
         let shows = []
@@ -76,12 +124,22 @@ class ShowsContent extends Component {
         console.log(shows)
 
         this.setState(prevState => ({
-          [this.state.activeSection]: [...prevState[this.state.activeSection], ...shows],
-          [`${this.state.activeSection}LastLoaded`]:
-            shows.length !== 0 && shows[shows.length - 1][this.state.sortByShows],
-          [`${this.state.activeSection}DisableLoad`]: shows.length === 0,
-          [`${this.state.activeSection}NumOfLoadedShows`]:
-            prevState[this.state.activeSection].length + shows.length,
+          database: {
+            ...prevState.database,
+            [this.state.activeSection]: [...prevState.database[this.state.activeSection], ...shows]
+          },
+          disableLoad: {
+            ...prevState.disableLoad,
+            [this.state.activeSection]: shows.length === 0
+          },
+          lastLoadedShow: {
+            ...prevState.lastLoadedShow,
+            [this.state.activeSection]: shows.length !== 0 && shows[shows.length - 1][this.state.sortBy]
+          },
+          loadedShows: {
+            ...prevState.loadedShows,
+            [this.state.activeSection]: prevState.database[this.state.activeSection].length + shows.length
+          },
           loadingContent: false
         }))
       })
@@ -89,7 +147,7 @@ class ShowsContent extends Component {
 
   handleScroll = throttle(500, () => {
     if (
-      this.state[`${this.state.activeSection}DisableLoad`] ||
+      this.state.disableLoad[this.state.activeSection] ||
       this.state.loadingContent ||
       document.body.scrollHeight < 1400
     )
@@ -101,123 +159,72 @@ class ShowsContent extends Component {
   })
 
   handleShowsOnClient = showId => {
-    const activeSectionSavedState = this.state[this.state.activeSection]
-    const watchingShowsSavedState = this.state.watchingShows
-
-    const filteredShows = this.state[this.state.activeSection].filter(item => item.id !== showId)
-    // const deletedShow = this.state[this.state.activeSection].find(item => item.id === showId)
+    const filteredShows = this.state.database[this.state.activeSection].filter(item => item.id !== showId)
 
     this.setState({
-      [this.state.activeSection]: filteredShows
-      // watchingShows:
-      //   this.state.activeSection !== "watchingShows"
-      //     ? [...this.state.watchingShows, deletedShow]
-      //     : filteredShows
+      database: {
+        ...this.state.database,
+        [this.state.activeSection]: filteredShows
+      }
     })
+    console.log(filteredShows)
+  }
+
+  updateWatchingShowsDatabase = () => {
+    const activeSectionSavedState = this.state.database[this.state.activeSection]
+    const watchingShowsSavedState = this.state.database.watchingShows
 
     this.props.firebase
       .watchingShows(this.props.authUser.uid)
-      .orderByChild(this.state.sortByShows)
-      .limitToFirst(this.state.watchingShowsNumOfLoadedShows)
+      .orderByChild(this.state.sortBy)
+      .limitToFirst(this.state.loadedShows.watchingShows + 1)
       .once("value", snapshot => {
         let watchingShows = []
         snapshot.forEach(item => {
           watchingShows = [...watchingShows, item.val()]
         })
 
-        this.setState({
-          watchingShows,
-          watchingShowsLastLoaded:
-            watchingShows.length !== 0 && watchingShows[watchingShows.length - 1][this.state.sortByShows]
-        })
+        console.log(snapshot.val())
+
+        this.setState(prevState => ({
+          database: {
+            ...this.state.database,
+            watchingShows
+          },
+          lastLoadedShow: {
+            ...this.state.lastLoadedShow,
+            watchingShows:
+              watchingShows.length !== 0 && watchingShows[watchingShows.length - 1][this.state.sortBy]
+          },
+          loadedShows: {
+            ...prevState.loadedShows,
+            watchingShows: watchingShows.length
+          }
+        }))
       })
 
     if (this.props.userContent.errorInDatabase.error) {
       this.setState({
-        [this.state.activeSection]: activeSectionSavedState,
-        watchingShows: watchingShowsSavedState
+        database: {
+          ...this.state.database,
+          [this.state.activeSection]: activeSectionSavedState,
+          watchingShows: watchingShowsSavedState
+        }
       })
     }
   }
 
-  getContent = ({ sortByShows = "name", isInitialLoad = true }) => {
-    console.log("test")
-    if (this.props.authUser === null) return
-    if (isInitialLoad) {
-      this.setState({ initialLoading: true })
-    }
+  sortBy = sortBy => {
+    if (this.state.sortBy === sortBy) return
 
-    const promiseWatchingShows = this.props.firebase
-      .watchingShows(this.props.authUser.uid)
-      .orderByChild(sortByShows)
-      .limitToFirst(this.state.watchingShowsNumOfLoadedShows)
-      .once("value", snapshot => {
-        let watchingShows = []
-        snapshot.forEach(item => {
-          watchingShows = [...watchingShows, item.val()]
-        })
-
-        this.setState({
-          watchingShows,
-          watchingShowsLastLoaded:
-            watchingShows.length !== 0 && watchingShows[watchingShows.length - 1][sortByShows]
-        })
-      })
-
-    const promiseDroppedShows = this.props.firebase
-      .droppedShows(this.props.authUser.uid)
-      .orderByChild(sortByShows)
-      .limitToFirst(this.state.droppedShowsNumOfLoadedShows)
-      .once("value", snapshot => {
-        let droppedShows = []
-        snapshot.forEach(item => {
-          droppedShows = [...droppedShows, item.val()]
-        })
-
-        this.setState({
-          droppedShows,
-          droppedShowsLastLoaded:
-            droppedShows.length !== 0 && droppedShows[droppedShows.length - 1][sortByShows]
-        })
-      })
-
-    const promiseWillWatchShows = this.props.firebase
-      .willWatchShows(this.props.authUser.uid)
-      .orderByChild(sortByShows)
-      .limitToFirst(this.state.willWatchShowsNumOfLoadedShows)
-      .once("value", snapshot => {
-        let willWatchShows = []
-        snapshot.forEach(item => {
-          willWatchShows = [...willWatchShows, item.val()]
-        })
-
-        this.setState({
-          willWatchShows,
-          willWatchShowsLastLoaded:
-            willWatchShows.length !== 0 && willWatchShows[willWatchShows.length - 1][sortByShows]
-        })
-      })
-
-    Promise.all([promiseWatchingShows, promiseDroppedShows, promiseWillWatchShows]).then(() =>
-      this.setState({
-        sortByShowsLoading: false,
-        initialLoading: false
-      })
-    )
-  }
-
-  sortByShows = sortByShows => {
-    if (this.state.sortByShows === sortByShows) return
-    console.log(sortByShows)
-
-    this.setState({ sortByShows, sortByShowsLoading: true })
-    this.getContent({ sortByShows, isInitialLoad: false })
+    this.setState({ sortBy, sortByLoading: true })
+    this.getContent({ sortBy, isInitialLoad: false })
   }
 
   renderContent = section => {
-    const content = this.state[section]
+    const content = this.state.database[section]
 
-    const watchingShows = this.props.authUser
+    const shows = this.props.authUser
       ? content
       : section !== "watchingShows"
       ? content
@@ -225,7 +232,7 @@ class ShowsContent extends Component {
 
     return (
       <>
-        {watchingShows.map(item => {
+        {shows.map(item => {
           const filteredGenres = item.genre_ids.map(genreId =>
             listOfGenres.filter(item => item.id === genreId)
           )
@@ -234,7 +241,7 @@ class ShowsContent extends Component {
 
           return (
             <div key={item.id} className="content-results__item content-results__item--shows">
-              {this.state.sortByShowsLoading ? (
+              {this.state.sortByLoading ? (
                 <PlaceholderLoadingContentResultsItem delayAnimation="0.5s" />
               ) : (
                 <div className="content-results__item--shows-wrapper">
@@ -286,7 +293,12 @@ class ShowsContent extends Component {
                         className="button"
                         onClick={() => {
                           if (this.props.authUser) {
-                            this.props.handleShowInDatabases(item.id, [item], "notWatchingShows")
+                            this.props.handleShowInDatabases(
+                              item.id,
+                              [item],
+                              "notWatchingShows",
+                              this.updateWatchingShowsDatabase
+                            )
                             this.handleShowsOnClient(item.id)
                           } else {
                             this.context.toggleContentLS(item.id, "watchingShows")
@@ -302,7 +314,12 @@ class ShowsContent extends Component {
                       <button
                         className="button"
                         onClick={() => {
-                          this.props.handleShowInDatabases(item.id, [item], "watchingShows")
+                          this.props.handleShowInDatabases(
+                            item.id,
+                            [item],
+                            "watchingShows",
+                            this.updateWatchingShowsDatabase
+                          )
                           this.handleShowsOnClient(item.id)
                         }}
                         type="button"
@@ -321,9 +338,9 @@ class ShowsContent extends Component {
   }
 
   render() {
-    const content = this.state[this.state.activeSection]
+    const content = this.state.database[this.state.activeSection]
 
-    const watchingShows = this.props.authUser
+    const shows = this.props.authUser
       ? content
       : this.state.activeSection !== "watchingShows"
       ? content
@@ -372,7 +389,7 @@ class ShowsContent extends Component {
 
         {this.state.initialLoading ? (
           <Loader className="loader--pink" />
-        ) : watchingShows.length === 0 ? (
+        ) : shows.length === 0 ? (
           <PlaceholderNoShows
             section={this.state.activeSection}
             authUser={this.props.authUser}
@@ -385,26 +402,26 @@ class ShowsContent extends Component {
               <div className="content-results__sortby-buttons">
                 <div
                   className={classNames("content-results__sortby-buttons", {
-                    "content-results__sortby-button--active": this.state.sortByShows === "name"
+                    "content-results__sortby-button--active": this.state.sortBy === "name"
                   })}
                 >
                   <button
                     type="button"
                     className="button button--sortby-shows"
-                    onClick={() => this.sortByShows("name", true)}
+                    onClick={() => this.sortBy("name", true)}
                   >
                     Alphabetically
                   </button>
                 </div>
                 <div
                   className={classNames("content-results__sortby-button", {
-                    "content-results__sortby-button--active": this.state.sortByShows === "timeStamp"
+                    "content-results__sortby-button--active": this.state.sortBy === "timeStamp"
                   })}
                 >
                   <button
                     type="button"
                     className="button button--sortby-shows"
-                    onClick={() => this.sortByShows("timeStamp", true)}
+                    onClick={() => this.sortBy("timeStamp", true)}
                   >
                     Recently added
                   </button>
@@ -439,6 +456,6 @@ class ShowsContent extends Component {
   }
 }
 
-export default withUserContent(ShowsContent, "ShowsContent")
+export default withUserContent(ShowsContent)
 
 ShowsContent.contextType = UserContentLocalStorageContext

@@ -24,14 +24,8 @@ class MainInfo extends Component {
       .orderByChild("id")
       .equalTo(Number(this.props.id))
       .on("value", snapshot => {
-        const movie = snapshot.val()
-          ? Object.keys(snapshot.val()).map(key => ({
-              ...snapshot.val()[key]
-            }))
-          : []
-
         this.setState({
-          movieInDatabase: movie[0]
+          movieInDatabase: snapshot.val()
         })
       })
   }
@@ -170,7 +164,7 @@ class MainInfo extends Component {
                   this.props.toggleWatchLaterMovie(
                     Number(this.props.id),
                     this.props.infoToPass,
-                    this.state.movieInDatabase
+                    "watchLaterMovies"
                   )
                 } else {
                   this.context.toggleContentLS(

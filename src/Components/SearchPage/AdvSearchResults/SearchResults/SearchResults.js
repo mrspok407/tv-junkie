@@ -140,7 +140,11 @@ class AdvSearchResults extends Component {
                             })}
                             onClick={() => {
                               if (this.props.authUser) {
-                                this.props.toggleWatchLaterMovie(id, this.props.advancedSearchContent)
+                                this.props.toggleWatchLaterMovie(
+                                  id,
+                                  this.props.advancedSearchContent,
+                                  "watchLaterMovies"
+                                )
                               } else {
                                 this.context.toggleContentLS(
                                   id,

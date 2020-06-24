@@ -3,9 +3,8 @@ import { withFirebase } from "Components/Firebase"
 import { compose } from "recompose"
 import axios from "axios"
 import { WithAuthenticationConsumer } from "Components/UserAuth/Session/WithAuthentication"
-import { toggleWatchingShowsDatabase, deleteShowFromSubDatabase } from "./FirebaseHelpers"
 
-const withUserContent = (Component, passedComponent) => {
+const withUserContent = Component => {
   class WithUserContent extends React.Component {
     constructor(props) {
       super(props)
@@ -27,17 +26,10 @@ const withUserContent = (Component, passedComponent) => {
       this.userUid = this.authUser && this.props.authUser.uid
     }
 
-    componentDidMount() {
-      this._isMounted = true
-      // this.getContent()
-    }
-
     componentDidUpdate(prevProps) {
       if (this.props.authUser && this.props.authUser !== prevProps.authUser) {
         this.authUser = this.props.authUser
         this.userUid = this.props.authUser.uid
-
-        // this.getContent()
       }
     }
 
@@ -217,13 +209,16 @@ const withUserContent = (Component, passedComponent) => {
       // }
     }
 
-    handleShowInDatabases = (id, contentArr, database) => {
+    handleShowInDatabases = (id, contentArr, database, callback = () => {}) => {
+      console.log(callback)
       const otherDatabases = this.state.subDatabases.filter(item => item !== database)
 
       const showToAdd = contentArr && contentArr.find(item => item.id === id)
 
+      const promises = []
+
       otherDatabases.forEach(item => {
-        this.firebase[item](this.userUid)
+        const promise = this.firebase[item](this.userUid)
           .orderByChild("id")
           .equalTo(id)
           .once(
@@ -256,6 +251,12 @@ const withUserContent = (Component, passedComponent) => {
               })
             }
           )
+
+        promises.push(promise)
+      })
+
+      Promise.all(promises).then(() => {
+        callback()
       })
 
       this.firebase[database](this.userUid)
@@ -267,93 +268,65 @@ const withUserContent = (Component, passedComponent) => {
         })
     }
 
-    // addShowToSubDatabase = (id, contentArr, database, showInDatabase) => {
-    //   if (this.authUser === null || showInDatabase.databases[database]) return
-
-    //   const showToAdd = contentArr && contentArr.find(item => item.id === id)
-
-    //   if (showInDatabase) {
-    //     const key = showInDatabase.showKey
-    //     const userWatchingShow = "false"
-    //     toggleWatchingShowsDatabase(this.firebase, this.userUid, key, userWatchingShow)
-    //   } else {
-    //     this.addShowToDatabase(id, showToAdd)
-    //   }
-
-    //   const otherDatabases = this.state.subDatabases.filter(item => item !== database)
-
-    //   deleteShowFromSubDatabase(this.firebase, this.userUid, otherDatabases, Number(id))
-    // .then(() => {
-    // const newShowRef = this.firebase[database](this.userUid).push()
-    // const key = showInDatabase.showKey
-    // const test = newShowRef.key
-
-    // // const userWatchingShow = "false"
-    // // const dropped = database === "droppedShows" ? true : false
-    // // const willWatch = database === "willWatchShows" ? true : false
-
-    // newShowRef.set({ ...showToAdd, showKey: key, key: test })
-
-    // toggleWatchingShowsDatabase(this.firebase, this.userUid, key, userWatchingShow, dropped, willWatch)
-    // })
-    // }
-
-    toggleWatchLaterMovie = (id, contentArr, movieInDatabase) => {
+    toggleWatchLaterMovie = (id, contentArr, database) => {
       if (this.authUser === null) return
 
       const movieToAdd = contentArr && contentArr.find(item => item.id === id)
 
-      if (!movieInDatabase) {
-        const newMovieRef = this.firebase.watchLaterMovies(this.userUid).push()
-        const key = newMovieRef.key
+      this.firebase[database](this.userUid)
+        .orderByChild("id")
+        .equalTo(id)
+        .once("value", snapshot => {
+          if (snapshot.val() !== null) {
+            const movie = snapshot.val()
+              ? Object.keys(snapshot.val()).map(key => ({
+                  ...snapshot.val()[key]
+                }))
+              : []
 
-        newMovieRef.set({ ...movieToAdd, key, timeStamp: this.firebase.timeStamp() })
-      } else {
-        const key = movieInDatabase.key
+            this.firebase[database](this.userUid)
+              .child(movie[0].movieKey)
+              .set(null)
+          } else {
+            const newMovieRef = this.firebase[database](this.userUid).push()
+            const movieKey = newMovieRef.key
 
-        this.firebase
-          .watchLaterMovies(this.userUid)
-          .child(key)
-          .remove()
-      }
-    }
+            newMovieRef
+              .set({
+                ...movieToAdd,
+                movieKey,
+                timeStamp: this.firebase.timeStamp()
+              })
+              .then(() => {
+                this.firebase[database](this.userUid)
+                  .child(movieKey)
+                  .once("value", snapshot => {
+                    if (snapshot.val() === null) return
 
-    getContent = () => {
-      // if (this.userUid === null) return
-      // this.setState({ loadingContent: true })
-      // this.firebase.userContent(this.userUid).once("value", snapshot => {
-      //   const userContent = snapshot.val() || {}
-      //   const databases = ["watchingShows", "droppedShows", "willWatchShows", "watchLaterMovies"]
-      //   databases.forEach(item => {
-      //     if (!userContent.hasOwnProperty(item)) userContent[item] = {}
-      //   })
-      //   const test = {}
-      //   Object.entries(userContent).forEach(([key, value]) => {
-      //     const content =
-      //       Object.keys(value).map(key => ({
-      //         ...value[key],
-      //         key
-      //       })) || []
-      //     test[key] = content
-      //   })
-      //   if (this._isMounted) {
-      //     this.setState({
-      //       ...test,
-      //       loadingContent: false
-      //     })
-      //   }
-      // const droppedTvShowsList = droppedShows
-      //   ? Object.keys(droppedShows).map(key => ({
-      //       ...droppedShows[key],
-      //       key
-      //     }))
-      //   : []
-      // })
-    }
+                    const negativeTimestamp = snapshot.val().timeStamp * -1
+                    this.firebase[database](this.userUid)
+                      .child(movieKey)
+                      .update({ timeStamp: negativeTimestamp }) // The negative time stamp needed for easier des order, cause firebase only provide as order
+                  })
+              })
+          }
+        })
 
-    componentWillUnmount() {
-      this._isMounted = false
-      // this.props.firebase.userContent(this.userUid).off()
+      // const movieToAdd = contentArr && contentArr.find(item => item.id === id)
+
+      // if (!movieInDatabase) {
+      //   const newMovieRef = this.firebase.watchLaterMovies(this.userUid).push()
+      //   const key = newMovieRef.key
+
+      //   newMovieRef.set({ ...movieToAdd, key, timeStamp: this.firebase.timeStamp() })
+      // } else {
+      //   const key = movieInDatabase.key
+
+      //   this.firebase
+      //     .watchLaterMovies(this.userUid)
+      //     .child(key)
+      //     .remove()
+      // }
     }
 
     render() {
