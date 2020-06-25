@@ -5,72 +5,142 @@ import { withUserContent } from "Components/UserContent"
 import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
 
 class SearchCard extends Component {
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      contentInDatabase: null,
+      loadingDataFromDatabase: false
+    }
+  }
+
+  componentDidMount() {
+    this.getContentInDatabase()
+  }
+
+  componentWillUnmount() {
+    const databases = this.props.userContent.showsDatabases.concat(this.props.userContent.moviesDatabases)
+
+    databases.forEach(item => {
+      this.props.firebase[item](this.props.authUser.uid).off()
+    })
+  }
+
+  getContentInDatabase = () => {
+    this.setState({ loadingDataFromDatabase: true })
+
+    const databases = this.props.userContent.showsDatabases.concat(this.props.userContent.moviesDatabases)
+
+    databases.forEach(item => {
+      this.props.firebase[item](this.props.authUser.uid)
+        .orderByChild("id")
+        .equalTo(this.props.id)
+        .on("value", snapshot => {
+          if (snapshot.val() !== null) {
+            // let content = {}
+
+            // Object.keys(snapshot.val()).forEach(key => {
+            //   content = { ...snapshot.val()[key], key }
+            // })
+
+            this.setState({
+              contentInDatabase: item,
+              loadingDataFromDatabase: false
+            })
+          } else {
+            if (this.props.movieTitle) {
+              this.setState({
+                contentInDatabase: null,
+                loadingDataFromDatabase: false
+              })
+            }
+            this.setState({
+              loadingDataFromDatabase: false
+            })
+          }
+        })
+    })
+  }
+
   renderButtons = () => {
-    const { id, searchResults, mediaType } = this.props
+    console.log(this.state.contentInDatabase)
+    const { searchResults, mediaType } = this.props
 
-    const watchLaterMovies = this.props.authUser
-      ? this.props.userContent.watchLaterMovies
-      : this.context.watchLaterMovies
+    console.log(this.props.mediaType)
 
-    const watchingShows = this.props.authUser
-      ? this.props.userContent.watchingShows
-      : this.context.watchingShows
     return (
       <div className="search-card__buttons">
-        {mediaType === "movie" ? (
+        {this.props.movieTitle ? (
           <button
-            className={classNames("button", {
-              "button--pressed": watchLaterMovies.find(item => item.id === id)
+            className={classNames("button button--search-card", {
+              "button--pressed": this.state.contentInDatabase === "watchLaterMovies"
             })}
             onClick={() => {
               if (this.props.authUser) {
-                this.props.toggleWatchLaterMovie(id, searchResults)
+                this.props.toggleWatchLaterMovie(this.props.id, searchResults, "watchLaterMovies")
               } else {
-                this.context.toggleContentLS(id, "watchLaterMovies", searchResults)
+                this.context.toggleContentLS(this.props.id, "watchLaterMovies", searchResults)
               }
 
               if (
-                !watchLaterMovies.find(item => item.id === id) ||
-                this.props.currentlyChosenContent.find(item => item.id === id)
+                !this.state.contentInDatabase === "watchLaterMovies" ||
+                this.props.currentlyChosenContent.find(item => item.id === this.props.id)
               ) {
-                this.props.toggleCurrentlyChosenContent(id, searchResults)
+                this.props.toggleCurrentlyChosenContent(this.props.id, searchResults)
               }
             }}
             type="button"
+            disabled={this.state.loadingDataFromDatabase}
           >
-            {watchLaterMovies.find(item => item.id === id) ? "Remove" : "Watch later"}
+            {this.state.loadingDataFromDatabase ? (
+              <span className="search-card__loading-db"></span>
+            ) : this.state.contentInDatabase === "watchLaterMovies" ? (
+              "Remove"
+            ) : (
+              "Watch later"
+            )}
           </button>
         ) : (
           <>
-            {watchingShows.find(item => item.id === id && item.userWatching === true) ? (
+            {this.state.contentInDatabase === "watchingShows" ? (
               <button
-                className="button button--searchlist button--pressed"
+                className="button button--search-card button--pressed"
                 onClick={() => {
                   if (this.props.authUser) {
-                    this.props.removeWatchingShow(id)
+                    this.props.handleShowInDatabases(this.props.id, searchResults, "notWatchingShows")
                   } else {
-                    this.context.toggleContentLS(id, "watchingShows")
+                    this.context.toggleContentLS(this.props.id, "watchingShows")
                   }
                 }}
                 type="button"
+                disabled={this.state.loadingDataFromDatabase}
               >
-                Not watching
+                {this.state.loadingDataFromDatabase ? (
+                  <span className="search-card__loading-db"></span>
+                ) : (
+                  "Not watching"
+                )}
               </button>
             ) : (
               <button
-                className="button button--searchlist"
+                className="button button--search-card"
                 onClick={() => {
                   if (this.props.authUser) {
-                    this.props.addWatchingShow(id, searchResults)
+                    this.props.handleShowInDatabases(this.props.id, searchResults, "watchingShows")
                   } else {
-                    this.context.toggleContentLS(id, "watchingShows", searchResults)
+                    this.context.toggleContentLS(this.props.id, "watchingShows", searchResults)
                   }
 
-                  this.props.toggleCurrentlyChosenContent(id, searchResults)
+                  this.props.toggleCurrentlyChosenContent(this.props.id, searchResults)
                 }}
                 type="button"
+                disabled={this.state.loadingDataFromDatabase}
               >
-                Watching
+                {this.state.loadingDataFromDatabase ? (
+                  <span className="search-card__loading-db"></span>
+                ) : (
+                  "Watching"
+                )}
               </button>
             )}
           </>

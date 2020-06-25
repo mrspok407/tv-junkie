@@ -27,7 +27,7 @@ class ShowsButtons extends Component {
   }
 
   getShowInDatabase = () => {
-    this.props.userContent.subDatabases.forEach(item => {
+    this.props.userContent.showsDatabases.forEach(item => {
       this.props.firebase[item](this.props.authUser.uid)
         .orderByChild("id")
         .equalTo(Number(this.props.id))

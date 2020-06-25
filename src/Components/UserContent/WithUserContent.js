@@ -14,7 +14,8 @@ const withUserContent = Component => {
         droppedShows: [],
         willWatchShows: [],
         watchLaterMovies: [],
-        subDatabases: ["watchingShows", "notWatchingShows", "droppedShows", "willWatchShows"],
+        showsDatabases: ["watchingShows", "notWatchingShows", "droppedShows", "willWatchShows"],
+        moviesDatabases: ["watchLaterMovies"],
         errorInDatabase: {
           error: false,
           message: ""
@@ -116,102 +117,9 @@ const withUserContent = Component => {
         })
     }
 
-    addWatchingShow = (id, contentArr) => {
-      // if (this.authUser === null) return
-      // const showToAdd = contentArr && contentArr.find(item => item.id === id)
-      // // let notWatchingShow
-      // this.firebase
-      //   .notWatchingShows(this.userUid)
-      //   .orderByChild("id")
-      //   .equalTo(id)
-      //   .once("value", snapshot => {
-      //     if (snapshot.val() !== null) {
-      //       const show = snapshot.val()
-      //         ? Object.keys(snapshot.val()).map(key => ({
-      //             ...snapshot.val()[key]
-      //           }))
-      //         : []
-      //       const newShowRef = this.firebase.watchingShows(this.userUid).push()
-      //       this.firebase
-      //         .watchingShows(this.userUid)
-      //         .update(snapshot.val())
-      //         .then(() => {
-      //           this.firebase
-      //             .notWatchingShows(this.userUid)
-      //             .child(show[0].showKey)
-      //             // .orderByChild("id")
-      //             // .equalTo(id)
-      //             .set(null)
-      //         })
-      //       // this.firebase
-      //       //   .notWatchingShows(this.userUid)
-      //       //   .child(notWatchingShow[0].showKey)
-      //       //   .remove()
-      //     } else {
-      //       this.addShowToDatabase(id, showToAdd)
-      //     }
-      //   })
-      // deleteShowFromSubDatabase(this.firebase, this.userUid, this.state.subDatabases, Number(id))
-      // deleteShowFromSubDatabase(this.firebase, this.userUid, this.state.subDatabases, Number(id)).then(() => {
-      //   if (!notWatchingShow) {
-      //     this.addShowToDatabase(id, showToAdd)
-      //   } else {
-      //     // const key = showInDatabase.showKey
-      //     // const userWatchingShow = true
-      //     // const dropped = false
-      //     // const willWatch = false
-      //     // const newShowRef = this.firebase.watchingShows(this.userUid).push()
-      //     // newShowRef.set({
-      //     //   ...notWatchingShow
-      //     // })
-      //     // toggleWatchingShowsDatabase(this.firebase, this.userUid, key, userWatchingShow, dropped, willWatch)
-      //   }
-      // })
-    }
-
-    removeWatchingShow = id => {
-      // if (this.authUser === null) return
-      // this.firebase
-      //   .watchingShows(this.userUid)
-      //   .orderByChild("id")
-      //   .equalTo(id)
-      //   .once("value", snapshot => {
-      //     if (snapshot.val() !== null) {
-      //       const show = snapshot.val()
-      //         ? Object.keys(snapshot.val()).map(key => ({
-      //             ...snapshot.val()[key]
-      //           }))
-      //         : []
-      //       const newShowRef = this.firebase.notWatchingShows(this.userUid).push()
-      //       this.firebase
-      //         .notWatchingShows(this.userUid)
-      //         .update(snapshot.val())
-      //         .then(() => {
-      //           this.firebase
-      //             .watchingShows(this.userUid)
-      //             .child(show[0].showKey)
-      //             // .orderByChild("id")
-      //             // .equalTo(id)
-      //             .set(null)
-      //         })
-      // this.firebase
-      //   .notWatchingShows(this.userUid)
-      //   .child(notWatchingShow[0].showKey)
-      //   .remove()
-      //   }
-      // })
-      // if (showInDatabase) {
-      //   const key = showInDatabase.showKey
-      //   const userWatchingShow = "false"
-      //   const dropped = false
-      //   const willWatch = false
-      //   toggleWatchingShowsDatabase(this.firebase, this.userUid, key, userWatchingShow, dropped, willWatch)
-      // }
-    }
-
     handleShowInDatabases = (id, contentArr, database, callback = () => {}) => {
       console.log(callback)
-      const otherDatabases = this.state.subDatabases.filter(item => item !== database)
+      const otherDatabases = this.state.showsDatabases.filter(item => item !== database)
 
       const showToAdd = contentArr && contentArr.find(item => item.id === id)
 
@@ -311,22 +219,6 @@ const withUserContent = Component => {
               })
           }
         })
-
-      // const movieToAdd = contentArr && contentArr.find(item => item.id === id)
-
-      // if (!movieInDatabase) {
-      //   const newMovieRef = this.firebase.watchLaterMovies(this.userUid).push()
-      //   const key = newMovieRef.key
-
-      //   newMovieRef.set({ ...movieToAdd, key, timeStamp: this.firebase.timeStamp() })
-      // } else {
-      //   const key = movieInDatabase.key
-
-      //   this.firebase
-      //     .watchLaterMovies(this.userUid)
-      //     .child(key)
-      //     .remove()
-      // }
     }
 
     render() {
@@ -334,9 +226,6 @@ const withUserContent = Component => {
         <Component
           {...this.props}
           userContent={this.state}
-          addWatchingShow={this.addWatchingShow}
-          removeWatchingShow={this.removeWatchingShow}
-          addShowToSubDatabase={this.addShowToSubDatabase}
           toggleWatchLaterMovie={this.toggleWatchLaterMovie}
           handleShowInDatabases={this.handleShowInDatabases}
         />
