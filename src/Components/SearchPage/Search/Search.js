@@ -5,15 +5,17 @@ import Input from "./Input/Input"
 import AdvancedSearch from "./AdvancedSearch/AdvancedSearch"
 import "./Search.scss"
 import PlaceholderNoResults from "Components/Placeholders/PlaceholderNoResults"
+import { withUserContent } from "Components/UserContent"
 
 let cancelRequest
 
-export default class Search extends Component {
+class Search extends Component {
   constructor(props) {
     super(props)
     this.state = {
       query: "",
       searchResults: [],
+      contentInDatabase: [],
       isSearchingList: false,
       totalPages: null,
       listIsOpen: false,
@@ -58,14 +60,53 @@ export default class Search extends Component {
           return 1
         })
 
-        this.setState({
-          searchResults: contentSortByPopularity,
-          isSearchingList: false,
-          totalPages,
-          mediaTypeSearching: mediatype.type.toLowerCase()
-        })
-      })
+        const databases = ["watchLaterMovies", "watchingShows"]
+        const contentInDatabase = []
+        let counter = 0
 
+        if (contentSortByPopularity.length !== 0) {
+          databases.forEach(database => {
+            contentSortByPopularity.forEach(content => {
+              this.props.firebase[database](this.props.authUser.uid)
+                .orderByChild("id")
+                .equalTo(content.id)
+                .once("value", snapshot => {
+                  counter++
+
+                  if (snapshot.val() !== null) {
+                    let content = {}
+
+                    Object.keys(snapshot.val()).forEach(key => {
+                      content = { ...snapshot.val()[key], key }
+                    })
+
+                    contentInDatabase.push(content)
+                  }
+
+                  if (
+                    counter === contentSortByPopularity.length * databases.length ||
+                    contentSortByPopularity.length === 0
+                  ) {
+                    this.setState({
+                      contentInDatabase: contentInDatabase,
+                      searchResults: contentSortByPopularity,
+                      isSearchingList: false,
+                      totalPages,
+                      mediaTypeSearching: mediatype.type.toLowerCase()
+                    })
+                  }
+                })
+            })
+          })
+        } else {
+          this.setState({
+            searchResults: contentSortByPopularity,
+            isSearchingList: false,
+            totalPages,
+            mediaTypeSearching: mediatype.type.toLowerCase()
+          })
+        }
+      })
       .catch(err => {
         if (axios.isCancel(err)) return
         this.setState({
@@ -74,6 +115,21 @@ export default class Search extends Component {
           error: "Something went wrong"
         })
       })
+  }
+
+  updateContentInDbClient = (id, contentArr) => {
+    const content = this.state.contentInDatabase.find(item => item.id === id)
+    const contentToAdd = contentArr && contentArr.find(item => item.id === id)
+
+    if (content) {
+      this.setState(prevState => ({
+        contentInDatabase: prevState.contentInDatabase.filter(item => item.id !== id)
+      }))
+    } else {
+      this.setState(prevState => ({
+        contentInDatabase: [...prevState.contentInDatabase, contentToAdd]
+      }))
+    }
   }
 
   renderSearch = list => {
@@ -119,6 +175,8 @@ export default class Search extends Component {
                 <div className="search-list">
                   <SearchList
                     searchResults={this.state.searchResults}
+                    contentInDatabase={this.state.contentInDatabase}
+                    updateContentInDbClient={this.updateContentInDbClient}
                     mediaTypeSearching={this.state.mediaTypeSearching}
                     handleClickOutside={this.handleClickOutside}
                     toggleCurrentlyChosenContent={this.props.toggleCurrentlyChosenContent}
@@ -140,3 +198,5 @@ export default class Search extends Component {
     )
   }
 }
+
+export default withUserContent(Search)

@@ -43,6 +43,8 @@ export default class MovieList extends Component {
             known_for={known_for}
             known_for_department={known_for_department}
             searchResults={searchResults}
+            contentInDatabase={this.props.contentInDatabase}
+            updateContentInDbClient={this.props.updateContentInDbClient}
             mediaType={media_type}
             mediaTypeSearching={mediaTypeSearching}
             toggleCurrentlyChosenContent={this.props.toggleCurrentlyChosenContent}

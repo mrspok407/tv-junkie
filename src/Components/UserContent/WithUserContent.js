@@ -118,7 +118,6 @@ const withUserContent = Component => {
     }
 
     handleShowInDatabases = (id, contentArr, database, callback = () => {}) => {
-      console.log(callback)
       const otherDatabases = this.state.showsDatabases.filter(item => item !== database)
 
       const showToAdd = contentArr && contentArr.find(item => item.id === id)

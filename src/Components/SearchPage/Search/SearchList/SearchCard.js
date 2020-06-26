@@ -8,76 +8,23 @@ class SearchCard extends Component {
   constructor(props) {
     super(props)
 
-    this.state = {
-      contentInDatabase: null,
-      loadingDataFromDatabase: false
-    }
-  }
-
-  componentDidMount() {
-    this.getContentInDatabase()
-  }
-
-  componentWillUnmount() {
-    const databases = this.props.userContent.showsDatabases.concat(this.props.userContent.moviesDatabases)
-
-    databases.forEach(item => {
-      this.props.firebase[item](this.props.authUser.uid).off()
-    })
-  }
-
-  getContentInDatabase = () => {
-    this.setState({ loadingDataFromDatabase: true })
-
-    const databases = this.props.userContent.showsDatabases.concat(this.props.userContent.moviesDatabases)
-
-    databases.forEach(item => {
-      this.props.firebase[item](this.props.authUser.uid)
-        .orderByChild("id")
-        .equalTo(this.props.id)
-        .on("value", snapshot => {
-          if (snapshot.val() !== null) {
-            // let content = {}
-
-            // Object.keys(snapshot.val()).forEach(key => {
-            //   content = { ...snapshot.val()[key], key }
-            // })
-
-            this.setState({
-              contentInDatabase: item,
-              loadingDataFromDatabase: false
-            })
-          } else {
-            if (this.props.movieTitle) {
-              this.setState({
-                contentInDatabase: null,
-                loadingDataFromDatabase: false
-              })
-            }
-            this.setState({
-              loadingDataFromDatabase: false
-            })
-          }
-        })
-    })
+    this.state = {}
   }
 
   renderButtons = () => {
-    console.log(this.state.contentInDatabase)
-    const { searchResults, mediaType } = this.props
-
-    console.log(this.props.mediaType)
+    const { searchResults } = this.props
 
     return (
       <div className="search-card__buttons">
         {this.props.movieTitle ? (
           <button
             className={classNames("button button--search-card", {
-              "button--pressed": this.state.contentInDatabase === "watchLaterMovies"
+              "button--pressed": this.props.contentInDatabase.some(item => item.id === this.props.id)
             })}
             onClick={() => {
               if (this.props.authUser) {
                 this.props.toggleWatchLaterMovie(this.props.id, searchResults, "watchLaterMovies")
+                this.props.updateContentInDbClient(this.props.id, searchResults)
               } else {
                 this.context.toggleContentLS(this.props.id, "watchLaterMovies", searchResults)
               }
@@ -90,24 +37,18 @@ class SearchCard extends Component {
               }
             }}
             type="button"
-            disabled={this.state.loadingDataFromDatabase}
           >
-            {this.state.loadingDataFromDatabase ? (
-              <span className="search-card__loading-db"></span>
-            ) : this.state.contentInDatabase === "watchLaterMovies" ? (
-              "Remove"
-            ) : (
-              "Watch later"
-            )}
+            {this.props.contentInDatabase.some(item => item.id === this.props.id) ? "Remove" : "Watch Later"}
           </button>
         ) : (
           <>
-            {this.state.contentInDatabase === "watchingShows" ? (
+            {this.props.contentInDatabase.some(item => item.id === this.props.id) ? (
               <button
                 className="button button--search-card button--pressed"
                 onClick={() => {
                   if (this.props.authUser) {
                     this.props.handleShowInDatabases(this.props.id, searchResults, "notWatchingShows")
+                    this.props.updateContentInDbClient(this.props.id, searchResults)
                   } else {
                     this.context.toggleContentLS(this.props.id, "watchingShows")
                   }
@@ -115,11 +56,7 @@ class SearchCard extends Component {
                 type="button"
                 disabled={this.state.loadingDataFromDatabase}
               >
-                {this.state.loadingDataFromDatabase ? (
-                  <span className="search-card__loading-db"></span>
-                ) : (
-                  "Not watching"
-                )}
+                Not watching
               </button>
             ) : (
               <button
@@ -127,6 +64,7 @@ class SearchCard extends Component {
                 onClick={() => {
                   if (this.props.authUser) {
                     this.props.handleShowInDatabases(this.props.id, searchResults, "watchingShows")
+                    this.props.updateContentInDbClient(this.props.id, searchResults)
                   } else {
                     this.context.toggleContentLS(this.props.id, "watchingShows", searchResults)
                   }
@@ -136,11 +74,7 @@ class SearchCard extends Component {
                 type="button"
                 disabled={this.state.loadingDataFromDatabase}
               >
-                {this.state.loadingDataFromDatabase ? (
-                  <span className="search-card__loading-db"></span>
-                ) : (
-                  "Watching"
-                )}
+                Watching
               </button>
             )}
           </>

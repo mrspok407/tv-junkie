@@ -80,8 +80,6 @@ class ShowsContent extends Component {
             shows = [...shows, item.val()]
           })
 
-          console.log(shows)
-
           this.setState({
             database: {
               ...this.state.database,
@@ -120,8 +118,6 @@ class ShowsContent extends Component {
         snapshot.forEach(item => {
           shows = [...shows, item.val()]
         })
-
-        console.log(shows)
 
         this.setState(prevState => ({
           database: {
@@ -167,7 +163,6 @@ class ShowsContent extends Component {
         [this.state.activeSection]: filteredShows
       }
     })
-    console.log(filteredShows)
   }
 
   updateWatchingShowsDatabase = () => {

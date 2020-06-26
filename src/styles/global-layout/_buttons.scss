@@ -73,7 +73,7 @@
 
 .button--pressed {
   background-color: getColor(pressedBgColor, $btnPalette);
-  transition: 0.5s;
+  /// transition: 0.5s;
   &:after,
   &:before {
     top: 0;
