@@ -34,7 +34,7 @@ const withUserContent = Component => {
       }
     }
 
-    addShowToDatabase = (id, showToAdd, database) => {
+    addShowToDatabase = ({ id, show, database }) => {
       axios
         .get(`https://api.themoviedb.org/3/tv/${id}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US`)
         .then(({ data: { number_of_seasons } }) => {
@@ -88,7 +88,7 @@ const withUserContent = Component => {
 
             newShowRef
               .set({
-                ...showToAdd,
+                ...show,
                 showKey,
                 showEpisodesKey,
                 timeStamp: this.firebase.timeStamp()
@@ -117,10 +117,10 @@ const withUserContent = Component => {
         })
     }
 
-    handleShowInDatabases = (id, contentArr, database, callback = () => {}) => {
+    handleShowInDatabases = ({ id, data = [], database, callback = () => {} }) => {
       const otherDatabases = this.state.showsDatabases.filter(item => item !== database)
 
-      const showToAdd = contentArr && contentArr.find(item => item.id === id)
+      const showToAdd = Array.isArray(data) ? data.find(item => item.id === id) : data
 
       const promises = []
 
@@ -132,17 +132,17 @@ const withUserContent = Component => {
             "value",
             snapshot => {
               if (snapshot.val() !== null) {
-                const show = snapshot.val()
-                  ? Object.keys(snapshot.val()).map(key => ({
-                      ...snapshot.val()[key]
-                    }))
-                  : []
+                let show = {}
+
+                Object.keys(snapshot.val()).forEach(key => {
+                  show = { ...snapshot.val()[key], key }
+                })
 
                 this.firebase[database](this.userUid)
                   .update(snapshot.val())
                   .then(() => {
                     this.firebase[item](this.userUid)
-                      .child(show[0].showKey)
+                      .child(show.showKey)
                       .set(null)
                   })
               }
@@ -171,28 +171,28 @@ const withUserContent = Component => {
         .equalTo(id)
         .once("value", snapshot => {
           if (snapshot.val() !== null) return
-          this.addShowToDatabase(id, showToAdd, database)
+          this.addShowToDatabase({ id, show: showToAdd, database })
         })
     }
 
-    toggleWatchLaterMovie = (id, contentArr, database) => {
+    toggleWatchLaterMovie = ({ id, data = [], database }) => {
       if (this.authUser === null) return
 
-      const movieToAdd = contentArr && contentArr.find(item => item.id === id)
+      const movieToAdd = Array.isArray(data) ? data.find(item => item.id === id) : data
 
       this.firebase[database](this.userUid)
         .orderByChild("id")
         .equalTo(id)
         .once("value", snapshot => {
           if (snapshot.val() !== null) {
-            const movie = snapshot.val()
-              ? Object.keys(snapshot.val()).map(key => ({
-                  ...snapshot.val()[key]
-                }))
-              : []
+            let movie = {}
+
+            Object.keys(snapshot.val()).forEach(key => {
+              movie = { ...snapshot.val()[key], key }
+            })
 
             this.firebase[database](this.userUid)
-              .child(movie[0].movieKey)
+              .child(movie.movieKey)
               .set(null)
           } else {
             const newMovieRef = this.firebase[database](this.userUid).push()

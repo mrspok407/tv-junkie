@@ -18,6 +18,10 @@ class MainInfo extends Component {
     this.getMovieInDatabase()
   }
 
+  componentWillUnmount() {
+    this.props.firebase.watchLaterMovies(this.props.authUser.uid).off()
+  }
+
   getMovieInDatabase = () => {
     this.props.firebase
       .watchLaterMovies(this.props.authUser.uid)
@@ -161,11 +165,11 @@ class MainInfo extends Component {
               })}
               onClick={() => {
                 if (this.props.authUser) {
-                  this.props.toggleWatchLaterMovie(
-                    Number(this.props.id),
-                    this.props.infoToPass,
-                    "watchLaterMovies"
-                  )
+                  this.props.toggleWatchLaterMovie({
+                    id: Number(this.props.id),
+                    data: this.props.infoToPass,
+                    database: "watchLaterMovies"
+                  })
                 } else {
                   this.context.toggleContentLS(
                     Number(this.props.id),

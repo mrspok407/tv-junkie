@@ -20,6 +20,7 @@ $font-sizes: (
   width: 100%;
   min-width: 350px;
   padding-bottom: 100px;
+  z-index: 5;
   @include mediaMaxW(1450px) {
     padding: 0 38px 100px 38px;
   }

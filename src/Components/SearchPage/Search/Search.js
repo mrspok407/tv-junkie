@@ -5,6 +5,7 @@ import Input from "./Input/Input"
 import AdvancedSearch from "./AdvancedSearch/AdvancedSearch"
 import "./Search.scss"
 import PlaceholderNoResults from "Components/Placeholders/PlaceholderNoResults"
+import SelectedContent from "Components/SearchPage/AdvSearchResults/SelectedContent/SelectedContent"
 import { withUserContent } from "Components/UserContent"
 
 let cancelRequest
@@ -118,6 +119,7 @@ class Search extends Component {
   }
 
   updateContentInDbClient = (id, contentArr) => {
+    console.log(this.state.contentInDatabase)
     const content = this.state.contentInDatabase.find(item => item.id === id)
     const contentToAdd = contentArr && contentArr.find(item => item.id === id)
 
@@ -186,14 +188,9 @@ class Search extends Component {
               )
             )}
           </div>
-          <AdvancedSearch
-            advancedSearch={this.props.advancedSearch}
-            searchingAdvancedSearch={this.props.searchingAdvancedSearch}
-            toggleActor={this.props.toggleActor}
-            withActors={this.props.withActors}
-            clearWithActors={this.props.clearWithActors}
-          />
         </div>
+        {this.props.renderCurrentlyChosenContent &&
+          this.props.renderCurrentlyChosenContent(this.updateContentInDbClient)}
       </div>
     )
   }

@@ -70,7 +70,11 @@ class ShowsButtons extends Component {
               type="button"
               onClick={() => {
                 if (this.props.authUser) {
-                  this.props.handleShowInDatabases(Number(id), infoToPass, "notWatchingShows")
+                  this.props.handleShowInDatabases({
+                    id: Number(id),
+                    data: infoToPass,
+                    database: "notWatchingShows"
+                  })
                   // this.props.removeWatchingShow(Number(id))
                 } else {
                   this.context.toggleContentLS(Number(id), "watchingShows")
@@ -86,7 +90,11 @@ class ShowsButtons extends Component {
               onClick={() => {
                 if (this.props.authUser) {
                   // this.props.addWatchingShow(Number(id), infoToPass)
-                  this.props.handleShowInDatabases(Number(id), infoToPass, "watchingShows")
+                  this.props.handleShowInDatabases({
+                    id: Number(id),
+                    data: infoToPass,
+                    database: "watchingShows"
+                  })
                 } else {
                   this.context.toggleContentLS(Number(id), "watchingShows", infoToPass)
                 }
@@ -110,14 +118,11 @@ class ShowsButtons extends Component {
               })}
               type="button"
               onClick={() => {
-                this.props.handleShowInDatabases(Number(id), infoToPass, "droppedShows")
-                // this.props.addShowToSubDatabase(
-                //   Number(id),
-                //   infoToPass,
-                //   "droppedShows",
-                //   this.props.showInDatabase
-                // )
-
+                this.props.handleShowInDatabases({
+                  id: Number(id),
+                  data: infoToPass,
+                  database: "droppedShows"
+                })
                 this.showDissableBtnWarning("dropBtn")
               }}
             >
@@ -138,13 +143,11 @@ class ShowsButtons extends Component {
               })}
               type="button"
               onClick={() => {
-                this.props.handleShowInDatabases(Number(id), infoToPass, "willWatchShows")
-                // this.props.addShowToSubDatabase(
-                //   Number(id),
-                //   infoToPass,
-                //   "willWatchShows",
-                //   this.props.showInDatabase
-                // )
+                this.props.handleShowInDatabases({
+                  id: Number(id),
+                  data: infoToPass,
+                  database: "willWatchShows"
+                })
                 this.showDissableBtnWarning("willWatchBtn")
               }}
             >

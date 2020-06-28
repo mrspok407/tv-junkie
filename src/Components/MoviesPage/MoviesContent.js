@@ -89,8 +89,15 @@ class MoviesContent extends Component {
     )
   }
 
-  loadNewContent = () => {
+  loadNewContent = ({ itemsToLoad = moviesToLoad }) => {
     if (this.props.authUser === null) return
+    if (
+      this.state.disableLoad[this.state.activeSection] ||
+      this.state.loadingContent ||
+      document.body.scrollHeight < 1400
+    )
+      return
+
     this.setState({
       loadingContent: true
     })
@@ -98,7 +105,7 @@ class MoviesContent extends Component {
     this.props.firebase[this.state.activeSection](this.props.authUser.uid)
       .orderByChild(this.state.sortBy)
       .startAt(this.state.lastLoadedMovie[this.state.activeSection] + 1)
-      .limitToFirst(moviesToLoad)
+      .limitToFirst(itemsToLoad)
       .once("value", snapshot => {
         let movies = []
         snapshot.forEach(item => {
@@ -130,15 +137,8 @@ class MoviesContent extends Component {
   }
 
   handleScroll = throttle(500, () => {
-    if (
-      this.state.disableLoad[this.state.activeSection] ||
-      this.state.loadingContent ||
-      document.body.scrollHeight < 1400
-    )
-      return
-
     if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 100) {
-      this.loadNewContent()
+      this.loadNewContent({ itemsToLoad: moviesToLoad })
     }
   })
 
@@ -343,7 +343,12 @@ class MoviesContent extends Component {
                     className="button--del-item"
                     onClick={() => {
                       if (this.props.authUser) {
-                        this.props.toggleWatchLaterMovie(item.id, [item], "watchLaterMovies")
+                        this.props.toggleWatchLaterMovie({
+                          id: item.id,
+                          data: item,
+                          database: "watchLaterMovies"
+                        })
+                        this.loadNewContent({ itemsToLoad: 1 })
                         this.handleMoviesOnClient(item.id)
                       } else {
                         this.context.toggleContentLS(item.id, "watchLaterMovies", movies)

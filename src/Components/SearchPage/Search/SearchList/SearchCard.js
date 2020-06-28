@@ -23,14 +23,18 @@ class SearchCard extends Component {
             })}
             onClick={() => {
               if (this.props.authUser) {
-                this.props.toggleWatchLaterMovie(this.props.id, searchResults, "watchLaterMovies")
+                this.props.toggleWatchLaterMovie({
+                  id: this.props.id,
+                  data: searchResults,
+                  database: "watchLaterMovies"
+                })
                 this.props.updateContentInDbClient(this.props.id, searchResults)
               } else {
                 this.context.toggleContentLS(this.props.id, "watchLaterMovies", searchResults)
               }
 
               if (
-                !this.state.contentInDatabase === "watchLaterMovies" ||
+                !this.props.contentInDatabase.some(item => item.id === this.props.id) ||
                 this.props.currentlyChosenContent.find(item => item.id === this.props.id)
               ) {
                 this.props.toggleCurrentlyChosenContent(this.props.id, searchResults)
@@ -47,11 +51,16 @@ class SearchCard extends Component {
                 className="button button--search-card button--pressed"
                 onClick={() => {
                   if (this.props.authUser) {
-                    this.props.handleShowInDatabases(this.props.id, searchResults, "notWatchingShows")
+                    this.props.handleShowInDatabases({
+                      id: this.props.id,
+                      data: searchResults,
+                      database: "notWatchingShows"
+                    })
                     this.props.updateContentInDbClient(this.props.id, searchResults)
                   } else {
                     this.context.toggleContentLS(this.props.id, "watchingShows")
                   }
+                  this.props.toggleCurrentlyChosenContent(this.props.id, searchResults)
                 }}
                 type="button"
                 disabled={this.state.loadingDataFromDatabase}
@@ -63,7 +72,11 @@ class SearchCard extends Component {
                 className="button button--search-card"
                 onClick={() => {
                   if (this.props.authUser) {
-                    this.props.handleShowInDatabases(this.props.id, searchResults, "watchingShows")
+                    this.props.handleShowInDatabases({
+                      id: this.props.id,
+                      data: searchResults,
+                      database: "watchingShows"
+                    })
                     this.props.updateContentInDbClient(this.props.id, searchResults)
                   } else {
                     this.context.toggleContentLS(this.props.id, "watchingShows", searchResults)

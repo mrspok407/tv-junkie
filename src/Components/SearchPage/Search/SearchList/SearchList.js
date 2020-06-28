@@ -3,7 +3,7 @@ import React, { Component } from "react"
 import SearchCard from "./SearchCard"
 import "./SearchList.scss"
 
-export default class MovieList extends Component {
+export default class SearchList extends Component {
   componentDidMount() {
     document.addEventListener("mousedown", this.props.handleClickOutside)
   }

@@ -3,12 +3,14 @@ import axios, { CancelToken } from "axios"
 import { throttle } from "throttle-debounce"
 // import { compose } from "recompose"
 import Search from "./Search/Search"
+import AdvancedSearch from "Components/SearchPage/Search/AdvancedSearch/AdvancedSearch"
 import AdvSearchResults from "./AdvSearchResults/SearchResults/SearchResults"
-import ContentResultsSelected from "./AdvSearchResults/SelectedContent/SelectedContent"
+import SelectedContent from "./AdvSearchResults/SelectedContent/SelectedContent"
 import PlaceholderNoResults from "Components/Placeholders/PlaceholderNoResults"
 // import { withUserContent } from "Components/UserContent"
 import ScrollToTop from "Utils/ScrollToTop"
 import Header from "Components/Header/Header"
+import "./SearchPage.scss"
 
 const LOCAL_STORAGE_KEY_ADV = "advancedSearchContent"
 const LOCAL_STORAGE_KEY_ACTORS = "addedActors"
@@ -19,7 +21,7 @@ const LOCAL_STORAGE_KEY_TOTALPAGES = "totalPages"
 const currentYear = new Date().getFullYear()
 
 let cancelRequestAdvSearch
-class MainPage extends Component {
+class SearchPage extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -327,28 +329,48 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
     )
   }
 
+  renderCurrentlyChosenContent = callback => (
+    <>
+      {this.state.currentlyChosenContent.length > 0 && (
+        <SelectedContent
+          currentlyChosenContent={this.state.currentlyChosenContent}
+          toggleCurrentlyChosenContent={this.toggleCurrentlyChosenContent}
+          updateContentInDbClient={callback}
+        />
+      )}
+    </>
+  )
+
   render() {
     return (
       <>
         <Header clearCurrentlyChosenContent={this.clearCurrentlyChosenContent} />
-        <Search
-          handleClickOutside={this.handleClickOutside}
-          onSearch={this.handleSearch}
-          searchingAdvancedSearch={this.state.searchingAdvancedSearch}
-          toggleActor={this.toggleActor}
-          withActors={this.state.withActors}
-          advancedSearch={this.advancedSearch}
-          clearWithActors={this.clearWithActors}
-          toggleCurrentlyChosenContent={this.toggleCurrentlyChosenContent}
-          currentlyChosenContent={this.state.currentlyChosenContent}
-        />
+        <div className="search-page__search">
+          <Search
+            searchingAdvancedSearch={this.state.searchingAdvancedSearch}
+            toggleActor={this.toggleActor}
+            withActors={this.state.withActors}
+            advancedSearch={this.advancedSearch}
+            clearWithActors={this.clearWithActors}
+            toggleCurrentlyChosenContent={this.toggleCurrentlyChosenContent}
+            currentlyChosenContent={this.state.currentlyChosenContent}
+            renderCurrentlyChosenContent={this.renderCurrentlyChosenContent}
+          />
+          <AdvancedSearch
+            advancedSearch={this.advancedSearch}
+            searchingAdvancedSearch={this.state.searchingAdvancedSearch}
+            toggleActor={this.toggleActor}
+            withActors={this.state.withActors}
+            clearWithActors={this.clearWithActors}
+          />
+        </div>
         {this.renderAdvMovies()}
-        {this.state.currentlyChosenContent.length > 0 && (
+        {/* {this.state.currentlyChosenContent.length > 0 && (
           <ContentResultsSelected
             currentlyChosenContent={this.state.currentlyChosenContent}
             toggleCurrentlyChosenContent={this.toggleCurrentlyChosenContent}
           />
-        )}
+        )} */}
 
         <ScrollToTop />
         {/* <Footer /> */}
@@ -357,4 +379,4 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
   }
 }
 
-export default MainPage
+export default SearchPage

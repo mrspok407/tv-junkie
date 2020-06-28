@@ -105,6 +105,13 @@ class ShowsContent extends Component {
 
   loadNewContent = () => {
     if (this.props.authUser === null) return
+    if (
+      this.state.disableLoad[this.state.activeSection] ||
+      this.state.loadingContent ||
+      document.body.scrollHeight < 1400
+    )
+      return
+
     this.setState({
       loadingContent: true
     })
@@ -142,13 +149,6 @@ class ShowsContent extends Component {
   }
 
   handleScroll = throttle(500, () => {
-    if (
-      this.state.disableLoad[this.state.activeSection] ||
-      this.state.loadingContent ||
-      document.body.scrollHeight < 1400
-    )
-      return
-
     if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 100) {
       this.loadNewContent()
     }
@@ -166,6 +166,7 @@ class ShowsContent extends Component {
   }
 
   updateWatchingShowsDatabase = () => {
+    console.log("updateWatchingShowsDatabase")
     const activeSectionSavedState = this.state.database[this.state.activeSection]
     const watchingShowsSavedState = this.state.database.watchingShows
 
@@ -288,12 +289,12 @@ class ShowsContent extends Component {
                         className="button"
                         onClick={() => {
                           if (this.props.authUser) {
-                            this.props.handleShowInDatabases(
-                              item.id,
-                              [item],
-                              "notWatchingShows",
-                              this.updateWatchingShowsDatabase
-                            )
+                            this.props.handleShowInDatabases({
+                              id: item.id,
+                              data: item,
+                              database: "notWatchingShows",
+                              callback: this.updateWatchingShowsDatabase
+                            })
                             this.handleShowsOnClient(item.id)
                           } else {
                             this.context.toggleContentLS(item.id, "watchingShows")
@@ -309,12 +310,12 @@ class ShowsContent extends Component {
                       <button
                         className="button"
                         onClick={() => {
-                          this.props.handleShowInDatabases(
-                            item.id,
-                            [item],
-                            "watchingShows",
-                            this.updateWatchingShowsDatabase
-                          )
+                          this.props.handleShowInDatabases({
+                            id: item.id,
+                            data: item,
+                            database: "watchingShows",
+                            callback: this.updateWatchingShowsDatabase
+                          })
                           this.handleShowsOnClient(item.id)
                         }}
                         type="button"
