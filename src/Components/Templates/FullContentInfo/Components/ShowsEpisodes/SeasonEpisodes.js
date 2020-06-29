@@ -1,10 +1,10 @@
 import React, { Component } from "react"
 import { differenceBtwDatesInDays } from "Utils"
 import classNames from "classnames"
-import Loader from "Components//Placeholders/Loader"
 
 export default class SeasonEpisodes extends Component {
   render() {
+    console.log(this.props.showEpisodesDatabase)
     return (
       <div className="full-detailes__episodes-list">
         {this.props.showEpisodes.map(item => {
@@ -62,12 +62,6 @@ export default class SeasonEpisodes extends Component {
                         }
                   }
                 >
-                  {this.props.authUser && (
-                    <div className="div">
-                      <Loader className="loader--small-pink" />
-                    </div>
-                  )}
-
                   <div className="full-detailes__episode-date">{episodeAirDate}</div>
                   <div className="full-detailes__episode-name">
                     <span className="full-detailes__episode-number">{episode.episode_number}.</span>
@@ -77,6 +71,28 @@ export default class SeasonEpisodes extends Component {
                     <div className="full-detailes__episode-when-new-episode">{daysToNewEpisode} days</div>
                   )}
                 </div>
+
+                {this.props.authUser && this.props.showInDatabase && (
+                  <div className="full-detailes__episode-checkbox">
+                    <label>
+                      <input
+                        type="checkbox"
+                        checked={
+                          this.props.showEpisodesDatabase[this.props.season.season_number - 1].episodes[
+                            episode.episode_number - 1
+                          ].watched
+                        }
+                        onChange={() =>
+                          this.props.toggleWatchedEpisode(
+                            this.props.season.season_number,
+                            episode.episode_number
+                          )
+                        }
+                      />
+                      <span className="custom-checkmark" />
+                    </label>
+                  </div>
+                )}
 
                 {this.props.detailEpisodeInfo.includes(episode.id) && (
                   <div

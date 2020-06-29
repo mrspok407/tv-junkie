@@ -166,7 +166,6 @@ class ShowsContent extends Component {
   }
 
   updateWatchingShowsDatabase = () => {
-    console.log("updateWatchingShowsDatabase")
     const activeSectionSavedState = this.state.database[this.state.activeSection]
     const watchingShowsSavedState = this.state.database.watchingShows
 
@@ -179,8 +178,6 @@ class ShowsContent extends Component {
         snapshot.forEach(item => {
           watchingShows = [...watchingShows, item.val()]
         })
-
-        console.log(snapshot.val())
 
         this.setState(prevState => ({
           database: {

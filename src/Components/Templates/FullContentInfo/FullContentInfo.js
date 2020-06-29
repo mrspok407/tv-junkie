@@ -48,6 +48,11 @@ function FullContentInfo({
   const [similarContent, setSimilarContent] = useState([])
 
   const [loadingPage, setLoadingPage] = useState(true)
+  const [loadingFromDatabase, setLoadingFromDatabase] = useState(false)
+  const [showInDatabase, setShowInDatabase] = useState({ database: null, show: null })
+  const [showEpisodesDatabase, setShowEpisodesDatabase] = useState([])
+
+  const [movieInDatabase, setMovieInDatabase] = useState(null)
 
   const [infoToPass, setInfoToPass] = useState([])
 
@@ -61,21 +66,28 @@ function FullContentInfo({
 
   useEffect(() => {
     if (mediaType === "show") {
-      console.log("test")
       getFullShowInfo()
+      getShowInDatabase()
     } else if (mediaType === "movie") {
       getFullMovieInfo()
+      getMovieInDatabase()
     }
 
     return () => {
       if (cancelRequest !== undefined) {
         cancelRequest()
       }
-      // firebase.watchingShows(authUser.uid).off()
-      // firebase.notWatchingShows(authUser.uid).off()
-      // firebase.droppedShows(authUser.uid).off()
-      // firebase.willWatchShows(authUser.uid).off()
+      firebase.watchingShows(authUser.uid).off()
+      firebase.notWatchingShows(authUser.uid).off()
+      firebase.droppedShows(authUser.uid).off()
+      firebase.willWatchShows(authUser.uid).off()
       firebase.watchLaterMovies(authUser.uid).off()
+
+      setShowInDatabase({ database: null, show: null })
+
+      const showEpisodesKey = showInDatabase.show && showInDatabase.show.showEpisodesKey
+
+      firebase.watchingShowsAllEpisodes(authUser.uid, showEpisodesKey).off()
     }
   }, [mediaType, id])
 
@@ -357,36 +369,73 @@ function FullContentInfo({
       })
   }
 
-  // const renderTest = id => {
-  //   console.log(userContent)
-  //   const test = userContent.watchingShows
-  //   const fffff = test.find(item => item.id === Number(id)) || {}
+  const getShowInDatabase = () => {
+    if (!authUser) return
+    setLoadingFromDatabase(true)
 
-  //   // const name = test.name
+    let counter = 0
 
-  //   console.log(fffff)
+    console.log(Number(id))
 
-  //   return <div>{fffff.episodes && fffff.episodes.map(item => item.map(item => <div>{item.name}</div>))}</div>
-  // }
+    userContent.showsDatabases.forEach(item => {
+      firebase[item](authUser.uid)
+        .orderByChild("id")
+        .equalTo(Number(id))
+        .on("value", snapshot => {
+          counter++
 
-  // const showInDb = userContent.watchingShows.find(item => item.id === Number(id))
+          if (snapshot.val() !== null) {
+            let show = {}
 
-  // const getMovieInDatabase = () => {
-  //   firebase
-  //     .watchLaterMovies(authUser.uid)
-  //     .orderByChild("id")
-  //     .equalTo(Number(id))
-  //     .on("value", snapshot => {
-  //       const movie = snapshot.val()
-  //         ? Object.keys(snapshot.val()).map(key => ({
-  //             ...snapshot.val()[key]
-  //           }))
-  //         : []
+            Object.keys(snapshot.val()).forEach(key => {
+              show = { ...snapshot.val()[key], key }
+            })
 
-  //       setMovieInDatabase(movie[0])
-  //       console.log(movie[0])
-  //     })
-  // }
+            setShowInDatabase({ database: item, show })
+            console.log(showInDatabase)
+          }
+
+          if (counter === userContent.showsDatabases.length) {
+            setLoadingFromDatabase(false)
+            console.log(showInDatabase)
+          }
+        })
+    })
+  }
+
+  useEffect(() => {
+    if (!authUser) return
+
+    console.log(showInDatabase)
+    const showEpisodesKey = showInDatabase.show && showInDatabase.show.showEpisodesKey
+
+    firebase.watchingShowsAllEpisodes(authUser.uid, showEpisodesKey).on("value", snapshot => {
+      if (snapshot.val() !== null) {
+        setShowEpisodesDatabase(snapshot.val())
+      }
+    })
+  }, [showInDatabase])
+
+  const getMovieInDatabase = () => {
+    if (!authUser) return
+    setLoadingFromDatabase(true)
+
+    userContent.moviesDatabases.forEach(item => {
+      firebase[item](authUser.uid)
+        .orderByChild("id")
+        .equalTo(Number(id))
+        .on("value", snapshot => {
+          if (snapshot.val() !== null) {
+            setMovieInDatabase(item)
+          } else {
+            setMovieInDatabase(null)
+          }
+          setLoadingFromDatabase(false)
+        })
+    })
+  }
+
+  console.log(showEpisodesDatabase)
 
   return (
     <>
@@ -396,7 +445,7 @@ function FullContentInfo({
           <div className="full-detailes__error">
             <h1>{error}</h1>
           </div>
-        ) : !loadingPage ? (
+        ) : !loadingPage && !loadingFromDatabase ? (
           <div className="full-detailes">
             <PosterWrapper
               poster={detailes.poster}
@@ -423,6 +472,10 @@ function FullContentInfo({
               imdbId={detailes.imdbId}
               id={id}
               infoToPass={infoToPass}
+              showInDatabase={showInDatabase}
+              showEpisodesDatabase={showEpisodesDatabase}
+              getShowInDatabase={getShowInDatabase}
+              movieInDatabase={movieInDatabase}
             />
 
             <div className="full-detailes__description">{detailes.description}</div>
@@ -434,6 +487,8 @@ function FullContentInfo({
                   showTitle={detailes.title}
                   todayDate={todayDate}
                   id={id}
+                  showInDatabase={showInDatabase}
+                  showEpisodesDatabase={showEpisodesDatabase}
                 />
                 {/* {showInDb ? (
                   <ShowsEpisodesAuthUser

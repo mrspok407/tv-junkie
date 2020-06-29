@@ -74,12 +74,37 @@ const withUserContent = Component => {
 
             Object.entries(mergedRowData).forEach(([key, value]) => {
               if (!key.indexOf("season/")) {
+                // Firebase can't handle "/" in database
                 const newKey = key.replace("/", "")
                 seasonsData.push({ [newKey]: { ...value } })
               }
             })
 
-            const allEpisodes = seasonsData
+            let allEpisodes = []
+
+            seasonsData.forEach((item, index) => {
+              const season = item[`season${index + 1}`]
+              let episodes = []
+
+              season.episodes.forEach(item => {
+                const updatedEpisode = {
+                  air_date: item.air_date,
+                  episode_number: item.episode_number,
+                  name: item.name,
+                  season_number: item.season_number,
+                  watched: false
+                }
+                episodes.push(updatedEpisode)
+              })
+
+              const updatedSeason = {
+                air_date: season.air_date,
+                season_number: season.season_number,
+                episodes
+              }
+
+              allEpisodes.push(updatedSeason)
+            })
 
             const newShowRef = this.firebase[database](this.userUid).push()
             const newShowEpisodesRef = this.firebase.userContentEpisodes(this.userUid).push()
@@ -104,12 +129,12 @@ const withUserContent = Component => {
                   })
               })
 
-            // newShowEpisodesRef.set({
-            //   showName: showToAdd.original_name,
-            //   episodes: allEpisodes,
-            //   showKey,
-            //   showEpisodesKey
-            // })
+            newShowEpisodesRef.set({
+              showName: show.original_name,
+              episodes: allEpisodes,
+              showKey,
+              showEpisodesKey
+            })
           })
         )
         .catch(err => {

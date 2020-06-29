@@ -14,31 +14,12 @@ class ShowsButtons extends Component {
   }
 
   componentDidMount() {
-    this.getShowInDatabase()
+    // this.getShowInDatabase()
     document.addEventListener("mousedown", this.handleClickOutside)
   }
 
   componentWillUnmount() {
     document.removeEventListener("mousedown", this.handleClickOutside)
-    this.props.firebase.watchingShows(this.props.authUser.uid).off()
-    this.props.firebase.notWatchingShows(this.props.authUser.uid).off()
-    this.props.firebase.droppedShows(this.props.authUser.uid).off()
-    this.props.firebase.willWatchShows(this.props.authUser.uid).off()
-  }
-
-  getShowInDatabase = () => {
-    this.props.userContent.showsDatabases.forEach(item => {
-      this.props.firebase[item](this.props.authUser.uid)
-        .orderByChild("id")
-        .equalTo(Number(this.props.id))
-        .on("value", snapshot => {
-          if (snapshot.val() !== null) {
-            this.setState({
-              showInDatabase: item
-            })
-          }
-        })
-    })
   }
 
   handleClickOutside = e => {
@@ -59,12 +40,12 @@ class ShowsButtons extends Component {
 
   render() {
     const { id, authUser, infoToPass } = this.props
+    console.log(this.props.showInDatabase.database)
 
     return (
       <div className="buttons__row">
         <div className="buttons__col">
-          {/* {watchingShows.some(item => item.id === Number(id) && item.userWatching) ? ( */}
-          {this.state.showInDatabase === "watchingShows" ? (
+          {this.props.showInDatabase.database === "watchingShows" ? (
             <button
               className="button button--pressed"
               type="button"
@@ -73,9 +54,9 @@ class ShowsButtons extends Component {
                   this.props.handleShowInDatabases({
                     id: Number(id),
                     data: infoToPass,
-                    database: "notWatchingShows"
+                    database: "notWatchingShows",
+                    callback: !this.props.showInDatabase.show ? this.props.getShowInDatabase : () => {}
                   })
-                  // this.props.removeWatchingShow(Number(id))
                 } else {
                   this.context.toggleContentLS(Number(id), "watchingShows")
                 }
@@ -89,11 +70,11 @@ class ShowsButtons extends Component {
               type="button"
               onClick={() => {
                 if (this.props.authUser) {
-                  // this.props.addWatchingShow(Number(id), infoToPass)
                   this.props.handleShowInDatabases({
                     id: Number(id),
                     data: infoToPass,
-                    database: "watchingShows"
+                    database: "watchingShows",
+                    callback: !this.props.showInDatabase.show ? this.props.getShowInDatabase : () => {}
                   })
                 } else {
                   this.context.toggleContentLS(Number(id), "watchingShows", infoToPass)
@@ -113,7 +94,7 @@ class ShowsButtons extends Component {
           <div className="buttons__col">
             <button
               className={classNames("button", {
-                "button--pressed": this.state.showInDatabase === "droppedShows",
+                "button--pressed": this.props.showInDatabase.database === "droppedShows",
                 "button--not-logged-in": !authUser
               })}
               type="button"
@@ -121,7 +102,8 @@ class ShowsButtons extends Component {
                 this.props.handleShowInDatabases({
                   id: Number(id),
                   data: infoToPass,
-                  database: "droppedShows"
+                  database: "droppedShows",
+                  callback: !this.props.showInDatabase.show ? this.props.getShowInDatabase : () => {}
                 })
                 this.showDissableBtnWarning("dropBtn")
               }}
@@ -138,7 +120,7 @@ class ShowsButtons extends Component {
           <div className="buttons__col">
             <button
               className={classNames("button", {
-                "button--pressed": this.state.showInDatabase === "willWatchShows",
+                "button--pressed": this.props.showInDatabase.database === "willWatchShows",
                 "button--not-logged-in": !authUser
               })}
               type="button"
@@ -146,7 +128,8 @@ class ShowsButtons extends Component {
                 this.props.handleShowInDatabases({
                   id: Number(id),
                   data: infoToPass,
-                  database: "willWatchShows"
+                  database: "willWatchShows",
+                  callback: !this.props.showInDatabase.show ? this.props.getShowInDatabase : () => {}
                 })
                 this.showDissableBtnWarning("willWatchBtn")
               }}

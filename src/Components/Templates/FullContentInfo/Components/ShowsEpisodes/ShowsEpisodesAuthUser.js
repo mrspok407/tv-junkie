@@ -6,65 +6,6 @@ import classNames from "classnames"
 import SeasonEpisodes from "./SeasonEpisodes"
 
 class ShowsEpisodesAuthUser extends Component {
-  componentDidMount() {
-    this.testFun()
-  }
-
-  testFun = () => {
-    axios
-      .get(
-        `https://api.themoviedb.org/3/tv/${this.props.id}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US`
-      )
-      .then(({ data: { number_of_seasons } }) => {
-        const maxSeasonsInChunk = 20
-        const allSeasons = []
-        const seasonChunks = []
-        const apiRequests = []
-
-        for (let i = 1; i <= number_of_seasons; i += 1) {
-          allSeasons.push(`season/${i}`)
-        }
-
-        for (let i = 0; i <= allSeasons.length; i += maxSeasonsInChunk) {
-          const chunk = allSeasons.slice(i, i + maxSeasonsInChunk)
-          seasonChunks.push(chunk.join())
-        }
-
-        seasonChunks.forEach(item => {
-          const request = axios.get(
-            `https://api.themoviedb.org/3/tv/${this.props.id}?api_key=${process.env.REACT_APP_TMDB_API}&append_to_response=${item}`
-          )
-          apiRequests.push(request)
-        })
-
-        return axios.all([...apiRequests])
-      })
-      .then(
-        axios.spread((...responses) => {
-          const rowData = []
-          const seasonsData = []
-
-          responses.forEach(item => {
-            rowData.push(item.data)
-          })
-
-          const mergedRowData = Object.assign({}, ...rowData)
-
-          Object.entries(mergedRowData).forEach(([key, value]) => {
-            if (!key.indexOf("season/")) {
-              const newKey = key.replace("/", "")
-              seasonsData.push({ [newKey]: { ...value } })
-            }
-          })
-
-          console.log(seasonsData)
-        })
-      )
-      .catch(err => {
-        console.log(err)
-      })
-  }
-
   render() {
     return (
       <>

@@ -73,18 +73,18 @@ class Firebase {
   willWatchShows = uid => this.db.ref(`users/${uid}/content/shows/info/willWatchShows`)
   watchLaterMovies = uid => this.db.ref(`users/${uid}/content/movies/watchLaterMovies`)
 
-  watchingShowsEpisode = (userUid, showKey, seasonNum, episodeNum) =>
+  watchingShowsEpisode = (userUid, showEpisodesKey, seasonNum, episodeNum) =>
     this.db.ref(
-      `users/${userUid}/content/shows/episodes/${showKey}/list/${seasonNum}/season${seasonNum +
-        1}/episodes/${episodeNum}`
+      `users/${userUid}/content/shows/episodes/${showEpisodesKey}/episodes/${seasonNum -
+        1}/episodes/${episodeNum - 1}`
     )
 
-  watchingShowsAllEpisodes = (userUid, showKey) =>
-    this.db.ref(`users/${userUid}/content/shows/episodes/${showKey}/list`)
+  watchingShowsAllEpisodes = (userUid, showEpisodesKey) =>
+    this.db.ref(`users/${userUid}/content/shows/episodes/${showEpisodesKey}/episodes`)
 
-  watchingShowsAllSeasonEpisodes = (userUid, showKey, seasonNum) =>
+  watchingShowsAllSeasonEpisodes = (userUid, showEpisodesKey, seasonNum) =>
     this.db.ref(
-      `users/${userUid}/content/shows/episodes/${showKey}/list/${seasonNum}/season${seasonNum + 1}/episodes`
+      `users/${userUid}/content/shows/episodes/${showEpisodesKey}/episodes/${seasonNum - 1}/episodes`
     )
 }
 

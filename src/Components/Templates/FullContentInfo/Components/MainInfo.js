@@ -15,24 +15,24 @@ class MainInfo extends Component {
   }
 
   componentDidMount() {
-    this.getMovieInDatabase()
+    // this.getMovieInDatabase()
   }
 
   componentWillUnmount() {
-    this.props.firebase.watchLaterMovies(this.props.authUser.uid).off()
+    // this.props.firebase.watchLaterMovies(this.props.authUser.uid).off()
   }
 
-  getMovieInDatabase = () => {
-    this.props.firebase
-      .watchLaterMovies(this.props.authUser.uid)
-      .orderByChild("id")
-      .equalTo(Number(this.props.id))
-      .on("value", snapshot => {
-        this.setState({
-          movieInDatabase: snapshot.val()
-        })
-      })
-  }
+  // getMovieInDatabase = () => {
+  //   this.props.firebase
+  //     .watchLaterMovies(this.props.authUser.uid)
+  //     .orderByChild("id")
+  //     .equalTo(Number(this.props.id))
+  //     .on("value", snapshot => {
+  //       this.setState({
+  //         movieInDatabase: snapshot.val()
+  //       })
+  //     })
+  // }
 
   render() {
     const yearRelease = this.props.releaseDate.slice(0, 4)
@@ -149,19 +149,16 @@ class MainInfo extends Component {
               id={this.props.id}
               userContent={this.props.userContent}
               authUser={this.props.authUser}
-              addWatchingShow={this.props.addWatchingShow}
-              removeWatchingShow={this.props.removeWatchingShow}
-              addShowToSubDatabase={this.props.addShowToSubDatabase}
               infoToPass={this.props.infoToPass}
               showInDatabase={this.props.showInDatabase}
-              handleShowInDatabases={this.props.handleShowInDatabases}
+              getShowInDatabase={this.props.getShowInDatabase}
             />
           )}
 
           {this.props.mediaType === "movie" && (
             <button
               className={classNames("button", {
-                "button--pressed": this.state.movieInDatabase
+                "button--pressed": this.props.movieInDatabase === "watchLaterMovies"
               })}
               onClick={() => {
                 if (this.props.authUser) {
@@ -180,7 +177,7 @@ class MainInfo extends Component {
               }}
               type="button"
             >
-              {this.state.movieInDatabase ? "Remove" : "Watch later"}
+              {this.props.movieInDatabase === "watchLaterMovies" ? "Remove" : "Watch later"}
             </button>
           )}
         </div>
