@@ -1,8 +1,6 @@
 import React, { Component } from "react"
 import { withUserContent } from "Components/UserContent"
 import axios, { CancelToken } from "axios"
-import ShowsEpisodesAuthUser from "./ShowsEpisodesAuthUser"
-import ShowsEpisodesNotAuthUser from "./ShowsEpisodesNotAuthUser"
 import { differenceBtwDatesInDays } from "Utils"
 import Loader from "Components//Placeholders/Loader"
 import classNames from "classnames"
@@ -25,6 +23,7 @@ class ShowsEpisodes extends Component {
 
   componentDidMount() {
     this._isMounted = true
+    this.initialFirstSeasonLoad()
   }
 
   componentWillUnmount() {
@@ -35,6 +34,49 @@ class ShowsEpisodes extends Component {
     const showEpisodesKey = this.props.showInDatabase.show && this.props.showInDatabase.show.showEpisodesKey
 
     this.props.firebase.watchingShowsAllEpisodes(this.props.authUser.uid, showEpisodesKey).off()
+  }
+
+  initialFirstSeasonLoad = () => {
+    console.log(this.props.seasonsArr)
+    const firstSeason = this.props.seasonsArr.find(item => item.season_number === 1)
+
+    this.setState({
+      openSeasons: firstSeason && [firstSeason.id]
+    })
+
+    axios
+      .get(
+        `https://api.themoviedb.org/3/tv/${this.props.id}/season/${firstSeason.season_number}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US`,
+        {
+          cancelToken: new CancelToken(function executor(c) {
+            cancelRequest = c
+          })
+        }
+      )
+      .then(({ data: { episodes } }) => {
+        if (!this._isMounted) return
+
+        const episodesReverse = episodes.reverse()
+
+        this.setState(prevState => ({
+          showEpisodes: [
+            ...prevState.showEpisodes,
+            {
+              seasonId: firstSeason.id,
+              episodes: episodesReverse
+            }
+          ],
+          loadingEpisodesIds: [...prevState.loadingEpisodesIds.filter(item => item !== firstSeason.id)],
+          errorShowEpisodes: ""
+        }))
+      })
+      .catch(err => {
+        if (axios.isCancel(err) || !this._isMounted) return
+        this.setState({
+          loadingEpisodesIds: [],
+          errorShowEpisodes: "Something went wrong, sorry"
+        })
+      })
   }
 
   showSeasonsEpisode = (seasonId, seasonNum) => {
@@ -95,18 +137,6 @@ class ShowsEpisodes extends Component {
     }
   }
 
-  // showSeasonsEpisodeAuthUser = seasonId => {
-  //   if (this.state.openSeasons.includes(seasonId)) {
-  //     this.setState(prevState => ({
-  //       openSeasons: [...prevState.openSeasons.filter(item => item !== seasonId)]
-  //     }))
-  //   } else {
-  //     this.setState(prevState => ({
-  //       openSeasons: [...prevState.openSeasons, seasonId]
-  //     }))
-  //   }
-  // }
-
   toggleWatchedEpisode = (seasonNum, episodeNum) => {
     if (!this.props.authUser) return
 
@@ -154,8 +184,19 @@ class ShowsEpisodes extends Component {
   }
 
   render() {
+    const showCheckboxes =
+      this.props.authUser &&
+      this.props.showInDatabase.show &&
+      this.props.showInDatabase.database !== "notWatchingShows"
     return (
       <>
+        {showCheckboxes && (
+          <div className="full-detailes__check-all-episodes">
+            <button type="button" className="button" onClick={() => this.checkEveryShowEpisode()}>
+              Check all episodes
+            </button>
+          </div>
+        )}
         <div className="full-detailes__seasons-and-episodes">
           {this.props.seasonsArr.map(season => {
             if (season.season_number === 0 || season.name === "Specials" || !season.air_date) return null
@@ -220,22 +261,17 @@ class ShowsEpisodes extends Component {
                               backgroundImage: `url(https://image.tmdb.org/t/p/w500/${season.poster_path})`
                             }}
                           />
-                          <div className="full-detailes__check-everything">
-                            <button
-                              type="button"
-                              className="button"
-                              onClick={() => this.checkEverySeasonEpisode(season.season_number)}
-                            >
-                              Check everything
-                            </button>
-                            <button
-                              type="button"
-                              className="button"
-                              onClick={() => this.checkEveryShowEpisode()}
-                            >
-                              Check all
-                            </button>
-                          </div>
+                          {showCheckboxes && (
+                            <div className="full-detailes__check-season-episodes">
+                              <button
+                                type="button"
+                                className="button"
+                                onClick={() => this.checkEverySeasonEpisode(season.season_number)}
+                              >
+                                Check all
+                              </button>
+                            </div>
+                          )}
                         </div>
                       )}
                       <SeasonEpisodes
@@ -247,9 +283,10 @@ class ShowsEpisodes extends Component {
                         season={season}
                         seasonId={seasonId}
                         authUser={this.props.authUser}
-                        showInDatabase={this.props.showInDatabase.show}
+                        showInDatabase={this.props.showInDatabase}
                         showEpisodesDatabase={this.props.showEpisodesDatabase}
                         toggleWatchedEpisode={this.toggleWatchedEpisode}
+                        loadingFromDatabase={this.props.loadingFromDatabase}
                       />
                     </>
                   ) : !this.state.errorShowEpisodes ? (

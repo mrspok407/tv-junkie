@@ -9,30 +9,8 @@ class MainInfo extends Component {
   constructor(props) {
     super(props)
 
-    this.state = {
-      movieInDatabase: null
-    }
+    this.state = {}
   }
-
-  componentDidMount() {
-    // this.getMovieInDatabase()
-  }
-
-  componentWillUnmount() {
-    // this.props.firebase.watchLaterMovies(this.props.authUser.uid).off()
-  }
-
-  // getMovieInDatabase = () => {
-  //   this.props.firebase
-  //     .watchLaterMovies(this.props.authUser.uid)
-  //     .orderByChild("id")
-  //     .equalTo(Number(this.props.id))
-  //     .on("value", snapshot => {
-  //       this.setState({
-  //         movieInDatabase: snapshot.val()
-  //       })
-  //     })
-  // }
 
   render() {
     const yearRelease = this.props.releaseDate.slice(0, 4)
@@ -152,16 +130,19 @@ class MainInfo extends Component {
               infoToPass={this.props.infoToPass}
               showInDatabase={this.props.showInDatabase}
               getShowInDatabase={this.props.getShowInDatabase}
+              changeShowDatabaseOnClient={this.props.changeShowDatabaseOnClient}
+              showDatabaseOnClient={this.props.showDatabaseOnClient}
             />
           )}
 
           {this.props.mediaType === "movie" && (
             <button
               className={classNames("button", {
-                "button--pressed": this.props.movieInDatabase === "watchLaterMovies"
+                "button--pressed": this.props.movieDatabaseOnClient === "watchLaterMovies"
               })}
               onClick={() => {
                 if (this.props.authUser) {
+                  this.props.changeMovieDatabaseOnClient("watchLaterMovies")
                   this.props.toggleWatchLaterMovie({
                     id: Number(this.props.id),
                     data: this.props.infoToPass,
@@ -177,7 +158,7 @@ class MainInfo extends Component {
               }}
               type="button"
             >
-              {this.props.movieInDatabase === "watchLaterMovies" ? "Remove" : "Watch later"}
+              {this.props.movieDatabaseOnClient === "watchLaterMovies" ? "Remove" : "Watch later"}
             </button>
           )}
         </div>

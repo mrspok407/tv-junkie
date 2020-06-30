@@ -37,11 +37,17 @@ $mobileLayout: 850px;
   transform: translate3d(0, 0, 0);
   transition: 500ms;
   cursor: pointer;
+  @include mediaMaxW($mobileLayout) {
+    grid-template-columns: repeat($itemsInSlider, calc(200px * 0.65));
+  }
 
   &__item-wrapper {
     padding: 5px;
     height: calc(var(--sliderWidth) / var(--itemWidth) * 1.5);
     align-self: center;
+    @include mediaMaxW($mobileLayout) {
+      height: 200px;
+    }
   }
 
   &__item {

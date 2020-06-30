@@ -4,6 +4,12 @@ import classNames from "classnames"
 
 export default class SeasonEpisodes extends Component {
   render() {
+    const showCheckboxes =
+      this.props.authUser &&
+      this.props.showInDatabase.show &&
+      this.props.showInDatabase.database !== "notWatchingShows" &&
+      this.props.showEpisodesDatabase
+
     console.log(this.props.showEpisodesDatabase)
     return (
       <div className="full-detailes__episodes-list">
@@ -72,7 +78,7 @@ export default class SeasonEpisodes extends Component {
                   )}
                 </div>
 
-                {this.props.authUser && this.props.showInDatabase && (
+                {showCheckboxes && daysToNewEpisode < 0 && (
                   <div className="full-detailes__episode-checkbox">
                     <label>
                       <input

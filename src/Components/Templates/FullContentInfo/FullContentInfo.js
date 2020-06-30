@@ -50,9 +50,11 @@ function FullContentInfo({
   const [loadingPage, setLoadingPage] = useState(true)
   const [loadingFromDatabase, setLoadingFromDatabase] = useState(false)
   const [showInDatabase, setShowInDatabase] = useState({ database: null, show: null })
+  const [showDatabaseOnClient, setShowDatabaseOnClient] = useState(null)
   const [showEpisodesDatabase, setShowEpisodesDatabase] = useState([])
 
   const [movieInDatabase, setMovieInDatabase] = useState(null)
+  const [movieDatabaseOnClient, setMovieDatabaseOnClient] = useState(null)
 
   const [infoToPass, setInfoToPass] = useState([])
 
@@ -90,119 +92,6 @@ function FullContentInfo({
       firebase.watchingShowsAllEpisodes(authUser.uid, showEpisodesKey).off()
     }
   }, [mediaType, id])
-
-  // const getFullContentInfo = mediaType => {
-  //   const contentType = mediaType === "show" ? "tv" : "movie"
-  //   setLoadingPage(true)
-
-  //   axios
-  //     .get(
-  //       `https://api.themoviedb.org/3/${contentType}/${id}?api_key=${
-  //         process.env.REACT_APP_TMDB_API
-  //       }&language=en-US&append_to_response=${contentType === "tv" ? "similar" : "similar_movies"}`,
-  //       {
-  //         cancelToken: new CancelToken(function executor(c) {
-  //           cancelRequest = c
-  //         })
-  //       }
-  //     )
-  //     .then(
-  //       ({
-  //         data,
-  //         data: {
-  //           poster_path,
-  //           backdrop_path,
-  //           original_title,
-  //           original_name,
-  //           title,
-  //           name,
-  //           release_date,
-  //           first_air_date,
-  //           last_air_date,
-  //           runtime,
-  //           episode_run_rime,
-  //           status,
-  //           genres,
-  //           production_companies,
-  //           networks,
-  //           number_of_seasons,
-  //           seasons,
-  //           vote_average,
-  //           vote_count,
-  //           overview,
-  //           tagline,
-  //           budget,
-  //           imdb_id,
-  //           similar_movies,
-  //           similar
-  //         }
-  //       }) => {
-  //         const contentGenres =
-  //           contentType === "movie" ? genres.map(item => item.name).join(", ") : genres.map(item => item.id)
-
-  //         const genresIds = contentGenres.map(item => item.id) || []
-
-  //         const prodComp =
-  //           production_companies.length === 0 || !production_companies ? "-" : production_companies[0].name
-
-  //         const networkNames = networks && networks.length ? networks.map(item => item.name).join(", ") : "-"
-
-  //         // const similarContent = similar_movies.results
-  //         //   .filter(item => item.poster_path)
-  //         //   .sort((a, b) => b.vote_count - a.vote_count)
-
-  //         console.log(similarContent)
-
-  //         // setInfoToPass([
-  //         //   {
-  //         //     title,
-  //         //     name,
-  //         //     original_title,
-  //         //     original_name,
-  //         //     id: data.id,
-  //         //     release_date,
-  //         //     first_air_date,
-  //         //     vote_average,
-  //         //     genre_ids: genresIds,
-  //         //     overview,
-  //         //     backdrop_path,
-  //         //     poster_path,
-  //         //     vote_count
-  //         //   }
-  //         // ])
-
-  //         setDetailes({
-  //           poster: poster_path,
-  //           posterMobile: backdrop_path,
-  //           title: title || original_title || name || original_name || "-",
-  //           releaseDate: release_date || first_air_date || "-",
-  //           lastAirDate: last_air_date || "-",
-  //           runtime: runtime || episode_run_rime[0] || "-",
-  //           status: status || "-",
-  //           genres: contentGenres || "-",
-  //           productionCompany: prodComp,
-  //           network: networkNames || "-",
-  //           rating: vote_average || "-",
-  //           description: overview || "-",
-  //           numberOfSeasons: number_of_seasons || "-",
-  //           tagline: tagline || "-",
-  //           budget: budget || "-",
-  //           imdbId: imdb_id || "",
-  //           seasonsArr: seasons.reverse()
-  //         })
-
-  //         console.log("test")
-
-  //         setSimilarContent(similarContent)
-  //         setLoadingPage(false)
-  //       }
-  //     )
-  //     .catch(err => {
-  //       if (axios.isCancel(err)) return
-  //       setError("Something went wrong, sorry")
-  //       setLoadingPage(false)
-  //     })
-  // }
 
   const getFullShowInfo = () => {
     setLoadingPage(true)
@@ -375,45 +264,56 @@ function FullContentInfo({
 
     let counter = 0
 
-    console.log(Number(id))
-
     userContent.showsDatabases.forEach(item => {
       firebase[item](authUser.uid)
         .orderByChild("id")
         .equalTo(Number(id))
-        .on("value", snapshot => {
-          counter++
+        .on(
+          "value",
+          snapshot => {
+            counter++
 
-          if (snapshot.val() !== null) {
-            let show = {}
+            if (snapshot.val() !== null) {
+              let show = {}
 
-            Object.keys(snapshot.val()).forEach(key => {
-              show = { ...snapshot.val()[key], key }
-            })
+              Object.keys(snapshot.val()).forEach(key => {
+                show = { ...snapshot.val()[key], key }
+              })
 
-            setShowInDatabase({ database: item, show })
-            console.log(showInDatabase)
+              setShowInDatabase({ database: item, show })
+              console.log(showInDatabase)
+            }
+
+            if (counter === userContent.showsDatabases.length) {
+              setLoadingFromDatabase(false)
+            }
+          },
+          error => {
+            console.log(`Error in database occured. ${error}`)
+
+            setShowDatabaseOnClient(showInDatabase.database)
           }
-
-          if (counter === userContent.showsDatabases.length) {
-            setLoadingFromDatabase(false)
-            console.log(showInDatabase)
-          }
-        })
+        )
     })
+  }
+
+  const changeShowDatabaseOnClient = database => {
+    setShowDatabaseOnClient(database)
   }
 
   useEffect(() => {
     if (!authUser) return
 
-    console.log(showInDatabase)
     const showEpisodesKey = showInDatabase.show && showInDatabase.show.showEpisodesKey
 
     firebase.watchingShowsAllEpisodes(authUser.uid, showEpisodesKey).on("value", snapshot => {
-      if (snapshot.val() !== null) {
-        setShowEpisodesDatabase(snapshot.val())
-      }
+      // if (snapshot.val() !== null) {
+      console.log("test")
+      setShowEpisodesDatabase(snapshot.val())
+      // }
     })
+
+    setShowDatabaseOnClient(showInDatabase.database)
   }, [showInDatabase])
 
   const getMovieInDatabase = () => {
@@ -424,18 +324,36 @@ function FullContentInfo({
       firebase[item](authUser.uid)
         .orderByChild("id")
         .equalTo(Number(id))
-        .on("value", snapshot => {
-          if (snapshot.val() !== null) {
-            setMovieInDatabase(item)
-          } else {
-            setMovieInDatabase(null)
+        .on(
+          "value",
+          snapshot => {
+            if (snapshot.val() !== null) {
+              setMovieInDatabase(item)
+            } else {
+              setMovieInDatabase(null)
+            }
+            setLoadingFromDatabase(false)
+          },
+          error => {
+            console.log(`Error in database occured. ${error}`)
+
+            setMovieDatabaseOnClient(movieInDatabase)
           }
-          setLoadingFromDatabase(false)
-        })
+        )
     })
   }
 
-  console.log(showEpisodesDatabase)
+  useEffect(() => {
+    setMovieDatabaseOnClient(movieInDatabase)
+  }, [movieInDatabase])
+
+  const changeMovieDatabaseOnClient = database => {
+    if (movieDatabaseOnClient === "watchLaterMovies") {
+      setMovieDatabaseOnClient(null)
+    } else {
+      setMovieDatabaseOnClient(database)
+    }
+  }
 
   return (
     <>
@@ -475,6 +393,10 @@ function FullContentInfo({
               showInDatabase={showInDatabase}
               showEpisodesDatabase={showEpisodesDatabase}
               getShowInDatabase={getShowInDatabase}
+              changeShowDatabaseOnClient={changeShowDatabaseOnClient}
+              changeMovieDatabaseOnClient={changeMovieDatabaseOnClient}
+              showDatabaseOnClient={showDatabaseOnClient}
+              movieDatabaseOnClient={movieDatabaseOnClient}
               movieInDatabase={movieInDatabase}
             />
 
@@ -490,22 +412,6 @@ function FullContentInfo({
                   showInDatabase={showInDatabase}
                   showEpisodesDatabase={showEpisodesDatabase}
                 />
-                {/* {showInDb ? (
-                  <ShowsEpisodesAuthUser
-                    episodes={showInDb.episodes}
-                    seasonsArr={detailes.seasonsArr}
-                    showTitle={detailes.title}
-                    todayDate={todayDate}
-                    id={id}
-                  />
-                ) : (
-                  <ShowsEpisodes
-                    seasonsArr={detailes.seasonsArr}
-                    todayDate={todayDate}
-                    id={id}
-                    showTitle={detailes.title}
-                  />
-                )} */}
               </>
             )}
             {similarContent.length > 0 && (

@@ -28,6 +28,9 @@ $font-sizes: (
   max-width: $maxContainerWidth;
   width: 100%;
   padding-bottom: 100px;
+  @include mediaMaxW($maxContainerWidth) {
+    padding: 0px 15px 100px 15px;
+  }
   @include mediaMaxW(#{$mobileViewPort}) {
     padding: 0px 15px 100px 15px;
   }
@@ -170,6 +173,19 @@ $font-sizes: (
       grid-column: inherit;
     }
   }
+
+  &__check-all-episodes {
+    grid-column: 1 / 2;
+    margin-bottom: -30px;
+  }
+
+  &__check-season-episodes {
+    margin-top: 10px;
+    @include mediaMaxW(#{$mobileViewPort}) {
+      margin-top: 0px;
+    }
+  }
+
   &__season {
     position: relative;
     display: grid;
@@ -185,10 +201,6 @@ $font-sizes: (
     }
 
     &-poster-wrapper {
-      display: grid;
-      grid-template-rows: 80% 10% 10%;
-      row-gap: 10px;
-      max-height: 363px;
     }
 
     &-poster {
