@@ -59,6 +59,11 @@ class Firebase {
 
   timeStamp = () => database.ServerValue.TIMESTAMP
 
+  /// Shows In Database ///
+  allShowsList = subDatabase => this.db.ref(`allShowsList/${subDatabase}`)
+  showInfo = (subDatabase, showKey) => this.db.ref(`allShowsList/${subDatabase}/${showKey}/info`)
+  showEpisodes = (subDatabase, showKey) => this.db.ref(`allShowsList/${subDatabase}/${showKey}/episodes`)
+
   /// Users API ///
   user = uid => this.db.ref(`users/${uid}`)
   users = () => this.db.ref("users")
@@ -68,6 +73,13 @@ class Firebase {
   userContentShows = uid => this.db.ref(`users/${uid}/content/shows/info`)
   userContentEpisodes = uid => this.db.ref(`users/${uid}/content/shows/episodes`)
   watchingShows = uid => this.db.ref(`users/${uid}/content/shows/info/watchingShows/`)
+
+  userShows = (uid, subDatabase) => this.db.ref(`users/${uid}/content/shows/${subDatabase}`)
+  userShowInfo = (uid, showKey, subDatabase) =>
+    this.db.ref(`users/${uid}/content/shows/${subDatabase}/${showKey}/info`)
+  userShowEpisodes = (uid, showKey, subDatabase) =>
+    this.db.ref(`users/${uid}/content/shows/${subDatabase}/${showKey}/episodes`)
+
   notWatchingShows = uid => this.db.ref(`users/${uid}/content/shows/info/notWatchingShows/`)
   droppedShows = uid => this.db.ref(`users/${uid}/content/shows/info/droppedShows`)
   willWatchShows = uid => this.db.ref(`users/${uid}/content/shows/info/willWatchShows`)

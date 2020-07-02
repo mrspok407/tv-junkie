@@ -144,7 +144,8 @@ function FullContentInfo({
               overview,
               backdrop_path,
               poster_path,
-              vote_count
+              vote_count,
+              status
             }
           ])
 
