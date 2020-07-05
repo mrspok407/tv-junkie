@@ -61,16 +61,17 @@ class Search extends Component {
           return 1
         })
 
-        const databases = ["watchLaterMovies", "watchingShows"]
+        const databases = ["watchLaterMovies", "userShows"]
         const contentInDatabase = []
         let counter = 0
 
         if (contentSortByPopularity.length !== 0) {
           databases.forEach(database => {
             contentSortByPopularity.forEach(content => {
-              this.props.firebase[database](this.props.authUser.uid)
-                .orderByChild("id")
-                .equalTo(content.id)
+              this.props.firebase[database](this.props.authUser.uid, "watchingShows")
+                // .orderByChild("id")
+                // .equalTo(content.id)
+                .child(content.id)
                 .once("value", snapshot => {
                   counter++
 

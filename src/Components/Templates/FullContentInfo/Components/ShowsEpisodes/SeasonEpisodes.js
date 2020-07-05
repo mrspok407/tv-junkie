@@ -6,11 +6,14 @@ export default class SeasonEpisodes extends Component {
   render() {
     const showCheckboxes =
       this.props.authUser &&
-      this.props.showInDatabase.show &&
+      this.props.showInDatabase.info &&
       this.props.showInDatabase.database !== "notWatchingShows" &&
-      this.props.showEpisodesDatabase
+      this.props.showEpisodesDatabase &&
+      this.props.showEpisodesDatabase.length > 0 &&
+      true
 
     console.log(this.props.showEpisodesDatabase)
+    console.log(this.props.showInDatabase)
     return (
       <div className="full-detailes__episodes-list">
         {this.props.showEpisodes.map(item => {
@@ -78,7 +81,7 @@ export default class SeasonEpisodes extends Component {
                   )}
                 </div>
 
-                {showCheckboxes && daysToNewEpisode < 0 && (
+                {showCheckboxes && daysToNewEpisode < 0 && episode.air_date && (
                   <div className="full-detailes__episode-checkbox">
                     <label>
                       <input

@@ -31,9 +31,10 @@ class ShowsEpisodes extends Component {
     if (cancelRequest !== undefined) {
       cancelRequest()
     }
-    const showEpisodesKey = this.props.showInDatabase.show && this.props.showInDatabase.show.showEpisodesKey
 
-    this.props.firebase.watchingShowsAllEpisodes(this.props.authUser.uid, showEpisodesKey).off()
+    this.props.firebase
+      .userShowAllEpisodes(this.props.authUser.uid, this.props.id, this.props.showInDatabase.database)
+      .off()
   }
 
   initialFirstSeasonLoad = () => {
@@ -140,17 +141,23 @@ class ShowsEpisodes extends Component {
   toggleWatchedEpisode = (seasonNum, episodeNum) => {
     if (!this.props.authUser) return
 
-    const show = this.props.showInDatabase.show
+    const show = this.props.showInDatabase
+
+    // this.props.firebase
+    //   .watchingShowsEpisode(this.props.authUser.uid, show.showEpisodesKey, seasonNum, episodeNum)
+    //   .update({
+    //     watched: !this.props.showEpisodesDatabase[seasonNum - 1].episodes[episodeNum - 1].watched
+    //   })
 
     this.props.firebase
-      .watchingShowsEpisode(this.props.authUser.uid, show.showEpisodesKey, seasonNum, episodeNum)
+      .userShowSingleEpisode(this.props.authUser.uid, show.info.id, show.database, seasonNum, episodeNum)
       .update({
         watched: !this.props.showEpisodesDatabase[seasonNum - 1].episodes[episodeNum - 1].watched
       })
   }
 
   checkEverySeasonEpisode = seasonNum => {
-    const show = this.props.showInDatabase.show || {}
+    const show = this.props.showInDatabase
     const seasonEpisodes = this.props.showEpisodesDatabase[seasonNum - 1].episodes
     const isAllEpisodesChecked = !this.props.showEpisodesDatabase[seasonNum - 1].episodes.some(
       item => item.watched === false
@@ -161,12 +168,12 @@ class ShowsEpisodes extends Component {
     })
 
     this.props.firebase
-      .watchingShowsAllSeasonEpisodes(this.props.authUser.uid, show.showEpisodesKey, seasonNum)
+      .userShowSeason(this.props.authUser.uid, show.info.id, show.database, seasonNum)
       .set(seasonEpisodes)
   }
 
   checkEveryShowEpisode = () => {
-    const show = this.props.showInDatabase.show || {}
+    const show = this.props.showInDatabase
     const allEpisodes = this.props.showEpisodesDatabase
     let isAllEpisodesChecked
 
@@ -179,14 +186,14 @@ class ShowsEpisodes extends Component {
     })
 
     this.props.firebase
-      .watchingShowsAllEpisodes(this.props.authUser.uid, show.showEpisodesKey)
+      .userShowAllEpisodes(this.props.authUser.uid, show.info.id, show.database)
       .set(allEpisodes)
   }
 
   render() {
     const showCheckboxes =
       this.props.authUser &&
-      this.props.showInDatabase.show &&
+      this.props.showInDatabase.info &&
       this.props.showInDatabase.database !== "notWatchingShows"
     return (
       <>
@@ -298,37 +305,6 @@ class ShowsEpisodes extends Component {
             )
           })}
         </div>
-        {/* {this.props.showInDatabase.show ? (
-          <ShowsEpisodesAuthUser
-            openSeasons={this.state.openSeasons}
-            detailEpisodeInfo={this.state.detailEpisodeInfo}
-            showEpisodeInfo={this.showEpisodeInfo}
-            toggleWatchedEpisode={this.toggleWatchedEpisode}
-            checkEverySeasonEpisode={this.checkEverySeasonEpisode}
-            checkEveryShowEpisode={this.checkEveryShowEpisode}
-            showSeasonsEpisodeAuthUser={this.showSeasonsEpisodeAuthUser}
-            showEpisodes={this.state.showEpisodes}
-            showInDb={this.props.showInDatabase.show}
-            seasonsArr={this.props.seasonsArr}
-            showTitle={this.props.showTitle}
-            todayDate={this.props.todayDate}
-            id={this.props.id}
-          />
-        ) : (
-          <ShowsEpisodesNotAuthUser
-            openSeasons={this.state.openSeasons}
-            detailEpisodeInfo={this.state.detailEpisodeInfo}
-            loadingEpisodesIds={this.state.loadingEpisodesIds}
-            showEpisodes={this.state.showEpisodes}
-            errorShowEpisodes={this.state.errorShowEpisodes}
-            showEpisodeInfo={this.showEpisodeInfo}
-            showSeasonsEpisode={this.showSeasonsEpisode}
-            seasonsArr={this.props.seasonsArr}
-            showTitle={this.props.showTitle}
-            todayDate={this.props.todayDate}
-            id={this.props.id}
-          />
-        )} */}
       </>
     )
   }

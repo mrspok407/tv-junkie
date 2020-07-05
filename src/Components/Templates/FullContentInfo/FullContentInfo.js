@@ -13,6 +13,7 @@ import ShowsEpisodes from "./Components/ShowsEpisodes/ShowsEpisodes"
 import PosterWrapper from "./Components/PosterWrapper"
 import "./FullContentInfo.scss"
 import { withUserContent } from "Components/UserContent"
+import { Children } from "react"
 
 const todayDate = new Date()
 let cancelRequest
@@ -49,7 +50,7 @@ function FullContentInfo({
 
   const [loadingPage, setLoadingPage] = useState(true)
   const [loadingFromDatabase, setLoadingFromDatabase] = useState(false)
-  const [showInDatabase, setShowInDatabase] = useState({ database: null, show: null })
+  const [showInDatabase, setShowInDatabase] = useState({ database: null, info: null })
   const [showDatabaseOnClient, setShowDatabaseOnClient] = useState(null)
   const [showEpisodesDatabase, setShowEpisodesDatabase] = useState([])
 
@@ -79,17 +80,16 @@ function FullContentInfo({
       if (cancelRequest !== undefined) {
         cancelRequest()
       }
-      firebase.watchingShows(authUser.uid).off()
-      firebase.notWatchingShows(authUser.uid).off()
-      firebase.droppedShows(authUser.uid).off()
-      firebase.willWatchShows(authUser.uid).off()
+      userContent.showsDatabases.forEach(database => {
+        firebase.userShows(authUser.uid, database).off()
+        firebase.userShowAllEpisodes(authUser.uid, id, database).off()
+      })
+
       firebase.watchLaterMovies(authUser.uid).off()
 
-      setShowInDatabase({ database: null, show: null })
-
-      const showEpisodesKey = showInDatabase.show && showInDatabase.show.showEpisodesKey
-
-      firebase.watchingShowsAllEpisodes(authUser.uid, showEpisodesKey).off()
+      setShowInDatabase({ database: null, info: null })
+      setShowEpisodesDatabase(null)
+      setShowDatabaseOnClient(null)
     }
   }, [mediaType, id])
 
@@ -265,23 +265,26 @@ function FullContentInfo({
 
     let counter = 0
 
-    userContent.showsDatabases.forEach(item => {
-      firebase[item](authUser.uid)
-        .orderByChild("id")
-        .equalTo(Number(id))
+    userContent.showsDatabases.forEach(database => {
+      counter++
+
+      firebase
+        .userShows(authUser.uid, database)
+        .child(Number(id))
         .on(
           "value",
           snapshot => {
-            counter++
-
             if (snapshot.val() !== null) {
+              console.log(snapshot.val())
               let show = {}
 
               Object.keys(snapshot.val()).forEach(key => {
                 show = { ...snapshot.val()[key], key }
               })
 
-              setShowInDatabase({ database: item, show })
+              setShowInDatabase({ database, info: show })
+              setShowEpisodesDatabase(snapshot.val().episodes)
+              setShowDatabaseOnClient(database)
               console.log(showInDatabase)
             }
 
@@ -302,20 +305,18 @@ function FullContentInfo({
     setShowDatabaseOnClient(database)
   }
 
-  useEffect(() => {
-    if (!authUser) return
+  // useEffect(() => {
+  //   if (!authUser) return
 
-    const showEpisodesKey = showInDatabase.show && showInDatabase.show.showEpisodesKey
+  //   console.log(showInDatabase)
 
-    firebase.watchingShowsAllEpisodes(authUser.uid, showEpisodesKey).on("value", snapshot => {
-      // if (snapshot.val() !== null) {
-      console.log("test")
-      setShowEpisodesDatabase(snapshot.val())
-      // }
-    })
+  //   firebase.userShowAllEpisodes(authUser.uid, id, showInDatabase.database).once("value", snapshot => {
+  //     console.log(snapshot.val())
+  //     setShowEpisodesDatabase(snapshot.val())
+  //   })
 
-    setShowDatabaseOnClient(showInDatabase.database)
-  }, [showInDatabase])
+  //   setShowDatabaseOnClient(showInDatabase.database)
+  // }, [showInDatabase])
 
   const getMovieInDatabase = () => {
     if (!authUser) return
@@ -323,8 +324,7 @@ function FullContentInfo({
 
     userContent.moviesDatabases.forEach(item => {
       firebase[item](authUser.uid)
-        .orderByChild("id")
-        .equalTo(Number(id))
+        .child(Number(id))
         .on(
           "value",
           snapshot => {

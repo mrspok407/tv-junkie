@@ -72,32 +72,41 @@ class Firebase {
   userContent = uid => this.db.ref(`users/${uid}/content`)
   userContentShows = uid => this.db.ref(`users/${uid}/content/shows/info`)
   userContentEpisodes = uid => this.db.ref(`users/${uid}/content/shows/episodes`)
-  watchingShows = uid => this.db.ref(`users/${uid}/content/shows/info/watchingShows/`)
+  // watchingShows = uid => this.db.ref(`users/${uid}/content/shows/info/watchingShows/`)
 
   userShows = (uid, subDatabase) => this.db.ref(`users/${uid}/content/shows/${subDatabase}`)
   userShowInfo = (uid, showKey, subDatabase) =>
     this.db.ref(`users/${uid}/content/shows/${subDatabase}/${showKey}/info`)
-  userShowEpisodes = (uid, showKey, subDatabase) =>
+  userShowAllEpisodes = (uid, showKey, subDatabase) =>
     this.db.ref(`users/${uid}/content/shows/${subDatabase}/${showKey}/episodes`)
 
-  notWatchingShows = uid => this.db.ref(`users/${uid}/content/shows/info/notWatchingShows/`)
-  droppedShows = uid => this.db.ref(`users/${uid}/content/shows/info/droppedShows`)
-  willWatchShows = uid => this.db.ref(`users/${uid}/content/shows/info/willWatchShows`)
+  userShowSingleEpisode = (uid, showKey, subDatabase, seasonNum, episodeNum) =>
+    this.db.ref(
+      `users/${uid}/content/shows/${subDatabase}/${showKey}/episodes/${seasonNum - 1}/episodes/${episodeNum -
+        1}`
+    )
+
+  userShowSeason = (uid, showKey, subDatabase, seasonNum) =>
+    this.db.ref(`users/${uid}/content/shows/${subDatabase}/${showKey}/episodes/${seasonNum - 1}/episodes`)
+
+  // notWatchingShows = uid => this.db.ref(`users/${uid}/content/shows/info/notWatchingShows/`)
+  // droppedShows = uid => this.db.ref(`users/${uid}/content/shows/info/droppedShows`)
+  // willWatchShows = uid => this.db.ref(`users/${uid}/content/shows/info/willWatchShows`)
   watchLaterMovies = uid => this.db.ref(`users/${uid}/content/movies/watchLaterMovies`)
 
-  watchingShowsEpisode = (userUid, showEpisodesKey, seasonNum, episodeNum) =>
-    this.db.ref(
-      `users/${userUid}/content/shows/episodes/${showEpisodesKey}/episodes/${seasonNum -
-        1}/episodes/${episodeNum - 1}`
-    )
+  // watchingShowsEpisode = (userUid, showEpisodesKey, seasonNum, episodeNum) =>
+  //   this.db.ref(
+  //     `users/${userUid}/content/shows/episodes/${showEpisodesKey}/episodes/${seasonNum -
+  //       1}/episodes/${episodeNum - 1}`
+  //   )
 
-  watchingShowsAllEpisodes = (userUid, showEpisodesKey) =>
-    this.db.ref(`users/${userUid}/content/shows/episodes/${showEpisodesKey}/episodes`)
+  // watchingShowsAllEpisodes = (userUid, showEpisodesKey) =>
+  //   this.db.ref(`users/${userUid}/content/shows/episodes/${showEpisodesKey}/episodes`)
 
-  watchingShowsAllSeasonEpisodes = (userUid, showEpisodesKey, seasonNum) =>
-    this.db.ref(
-      `users/${userUid}/content/shows/episodes/${showEpisodesKey}/episodes/${seasonNum - 1}/episodes`
-    )
+  // watchingShowsAllSeasonEpisodes = (userUid, showEpisodesKey, seasonNum) =>
+  //   this.db.ref(
+  //     `users/${userUid}/content/shows/episodes/${showEpisodesKey}/episodes/${seasonNum - 1}/episodes`
+  //   )
 }
 
 export default Firebase

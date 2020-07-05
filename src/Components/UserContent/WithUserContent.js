@@ -34,10 +34,10 @@ const withUserContent = Component => {
       }
     }
 
-    addShowToUserDatabase = ({ id, show, database }) => {
-      axios
+    getShowEpisodes = ({ id }) => {
+      const promise = axios
         .get(`https://api.themoviedb.org/3/tv/${id}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US`)
-        .then(({ data: { number_of_seasons, status } }) => {
+        .then(({ data: { number_of_seasons } }) => {
           const maxSeasonsInChunk = 20
           const allSeasons = []
           const seasonChunks = []
@@ -106,263 +106,89 @@ const withUserContent = Component => {
               allEpisodes.push(updatedSeason)
             })
 
-            // const showRefUser = this.firebase.userShows(this.userUid, database).push()
-            // const showKey = showRefUser.key
-
-            // const allShowsListSubDatabase =
-            //   mergedRowData.status === "Ended" || mergedRowData.status === "Canceled" ? "ended" : "ongoing"
-            // const showRefDatabase = this.firebase.allShowsList(allShowsListSubDatabase).push()
-            // const showRefDatabaseKey = showRefDatabase.key
-
-            // showRefUser
-            //   .set({
-            //     info: {
-            //       ...show,
-            //       showKey,
-            //       showKeyDatabase: showRefDatabaseKey,
-            //       timeStamp: this.firebase.timeStamp(),
-            //       status: mergedRowData.status
-            //     },
-            //     episodes: {
-            //       ...allEpisodes
-            //     },
-            //     id: show.id
-            //   })
-            //   .then(() => {
-            //     this.firebase
-            //       .userShows(this.userUid, database)
-            //       .child(showKey)
-            //       .once("value", snapshot => {
-            //         console.log(snapshot.val())
-            //         const negativeTimestamp = snapshot.val().info.timeStamp * -1
-            //         this.firebase
-            //           // .userShows(this.userUid, database)
-            //           // .child(showKey)
-            //           // .child("info")
-            //           .userShowInfo(this.userUid, showKey, database)
-            //           .update({ timeStamp: negativeTimestamp }) // The negative time stamp needed for easier des order, cause firebase only provide as order
-            //       })
-            //   })
-
-            this.addShowToDatabase({
-              id,
-              show,
+            const dataToPass = {
               episodes: allEpisodes,
-              userDatabase: database,
               status: mergedRowData.status
-            })
+            }
 
-            // showRefDatabase.set({
-            //   info: {
-            //     ...show,
-            //     status: mergedRowData.status
-            //   },
-            //   episodes: {
-            //     ...allEpisodes
-            //   },
-            //   id: show.id
-            // })
+            return dataToPass
           })
         )
         .catch(err => {
           console.log(err)
         })
+
+      return promise
     }
 
-    addShowToDatabase = ({ id, show, episodes, userDatabase, status }) => {
-      const showRefUser = this.firebase.userShows(this.userUid, userDatabase).push()
-      const showKey = showRefUser.key
+    addShowToDatabase = ({ id, show, userDatabase }) => {
+      this.getShowEpisodes({ id }).then(data => {
+        const allShowsListSubDatabase =
+          data.status === "Ended" || data.status === "Canceled" ? "ended" : "ongoing"
 
-      const allShowsListSubDatabase = status === "Ended" || status === "Canceled" ? "ended" : "ongoing"
+        this.firebase
+          .userShows(this.userUid, userDatabase)
+          .child(id)
+          .set({
+            info: {
+              ...show,
+              timeStamp: this.firebase.timeStamp(),
+              status: data.status
+            },
+            episodes: data.episodes,
+            id
+          })
+          .then(() => {
+            this.firebase
+              .userShows(this.userUid, userDatabase)
+              .child(id)
+              .once("value", snapshot => {
+                console.log(snapshot.val())
+                const negativeTimestamp = snapshot.val().info.timeStamp * -1
+                this.firebase
+                  .userShowInfo(this.userUid, id, userDatabase)
+                  .update({ timeStamp: negativeTimestamp }) // The negative time stamp needed for easier des order, cause firebase only provide as order
+              })
+          })
 
-      showRefUser
-        .set({
-          info: {
-            ...show,
-            showKey,
-            timeStamp: this.firebase.timeStamp(),
-            status
-          },
-          episodes,
-          id
-        })
-        .then(() => {
-          this.firebase
-            .userShows(this.userUid, userDatabase)
-            .child(showKey)
-            .once("value", snapshot => {
-              console.log(snapshot.val())
-              const negativeTimestamp = snapshot.val().info.timeStamp * -1
-              this.firebase
-                // .userShows(this.userUid, database)
-                // .child(showKey)
-                // .child("info")
-                .userShowInfo(this.userUid, showKey, userDatabase)
-                .update({ timeStamp: negativeTimestamp }) // The negative time stamp needed for easier des order, cause firebase only provide as order
-            })
-        })
-
-      this.firebase
-        .allShowsList(allShowsListSubDatabase)
-        .child(id)
-        .transaction(
-          snapshot => {
-            if (snapshot === null) {
-              const showRefDatabase = this.firebase.allShowsList(allShowsListSubDatabase).push()
-              const showRefDatabaseKey = showRefDatabase.key
-              return {
-                info: {
-                  ...show,
-                  status
-                },
-                episodes,
-                id
+        this.firebase
+          .allShowsList(allShowsListSubDatabase)
+          .child(id)
+          .transaction(
+            snapshot => {
+              if (snapshot === null) {
+                return {
+                  info: {
+                    ...show,
+                    status: data.status
+                  },
+                  episodes: data.episodes,
+                  id,
+                  usersWatching: 1
+                }
+              } else {
+                console.log("allready exists")
+                return
               }
-            } else {
-              console.log("allready exists")
-              return
+            },
+            (error, committed, snapshot) => {
+              if (error) {
+                console.log("Transaction failed abnormally!", error)
+              } else if (!committed) {
+                console.log("We aborted the transaction (because allready exists).")
+                this.firebase
+                  .allShowsList(allShowsListSubDatabase)
+                  .child(id)
+                  .update({
+                    usersWatching: snapshot.val().usersWatching + 1
+                  })
+              } else {
+                console.log("added!")
+              }
+              console.log("show's data: ", snapshot.val())
             }
-          },
-          (error, committed, snapshot) => {
-            if (error) {
-              console.log("Transaction failed abnormally!", error)
-            } else if (!committed) {
-              console.log("We aborted the transaction (because allready exists).")
-              let show = {}
-
-              Object.keys(snapshot.val()).forEach(key => {
-                show = { ...snapshot.val()[key], key }
-              })
-
-              this.firebase.userShowInfo(this.userUid, showKey, userDatabase).update({ showKeyDatabase: id })
-            } else {
-              console.log("added!")
-
-              let show = {}
-
-              Object.keys(snapshot.val()).forEach(key => {
-                show = { ...snapshot.val()[key], key }
-              })
-
-              this.firebase.userShowInfo(this.userUid, showKey, userDatabase).update({ showKeyDatabase: id })
-            }
-            console.log("show's data: ", snapshot.val())
-          }
-        )
-
-      // this.firebase
-      //   .allShowsList(allShowsListSubDatabase)
-      //   .orderByChild("id")
-      //   .equalTo(id)
-      //   .once("value", snapshot => {
-      //     if (snapshot.val() !== null) {
-      //       let show = {}
-
-      //       Object.keys(snapshot.val()).forEach(key => {
-      //         show = { ...snapshot.val()[key], key }
-      //       })
-
-      //       this.firebase
-      //         .userShowInfo(this.userUid, showKey, userDatabase)
-      //         .update({ showKeyDatabase: show.key })
-      //     } else {
-      //       const showRefDatabase = this.firebase.allShowsList(allShowsListSubDatabase).push({}, error => {
-      //         if (error) {
-      //           console.log("error")
-      //         } else {
-      //           console.log(showRefDatabase.key)
-      //           console.log("pushed")
-
-      //           this.firebase
-      //             .allShowsList(allShowsListSubDatabase)
-      //             .child(showRefDatabase.key)
-      //             .transaction(
-      //               snapshot => {
-      //                 console.log(snapshot)
-      //                 if (snapshot === null) {
-      //                   // const showRefDatabase = this.firebase.allShowsList(allShowsListSubDatabase).push()
-      //                   // const showRefDatabaseKey = showRefDatabase.key
-      //                   return {
-      //                     info: {
-      //                       ...show,
-      //                       status
-      //                     },
-      //                     episodes,
-      //                     id
-      //                   }
-      //                 } else {
-      //                   console.log("allready exists")
-      //                   return
-      //                 }
-      //               },
-      //               (error, committed, snapshot) => {
-      //                 if (error) {
-      //                   console.log("Transaction failed abnormally!", error)
-      //                 } else if (!committed) {
-      //                   console.log("We aborted the transaction (because allready exists).")
-      //                   let show = {}
-
-      //                   Object.keys(snapshot.val()).forEach(key => {
-      //                     show = { ...snapshot.val()[key], key }
-      //                   })
-
-      //                   this.firebase
-      //                     .userShowInfo(this.userUid, showKey, userDatabase)
-      //                     .update({ showKeyDatabase: showRefDatabase.key })
-      //                 } else {
-      //                   console.log("added!")
-
-      //                   let show = {}
-
-      //                   Object.keys(snapshot.val()).forEach(key => {
-      //                     show = { ...snapshot.val()[key], key }
-      //                   })
-
-      //                   this.firebase
-      //                     .userShowInfo(this.userUid, showKey, userDatabase)
-      //                     .update({ showKeyDatabase: showRefDatabase.key })
-      //                 }
-      //                 console.log("show's data: ", snapshot.val())
-      //               }
-      //             )
-      //         }
-      //       })
-      //       // const showRefDatabaseKey = showRefDatabase.key
-
-      //       // showRefDatabase.transaction(snapshot => {})
-
-      //       // showRefDatabase
-      //       //   .set({
-      //       //     info: {
-      //       //       ...show,
-      //       //       status
-      //       //     },
-      //       //     episodes,
-      //       //     id
-      //       //   })
-      //       //   .then(() => {
-      //       //     this.firebase
-      //       //       .userShowInfo(this.userUid, showKey, userDatabase)
-      //       //       .update({ showKeyDatabase: showRefDatabaseKey })
-      //       //   })
-      //     }
-      //   })
-
-      // this.firebase
-      //   .allShowsList(database)
-      //   .child(ref.key)
-      //   .once("value", snapshot => {
-      //     if (snapshot.val() !== null) return
-
-      //     ref.set({
-      //       info: {
-      //         ...show,
-      //         status: database
-      //       },
-      //       episodes,
-      //       id: show.id
-      //     })
-      //   })
+          )
+      })
     }
 
     handleShowInDatabases = ({ id, data = [], database, callback = () => {} }) => {
@@ -375,25 +201,29 @@ const withUserContent = Component => {
       otherDatabases.forEach(item => {
         const promise = this.firebase
           .userShows(this.userUid, item)
-          .orderByChild("id")
-          .equalTo(id)
+          // .orderByChild("id")
+          // .equalTo(id)
+          .child(id)
           .once(
             "value",
             snapshot => {
               if (snapshot.val() !== null) {
-                let show = {}
+                // let show = {}
 
-                Object.keys(snapshot.val()).forEach(key => {
-                  show = { ...snapshot.val()[key], key }
-                })
+                // Object.keys(snapshot.val()).forEach(key => {
+                //   show = { ...snapshot.val()[key], key }
+                // })
 
                 this.firebase
                   .userShows(this.userUid, database)
-                  .update(snapshot.val())
+                  .child(id)
+                  .set({
+                    ...snapshot.val()
+                  })
                   .then(() => {
                     this.firebase
                       .userShows(this.userUid, item)
-                      .child(show.key)
+                      .child(id)
                       .set(null)
                   })
               }
@@ -418,13 +248,12 @@ const withUserContent = Component => {
 
         this.firebase
           .userShows(this.userUid, database)
-          .orderByChild("id")
-          .equalTo(id)
+          // .orderByChild("id")
+          // .equalTo(id)
+          .child(id)
           .once("value", snapshot => {
-            console.log("test")
             if (snapshot.val() !== null) return
-            console.log("test2")
-            this.addShowToUserDatabase({ id, show: showToAdd, database })
+            this.addShowToDatabase({ id, show: showToAdd, userDatabase: database })
           })
       })
     }
@@ -435,38 +264,28 @@ const withUserContent = Component => {
       const movieToAdd = Array.isArray(data) ? data.find(item => item.id === id) : data
 
       this.firebase[database](this.userUid)
-        .orderByChild("id")
-        .equalTo(id)
+        .child(id)
         .once("value", snapshot => {
           if (snapshot.val() !== null) {
-            let movie = {}
-
-            Object.keys(snapshot.val()).forEach(key => {
-              movie = { ...snapshot.val()[key], key }
-            })
-
             this.firebase[database](this.userUid)
-              .child(movie.movieKey)
+              .child(id)
               .set(null)
           } else {
-            const newMovieRef = this.firebase[database](this.userUid).push()
-            const movieKey = newMovieRef.key
-
-            newMovieRef
+            this.firebase[database](this.userUid)
+              .child(id)
               .set({
                 ...movieToAdd,
-                movieKey,
                 timeStamp: this.firebase.timeStamp()
               })
               .then(() => {
                 this.firebase[database](this.userUid)
-                  .child(movieKey)
+                  .child(id)
                   .once("value", snapshot => {
                     if (snapshot.val() === null) return
 
                     const negativeTimestamp = snapshot.val().timeStamp * -1
                     this.firebase[database](this.userUid)
-                      .child(movieKey)
+                      .child(id)
                       .update({ timeStamp: negativeTimestamp }) // The negative time stamp needed for easier des order, cause firebase only provide as order
                   })
               })

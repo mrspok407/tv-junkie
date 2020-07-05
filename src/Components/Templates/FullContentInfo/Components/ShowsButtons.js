@@ -8,8 +8,7 @@ class ShowsButtons extends Component {
     super(props)
 
     this.state = {
-      disableBtnWarning: null,
-      showInDatabase: null
+      disableBtnWarning: null
     }
   }
 
@@ -98,6 +97,7 @@ class ShowsButtons extends Component {
               type="button"
               onClick={() => {
                 this.props.changeShowDatabaseOnClient("droppedShows")
+                this.props.getShowInDatabase()
                 this.props.handleShowInDatabases({
                   id: Number(id),
                   data: infoToPass,
