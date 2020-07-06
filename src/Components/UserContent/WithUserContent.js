@@ -132,9 +132,10 @@ const withUserContent = Component => {
           .set({
             info: {
               ...show,
-              timeStamp: this.firebase.timeStamp(),
               status: data.status
             },
+            name: show.name || show.original_name,
+            timeStamp: this.firebase.timeStamp(),
             episodes: data.episodes,
             id
           })
@@ -143,11 +144,14 @@ const withUserContent = Component => {
               .userShows(this.userUid, userDatabase)
               .child(id)
               .once("value", snapshot => {
-                console.log(snapshot.val())
-                const negativeTimestamp = snapshot.val().info.timeStamp * -1
+                const negativeTimestamp = snapshot.val().timeStamp * -1
+
                 this.firebase
-                  .userShowInfo(this.userUid, id, userDatabase)
-                  .update({ timeStamp: negativeTimestamp }) // The negative time stamp needed for easier des order, cause firebase only provide as order
+                  .userShows(this.userUid, userDatabase)
+                  .child(id)
+                  .update({
+                    timeStamp: negativeTimestamp // The negative time stamp needed for easier des order, cause firebase only provide as order
+                  })
               })
           })
 
@@ -185,7 +189,6 @@ const withUserContent = Component => {
               } else {
                 console.log("added!")
               }
-              console.log("show's data: ", snapshot.val())
             }
           )
       })

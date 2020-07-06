@@ -143,6 +143,8 @@ class ShowsEpisodes extends Component {
 
     const show = this.props.showInDatabase
 
+    console.log(show)
+
     // this.props.firebase
     //   .watchingShowsEpisode(this.props.authUser.uid, show.showEpisodesKey, seasonNum, episodeNum)
     //   .update({

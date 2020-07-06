@@ -276,13 +276,8 @@ function FullContentInfo({
           snapshot => {
             if (snapshot.val() !== null) {
               console.log(snapshot.val())
-              let show = {}
 
-              Object.keys(snapshot.val()).forEach(key => {
-                show = { ...snapshot.val()[key], key }
-              })
-
-              setShowInDatabase({ database, info: show })
+              setShowInDatabase({ database, info: snapshot.val().info })
               setShowEpisodesDatabase(snapshot.val().episodes)
               setShowDatabaseOnClient(database)
               console.log(showInDatabase)

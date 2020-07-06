@@ -50,9 +50,10 @@ class ShowsContent extends Component {
   }
 
   componentWillUnmount() {
-    this.props.firebase.watchingShows(this.props.authUser.uid).off()
-    this.props.firebase.droppedShows(this.props.authUser.uid).off()
-    this.props.firebase.willWatchShows(this.props.authUser.uid).off()
+    this.props.firebase.userShows(this.props.authUser.uid, "watchingShows").off()
+    this.props.firebase.userShows(this.props.authUser.uid, "droppedShows").off()
+    this.props.firebase.userShows(this.props.authUser.uid, "willWatchShows").off()
+
     window.removeEventListener("scroll", this.handleScroll)
   }
 
@@ -68,39 +69,63 @@ class ShowsContent extends Component {
       this.setState({ initialLoading: true })
     }
 
-    const promises = []
+    let counter = 0
 
     Object.keys(this.state.database).forEach(database => {
-      const promise = this.props.firebase[database](this.props.authUser.uid)
+      this.props.firebase
+        .userShows(this.props.authUser.uid, database)
         .orderByChild(sortBy)
         .limitToFirst(this.state.loadedShows[database])
         .once("value", snapshot => {
           let shows = []
           snapshot.forEach(item => {
-            shows = [...shows, item.val()]
+            shows = [
+              ...shows,
+              {
+                id: item.val().id,
+                name: item.val().info.name,
+                status: item.val().info.status,
+                timeStamp: item.val().timeStamp
+              }
+            ]
           })
 
-          this.setState({
-            database: {
-              ...this.state.database,
-              [database]: shows
-            },
-            lastLoadedShow: {
-              ...this.state.lastLoadedShow,
-              [database]: shows.length !== 0 && shows[shows.length - 1][sortBy]
+          Promise.all(
+            shows.map(item => {
+              const allShowsListSubDatabase =
+                item.status === "Ended" || item.status === "Canceled" ? "ended" : "ongoing"
+
+              return this.props.firebase
+                .showInfo(allShowsListSubDatabase, item.id)
+                .once("value")
+                .then(snapshot => {
+                  return snapshot.val()
+                })
+            })
+          ).then(showsData => {
+            counter++
+            console.log(showsData)
+
+            this.setState({
+              database: {
+                ...this.state.database,
+                [database]: showsData
+              },
+              lastLoadedShow: {
+                ...this.state.lastLoadedShow,
+                [database]: shows.length !== 0 && shows[shows.length - 1][sortBy]
+              }
+            })
+
+            if (counter === 3) {
+              this.setState({
+                sortByLoading: false,
+                initialLoading: false
+              })
             }
           })
         })
-
-      promises.push(promise)
     })
-
-    Promise.all(promises).then(() =>
-      this.setState({
-        sortByLoading: false,
-        initialLoading: false
-      })
-    )
   }
 
   loadNewContent = () => {
@@ -116,35 +141,86 @@ class ShowsContent extends Component {
       loadingContent: true
     })
 
-    this.props.firebase[this.state.activeSection](this.props.authUser.uid)
+    console.log(this.state.lastLoadedShow[this.state.activeSection])
+
+    this.props.firebase
+      .userShows(this.props.authUser.uid, this.state.activeSection)
       .orderByChild(this.state.sortBy)
       .startAt(this.state.lastLoadedShow[this.state.activeSection] + 1)
       .limitToFirst(showsToLoad)
       .once("value", snapshot => {
+        // let shows = []
+        // snapshot.forEach(item => {
+        //   shows = [...shows, item.val()]
+        // })
+
         let shows = []
         snapshot.forEach(item => {
-          shows = [...shows, item.val()]
+          shows = [
+            ...shows,
+            {
+              id: item.val().id,
+              name: item.val().info.name,
+              timeStamp: item.val().timeStamp,
+              status: item.val().info.status
+            }
+          ]
         })
 
-        this.setState(prevState => ({
-          database: {
-            ...prevState.database,
-            [this.state.activeSection]: [...prevState.database[this.state.activeSection], ...shows]
-          },
-          disableLoad: {
-            ...prevState.disableLoad,
-            [this.state.activeSection]: shows.length === 0
-          },
-          lastLoadedShow: {
-            ...prevState.lastLoadedShow,
-            [this.state.activeSection]: shows.length !== 0 && shows[shows.length - 1][this.state.sortBy]
-          },
-          loadedShows: {
-            ...prevState.loadedShows,
-            [this.state.activeSection]: prevState.database[this.state.activeSection].length + shows.length
-          },
-          loadingContent: false
-        }))
+        Promise.all(
+          shows.map(item => {
+            const allShowsListSubDatabase =
+              item.status === "Ended" || item.status === "Canceled" ? "ended" : "ongoing"
+
+            return this.props.firebase
+              .showInfo(allShowsListSubDatabase, item.id)
+              .once("value")
+              .then(snapshot => {
+                return snapshot.val()
+              })
+          })
+        ).then(showsData => {
+          this.setState(prevState => ({
+            database: {
+              ...prevState.database,
+              [this.state.activeSection]: [...prevState.database[this.state.activeSection], ...showsData]
+            },
+            disableLoad: {
+              ...prevState.disableLoad,
+              [this.state.activeSection]: showsData.length === 0
+            },
+            lastLoadedShow: {
+              ...prevState.lastLoadedShow,
+              [this.state.activeSection]: shows.length !== 0 && shows[shows.length - 1][this.state.sortBy]
+            },
+            loadedShows: {
+              ...prevState.loadedShows,
+              [this.state.activeSection]:
+                prevState.database[this.state.activeSection].length + showsData.length
+            },
+            loadingContent: false
+          }))
+        })
+
+        // this.setState(prevState => ({
+        //   database: {
+        //     ...prevState.database,
+        //     [this.state.activeSection]: [...prevState.database[this.state.activeSection], ...shows]
+        //   },
+        //   disableLoad: {
+        //     ...prevState.disableLoad,
+        //     [this.state.activeSection]: shows.length === 0
+        //   },
+        //   lastLoadedShow: {
+        //     ...prevState.lastLoadedShow,
+        //     [this.state.activeSection]: shows.length !== 0 && shows[shows.length - 1][this.state.sortBy]
+        //   },
+        //   loadedShows: {
+        //     ...prevState.loadedShows,
+        //     [this.state.activeSection]: prevState.database[this.state.activeSection].length + shows.length
+        //   },
+        //   loadingContent: false
+        // }))
       })
   }
 
@@ -170,31 +246,144 @@ class ShowsContent extends Component {
     const watchingShowsSavedState = this.state.database.watchingShows
 
     this.props.firebase
-      .watchingShows(this.props.authUser.uid)
+      .userShows(this.props.authUser.uid, "watchingShows")
       .orderByChild(this.state.sortBy)
-      .limitToFirst(this.state.loadedShows.watchingShows + 1)
+      .limitToFirst(this.state.loadedShows.watchingShows)
       .once("value", snapshot => {
+        // let watchingShows = []
+        // snapshot.forEach(item => {
+        //   watchingShows = [...watchingShows, item.val()]
+        // })
+
         let watchingShows = []
         snapshot.forEach(item => {
-          watchingShows = [...watchingShows, item.val()]
+          watchingShows = [
+            ...watchingShows,
+            {
+              id: item.val().id,
+              status: item.val().info.status,
+              name: item.val().info.name,
+              timeStamp: item.val().timeStamp
+            }
+          ]
         })
 
-        this.setState(prevState => ({
-          database: {
-            ...this.state.database,
-            watchingShows
-          },
-          lastLoadedShow: {
-            ...this.state.lastLoadedShow,
-            watchingShows:
-              watchingShows.length !== 0 && watchingShows[watchingShows.length - 1][this.state.sortBy]
-          },
-          loadedShows: {
-            ...prevState.loadedShows,
-            watchingShows: watchingShows.length
-          }
-        }))
+        Promise.all(
+          watchingShows.map(item => {
+            const allShowsListSubDatabase =
+              item.status === "Ended" || item.status === "Canceled" ? "ended" : "ongoing"
+
+            return this.props.firebase
+              .showInfo(allShowsListSubDatabase, item.id)
+              .once("value")
+              .then(snapshot => {
+                return snapshot.val()
+              })
+          })
+        ).then(showsData => {
+          this.setState(prevState => ({
+            database: {
+              ...this.state.database,
+              watchingShows: showsData
+            },
+            lastLoadedShow: {
+              ...this.state.lastLoadedShow,
+              watchingShows:
+                watchingShows.length !== 0 && watchingShows[watchingShows.length - 1][this.state.sortBy]
+            },
+            loadedShows: {
+              ...prevState.loadedShows,
+              watchingShows: showsData.length
+            }
+          }))
+        })
+
+        // this.setState(prevState => ({
+        //   database: {
+        //     ...this.state.database,
+        //     watchingShows
+        //   },
+        //   lastLoadedShow: {
+        //     ...this.state.lastLoadedShow,
+        //     watchingShows:
+        //       watchingShows.length !== 0 && watchingShows[watchingShows.length - 1][this.state.sortBy]
+        //   },
+        //   loadedShows: {
+        //     ...prevState.loadedShows,
+        //     watchingShows: watchingShows.length
+        //   }
+        // }))
       })
+
+    if (this.state.activeSection !== "watchingShows") {
+      this.props.firebase
+        .userShows(this.props.authUser.uid, this.state.activeSection)
+        .orderByChild(this.state.sortBy)
+        .limitToFirst(this.state.loadedShows[this.state.activeSection])
+        .once("value", snapshot => {
+          // let shows = []
+          // snapshot.forEach(item => {
+          //   shows = [...shows, item.val()]
+          // })
+
+          let shows = []
+          snapshot.forEach(item => {
+            shows = [
+              ...shows,
+              {
+                id: item.val().id,
+                status: item.val().info.status,
+                name: item.val().info.name,
+                timeStamp: item.val().timeStamp
+              }
+            ]
+          })
+
+          Promise.all(
+            shows.map(item => {
+              const allShowsListSubDatabase =
+                item.status === "Ended" || item.status === "Canceled" ? "ended" : "ongoing"
+
+              return this.props.firebase
+                .showInfo(allShowsListSubDatabase, item.id)
+                .once("value")
+                .then(snapshot => {
+                  return snapshot.val()
+                })
+            })
+          ).then(showsData => {
+            this.setState(prevState => ({
+              database: {
+                ...this.state.database,
+                [this.state.activeSection]: showsData
+              },
+              lastLoadedShow: {
+                ...this.state.lastLoadedShow,
+                [this.state.activeSection]: shows.length !== 0 && shows[shows.length - 1][this.state.sortBy]
+              },
+              loadedShows: {
+                ...prevState.loadedShows,
+                [this.state.activeSection]: showsData.length
+              }
+            }))
+          })
+
+          // this.setState(prevState => ({
+          //   database: {
+          //     ...this.state.database,
+          //     [this.state.activeSection]: shows
+          //   },
+          //   lastLoadedShow: {
+          //     ...this.state.lastLoadedShow,
+          //     [this.state.activeSection]: shows.length !== 0 && shows[shows.length - 1][this.state.sortBy]
+          //   },
+          //   loadedShows: {
+          //     ...prevState.loadedShows,
+          //     [this.state.activeSection]: shows.length
+          //   }
+          // }))
+        })
+    }
 
     if (this.props.userContent.errorInDatabase.error) {
       this.setState({
@@ -216,6 +405,7 @@ class ShowsContent extends Component {
 
   renderContent = section => {
     const content = this.state.database[section]
+    console.log(this.state.database[section])
 
     const shows = this.props.authUser
       ? content
@@ -338,6 +528,8 @@ class ShowsContent extends Component {
       : this.state.activeSection !== "watchingShows"
       ? content
       : this.context.watchingShows
+
+    console.log(content)
 
     const maxColumns = 4
     const currentNumOfColumns = content.length <= maxColumns - 1 ? content.length : maxColumns
