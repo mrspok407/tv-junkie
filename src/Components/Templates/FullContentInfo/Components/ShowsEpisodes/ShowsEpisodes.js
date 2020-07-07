@@ -145,12 +145,6 @@ class ShowsEpisodes extends Component {
 
     console.log(show)
 
-    // this.props.firebase
-    //   .watchingShowsEpisode(this.props.authUser.uid, show.showEpisodesKey, seasonNum, episodeNum)
-    //   .update({
-    //     watched: !this.props.showEpisodesDatabase[seasonNum - 1].episodes[episodeNum - 1].watched
-    //   })
-
     this.props.firebase
       .userShowSingleEpisode(this.props.authUser.uid, show.info.id, show.database, seasonNum, episodeNum)
       .update({
@@ -270,7 +264,7 @@ class ShowsEpisodes extends Component {
                               backgroundImage: `url(https://image.tmdb.org/t/p/w500/${season.poster_path})`
                             }}
                           />
-                          {showCheckboxes && (
+                          {showCheckboxes && daysToNewSeason < 0 && (
                             <div className="full-detailes__check-season-episodes">
                               <button
                                 type="button"

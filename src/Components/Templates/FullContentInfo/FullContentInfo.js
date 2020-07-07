@@ -277,7 +277,12 @@ function FullContentInfo({
             if (snapshot.val() !== null) {
               console.log(snapshot.val())
 
-              setShowInDatabase({ database, info: snapshot.val().info })
+              const showInfo = {
+                ...snapshot.val()
+              }
+              delete showInfo.episodes
+
+              setShowInDatabase({ database, info: showInfo })
               setShowEpisodesDatabase(snapshot.val().episodes)
               setShowDatabaseOnClient(database)
               console.log(showInDatabase)

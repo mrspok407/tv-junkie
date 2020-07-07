@@ -156,3 +156,35 @@ export default class SeasonEpisodes extends Component {
     )
   }
 }
+
+// this.props.firebase
+// .showEpisodes(allShowsListSubDatabase, show.info.id)
+// .child(indexSeason)
+// .child("episodes")
+// .once("value", snapshot => {
+//   const filteredEpisodes = snapshot.val().filter(item => {
+//     const daysToNewEpisode = differenceBtwDatesInDays(item.air_date, this.props.todayDate)
+
+//     return daysToNewEpisode < 0 && item
+//   })
+
+//   const length = snapshot.val().length - filteredEpisodes.length
+
+//   // season.episodes = filteredEpisodes
+
+//   console.log(season.episodes)
+
+//   season.episodes.forEach((episode, indexEpisode) => {
+//     // const daysToNewEpisode = differenceBtwDatesInDays(episode.air_date, this.props.todayDate)
+//     // if (daysToNewEpisode > 0) return
+
+//     this.props.firebase
+//       .showEpisodes(allShowsListSubDatabase, show.info.id)
+//       .child(indexSeason)
+//       .child("episodes")
+//       .child(indexEpisode)
+//       .once("value", snapshot => {
+//         const daysToNewEpisode = differenceBtwDatesInDays(
+//           snapshot.val().air_date,
+//           this.props.todayDate
+//         )

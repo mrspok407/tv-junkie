@@ -75,15 +75,15 @@ const withUserContent = Component => {
             Object.entries(mergedRowData).forEach(([key, value]) => {
               if (!key.indexOf("season/")) {
                 // Firebase can't handle "/" in database
-                const newKey = key.replace("/", "")
-                seasonsData.push({ [newKey]: { ...value } })
+                // const newKey = key.replace("/", "")
+                seasonsData.push({ [key]: { ...value } })
               }
             })
 
             let allEpisodes = []
 
             seasonsData.forEach((item, index) => {
-              const season = item[`season${index + 1}`]
+              const season = item[`season/${index + 1}`]
               let episodes = []
 
               season.episodes.forEach(item => {
@@ -91,8 +91,7 @@ const withUserContent = Component => {
                   air_date: item.air_date,
                   episode_number: item.episode_number,
                   name: item.name,
-                  season_number: item.season_number,
-                  watched: false
+                  season_number: item.season_number
                 }
                 episodes.push(updatedEpisode)
               })
@@ -126,17 +125,38 @@ const withUserContent = Component => {
         const allShowsListSubDatabase =
           data.status === "Ended" || data.status === "Canceled" ? "ended" : "ongoing"
 
+        const userEpisodes = []
+
+        data.episodes.forEach(season => {
+          let episodes = []
+
+          season.episodes.forEach(() => {
+            const updatedEpisode = {
+              watched: false
+            }
+            episodes.push(updatedEpisode)
+          })
+
+          const updatedSeason = {
+            season_number: season.season_number,
+            episodes
+          }
+
+          userEpisodes.push(updatedSeason)
+        })
+
         this.firebase
           .userShows(this.userUid, userDatabase)
           .child(id)
           .set({
-            info: {
-              ...show,
-              status: data.status
-            },
+            // info: {
+            //    ...show,
+            //   status: data.status
+            // },
+            status: data.status,
             name: show.name || show.original_name,
             timeStamp: this.firebase.timeStamp(),
-            episodes: data.episodes,
+            episodes: userEpisodes,
             id
           })
           .then(() => {

@@ -21,6 +21,7 @@ class ShowsContent extends Component {
       initialLoading: true,
       loadingContent: false,
       sortByLoading: false,
+      updaterLoading: false,
       database: {
         watchingShows: [],
         droppedShows: [],
@@ -63,7 +64,7 @@ class ShowsContent extends Component {
     })
   }
 
-  getContent = ({ sortBy = "name", isInitialLoad = true }) => {
+  getContent = ({ sortBy = "name", isInitialLoad = true, databases = [] }) => {
     if (this.props.authUser === null) return
     if (isInitialLoad) {
       this.setState({ initialLoading: true })
@@ -71,11 +72,15 @@ class ShowsContent extends Component {
 
     let counter = 0
 
-    Object.keys(this.state.database).forEach(database => {
+    const getContentFromDatabases = databases.length > 0 ? databases : Object.keys(this.state.database)
+
+    getContentFromDatabases.forEach(database => {
+      const limitTo = this.state.loadedShows[database] <= 0 ? 1 : this.state.loadedShows[database]
+
       this.props.firebase
         .userShows(this.props.authUser.uid, database)
         .orderByChild(sortBy)
-        .limitToFirst(this.state.loadedShows[database])
+        .limitToFirst(!isInitialLoad ? limitTo + 1 : limitTo)
         .once("value", snapshot => {
           let shows = []
           snapshot.forEach(item => {
@@ -83,8 +88,8 @@ class ShowsContent extends Component {
               ...shows,
               {
                 id: item.val().id,
-                name: item.val().info.name,
-                status: item.val().info.status,
+                name: item.val().name,
+                status: item.val().status,
                 timeStamp: item.val().timeStamp
               }
             ]
@@ -118,6 +123,7 @@ class ShowsContent extends Component {
             })
 
             if (counter === 3) {
+              console.log("ff")
               this.setState({
                 sortByLoading: false,
                 initialLoading: false
@@ -133,9 +139,12 @@ class ShowsContent extends Component {
     if (
       this.state.disableLoad[this.state.activeSection] ||
       this.state.loadingContent ||
+      this.state.updaterLoading ||
       document.body.scrollHeight < 1400
     )
       return
+
+    console.log("TEEEEEEEEST")
 
     this.setState({
       loadingContent: true
@@ -149,20 +158,15 @@ class ShowsContent extends Component {
       .startAt(this.state.lastLoadedShow[this.state.activeSection] + 1)
       .limitToFirst(showsToLoad)
       .once("value", snapshot => {
-        // let shows = []
-        // snapshot.forEach(item => {
-        //   shows = [...shows, item.val()]
-        // })
-
         let shows = []
         snapshot.forEach(item => {
           shows = [
             ...shows,
             {
               id: item.val().id,
-              name: item.val().info.name,
+              name: item.val().name,
               timeStamp: item.val().timeStamp,
-              status: item.val().info.status
+              status: item.val().status
             }
           ]
         })
@@ -201,26 +205,6 @@ class ShowsContent extends Component {
             loadingContent: false
           }))
         })
-
-        // this.setState(prevState => ({
-        //   database: {
-        //     ...prevState.database,
-        //     [this.state.activeSection]: [...prevState.database[this.state.activeSection], ...shows]
-        //   },
-        //   disableLoad: {
-        //     ...prevState.disableLoad,
-        //     [this.state.activeSection]: shows.length === 0
-        //   },
-        //   lastLoadedShow: {
-        //     ...prevState.lastLoadedShow,
-        //     [this.state.activeSection]: shows.length !== 0 && shows[shows.length - 1][this.state.sortBy]
-        //   },
-        //   loadedShows: {
-        //     ...prevState.loadedShows,
-        //     [this.state.activeSection]: prevState.database[this.state.activeSection].length + shows.length
-        //   },
-        //   loadingContent: false
-        // }))
       })
   }
 
@@ -245,147 +229,13 @@ class ShowsContent extends Component {
     const activeSectionSavedState = this.state.database[this.state.activeSection]
     const watchingShowsSavedState = this.state.database.watchingShows
 
-    this.props.firebase
-      .userShows(this.props.authUser.uid, "watchingShows")
-      .orderByChild(this.state.sortBy)
-      .limitToFirst(this.state.loadedShows.watchingShows)
-      .once("value", snapshot => {
-        // let watchingShows = []
-        // snapshot.forEach(item => {
-        //   watchingShows = [...watchingShows, item.val()]
-        // })
-
-        let watchingShows = []
-        snapshot.forEach(item => {
-          watchingShows = [
-            ...watchingShows,
-            {
-              id: item.val().id,
-              status: item.val().info.status,
-              name: item.val().info.name,
-              timeStamp: item.val().timeStamp
-            }
-          ]
-        })
-
-        Promise.all(
-          watchingShows.map(item => {
-            const allShowsListSubDatabase =
-              item.status === "Ended" || item.status === "Canceled" ? "ended" : "ongoing"
-
-            return this.props.firebase
-              .showInfo(allShowsListSubDatabase, item.id)
-              .once("value")
-              .then(snapshot => {
-                return snapshot.val()
-              })
-          })
-        ).then(showsData => {
-          this.setState(prevState => ({
-            database: {
-              ...this.state.database,
-              watchingShows: showsData
-            },
-            lastLoadedShow: {
-              ...this.state.lastLoadedShow,
-              watchingShows:
-                watchingShows.length !== 0 && watchingShows[watchingShows.length - 1][this.state.sortBy]
-            },
-            loadedShows: {
-              ...prevState.loadedShows,
-              watchingShows: showsData.length
-            }
-          }))
-        })
-
-        // this.setState(prevState => ({
-        //   database: {
-        //     ...this.state.database,
-        //     watchingShows
-        //   },
-        //   lastLoadedShow: {
-        //     ...this.state.lastLoadedShow,
-        //     watchingShows:
-        //       watchingShows.length !== 0 && watchingShows[watchingShows.length - 1][this.state.sortBy]
-        //   },
-        //   loadedShows: {
-        //     ...prevState.loadedShows,
-        //     watchingShows: watchingShows.length
-        //   }
-        // }))
+    if (!this.props.userContent.errorInDatabase.error) {
+      this.getContent({
+        sortBy: this.state.sortBy,
+        isInitialLoad: false,
+        databases: ["watchingShows", this.state.activeSection]
       })
-
-    if (this.state.activeSection !== "watchingShows") {
-      this.props.firebase
-        .userShows(this.props.authUser.uid, this.state.activeSection)
-        .orderByChild(this.state.sortBy)
-        .limitToFirst(this.state.loadedShows[this.state.activeSection])
-        .once("value", snapshot => {
-          // let shows = []
-          // snapshot.forEach(item => {
-          //   shows = [...shows, item.val()]
-          // })
-
-          let shows = []
-          snapshot.forEach(item => {
-            shows = [
-              ...shows,
-              {
-                id: item.val().id,
-                status: item.val().info.status,
-                name: item.val().info.name,
-                timeStamp: item.val().timeStamp
-              }
-            ]
-          })
-
-          Promise.all(
-            shows.map(item => {
-              const allShowsListSubDatabase =
-                item.status === "Ended" || item.status === "Canceled" ? "ended" : "ongoing"
-
-              return this.props.firebase
-                .showInfo(allShowsListSubDatabase, item.id)
-                .once("value")
-                .then(snapshot => {
-                  return snapshot.val()
-                })
-            })
-          ).then(showsData => {
-            this.setState(prevState => ({
-              database: {
-                ...this.state.database,
-                [this.state.activeSection]: showsData
-              },
-              lastLoadedShow: {
-                ...this.state.lastLoadedShow,
-                [this.state.activeSection]: shows.length !== 0 && shows[shows.length - 1][this.state.sortBy]
-              },
-              loadedShows: {
-                ...prevState.loadedShows,
-                [this.state.activeSection]: showsData.length
-              }
-            }))
-          })
-
-          // this.setState(prevState => ({
-          //   database: {
-          //     ...this.state.database,
-          //     [this.state.activeSection]: shows
-          //   },
-          //   lastLoadedShow: {
-          //     ...this.state.lastLoadedShow,
-          //     [this.state.activeSection]: shows.length !== 0 && shows[shows.length - 1][this.state.sortBy]
-          //   },
-          //   loadedShows: {
-          //     ...prevState.loadedShows,
-          //     [this.state.activeSection]: shows.length
-          //   }
-          // }))
-        })
-    }
-
-    if (this.props.userContent.errorInDatabase.error) {
+    } else {
       this.setState({
         database: {
           ...this.state.database,
