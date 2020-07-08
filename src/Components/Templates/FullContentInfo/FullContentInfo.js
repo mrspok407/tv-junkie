@@ -13,9 +13,9 @@ import ShowsEpisodes from "./Components/ShowsEpisodes/ShowsEpisodes"
 import PosterWrapper from "./Components/PosterWrapper"
 import "./FullContentInfo.scss"
 import { withUserContent } from "Components/UserContent"
-import { Children } from "react"
 
 const todayDate = new Date()
+
 let cancelRequest
 
 function FullContentInfo({
@@ -50,7 +50,7 @@ function FullContentInfo({
 
   const [loadingPage, setLoadingPage] = useState(true)
   const [loadingFromDatabase, setLoadingFromDatabase] = useState(false)
-  const [showInDatabase, setShowInDatabase] = useState({ database: null, info: null })
+  const [showInDatabase, setShowInDatabase] = useState({ database: null, info: null, episodes: null })
   const [showDatabaseOnClient, setShowDatabaseOnClient] = useState(null)
   const [showEpisodesDatabase, setShowEpisodesDatabase] = useState([])
 
@@ -80,9 +80,10 @@ function FullContentInfo({
       if (cancelRequest !== undefined) {
         cancelRequest()
       }
+      if (!authUser) return
+
       userContent.showsDatabases.forEach(database => {
         firebase.userShows(authUser.uid, database).off()
-        firebase.userShowAllEpisodes(authUser.uid, id, database).off()
       })
 
       firebase.watchLaterMovies(authUser.uid).off()
@@ -275,17 +276,14 @@ function FullContentInfo({
           "value",
           snapshot => {
             if (snapshot.val() !== null) {
-              console.log(snapshot.val())
+              // const showInfo = {
+              //   ...snapshot.val()
+              // }
+              // delete showInfo.episodes
 
-              const showInfo = {
-                ...snapshot.val()
-              }
-              delete showInfo.episodes
-
-              setShowInDatabase({ database, info: showInfo })
+              setShowInDatabase({ database, info: snapshot.val() })
               setShowEpisodesDatabase(snapshot.val().episodes)
               setShowDatabaseOnClient(database)
-              console.log(showInDatabase)
             }
 
             if (counter === userContent.showsDatabases.length) {
@@ -411,6 +409,7 @@ function FullContentInfo({
                   todayDate={todayDate}
                   id={id}
                   showInDatabase={showInDatabase}
+                  infoToPass={infoToPass}
                   showEpisodesDatabase={showEpisodesDatabase}
                 />
               </>

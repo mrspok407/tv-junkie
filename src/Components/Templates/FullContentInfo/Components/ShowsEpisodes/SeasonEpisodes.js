@@ -8,12 +8,10 @@ export default class SeasonEpisodes extends Component {
       this.props.authUser &&
       this.props.showInDatabase.info &&
       this.props.showInDatabase.database !== "notWatchingShows" &&
-      this.props.showEpisodesDatabase &&
-      this.props.showEpisodesDatabase.length > 0 &&
+      this.props.showInDatabase.info.episodes &&
+      this.props.showInDatabase.info.episodes.length > 0 &&
       true
 
-    console.log(this.props.showEpisodesDatabase)
-    console.log(this.props.showInDatabase)
     return (
       <div className="full-detailes__episodes-list">
         {this.props.showEpisodes.map(item => {
@@ -87,9 +85,8 @@ export default class SeasonEpisodes extends Component {
                       <input
                         type="checkbox"
                         checked={
-                          this.props.showEpisodesDatabase[this.props.season.season_number - 1].episodes[
-                            episode.episode_number - 1
-                          ].watched
+                          this.props.showInDatabase.info.episodes[this.props.season.season_number - 1]
+                            .episodes[episode.episode_number - 1].watched
                         }
                         onChange={() =>
                           this.props.toggleWatchedEpisode(
@@ -178,13 +175,14 @@ export default class SeasonEpisodes extends Component {
 //     // const daysToNewEpisode = differenceBtwDatesInDays(episode.air_date, this.props.todayDate)
 //     // if (daysToNewEpisode > 0) return
 
-//     this.props.firebase
-//       .showEpisodes(allShowsListSubDatabase, show.info.id)
-//       .child(indexSeason)
-//       .child("episodes")
-//       .child(indexEpisode)
-//       .once("value", snapshot => {
-//         const daysToNewEpisode = differenceBtwDatesInDays(
-//           snapshot.val().air_date,
-//           this.props.todayDate
-//         )
+// this.props.firebase
+//   .showEpisodes(allShowsListSubDatabase, show.info.id)
+//   .child(indexSeason)
+//   .child("episodes")
+//   .child(indexEpisode)
+//   .once("value", snapshot => {
+//     const daysToNewEpisode = differenceBtwDatesInDays(
+//       snapshot.val().air_date,
+//       this.props.todayDate
+//     )
+//   })
