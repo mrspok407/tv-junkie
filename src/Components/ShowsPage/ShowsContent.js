@@ -21,7 +21,6 @@ class ShowsContent extends Component {
       initialLoading: true,
       loadingContent: false,
       sortByLoading: false,
-      updaterLoading: false,
       database: {
         watchingShows: [],
         droppedShows: [],
@@ -109,7 +108,6 @@ class ShowsContent extends Component {
             })
           ).then(showsData => {
             counter++
-            console.log(showsData)
 
             this.setState({
               database: {
@@ -123,7 +121,6 @@ class ShowsContent extends Component {
             })
 
             if (counter === 3) {
-              console.log("ff")
               this.setState({
                 sortByLoading: false,
                 initialLoading: false
@@ -139,24 +136,21 @@ class ShowsContent extends Component {
     if (
       this.state.disableLoad[this.state.activeSection] ||
       this.state.loadingContent ||
-      this.state.updaterLoading ||
       document.body.scrollHeight < 1400
     )
       return
 
-    console.log("TEEEEEEEEST")
+    console.log("loadNewContent")
 
     this.setState({
       loadingContent: true
     })
 
-    console.log(this.state.lastLoadedShow[this.state.activeSection])
-
     this.props.firebase
       .userShows(this.props.authUser.uid, this.state.activeSection)
       .orderByChild(this.state.sortBy)
       .startAt(this.state.lastLoadedShow[this.state.activeSection] + 1)
-      .limitToFirst(showsToLoad)
+      .limitToFirst(showsToLoad + 1)
       .once("value", snapshot => {
         let shows = []
         snapshot.forEach(item => {
@@ -170,6 +164,9 @@ class ShowsContent extends Component {
             }
           ]
         })
+
+        const disableLoadNewContent = shows.length !== showsToLoad + 1 ? true : false
+        if (!disableLoadNewContent) shows.pop()
 
         Promise.all(
           shows.map(item => {
@@ -191,7 +188,7 @@ class ShowsContent extends Component {
             },
             disableLoad: {
               ...prevState.disableLoad,
-              [this.state.activeSection]: showsData.length === 0
+              [this.state.activeSection]: disableLoadNewContent
             },
             lastLoadedShow: {
               ...prevState.lastLoadedShow,
@@ -209,7 +206,7 @@ class ShowsContent extends Component {
   }
 
   handleScroll = throttle(500, () => {
-    if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 100) {
+    if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 800) {
       this.loadNewContent()
     }
   })
@@ -255,7 +252,8 @@ class ShowsContent extends Component {
 
   renderContent = section => {
     const content = this.state.database[section]
-    console.log(this.state.database[section])
+
+    console.log(content)
 
     const shows = this.props.authUser
       ? content
@@ -378,8 +376,6 @@ class ShowsContent extends Component {
       : this.state.activeSection !== "watchingShows"
       ? content
       : this.context.watchingShows
-
-    console.log(content)
 
     const maxColumns = 4
     const currentNumOfColumns = content.length <= maxColumns - 1 ? content.length : maxColumns
