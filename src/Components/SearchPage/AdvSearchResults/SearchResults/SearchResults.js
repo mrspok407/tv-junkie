@@ -146,11 +146,11 @@ class AdvSearchResults extends Component {
                                   database: "watchLaterMovies"
                                 })
                               } else {
-                                this.context.toggleContentLS(
+                                this.context.toggleContentLS({
                                   id,
-                                  "watchLaterMovies",
-                                  this.props.advancedSearchContent
-                                )
+                                  data: this.props.advancedSearchContent,
+                                  type: "watchLaterMovies"
+                                })
                               }
 
                               if (
@@ -176,7 +176,10 @@ class AdvSearchResults extends Component {
                                 if (this.props.authUser) {
                                   this.props.removeWatchingShow(id)
                                 } else {
-                                  this.context.toggleContentLS(id, "watchingShows")
+                                  this.context.toggleContentLS({
+                                    id,
+                                    type: "watchingShows"
+                                  })
                                 }
 
                                 if (this.props.currentlyChosenContent.find(item => item.id === id)) {
@@ -202,11 +205,11 @@ class AdvSearchResults extends Component {
                                       database: "watchingShows"
                                     })
                                   } else {
-                                    this.context.toggleContentLS(
+                                    this.context.toggleContentLS({
                                       id,
-                                      "watchingShows",
-                                      this.props.advancedSearchContent
-                                    )
+                                      data: this.props.advancedSearchContent,
+                                      type: "watchingShows"
+                                    })
                                   }
                                   this.props.toggleCurrentlyChosenContent(
                                     id,

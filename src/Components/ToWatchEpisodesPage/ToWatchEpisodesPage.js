@@ -1,12 +1,13 @@
 import React, { Component } from "react"
+import { withFirebase } from "Components/Firebase/FirebaseContext"
 import ScrollToTop from "Utils/ScrollToTop"
 import HeaderBase from "Components/Header/Header"
-import { withFirebase } from "Components/Firebase/FirebaseContext"
-import ShowsContent from "./ShowsContent"
+import ToWatchEpisodesContent from "./ToWatchEpisodesContent"
+import "./ToWatchEpisodesPage.scss"
 
 const Header = withFirebase(HeaderBase)
 
-class Shows extends Component {
+class ToWatchEpisodesPage extends Component {
   constructor(props) {
     super(props)
 
@@ -17,11 +18,11 @@ class Shows extends Component {
     return (
       <>
         <Header />
-        <ShowsContent />
+        <ToWatchEpisodesContent />
         <ScrollToTop />
       </>
     )
   }
 }
 
-export default Shows
+export default ToWatchEpisodesPage

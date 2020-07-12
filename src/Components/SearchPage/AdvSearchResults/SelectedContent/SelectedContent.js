@@ -105,7 +105,10 @@ class MovieResultsSelected extends React.PureComponent {
                               if (this.props.authUser) {
                                 this.props.toggleWatchLaterMovie(id)
                               } else {
-                                this.context.toggleContentLS(id, "watchLaterMovies")
+                                this.context.toggleContentLS({
+                                  id,
+                                  type: "watchLaterMovies"
+                                })
                               }
                               this.props.toggleCurrentlyChosenContent(id)
                             }}
@@ -121,7 +124,10 @@ class MovieResultsSelected extends React.PureComponent {
                               if (this.props.authUser) {
                                 this.props.removeWatchingShow(id)
                               } else {
-                                this.context.toggleContentLS(id, "watchingShows")
+                                this.context.toggleContentLS({
+                                  id,
+                                  type: "watchingShows"
+                                })
                               }
                               this.props.toggleCurrentlyChosenContent(id)
                             }}

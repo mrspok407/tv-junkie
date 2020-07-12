@@ -61,6 +61,7 @@ class Firebase {
 
   /// Shows In Database ///
   allShowsList = subDatabase => this.db.ref(`allShowsList/${subDatabase}`)
+  showInDatabase = (subDatabase, showKey) => this.db.ref(`allShowsList/${subDatabase}/${showKey}`)
   showInfo = (subDatabase, showKey) => this.db.ref(`allShowsList/${subDatabase}/${showKey}/info`)
   showEpisodes = (subDatabase, showKey) => this.db.ref(`allShowsList/${subDatabase}/${showKey}/episodes`)
 
@@ -69,12 +70,13 @@ class Firebase {
   users = () => this.db.ref("users")
 
   /// User Content API ///
-  userContent = uid => this.db.ref(`users/${uid}/content`)
-  userContentShows = uid => this.db.ref(`users/${uid}/content/shows/info`)
-  userContentEpisodes = uid => this.db.ref(`users/${uid}/content/shows/episodes`)
-  // watchingShows = uid => this.db.ref(`users/${uid}/content/shows/info/watchingShows/`)
+  // userContent = uid => this.db.ref(`users/${uid}/content`)
+  // userContentShows = uid => this.db.ref(`users/${uid}/content/shows/info`)
+  // userContentEpisodes = uid => this.db.ref(`users/${uid}/content/shows/episodes`)
 
   userShows = (uid, subDatabase) => this.db.ref(`users/${uid}/content/shows/${subDatabase}`)
+  userShow = (uid, showKey, subDatabase) =>
+    this.db.ref(`users/${uid}/content/shows/${subDatabase}/${showKey}`)
   userShowInfo = (uid, showKey, subDatabase) =>
     this.db.ref(`users/${uid}/content/shows/${subDatabase}/${showKey}/info`)
   userShowAllEpisodes = (uid, showKey, subDatabase) =>

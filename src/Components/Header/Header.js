@@ -42,6 +42,19 @@ export default class Header extends Component {
               </li>
             </NavLink>
 
+            {authUser && (
+              <NavLink
+                exact
+                to={ROUTES.TO_WATCH}
+                activeClassName="nav__item--active"
+                onClick={() => this.closeNavMobile()}
+              >
+                <li data-item="2" className="nav__item">
+                  To Watch
+                </li>
+              </NavLink>
+            )}
+
             <NavLink
               exact
               to={ROUTES.SHOWS}

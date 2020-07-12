@@ -134,21 +134,19 @@ function FullContentInfo({
           const similarShows = similar.results.filter(item => item.poster_path)
           const similarShowsSortByVotes = similarShows.sort((a, b) => b.vote_count - a.vote_count)
 
-          setInfoToPass([
-            {
-              name,
-              original_name,
-              id: data.id,
-              first_air_date,
-              vote_average,
-              genre_ids: genreIds,
-              overview,
-              backdrop_path,
-              poster_path,
-              vote_count,
-              status
-            }
-          ])
+          setInfoToPass({
+            name,
+            original_name,
+            id: data.id,
+            first_air_date,
+            vote_average,
+            genre_ids: genreIds,
+            overview,
+            backdrop_path,
+            poster_path,
+            vote_count,
+            status
+          })
 
           setDetailes({
             poster: poster_path,
@@ -218,20 +216,18 @@ function FullContentInfo({
           const similarMovies = similar_movies.results.filter(item => item.poster_path)
           const similarMoviesSortByVotes = similarMovies.sort((a, b) => b.vote_count - a.vote_count)
 
-          setInfoToPass([
-            {
-              title,
-              original_title,
-              id: data.id,
-              release_date,
-              vote_average,
-              genre_ids: genresIds,
-              overview,
-              backdrop_path,
-              poster_path,
-              vote_count
-            }
-          ])
+          setInfoToPass({
+            title,
+            original_title,
+            id: data.id,
+            release_date,
+            vote_average,
+            genre_ids: genresIds,
+            overview,
+            backdrop_path,
+            poster_path,
+            vote_count
+          })
 
           setDetailes({
             poster: poster_path,

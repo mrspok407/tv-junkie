@@ -55,7 +55,10 @@ class ShowsButtons extends Component {
                     database: "notWatchingShows"
                   })
                 } else {
-                  this.context.toggleContentLS(Number(id), "watchingShows")
+                  this.context.toggleContentLS({
+                    id: Number(id),
+                    type: "watchingShows"
+                  })
                 }
               }}
             >
@@ -74,7 +77,11 @@ class ShowsButtons extends Component {
                     database: "watchingShows"
                   })
                 } else {
-                  this.context.toggleContentLS(Number(id), "watchingShows", infoToPass)
+                  this.context.toggleContentLS({
+                    id: Number(id),
+                    data: infoToPass,
+                    type: "watchingShows"
+                  })
                 }
               }}
             >

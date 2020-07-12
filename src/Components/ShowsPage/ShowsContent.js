@@ -332,7 +332,10 @@ class ShowsContent extends Component {
                             })
                             this.handleShowsOnClient(item.id)
                           } else {
-                            this.context.toggleContentLS(item.id, "watchingShows")
+                            this.context.toggleContentLS({
+                              id: item.id,
+                              type: "watchingShows"
+                            })
                           }
                         }}
                         type="button"

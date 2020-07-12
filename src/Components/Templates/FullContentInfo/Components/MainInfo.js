@@ -149,11 +149,11 @@ class MainInfo extends Component {
                     database: "watchLaterMovies"
                   })
                 } else {
-                  this.context.toggleContentLS(
-                    Number(this.props.id),
-                    "watchLaterMovies",
-                    this.props.infoToPass
-                  )
+                  this.context.toggleContentLS({
+                    id: Number(this.props.id),
+                    data: this.props.infoToPass,
+                    type: "watchLaterMovies"
+                  })
                 }
               }}
               type="button"

@@ -1,5 +1,6 @@
 export const SEARCH_PAGE = "/"
 export const SHOWS = "/shows"
+export const TO_WATCH = "/towatch"
 export const MOVIES = "/movies"
 export const FULL_CONTENT_INFO = "/:mediaType/:id"
 export const PROFILE = "/profile"

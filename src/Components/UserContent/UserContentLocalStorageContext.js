@@ -23,19 +23,18 @@ const userContentLocalStorageProvider = Component => {
       localStorage.setItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES, JSON.stringify(this.state.watchLaterMovies))
     }
 
-    toggleContentLS = (id, type, contentArr) => {
-      console.log(id)
+    toggleContentLS = ({ id,  data = [], type }) => {
       const contentExists = this.state[type].find(item => item.id === id)
-      const newContent = contentArr && contentArr.find(item => item.id === id)
+      const content = Array.isArray(data) ? data.find(item => item.id === id) : data
 
       if (contentExists) {
         this.setState(prevState => ({
           [type]: [...prevState[type].filter(item => item.id !== id)]
         }))
       } else {
-        this.setState(prevState => ({
-          [type]: [...prevState[type], { ...newContent, userWatching: newContent && true }]
-        }))
+        this.setState({
+          [type]: [...this.state[type], { ...content, userWatching: content && true }]
+        })
       }
     }
 

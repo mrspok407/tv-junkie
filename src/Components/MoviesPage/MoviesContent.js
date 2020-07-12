@@ -351,7 +351,11 @@ class MoviesContent extends Component {
                         this.loadNewContent({ itemsToLoad: 1 })
                         this.handleMoviesOnClient(item.id)
                       } else {
-                        this.context.toggleContentLS(item.id, "watchLaterMovies", movies)
+                        this.context.toggleContentLS({
+                          id: item.id,
+                          data: movies,
+                          type: "watchLaterMovies"
+                        })
                       }
                     }}
                     type="button"

@@ -30,7 +30,11 @@ class SearchCard extends Component {
                 })
                 this.props.updateContentInDbClient(this.props.id, searchResults)
               } else {
-                this.context.toggleContentLS(this.props.id, "watchLaterMovies", searchResults)
+                this.context.toggleContentLS({
+                  id: this.props.id,
+                  data: searchResults,
+                  type: "watchLaterMovies"
+                })
               }
 
               if (
@@ -58,7 +62,10 @@ class SearchCard extends Component {
                     })
                     this.props.updateContentInDbClient(this.props.id, searchResults)
                   } else {
-                    this.context.toggleContentLS(this.props.id, "watchingShows")
+                    this.context.toggleContentLS({
+                      id: this.props.id,
+                      type: "watchingShows"
+                    })
                   }
                   this.props.toggleCurrentlyChosenContent(this.props.id, searchResults)
                 }}
@@ -79,7 +86,11 @@ class SearchCard extends Component {
                     })
                     this.props.updateContentInDbClient(this.props.id, searchResults)
                   } else {
-                    this.context.toggleContentLS(this.props.id, "watchingShows", searchResults)
+                    this.context.toggleContentLS({
+                      id: this.props.id,
+                      data: searchResults,
+                      type: "watchingShows"
+                    })
                   }
 
                   this.props.toggleCurrentlyChosenContent(this.props.id, searchResults)

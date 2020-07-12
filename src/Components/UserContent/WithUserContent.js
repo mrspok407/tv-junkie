@@ -34,7 +34,7 @@ const withUserContent = Component => {
       }
     }
 
-    getShowEpisodes = ({ id }) => {
+    getShowEpisodes = async ({ id }) => {
       const promise = axios
         .get(`https://api.themoviedb.org/3/tv/${id}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US`)
         .then(({ data: { number_of_seasons } }) => {
@@ -74,8 +74,6 @@ const withUserContent = Component => {
 
             Object.entries(mergedRowData).forEach(([key, value]) => {
               if (!key.indexOf("season/")) {
-                // Firebase can't handle "/" in database
-                // const newKey = key.replace("/", "")
                 seasonsData.push({ [key]: { ...value } })
               }
             })
@@ -121,6 +119,7 @@ const withUserContent = Component => {
     }
 
     addShowToDatabase = ({ id, show, userDatabase }) => {
+      console.log(show)
       this.getShowEpisodes({ id }).then(data => {
         const allShowsListSubDatabase =
           data.status === "Ended" || data.status === "Canceled" ? "ended" : "ongoing"
@@ -149,11 +148,8 @@ const withUserContent = Component => {
           .userShows(this.userUid, userDatabase)
           .child(id)
           .set({
-            // info: {
-            //    ...show,
-            //   status: data.status
-            // },
             status: data.status,
+            firstAirData: show.first_air_date,
             name: show.name || show.original_name,
             timeStamp: this.firebase.timeStamp(),
             episodes: userEpisodes,
@@ -217,26 +213,18 @@ const withUserContent = Component => {
     handleShowInDatabases = ({ id, data = [], database, callback = () => {} }) => {
       const otherDatabases = this.state.showsDatabases.filter(item => item !== database)
 
-      const showToAdd = Array.isArray(data) ? data.find(item => item.id === id) : data
+      const show = Array.isArray(data) ? data.find(item => item.id === id) : data
 
       const promises = []
 
       otherDatabases.forEach(item => {
         const promise = this.firebase
           .userShows(this.userUid, item)
-          // .orderByChild("id")
-          // .equalTo(id)
           .child(id)
           .once(
             "value",
             snapshot => {
               if (snapshot.val() !== null) {
-                // let show = {}
-
-                // Object.keys(snapshot.val()).forEach(key => {
-                //   show = { ...snapshot.val()[key], key }
-                // })
-
                 this.firebase
                   .userShows(this.userUid, database)
                   .child(id)
@@ -271,12 +259,10 @@ const withUserContent = Component => {
 
         this.firebase
           .userShows(this.userUid, database)
-          // .orderByChild("id")
-          // .equalTo(id)
           .child(id)
           .once("value", snapshot => {
             if (snapshot.val() !== null) return
-            this.addShowToDatabase({ id, show: showToAdd, userDatabase: database })
+            this.addShowToDatabase({ id, show: show, userDatabase: database })
           })
       })
     }
