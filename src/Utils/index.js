@@ -4,6 +4,8 @@ import iconMediaTypeMovie from "assets/images/icons/media-type-movie.png"
 import iconMediaTypePerson from "assets/images/icons/media-type-person.png"
 import iconMediaTypeTv from "assets/images/icons/media-type-tv.png"
 
+export const todayDate = new Date()
+
 export const range = (start, stop, step) =>
   Array.from({ length: (stop - start) / step + 1 }, (_, i) => start + i * step)
 

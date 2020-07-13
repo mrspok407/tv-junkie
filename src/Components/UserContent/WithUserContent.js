@@ -34,7 +34,7 @@ const withUserContent = Component => {
       }
     }
 
-    getShowEpisodes = async ({ id }) => {
+    getShowEpisodes = ({ id }) => {
       const promise = axios
         .get(`https://api.themoviedb.org/3/tv/${id}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US`)
         .then(({ data: { number_of_seasons } }) => {
@@ -97,6 +97,9 @@ const withUserContent = Component => {
               const updatedSeason = {
                 air_date: season.air_date,
                 season_number: season.season_number,
+                id: season._id,
+                poster_path: season.poster_path,
+                name: season.name,
                 episodes
               }
 

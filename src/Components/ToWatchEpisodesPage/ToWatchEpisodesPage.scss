@@ -1,0 +1,9 @@
+.towatch__show {
+  display: flex;
+  flex-direction: column;
+
+  &-name {
+    font-size: 2.5rem;
+    color: peru;
+  }
+}

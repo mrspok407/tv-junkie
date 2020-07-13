@@ -83,13 +83,12 @@ function FullContentInfo({
       if (!authUser) return
 
       userContent.showsDatabases.forEach(database => {
-        firebase.userShows(authUser.uid, database).off()
+        firebase.userShow(authUser.uid, Number(id), database).off()
       })
 
       firebase.watchLaterMovies(authUser.uid).off()
 
       setShowInDatabase({ database: null, info: null })
-      setShowEpisodesDatabase(null)
       setShowDatabaseOnClient(null)
     }
   }, [mediaType, id])
@@ -265,52 +264,77 @@ function FullContentInfo({
     userContent.showsDatabases.forEach(database => {
       counter++
 
-      firebase
-        .userShows(authUser.uid, database)
-        .child(Number(id))
-        .on(
-          "value",
-          snapshot => {
-            if (snapshot.val() !== null) {
-              // const showInfo = {
-              //   ...snapshot.val()
-              // }
-              // delete showInfo.episodes
+      firebase.userShow(authUser.uid, Number(id), database).on(
+        "value",
+        snapshot => {
+          if (snapshot.val() !== null) {
+            const userShow = snapshot.val()
+            const allShowsListSubDatabase =
+              userShow.status === "Ended" || userShow.status === "Canceled" ? "ended" : "ongoing"
 
-              setShowInDatabase({ database, info: snapshot.val() })
-              setShowEpisodesDatabase(snapshot.val().episodes)
-              setShowDatabaseOnClient(database)
-            }
+            firebase.showInDatabase(allShowsListSubDatabase, Number(id)).once("value", snapshot => {
+              let updatedShow = {}
 
-            if (counter === userContent.showsDatabases.length) {
-              setLoadingFromDatabase(false)
-            }
-          },
-          error => {
-            console.log(`Error in database occured. ${error}`)
+              let allEpisodes = []
 
-            setShowDatabaseOnClient(showInDatabase.database)
+              show.episodes.forEach((season, indexSeason) => {
+                let episodes = []
+
+                season.episodes.forEach((episode, indexEpisode) => {
+                  const seasonPath = userShow.episodes[indexSeason]
+
+                  const watched =
+                    seasonPath && seasonPath.episodes[indexEpisode]
+                      ? seasonPath.episodes[indexEpisode].watched
+                      : false
+
+                  const updatedEpisode = {
+                    ...episode,
+                    watched: watched
+                  }
+                  episodes.push(updatedEpisode)
+                })
+
+                const updatedSeason = {
+                  ...season,
+                  episodes
+                }
+
+                allEpisodes.push(updatedSeason)
+              })
+
+              updatedShow = {
+                ...show,
+                episodes: allEpisodes
+              }
+
+              firebase.userShowAllEpisodes(authUser.uid, Number(id), database).set(allEpisodes)
+
+              console.log(updatedShow)
+            })
+
+            console.log("updated")
+
+            setShowInDatabase({ database, info: snapshot.val() })
+            setShowDatabaseOnClient(database)
           }
-        )
+
+          if (counter === userContent.showsDatabases.length) {
+            setLoadingFromDatabase(false)
+          }
+        },
+        error => {
+          console.log(`Error in database occured. ${error}`)
+
+          setShowDatabaseOnClient(showInDatabase.database)
+        }
+      )
     })
   }
 
   const changeShowDatabaseOnClient = database => {
     setShowDatabaseOnClient(database)
   }
-
-  // useEffect(() => {
-  //   if (!authUser) return
-
-  //   console.log(showInDatabase)
-
-  //   firebase.userShowAllEpisodes(authUser.uid, id, showInDatabase.database).once("value", snapshot => {
-  //     console.log(snapshot.val())
-  //     setShowEpisodesDatabase(snapshot.val())
-  //   })
-
-  //   setShowDatabaseOnClient(showInDatabase.database)
-  // }, [showInDatabase])
 
   const getMovieInDatabase = () => {
     if (!authUser) return
@@ -386,7 +410,6 @@ function FullContentInfo({
               id={id}
               infoToPass={infoToPass}
               showInDatabase={showInDatabase}
-              showEpisodesDatabase={showEpisodesDatabase}
               getShowInDatabase={getShowInDatabase}
               changeShowDatabaseOnClient={changeShowDatabaseOnClient}
               changeMovieDatabaseOnClient={changeMovieDatabaseOnClient}
@@ -406,7 +429,6 @@ function FullContentInfo({
                   id={id}
                   showInDatabase={showInDatabase}
                   infoToPass={infoToPass}
-                  showEpisodesDatabase={showEpisodesDatabase}
                 />
               </>
             )}
