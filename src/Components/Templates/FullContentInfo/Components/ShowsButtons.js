@@ -104,7 +104,6 @@ class ShowsButtons extends Component {
               type="button"
               onClick={() => {
                 this.props.changeShowDatabaseOnClient("droppedShows")
-                this.props.getShowInDatabase()
                 this.props.handleShowInDatabases({
                   id: Number(id),
                   data: infoToPass,

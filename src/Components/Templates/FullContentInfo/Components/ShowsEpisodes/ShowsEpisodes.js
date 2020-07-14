@@ -48,7 +48,11 @@ class ShowsEpisodes extends Component {
   }
 
   initialFirstSeasonLoad = () => {
-    const firstSeason = this.props.seasonsArr.find(item => item.season_number === 1)
+    // const firstSeason = this.props.seasonsArr.find(item => item.season_number === 1)
+    if (this.props.seasonsArr.length === 0) return
+
+    const firstSeason = this.props.seasonsArr[this.props.seasonsArr.length - 1]
+    console.log(this.props.seasonsArr)
 
     this.setState({
       openSeasons: firstSeason && [firstSeason.id]
@@ -202,7 +206,6 @@ class ShowsEpisodes extends Component {
       show.status === "Ended" || show.status === "Canceled" ? "ended" : "ongoing"
 
     this.props.firebase.showEpisodes(allShowsListSubDatabase, show.id).once("value", snapshot => {
-      console.log(snapshot.val())
       if (snapshot.val() !== null) {
         let allEpisodes = []
 
@@ -262,6 +265,15 @@ class ShowsEpisodes extends Component {
       this.props.authUser &&
       this.props.showInDatabase.info &&
       this.props.showInDatabase.database !== "notWatchingShows"
+
+    // const newSeasons = this.props.toWatch
+    //   ? this.props.seasonsArr.filter(
+    //       season => season.episodes.some(episode => episode.watched === false) === true
+    //     )
+    //   : this.props.seasonsArr
+
+    // console.log(newSeasons)
+
     return (
       <>
         {showCheckboxes && (
@@ -273,7 +285,10 @@ class ShowsEpisodes extends Component {
         )}
         <div className="full-detailes__seasons-and-episodes">
           {this.props.seasonsArr.map(season => {
+            // console.log(this.props.toWatch && season.episodes.some(item => item.watched === false))
             if (season.season_number === 0 || season.name === "Specials" || !season.air_date) return null
+            // if (!season.episodes.some(item => item.watched === false)) return null
+
             const seasonId = season.id
 
             const daysToNewSeason = differenceBtwDatesInDays(season.air_date, this.props.todayDate)
@@ -350,6 +365,7 @@ class ShowsEpisodes extends Component {
                       )}
                       <SeasonEpisodes
                         showEpisodes={this.state.showEpisodes}
+                        toWatch={this.props.toWatch}
                         showTitle={this.props.showTitle}
                         todayDate={this.props.todayDate}
                         detailEpisodeInfo={this.state.detailEpisodeInfo}

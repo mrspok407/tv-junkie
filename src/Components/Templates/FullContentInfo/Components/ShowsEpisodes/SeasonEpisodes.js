@@ -12,6 +12,9 @@ export default class SeasonEpisodes extends Component {
       this.props.showInDatabase.info.episodes.length > 0 &&
       true
 
+    // console.log(this.props.showInDatabase)
+    // console.log(this.props.season)
+
     return (
       <div className="full-detailes__episodes-list">
         {this.props.showEpisodes.map(item => {

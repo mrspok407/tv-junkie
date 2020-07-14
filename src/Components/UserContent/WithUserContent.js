@@ -89,7 +89,8 @@ const withUserContent = Component => {
                   air_date: item.air_date,
                   episode_number: item.episode_number,
                   name: item.name,
-                  season_number: item.season_number
+                  season_number: item.season_number,
+                  id: item.id
                 }
                 episodes.push(updatedEpisode)
               })

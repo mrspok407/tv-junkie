@@ -267,60 +267,69 @@ function FullContentInfo({
       firebase.userShow(authUser.uid, Number(id), database).on(
         "value",
         snapshot => {
+          console.log("updated")
           if (snapshot.val() !== null) {
             const userShow = snapshot.val()
             const allShowsListSubDatabase =
               userShow.status === "Ended" || userShow.status === "Canceled" ? "ended" : "ongoing"
 
-            firebase.showInDatabase(allShowsListSubDatabase, Number(id)).once("value", snapshot => {
-              let updatedShow = {}
+            firebase
+              .showInDatabase(allShowsListSubDatabase, Number(id))
+              .once("value", snapshot => {
+                const show = snapshot.val()
 
-              let allEpisodes = []
+                let updatedSeasons = []
+                let updatedSeasonsUser = []
 
-              show.episodes.forEach((season, indexSeason) => {
-                let episodes = []
+                show.episodes.forEach((season, indexSeason) => {
+                  let updatedEpisodes = []
+                  let updatedEpisodesUser = []
 
-                season.episodes.forEach((episode, indexEpisode) => {
-                  const seasonPath = userShow.episodes[indexSeason]
+                  season.episodes.forEach((episode, indexEpisode) => {
+                    const seasonPath = userShow.episodes[indexSeason]
+                    const watched =
+                      seasonPath && seasonPath.episodes[indexEpisode]
+                        ? seasonPath.episodes[indexEpisode].watched
+                        : false
 
-                  const watched =
-                    seasonPath && seasonPath.episodes[indexEpisode]
-                      ? seasonPath.episodes[indexEpisode].watched
-                      : false
+                    const updatedEpisode = {
+                      ...episode,
+                      watched: watched
+                    }
 
-                  const updatedEpisode = {
-                    ...episode,
-                    watched: watched
+                    const updatedEpisodeUser = {
+                      watched: watched
+                    }
+
+                    updatedEpisodes.push(updatedEpisode)
+                    updatedEpisodesUser.push(updatedEpisodeUser)
+                  })
+
+                  const updatedSeason = {
+                    ...season,
+                    episodes: updatedEpisodes
                   }
-                  episodes.push(updatedEpisode)
+
+                  const updatedSeasonUser = {
+                    season_number: season.season_number,
+                    episodes: updatedEpisodesUser
+                  }
+
+                  updatedSeasons.push(updatedSeason)
+                  updatedSeasonsUser.push(updatedSeasonUser)
                 })
 
-                const updatedSeason = {
-                  ...season,
-                  episodes
-                }
-
-                allEpisodes.push(updatedSeason)
+                firebase.userShowAllEpisodes(authUser.uid, Number(id), database).set(updatedSeasonsUser)
+              })
+              .then(() => {
+                // if (counter === userContent.showsDatabases.length) {
+                //   setLoadingFromDatabase(false)
+                //   console.log("loading finished")
+                // }
               })
 
-              updatedShow = {
-                ...show,
-                episodes: allEpisodes
-              }
-
-              firebase.userShowAllEpisodes(authUser.uid, Number(id), database).set(allEpisodes)
-
-              console.log(updatedShow)
-            })
-
-            console.log("updated")
-
-            setShowInDatabase({ database, info: snapshot.val() })
+            setShowInDatabase({ database, info: userShow })
             setShowDatabaseOnClient(database)
-          }
-
-          if (counter === userContent.showsDatabases.length) {
-            setLoadingFromDatabase(false)
           }
         },
         error => {
@@ -329,6 +338,10 @@ function FullContentInfo({
           setShowDatabaseOnClient(showInDatabase.database)
         }
       )
+      if (counter === userContent.showsDatabases.length) {
+        setLoadingFromDatabase(false)
+        console.log("loading finished")
+      }
     })
   }
 
