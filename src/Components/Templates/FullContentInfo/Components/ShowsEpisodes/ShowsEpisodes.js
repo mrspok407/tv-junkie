@@ -104,6 +104,7 @@ class ShowsEpisodes extends Component {
       })
     }
 
+    if (this.props.toWatch) return
     if (this.state.showEpisodes.some(item => item.seasonId === seasonId)) return
 
     this.setState(prevState => ({
@@ -364,6 +365,7 @@ class ShowsEpisodes extends Component {
                         </div>
                       )}
                       <SeasonEpisodes
+                        seasonsArr={this.props.seasonsArr}
                         showEpisodes={this.state.showEpisodes}
                         toWatch={this.props.toWatch}
                         showTitle={this.props.showTitle}

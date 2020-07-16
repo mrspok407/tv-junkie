@@ -14,11 +14,17 @@ export default class SeasonEpisodes extends Component {
 
     // console.log(this.props.showInDatabase)
     // console.log(this.props.season)
+    console.log(this.props.showEpisodes)
+    console.log(this.props.seasonsArr)
+
+    const seasons = this.props.toWatch ? this.props.seasonsArr : this.props.showEpisodes
 
     return (
       <div className="full-detailes__episodes-list">
-        {this.props.showEpisodes.map(item => {
-          if (item.seasonId !== this.props.seasonId) return null
+        {seasons.map(item => {
+          const seasonId = this.props.toWatch ? item.id : item.seasonId
+
+          if (seasonId !== this.props.seasonId) return null
 
           return item.episodes.map(episode => {
             const urlShowTitle = this.props.showTitle.split(" ").join("+")

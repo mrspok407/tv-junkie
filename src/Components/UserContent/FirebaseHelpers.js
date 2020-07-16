@@ -16,8 +16,6 @@ export const checkIfAllEpisodesWatched = ({ show, firebase, authUser, todayDate 
       return daysToNewEpisode < 0 && episode
     })
 
-    console.log(releasedEpisodes)
-
     firebase.userShowAllEpisodes(authUser.uid, show.info.id, show.database).once("value", snapshot => {
       let allEpisodes = []
 
@@ -26,7 +24,6 @@ export const checkIfAllEpisodesWatched = ({ show, firebase, authUser, todayDate 
       })
 
       allEpisodes.splice(releasedEpisodes.length)
-      console.log(allEpisodes)
 
       const allEpisodesWatched = !allEpisodes.some(episode => !episode.watched)
 

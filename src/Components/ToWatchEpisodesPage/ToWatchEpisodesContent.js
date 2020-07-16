@@ -55,8 +55,14 @@ class ToWatchEpisodesContent extends Component {
                 const show = this.state.watchingShows.find(item => item.id === snapshot.val().id)
 
                 if (show) {
-                  show.episodes.forEach((season, index) => {
-                    show.episodes[index].episodes = snapshot.val().episodes[index].episodes
+                  show.episodes.forEach((season, seasonIndex) => {
+                    // show.episodes[index].episodes = snapshot.val().episodes[index].episodes
+                    season.episodes.forEach((episode, episodeIndex) => {
+                      show.episodes[seasonIndex].episodes[episodeIndex] = {
+                        ...episode,
+                        watched: snapshot.val().episodes[seasonIndex].episodes[episodeIndex].watched
+                      }
+                    })
                   })
                   watchingShows.splice(index, 0, show)
 
@@ -163,8 +169,6 @@ class ToWatchEpisodesContent extends Component {
             status: show.info.status
           }
 
-          console.log(show.episodes)
-
           let newEpisodes = []
 
           show.episodes.forEach(season => {
@@ -177,6 +181,8 @@ class ToWatchEpisodesContent extends Component {
               }
             })
 
+            episodes.reverse()
+
             newSeason = {
               ...season,
               episodes
@@ -188,55 +194,24 @@ class ToWatchEpisodesContent extends Component {
           })
 
           newEpisodes.reverse()
-          console.log(newEpisodes)
-
-          // let reversedEpisodes = [...show.episodes]
-          // reversedEpisodes.reverse()
-
-          // // const newSeasons = reversedEpisodes.filter(
-          // //   season => season.episodes.some(episode => episode.watched === false) === true
-          // // )
-
-          // let updatedSeasons = []
-
-          // const test = [...reversedEpisodes]
-          // console.log(test)
-
-          // reversedEpisodes.forEach((season, index) => {
-          //   const filteredSeason = season.episodes.filter(episode => episode.watched === false)
-          //   console.log(filteredSeason)
-          //   if (filteredSeason.length === 0) {
-          //     // const test = [...reversedEpisodes]
-          //     // test.splice(index, 1)
-
-          //     // reversedEpisodes = test
-          //     // console.log(reversedEpisodes)
-          //     reversedEpisodes.splice(index, 1)
-          //   } else {
-          //     reversedEpisodes[index].episodes = filteredSeason
-          //   }
-          // })
-
-          // console.log(reversedEpisodes)
-          // console.log(updatedSeasons)
-
-          //  const newSeasons = updatedSeasons.filter(season => season.length !== 0 && true)
-
-          // console.log(newSeasons)
 
           return (
-            <div key={show.id} className="towatch__show">
-              <div className="towatch__show-name">{show.info.name}</div>
-              <ShowsEpisodes
-                toWatch={true}
-                seasonsArr={newEpisodes}
-                showTitle={show.info.name || show.info.original_name}
-                todayDate={todayDate}
-                id={show.id}
-                showInDatabase={showInDatabase}
-                infoToPass={infoToPass}
-              />
-            </div>
+            <>
+              {newEpisodes.length !== 0 && (
+                <div key={show.id} className="towatch__show">
+                  <div className="towatch__show-name">{show.info.name}</div>
+                  <ShowsEpisodes
+                    toWatch={true}
+                    seasonsArr={newEpisodes}
+                    showTitle={show.info.name || show.info.original_name}
+                    todayDate={todayDate}
+                    id={show.id}
+                    showInDatabase={showInDatabase}
+                    infoToPass={infoToPass}
+                  />
+                </div>
+              )}
+            </>
           )
         })}
       </div>
