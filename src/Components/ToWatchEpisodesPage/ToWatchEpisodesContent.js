@@ -195,23 +195,21 @@ class ToWatchEpisodesContent extends Component {
 
           newEpisodes.reverse()
 
+          if (newEpisodes.length === 0) return
+
           return (
-            <>
-              {newEpisodes.length !== 0 && (
-                <div key={show.id} className="towatch__show">
-                  <div className="towatch__show-name">{show.info.name}</div>
-                  <ShowsEpisodes
-                    toWatch={true}
-                    seasonsArr={newEpisodes}
-                    showTitle={show.info.name || show.info.original_name}
-                    todayDate={todayDate}
-                    id={show.id}
-                    showInDatabase={showInDatabase}
-                    infoToPass={infoToPass}
-                  />
-                </div>
-              )}
-            </>
+            <div key={show.id} className="towatch__show">
+              <div className="towatch__show-name">{show.info.name}</div>
+              <ShowsEpisodes
+                toWatch={true}
+                seasonsArr={newEpisodes}
+                showTitle={show.info.name || show.info.original_name}
+                todayDate={todayDate}
+                id={show.id}
+                showInDatabase={showInDatabase}
+                infoToPass={infoToPass}
+              />
+            </div>
           )
         })}
       </div>
