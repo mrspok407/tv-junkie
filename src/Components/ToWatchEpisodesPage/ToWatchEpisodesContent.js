@@ -1,7 +1,9 @@
 import React, { Component } from "react"
+import { Link } from "react-router-dom"
 import { withUserContent } from "Components/UserContent"
-import ShowsEpisodes from "Components/Templates/FullContentInfo/Components/ShowsEpisodes/ShowsEpisodes"
+import ShowsEpisodes from "Components/Templates/SeasonsAndEpisodes/ShowsEpisodes"
 import { todayDate } from "Utils"
+import merge from "deepmerge"
 
 class ToWatchEpisodesContent extends Component {
   constructor(props) {
@@ -21,6 +23,21 @@ class ToWatchEpisodesContent extends Component {
     this.state.watchingShows.forEach(show => {
       this.props.firebase.userShow(this.props.authUser.uid, show.id, "watchingShows").off()
     })
+  }
+
+  combineMerge = (target, source, options) => {
+    const destination = target.slice()
+
+    source.forEach((item, index) => {
+      if (typeof destination[index] === "undefined") {
+        destination[index] = options.cloneUnlessOtherwiseSpecified(item, options)
+      } else if (options.isMergeableObject(item)) {
+        destination[index] = merge(target[index], item, options)
+      } else if (target.indexOf(item) === -1) {
+        destination.push(item)
+      }
+    })
+    return destination
   }
 
   getContent = ({ sortBy = "first_air_date", isInitialLoad = true, database = "watchingShows" }) => {
@@ -96,33 +113,27 @@ class ToWatchEpisodesContent extends Component {
             let updatedSeasonsUser = []
 
             show.episodes.forEach((season, indexSeason) => {
-              let updatedEpisodes = []
               let updatedEpisodesUser = []
+              const seasonPath = userShows.find(item => item.id === show.id).episodes[indexSeason]
+              const databaseEpisodes = season.episodes
+              const userEpisodes = seasonPath
+                ? userShows.find(item => item.id === show.id).episodes[indexSeason].episodes
+                : []
 
-              season.episodes.forEach((episode, indexEpisode) => {
-                const seasonPath = userShows.find(item => item.id === show.id).episodes[indexSeason]
+              const mergedEpisodes = merge(databaseEpisodes, userEpisodes, {
+                arrayMerge: this.combineMerge
+              })
 
-                const watched =
-                  seasonPath && seasonPath.episodes[indexEpisode]
-                    ? seasonPath.episodes[indexEpisode].watched
-                    : false
-
+              mergedEpisodes.forEach(episode => {
                 const updatedEpisode = {
-                  ...episode,
-                  watched: watched
+                  watched: episode.watched || false
                 }
-
-                const updatedEpisodeUser = {
-                  watched: watched
-                }
-
-                updatedEpisodes.push(updatedEpisode)
-                updatedEpisodesUser.push(updatedEpisodeUser)
+                updatedEpisodesUser.push(updatedEpisode)
               })
 
               const updatedSeason = {
                 ...season,
-                episodes: updatedEpisodes
+                episodes: mergedEpisodes
               }
 
               const updatedSeasonUser = {
@@ -154,7 +165,7 @@ class ToWatchEpisodesContent extends Component {
 
   render() {
     return (
-      <div className="content-results">
+      <div className="content-results content-results--to-watch-page">
         {this.state.watchingShows.map(show => {
           const showInDatabase = show && {
             database: "watchingShows",
@@ -176,7 +187,7 @@ class ToWatchEpisodesContent extends Component {
             let episodes = []
 
             season.episodes.forEach(episode => {
-              if (!episode.watched) {
+              if (!episode.watched && episode.air_date) {
                 episodes.push(episode)
               }
             })
@@ -199,9 +210,11 @@ class ToWatchEpisodesContent extends Component {
 
           return (
             <div key={show.id} className="towatch__show">
-              <div className="towatch__show-name">{show.info.name}</div>
+              <Link className="towatch__show-name" to={`/show/${show.info.id}`}>
+                {show.info.name}
+              </Link>
               <ShowsEpisodes
-                toWatch={true}
+                toWatchPage={true}
                 seasonsArr={newEpisodes}
                 showTitle={show.info.name || show.info.original_name}
                 todayDate={todayDate}

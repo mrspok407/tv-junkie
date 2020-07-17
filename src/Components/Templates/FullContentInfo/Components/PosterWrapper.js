@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import axios, { CancelToken } from "axios"
-import Loader from "Components//Placeholders/Loader"
+import Loader from "Components/Placeholders/Loader"
 
 let cancelRequest
 

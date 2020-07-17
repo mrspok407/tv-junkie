@@ -1,7 +1,5 @@
 @import "../../../styles/globals";
 
-$maxContainerWidth: 1000px;
-
 $seasonInfoBgClr: #1d1d1d96;
 $seasonInfoBgClrHover: #252525;
 
@@ -24,167 +22,23 @@ $font-sizes: (
   episodeInfo: 1rem
 );
 
-.full-detailes-container {
-  max-width: $maxContainerWidth;
-  width: 100%;
-  padding-bottom: 100px;
-  @include mediaMaxW($maxContainerWidth) {
-    padding: 0px 15px 100px 15px;
-  }
-  @include mediaMaxW(#{$mobileViewPort}) {
-    padding: 0px 15px 100px 15px;
-  }
-}
-
-.full-detailes {
+.show-episodes {
   display: grid;
-  grid-template-columns: 0.8fr 2fr;
-  grid-auto-rows: max-content;
-  grid-gap: 40px;
-  padding-top: 50px;
+  grid-column: 1 / 3;
+  grid-template-columns: 1fr;
+  row-gap: 10px;
+  grid-auto-rows: minmax(50px, max-content);
   @include mediaMaxW(#{$mobileViewPort}) {
-    grid-template-columns: 1fr;
+    grid-column: inherit;
   }
 
-  &__error {
-    text-align: center;
-    color: getColor(orangeClr, $mainPalette);
-  }
-
-  &__poster {
-    background-position: center top;
-    background-repeat: no-repeat;
-    background-size: cover;
-    border-radius: 5px;
-    height: 100%;
-    box-shadow: 0px 0px 15px 7px rgba(0, 0, 0, 1);
-    @include mediaMaxW(#{$mobileViewPort}) {
-      display: none;
-    }
-    &--mobile {
-      display: none;
-      @include mediaMaxW(#{$mobileViewPort}) {
-        display: inherit;
-        justify-self: center;
-        width: 100%;
-        max-width: 400px;
-        height: 200px;
-      }
-    }
-
-    &-wrapper {
-      display: grid;
-      grid-template-rows: 1fr;
-      row-gap: 5px;
-    }
-    &--movie {
-      grid-template-rows: 90% 10%;
-    }
-  }
-  &__movie-links {
-    position: relative;
-    font-size: map-get($font-sizes, movieLinks);
-    z-index: 1;
-    .loader--small-pink {
-      position: static;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 58px;
-      transform: translate(0, 0);
-      .loader-shadow {
-        top: 50%;
-        transform: translate(-50%, -50%);
-      }
-    }
-  }
-
-  &__info {
-    &-title {
-      padding-bottom: 30px;
-      font-size: map-get($font-sizes, title);
-      color: map-get($colors, title);
-      @include mediaMaxW(430px) {
-        font-size: 2rem;
-      }
-
-      span {
-        padding-left: 5px;
-        font-size: map-get($font-sizes, title) * 0.6;
-        color: #fff;
-      }
-    }
-    &-row {
-      display: grid;
-      grid-template-columns: 30% 70%;
-      grid-template-rows: minmax(45px, max-content);
-      align-items: center;
-      border-bottom: 1px solid #86868647;
-      padding: 3px 0 3px 0;
-      &:last-child {
-        border: none;
-      }
-    }
-    &-option {
-      color: map-get($colors, infoOption);
-      font-size: map-get($font-sizes, infoOption);
-    }
-    &-value {
-      color: map-get($colors, infoValue);
-      font-size: map-get($font-sizes, infoValue);
-    }
-    &-no-info {
-      color: map-get($colors, infoOption);
-    }
-    &--button {
-      grid-template-columns: 1fr;
-      padding-top: 5px;
-      padding-bottom: 0;
-    }
-    &-imdb {
-      display: block;
-      background-image: url("../../../assets/images/icons/imdb-logo.svg");
-      background-size: contain;
-      background-repeat: no-repeat;
-      width: 78px;
-      height: 39px;
-    }
-  }
-
-  &__description {
-    grid-column: 1 / 3;
-    line-height: 26px;
-    font-size: map-get($font-sizes, description);
-    color: map-get($colors, description);
-    @include mediaMaxW(#{$mobileViewPort}) {
-      grid-column: inherit;
-    }
-  }
-
-  &__seasons-and-episodes {
-    display: grid;
-    grid-column: 1 / 3;
-    grid-template-columns: 1fr;
-    row-gap: 10px;
-    grid-auto-rows: minmax(50px, max-content);
-    @include mediaMaxW(#{$mobileViewPort}) {
-      grid-column: inherit;
-    }
+  &--to-watch-page {
+    grid-auto-rows: minmax(35px, max-content);
   }
 
   &__check-all-episodes {
     grid-column: 1 / 2;
     margin-bottom: -30px;
-  }
-
-  &__check-season-episodes {
-    margin-top: 10px;
-    @include mediaMaxW(#{$mobileViewPort}) {
-      margin-top: 0px;
-    }
   }
 
   &__season {
@@ -201,9 +55,6 @@ $font-sizes: (
       border-bottom: none;
     }
 
-    &-poster-wrapper {
-    }
-
     &-poster {
       background-position: center top;
       background-repeat: no-repeat;
@@ -214,16 +65,16 @@ $font-sizes: (
         display: none;
       }
     }
+
     &--no-poster {
       grid-template-columns: 1fr;
       column-gap: 0px;
     }
+
     &-info {
       position: relative;
       display: flex;
-      justify-content: space-between;
       grid-column: 1 / 3;
-      height: 50px;
       background-color: $seasonInfoBgClr;
       font-size: map-get($font-sizes, seasonInfo);
       color: map-get($colors, seasonInfo);
@@ -231,6 +82,7 @@ $font-sizes: (
       @include mediaMaxW(#{$mobileViewPort}) {
         grid-column: inherit;
       }
+
       &--open {
         &:after {
           transform: scale(-1);
@@ -239,6 +91,7 @@ $font-sizes: (
           opacity: 1;
         }
       }
+
       &:after {
         content: "";
         position: absolute;
@@ -268,15 +121,33 @@ $font-sizes: (
         opacity: 1;
       }
     }
+
     &-number {
       padding: 10px;
+
+      &--to-watch-page {
+        padding: 7px;
+      }
     }
-    &-when-new-season {
+
+    &-episodes-left {
+      padding: 11px 0px 0px 7px;
+      font-size: 0.9rem;
+    }
+
+    &-days-to-air {
       padding-left: 50px;
     }
+
     &-date {
+      margin-left: auto;
       padding: 10px 35px 10px 10px;
+
+      &--to-watch-page {
+        padding: 7px 35px 7px 10px;
+      }
     }
+
     .loader--small-pink {
       position: absolute;
       top: 50%;
@@ -303,18 +174,33 @@ $font-sizes: (
         }
       }
     }
+
+    &-check-all-episodes {
+      margin-top: 10px;
+      @include mediaMaxW(#{$mobileViewPort}) {
+        margin-top: 0px;
+      }
+
+      &--to-watch-page {
+        margin-top: 0;
+      }
+    }
   }
+
   &__episodes-list {
     display: grid;
     grid-auto-rows: max-content;
     grid-row-gap: 5px;
-    &--loading {
+
+    &--to-watch-page {
       grid-column: 1 / 3;
+
       @include mediaMaxW(#{$mobileViewPort}) {
-        grid-column: inherit;
+        grid-column: initial;
       }
     }
   }
+
   &__episode {
     position: relative;
     font-size: map-get($font-sizes, episodeInfo);
@@ -332,6 +218,12 @@ $font-sizes: (
       z-index: -1;
     }
 
+    &--to-watch-page {
+      &:after {
+        display: none;
+      }
+    }
+
     &--open {
       &:after {
         transform: scale(-1);
@@ -347,6 +239,7 @@ $font-sizes: (
     @include mediaMaxW(#{$mobileViewPort}) {
       font-size: 0.9rem;
     }
+
     &-wrapper {
       position: relative;
       display: grid;
@@ -372,6 +265,33 @@ $font-sizes: (
 
       &:hover:before {
         opacity: 1;
+      }
+
+      &--to-watch-page {
+        grid-template-columns: minmax(100px, 1.35fr) 3fr 1.1fr;
+        cursor: initial;
+      }
+    }
+
+    &-date {
+      padding-left: 33px;
+      align-self: center;
+    }
+
+    &-name {
+      align-self: center;
+    }
+
+    &-number {
+      padding-right: 7px;
+    }
+
+    &-days-to-air {
+      align-self: center;
+      justify-self: end;
+      padding-right: 30px;
+      @include mediaMaxW(#{$mobileViewPort}) {
+        text-align: center;
       }
     }
 
@@ -425,29 +345,6 @@ $font-sizes: (
       }
     }
 
-    &-date {
-      padding-left: 33px;
-      align-self: center;
-    }
-    &-name {
-      align-self: center;
-    }
-    &-number {
-      padding-right: 7px;
-    }
-    &-when-new-episode {
-      align-self: center;
-      justify-self: end;
-      padding-right: 30px;
-      @include mediaMaxW(#{$mobileViewPort}) {
-        text-align: center;
-      }
-    }
-    &--loading {
-      &:after {
-        display: none;
-      }
-    }
     &-detailes {
       display: grid;
       grid-template-columns: 11fr 39fr;
@@ -471,18 +368,6 @@ $font-sizes: (
       &-overview {
         padding: 10px 0 10px 0;
       }
-    }
-  }
-  &__slider {
-    grid-column: 1 / 3;
-    overflow: hidden;
-    @include mediaMaxW(#{$mobileViewPort}) {
-      grid-column: inherit;
-    }
-    &-title {
-      padding: 10px 5px 10px 10px;
-      font-size: 1.6rem;
-      color: map-get($colors, similarContentTitle);
     }
   }
 }

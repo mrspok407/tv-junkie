@@ -9,7 +9,7 @@ import ScrollToTop from "Utils/ScrollToTop"
 import Header from "Components/Header/Header"
 import Slider from "Utils/Slider/Slider"
 import MainInfo from "./Components/MainInfo"
-import ShowsEpisodes from "./Components/ShowsEpisodes/ShowsEpisodes"
+import ShowsEpisodes from "Components/Templates/SeasonsAndEpisodes/ShowsEpisodes"
 import PosterWrapper from "./Components/PosterWrapper"
 import "./FullContentInfo.scss"
 import { withUserContent } from "Components/UserContent"
@@ -436,6 +436,7 @@ function FullContentInfo({
             {mediaType === "show" && (
               <>
                 <ShowsEpisodes
+                  fullContentPage={true}
                   seasonsArr={detailes.seasonsArr}
                   showTitle={detailes.title}
                   todayDate={todayDate}

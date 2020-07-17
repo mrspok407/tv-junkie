@@ -3,9 +3,10 @@ import { withUserContent } from "Components/UserContent"
 import axios, { CancelToken } from "axios"
 import { differenceBtwDatesInDays } from "Utils"
 import { checkIfAllEpisodesWatched } from "Components/UserContent/FirebaseHelpers"
-import Loader from "Components//Placeholders/Loader"
+import Loader from "Components/Placeholders/Loader"
 import classNames from "classnames"
 import SeasonEpisodes from "./SeasonEpisodes"
+import "./ShowsEpisodes.scss"
 
 let cancelRequest
 
@@ -52,7 +53,6 @@ class ShowsEpisodes extends Component {
     if (this.props.seasonsArr.length === 0) return
 
     const firstSeason = this.props.seasonsArr[this.props.seasonsArr.length - 1]
-    console.log(this.props.seasonsArr)
 
     this.setState({
       openSeasons: firstSeason && [firstSeason.id]
@@ -104,7 +104,7 @@ class ShowsEpisodes extends Component {
       })
     }
 
-    if (this.props.toWatch) return
+    if (this.props.toWatchPage) return
     if (this.state.showEpisodes.some(item => item.seasonId === seasonId)) return
 
     this.setState(prevState => ({
@@ -156,6 +156,8 @@ class ShowsEpisodes extends Component {
     if (!this.props.authUser) return
 
     const show = this.props.showInDatabase
+
+    console.log(show)
 
     this.props.firebase
       .userShowSingleEpisode(this.props.authUser.uid, show.info.id, show.database, seasonNum, episodeNum)
@@ -267,46 +269,47 @@ class ShowsEpisodes extends Component {
       this.props.showInDatabase.info &&
       this.props.showInDatabase.database !== "notWatchingShows"
 
-    // const newSeasons = this.props.toWatch
-    //   ? this.props.seasonsArr.filter(
-    //       season => season.episodes.some(episode => episode.watched === false) === true
-    //     )
-    //   : this.props.seasonsArr
-
-    // console.log(newSeasons)
-
     return (
       <>
-        {showCheckboxes && (
-          <div className="full-detailes__check-all-episodes">
+        {showCheckboxes && this.props.fullContentPage && (
+          <div className="show-episodes__check-all-episodes">
             <button type="button" className="button" onClick={() => this.checkEveryShowEpisode()}>
               Check all episodes
             </button>
           </div>
         )}
-        <div className="full-detailes__seasons-and-episodes">
+        <div
+          className={classNames("show-episodes", {
+            "show-episodes--to-watch-page": this.props.toWatchPage
+          })}
+        >
           {this.props.seasonsArr.map(season => {
-            // console.log(this.props.toWatch && season.episodes.some(item => item.watched === false))
             if (season.season_number === 0 || season.name === "Specials" || !season.air_date) return null
-            // if (!season.episodes.some(item => item.watched === false)) return null
 
             const seasonId = season.id
 
             const daysToNewSeason = differenceBtwDatesInDays(season.air_date, this.props.todayDate)
 
+            const episodeToString =
+              this.props.toWatchPage && season.episodes[season.episodes.length - 1].episode_number.toString()
+            const episodeNumber =
+              episodeToString && episodeToString.length === 1
+                ? "e0".concat(episodeToString)
+                : "e".concat(episodeToString)
+
             return (
               <div
                 key={seasonId}
-                className={classNames("full-detailes__season", {
-                  "full-detailes__season--no-poster": !season.poster_path
+                className={classNames("show-episodes__season", {
+                  "show-episodes__season--no-poster": !season.poster_path
                 })}
                 style={
                   !this.state.loadingEpisodesIds.includes(seasonId) ? { rowGap: "10px" } : { rowGap: "0px" }
                 }
               >
                 <div
-                  className={classNames("full-detailes__season-info", {
-                    "full-detailes__season-info--open": this.state.openSeasons.includes(seasonId)
+                  className={classNames("show-episodes__season-info", {
+                    "show-episodes__season-info--open": this.state.openSeasons.includes(seasonId)
                   })}
                   style={
                     daysToNewSeason > 0
@@ -319,15 +322,28 @@ class ShowsEpisodes extends Component {
                   }
                   onClick={() => this.showSeasonsEpisode(seasonId, season.season_number)}
                 >
-                  <div className="full-detailes__season-number">
+                  <div
+                    className={classNames("show-episodes__season-number", {
+                      "show-episodes__season-number--to-watch-page": this.props.toWatchPage
+                    })}
+                  >
                     Season {season.season_number}
                     {daysToNewSeason > 0 && (
-                      <span className="full-detailes__season-when-new-season">
-                        {daysToNewSeason} days to air
-                      </span>
+                      <span className="show-episodes__season-days-to-air">{daysToNewSeason} days to air</span>
                     )}
                   </div>
-                  <div className="full-detailes__season-date">
+
+                  {this.props.toWatchPage && (
+                    <div className="show-episodes__season-episodes-left">
+                      {season.episodes.length} episodes left from {episodeNumber}
+                    </div>
+                  )}
+
+                  <div
+                    className={classNames("show-episodes__season-date", {
+                      "show-episodes__season-date--to-watch-page": this.props.toWatchPage
+                    })}
+                  >
                     {season.air_date && season.air_date.slice(0, 4)}
                   </div>
                 </div>
@@ -343,16 +359,16 @@ class ShowsEpisodes extends Component {
                           }}
                         />
                       )} */}
-                      {season.poster_path && (
-                        <div className="full-detailes__season-poster-wrapper">
+                      {season.poster_path && this.props.fullContentPage && (
+                        <div className="show-episodes__season-poster-wrapper">
                           <div
-                            className="full-detailes__season-poster"
+                            className="show-episodes__season-poster"
                             style={{
                               backgroundImage: `url(https://image.tmdb.org/t/p/w500/${season.poster_path})`
                             }}
                           />
                           {showCheckboxes && daysToNewSeason < 0 && (
-                            <div className="full-detailes__check-season-episodes">
+                            <div className="show-episodes__season-check-all-episodes">
                               <button
                                 type="button"
                                 className="button"
@@ -365,9 +381,10 @@ class ShowsEpisodes extends Component {
                         </div>
                       )}
                       <SeasonEpisodes
+                        fullContentPage={this.props.fullContentPage}
                         seasonsArr={this.props.seasonsArr}
                         showEpisodes={this.state.showEpisodes}
-                        toWatch={this.props.toWatch}
+                        toWatchPage={this.props.toWatchPage}
                         showTitle={this.props.showTitle}
                         todayDate={this.props.todayDate}
                         detailEpisodeInfo={this.state.detailEpisodeInfo}
@@ -379,6 +396,21 @@ class ShowsEpisodes extends Component {
                         toggleWatchedEpisode={this.toggleWatchedEpisode}
                         loadingFromDatabase={this.props.loadingFromDatabase}
                       />
+                      {this.props.toWatchPage && (
+                        <div
+                          className={classNames("show-episodes__season-check-all-episodes", {
+                            "show-episodes__season-check-all-episodes--to-watch-page": this.props.toWatchPage
+                          })}
+                        >
+                          <button
+                            type="button"
+                            className="button"
+                            onClick={() => this.checkEverySeasonEpisode(season.season_number)}
+                          >
+                            Check all
+                          </button>
+                        </div>
+                      )}
                     </>
                   ) : !this.state.errorShowEpisodes ? (
                     <Loader className="loader--small-pink" />
