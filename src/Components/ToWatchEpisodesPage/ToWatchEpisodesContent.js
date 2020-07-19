@@ -3,6 +3,8 @@ import { Link } from "react-router-dom"
 import { withUserContent } from "Components/UserContent"
 import ShowsEpisodes from "Components/Templates/SeasonsAndEpisodes/ShowsEpisodes"
 import { todayDate } from "Utils"
+import Loader from "Components/Placeholders/Loader"
+import PlaceholderNoToWatchEpisodes from "Components/Placeholders/PlaceholderNoToWatchEpisodes"
 import merge from "deepmerge"
 
 class ToWatchEpisodesContent extends Component {
@@ -71,9 +73,13 @@ class ToWatchEpisodesContent extends Component {
                 const watchingShows = this.state.watchingShows.filter(item => item.id !== snapshot.val().id)
                 const show = this.state.watchingShows.find(item => item.id === snapshot.val().id)
 
+                const allShowsListSubDatabase =
+                  snapshot.val().status === "Ended" || snapshot.val().status === "Canceled"
+                    ? "ended"
+                    : "ongoing"
+
                 if (show) {
                   show.episodes.forEach((season, seasonIndex) => {
-                    // show.episodes[index].episodes = snapshot.val().episodes[index].episodes
                     season.episodes.forEach((episode, episodeIndex) => {
                       show.episodes[seasonIndex].episodes[episodeIndex] = {
                         ...episode,
@@ -83,11 +89,27 @@ class ToWatchEpisodesContent extends Component {
                   })
                   watchingShows.splice(index, 0, show)
 
-                  console.log(watchingShows)
-
                   this.setState({
                     watchingShows: watchingShows
                   })
+                }
+
+                if (snapshot.val().allEpisodesWatched && allShowsListSubDatabase === "ended") {
+                  this.props.firebase
+                    .userShows(this.props.authUser.uid, "finishedShows")
+                    .child(snapshot.val().id)
+                    .set({
+                      timeStamp: snapshot.val().timeStamp,
+                      firstAirDate: snapshot.val().firstAirDate,
+                      id: snapshot.val().id,
+                      name: snapshot.val().name,
+                      status: snapshot.val().status
+                    })
+                } else {
+                  this.props.firebase
+                    .userShows(this.props.authUser.uid, "finishedShows")
+                    .child(snapshot.val().id)
+                    .set(null)
                 }
               }
             })
@@ -166,65 +188,77 @@ class ToWatchEpisodesContent extends Component {
   render() {
     return (
       <div className="content-results content-results--to-watch-page">
-        {this.state.watchingShows.map(show => {
-          const showInDatabase = show && {
-            database: "watchingShows",
-            info: {
-              ...show.info,
-              episodes: show.episodes
-            }
-          }
-
-          const infoToPass = show && {
-            id: show.info.id,
-            status: show.info.status
-          }
-
-          let newEpisodes = []
-
-          show.episodes.forEach(season => {
-            let newSeason = {}
-            let episodes = []
-
-            season.episodes.forEach(episode => {
-              if (!episode.watched && episode.air_date) {
-                episodes.push(episode)
+        {this.state.initialLoading ? (
+          <Loader className="loader--pink" />
+        ) : this.state.watchingShows.length === 0 ? (
+          <PlaceholderNoToWatchEpisodes />
+        ) : (
+          <>
+            {this.state.watchingShows.map(show => {
+              const showInDatabase = show && {
+                database: "watchingShows",
+                info: {
+                  ...show.info,
+                  episodes: show.episodes
+                }
               }
-            })
 
-            episodes.reverse()
+              const infoToPass = show && {
+                id: show.info.id,
+                status: show.info.status
+              }
 
-            newSeason = {
-              ...season,
-              episodes
-            }
+              let newEpisodes = []
 
-            if (newSeason.episodes.length !== 0) {
-              newEpisodes = [...newEpisodes, newSeason]
-            }
-          })
+              show.episodes.forEach(season => {
+                let newSeason = {}
+                let episodes = []
 
-          newEpisodes.reverse()
+                season.episodes.forEach(episode => {
+                  if (
+                    !episode.watched &&
+                    episode.air_date &&
+                    new Date(episode.air_date) < todayDate.getTime()
+                  ) {
+                    episodes.push(episode)
+                  }
+                })
 
-          if (newEpisodes.length === 0) return
+                episodes.reverse()
 
-          return (
-            <div key={show.id} className="towatch__show">
-              <Link className="towatch__show-name" to={`/show/${show.info.id}`}>
-                {show.info.name}
-              </Link>
-              <ShowsEpisodes
-                toWatchPage={true}
-                seasonsArr={newEpisodes}
-                showTitle={show.info.name || show.info.original_name}
-                todayDate={todayDate}
-                id={show.id}
-                showInDatabase={showInDatabase}
-                infoToPass={infoToPass}
-              />
-            </div>
-          )
-        })}
+                newSeason = {
+                  ...season,
+                  episodes
+                }
+
+                if (newSeason.episodes.length !== 0) {
+                  newEpisodes = [...newEpisodes, newSeason]
+                }
+              })
+
+              newEpisodes.reverse()
+
+              if (newEpisodes.length === 0) return
+
+              return (
+                <div key={show.id} className="towatch__show">
+                  <Link className="towatch__show-name" to={`/show/${show.info.id}`}>
+                    {show.info.name}
+                  </Link>
+                  <ShowsEpisodes
+                    toWatchPage={true}
+                    seasonsArr={newEpisodes}
+                    showTitle={show.info.name || show.info.original_name}
+                    todayDate={todayDate}
+                    id={show.id}
+                    showInDatabase={showInDatabase}
+                    infoToPass={infoToPass}
+                  />
+                </div>
+              )
+            })}
+          </>
+        )}
       </div>
     )
   }

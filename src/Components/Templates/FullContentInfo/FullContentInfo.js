@@ -322,14 +322,35 @@ function FullContentInfo({
                 firebase.userShowAllEpisodes(authUser.uid, Number(id), database).set(updatedSeasonsUser)
               })
               .then(() => {
-                // if (counter === userContent.showsDatabases.length) {
-                //   setLoadingFromDatabase(false)
-                //   console.log("loading finished")
-                // }
+                if (counter === userContent.showsDatabases.length) {
+                  setLoadingFromDatabase(false)
+                  console.log("loading finished")
+                }
               })
+
+            if (userShow.allEpisodesWatched && allShowsListSubDatabase === "ended") {
+              firebase
+                .userShows(authUser.uid, "finishedShows")
+                .child(Number(id))
+                .set({
+                  timeStamp: userShow.timeStamp,
+                  firstAirDate: userShow.firstAirDate,
+                  id: userShow.id,
+                  name: userShow.name,
+                  status: userShow.status
+                })
+            } else {
+              firebase
+                .userShows(authUser.uid, "finishedShows")
+                .child(Number(id))
+                .set(null)
+            }
 
             setShowInDatabase({ database, info: userShow })
             setShowDatabaseOnClient(database)
+          } else {
+            setLoadingFromDatabase(false)
+            console.log("loading finished")
           }
         },
         error => {
@@ -338,10 +359,6 @@ function FullContentInfo({
           setShowDatabaseOnClient(showInDatabase.database)
         }
       )
-      if (counter === userContent.showsDatabases.length) {
-        setLoadingFromDatabase(false)
-        console.log("loading finished")
-      }
     })
   }
 

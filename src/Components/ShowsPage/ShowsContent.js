@@ -24,22 +24,26 @@ class ShowsContent extends Component {
       database: {
         watchingShows: [],
         droppedShows: [],
-        willWatchShows: []
+        willWatchShows: [],
+        finishedShows: []
       },
       disableLoad: {
         watchingShows: false,
         droppedShows: false,
-        willWatchShows: false
+        willWatchShows: false,
+        finishedShows: false
       },
       lastLoadedShow: {
         watchingShows: showsToLoad,
         droppedShows: showsToLoad,
-        willWatchShows: showsToLoad
+        willWatchShows: showsToLoad,
+        finishedShows: showsToLoad
       },
       loadedShows: {
         watchingShows: showsToLoad,
         droppedShows: showsToLoad,
-        willWatchShows: showsToLoad
+        willWatchShows: showsToLoad,
+        finishedShows: showsToLoad
       }
     }
   }
@@ -417,6 +421,17 @@ class ShowsContent extends Component {
               onClick={() => this.toggleSection("willWatchShows")}
             >
               Will Watch
+            </button>
+          </div>
+          <div className="buttons__col">
+            <button
+              className={classNames("button", {
+                "button--pressed": this.state.activeSection === "finishedShows"
+              })}
+              type="button"
+              onClick={() => this.toggleSection("finishedShows")}
+            >
+              Finished
             </button>
           </div>
         </div>

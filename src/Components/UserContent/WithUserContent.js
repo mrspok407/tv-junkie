@@ -153,7 +153,7 @@ const withUserContent = Component => {
           .child(id)
           .set({
             status: data.status,
-            firstAirData: show.first_air_date,
+            firstAirDate: show.first_air_date,
             name: show.name || show.original_name,
             timeStamp: this.firebase.timeStamp(),
             episodes: userEpisodes,
