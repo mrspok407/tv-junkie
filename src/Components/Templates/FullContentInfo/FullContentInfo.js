@@ -270,8 +270,8 @@ function FullContentInfo({
           console.log("updated")
           if (snapshot.val() !== null) {
             const userShow = snapshot.val()
-            const allShowsListSubDatabase =
-              userShow.status === "Ended" || userShow.status === "Canceled" ? "ended" : "ongoing"
+            const allShowsListSubDatabase = userShow.status
+            // userShow.status === "Ended" || userShow.status === "Canceled" ? "ended" : "ongoing"
 
             firebase
               .showInDatabase(allShowsListSubDatabase, Number(id))
@@ -337,7 +337,8 @@ function FullContentInfo({
                   firstAirDate: userShow.firstAirDate,
                   id: userShow.id,
                   name: userShow.name,
-                  status: userShow.status
+                  status: userShow.status,
+                  finished_and_name: userShow.finished_and_name
                 })
             } else {
               firebase

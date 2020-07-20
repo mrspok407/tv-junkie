@@ -204,6 +204,8 @@ class ShowsEpisodes extends Component {
   }
 
   getAllEpisodesFromDatabase = () => {
+    if (!this.props.authUser) return
+
     const show = this.props.infoToPass
     const allShowsListSubDatabase =
       show.status === "Ended" || show.status === "Canceled" ? "ended" : "ongoing"

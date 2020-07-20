@@ -21,6 +21,7 @@ class ShowsContent extends Component {
       initialLoading: true,
       loadingContent: false,
       sortByLoading: false,
+      updateWatchingShowsLoading: false,
       database: {
         watchingShows: [],
         droppedShows: [],
@@ -57,6 +58,7 @@ class ShowsContent extends Component {
     this.props.firebase.userShows(this.props.authUser.uid, "watchingShows").off()
     this.props.firebase.userShows(this.props.authUser.uid, "droppedShows").off()
     this.props.firebase.userShows(this.props.authUser.uid, "willWatchShows").off()
+    this.props.firebase.userShows(this.props.authUser.uid, "finishedShows").off()
 
     window.removeEventListener("scroll", this.handleScroll)
   }
@@ -68,10 +70,14 @@ class ShowsContent extends Component {
   }
 
   getContent = ({ sortBy = "name", isInitialLoad = true, databases = [] }) => {
-    if (this.props.authUser === null) return
+    if (this.props.authUser === null || this.state.updateWatchingShowsLoading) return
     if (isInitialLoad) {
       this.setState({ initialLoading: true })
     }
+
+    this.setState({
+      updateWatchingShowsLoading: true
+    })
 
     let counter = 0
 
@@ -82,7 +88,9 @@ class ShowsContent extends Component {
 
       this.props.firebase
         .userShows(this.props.authUser.uid, database)
-        .orderByChild(sortBy)
+        .orderByChild(`finished_and_${sortBy}`)
+        .startAt(database !== "finishedShows" ? "false" : "true")
+        .endAt(database !== "finishedShows" ? "true" : "zzzzzz") // Need zzzzzz's so it will sure go to the end
         .limitToFirst(!isInitialLoad ? limitTo + 1 : limitTo)
         .once("value", snapshot => {
           let shows = []
@@ -91,17 +99,18 @@ class ShowsContent extends Component {
               ...shows,
               {
                 id: item.val().id,
-                name: item.val().name,
-                status: item.val().status,
-                timeStamp: item.val().timeStamp
+                finished_and_name: item.val().finished_and_name,
+                // name: item.val().name,
+                status: item.val().status
+                // timeStamp: item.val().timeStamp
               }
             ]
           })
 
           Promise.all(
             shows.map(item => {
-              const allShowsListSubDatabase =
-                item.status === "Ended" || item.status === "Canceled" ? "ended" : "ongoing"
+              const allShowsListSubDatabase = item.status
+              // item.status === "Ended" || item.status === "Canceled" ? "ended" : "ongoing"
 
               return this.props.firebase
                 .showInfo(allShowsListSubDatabase, item.id)
@@ -113,6 +122,8 @@ class ShowsContent extends Component {
           ).then(showsData => {
             counter++
 
+            console.log(shows[shows.length - 1])
+
             this.setState({
               database: {
                 ...this.state.database,
@@ -120,14 +131,16 @@ class ShowsContent extends Component {
               },
               lastLoadedShow: {
                 ...this.state.lastLoadedShow,
-                [database]: shows.length !== 0 && shows[shows.length - 1][sortBy]
+                [database]: shows.length !== 0 && shows[shows.length - 1][`finished_and_${sortBy}`]
               }
             })
 
-            if (counter === 3) {
+            if (counter === 4) {
+              console.log("finished")
               this.setState({
                 sortByLoading: false,
-                initialLoading: false
+                initialLoading: false,
+                updateWatchingShowsLoading: false
               })
             }
           })
@@ -150,10 +163,13 @@ class ShowsContent extends Component {
       loadingContent: true
     })
 
+    console.log(this.state.lastLoadedShow[this.state.activeSection])
+
     this.props.firebase
       .userShows(this.props.authUser.uid, this.state.activeSection)
-      .orderByChild(this.state.sortBy)
+      .orderByChild(`finished_and_${this.state.sortBy}`)
       .startAt(this.state.lastLoadedShow[this.state.activeSection] + 1)
+      .endAt(this.state.activeSection !== "finishedShows" ? "true" : "zzzzzz") // Need zzzzzz's so it will sure go to the end
       .limitToFirst(showsToLoad + 1)
       .once("value", snapshot => {
         let shows = []
@@ -162,6 +178,7 @@ class ShowsContent extends Component {
             ...shows,
             {
               id: item.val().id,
+              finished_and_name: item.val().finished_and_name,
               name: item.val().name,
               timeStamp: item.val().timeStamp,
               status: item.val().status
@@ -174,8 +191,8 @@ class ShowsContent extends Component {
 
         Promise.all(
           shows.map(item => {
-            const allShowsListSubDatabase =
-              item.status === "Ended" || item.status === "Canceled" ? "ended" : "ongoing"
+            const allShowsListSubDatabase = item.status
+            // item.status === "Ended" || item.status === "Canceled" ? "ended" : "ongoing"
 
             return this.props.firebase
               .showInfo(allShowsListSubDatabase, item.id)
@@ -196,7 +213,8 @@ class ShowsContent extends Component {
             },
             lastLoadedShow: {
               ...prevState.lastLoadedShow,
-              [this.state.activeSection]: shows.length !== 0 && shows[shows.length - 1][this.state.sortBy]
+              [this.state.activeSection]:
+                shows.length !== 0 && shows[shows.length - 1][`finished_and_${this.state.sortBy}`]
             },
             loadedShows: {
               ...prevState.loadedShows,

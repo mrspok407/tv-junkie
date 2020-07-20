@@ -1,8 +1,12 @@
 import { differenceBtwDatesInDays } from "Utils"
 
 export const checkIfAllEpisodesWatched = ({ show, firebase, authUser, todayDate }) => {
-  const allShowsListSubDatabase =
-    show.info.status === "Ended" || show.info.status === "Canceled" ? "ended" : "ongoing"
+  const allShowsListSubDatabase = show.info.status
+  // show.info.status === "Ended" || show.info.status === "Canceled" ? "ended" : "ongoing"
+
+  // console.log(allShowsListSubDatabase)
+  console.log(show)
+  // console.log(show.info.id)
 
   firebase.showEpisodes(allShowsListSubDatabase, show.info.id).once("value", snapshot => {
     let allEpisodesDatabase = []
@@ -27,8 +31,12 @@ export const checkIfAllEpisodesWatched = ({ show, firebase, authUser, todayDate 
 
       const allEpisodesWatched = !allEpisodes.some(episode => !episode.watched)
 
+      const finished = allShowsListSubDatabase === "ended" && allEpisodesWatched ? true : false
+
       firebase.userShow(authUser.uid, show.info.id, show.database).update({
-        allEpisodesWatched
+        allEpisodesWatched,
+        finished_and_name: `${finished}_${show.info.name || show.info.original_name}`
+        // watched_ended_name: allEpisodesWatched && allShowsListSubDatabase === "ended" ? true : null
       })
     })
   })

@@ -73,10 +73,10 @@ class ToWatchEpisodesContent extends Component {
                 const watchingShows = this.state.watchingShows.filter(item => item.id !== snapshot.val().id)
                 const show = this.state.watchingShows.find(item => item.id === snapshot.val().id)
 
-                const allShowsListSubDatabase =
-                  snapshot.val().status === "Ended" || snapshot.val().status === "Canceled"
-                    ? "ended"
-                    : "ongoing"
+                const allShowsListSubDatabase = snapshot.val().status
+                // snapshot.val().status === "Ended" || snapshot.val().status === "Canceled"
+                //   ? "ended"
+                //   : "ongoing"
 
                 if (show) {
                   show.episodes.forEach((season, seasonIndex) => {
@@ -95,6 +95,7 @@ class ToWatchEpisodesContent extends Component {
                 }
 
                 if (snapshot.val().allEpisodesWatched && allShowsListSubDatabase === "ended") {
+                  console.log("test")
                   this.props.firebase
                     .userShows(this.props.authUser.uid, "finishedShows")
                     .child(snapshot.val().id)
@@ -103,7 +104,8 @@ class ToWatchEpisodesContent extends Component {
                       firstAirDate: snapshot.val().firstAirDate,
                       id: snapshot.val().id,
                       name: snapshot.val().name,
-                      status: snapshot.val().status
+                      status: snapshot.val().status,
+                      finished_and_name: snapshot.val().finished_and_name
                     })
                 } else {
                   this.props.firebase
@@ -117,8 +119,8 @@ class ToWatchEpisodesContent extends Component {
 
         Promise.all(
           userShows.map(item => {
-            const allShowsListSubDatabase =
-              item.status === "Ended" || item.status === "Canceled" ? "ended" : "ongoing"
+            const allShowsListSubDatabase = item.status
+            // item.status === "Ended" || item.status === "Canceled" ? "ended" : "ongoing"
 
             return this.props.firebase
               .showInDatabase(allShowsListSubDatabase, item.id)
@@ -195,13 +197,19 @@ class ToWatchEpisodesContent extends Component {
         ) : (
           <>
             {this.state.watchingShows.map(show => {
+              const allShowsListSubDatabase =
+                show.info.status === "Ended" || show.info.status === "Canceled" ? "ended" : "ongoing"
+
               const showInDatabase = show && {
                 database: "watchingShows",
                 info: {
                   ...show.info,
+                  status: allShowsListSubDatabase,
                   episodes: show.episodes
                 }
               }
+
+              console.log(showInDatabase)
 
               const infoToPass = show && {
                 id: show.info.id,

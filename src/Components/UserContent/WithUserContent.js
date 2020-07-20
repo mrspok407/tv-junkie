@@ -152,12 +152,16 @@ const withUserContent = Component => {
           .userShows(this.userUid, userDatabase)
           .child(id)
           .set({
-            status: data.status,
+            allEpisodesWatched: false,
+            // status: data.status,
+            status: allShowsListSubDatabase,
             firstAirDate: show.first_air_date,
             name: show.name || show.original_name,
             timeStamp: this.firebase.timeStamp(),
             episodes: userEpisodes,
-            id
+            id,
+            finished_and_name: `false_${show.name || show.original_name}`
+            // status_watched_name: `false_${allShowsListSubDatabase}_${show.name || show.original_name}`
           })
           .then(() => {
             this.firebase
