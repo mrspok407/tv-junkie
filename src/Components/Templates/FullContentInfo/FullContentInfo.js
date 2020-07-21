@@ -333,12 +333,13 @@ function FullContentInfo({
                 .userShows(authUser.uid, "finishedShows")
                 .child(Number(id))
                 .set({
-                  timeStamp: userShow.timeStamp,
-                  firstAirDate: userShow.firstAirDate,
+                  // timeStamp: userShow.timeStamp,
+                  // firstAirDate: userShow.firstAirDate,
                   id: userShow.id,
-                  name: userShow.name,
+                  // name: userShow.name,
                   status: userShow.status,
-                  finished_and_name: userShow.finished_and_name
+                  finished_and_name: userShow.finished_and_name,
+                  finished_and_timeStamp: userShow.finished_and_timeStamp
                 })
             } else {
               firebase

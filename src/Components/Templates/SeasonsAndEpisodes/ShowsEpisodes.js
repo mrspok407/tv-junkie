@@ -49,10 +49,11 @@ class ShowsEpisodes extends Component {
   }
 
   initialFirstSeasonLoad = () => {
-    // const firstSeason = this.props.seasonsArr.find(item => item.season_number === 1)
-    if (this.props.seasonsArr.length === 0) return
+    const seasons = this.props.seasonsArr.filter(item => item.name !== "Specials")
 
-    const firstSeason = this.props.seasonsArr[this.props.seasonsArr.length - 1]
+    if (seasons.length === 0) return
+
+    const firstSeason = seasons[seasons.length - 1]
 
     this.setState({
       openSeasons: firstSeason && [firstSeason.id]

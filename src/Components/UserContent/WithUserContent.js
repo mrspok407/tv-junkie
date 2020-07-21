@@ -148,6 +148,8 @@ const withUserContent = Component => {
           userEpisodes.push(updatedSeason)
         })
 
+        console.log(this.firebase.timeStamp())
+
         this.firebase
           .userShows(this.userUid, userDatabase)
           .child(id)
@@ -160,8 +162,8 @@ const withUserContent = Component => {
             timeStamp: this.firebase.timeStamp(),
             episodes: userEpisodes,
             id,
-            finished_and_name: `false_${show.name || show.original_name}`
-            // status_watched_name: `false_${allShowsListSubDatabase}_${show.name || show.original_name}`
+            finished_and_name: `false_${show.name || show.original_name}` // I need this cause Firebase can't filter by more than one query on the server
+            //  finished_and_timeStamp: `false_${3190666598976 - this.firebase.timeStamp()}` // This is one of the approach recommended by Firebase developer Puf
           })
           .then(() => {
             this.firebase
@@ -169,12 +171,14 @@ const withUserContent = Component => {
               .child(id)
               .once("value", snapshot => {
                 const negativeTimestamp = snapshot.val().timeStamp * -1
+                const finishedTimestamp = 3190666598976 - snapshot.val().timeStamp
 
                 this.firebase
                   .userShows(this.userUid, userDatabase)
                   .child(id)
                   .update({
-                    timeStamp: negativeTimestamp // The negative time stamp needed for easier des order, cause firebase only provide as order
+                    timeStamp: negativeTimestamp, // The negative time stamp needed for easier des order, cause firebase only provide asc order
+                    finished_and_timeStamp: `false_${finishedTimestamp}`
                   })
               })
           })
@@ -219,6 +223,10 @@ const withUserContent = Component => {
     }
 
     handleShowInDatabases = ({ id, data = [], database, callback = () => {} }) => {
+      this.setState({
+        handleShowInDatabaseLoading: true
+      })
+
       const otherDatabases = this.state.showsDatabases.filter(item => item !== database)
 
       const show = Array.isArray(data) ? data.find(item => item.id === id) : data

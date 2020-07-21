@@ -9,7 +9,11 @@ import PlaceholderLoadingContentResultsItem from "Components/Placeholders/Placeh
 import Loader from "Components/Placeholders/Loader"
 import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
 
-const showsToLoad = 5
+const SHOW_TO_LOAD_INITIAL = 20
+const SCROLL_THRESHOLD = 1400
+
+const TIMEOUT_TO_UPDATE_WATCHING_SHOWS = 500
+let timeoutUpdateWatchingShows
 
 class ShowsContent extends Component {
   constructor(props) {
@@ -35,16 +39,16 @@ class ShowsContent extends Component {
         finishedShows: false
       },
       lastLoadedShow: {
-        watchingShows: showsToLoad,
-        droppedShows: showsToLoad,
-        willWatchShows: showsToLoad,
-        finishedShows: showsToLoad
+        watchingShows: SHOW_TO_LOAD_INITIAL,
+        droppedShows: SHOW_TO_LOAD_INITIAL,
+        willWatchShows: SHOW_TO_LOAD_INITIAL,
+        finishedShows: SHOW_TO_LOAD_INITIAL
       },
       loadedShows: {
-        watchingShows: showsToLoad,
-        droppedShows: showsToLoad,
-        willWatchShows: showsToLoad,
-        finishedShows: showsToLoad
+        watchingShows: SHOW_TO_LOAD_INITIAL,
+        droppedShows: SHOW_TO_LOAD_INITIAL,
+        willWatchShows: SHOW_TO_LOAD_INITIAL,
+        finishedShows: SHOW_TO_LOAD_INITIAL
       }
     }
   }
@@ -75,10 +79,6 @@ class ShowsContent extends Component {
       this.setState({ initialLoading: true })
     }
 
-    this.setState({
-      updateWatchingShowsLoading: true
-    })
-
     let counter = 0
 
     const getContentFromDatabases = databases.length > 0 ? databases : Object.keys(this.state.database)
@@ -90,9 +90,12 @@ class ShowsContent extends Component {
         .userShows(this.props.authUser.uid, database)
         .orderByChild(`finished_and_${sortBy}`)
         .startAt(database !== "finishedShows" ? "false" : "true")
-        .endAt(database !== "finishedShows" ? "true" : "zzzzzz") // Need zzzzzz's so it will sure go to the end
-        .limitToFirst(!isInitialLoad ? limitTo + 1 : limitTo)
+        .endAt(
+          database !== "finishedShows" ? "true" : sortBy === "name" ? "true_zzzzzzz" : "true_3190666598976"
+        ) // Need zzzzzz's and true_3190666598976 so it will sure go to the end
+        .limitToFirst(!isInitialLoad ? limitTo : limitTo)
         .once("value", snapshot => {
+          console.log(`database: ${snapshot.val()}`)
           let shows = []
           snapshot.forEach(item => {
             shows = [
@@ -101,6 +104,7 @@ class ShowsContent extends Component {
                 id: item.val().id,
                 finished_and_name: item.val().finished_and_name,
                 // name: item.val().name,
+                finished_and_timeStamp: item.val().finished_and_timeStamp,
                 status: item.val().status
                 // timeStamp: item.val().timeStamp
               }
@@ -110,7 +114,6 @@ class ShowsContent extends Component {
           Promise.all(
             shows.map(item => {
               const allShowsListSubDatabase = item.status
-              // item.status === "Ended" || item.status === "Canceled" ? "ended" : "ongoing"
 
               return this.props.firebase
                 .showInfo(allShowsListSubDatabase, item.id)
@@ -120,9 +123,8 @@ class ShowsContent extends Component {
                 })
             })
           ).then(showsData => {
+            console.log(showsData)
             counter++
-
-            console.log(shows[shows.length - 1])
 
             this.setState({
               database: {
@@ -135,12 +137,11 @@ class ShowsContent extends Component {
               }
             })
 
-            if (counter === 4) {
-              console.log("finished")
+            if (counter === getContentFromDatabases.length) {
+              console.log("getContent finished")
               this.setState({
                 sortByLoading: false,
-                initialLoading: false,
-                updateWatchingShowsLoading: false
+                initialLoading: false
               })
             }
           })
@@ -150,14 +151,8 @@ class ShowsContent extends Component {
 
   loadNewContent = () => {
     if (this.props.authUser === null) return
-    if (
-      this.state.disableLoad[this.state.activeSection] ||
-      this.state.loadingContent ||
-      document.body.scrollHeight < 1400
-    )
-      return
-
-    console.log("loadNewContent")
+    if (this.state.disableLoad[this.state.activeSection] || this.state.loadingContent) return
+    if (document.body.scrollHeight < SCROLL_THRESHOLD) return
 
     this.setState({
       loadingContent: true
@@ -169,8 +164,14 @@ class ShowsContent extends Component {
       .userShows(this.props.authUser.uid, this.state.activeSection)
       .orderByChild(`finished_and_${this.state.sortBy}`)
       .startAt(this.state.lastLoadedShow[this.state.activeSection] + 1)
-      .endAt(this.state.activeSection !== "finishedShows" ? "true" : "zzzzzz") // Need zzzzzz's so it will sure go to the end
-      .limitToFirst(showsToLoad + 1)
+      .endAt(
+        this.state.activeSection !== "finishedShows"
+          ? "true"
+          : this.state.sortBy === "name"
+          ? "true_zzzzzzz"
+          : "true_3190666598976"
+      ) // Need zzzzzz's and true_3190666598976 so it will sure go to the end
+      .limitToFirst(SHOW_TO_LOAD_INITIAL + 1)
       .once("value", snapshot => {
         let shows = []
         snapshot.forEach(item => {
@@ -179,20 +180,20 @@ class ShowsContent extends Component {
             {
               id: item.val().id,
               finished_and_name: item.val().finished_and_name,
-              name: item.val().name,
-              timeStamp: item.val().timeStamp,
+              finished_and_timeStamp: item.val().finished_and_timeStamp,
+              // name: item.val().name,
+              // timeStamp: item.val().timeStamp,
               status: item.val().status
             }
           ]
         })
 
-        const disableLoadNewContent = shows.length !== showsToLoad + 1 ? true : false
+        const disableLoadNewContent = shows.length !== SHOW_TO_LOAD_INITIAL + 1 ? true : false
         if (!disableLoadNewContent) shows.pop()
 
         Promise.all(
           shows.map(item => {
             const allShowsListSubDatabase = item.status
-            // item.status === "Ended" || item.status === "Canceled" ? "ended" : "ongoing"
 
             return this.props.firebase
               .showInfo(allShowsListSubDatabase, item.id)
@@ -236,6 +237,8 @@ class ShowsContent extends Component {
   handleShowsOnClient = showId => {
     const filteredShows = this.state.database[this.state.activeSection].filter(item => item.id !== showId)
 
+    clearTimeout(timeoutUpdateWatchingShows)
+
     this.setState({
       database: {
         ...this.state.database,
@@ -249,11 +252,13 @@ class ShowsContent extends Component {
     const watchingShowsSavedState = this.state.database.watchingShows
 
     if (!this.props.userContent.errorInDatabase.error) {
-      this.getContent({
-        sortBy: this.state.sortBy,
-        isInitialLoad: false,
-        databases: ["watchingShows", this.state.activeSection]
-      })
+      timeoutUpdateWatchingShows = setTimeout(() => {
+        this.getContent({
+          sortBy: this.state.sortBy,
+          isInitialLoad: false,
+          databases: ["watchingShows", this.state.activeSection]
+        })
+      }, TIMEOUT_TO_UPDATE_WATCHING_SHOWS)
     } else {
       this.setState({
         database: {
@@ -366,23 +371,25 @@ class ShowsContent extends Component {
                       </button>
                     </div>
                   ) : (
-                    <div className="content-results__item-links content-results__item-links--adv-search">
-                      <button
-                        className="button"
-                        onClick={() => {
-                          this.props.handleShowInDatabases({
-                            id: item.id,
-                            data: item,
-                            database: "watchingShows",
-                            callback: this.updateWatchingShowsDatabase
-                          })
-                          this.handleShowsOnClient(item.id)
-                        }}
-                        type="button"
-                      >
-                        Watching
-                      </button>
-                    </div>
+                    section !== "finishedShows" && (
+                      <div className="content-results__item-links content-results__item-links--adv-search">
+                        <button
+                          className="button"
+                          onClick={() => {
+                            this.props.handleShowInDatabases({
+                              id: item.id,
+                              data: item,
+                              database: "watchingShows",
+                              callback: this.updateWatchingShowsDatabase
+                            })
+                            this.handleShowsOnClient(item.id)
+                          }}
+                          type="button"
+                        >
+                          Watching
+                        </button>
+                      </div>
+                    )
                   )}
                 </div>
               )}

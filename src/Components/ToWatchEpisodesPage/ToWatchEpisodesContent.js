@@ -61,6 +61,7 @@ class ToWatchEpisodesContent extends Component {
               name: item.val().name,
               status: item.val().status,
               timeStamp: item.val().timeStamp,
+              // finished_and_timeStamp: item.val().finished_and_timeStamp,
               episodes: item.val().episodes
             }
           ]
@@ -69,9 +70,12 @@ class ToWatchEpisodesContent extends Component {
             .userShow(this.props.authUser.uid, item.val().id, database)
             .on("value", snapshot => {
               if (snapshot.val() !== null) {
+                console.log(snapshot.val())
                 const index = this.state.watchingShows.findIndex(item => item.id === snapshot.val().id)
                 const watchingShows = this.state.watchingShows.filter(item => item.id !== snapshot.val().id)
                 const show = this.state.watchingShows.find(item => item.id === snapshot.val().id)
+
+                console.log(show)
 
                 const allShowsListSubDatabase = snapshot.val().status
                 // snapshot.val().status === "Ended" || snapshot.val().status === "Canceled"
@@ -87,6 +91,8 @@ class ToWatchEpisodesContent extends Component {
                       }
                     })
                   })
+                  show.info.timeStamp = snapshot.val().timeStamp
+                  console.log(show)
                   watchingShows.splice(index, 0, show)
 
                   this.setState({
@@ -95,17 +101,18 @@ class ToWatchEpisodesContent extends Component {
                 }
 
                 if (snapshot.val().allEpisodesWatched && allShowsListSubDatabase === "ended") {
-                  console.log("test")
                   this.props.firebase
                     .userShows(this.props.authUser.uid, "finishedShows")
                     .child(snapshot.val().id)
                     .set({
-                      timeStamp: snapshot.val().timeStamp,
-                      firstAirDate: snapshot.val().firstAirDate,
+                      // timeStamp: snapshot.val().timeStamp,
+                      // firstAirDate: snapshot.val().firstAirDate,
                       id: snapshot.val().id,
-                      name: snapshot.val().name,
+                      // name: snapshot.val().name,
                       status: snapshot.val().status,
-                      finished_and_name: snapshot.val().finished_and_name
+                      finished_and_name: snapshot.val().finished_and_name,
+                      // timeStamp: snapshot.val().timeStamp,
+                      finished_and_timeStamp: snapshot.val().finished_and_timeStamp
                     })
                 } else {
                   this.props.firebase
@@ -135,6 +142,7 @@ class ToWatchEpisodesContent extends Component {
           showsData.forEach(show => {
             let updatedSeasons = []
             let updatedSeasonsUser = []
+            const userShow = userShows.find(item => item.id === show.id)
 
             show.episodes.forEach((season, indexSeason) => {
               let updatedEpisodesUser = []
@@ -169,8 +177,14 @@ class ToWatchEpisodesContent extends Component {
               updatedSeasonsUser.push(updatedSeasonUser)
             })
 
+            console.log(show)
+
             updatedShows.push({
               ...show,
+              info: {
+                ...show.info,
+                timeStamp: userShow.timeStamp
+              },
               episodes: updatedSeasons
             })
 
@@ -178,6 +192,8 @@ class ToWatchEpisodesContent extends Component {
               .userShowAllEpisodes(this.props.authUser.uid, show.id, database)
               .set(updatedSeasonsUser)
           })
+
+          console.log(updatedShows)
 
           this.setState({
             watchingShows: updatedShows.reverse(),
