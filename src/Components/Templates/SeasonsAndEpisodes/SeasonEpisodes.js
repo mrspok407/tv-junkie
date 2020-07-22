@@ -11,9 +11,7 @@ export default class SeasonEpisodes extends Component {
     }
   }
 
-  componentDidMount() {
-    console.log(this.props.showInDatabase)
-  }
+  componentDidMount() {}
 
   toggleTorrentLinks = id => {
     const allreadyShowed = this.state.showTorrentLinks.includes(id)
@@ -39,6 +37,7 @@ export default class SeasonEpisodes extends Component {
       true
 
     // console.log(this.props.season)
+    console.log(this.props.showInDatabase)
 
     const seasons = this.props.toWatchPage ? this.props.seasonsArr : this.props.showEpisodes
 
@@ -53,7 +52,16 @@ export default class SeasonEpisodes extends Component {
 
           if (seasonId !== this.props.seasonId) return null
 
-          return item.episodes.map(episode => {
+          return item.episodes.map((episode, episodeIndex) => {
+            if (this.props.toWatchPage && episode.watched) return
+            //console.log(episodeIndex)
+            // console.log(episode.episode_number)
+
+            const indexOfEpisode = item.episodes.length - 1 - episodeIndex
+
+            // console.log(indexOfEpisode)
+            // console.log(episode.episode_number)
+
             const urlShowTitle = this.props.showTitle.split(" ").join("+")
             // Format Date //
             const airDateISO = episode.air_date && new Date(episode.air_date).toISOString()
@@ -202,13 +210,15 @@ export default class SeasonEpisodes extends Component {
                       <input
                         type="checkbox"
                         checked={
+                          // .episodes[episode.episode_number - 1].watched
                           this.props.showInDatabase.info.episodes[this.props.season.season_number - 1]
-                            .episodes[episode.episode_number - 1].watched
+                            .episodes[indexOfEpisode].watched
                         }
                         onChange={() =>
                           this.props.toggleWatchedEpisode(
                             this.props.season.season_number,
-                            episode.episode_number
+                            // episode.episode_number
+                            indexOfEpisode
                           )
                         }
                       />

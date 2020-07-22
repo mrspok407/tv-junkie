@@ -79,7 +79,9 @@ class SignInFormBase extends Component {
 
   handleOnChange = event => {
     event.preventDefault()
-    const { value, name } = event.target
+    const { value } = event.target
+
+    const name = event.target.name === "current-password" ? "password" : event.target.name
 
     const validation = () => {
       const { email } = this.state.requiredInputs
@@ -200,7 +202,8 @@ class SignInFormBase extends Component {
             "auth__form-input--error": passwordError
           })}
           classNameLabel="auth__form-label"
-          name="password"
+          name="current-password"
+          autocomplete="current-password"
           value={password}
           handleOnChange={this.handleOnChange}
           handleKeyDown={this.handleKeyDown}

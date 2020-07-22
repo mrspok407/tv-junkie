@@ -61,6 +61,7 @@ class ToWatchEpisodesContent extends Component {
               name: item.val().name,
               status: item.val().status,
               timeStamp: item.val().timeStamp,
+              allEpisodesWatched: item.val().allEpisodesWatched,
               // finished_and_timeStamp: item.val().finished_and_timeStamp,
               episodes: item.val().episodes
             }
@@ -70,12 +71,9 @@ class ToWatchEpisodesContent extends Component {
             .userShow(this.props.authUser.uid, item.val().id, database)
             .on("value", snapshot => {
               if (snapshot.val() !== null) {
-                console.log(snapshot.val())
                 const index = this.state.watchingShows.findIndex(item => item.id === snapshot.val().id)
                 const watchingShows = this.state.watchingShows.filter(item => item.id !== snapshot.val().id)
                 const show = this.state.watchingShows.find(item => item.id === snapshot.val().id)
-
-                console.log(show)
 
                 const allShowsListSubDatabase = snapshot.val().status
                 // snapshot.val().status === "Ended" || snapshot.val().status === "Canceled"
@@ -92,7 +90,6 @@ class ToWatchEpisodesContent extends Component {
                     })
                   })
                   show.info.timeStamp = snapshot.val().timeStamp
-                  console.log(show)
                   watchingShows.splice(index, 0, show)
 
                   this.setState({
@@ -140,9 +137,11 @@ class ToWatchEpisodesContent extends Component {
           const updatedShows = []
 
           showsData.forEach(show => {
+            const userShow = userShows.find(item => item.id === show.id)
+            if (userShow.allEpisodesWatched) return
+
             let updatedSeasons = []
             let updatedSeasonsUser = []
-            const userShow = userShows.find(item => item.id === show.id)
 
             show.episodes.forEach((season, indexSeason) => {
               let updatedEpisodesUser = []
@@ -177,8 +176,6 @@ class ToWatchEpisodesContent extends Component {
               updatedSeasonsUser.push(updatedSeasonUser)
             })
 
-            console.log(show)
-
             updatedShows.push({
               ...show,
               info: {
@@ -192,8 +189,6 @@ class ToWatchEpisodesContent extends Component {
               .userShowAllEpisodes(this.props.authUser.uid, show.id, database)
               .set(updatedSeasonsUser)
           })
-
-          console.log(updatedShows)
 
           this.setState({
             watchingShows: updatedShows.reverse(),
@@ -225,8 +220,6 @@ class ToWatchEpisodesContent extends Component {
                 }
               }
 
-              console.log(showInDatabase)
-
               const infoToPass = show && {
                 id: show.info.id,
                 status: show.info.status
@@ -239,13 +232,7 @@ class ToWatchEpisodesContent extends Component {
                 let episodes = []
 
                 season.episodes.forEach(episode => {
-                  if (
-                    !episode.watched &&
-                    episode.air_date &&
-                    new Date(episode.air_date) < todayDate.getTime()
-                  ) {
-                    episodes.push(episode)
-                  }
+                  episodes.push(episode)
                 })
 
                 episodes.reverse()
@@ -255,7 +242,7 @@ class ToWatchEpisodesContent extends Component {
                   episodes
                 }
 
-                if (newSeason.episodes.length !== 0) {
+                if (newSeason.episodes.length !== 0 && newSeason.episodes.some(item => !item.watched)) {
                   newEpisodes = [...newEpisodes, newSeason]
                 }
               })

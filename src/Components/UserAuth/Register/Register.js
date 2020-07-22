@@ -126,7 +126,8 @@ class RegisterBase extends Component {
 
   handleOnChange = event => {
     event.preventDefault()
-    const { value, name } = event.target
+    const { value } = event.target
+    const name = event.target.name === "new-password" ? "password" : event.target.name
 
     const validation = () => {
       const { email, password, passwordConfirm } = this.state.requiredInputs
@@ -173,7 +174,9 @@ class RegisterBase extends Component {
   handleValidationOnblur = event => {
     event.preventDefault()
 
-    const { value, name } = event.target
+    const { value } = event.target
+    const name = event.target.name === "new-password" ? "password" : event.target.name
+
     const { email, password, passwordConfirm } = this.state.requiredInputs
     const errors = { ...this.state.errors }
 
@@ -277,7 +280,8 @@ class RegisterBase extends Component {
             "auth__form-input--error": passwordError
           })}
           classNameLabel="auth__form-label"
-          name="password"
+          name="new-password"
+          autocomplete="new-password"
           value={password}
           handleOnChange={this.handleOnChange}
           handleValidation={this.handleValidationOnblur}

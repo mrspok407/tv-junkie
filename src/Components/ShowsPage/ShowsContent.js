@@ -95,7 +95,6 @@ class ShowsContent extends Component {
         ) // Need zzzzzz's and true_3190666598976 so it will sure go to the end
         .limitToFirst(!isInitialLoad ? limitTo : limitTo)
         .once("value", snapshot => {
-          console.log(`database: ${snapshot.val()}`)
           let shows = []
           snapshot.forEach(item => {
             shows = [
@@ -123,7 +122,6 @@ class ShowsContent extends Component {
                 })
             })
           ).then(showsData => {
-            console.log(showsData)
             counter++
 
             this.setState({
@@ -138,7 +136,6 @@ class ShowsContent extends Component {
             })
 
             if (counter === getContentFromDatabases.length) {
-              console.log("getContent finished")
               this.setState({
                 sortByLoading: false,
                 initialLoading: false
@@ -279,8 +276,6 @@ class ShowsContent extends Component {
 
   renderContent = section => {
     const content = this.state.database[section]
-
-    console.log(content)
 
     const shows = this.props.authUser
       ? content

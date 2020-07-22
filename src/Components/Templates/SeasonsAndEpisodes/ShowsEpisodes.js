@@ -157,14 +157,15 @@ class ShowsEpisodes extends Component {
     if (!this.props.authUser) return
 
     const show = this.props.showInDatabase
-
     console.log(show)
+    console.log(seasonNum)
+    console.log(episodeNum)
 
     this.props.firebase
       .userShowSingleEpisode(this.props.authUser.uid, show.info.id, show.database, seasonNum, episodeNum)
       .update(
         {
-          watched: !show.info.episodes[seasonNum - 1].episodes[episodeNum - 1].watched
+          watched: !show.info.episodes[seasonNum - 1].episodes[episodeNum].watched
         },
         checkIfAllEpisodesWatched({
           show,
@@ -181,16 +182,21 @@ class ShowsEpisodes extends Component {
     const seasonEpisodesFromDatabase = this.state.allEpisodesFromDatabase.filter(
       item => item.season_number === seasonNum
     )
+    const seasonLength = seasonEpisodesFromDatabase.length
+
     let isAllEpisodesChecked = true
 
-    seasonEpisodesFromDatabase.forEach(item => {
-      if (!seasonEpisodes[item.episode_number - 1].watched) {
+    seasonEpisodesFromDatabase.forEach((episode, episodeIndex) => {
+      const indexOfEpisode = seasonLength - 1 - episodeIndex
+      // console.log(seasonEpisodesFromDatabase)
+      if (!seasonEpisodes[indexOfEpisode].watched) {
         isAllEpisodesChecked = false
       }
     })
 
-    seasonEpisodesFromDatabase.forEach(item => {
-      seasonEpisodes[item.episode_number - 1].watched = !isAllEpisodesChecked
+    seasonEpisodesFromDatabase.forEach((episode, episodeIndex) => {
+      const indexOfEpisode = seasonLength - 1 - episodeIndex
+      seasonEpisodes[indexOfEpisode].watched = !isAllEpisodesChecked
     })
 
     this.props.firebase.userShowSeason(this.props.authUser.uid, show.info.id, show.database, seasonNum).set(
@@ -234,26 +240,44 @@ class ShowsEpisodes extends Component {
   checkEveryShowEpisode = () => {
     const show = this.props.showInDatabase
     const allEpisodesUser = show.info.episodes
-    let allEpisodesDatabase = []
-    let isAllEpisodesChecked = true
 
-    show.info.episodes.forEach(item => {
-      allEpisodesDatabase = [...allEpisodesDatabase, ...item.episodes]
+    // console.log(show.info.episodes)
+
+    // let allEpisodesDatabase = []
+    let isAllEpisodesChecked = true
+    let userEpisodesFormated = []
+
+    allEpisodesUser.forEach(season => {
+      const episodes = season.episodes
+
+      userEpisodesFormated = [...userEpisodesFormated, ...episodes]
     })
 
-    console.log(this.state.allEpisodesFromDatabase)
+    console.log(userEpisodesFormated)
 
-    this.state.allEpisodesFromDatabase.forEach(item => {
-      if (!allEpisodesDatabase[item.episode_number - 1].watched) {
+    // show.info.episodes.forEach(item => {
+    //   allEpisodesDatabase = [...allEpisodesDatabase, ...item.episodes]
+    // })
+
+    // console.log(this.state.allEpisodesFromDatabase)
+
+    this.state.allEpisodesFromDatabase.forEach((episode, episodeIndex) => {
+      const indexOfEpisode = this.state.allEpisodesFromDatabase.length - 1 - episodeIndex
+      if (!userEpisodesFormated[indexOfEpisode].watched) {
         isAllEpisodesChecked = false
       }
     })
 
-    this.state.allEpisodesFromDatabase.forEach(item => {
-      allEpisodesUser[item.season_number - 1].episodes[
-        item.episode_number - 1
-      ].watched = !isAllEpisodesChecked
+    this.state.allEpisodesFromDatabase.forEach((episode, episodeIndex) => {
+      // console.log(userEpisodesFormated)
+      // console.log(episode)
+
+      // const indexOfEpisode = allEpisodesUser[episode.season_number - 1].episodes.length - 1 - episodeIndex
+      // allEpisodesUser[episode.season_number - 1].episodes[indexOfEpisode].watched = !isAllEpisodesChecked
+      userEpisodesFormated[episodeIndex].watched = !isAllEpisodesChecked
     })
+
+    console.log(userEpisodesFormated)
 
     this.props.firebase.userShowAllEpisodes(this.props.authUser.uid, show.info.id, show.database).set(
       allEpisodesUser,
@@ -291,10 +315,14 @@ class ShowsEpisodes extends Component {
 
             const seasonId = season.id
 
+            const seasonEpisodesNotWatched =
+              this.props.toWatchPage && season.episodes.filter(episode => !episode.watched)
+
             const daysToNewSeason = differenceBtwDatesInDays(season.air_date, this.props.todayDate)
 
             const episodeToString =
-              this.props.toWatchPage && season.episodes[season.episodes.length - 1].episode_number.toString()
+              this.props.toWatchPage &&
+              seasonEpisodesNotWatched[seasonEpisodesNotWatched.length - 1].episode_number.toString()
             const episodeNumber =
               episodeToString && episodeToString.length === 1
                 ? "e0".concat(episodeToString)
@@ -338,7 +366,7 @@ class ShowsEpisodes extends Component {
 
                   {this.props.toWatchPage && (
                     <div className="show-episodes__season-episodes-left">
-                      {season.episodes.length} episodes left from {episodeNumber}
+                      {seasonEpisodesNotWatched.length} episodes left from {episodeNumber}
                     </div>
                   )}
 

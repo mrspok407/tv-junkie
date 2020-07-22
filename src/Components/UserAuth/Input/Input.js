@@ -39,6 +39,7 @@ export default class Input extends Component {
       classNameInput,
       classNameLabel,
       name,
+      autocomplete,
       value,
       handleOnChange,
       handleValidation,
@@ -58,6 +59,7 @@ export default class Input extends Component {
         )}
         <input
           className={classNameInput}
+          autoComplete={autocomplete}
           name={name}
           value={value}
           onChange={handleOnChange}
@@ -65,6 +67,7 @@ export default class Input extends Component {
           onKeyDown={handleKeyDown}
           type={type}
           placeholder={placeholder}
+          // required
         />
       </>
     )

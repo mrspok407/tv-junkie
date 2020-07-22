@@ -28,8 +28,6 @@ export const checkIfAllEpisodesWatched = ({ show, firebase, authUser, todayDate 
 
       const finished = allShowsListSubDatabase === "ended" && allEpisodesWatched ? true : false
 
-      console.log(show)
-
       firebase.userShow(authUser.uid, show.info.id, show.database).update({
         allEpisodesWatched,
         finished_and_name: `${finished}_${show.info.name || show.info.original_name}`,

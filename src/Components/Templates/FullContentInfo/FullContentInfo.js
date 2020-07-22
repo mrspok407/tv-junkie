@@ -267,7 +267,6 @@ function FullContentInfo({
       firebase.userShow(authUser.uid, Number(id), database).on(
         "value",
         snapshot => {
-          console.log("updated")
           if (snapshot.val() !== null) {
             const userShow = snapshot.val()
             const allShowsListSubDatabase = userShow.status
@@ -324,7 +323,6 @@ function FullContentInfo({
               .then(() => {
                 if (counter === userContent.showsDatabases.length) {
                   setLoadingFromDatabase(false)
-                  console.log("loading finished")
                 }
               })
 
@@ -352,7 +350,6 @@ function FullContentInfo({
             setShowDatabaseOnClient(database)
           } else {
             setLoadingFromDatabase(false)
-            console.log("loading finished")
           }
         },
         error => {
