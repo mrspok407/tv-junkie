@@ -6,6 +6,7 @@ import Admin from "Components/Admin/Admin"
 import SearchPage from "Components/SearchPage/SearchPage"
 import ShowsPage from "Components/ShowsPage/ShowsPage"
 import ToWatchEpisodesPage from "Components/ToWatchEpisodesPage/ToWatchEpisodesPage"
+import CalendarPage from "Components/CalendarPage/CalendarPage"
 import MoviesPage from "Components/MoviesPage/MoviesPage"
 import FullContentInfo from "Components/Templates/FullContentInfo/FullContentInfo"
 import GridTests from "Utils/GridTests/GridTests"
@@ -22,6 +23,7 @@ class App extends Component {
             <Route path={ROUTES.SEARCH_PAGE} exact component={SearchPage} />
             <Route path={ROUTES.SHOWS} exact component={ShowsPage} />
             <Route path={ROUTES.TO_WATCH} component={ToWatchEpisodesPage} />
+            <Route path={ROUTES.CALENDAR} component={CalendarPage} />
             <Route path={ROUTES.MOVIES} component={MoviesPage} />
             <Route path={ROUTES.FULL_CONTENT_INFO} component={FullContentInfo} />
             <Route path={ROUTES.PROFILE} component={Profile} />

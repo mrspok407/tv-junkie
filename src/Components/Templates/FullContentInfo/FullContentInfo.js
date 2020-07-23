@@ -4,6 +4,8 @@
 import React, { useState, useEffect } from "react"
 import { useLocation } from "react-router-dom"
 import axios, { CancelToken } from "axios"
+import { combineMergeObjects } from "Utils"
+import merge from "deepmerge"
 import PlaceholderLoadingFullInfo from "Components/Placeholders/PlaceholderLoadingFullInfo/PlaceholderLoadingFullInfo"
 import ScrollToTop from "Utils/ScrollToTop"
 import Header from "Components/Header/Header"
@@ -269,11 +271,11 @@ function FullContentInfo({
         snapshot => {
           if (snapshot.val() !== null) {
             const userShow = snapshot.val()
-            const allShowsListSubDatabase = userShow.status
+            const showsSubDatabase = userShow.status
             // userShow.status === "Ended" || userShow.status === "Canceled" ? "ended" : "ongoing"
 
             firebase
-              .showInDatabase(allShowsListSubDatabase, Number(id))
+              .showInDatabase(showsSubDatabase, Number(id))
               .once("value", snapshot => {
                 const show = snapshot.val()
 
@@ -281,32 +283,25 @@ function FullContentInfo({
                 let updatedSeasonsUser = []
 
                 show.episodes.forEach((season, indexSeason) => {
-                  let updatedEpisodes = []
                   let updatedEpisodesUser = []
+                  const seasonPath = userShow.episodes[indexSeason]
+                  const databaseEpisodes = season.episodes
+                  const userEpisodes = seasonPath ? userShow.episodes[indexSeason].episodes : []
 
-                  season.episodes.forEach((episode, indexEpisode) => {
-                    const seasonPath = userShow.episodes[indexSeason]
-                    const watched =
-                      seasonPath && seasonPath.episodes[indexEpisode]
-                        ? seasonPath.episodes[indexEpisode].watched
-                        : false
+                  const mergedEpisodes = merge(databaseEpisodes, userEpisodes, {
+                    arrayMerge: combineMergeObjects
+                  })
 
+                  mergedEpisodes.forEach(episode => {
                     const updatedEpisode = {
-                      ...episode,
-                      watched: watched
+                      watched: episode.watched || false
                     }
-
-                    const updatedEpisodeUser = {
-                      watched: watched
-                    }
-
-                    updatedEpisodes.push(updatedEpisode)
-                    updatedEpisodesUser.push(updatedEpisodeUser)
+                    updatedEpisodesUser.push(updatedEpisode)
                   })
 
                   const updatedSeason = {
                     ...season,
-                    episodes: updatedEpisodes
+                    episodes: mergedEpisodes
                   }
 
                   const updatedSeasonUser = {
@@ -326,7 +321,7 @@ function FullContentInfo({
                 }
               })
 
-            if (userShow.allEpisodesWatched && allShowsListSubDatabase === "ended") {
+            if (userShow.allEpisodesWatched && showsSubDatabase === "ended") {
               firebase
                 .userShows(authUser.uid, "finishedShows")
                 .child(Number(id))

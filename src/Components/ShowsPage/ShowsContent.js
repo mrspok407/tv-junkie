@@ -112,10 +112,10 @@ class ShowsContent extends Component {
 
           Promise.all(
             shows.map(item => {
-              const allShowsListSubDatabase = item.status
+              const showsSubDatabase = item.status
 
               return this.props.firebase
-                .showInfo(allShowsListSubDatabase, item.id)
+                .showInfo(showsSubDatabase, item.id)
                 .once("value")
                 .then(snapshot => {
                   return snapshot.val()
@@ -190,10 +190,10 @@ class ShowsContent extends Component {
 
         Promise.all(
           shows.map(item => {
-            const allShowsListSubDatabase = item.status
+            const showsSubDatabase = item.status
 
             return this.props.firebase
-              .showInfo(allShowsListSubDatabase, item.id)
+              .showInfo(showsSubDatabase, item.id)
               .once("value")
               .then(snapshot => {
                 return snapshot.val()

@@ -125,8 +125,7 @@ const withUserContent = Component => {
     addShowToDatabase = ({ id, show, userDatabase }) => {
       console.log(show)
       this.getShowEpisodes({ id }).then(data => {
-        const allShowsListSubDatabase =
-          data.status === "Ended" || data.status === "Canceled" ? "ended" : "ongoing"
+        const showsSubDatabase = data.status === "Ended" || data.status === "Canceled" ? "ended" : "ongoing"
 
         const userEpisodes = []
 
@@ -156,7 +155,7 @@ const withUserContent = Component => {
           .set({
             allEpisodesWatched: false,
             // status: data.status,
-            status: allShowsListSubDatabase,
+            status: showsSubDatabase,
             firstAirDate: show.first_air_date,
             name: show.name || show.original_name,
             timeStamp: this.firebase.timeStamp(),
@@ -184,7 +183,7 @@ const withUserContent = Component => {
           })
 
         this.firebase
-          .allShowsList(allShowsListSubDatabase)
+          .allShowsList(showsSubDatabase)
           .child(id)
           .transaction(
             snapshot => {
@@ -209,7 +208,7 @@ const withUserContent = Component => {
               } else if (!committed) {
                 console.log("We aborted the transaction (because allready exists).")
                 this.firebase
-                  .allShowsList(allShowsListSubDatabase)
+                  .allShowsList(showsSubDatabase)
                   .child(id)
                   .update({
                     usersWatching: snapshot.val().usersWatching + 1

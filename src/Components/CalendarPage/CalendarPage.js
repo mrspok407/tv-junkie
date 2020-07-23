@@ -2,21 +2,21 @@ import React, { Component } from "react"
 import { withFirebase } from "Components/Firebase/FirebaseContext"
 import ScrollToTop from "Utils/ScrollToTop"
 import HeaderBase from "Components/Header/Header"
-import ToWatchEpisodesContent from "./ToWatchEpisodesContent"
-import "./ToWatchEpisodesPage.scss"
+import CalendarContent from "./CalendarContent"
+import "./CalendarPage.scss"
 
 const Header = withFirebase(HeaderBase)
 
-class ToWatchEpisodesPage extends Component {
+class CalendarPage extends Component {
   render() {
     return (
       <>
         <Header />
-        <ToWatchEpisodesContent />
+        <CalendarContent />
         <ScrollToTop />
       </>
     )
   }
 }
 
-export default ToWatchEpisodesPage
+export default CalendarPage

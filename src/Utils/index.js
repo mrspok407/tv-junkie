@@ -3,6 +3,7 @@ import iconMediaTypeMulti from "assets/images/icons/media-type-multi.png"
 import iconMediaTypeMovie from "assets/images/icons/media-type-movie.png"
 import iconMediaTypePerson from "assets/images/icons/media-type-person.png"
 import iconMediaTypeTv from "assets/images/icons/media-type-tv.png"
+import merge from "deepmerge"
 
 export const todayDate = new Date()
 
@@ -170,3 +171,18 @@ export const mediaTypesArr = [
 export const validEmailRegex = RegExp(
   /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
 )
+
+export const combineMergeObjects = (target, source, options) => {
+  const destination = target.slice()
+
+  source.forEach((item, index) => {
+    if (typeof destination[index] === "undefined") {
+      destination[index] = options.cloneUnlessOtherwiseSpecified(item, options)
+    } else if (options.isMergeableObject(item)) {
+      destination[index] = merge(target[index], item, options)
+    } else if (target.indexOf(item) === -1) {
+      destination.push(item)
+    }
+  })
+  return destination
+}

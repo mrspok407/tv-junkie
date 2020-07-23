@@ -214,10 +214,9 @@ class ShowsEpisodes extends Component {
     if (!this.props.authUser) return
 
     const show = this.props.infoToPass
-    const allShowsListSubDatabase =
-      show.status === "Ended" || show.status === "Canceled" ? "ended" : "ongoing"
+    const showsSubDatabase = show.status === "Ended" || show.status === "Canceled" ? "ended" : "ongoing"
 
-    this.props.firebase.showEpisodes(allShowsListSubDatabase, show.id).once("value", snapshot => {
+    this.props.firebase.showEpisodes(showsSubDatabase, show.id).once("value", snapshot => {
       if (snapshot.val() !== null) {
         let allEpisodes = []
 

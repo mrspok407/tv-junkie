@@ -8,12 +8,12 @@ userContent.showsDatabases.forEach(database => {
       console.log("updated")
       if (snapshot.val() !== null) {
         const userShow = snapshot.val()
-        const allShowsListSubDatabase =
+        const showsSubDatabase =
           userShow.status === "Ended" || userShow.status === "Canceled" ? "ended" : "ongoing" // Чекаем статус сирика, чтобы в общей базе искать в нужной сабБазе (ongoing),
         // т.к. ending не обновятся уже, незачем в одной общей держать
 
         firebase
-          .showInDatabase(allShowsListSubDatabase, Number(id))
+          .showInDatabase(showsSubDatabase, Number(id))
           .once("value", snapshot => {
             const show = snapshot.val()
 

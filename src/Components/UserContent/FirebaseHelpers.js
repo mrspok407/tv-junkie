@@ -1,9 +1,9 @@
 import { differenceBtwDatesInDays } from "Utils"
 
 export const checkIfAllEpisodesWatched = ({ show, firebase, authUser, todayDate }) => {
-  const allShowsListSubDatabase = show.info.status
+  const showsSubDatabase = show.info.status
 
-  firebase.showEpisodes(allShowsListSubDatabase, show.info.id).once("value", snapshot => {
+  firebase.showEpisodes(showsSubDatabase, show.info.id).once("value", snapshot => {
     let allEpisodesDatabase = []
 
     snapshot.val().forEach(item => {
@@ -26,7 +26,7 @@ export const checkIfAllEpisodesWatched = ({ show, firebase, authUser, todayDate 
 
       const allEpisodesWatched = !allEpisodes.some(episode => !episode.watched)
 
-      const finished = allShowsListSubDatabase === "ended" && allEpisodesWatched ? true : false
+      const finished = showsSubDatabase === "ended" && allEpisodesWatched ? true : false
 
       firebase.userShow(authUser.uid, show.info.id, show.database).update({
         allEpisodesWatched,

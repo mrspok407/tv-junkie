@@ -2,7 +2,7 @@ import React, { Component } from "react"
 import { Link } from "react-router-dom"
 import { withUserContent } from "Components/UserContent"
 import ShowsEpisodes from "Components/Templates/SeasonsAndEpisodes/ShowsEpisodes"
-import { todayDate } from "Utils"
+import { todayDate, combineMergeObjects } from "Utils"
 import Loader from "Components/Placeholders/Loader"
 import PlaceholderNoToWatchEpisodes from "Components/Placeholders/PlaceholderNoToWatchEpisodes"
 import merge from "deepmerge"
@@ -27,21 +27,6 @@ class ToWatchEpisodesContent extends Component {
     })
   }
 
-  combineMerge = (target, source, options) => {
-    const destination = target.slice()
-
-    source.forEach((item, index) => {
-      if (typeof destination[index] === "undefined") {
-        destination[index] = options.cloneUnlessOtherwiseSpecified(item, options)
-      } else if (options.isMergeableObject(item)) {
-        destination[index] = merge(target[index], item, options)
-      } else if (target.indexOf(item) === -1) {
-        destination.push(item)
-      }
-    })
-    return destination
-  }
-
   getContent = ({ sortBy = "first_air_date", isInitialLoad = true, database = "watchingShows" }) => {
     if (this.props.authUser === null) return
     if (isInitialLoad) {
@@ -58,10 +43,10 @@ class ToWatchEpisodesContent extends Component {
             ...userShows,
             {
               id: item.val().id,
-              name: item.val().name,
+              // name: item.val().name,
               status: item.val().status,
-              timeStamp: item.val().timeStamp,
-              allEpisodesWatched: item.val().allEpisodesWatched,
+              // timeStamp: item.val().timeStamp,
+              // allEpisodesWatched: item.val().allEpisodesWatched,
               // finished_and_timeStamp: item.val().finished_and_timeStamp,
               episodes: item.val().episodes
             }
@@ -75,7 +60,7 @@ class ToWatchEpisodesContent extends Component {
                 const watchingShows = this.state.watchingShows.filter(item => item.id !== snapshot.val().id)
                 const show = this.state.watchingShows.find(item => item.id === snapshot.val().id)
 
-                const allShowsListSubDatabase = snapshot.val().status
+                const showsSubDatabase = snapshot.val().status
                 // snapshot.val().status === "Ended" || snapshot.val().status === "Canceled"
                 //   ? "ended"
                 //   : "ongoing"
@@ -97,7 +82,7 @@ class ToWatchEpisodesContent extends Component {
                   })
                 }
 
-                if (snapshot.val().allEpisodesWatched && allShowsListSubDatabase === "ended") {
+                if (snapshot.val().allEpisodesWatched && showsSubDatabase === "ended") {
                   this.props.firebase
                     .userShows(this.props.authUser.uid, "finishedShows")
                     .child(snapshot.val().id)
@@ -122,12 +107,11 @@ class ToWatchEpisodesContent extends Component {
         })
 
         Promise.all(
-          userShows.map(item => {
-            const allShowsListSubDatabase = item.status
-            // item.status === "Ended" || item.status === "Canceled" ? "ended" : "ongoing"
+          userShows.map(show => {
+            const showsSubDatabase = show.status
 
             return this.props.firebase
-              .showInDatabase(allShowsListSubDatabase, item.id)
+              .showInDatabase(showsSubDatabase, show.id)
               .once("value")
               .then(snapshot => {
                 return snapshot.val()
@@ -152,7 +136,7 @@ class ToWatchEpisodesContent extends Component {
                 : []
 
               const mergedEpisodes = merge(databaseEpisodes, userEpisodes, {
-                arrayMerge: this.combineMerge
+                arrayMerge: combineMergeObjects
               })
 
               mergedEpisodes.forEach(episode => {
@@ -208,14 +192,14 @@ class ToWatchEpisodesContent extends Component {
         ) : (
           <>
             {this.state.watchingShows.map(show => {
-              const allShowsListSubDatabase =
+              const showsSubDatabase =
                 show.info.status === "Ended" || show.info.status === "Canceled" ? "ended" : "ongoing"
 
               const showInDatabase = show && {
                 database: "watchingShows",
                 info: {
                   ...show.info,
-                  status: allShowsListSubDatabase,
+                  status: showsSubDatabase,
                   episodes: show.episodes
                 }
               }
@@ -232,7 +216,9 @@ class ToWatchEpisodesContent extends Component {
                 let episodes = []
 
                 season.episodes.forEach(episode => {
-                  episodes.push(episode)
+                  if (episode.air_date && new Date(episode.air_date) < todayDate.getTime()) {
+                    episodes.push(episode)
+                  }
                 })
 
                 episodes.reverse()

@@ -37,22 +37,29 @@ export default class Header extends Component {
               activeClassName="nav__item--active"
               onClick={() => this.closeNavMobile()}
             >
-              <li data-item="1" className="nav__item">
-                Search
-              </li>
+              <li className="nav__item">Search</li>
             </NavLink>
 
             {authUser && (
-              <NavLink
-                exact
-                to={ROUTES.TO_WATCH}
-                activeClassName="nav__item--active"
-                onClick={() => this.closeNavMobile()}
-              >
-                <li data-item="2" className="nav__item">
-                  To Watch
-                </li>
-              </NavLink>
+              <>
+                <NavLink
+                  exact
+                  to={ROUTES.CALENDAR}
+                  activeClassName="nav__item--active"
+                  onClick={() => this.closeNavMobile()}
+                >
+                  <li className="nav__item">Calendar</li>
+                </NavLink>
+
+                <NavLink
+                  exact
+                  to={ROUTES.TO_WATCH}
+                  activeClassName="nav__item--active"
+                  onClick={() => this.closeNavMobile()}
+                >
+                  <li className="nav__item">To Watch</li>
+                </NavLink>
+              </>
             )}
 
             <NavLink
@@ -61,9 +68,7 @@ export default class Header extends Component {
               activeClassName="nav__item--active"
               onClick={() => this.closeNavMobile()}
             >
-              <li data-item="2" className="nav__item">
-                Your Shows
-              </li>
+              <li className="nav__item">Your Shows</li>
             </NavLink>
 
             <NavLink
@@ -72,22 +77,20 @@ export default class Header extends Component {
               activeClassName="nav__item--active"
               onClick={() => this.closeNavMobile()}
             >
-              <li data-item="3" className="nav__item">
-                Your Movies
-              </li>
+              <li className="nav__item">Your Movies</li>
             </NavLink>
 
             {authUser ? (
               <>
                 <NavLink exact to={ROUTES.PROFILE}>
-                  <li data-item="4" className="nav__item" onClick={() => this.closeNavMobile()}>
+                  <li className="nav__item" onClick={() => this.closeNavMobile()}>
                     Profile
                   </li>
                 </NavLink>
 
                 {authUser.roles && !!authUser.roles[ROLES.ADMIN] && (
                   <NavLink exact to={ROUTES.ADMIN}>
-                    <li data-item="4" className="nav__item" onClick={() => this.closeNavMobile()}>
+                    <li className="nav__item" onClick={() => this.closeNavMobile()}>
                       Admin
                     </li>
                   </NavLink>

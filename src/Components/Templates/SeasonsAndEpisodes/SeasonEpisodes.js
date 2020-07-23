@@ -36,7 +36,9 @@ export default class SeasonEpisodes extends Component {
       this.props.showInDatabase.info.episodes.length > 0 &&
       true
 
-    // console.log(this.props.season)
+    const showSeason =
+      showCheckboxes && this.props.showInDatabase.info.episodes[this.props.season.season_number - 1]
+
     console.log(this.props.showInDatabase)
 
     const seasons = this.props.toWatchPage ? this.props.seasonsArr : this.props.showEpisodes
@@ -211,8 +213,7 @@ export default class SeasonEpisodes extends Component {
                         type="checkbox"
                         checked={
                           // .episodes[episode.episode_number - 1].watched
-                          this.props.showInDatabase.info.episodes[this.props.season.season_number - 1]
-                            .episodes[indexOfEpisode].watched
+                          showSeason && showSeason.episodes[indexOfEpisode].watched
                         }
                         onChange={() =>
                           this.props.toggleWatchedEpisode(
