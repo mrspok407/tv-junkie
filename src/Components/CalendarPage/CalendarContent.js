@@ -2,6 +2,8 @@ import React, { Component } from "react"
 import { Link } from "react-router-dom"
 import { withUserContent } from "Components/UserContent"
 import { differenceBtwDatesInDays, todayDate } from "Utils"
+import { organiseFutureEpisodesByMonth } from "./CalendarHelpers"
+import classNames from "classnames"
 import ShowsEpisodes from "Components/Templates/SeasonsAndEpisodes/ShowsEpisodes"
 import Loader from "Components/Placeholders/Loader"
 import PlaceholderNoToWatchEpisodes from "Components/Placeholders/PlaceholderNoToWatchEpisodes"
@@ -12,7 +14,7 @@ class CalendarContent extends Component {
     super(props)
 
     this.state = {
-      watchingShows: [],
+      willAirEpisodes: [],
       initialLoading: true
     }
   }
@@ -55,63 +57,107 @@ class CalendarContent extends Component {
           console.log(userShows)
           console.log(showsData)
 
-          const allEpisodes = showsData.reduce((acc, show) => {
-            const showEpisodes = show.episodes.reduce((acc, season) => {
-              const toAirEpisodes = season.episodes.reduce((acc, episode) => {
-                if (differenceBtwDatesInDays(episode.air_date, todayDate) > 0) {
-                  acc.push({ ...episode, name: show.info.name || show.info.original_name })
-                }
-                return acc
-              }, [])
+          const willAirEpisodes = organiseFutureEpisodesByMonth(showsData)
 
-              return [...acc, ...toAirEpisodes]
-            }, [])
+          this.setState({
+            willAirEpisodes
+          })
 
-            return [...acc, ...showEpisodes]
-          }, [])
-
-          const sortedEpisodes = allEpisodes.sort((a, b) => (a.air_date > b.air_date ? 1 : -1))
-          const uniqueMonths = sortedEpisodes
-            .map(episode => episode.air_date.slice(0, 7))
-            .filter((month, index, array) => array.indexOf(month) === index)
-
-          console.log(sortedEpisodes)
-          console.log(uniqueMonths)
-
-          const episodesWithMonths = uniqueMonths.reduce((acc, month) => {
-            const episodes = sortedEpisodes.reduce((acc, episode) => {
-              if (episode.air_date.slice(0, 7) === month) acc.push(episode)
-              return acc
-            }, [])
-
-            acc.push({ month, episodes })
-
-            return acc
-          }, [])
-
-          //   let episodesWithMonths = []
-
-          //   uniqueMonths.forEach(month => {
-          //     const episodes = []
-          //     sortedEpisodes.forEach(episode => {
-          //       if (episode.air_date.slice(0, 7) === month) {
-          //         episodes.push(episode)
-          //       }
-          //     })
-          //     episodesWithMonths.push({ month, episodes })
-          //   })
-
-          console.log(episodesWithMonths)
-
-          //   sortedEpisodes.forEach(episode => {
-          //     const months = {}
-          //   })
+          console.log(willAirEpisodes)
         })
       })
   }
 
   render() {
-    return <></>
+    return (
+      <div className="content-results content-results--to-watch-page">
+        <div
+          className={classNames("show-episodes", {
+            "show-episodes--to-watch-page": this.props.toWatchPage
+          })}
+        >
+          {this.state.willAirEpisodes.map(month => {
+            return (
+              <div key={month.month} className="show-episodes__season--no-poster">
+                <div
+                  // className={classNames("show-episodes__season-info", {
+                  //   "show-episodes__season-info--open": this.state.openSeasons.includes(seasonId)
+                  // })}
+                  // onClick={() => this.showSeasonsEpisode(seasonId, season.season_number)}
+                  className="show-episodes__season-info--open"
+                >
+                  <div
+                    className={classNames("show-episodes__season-number", {
+                      "show-episodes__season-number--to-watch-page": this.props.toWatchPage
+                    })}
+                  >
+                    Month {month.month}
+                  </div>
+                </div>
+
+                {month.episodes.map(episode => {
+                  // Format Date //
+                  const airDateISO = episode.air_date && new Date(episode.air_date).toISOString()
+
+                  const optionss = {
+                    month: "long",
+                    day: "numeric",
+                    year: "numeric"
+                  }
+
+                  const formatedDate = new Date(airDateISO)
+
+                  const episodeAirDate = episode.air_date
+                    ? new Intl.DateTimeFormat("en-US", optionss).format(formatedDate)
+                    : "No date available"
+                  // Format Date End //
+
+                  // Format Seasons And Episode Numbers //
+                  const seasonToString = episode.season_number.toString()
+                  const episodeToString = episode.episode_number.toString()
+
+                  const seasonNumber =
+                    seasonToString.length === 1 ? "s0".concat(seasonToString) : "s".concat(seasonToString)
+                  const episodeNumber =
+                    episodeToString.length === 1 ? "e0".concat(episodeToString) : "e".concat(episodeToString)
+                  // Format Seasons And Episode Numbers End //
+
+                  const episodeAirDateAsDateObj = new Date(episode.air_date)
+
+                  const daysToNewEpisode = differenceBtwDatesInDays(episode.air_date, todayDate)
+
+                  return (
+                    <div
+                      key={episode.id}
+                      className={classNames("show-episodes__episode", {
+                        "show-episodes__episode--to-watch-page": this.props.toWatchPage
+                      })}
+                    >
+                      <div
+                        className={classNames("show-episodes__episode-wrapper", {
+                          "show-episodes__episode-wrapper--to-watch-page": this.props.toWatchPage
+                        })}
+                        // onClick={() => this.props.fullContentPage && this.props.showEpisodeInfo(episode.id)}
+                      >
+                        <div className="show-episodes__episode-date">{episodeAirDate}</div>
+                        <div className="show-episodes__episode-name">
+                          <span className="show-episodes__episode-number">{episode.episode_number}.</span>
+                          {episode.show}
+                          {episode.name}
+                        </div>
+                        {daysToNewEpisode > 0 && (
+                          <div className="show-episodes__episode-days-to-air">{daysToNewEpisode} days</div>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    )
   }
 }
 

@@ -50,7 +50,6 @@ class ShowsEpisodes extends Component {
 
   initialFirstSeasonLoad = () => {
     const seasons = this.props.seasonsArr.filter(item => item.name !== "Specials")
-
     if (seasons.length === 0) return
 
     const firstSeason = seasons[seasons.length - 1]
@@ -59,39 +58,45 @@ class ShowsEpisodes extends Component {
       openSeasons: firstSeason && [firstSeason.id]
     })
 
-    axios
-      .get(
-        `https://api.themoviedb.org/3/tv/${this.props.id}/season/${firstSeason.season_number}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US`,
-        {
-          cancelToken: new CancelToken(function executor(c) {
-            cancelRequest = c
-          })
-        }
-      )
-      .then(({ data: { episodes } }) => {
-        if (!this._isMounted) return
-
-        const episodesReverse = episodes.reverse()
-
-        this.setState(prevState => ({
-          showEpisodes: [
-            ...prevState.showEpisodes,
-            {
-              seasonId: firstSeason.id,
-              episodes: episodesReverse
-            }
-          ],
-          loadingEpisodesIds: [...prevState.loadingEpisodesIds.filter(item => item !== firstSeason.id)],
-          errorShowEpisodes: ""
-        }))
+    if (this.props.toWatchPage) {
+      this.setState({
+        showEpisodes: [{ seasonId: firstSeason.id, episodes: firstSeason.episodes }]
       })
-      .catch(err => {
-        if (axios.isCancel(err) || !this._isMounted) return
-        this.setState({
-          loadingEpisodesIds: [],
-          errorShowEpisodes: "Something went wrong, sorry"
+    } else {
+      axios
+        .get(
+          `https://api.themoviedb.org/3/tv/${this.props.id}/season/${firstSeason.season_number}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US`,
+          {
+            cancelToken: new CancelToken(function executor(c) {
+              cancelRequest = c
+            })
+          }
+        )
+        .then(({ data: { episodes } }) => {
+          if (!this._isMounted) return
+
+          const episodesReverse = episodes.reverse()
+
+          this.setState(prevState => ({
+            showEpisodes: [
+              ...prevState.showEpisodes,
+              {
+                seasonId: firstSeason.id,
+                episodes: episodesReverse
+              }
+            ],
+            loadingEpisodesIds: [...prevState.loadingEpisodesIds.filter(item => item !== firstSeason.id)],
+            errorShowEpisodes: ""
+          }))
         })
-      })
+        .catch(err => {
+          if (axios.isCancel(err) || !this._isMounted) return
+          this.setState({
+            loadingEpisodesIds: [],
+            errorShowEpisodes: "Something went wrong, sorry"
+          })
+        })
+    }
   }
 
   showSeasonsEpisode = (seasonId, seasonNum) => {

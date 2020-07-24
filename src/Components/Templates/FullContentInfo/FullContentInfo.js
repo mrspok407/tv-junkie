@@ -272,7 +272,6 @@ function FullContentInfo({
           if (snapshot.val() !== null) {
             const userShow = snapshot.val()
             const showsSubDatabase = userShow.status
-            // userShow.status === "Ended" || userShow.status === "Canceled" ? "ended" : "ongoing"
 
             firebase
               .showInDatabase(showsSubDatabase, Number(id))
@@ -291,6 +290,8 @@ function FullContentInfo({
                   const mergedEpisodes = merge(databaseEpisodes, userEpisodes, {
                     arrayMerge: combineMergeObjects
                   })
+
+                  console.log(mergedEpisodes)
 
                   mergedEpisodes.forEach(episode => {
                     const updatedEpisode = {
