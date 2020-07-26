@@ -54,7 +54,6 @@ function FullContentInfo({
   const [loadingFromDatabase, setLoadingFromDatabase] = useState(false)
   const [showInDatabase, setShowInDatabase] = useState({ database: null, info: null, episodes: null })
   const [showDatabaseOnClient, setShowDatabaseOnClient] = useState(null)
-  const [showEpisodesDatabase, setShowEpisodesDatabase] = useState([])
 
   const [movieInDatabase, setMovieInDatabase] = useState(null)
   const [movieDatabaseOnClient, setMovieDatabaseOnClient] = useState(null)

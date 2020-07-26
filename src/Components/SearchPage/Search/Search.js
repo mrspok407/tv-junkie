@@ -2,10 +2,8 @@ import React, { Component } from "react"
 import axios, { CancelToken } from "axios"
 import SearchList from "./SearchList/SearchList"
 import Input from "./Input/Input"
-import AdvancedSearch from "./AdvancedSearch/AdvancedSearch"
 import "./Search.scss"
 import PlaceholderNoResults from "Components/Placeholders/PlaceholderNoResults"
-import SelectedContent from "Components/SearchPage/AdvSearchResults/SelectedContent/SelectedContent"
 import { withUserContent } from "Components/UserContent"
 
 let cancelRequest

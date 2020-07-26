@@ -74,7 +74,7 @@
     }
   }
 
-  &--show-episodes {
+  &--episodes {
     grid-template-columns: repeat(auto-fit, minmax(30px, 1fr));
     padding: 10px 0 10px 0;
 
@@ -253,7 +253,8 @@ $font-sizes: (
   }
 }
 
-.content-results--to-watch-page {
+.content-results--to-watch-page,
+.content-results--calendar {
   display: grid;
   row-gap: 40px;
   max-width: 1000px;

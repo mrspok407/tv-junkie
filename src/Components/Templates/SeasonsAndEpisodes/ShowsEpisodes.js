@@ -6,7 +6,7 @@ import { checkIfAllEpisodesWatched } from "Components/UserContent/FirebaseHelper
 import Loader from "Components/Placeholders/Loader"
 import classNames from "classnames"
 import SeasonEpisodes from "./SeasonEpisodes"
-import "./ShowsEpisodes.scss"
+import "../../../styles/abstractions/listOfEpisodes.scss"
 
 let cancelRequest
 
@@ -99,7 +99,7 @@ class ShowsEpisodes extends Component {
     }
   }
 
-  showSeasonsEpisode = (seasonId, seasonNum) => {
+  showSeasonsEpisodes = (seasonId, seasonNum) => {
     if (this.state.openSeasons.includes(seasonId)) {
       this.setState(prevState => ({
         openSeasons: [...prevState.openSeasons.filter(item => item !== seasonId)]
@@ -303,15 +303,15 @@ class ShowsEpisodes extends Component {
     return (
       <>
         {showCheckboxes && this.props.fullContentPage && (
-          <div className="show-episodes__check-all-episodes">
+          <div className="episodes__check-all-episodes">
             <button type="button" className="button" onClick={() => this.checkEveryShowEpisode()}>
               Check all episodes
             </button>
           </div>
         )}
         <div
-          className={classNames("show-episodes", {
-            "show-episodes--to-watch-page": this.props.toWatchPage
+          className={classNames("episodes", {
+            "episodes--to-watch-page": this.props.toWatchPage
           })}
         >
           {this.props.seasonsArr.map(season => {
@@ -335,16 +335,16 @@ class ShowsEpisodes extends Component {
             return (
               <div
                 key={seasonId}
-                className={classNames("show-episodes__season", {
-                  "show-episodes__season--no-poster": !season.poster_path
+                className={classNames("episodes__episode-group", {
+                  "episodes__episode-group--no-poster": !season.poster_path
                 })}
                 style={
                   !this.state.loadingEpisodesIds.includes(seasonId) ? { rowGap: "10px" } : { rowGap: "0px" }
                 }
               >
                 <div
-                  className={classNames("show-episodes__season-info", {
-                    "show-episodes__season-info--open": this.state.openSeasons.includes(seasonId)
+                  className={classNames("episodes__episode-group-info", {
+                    "episodes__episode-group-info--open": this.state.openSeasons.includes(seasonId)
                   })}
                   style={
                     daysToNewSeason > 0
@@ -355,28 +355,28 @@ class ShowsEpisodes extends Component {
                           backgroundColor: "#1d1d1d96"
                         }
                   }
-                  onClick={() => this.showSeasonsEpisode(seasonId, season.season_number)}
+                  onClick={() => this.showSeasonsEpisodes(seasonId, season.season_number)}
                 >
                   <div
-                    className={classNames("show-episodes__season-number", {
-                      "show-episodes__season-number--to-watch-page": this.props.toWatchPage
+                    className={classNames("episodes__episode-group-name", {
+                      "episodes__episode-group-name--to-watch-page": this.props.toWatchPage
                     })}
                   >
                     Season {season.season_number}
-                    {daysToNewSeason > 0 && (
-                      <span className="show-episodes__season-days-to-air">{daysToNewSeason} days to air</span>
-                    )}
                   </div>
+                  {daysToNewSeason > 0 && (
+                    <div className="episodes__episode-groupd-days-to-air">{daysToNewSeason} days to air</div>
+                  )}
 
                   {this.props.toWatchPage && (
-                    <div className="show-episodes__season-episodes-left">
+                    <div className="episodes__episode-group-episodes-left">
                       {seasonEpisodesNotWatched.length} episodes left from {episodeNumber}
                     </div>
                   )}
 
                   <div
-                    className={classNames("show-episodes__season-date", {
-                      "show-episodes__season-date--to-watch-page": this.props.toWatchPage
+                    className={classNames("episodes__episode-group-date", {
+                      "episodes__episode-group-date--to-watch-page": this.props.toWatchPage
                     })}
                   >
                     {season.air_date && season.air_date.slice(0, 4)}
@@ -395,15 +395,15 @@ class ShowsEpisodes extends Component {
                         />
                       )} */}
                       {season.poster_path && this.props.fullContentPage && (
-                        <div className="show-episodes__season-poster-wrapper">
+                        <div className="episodes__episode-group-poster-wrapper">
                           <div
-                            className="show-episodes__season-poster"
+                            className="episodes__episode-group-poster"
                             style={{
                               backgroundImage: `url(https://image.tmdb.org/t/p/w500/${season.poster_path})`
                             }}
                           />
                           {showCheckboxes && daysToNewSeason < 0 && (
-                            <div className="show-episodes__season-check-all-episodes">
+                            <div className="episodes__episode-group-check-all-episodes">
                               <button
                                 type="button"
                                 className="button"
@@ -433,8 +433,9 @@ class ShowsEpisodes extends Component {
                       />
                       {this.props.toWatchPage && (
                         <div
-                          className={classNames("show-episodes__season-check-all-episodes", {
-                            "show-episodes__season-check-all-episodes--to-watch-page": this.props.toWatchPage
+                          className={classNames("episodes__episode-group-check-all-episodes", {
+                            "episodes__episode-group-check-all-episodes--to-watch-page": this.props
+                              .toWatchPage
                           })}
                         >
                           <button

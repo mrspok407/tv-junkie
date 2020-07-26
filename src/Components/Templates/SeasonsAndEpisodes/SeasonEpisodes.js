@@ -1,3 +1,4 @@
+/* eslint-disable array-callback-return */
 import React, { Component } from "react"
 import { differenceBtwDatesInDays } from "Utils"
 import classNames from "classnames"
@@ -45,8 +46,8 @@ export default class SeasonEpisodes extends Component {
 
     return (
       <div
-        className={classNames("show-episodes__episodes-list", {
-          "show-episodes__episodes-list--to-watch-page": this.props.toWatchPage
+        className={classNames("episodes__episode-list", {
+          "episodes__episode-list--to-watch-page": this.props.toWatchPage
         })}
       >
         {seasons.map(item => {
@@ -98,14 +99,14 @@ export default class SeasonEpisodes extends Component {
             return (
               <div
                 key={episode.id}
-                className={classNames("show-episodes__episode", {
-                  "show-episodes__episode--open": this.props.detailEpisodeInfo.includes(episode.id),
-                  "show-episodes__episode--to-watch-page": this.props.toWatchPage
+                className={classNames("episodes__episode", {
+                  "episodes__episode--open": this.props.detailEpisodeInfo.includes(episode.id),
+                  "episodes__episode--to-watch-page": this.props.toWatchPage
                 })}
               >
                 <div
-                  className={classNames("show-episodes__episode-wrapper", {
-                    "show-episodes__episode-wrapper--to-watch-page": this.props.toWatchPage
+                  className={classNames("episodes__episode-wrapper", {
+                    "episodes__episode-wrapper--to-watch-page": this.props.toWatchPage
                   })}
                   onClick={() => this.props.fullContentPage && this.props.showEpisodeInfo(episode.id)}
                   style={
@@ -118,13 +119,13 @@ export default class SeasonEpisodes extends Component {
                         }
                   }
                 >
-                  <div className="show-episodes__episode-date">{episodeAirDate}</div>
-                  <div className="show-episodes__episode-name">
-                    <span className="show-episodes__episode-number">{episode.episode_number}.</span>
+                  <div className="episodes__episode-date">{episodeAirDate}</div>
+                  <div className="episodes__episode-name">
+                    <span className="episodes__episode-number">{episode.episode_number}.</span>
                     {episode.name}
                   </div>
                   {daysToNewEpisode > 0 ? (
-                    <div className="show-episodes__episode-days-to-air">{daysToNewEpisode} days</div>
+                    <div className="episodes__episode-days-to-air">{daysToNewEpisode} days</div>
                   ) : (
                     episodeAirDateAsDateObj < this.props.todayDate.getTime() &&
                     episode.air_date &&
@@ -132,7 +133,7 @@ export default class SeasonEpisodes extends Component {
                       <>
                         <div
                           className={classNames(
-                            "torrent-links torrent-links--show-episodes torrent-links--to-watch-page-desktop",
+                            "torrent-links torrent-links--episodes torrent-links--to-watch-page-desktop",
                             {
                               "torrent-links--to-watch-page": this.props.toWatchPage
                             }
@@ -172,7 +173,7 @@ export default class SeasonEpisodes extends Component {
                         {this.state.showTorrentLinks.includes(episode.id) && (
                           <div
                             className={classNames(
-                              "torrent-links torrent-links--show-episodes torrent-links--to-watch-page-mobile",
+                              "torrent-links torrent-links--episodes torrent-links--to-watch-page-mobile",
                               {
                                 "torrent-links--to-watch-page": this.props.toWatchPage
                               }
@@ -207,7 +208,7 @@ export default class SeasonEpisodes extends Component {
                 </div>
 
                 {showCheckboxes && daysToNewEpisode < 0 && episode.air_date && (
-                  <div className="show-episodes__episode-checkbox">
+                  <div className="episodes__episode-checkbox">
                     <label>
                       <input
                         type="checkbox"
@@ -230,24 +231,24 @@ export default class SeasonEpisodes extends Component {
 
                 {this.props.detailEpisodeInfo.includes(episode.id) && (
                   <div
-                    className={classNames("show-episodes__episode-detailes", {
-                      "show-episodes__episode-detailes--no-image": !episode.still_path
+                    className={classNames("episodes__episode-detailes", {
+                      "episodes__episode-detailes--no-image": !episode.still_path
                     })}
                   >
                     {episode.still_path && (
                       <div
-                        className="show-episodes__episode-detailes-image"
+                        className="episodes__episode-detailes-image"
                         style={{
                           backgroundImage: `url(https://image.tmdb.org/t/p/w500${episode.still_path})`
                         }}
                       />
                     )}
                     {episode.overview && (
-                      <div className="show-episodes__episode-detailes-overview">{episode.overview}</div>
+                      <div className="episodes__episode-detailes-overview">{episode.overview}</div>
                     )}
 
                     {episodeAirDateAsDateObj < this.props.todayDate.getTime() && episode.air_date && (
-                      <div className="torrent-links torrent-links--show-episodes">
+                      <div className="torrent-links torrent-links--episodes">
                         <a
                           target="_blank"
                           rel="noopener noreferrer"
