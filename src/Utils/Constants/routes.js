@@ -1,4 +1,5 @@
-export const SEARCH_PAGE = "/"
+export const MAIN_PAGE = "/"
+export const SEARCH_PAGE = "/search"
 export const SHOWS = "/shows"
 export const TO_WATCH = "/towatch"
 export const CALENDAR = "/calendar"

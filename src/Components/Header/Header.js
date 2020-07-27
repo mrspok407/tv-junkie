@@ -9,6 +9,7 @@ import * as ROLES from "Utils/Constants/roles"
 import { AuthUserContext } from "Components/UserAuth/Session/WithAuthentication"
 import "./Header.scss"
 import "../UserAuth/UserAuth.scss"
+import Search from "Components/SearchPage/Search/Search"
 
 export default class Header extends Component {
   state = {
@@ -31,13 +32,22 @@ export default class Header extends Component {
           })}
         >
           <ul className="nav__list">
-            <NavLink
+            {/* <NavLink
               exact
               to={ROUTES.SEARCH_PAGE}
               activeClassName="nav__item--active"
               onClick={() => this.closeNavMobile()}
             >
               <li className="nav__item">Search</li>
+            </NavLink> */}
+            <NavLink
+              exact
+              to={ROUTES.MAIN_PAGE}
+              activeClassName="nav__item--active"
+              className="nav__link--logo"
+              onClick={() => this.closeNavMobile()}
+            >
+              <li className="nav__item nav__item--logo"></li>
             </NavLink>
 
             {authUser && (
@@ -88,13 +98,13 @@ export default class Header extends Component {
                   </li>
                 </NavLink>
 
-                {authUser.roles && !!authUser.roles[ROLES.ADMIN] && (
+                {/* {authUser.roles && !!authUser.roles[ROLES.ADMIN] && (
                   <NavLink exact to={ROUTES.ADMIN}>
                     <li className="nav__item" onClick={() => this.closeNavMobile()}>
                       Admin
                     </li>
                   </NavLink>
-                )}
+                )} */}
               </>
             ) : (
               <Login
@@ -102,6 +112,10 @@ export default class Header extends Component {
                 closeNavMobile={this.closeNavMobile}
               />
             )}
+
+            <li className="nav__item">
+              <Search />
+            </li>
           </ul>
         </nav>
         <button

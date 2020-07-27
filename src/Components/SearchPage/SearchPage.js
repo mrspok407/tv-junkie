@@ -347,14 +347,9 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
         <Header clearCurrentlyChosenContent={this.clearCurrentlyChosenContent} />
         <div className="search-page__search">
           <Search
-            searchingAdvancedSearch={this.state.searchingAdvancedSearch}
-            toggleActor={this.toggleActor}
-            withActors={this.state.withActors}
-            advancedSearch={this.advancedSearch}
-            clearWithActors={this.clearWithActors}
-            toggleCurrentlyChosenContent={this.toggleCurrentlyChosenContent}
-            currentlyChosenContent={this.state.currentlyChosenContent}
-            renderCurrentlyChosenContent={this.renderCurrentlyChosenContent}
+          // toggleCurrentlyChosenContent={this.toggleCurrentlyChosenContent}
+          // currentlyChosenContent={this.state.currentlyChosenContent}
+          // renderCurrentlyChosenContent={this.renderCurrentlyChosenContent}
           />
           <AdvancedSearch
             advancedSearch={this.advancedSearch}

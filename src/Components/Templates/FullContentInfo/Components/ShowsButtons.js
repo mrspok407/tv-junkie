@@ -41,7 +41,63 @@ class ShowsButtons extends Component {
 
     return (
       <div className="buttons__row">
-        <div className="buttons__col">
+
+<div className="buttons__col">
+            <button
+              className={classNames("button", {
+                "button--pressed": this.props.showDatabaseOnClient === "watchingShows",
+                "button--not-logged-in": !authUser
+              })}
+              type="button"
+              onClick={() => {
+                if (this.props.authUser) {
+                  this.props.changeShowDatabaseOnClient("watchingShows")
+                  this.props.handleShowInDatabases({
+                    id: Number(id),
+                    data: infoToPass,
+                    database: "watchingShows"
+                  })
+                } else {
+                  this.context.toggleContentLS({
+                    id: Number(id),
+                    data: infoToPass,
+                    type: "watchingShows"
+                  })
+                }
+              }}
+            >
+              Watching
+            </button>
+          </div>
+
+          <div className="buttons__col">
+            <button
+              className={classNames("button", {
+                "button--pressed": this.props.showDatabaseOnClient === "notWatchingShows",
+                "button--not-logged-in": !authUser
+              })}
+              type="button"
+              onClick={() => {
+                if (this.props.authUser) {
+                  this.props.changeShowDatabaseOnClient("notWatchingShows")
+                  this.props.handleShowInDatabases({
+                    id: Number(id),
+                    data: infoToPass,
+                    database: "notWatchingShows"
+                  })
+                } else {
+                  this.context.toggleContentLS({
+                    id: Number(id),
+                    type: "watchingShows"
+                  })
+                }
+              }}
+            >
+              Not watching
+            </button>
+          </div>
+
+        {/* <div className="buttons__col">
           {this.props.showDatabaseOnClient === "watchingShows" ? (
             <button
               className="button button--pressed"
@@ -88,7 +144,7 @@ class ShowsButtons extends Component {
               Watching
             </button>
           )}
-        </div>
+        </div> */}
         <div
           className="buttons__col-wrapper"
           ref={_notAuthButtons => {

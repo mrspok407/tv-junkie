@@ -32,7 +32,8 @@ const INITIAL_STATE = {
   },
   isAdmin: false,
   submitClicked: false,
-  submitRequestLoading: false
+  submitRequestLoading: false,
+  showPassword: false
 }
 
 class RegisterBase extends Component {
@@ -235,6 +236,12 @@ class RegisterBase extends Component {
     return isValid
   }
 
+  toggleShowPassword = () => {
+    this.setState({
+      showPassword: !this.state.showPassword
+    })
+  }
+
   render() {
     const { errors, requiredInputs } = this.state
     const { login } = this.state.inputs
@@ -276,7 +283,7 @@ class RegisterBase extends Component {
         <div className="auth__form-error">{emailError}</div>
 
         <Input
-          classNameInput={classNames("auth__form-input", {
+          classNameInput={classNames("auth__form-input  auth__form-input--password", {
             "auth__form-input--error": passwordError
           })}
           classNameLabel="auth__form-label"
@@ -286,15 +293,17 @@ class RegisterBase extends Component {
           handleOnChange={this.handleOnChange}
           handleValidation={this.handleValidationOnblur}
           handleKeyDown={this.handleKeyDown}
-          type="password"
+          type={!this.state.showPassword ? "password" : "text"}
           placeholder="Password"
           labelText="Password"
+          hidePasswordBtn={true}
+          toggleShowPassword={this.toggleShowPassword}
           withLabel
         />
         <div className="auth__form-error">{passwordError}</div>
 
         <Input
-          classNameInput={classNames("auth__form-input", {
+          classNameInput={classNames("auth__form-input auth__form-input--password", {
             "auth__form-input--error": passwordConfirmError
           })}
           classNameLabel="auth__form-label"
@@ -303,7 +312,7 @@ class RegisterBase extends Component {
           handleOnChange={this.handleOnChange}
           handleValidation={this.handleValidationOnblur}
           handleKeyDown={this.handleKeyDown}
-          type="password"
+          type={!this.state.showPassword ? "password" : "text"}
           placeholder="Password"
           labelText="Confirm Password"
           withLabel
