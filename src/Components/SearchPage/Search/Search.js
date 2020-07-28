@@ -1,5 +1,8 @@
 import React, { Component } from "react"
 import axios, { CancelToken } from "axios"
+import { Link } from "react-router-dom"
+import * as ROUTES from "Utils/Constants/routes"
+import classNames from "classnames"
 import SearchList from "./SearchList/SearchList"
 import Input from "./Input/Input"
 import "./Search.scss"
@@ -162,29 +165,40 @@ class Search extends Component {
     return (
       <div className="search">
         <div className="search__cont">
-          <div ref={this.searchContRef} className="search__input-cont">
+          <div
+            ref={this.searchContRef}
+            className={classNames("search__input-cont", {
+              "search__input-cont--nav-search": this.props.navSearch
+            })}
+          >
             <Input
               onSearch={this.handleSearch}
               onFocus={this.onFocus}
               isSearchingList={this.state.isSearchingList}
+              navSearch={this.props.navSearch}
             />
             {this.state.totalPages === 0 && this.state.query !== "" && this.state.listIsOpen ? (
               <PlaceholderNoResults message="No results found" handleClickOutside={this.handleClickOutside} />
             ) : (
               this.state.listIsOpen &&
               this.renderSearch(
-                <div className="search-list">
-                  <SearchList
-                    searchResults={this.state.searchResults}
-                    contentInDatabase={this.state.contentInDatabase}
-                    updateContentInDbClient={this.updateContentInDbClient}
-                    mediaTypeSearching={this.state.mediaTypeSearching}
-                    handleClickOutside={this.handleClickOutside}
-                    toggleCurrentlyChosenContent={this.props.toggleCurrentlyChosenContent}
-                    currentlyChosenContent={this.props.currentlyChosenContent}
-                  />
-                </div>
+                <SearchList
+                  searchResults={this.state.searchResults}
+                  contentInDatabase={this.state.contentInDatabase}
+                  updateContentInDbClient={this.updateContentInDbClient}
+                  mediaTypeSearching={this.state.mediaTypeSearching}
+                  handleClickOutside={this.handleClickOutside}
+                  toggleCurrentlyChosenContent={this.props.toggleCurrentlyChosenContent}
+                  currentlyChosenContent={this.props.currentlyChosenContent}
+                  navSearch={this.props.navSearch}
+                />
               )
+            )}
+            {this.props.navSearch && (
+              <div className="search__link-to-adv-container">
+                <Link className="search__link-to-adv" to={ROUTES.SEARCH_PAGE}></Link>
+                <span className="tooltip">Advanced search</span>
+              </div>
             )}
           </div>
         </div>

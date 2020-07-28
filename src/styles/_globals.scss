@@ -5,7 +5,7 @@
 $bodyBackgroundClr: #131313;
 $mainContainerMaxWidth: 1350px;
 
-$mobileViewPort: 800px;
+$mobileViewPort: 1000px;
 
 $mainPalette: (
   orangeClr: peru,
@@ -24,11 +24,11 @@ $inputPalette: (
   placeholderColor: #cececea6
 );
 
-$movieListPalette: (
-  backgroundColor: #fdfdfd,
+$searchCardPalette: (
+  backgroundColor: #212121,
   backgroundColorHover: #212121,
   separatorColor: #d0d0d0,
-  titleColor: #000000,
+  titleColor: peru,
   overviewColor: #1b1b1b,
   titleColorHover: #ffffff,
   overviewColorHover: #d6d6d6

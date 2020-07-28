@@ -112,6 +112,10 @@ class SearchCard extends Component {
       movieTitle,
       showTitle,
       personName,
+      releaseDate,
+      voteAverage,
+      originCountry,
+      originalLanguage,
       poster,
       personImage,
       posterBackdrop,
@@ -134,7 +138,7 @@ class SearchCard extends Component {
       >
         {mediaType !== "person" && mediaTypeSearching !== "person" ? (
           <>
-            <Link className="search-card__image-link" to={`/${type}/${id}`}>
+            {/* <Link className="search-card__image-link" to={`/${type}/${id}`}>
               <div
                 className="search-card__image"
                 style={
@@ -147,19 +151,39 @@ class SearchCard extends Component {
                       }
                 }
               />
-            </Link>
+            </Link> */}
             <Link className="search-card__info-link" to={`/${type}/${id}`}>
               <div className="search-card__info">
                 <div className="search-card__info-title">{movieTitle || showTitle}</div>
+                <div className="search-card__info-wrapper">
+                  <div className="search-card__info-rating">
+                    {voteAverage !== 0 && (
+                      <>
+                        {voteAverage}
+                        <span>/10</span>
+                      </>
+                    )}
+                  </div>
+                  <div className="search-card__info-year">{releaseDate && releaseDate.slice(0, 4)}</div>
+                  <div className="search-card__info-country">
+                    {`${originCountry.length > 0 ? originCountry.join(", ") : ""}`}
+                  </div>
+                </div>
+                {/* <div className="search-card__info-country">
+                  {originCountry.length > 0 && `Country: ${originCountry.join(", ")}`}
+                  {originalLanguage && `Language: ${originalLanguage}`}
+                </div> */}
+
+                {/* <div className="search-card__info-title">{movieTitle || showTitle}</div>
 
                 <div className="search-card__info-description">
                   <div className="search-card__info-description--movie">
                     {overview.length > 150 ? `${overview.substring(0, 150)}...` : overview}
                   </div>
-                </div>
+                </div> */}
               </div>
             </Link>
-            {this.renderButtons()}
+            {/* {this.renderButtons()} */}
           </>
         ) : (
           <>

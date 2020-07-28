@@ -87,7 +87,7 @@
   &__list {
     position: relative;
     display: inline-flex;
-    justify-content: center;
+    justify-content: space-evenly;
     width: 100%;
     list-style-type: none;
     color: #fff;
@@ -97,15 +97,20 @@
       flex-direction: column;
       justify-content: start;
     }
+  }
 
-    a {
-      color: #fff;
+  &__link {
+    color: #fff;
 
-      @include mediaMaxW(#{$mobileViewPort}) {
-        display: flex;
-        justify-content: center;
-        width: 60%;
-      }
+    @include mediaMaxW(#{$mobileViewPort}) {
+      display: flex;
+      justify-content: center;
+      width: 60%;
+    }
+
+    &--logo {
+      display: flex;
+      align-items: center;
     }
   }
 
@@ -143,14 +148,14 @@
       opacity: 1;
     }
 
+    @include mediaMaxW(1075px) {
+      padding: 26px 11px 26px 11px;
+    }
+
     @include mediaMaxW(#{$mobileViewPort}) {
       width: 100px;
       padding: 14px 5px 14px 5px;
       font-size: 0.95rem;
-    }
-
-    @include mediaMaxW(#{$mobileViewPort}) {
-      width: 100%;
     }
 
     &--active li {
@@ -164,19 +169,35 @@
     &--logo {
       width: 150px;
       background-image: url("../../assets/images/icons/logo-icon.png");
-      background-size: contain;
+      background-size: cover;
       background-repeat: no-repeat;
 
       &:hover:after,
       &:hover:before {
         display: none;
       }
-    }
-  }
 
-  &__link--logo {
-    display: flex;
-    align-items: center;
+      @include mediaMaxW(#{$mobileViewPort}) {
+        height: 55px;
+      }
+    }
+
+    &--nav-search {
+      cursor: initial;
+
+      @include mediaMaxW(#{$mobileViewPort}) {
+        width: 60%;
+      }
+
+      @include mediaMaxW(#{$mobileViewPort - 400px}) {
+        width: 90%;
+      }
+
+      &:hover:after,
+      &:hover:before {
+        display: none;
+      }
+    }
   }
 }
 

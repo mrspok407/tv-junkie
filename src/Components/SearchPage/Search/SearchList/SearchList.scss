@@ -3,28 +3,32 @@
 .search-list {
   display: flex;
   position: absolute;
-  top: 50px;
+  top: 100%;
   align-items: center;
   flex-direction: column;
   width: 100%;
-  background-color: getColor(backgroundColor, $movieListPalette);
+  background-color: getColor(backgroundColor, $searchCardPalette);
   z-index: 1;
 
   &--searching {
     min-height: 100vh;
+  }
+
+  &--nav-search {
+    top: calc(100% + 15px);
   }
 }
 
 .search-card {
   $parentRef: &;
   position: relative;
-  display: grid;
-  grid-template-columns: 1fr 5fr;
+  // display: grid;
+  // grid-template-columns: 1fr 5fr;
   width: 100%;
   padding: 10px;
   overflow: hidden;
   cursor: pointer;
-  background-color: getColor(backgroundColor, $movieListPalette);
+  background-color: getColor(backgroundColor, $searchCardPalette);
   transition: 0.2s;
 
   @mixin cardHovered {
@@ -40,14 +44,14 @@
     bottom: 0px;
     width: 100%;
     height: 1px;
-    background-color: getColor(separatorColor, $movieListPalette);
+    background-color: getColor(separatorColor, $searchCardPalette);
   }
   &:last-child:after {
     display: none;
   }
   @include mediaMinW(1000px) {
     &:hover {
-      background-color: getColor(backgroundColorHover, $movieListPalette);
+      background-color: getColor(backgroundColorHover, $searchCardPalette);
     }
   }
 
@@ -76,30 +80,62 @@
   }
 
   &__info {
-    display: flex;
-    flex-direction: column;
+    // display: flex;
+    // flex-direction: column;
+    display: grid;
+    grid-template-columns: 3.5fr 1fr;
+    // grid-template-rows: repeat(2, 1fr);
+    grid-gap: 5px;
+
+    &-wrapper {
+      display: grid;
+      row-gap: 2px;
+    }
 
     &-title {
       margin-bottom: 5px;
       transition: 0.2s;
       @include mediaMinW(1000px) {
         @include cardHovered {
-          color: getColor(titleColorHover, $movieListPalette);
+          color: getColor(titleColorHover, $searchCardPalette);
         }
       }
       font: {
         size: 1.3rem;
         weight: 600;
       }
-      color: getColor(titleColor, $movieListPalette);
+      color: getColor(titleColor, $searchCardPalette);
+    }
+
+    &-year {
+      font-size: 1rem;
+      padding-left: 6px;
+      color: #2b2b2b;
+    }
+
+    &-rating {
+      font-size: 1rem;
+      color: #000;
+
+      span {
+        font-size: 0.9rem;
+      }
+    }
+
+    &-country {
+      color: #000;
+      font-size: 1rem;
+    }
+
+    &-title {
     }
     &-description {
       margin-bottom: 5px;
       transition: 0.2s;
-      color: getColor(overviewColor, $movieListPalette);
+      color: getColor(overviewColor, $searchCardPalette);
       @include mediaMinW(1000px) {
         @include cardHovered {
-          color: getColor(overviewColorHover, $movieListPalette);
+          color: getColor(overviewColorHover, $searchCardPalette);
         }
       }
     }

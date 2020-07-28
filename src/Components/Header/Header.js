@@ -5,7 +5,7 @@ import classNames from "classnames"
 import logo from "assets/images/main-page-logo.png"
 import Login from "./Login"
 import * as ROUTES from "Utils/Constants/routes"
-import * as ROLES from "Utils/Constants/roles"
+// import * as ROLES from "Utils/Constants/roles"
 import { AuthUserContext } from "Components/UserAuth/Session/WithAuthentication"
 import "./Header.scss"
 import "../UserAuth/UserAuth.scss"
@@ -32,14 +32,6 @@ export default class Header extends Component {
           })}
         >
           <ul className="nav__list">
-            {/* <NavLink
-              exact
-              to={ROUTES.SEARCH_PAGE}
-              activeClassName="nav__item--active"
-              onClick={() => this.closeNavMobile()}
-            >
-              <li className="nav__item">Search</li>
-            </NavLink> */}
             <NavLink
               exact
               to={ROUTES.MAIN_PAGE}
@@ -55,6 +47,7 @@ export default class Header extends Component {
                 <NavLink
                   exact
                   to={ROUTES.CALENDAR}
+                  className="nav__link"
                   activeClassName="nav__item--active"
                   onClick={() => this.closeNavMobile()}
                 >
@@ -64,6 +57,7 @@ export default class Header extends Component {
                 <NavLink
                   exact
                   to={ROUTES.TO_WATCH}
+                  className="nav__link"
                   activeClassName="nav__item--active"
                   onClick={() => this.closeNavMobile()}
                 >
@@ -75,31 +69,33 @@ export default class Header extends Component {
             <NavLink
               exact
               to={ROUTES.SHOWS}
+              className="nav__link"
               activeClassName="nav__item--active"
               onClick={() => this.closeNavMobile()}
             >
-              <li className="nav__item">Your Shows</li>
+              <li className="nav__item">Shows</li>
             </NavLink>
 
             <NavLink
               exact
               to={ROUTES.MOVIES}
+              className="nav__link"
               activeClassName="nav__item--active"
               onClick={() => this.closeNavMobile()}
             >
-              <li className="nav__item">Your Movies</li>
+              <li className="nav__item">Movies</li>
             </NavLink>
 
             {authUser ? (
               <>
-                <NavLink exact to={ROUTES.PROFILE}>
+                <NavLink exact to={ROUTES.PROFILE} className="nav__link">
                   <li className="nav__item" onClick={() => this.closeNavMobile()}>
                     Profile
                   </li>
                 </NavLink>
 
                 {/* {authUser.roles && !!authUser.roles[ROLES.ADMIN] && (
-                  <NavLink exact to={ROUTES.ADMIN}>
+                  <NavLink exact to={ROUTES.ADMIN} className="nav__link">
                     <li className="nav__item" onClick={() => this.closeNavMobile()}>
                       Admin
                     </li>
@@ -113,8 +109,8 @@ export default class Header extends Component {
               />
             )}
 
-            <li className="nav__item">
-              <Search />
+            <li className="nav__item nav__item--nav-search">
+              <Search navSearch={true} />
             </li>
           </ul>
         </nav>

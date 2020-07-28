@@ -10,7 +10,7 @@ export default class Input extends Component {
     super(props)
 
     this.state = {
-      query: "",
+      query: "Homeland",
       mediaType: { type: "Multi", icon: mediaTypesArr[0].icon },
       mediaTypesIsOpen: false
     }
@@ -20,7 +20,7 @@ export default class Input extends Component {
 
   componentDidMount() {
     const windowWidth = window.innerWidth
-    if (this.inputRef && windowWidth > 1000) this.inputRef.focus()
+    if (this.inputRef && windowWidth > 1000 && !this.props.navSearch) this.inputRef.focus()
     document.addEventListener("mousedown", this.handleClickOutside)
   }
 
@@ -56,7 +56,8 @@ export default class Input extends Component {
         <div
           ref={this.mediaTypeRef}
           className={classNames("search__media-type", {
-            "search__media-type--is-open": this.state.mediaTypesIsOpen
+            "search__media-type--is-open": this.state.mediaTypesIsOpen,
+            "search__media-type--nav-search": this.props.navSearch
           })}
           style={{
             backgroundImage: `url(${this.state.mediaType.icon})`
@@ -69,12 +70,18 @@ export default class Input extends Component {
                 mediaTypesIsOpen: !prevState.mediaTypesIsOpen
               }))
             }
-            className="media-type__button media-type__selected-value"
+            className={classNames("media-type__button media-type__selected-value", {
+              "media-type__selected-value--nav-search": this.props.navSearch
+            })}
           >
             <span>{this.state.mediaType.type === "Multi" ? "All" : this.state.mediaType.type}</span>
           </button>
           {this.state.mediaTypesIsOpen && (
-            <div className="media-type__options">
+            <div
+              className={classNames("media-type__options", {
+                "media-type__options--nav-search": this.props.navSearch
+              })}
+            >
               <ul className="media-type__list">
                 {mediaTypesArr.map(item => {
                   const type = item.type === "Multi" ? "All" : item.type
@@ -82,13 +89,16 @@ export default class Input extends Component {
                     <li
                       key={item.id}
                       className={classNames("media-type__item", {
-                        "media-type__item--selected": item.type === this.state.mediaType.type
+                        "media-type__item--selected": item.type === this.state.mediaType.type,
+                        "media-type__item--nav-search": this.props.navSearch
                       })}
                       style={{ backgroundImage: `url(${item.icon})` }}
                     >
                       <button
                         type="button"
-                        className="media-type__button"
+                        className={classNames("media-type__button", {
+                          "media-type__button--nav-search": this.props.navSearch
+                        })}
                         value={item.type}
                         onClick={e => {
                           this.setState(
@@ -117,7 +127,9 @@ export default class Input extends Component {
           ref={_input => {
             this.inputRef = _input
           }}
-          className="search__input"
+          className={classNames("search__input", {
+            "search__input--nav-search": this.props.navSearch
+          })}
           type="text"
           placeholder="Search"
           value={this.state.query}
@@ -125,7 +137,13 @@ export default class Input extends Component {
           onKeyDown={this.handleKeyDown}
           onFocus={this.props.onFocus}
         />
-        {this.props.isSearchingList && <Loader className="loader--small-pink" />}
+        {this.props.isSearchingList && (
+          <Loader
+            className={classNames("loader--small-pink", {
+              "loader--nav-search": this.props.navSearch
+            })}
+          />
+        )}
         {this.state.query && (
           <button type="button" className="button--input-clear" onClick={this.resetSearch} />
         )}

@@ -10,7 +10,7 @@
   height: 105px;
   padding: 10px 0 10px 0;
   overflow: hidden;
-  background-color: getColor(backgroundColor, $movieListPalette);
+  background-color: getColor(backgroundColor, $searchCardPalette);
   opacity: 1;
   z-index: 1;
   animation: showPlaceholderNoResults 0.2s 0.25s forwards;
