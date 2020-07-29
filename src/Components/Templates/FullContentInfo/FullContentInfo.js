@@ -2,7 +2,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/anchor-has-content */
 import React, { useState, useEffect } from "react"
-import { useLocation } from "react-router-dom"
+import { useLocation, useHistory } from "react-router-dom"
 import axios, { CancelToken } from "axios"
 import { combineMergeObjects } from "Utils"
 import merge from "deepmerge"
@@ -33,7 +33,7 @@ function FullContentInfo({
     posterMobile: "",
     title: "",
     releaseDate: "",
-    lastAirDate: "",
+    lastAirDate: "-",
     runtime: "",
     status: "",
     genres: [],
@@ -63,10 +63,20 @@ function FullContentInfo({
   const [error, setError] = useState()
 
   const { pathname } = useLocation()
+  const history = useHistory()
+
+  // console.log(history)
 
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [pathname])
+
+  console.log(pathname.replace(/\D/g, "") === id)
+
+  // history.listen((location, action) => {
+  //   console.log(`The current URL is ${location.pathname}${location.search}${location.hash}`)
+  //   console.log(`The last navigation action was ${action}`)
+  // })
 
   useEffect(() => {
     if (mediaType === "show") {
@@ -92,7 +102,7 @@ function FullContentInfo({
       setShowInDatabase({ database: null, info: null })
       setShowDatabaseOnClient(null)
     }
-  }, [mediaType, id])
+  }, [mediaType, id, pathname])
 
   const getFullShowInfo = () => {
     setLoadingPage(true)
@@ -243,6 +253,9 @@ function FullContentInfo({
             tagline: tagline || "-",
             budget: budget || "-",
             imdbId: imdb_id || ""
+            // releaseDate: "-",
+            // lastAirDate: "-",
+            // seasonsArr: []
           })
 
           setSimilarContent(similarMoviesSortByVotes)
@@ -290,7 +303,7 @@ function FullContentInfo({
                     arrayMerge: combineMergeObjects
                   })
 
-                  console.log(mergedEpisodes)
+                  //  console.log(mergedEpisodes)
 
                   mergedEpisodes.forEach(episode => {
                     const updatedEpisode = {
@@ -406,7 +419,7 @@ function FullContentInfo({
           <div className="full-detailes__error">
             <h1>{error}</h1>
           </div>
-        ) : !loadingPage && !loadingFromDatabase ? (
+        ) : !loadingPage && !loadingFromDatabase && pathname.replace(/\D/g, "") === id ? (
           <div className="full-detailes">
             <PosterWrapper
               poster={detailes.poster}
@@ -418,6 +431,7 @@ function FullContentInfo({
             />
 
             <MainInfo
+              detailes={detailes}
               title={detailes.title}
               mediaType={mediaType}
               releaseDate={detailes.releaseDate}

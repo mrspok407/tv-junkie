@@ -16,11 +16,7 @@ export default class SearchList extends Component {
   render() {
     console.log(this.props.searchResults)
     return (
-      <div
-        className={classNames("search-list", {
-          "search-list--nav-search": this.props.navSearch
-        })}
-      >
+      <div className="search-list">
         {this.props.searchResults.map(
           ({
             title = "",

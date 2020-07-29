@@ -40,7 +40,7 @@ export default class SeasonEpisodes extends Component {
     const showSeason =
       showCheckboxes && this.props.showInDatabase.info.episodes[this.props.season.season_number - 1]
 
-    console.log(this.props.showInDatabase)
+    // console.log(this.props.showInDatabase)
 
     const seasons = this.props.toWatchPage ? this.props.seasonsArr : this.props.showEpisodes
 

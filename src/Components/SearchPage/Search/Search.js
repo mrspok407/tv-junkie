@@ -1,6 +1,7 @@
 import React, { Component } from "react"
 import axios, { CancelToken } from "axios"
-import { Link } from "react-router-dom"
+import { compose } from "recompose"
+import { Link, withRouter } from "react-router-dom"
 import * as ROUTES from "Utils/Constants/routes"
 import classNames from "classnames"
 import SearchList from "./SearchList/SearchList"
@@ -55,60 +56,14 @@ class Search extends Component {
       )
       .then(({ data: { results, total_pages: totalPages } }) => {
         const content = [...results]
-        const contentSortByPopularity = content.sort((a, b) => {
-          if (a.popularity > b.popularity) {
-            return -1
-          }
-          return 1
+        const contentSortByPopularity = content.sort((a, b) => (a.popularity > b.popularity ? -1 : 1))
+
+        this.setState({
+          searchResults: contentSortByPopularity,
+          isSearchingList: false,
+          totalPages,
+          mediaTypeSearching: mediatype.type.toLowerCase()
         })
-
-        const databases = ["watchLaterMovies", "userShows"]
-        const contentInDatabase = []
-        let counter = 0
-
-        if (contentSortByPopularity.length !== 0) {
-          databases.forEach(database => {
-            contentSortByPopularity.forEach(content => {
-              this.props.firebase[database](this.props.authUser.uid, "watchingShows")
-                // .orderByChild("id")
-                // .equalTo(content.id)
-                .child(content.id)
-                .once("value", snapshot => {
-                  counter++
-
-                  if (snapshot.val() !== null) {
-                    let content = {}
-
-                    Object.keys(snapshot.val()).forEach(key => {
-                      content = { ...snapshot.val()[key], key }
-                    })
-
-                    contentInDatabase.push(content)
-                  }
-
-                  if (
-                    counter === contentSortByPopularity.length * databases.length ||
-                    contentSortByPopularity.length === 0
-                  ) {
-                    this.setState({
-                      contentInDatabase: contentInDatabase,
-                      searchResults: contentSortByPopularity,
-                      isSearchingList: false,
-                      totalPages,
-                      mediaTypeSearching: mediatype.type.toLowerCase()
-                    })
-                  }
-                })
-            })
-          })
-        } else {
-          this.setState({
-            searchResults: contentSortByPopularity,
-            isSearchingList: false,
-            totalPages,
-            mediaTypeSearching: mediatype.type.toLowerCase()
-          })
-        }
       })
       .catch(err => {
         if (axios.isCancel(err)) return
@@ -161,21 +116,31 @@ class Search extends Component {
     })
   }
 
+  goToFirstResult = () => {
+    if (!this.state.listIsOpen || this.state.isSearchingList) return
+    if (this.state.searchResults.length === 0) return
+
+    const content = this.state.searchResults[0]
+    const mediaType = content.media_type === "movie" ? "movie" : "show"
+
+    this.props.history.push(`/${mediaType}/${content.id}`)
+
+    this.setState({
+      // listIsOpen: false
+    })
+  }
+
   render() {
     return (
       <div className="search">
         <div className="search__cont">
-          <div
-            ref={this.searchContRef}
-            className={classNames("search__input-cont", {
-              "search__input-cont--nav-search": this.props.navSearch
-            })}
-          >
+          <div ref={this.searchContRef} className="search__input-cont">
             <Input
               onSearch={this.handleSearch}
               onFocus={this.onFocus}
               isSearchingList={this.state.isSearchingList}
               navSearch={this.props.navSearch}
+              goToFirstResult={this.goToFirstResult}
             />
             {this.state.totalPages === 0 && this.state.query !== "" && this.state.listIsOpen ? (
               <PlaceholderNoResults message="No results found" handleClickOutside={this.handleClickOutside} />
@@ -190,7 +155,6 @@ class Search extends Component {
                   handleClickOutside={this.handleClickOutside}
                   toggleCurrentlyChosenContent={this.props.toggleCurrentlyChosenContent}
                   currentlyChosenContent={this.props.currentlyChosenContent}
-                  navSearch={this.props.navSearch}
                 />
               )
             )}
@@ -209,4 +173,4 @@ class Search extends Component {
   }
 }
 
-export default withUserContent(Search)
+export default compose(withRouter, withUserContent)(Search)

@@ -13,17 +13,11 @@
   &--searching {
     min-height: 100vh;
   }
-
-  &--nav-search {
-    top: calc(100% + 15px);
-  }
 }
 
 .search-card {
   $parentRef: &;
   position: relative;
-  // display: grid;
-  // grid-template-columns: 1fr 5fr;
   width: 100%;
   padding: 10px;
   overflow: hidden;
@@ -55,101 +49,76 @@
     }
   }
 
-  &--person {
-    cursor: inherit;
-  }
-
-  &__buttons {
-    align-self: end;
-  }
-
   &__image {
     min-width: 100px;
     height: 132px;
     background-size: auto 100%;
     background-repeat: no-repeat;
     background-position: left top;
-
-    &--person {
-      grid-row: 1 / 3;
-    }
-
-    &-link {
-      grid-row: 1 / 3;
-    }
   }
 
   &__info {
-    // display: flex;
-    // flex-direction: column;
     display: grid;
-    grid-template-columns: 3.5fr 1fr;
-    // grid-template-rows: repeat(2, 1fr);
-    grid-gap: 5px;
+    grid-template-columns: max-content 4fr 1fr;
+    grid-gap: 10px;
 
-    &-wrapper {
-      display: grid;
-      row-gap: 2px;
+    &-image {
+      --height: 62px;
+      min-width: calc(var(--height) / 1.5);
+      height: var(--height);
+      background-size: auto 100%;
+      background-repeat: no-repeat;
+      background-position: left top;
     }
 
     &-title {
-      margin-bottom: 5px;
-      transition: 0.2s;
-      @include mediaMinW(1000px) {
-        @include cardHovered {
-          color: getColor(titleColorHover, $searchCardPalette);
-        }
-      }
+      text-align: left;
       font: {
         size: 1.3rem;
         weight: 600;
       }
       color: getColor(titleColor, $searchCardPalette);
+      transition: 0.2s;
+
+      @include mediaMinW(1000px) {
+        @include cardHovered {
+          color: getColor(titleColorHover, $searchCardPalette);
+        }
+      }
     }
 
     &-year {
       font-size: 1rem;
       padding-left: 6px;
-      color: #2b2b2b;
+      color: getColor(yearColor, $searchCardPalette);
     }
 
     &-rating {
-      font-size: 1rem;
-      color: #000;
+      justify-self: end;
+      font: {
+        size: 1rem;
+        weight: 600;
+      }
+      color: getColor(ratingColor, $searchCardPalette);
 
       span {
-        font-size: 0.9rem;
+        padding-left: 2px;
+        font-size: 0.8rem;
       }
     }
 
     &-country {
-      color: #000;
+      padding-left: 5px;
+      color: getColor(countryColor, $searchCardPalette);
       font-size: 1rem;
     }
 
-    &-title {
-    }
-    &-description {
-      margin-bottom: 5px;
-      transition: 0.2s;
-      color: getColor(overviewColor, $searchCardPalette);
-      @include mediaMinW(1000px) {
-        @include cardHovered {
-          color: getColor(overviewColorHover, $searchCardPalette);
-        }
+    &-link {
+      color: getColor(linkColor, $searchCardPalette);
+
+      &:hover {
+        text-decoration: underline;
       }
-    }
-    &__buttons {
-      &--person {
-        grid-template-columns: 50%;
-        justify-content: center;
-      }
-      @include mediaMaxW(#{$mobileViewPort}) {
-        grid-template-columns: 1fr;
-      }
-    }
-    &-person-movies {
-      margin-top: 4px;
     }
   }
 
@@ -163,6 +132,39 @@
     @keyframes authFormLoading {
       to {
         transform: rotate(360deg);
+      }
+    }
+  }
+
+  &--person {
+    cursor: inherit;
+
+    .search-card__info {
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      grid-template-rows: repeat(3, max-content);
+      row-gap: 4px;
+
+      &-image {
+        grid-row: 1 / 4;
+      }
+
+      &-name,
+      &-activity,
+      &-known-movies {
+        text-align: left;
+        font: {
+          size: 1rem;
+        }
+        color: #fff;
+      }
+
+      &-name {
+        font: {
+          size: 1.2rem;
+          weight: 600;
+        }
+        color: getColor(orangeClr, $mainPalette);
       }
     }
   }

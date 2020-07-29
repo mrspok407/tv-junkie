@@ -26,12 +26,14 @@ $inputPalette: (
 
 $searchCardPalette: (
   backgroundColor: #212121,
-  backgroundColorHover: #212121,
+  backgroundColorHover: #000000,
   separatorColor: #d0d0d0,
   titleColor: peru,
-  overviewColor: #1b1b1b,
   titleColorHover: #ffffff,
-  overviewColorHover: #d6d6d6
+  yearColor: #e0e0e0,
+  countryColor: #e0e0e0,
+  ratingColor: #e0e0e0,
+  linkColor: #4ba9f9
 );
 
 @import "mixins";

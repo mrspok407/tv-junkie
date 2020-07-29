@@ -138,71 +138,82 @@ class SearchCard extends Component {
       >
         {mediaType !== "person" && mediaTypeSearching !== "person" ? (
           <>
-            {/* <Link className="search-card__image-link" to={`/${type}/${id}`}>
+            <Link to={`/${type}/${id}`}>
+              <div className="search-card__info">
+                <div
+                  className="search-card__info-image"
+                  style={
+                    poster !== null
+                      ? {
+                          backgroundImage: `url(https://image.tmdb.org/t/p/w500/${poster || posterBackdrop})`
+                        }
+                      : {
+                          backgroundImage: `url(https://d32qys9a6wm9no.cloudfront.net/images/movies/poster/500x735.png)`
+                        }
+                  }
+                />
+                <div className="search-card__info-title">
+                  {movieTitle || showTitle}
+                  <span className="search-card__info-year">
+                    {releaseDate && `(${releaseDate.slice(0, 4)})`}
+                  </span>
+                  <span className="search-card__info-country">
+                    {`${originCountry.length > 0 ? originCountry.join(", ") : ""}`}
+                  </span>
+                </div>
+                <div className="search-card__info-rating">
+                  {voteAverage !== 0 && (
+                    <>
+                      {voteAverage}
+                      <span>/10</span>
+                    </>
+                  )}
+                </div>
+              </div>
+            </Link>
+          </>
+        ) : (
+          <>
+            <div className="search-card__info">
               <div
-                className="search-card__image"
+                className="search-card__info-image"
                 style={
-                  poster !== null
+                  personImage !== null
                     ? {
-                        backgroundImage: `url(https://image.tmdb.org/t/p/w500/${poster || posterBackdrop})`
+                        backgroundImage: `url(https://image.tmdb.org/t/p/w500/${personImage})`
                       }
                     : {
                         backgroundImage: `url(https://d32qys9a6wm9no.cloudfront.net/images/movies/poster/500x735.png)`
                       }
                 }
               />
-            </Link> */}
-            <Link className="search-card__info-link" to={`/${type}/${id}`}>
-              <div className="search-card__info">
-                <div className="search-card__info-title">{movieTitle || showTitle}</div>
-                <div className="search-card__info-wrapper">
-                  <div className="search-card__info-rating">
-                    {voteAverage !== 0 && (
-                      <>
-                        {voteAverage}
-                        <span>/10</span>
-                      </>
-                    )}
-                  </div>
-                  <div className="search-card__info-year">{releaseDate && releaseDate.slice(0, 4)}</div>
-                  <div className="search-card__info-country">
-                    {`${originCountry.length > 0 ? originCountry.join(", ") : ""}`}
-                  </div>
-                </div>
-                {/* <div className="search-card__info-country">
-                  {originCountry.length > 0 && `Country: ${originCountry.join(", ")}`}
-                  {originalLanguage && `Language: ${originalLanguage}`}
-                </div> */}
+              <div className="search-card__info-name">{movieTitle || showTitle || personName}</div>
+              <div className="search-card__info-activity">Main activity: {known_for_department}</div>
+              <div className="search-card__info-known-movies">
+                {known_for.map((item, i) => {
+                  const mediaType = item.media_type === "movie" ? "movie" : "show"
 
-                {/* <div className="search-card__info-title">{movieTitle || showTitle}</div>
+                  const title =
+                    item.media_type === "movie" ? item.original_title || "No title" : item.name || "No title"
 
-                <div className="search-card__info-description">
-                  <div className="search-card__info-description--movie">
-                    {overview.length > 150 ? `${overview.substring(0, 150)}...` : overview}
-                  </div>
-                </div> */}
+                  const releaseDate =
+                    item.media_type === "movie" ? item.release_date || "" : item.first_air_date || ""
+
+                  return (
+                    <span key={item.id}>
+                      <Link className="search-card__info-link" to={`/${mediaType}/${item.id}`}>
+                        {title}
+                      </Link>
+
+                      {known_for.length - 1 !== i
+                        ? ` (${releaseDate.slice(0, 4)}), `
+                        : ` (${releaseDate.slice(0, 4)})`}
+                    </span>
+                  )
+                })}
               </div>
-            </Link>
-            {/* {this.renderButtons()} */}
-          </>
-        ) : (
-          <>
-            <div
-              className="search-card__image"
-              style={
-                personImage !== null
-                  ? {
-                      backgroundImage: `url(https://image.tmdb.org/t/p/w500/${personImage})`
-                    }
-                  : {
-                      backgroundImage: `url(https://d32qys9a6wm9no.cloudfront.net/images/movies/poster/500x735.png)`
-                    }
-              }
-            />
-            <div className="search-card__info">
-              <div className="search-card__info-title">{movieTitle || showTitle || personName}</div>
 
-              <div className="search-card__info-description">
+              {/* <div className="search-card__info-description">
                 {mediaTypeSearching !== "person" && (
                   <div className="search-card__info-description--movie">
                     {overview.length > 150 ? `${overview.substring(0, 150)}...` : overview}
@@ -232,7 +243,7 @@ class SearchCard extends Component {
                     })}
                   </div>
                 </div>
-              </div>
+              </div> */}
             </div>
           </>
         )}
