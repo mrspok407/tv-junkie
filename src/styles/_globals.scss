@@ -14,7 +14,7 @@ $mainPalette: (
 
 $btnPalette: (
   textColor: #fff,
-  bgColor: peru,
+  bgColor: getColor(orangeClr, $mainPalette),
   pressedBgColor: #66b4e6,
   hoverEffectBgColor: #fff
 );
@@ -28,11 +28,12 @@ $searchCardPalette: (
   backgroundColor: #212121,
   backgroundColorHover: #000000,
   separatorColor: #d0d0d0,
-  titleColor: peru,
+  titleColor: getColor(orangeClr, $mainPalette),
   titleColorHover: #ffffff,
   yearColor: #e0e0e0,
   countryColor: #e0e0e0,
   ratingColor: #e0e0e0,
+  typeColor: getColor(orangeClr, $mainPalette),
   linkColor: #4ba9f9
 );
 

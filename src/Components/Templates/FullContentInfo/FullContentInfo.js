@@ -2,7 +2,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/anchor-has-content */
 import React, { useState, useEffect } from "react"
-import { useLocation, useHistory } from "react-router-dom"
 import axios, { CancelToken } from "axios"
 import { combineMergeObjects } from "Utils"
 import merge from "deepmerge"
@@ -33,7 +32,7 @@ function FullContentInfo({
     posterMobile: "",
     title: "",
     releaseDate: "",
-    lastAirDate: "-",
+    lastAirDate: "",
     runtime: "",
     status: "",
     genres: [],
@@ -58,39 +57,22 @@ function FullContentInfo({
   const [movieInDatabase, setMovieInDatabase] = useState(null)
   const [movieDatabaseOnClient, setMovieDatabaseOnClient] = useState(null)
 
-  const [infoToPass, setInfoToPass] = useState([])
+  const [infoToPass, setInfoToPass] = useState({})
 
   const [error, setError] = useState()
-
-  const { pathname } = useLocation()
-  const history = useHistory()
-
-  // console.log(history)
-
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [pathname])
-
-  console.log(pathname.replace(/\D/g, "") === id)
-
-  // history.listen((location, action) => {
-  //   console.log(`The current URL is ${location.pathname}${location.search}${location.hash}`)
-  //   console.log(`The last navigation action was ${action}`)
-  // })
 
   useEffect(() => {
     if (mediaType === "show") {
       getFullShowInfo()
       getShowInDatabase()
-    } else if (mediaType === "movie") {
+    }
+    if (mediaType === "movie") {
       getFullMovieInfo()
       getMovieInDatabase()
     }
 
     return () => {
-      if (cancelRequest !== undefined) {
-        cancelRequest()
-      }
+      if (cancelRequest !== undefined) cancelRequest()
       if (!authUser) return
 
       userContent.showsDatabases.forEach(database => {
@@ -102,7 +84,7 @@ function FullContentInfo({
       setShowInDatabase({ database: null, info: null })
       setShowDatabaseOnClient(null)
     }
-  }, [mediaType, id, pathname])
+  }, [mediaType, id])
 
   const getFullShowInfo = () => {
     setLoadingPage(true)
@@ -117,8 +99,8 @@ function FullContentInfo({
       )
       .then(
         ({
-          data,
           data: {
+            id,
             name,
             original_name,
             first_air_date,
@@ -147,7 +129,7 @@ function FullContentInfo({
           setInfoToPass({
             name,
             original_name,
-            id: data.id,
+            id: id,
             first_air_date,
             vote_average,
             genre_ids: genreIds,
@@ -159,6 +141,7 @@ function FullContentInfo({
           })
 
           setDetailes({
+            ...detailes,
             poster: poster_path,
             posterMobile: backdrop_path,
             title: name || original_name || "-",
@@ -197,8 +180,8 @@ function FullContentInfo({
       )
       .then(
         ({
-          data,
           data: {
+            id,
             poster_path,
             backdrop_path,
             original_title,
@@ -229,7 +212,7 @@ function FullContentInfo({
           setInfoToPass({
             title,
             original_title,
-            id: data.id,
+            id: id,
             release_date,
             vote_average,
             genre_ids: genresIds,
@@ -240,6 +223,7 @@ function FullContentInfo({
           })
 
           setDetailes({
+            ...detailes,
             poster: poster_path,
             posterMobile: backdrop_path,
             title: title || original_title || "-",
@@ -253,9 +237,6 @@ function FullContentInfo({
             tagline: tagline || "-",
             budget: budget || "-",
             imdbId: imdb_id || ""
-            // releaseDate: "-",
-            // lastAirDate: "-",
-            // seasonsArr: []
           })
 
           setSimilarContent(similarMoviesSortByVotes)
@@ -294,7 +275,6 @@ function FullContentInfo({
                 let updatedSeasonsUser = []
 
                 show.episodes.forEach((season, indexSeason) => {
-                  let updatedEpisodesUser = []
                   const seasonPath = userShow.episodes[indexSeason]
                   const databaseEpisodes = season.episodes
                   const userEpisodes = seasonPath ? userShow.episodes[indexSeason].episodes : []
@@ -303,14 +283,10 @@ function FullContentInfo({
                     arrayMerge: combineMergeObjects
                   })
 
-                  //  console.log(mergedEpisodes)
-
-                  mergedEpisodes.forEach(episode => {
-                    const updatedEpisode = {
-                      watched: episode.watched || false
-                    }
-                    updatedEpisodesUser.push(updatedEpisode)
-                  })
+                  const updatedEpisodesUser = mergedEpisodes.reduce((acc, episode) => {
+                    acc.push({ watched: episode.watched || false })
+                    return acc
+                  }, [])
 
                   const updatedSeason = {
                     ...season,
@@ -339,10 +315,7 @@ function FullContentInfo({
                 .userShows(authUser.uid, "finishedShows")
                 .child(Number(id))
                 .set({
-                  // timeStamp: userShow.timeStamp,
-                  // firstAirDate: userShow.firstAirDate,
                   id: userShow.id,
-                  // name: userShow.name,
                   status: userShow.status,
                   finished_and_name: userShow.finished_and_name,
                   finished_and_timeStamp: userShow.finished_and_timeStamp
@@ -419,7 +392,7 @@ function FullContentInfo({
           <div className="full-detailes__error">
             <h1>{error}</h1>
           </div>
-        ) : !loadingPage && !loadingFromDatabase && pathname.replace(/\D/g, "") === id ? (
+        ) : !loadingPage && !loadingFromDatabase ? (
           <div className="full-detailes">
             <PosterWrapper
               poster={detailes.poster}
@@ -432,19 +405,7 @@ function FullContentInfo({
 
             <MainInfo
               detailes={detailes}
-              title={detailes.title}
               mediaType={mediaType}
-              releaseDate={detailes.releaseDate}
-              lastAirDate={detailes.lastAirDate}
-              status={detailes.status}
-              genres={detailes.genres}
-              network={detailes.network}
-              productionCompany={detailes.productionCompany}
-              rating={detailes.rating}
-              runtime={detailes.runtime}
-              tagline={detailes.tagline}
-              budget={detailes.budget}
-              imdbId={detailes.imdbId}
               id={id}
               infoToPass={infoToPass}
               showInDatabase={showInDatabase}

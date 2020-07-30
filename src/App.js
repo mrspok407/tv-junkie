@@ -4,6 +4,7 @@ import { compose } from "recompose"
 import Profile from "Components/UserProfile/Profile"
 import Admin from "Components/Admin/Admin"
 import SearchPage from "Components/SearchPage/SearchPage"
+import HomePage from "Components/HomePage/HomePage"
 import ShowsPage from "Components/ShowsPage/ShowsPage"
 import ToWatchEpisodesPage from "Components/ToWatchEpisodesPage/ToWatchEpisodesPage"
 import CalendarPage from "Components/CalendarPage/CalendarPage"
@@ -20,6 +21,7 @@ class App extends Component {
       <Router basename="/">
         <div className="container">
           <Switch>
+            <Route path={ROUTES.HOME_PAGE} exact component={HomePage} />
             <Route path={ROUTES.SEARCH_PAGE} exact component={SearchPage} />
             <Route path={ROUTES.SHOWS} exact component={ShowsPage} />
             <Route path={ROUTES.TO_WATCH} component={ToWatchEpisodesPage} />

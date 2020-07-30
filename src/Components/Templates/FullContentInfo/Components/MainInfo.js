@@ -6,25 +6,20 @@ import { UserContentLocalStorageContext } from "Components/UserContent/UserConte
 import { withUserContent } from "Components/UserContent"
 
 class MainInfo extends Component {
-  constructor(props) {
-    super(props)
-
-    this.state = {}
-  }
-
   render() {
-    console.log(this.props.detailes)
-    const yearRelease = this.props.releaseDate.slice(0, 4)
-    const yearEnded = this.props.mediaType === "show" && this.props.lastAirDate.slice(0, 4)
-    const yearRange = this.props.status !== "Ended" ? `${yearRelease} - ...` : `${yearRelease} - ${yearEnded}`
+    const detailes = this.props.detailes
+
+    const yearRelease = detailes.releaseDate.slice(0, 4)
+    const yearEnded = this.props.mediaType === "show" && detailes.lastAirDate.slice(0, 4)
+    const yearRange = detailes.status !== "Ended" ? `${yearRelease} - ...` : `${yearRelease} - ${yearEnded}`
 
     const formatedBudget =
-      this.props.budget !== 0 && this.props.budget !== "-" ? (
+      detailes.budget !== 0 && detailes.budget !== "-" ? (
         new Intl.NumberFormat("en-US", {
           style: "currency",
           currency: "USD"
         })
-          .format(this.props.budget)
+          .format(detailes.budget)
           .slice(0, -3)
           .split(",")
           .join(".")
@@ -35,7 +30,7 @@ class MainInfo extends Component {
     return (
       <div className="full-detailes__info">
         <div className="full-detailes__info-title">
-          {this.props.title}
+          {detailes.title}
           <span>{this.props.mediaType === "show" && yearRelease !== "-" ? ` (${yearRange})` : ""}</span>
         </div>
         <div className="full-detailes__info-row">
@@ -48,25 +43,25 @@ class MainInfo extends Component {
             )}
           </div>
         </div>
-        {this.props.status !== "Released" && (
+        {detailes.status !== "Released" && (
           <div className="full-detailes__info-row">
             <div className="full-detailes__info-option">Status</div>
-            <div className="full-detailes__info-value">{this.props.status}</div>
+            <div className="full-detailes__info-value">{detailes.status}</div>
           </div>
         )}
 
         <div className="full-detailes__info-row">
           <div className="full-detailes__info-option">Genres</div>
-          <div className="full-detailes__info-value">{this.props.genres}</div>
+          <div className="full-detailes__info-value">{detailes.genres}</div>
         </div>
         <div className="full-detailes__info-row">
           <div className="full-detailes__info-option">Company</div>
           <div className="full-detailes__info-value">
             {this.props.mediaType === "show"
-              ? this.props.network
+              ? detailes.network
               : this.props.mediaType === "movie" &&
-                (this.props.productionCompany !== "-" ? (
-                  this.props.productionCompany
+                (detailes.productionCompany !== "-" ? (
+                  detailes.productionCompany
                 ) : (
                   <span className="full-detailes__info-no-info">-</span>
                 ))}
@@ -75,20 +70,20 @@ class MainInfo extends Component {
         <div className="full-detailes__info-row">
           <div className="full-detailes__info-option">Rating</div>
           <div className="full-detailes__info-value">
-            {this.props.rating !== "-" ? (
-              this.props.rating
+            {detailes.rating !== "-" ? (
+              detailes.rating
             ) : (
-              <span className="full-detailes__info-no-info">{this.props.rating}</span>
+              <span className="full-detailes__info-no-info">{detailes.rating}</span>
             )}
           </div>
         </div>
         <div className="full-detailes__info-row">
           <div className="full-detailes__info-option">Runtime</div>
           <div className="full-detailes__info-value">
-            {this.props.runtime !== "-" ? (
-              `${this.props.runtime} min`
+            {detailes.runtime !== "-" ? (
+              `${detailes.runtime} min`
             ) : (
-              <span className="full-detailes__info-no-info">{this.props.runtime}</span>
+              <span className="full-detailes__info-no-info">{detailes.runtime}</span>
             )}
           </div>
         </div>
@@ -97,10 +92,10 @@ class MainInfo extends Component {
             <div className="full-detailes__info-row">
               <div className="full-detailes__info-option">Tagline</div>
               <div className="full-detailes__info-value">
-                {this.props.tagline !== "-" ? (
-                  `${this.props.tagline}`
+                {detailes.tagline !== "-" ? (
+                  `${detailes.tagline}`
                 ) : (
-                  <span className="full-detailes__info-no-info">{this.props.tagline}</span>
+                  <span className="full-detailes__info-no-info">{detailes.tagline}</span>
                 )}
               </div>
             </div>
@@ -112,7 +107,7 @@ class MainInfo extends Component {
               <div className="full-detailes__info-option">External links</div>
               <div className="full-detailes__info-value">
                 <a
-                  href={`https://www.imdb.com/title/${this.props.imdbId}`}
+                  href={`https://www.imdb.com/title/${detailes.imdbId}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="full-detailes__info-imdb"

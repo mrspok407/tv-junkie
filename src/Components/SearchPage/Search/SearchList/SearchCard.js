@@ -11,101 +11,101 @@ class SearchCard extends Component {
     this.state = {}
   }
 
-  renderButtons = () => {
-    const { searchResults } = this.props
+  // renderButtons = () => {
+  //   const { searchResults } = this.props
 
-    return (
-      <div className="search-card__buttons">
-        {this.props.movieTitle ? (
-          <button
-            className={classNames("button button--search-card", {
-              "button--pressed": this.props.contentInDatabase.some(item => item.id === this.props.id)
-            })}
-            onClick={() => {
-              if (this.props.authUser) {
-                this.props.toggleWatchLaterMovie({
-                  id: this.props.id,
-                  data: searchResults,
-                  database: "watchLaterMovies"
-                })
-                this.props.updateContentInDbClient(this.props.id, searchResults)
-              } else {
-                this.context.toggleContentLS({
-                  id: this.props.id,
-                  data: searchResults,
-                  type: "watchLaterMovies"
-                })
-              }
+  //   return (
+  //     <div className="search-card__buttons">
+  //       {this.props.movieTitle ? (
+  //         <button
+  //           className={classNames("button button--search-card", {
+  //             "button--pressed": this.props.contentInDatabase.some(item => item.id === this.props.id)
+  //           })}
+  //           onClick={() => {
+  //             if (this.props.authUser) {
+  //               this.props.toggleWatchLaterMovie({
+  //                 id: this.props.id,
+  //                 data: searchResults,
+  //                 database: "watchLaterMovies"
+  //               })
+  //               this.props.updateContentInDbClient(this.props.id, searchResults)
+  //             } else {
+  //               this.context.toggleContentLS({
+  //                 id: this.props.id,
+  //                 data: searchResults,
+  //                 type: "watchLaterMovies"
+  //               })
+  //             }
 
-              if (
-                !this.props.contentInDatabase.some(item => item.id === this.props.id) ||
-                this.props.currentlyChosenContent.find(item => item.id === this.props.id)
-              ) {
-                this.props.toggleCurrentlyChosenContent(this.props.id, searchResults)
-              }
-            }}
-            type="button"
-          >
-            {this.props.contentInDatabase.some(item => item.id === this.props.id) ? "Remove" : "Watch Later"}
-          </button>
-        ) : (
-          <>
-            {this.props.contentInDatabase.some(item => item.id === this.props.id) ? (
-              <button
-                className="button button--search-card button--pressed"
-                onClick={() => {
-                  if (this.props.authUser) {
-                    this.props.handleShowInDatabases({
-                      id: this.props.id,
-                      data: searchResults,
-                      database: "notWatchingShows"
-                    })
-                    this.props.updateContentInDbClient(this.props.id, searchResults)
-                  } else {
-                    this.context.toggleContentLS({
-                      id: this.props.id,
-                      type: "watchingShows"
-                    })
-                  }
-                  this.props.toggleCurrentlyChosenContent(this.props.id, searchResults)
-                }}
-                type="button"
-                disabled={this.state.loadingDataFromDatabase}
-              >
-                Not watching
-              </button>
-            ) : (
-              <button
-                className="button button--search-card"
-                onClick={() => {
-                  if (this.props.authUser) {
-                    this.props.handleShowInDatabases({
-                      id: this.props.id,
-                      data: searchResults,
-                      database: "watchingShows"
-                    })
-                    this.props.updateContentInDbClient(this.props.id, searchResults)
-                  } else {
-                    this.context.toggleContentLS({
-                      id: this.props.id,
-                      data: searchResults,
-                      type: "watchingShows"
-                    })
-                  }
+  //             if (
+  //               !this.props.contentInDatabase.some(item => item.id === this.props.id) ||
+  //               this.props.currentlyChosenContent.find(item => item.id === this.props.id)
+  //             ) {
+  //               this.props.toggleCurrentlyChosenContent(this.props.id, searchResults)
+  //             }
+  //           }}
+  //           type="button"
+  //         >
+  //           {this.props.contentInDatabase.some(item => item.id === this.props.id) ? "Remove" : "Watch Later"}
+  //         </button>
+  //       ) : (
+  //         <>
+  //           {this.props.contentInDatabase.some(item => item.id === this.props.id) ? (
+  //             <button
+  //               className="button button--search-card button--pressed"
+  //               onClick={() => {
+  //                 if (this.props.authUser) {
+  //                   this.props.handleShowInDatabases({
+  //                     id: this.props.id,
+  //                     data: searchResults,
+  //                     database: "notWatchingShows"
+  //                   })
+  //                   this.props.updateContentInDbClient(this.props.id, searchResults)
+  //                 } else {
+  //                   this.context.toggleContentLS({
+  //                     id: this.props.id,
+  //                     type: "watchingShows"
+  //                   })
+  //                 }
+  //                 this.props.toggleCurrentlyChosenContent(this.props.id, searchResults)
+  //               }}
+  //               type="button"
+  //               disabled={this.state.loadingDataFromDatabase}
+  //             >
+  //               Not watching
+  //             </button>
+  //           ) : (
+  //             <button
+  //               className="button button--search-card"
+  //               onClick={() => {
+  //                 if (this.props.authUser) {
+  //                   this.props.handleShowInDatabases({
+  //                     id: this.props.id,
+  //                     data: searchResults,
+  //                     database: "watchingShows"
+  //                   })
+  //                   this.props.updateContentInDbClient(this.props.id, searchResults)
+  //                 } else {
+  //                   this.context.toggleContentLS({
+  //                     id: this.props.id,
+  //                     data: searchResults,
+  //                     type: "watchingShows"
+  //                   })
+  //                 }
 
-                  this.props.toggleCurrentlyChosenContent(this.props.id, searchResults)
-                }}
-                type="button"
-                disabled={this.state.loadingDataFromDatabase}
-              >
-                Watching
-              </button>
-            )}
-          </>
-        )}
-      </div>
-    )
-  }
+  //                 this.props.toggleCurrentlyChosenContent(this.props.id, searchResults)
+  //               }}
+  //               type="button"
+  //               disabled={this.state.loadingDataFromDatabase}
+  //             >
+  //               Watching
+  //             </button>
+  //           )}
+  //         </>
+  //       )}
+  //     </div>
+  //   )
+  // }
 
   render() {
     const {
@@ -115,11 +115,9 @@ class SearchCard extends Component {
       releaseDate,
       voteAverage,
       originCountry,
-      originalLanguage,
       poster,
       personImage,
       posterBackdrop,
-      overview,
       id,
       known_for,
       known_for_department,
@@ -133,12 +131,13 @@ class SearchCard extends Component {
       <div
         key={id}
         className={classNames("search-card", {
-          "search-card--person": mediaType === "person" || mediaTypeSearching === "person"
+          "search-card--person": mediaType === "person" || mediaTypeSearching === "person",
+          "search-card__active": this.props.index === this.props.currentListItem
         })}
       >
         {mediaType !== "person" && mediaTypeSearching !== "person" ? (
           <>
-            <Link to={`/${type}/${id}`}>
+            <Link className="search-card__link" to={`/${type}/${id}`} onClick={() => this.props.closeList()}>
               <div className="search-card__info">
                 <div
                   className="search-card__info-image"
@@ -161,20 +160,25 @@ class SearchCard extends Component {
                     {`${originCountry.length > 0 ? originCountry.join(", ") : ""}`}
                   </span>
                 </div>
-                <div className="search-card__info-rating">
+                <div className="search-card__info-wrapper">
                   {voteAverage !== 0 && (
-                    <>
-                      {voteAverage}
-                      <span>/10</span>
-                    </>
+                    <div className="search-card__info-rating">
+                      {
+                        <>
+                          {voteAverage}
+                          <span>/10</span>
+                        </>
+                      }
+                    </div>
                   )}
+                  <div className="search-card__info-type">{movieTitle ? "Movie" : "Show"}</div>
                 </div>
               </div>
             </Link>
           </>
         ) : (
           <>
-            <div className="search-card__info">
+            <div className="search-card__info search-card__info--person">
               <div
                 className="search-card__info-image"
                 style={
@@ -212,38 +216,6 @@ class SearchCard extends Component {
                   )
                 })}
               </div>
-
-              {/* <div className="search-card__info-description">
-                {mediaTypeSearching !== "person" && (
-                  <div className="search-card__info-description--movie">
-                    {overview.length > 150 ? `${overview.substring(0, 150)}...` : overview}
-                  </div>
-                )}
-
-                <div className="search-card__info-description--person">
-                  <div className="search-card__info-activity">Main activity: {known_for_department}</div>
-                  <div className="search-card__info-person-movies">
-                    {known_for.map((item, i) => {
-                      const title =
-                        item.media_type === "movie"
-                          ? item.original_title || "No title"
-                          : item.name || "No title"
-
-                      const releaseDate =
-                        item.media_type === "movie" ? item.release_date || "" : item.first_air_date || ""
-
-                      return (
-                        <span key={item.id}>
-                          {title}
-                          {known_for.length - 1 !== i
-                            ? ` (${releaseDate.slice(0, 4)}), `
-                            : ` (${releaseDate.slice(0, 4)})`}
-                        </span>
-                      )
-                    })}
-                  </div>
-                </div>
-              </div> */}
             </div>
           </>
         )}

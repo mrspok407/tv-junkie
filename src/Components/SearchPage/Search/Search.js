@@ -22,6 +22,7 @@ class Search extends Component {
       isSearchingList: false,
       totalPages: null,
       listIsOpen: false,
+      currentListItem: 0,
       mediaTypeSearching: "",
       error: ""
     }
@@ -56,7 +57,9 @@ class Search extends Component {
       )
       .then(({ data: { results, total_pages: totalPages } }) => {
         const content = [...results]
-        const contentSortByPopularity = content.sort((a, b) => (a.popularity > b.popularity ? -1 : 1))
+        const contentSortByPopularity = content
+          .sort((a, b) => (a.popularity > b.popularity ? -1 : 1))
+          .slice(0, 5)
 
         this.setState({
           searchResults: contentSortByPopularity,
@@ -116,18 +119,35 @@ class Search extends Component {
     })
   }
 
-  goToFirstResult = () => {
-    if (!this.state.listIsOpen || this.state.isSearchingList) return
-    if (this.state.searchResults.length === 0) return
+  closeList = () => {
+    this.setState({
+      listIsOpen: false,
+      currentListItem: 0
+    })
+  }
 
-    const content = this.state.searchResults[0]
-    const mediaType = content.media_type === "movie" ? "movie" : "show"
+  linkOnKeyPress = () => {
+    const content = this.state.searchResults[this.state.currentListItem]
+    const mediaType = content.original_title ? "movie" : content.original_name ? "show" : null
+
+    if (!this.state.listIsOpen || this.state.isSearchingList || !mediaType) return
+    if (this.state.searchResults.length === 0) return
 
     this.props.history.push(`/${mediaType}/${content.id}`)
 
-    this.setState({
-      // listIsOpen: false
-    })
+    this.closeList()
+  }
+
+  navigateSearchListByArrows = arrowKey => {
+    if (!this.state.listIsOpen || this.state.isSearchingList) return
+    if (this.state.searchResults.length === 0) return
+
+    if (arrowKey === 40 && this.state.searchResults.length !== this.state.currentListItem + 1) {
+      this.setState({ currentListItem: this.state.currentListItem + 1 })
+    }
+    if (arrowKey === 38 && this.state.currentListItem > 0) {
+      this.setState({ currentListItem: this.state.currentListItem - 1 })
+    }
   }
 
   render() {
@@ -139,8 +159,10 @@ class Search extends Component {
               onSearch={this.handleSearch}
               onFocus={this.onFocus}
               isSearchingList={this.state.isSearchingList}
+              listIsOpen={this.state.listIsOpen}
               navSearch={this.props.navSearch}
-              goToFirstResult={this.goToFirstResult}
+              linkOnKeyPress={this.linkOnKeyPress}
+              navigateSearchListByArrows={this.navigateSearchListByArrows}
             />
             {this.state.totalPages === 0 && this.state.query !== "" && this.state.listIsOpen ? (
               <PlaceholderNoResults message="No results found" handleClickOutside={this.handleClickOutside} />
@@ -149,6 +171,10 @@ class Search extends Component {
               this.renderSearch(
                 <SearchList
                   searchResults={this.state.searchResults}
+                  closeList={this.closeList}
+                  isSearchingList={this.state.isSearchingList}
+                  navSearch={this.props.navSearch}
+                  currentListItem={this.state.currentListItem}
                   contentInDatabase={this.state.contentInDatabase}
                   updateContentInDbClient={this.updateContentInDbClient}
                   mediaTypeSearching={this.state.mediaTypeSearching}

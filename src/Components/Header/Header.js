@@ -34,7 +34,7 @@ export default class Header extends Component {
           <ul className="nav__list">
             <NavLink
               exact
-              to={ROUTES.MAIN_PAGE}
+              to={ROUTES.HOME_PAGE}
               activeClassName="nav__item--active"
               className="nav__link--logo"
               onClick={() => this.closeNavMobile()}

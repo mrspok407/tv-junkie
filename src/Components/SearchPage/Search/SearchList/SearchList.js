@@ -14,29 +14,31 @@ export default class SearchList extends Component {
   }
 
   render() {
-    console.log(this.props.searchResults)
     return (
-      <div className="search-list">
+      <div ref={this.searchList} className="search-list">
         {this.props.searchResults.map(
-          ({
-            title = "",
-            original_title = "",
-            name = "",
-            original_name = "",
-            vote_average = "",
-            first_air_date = "",
-            release_date = "",
-            origin_country = [],
-            original_language = "",
-            poster_path = "",
-            profile_path = "",
-            backdrop_path = "",
-            overview = "",
-            id,
-            media_type = "",
-            known_for,
-            known_for_department
-          }) => {
+          (
+            {
+              title = "",
+              original_title = "",
+              name = "",
+              original_name = "",
+              vote_average = "",
+              first_air_date = "",
+              release_date = "",
+              origin_country = [],
+              original_language = "",
+              poster_path = "",
+              profile_path = "",
+              backdrop_path = "",
+              overview = "",
+              id,
+              media_type = "",
+              known_for,
+              known_for_department
+            },
+            index
+          ) => {
             return (
               <SearchCard
                 key={id}
@@ -52,9 +54,12 @@ export default class SearchList extends Component {
                 posterBackdrop={backdrop_path}
                 overview={overview}
                 id={id}
+                closeList={this.props.closeList}
+                currentListItem={this.props.currentListItem}
                 known_for={known_for}
                 known_for_department={known_for_department}
                 searchResults={this.props.searchResults}
+                index={index}
                 contentInDatabase={this.props.contentInDatabase}
                 updateContentInDbClient={this.props.updateContentInDbClient}
                 mediaType={media_type}

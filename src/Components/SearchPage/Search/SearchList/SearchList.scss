@@ -19,11 +19,14 @@
   $parentRef: &;
   position: relative;
   width: 100%;
-  padding: 10px;
   overflow: hidden;
   cursor: pointer;
   background-color: getColor(backgroundColor, $searchCardPalette);
   transition: 0.2s;
+
+  &__active {
+    background-color: getColor(backgroundColorHover, $searchCardPalette);
+  }
 
   @mixin cardHovered {
     #{$parentRef}:hover & {
@@ -43,10 +46,10 @@
   &:last-child:after {
     display: none;
   }
-  @include mediaMinW(1000px) {
-    &:hover {
-      background-color: getColor(backgroundColorHover, $searchCardPalette);
-    }
+
+  &__link {
+    display: block;
+    padding: 10px;
   }
 
   &__image {
@@ -93,8 +96,14 @@
       color: getColor(yearColor, $searchCardPalette);
     }
 
-    &-rating {
+    &-wrapper {
+      display: grid;
+      grid-template-rows: repeat(1fr);
       justify-self: end;
+    }
+
+    &-rating,
+    &-type {
       font: {
         size: 1rem;
         weight: 600;
@@ -105,6 +114,10 @@
         padding-left: 2px;
         font-size: 0.8rem;
       }
+    }
+
+    &-type {
+      color: getColor(typeColor, $searchCardPalette);
     }
 
     &-country {
@@ -119,6 +132,10 @@
       &:hover {
         text-decoration: underline;
       }
+    }
+
+    &--person {
+      padding: 10px;
     }
   }
 

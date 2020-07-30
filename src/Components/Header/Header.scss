@@ -172,8 +172,8 @@
       background-size: cover;
       background-repeat: no-repeat;
 
-      &:hover:after,
-      &:hover:before {
+      &:after,
+      &:before {
         display: none;
       }
 
@@ -264,8 +264,6 @@
 
       .search-list {
         display: initial;
-        max-height: 409px;
-        overflow-y: auto;
         top: calc(100% + 15px);
         @include scrollbar(5px, getColor(blueClr, $mainPalette), #c5bbb1);
       }

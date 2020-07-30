@@ -64,7 +64,7 @@ class CalendarContent extends Component {
 
           this.setState({
             willAirEpisodes,
-            openMonths: months,
+            openMonths: this.props.homePage ? [months[0]] : months,
             initialLoading: false
           })
 
@@ -86,6 +86,10 @@ class CalendarContent extends Component {
   }
 
   render() {
+    const willAirEpisodes = this.props.homePage
+      ? this.state.willAirEpisodes.slice(0, 2)
+      : this.state.willAirEpisodes
+
     return (
       <div className="content-results content-results--calendar">
         {this.state.initialLoading ? (
@@ -94,7 +98,7 @@ class CalendarContent extends Component {
           <PlaceholderNoFutureEpisodes />
         ) : (
           <div className="episodes episodes--calendar">
-            {this.state.willAirEpisodes.map(month => {
+            {willAirEpisodes.map(month => {
               const date = new Date(month.month)
               const monthLongName = date.toLocaleString("en", { month: "long" })
               return (
@@ -128,7 +132,7 @@ class CalendarContent extends Component {
                     {this.state.openMonths.includes(month.month) && (
                       <>
                         {month.episodes
-                          .sort((a, b) => (a.episode_number > b.episode_number ? 1 : -1))
+                          // .sort((a, b) => (a.episode_number > b.episode_number ? 1 : -1))
                           .map((episode, episodeIndex, array) => {
                             const prevEpisode = array[episodeIndex - 1]
                             const prevEpisodeAirDate = prevEpisode && prevEpisode.air_date
@@ -189,7 +193,7 @@ class CalendarContent extends Component {
                                   </div>
                                   {daysToNewEpisode > 0 && (
                                     <div className="episodes__episode-days-to-air episodes__episode--calendar-days-to-air">
-                                      {daysToNewEpisode} days
+                                      {daysToNewEpisode} {daysToNewEpisode > 1 ? "days" : "day"}
                                     </div>
                                   )}
                                 </div>

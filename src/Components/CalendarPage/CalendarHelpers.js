@@ -22,7 +22,9 @@ export const organiseFutureEpisodesByMonth = data => {
   const episodesByMonths = uniqueMonths.reduce((acc, month) => {
     const monthNew = month.concat("-01")
     const episodes = sortedAndFiltered.reduce((acc, episode) => {
-      if (episode.air_date.slice(0, 7) === month) acc.push(episode)
+      if (episode.air_date.slice(0, 7) === month) {
+        acc.push(episode)
+      }
       return acc
     }, [])
 
@@ -30,6 +32,8 @@ export const organiseFutureEpisodesByMonth = data => {
 
     return acc
   }, [])
+
+  // console.log(episodesByMonths)
 
   return episodesByMonths
 }
