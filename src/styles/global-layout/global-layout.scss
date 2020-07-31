@@ -196,9 +196,6 @@ $font-sizes: (
   width: 100%;
   min-width: 350px;
   padding-bottom: 100px;
-  @include mediaMaxW($mainContainerMaxWidth) {
-    padding: 0 38px 100px 38px;
-  }
   @include mediaMaxW(#{$mobileViewPort}) {
     padding: 0 8px 100px 8px;
   }

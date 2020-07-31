@@ -11,7 +11,10 @@ class MainInfo extends Component {
 
     const yearRelease = detailes.releaseDate.slice(0, 4)
     const yearEnded = this.props.mediaType === "show" && detailes.lastAirDate.slice(0, 4)
-    const yearRange = detailes.status !== "Ended" ? `${yearRelease} - ...` : `${yearRelease} - ${yearEnded}`
+    const yearRange =
+      detailes.status === "Ended" || detailes.status === "Canceled"
+        ? `${yearRelease} - ${yearEnded}`
+        : `${yearRelease} - ...`
 
     const formatedBudget =
       detailes.budget !== 0 && detailes.budget !== "-" ? (

@@ -110,12 +110,33 @@ class Search extends Component {
       this.setState({
         listIsOpen: false
       })
+      this.onBlur()
     }
   }
 
   onFocus = () => {
+    const navItem = document.querySelectorAll(".nav__link")
+    const input = document.querySelector(".search__input")
+
+    input.classList.add("search__input--focus")
+    navItem.forEach(item => {
+      item.classList.remove("nav__link-move-back")
+      item.classList.add("nav__link-move")
+    })
+
     this.setState({
       listIsOpen: true
+    })
+  }
+
+  onBlur = () => {
+    const navItem = document.querySelectorAll(".nav__link")
+    const input = document.querySelector(".search__input")
+
+    input.classList.remove("search__input--focus")
+    navItem.forEach(item => {
+      item.classList.remove("nav__link-move")
+      item.classList.add("nav__link-move-back")
     })
   }
 
@@ -124,6 +145,7 @@ class Search extends Component {
       listIsOpen: false,
       currentListItem: 0
     })
+    this.onBlur()
   }
 
   linkOnKeyPress = () => {

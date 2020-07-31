@@ -180,9 +180,7 @@ export default function Slider({ listOfContent }) {
   }
 
   const toggleArrows = () => {
-    console.log("toggleArrows")
     if (!sliderAvailable) return
-    console.log("toggleArrows2")
 
     setLeftArrowVisible(!(currentItem <= 0))
     setrightArrowVisible(!(currentItem >= nonVisibleItems))

@@ -1,3 +1,10 @@
 .user-profile {
+  display: flex;
+  justify-content: center;
   color: #fff;
+  width: 100%;
+
+  .button {
+    width: 10%;
+  }
 }

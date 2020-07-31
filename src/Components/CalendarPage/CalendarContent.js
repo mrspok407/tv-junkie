@@ -2,7 +2,7 @@ import React, { Component } from "react"
 import { Link } from "react-router-dom"
 import { withUserContent } from "Components/UserContent"
 import { differenceBtwDatesInDays, todayDate } from "Utils"
-import { organiseFutureEpisodesByMonth } from "./CalendarHelpers"
+import { organiseFutureEpisodesByMonth, organizeMonthEpisodesByEpisodeNumber } from "./CalendarHelpers"
 import classNames from "classnames"
 import Loader from "Components/Placeholders/Loader"
 import PlaceholderNoFutureEpisodes from "Components/Placeholders/PlaceholderNoFutureEpisodes"
@@ -27,6 +27,7 @@ class CalendarContent extends Component {
     if (isInitialLoad) {
       this.setState({ initialLoading: true })
     }
+    if (this.props.homePage) this.props.handleCalendarLoading(true)
 
     this.props.firebase
       .userShows(this.props.authUser.uid, database)
@@ -53,9 +54,6 @@ class CalendarContent extends Component {
               })
           })
         ).then(showsData => {
-          console.log(userShows)
-          console.log(showsData)
-
           const willAirEpisodes = organiseFutureEpisodesByMonth(showsData)
 
           const months = willAirEpisodes.map(item => {
@@ -67,8 +65,7 @@ class CalendarContent extends Component {
             openMonths: this.props.homePage ? [months[0]] : months,
             initialLoading: false
           })
-
-          console.log(willAirEpisodes)
+          if (this.props.homePage) this.props.handleCalendarLoading(false)
         })
       })
   }
@@ -101,19 +98,19 @@ class CalendarContent extends Component {
             {willAirEpisodes.map(month => {
               const date = new Date(month.month)
               const monthLongName = date.toLocaleString("en", { month: "long" })
+
+              const monthEpisodes = organizeMonthEpisodesByEpisodeNumber(month.episodes)
+
               return (
-                <div key={month.month} className="episodes__episode-group episodes__episode-group--calendar">
+                <div key={month.month} className="episodes__episode-group">
                   <div
-                    className={classNames(
-                      "episodes__episode-group-info episodes__episode-group-info--calendar",
-                      {
-                        "episodes__episode-group-info--open": this.state.openMonths.includes(month.month)
-                      }
-                    )}
+                    className={classNames("episodes__episode-group-info", {
+                      "episodes__episode-group-info--open": this.state.openMonths.includes(month.month)
+                    })}
                     // onClick={() => this.showSeasonsEpisode(seasonId, season.season_number)}
                     onClick={() => this.showMonthEpisodes(month.month)}
                   >
-                    <div className="episodes__episode-group-name episodes__episode-group-name--calendar">
+                    <div className="episodes__episode-group-name">
                       {todayDate.getFullYear() !== date.getFullYear() ? (
                         <>
                           {monthLongName}
@@ -123,83 +120,79 @@ class CalendarContent extends Component {
                         monthLongName
                       )}
                     </div>
-                    <div className="episodes__episode-group-episodes-left episodes__episode-group-episodes-left--calendar">
+                    <div className="episodes__episode-group-episodes-left">
                       {month.episodes.length} {month.episodes.length > 1 ? "episodes" : "episode"}
                     </div>
                   </div>
 
-                  <div className="episodes__episode-list episodes__episode-list--calendar">
+                  <div className="episodes__episode-list">
                     {this.state.openMonths.includes(month.month) && (
                       <>
-                        {month.episodes
-                          // .sort((a, b) => (a.episode_number > b.episode_number ? 1 : -1))
-                          .map((episode, episodeIndex, array) => {
-                            const prevEpisode = array[episodeIndex - 1]
-                            const prevEpisodeAirDate = prevEpisode && prevEpisode.air_date
+                        {monthEpisodes.map((episode, episodeIndex, array) => {
+                          const prevEpisode = array[episodeIndex - 1]
+                          const prevEpisodeAirDate = prevEpisode && prevEpisode.air_date
 
-                            // Format Date //
-                            const airDateISO = episode.air_date && new Date(episode.air_date).toISOString()
+                          // Format Date //
+                          const airDateISO = episode.air_date && new Date(episode.air_date).toISOString()
 
-                            const options = {
-                              weekday: "short",
-                              day: "numeric"
-                            }
+                          const options = {
+                            weekday: "short",
+                            day: "numeric"
+                          }
 
-                            const formatedDate = new Date(airDateISO)
+                          const formatedDate = new Date(airDateISO)
 
-                            const episodeAirDate = episode.air_date
-                              ? new Intl.DateTimeFormat("en-US", options)
-                                  .format(formatedDate)
-                                  .split(" ")
-                                  .join(", ")
-                              : "No date available"
-                            // Format Date End //
+                          const episodeAirDate = episode.air_date
+                            ? new Intl.DateTimeFormat("en-US", options)
+                                .format(formatedDate)
+                                .split(" ")
+                                .join(", ")
+                            : "No date available"
+                          // Format Date End //
 
-                            // Format Seasons And Episode Numbers //
-                            const seasonToString = episode.season_number.toString()
-                            const episodeToString = episode.episode_number.toString()
+                          // Format Seasons And Episode Numbers //
+                          const seasonToString = episode.season_number.toString()
+                          const episodeToString = episode.episode_number.toString()
 
-                            const seasonNumber =
-                              seasonToString.length === 1
-                                ? "s".concat(seasonToString)
-                                : "s".concat(seasonToString)
-                            const episodeNumber =
-                              episodeToString.length === 1
-                                ? "e0".concat(episodeToString)
-                                : "e".concat(episodeToString)
-                            // Format Seasons And Episode Numbers End //
+                          const seasonNumber =
+                            seasonToString.length === 1
+                              ? "s".concat(seasonToString)
+                              : "s".concat(seasonToString)
+                          const episodeNumber =
+                            episodeToString.length === 1
+                              ? "e0".concat(episodeToString)
+                              : "e".concat(episodeToString)
+                          // Format Seasons And Episode Numbers End //
 
-                            // const episodeAirDateAsDateObj = new Date(episode.air_date)
+                          // const episodeAirDateAsDateObj = new Date(episode.air_date)
 
-                            const daysToNewEpisode = differenceBtwDatesInDays(episode.air_date, todayDate)
+                          const daysToNewEpisode = differenceBtwDatesInDays(episode.air_date, todayDate)
 
-                            return (
-                              <div key={episode.id} className="episodes__episode episodes__episode--calendar">
-                                <div className="episodes__episode-wrapper">
-                                  <div className="episodes__episode-date episodes__episode--calendar-date">
-                                    {episode.air_date !== prevEpisodeAirDate && episodeAirDate}
-                                  </div>
-                                  <div className="episodes__episode--calendar-wrapper">
-                                    <div className="episodes__episode--calendar-show-name">
-                                      <Link to={`/show/${episode.showId}`}>{episode.show}</Link>
-                                    </div>
-                                    <div className="episodes__episode--calendar-episode-number">
-                                      {seasonNumber}
-                                      {episodeNumber}
-                                    </div>
-                                    <div className="episodes__episode--calendar-episode-title">
-                                      {episode.name}
-                                    </div>
-                                  </div>
-                                  {daysToNewEpisode > 0 && (
-                                    <div className="episodes__episode-days-to-air episodes__episode--calendar-days-to-air">
-                                      {daysToNewEpisode} {daysToNewEpisode > 1 ? "days" : "day"}
-                                    </div>
-                                  )}
+                          return (
+                            <div key={episode.id} className="episodes__episode">
+                              <div className="episodes__episode-wrapper">
+                                <div className="episodes__episode-date">
+                                  {episode.air_date !== prevEpisodeAirDate && episodeAirDate}
                                 </div>
+                                <div className="episodes__episode-wrapper--calendar">
+                                  <div className="episodes__episode-show-name">
+                                    <Link to={`/show/${episode.showId}`}>{episode.show}</Link>
+                                  </div>
+                                  <div className="episodes__episode-episode-number">
+                                    {seasonNumber}
+                                    {episodeNumber}
+                                  </div>
+                                  <div className="episodes__episode-episode-title">{episode.name}</div>
+                                </div>
+                                {daysToNewEpisode > 0 && (
+                                  <div className="episodes__episode-days-to-air episodes__episode-days-to-air">
+                                    {daysToNewEpisode} {daysToNewEpisode > 1 ? "days" : "day"}
+                                  </div>
+                                )}
                               </div>
-                            )
-                          })}
+                            </div>
+                          )
+                        })}
                       </>
                     )}
                   </div>

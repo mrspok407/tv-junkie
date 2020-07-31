@@ -207,7 +207,7 @@ export default class SeasonEpisodes extends Component {
                   )}
                 </div>
 
-                {showCheckboxes && daysToNewEpisode < 0 && episode.air_date && (
+                {showCheckboxes && daysToNewEpisode <= 0 && episode.air_date && (
                   <div className="episodes__episode-checkbox">
                     <label>
                       <input

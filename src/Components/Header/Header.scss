@@ -101,6 +101,7 @@
 
   &__link {
     color: #fff;
+    transition: 0.3s;
 
     @include mediaMaxW(#{$mobileViewPort}) {
       display: flex;
@@ -112,11 +113,19 @@
       display: flex;
       align-items: center;
     }
+
+    &-move {
+      transform: translateX(-15px);
+    }
+
+    &-move-back {
+      transform: translateX(0);
+    }
   }
 
   &__item {
     position: relative;
-    padding: 26px 18px 26px 18px;
+    padding: 26px 17px 26px 17px;
     border: none;
     text-align: center;
     cursor: pointer;
@@ -201,9 +210,15 @@
 
       .search__input {
         height: 27px;
+        width: 126px;
         padding-left: 34px;
+        padding-right: 32px;
         padding-bottom: 8px;
         font-size: 1.2rem;
+
+        &--focus {
+          width: 300px;
+        }
       }
 
       .search__media-type {
@@ -265,6 +280,13 @@
       .search-list {
         display: initial;
         top: calc(100% + 15px);
+        opacity: 0;
+        animation: ttttt 0s 0.2s forwards;
+        @keyframes ttttt {
+          to {
+            opacity: 1;
+          }
+        }
         @include scrollbar(5px, getColor(blueClr, $mainPalette), #c5bbb1);
       }
 

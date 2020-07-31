@@ -18,6 +18,7 @@ class HomePage extends Component {
     this.state = {
       weekTvTrending: [],
       initialLoading: false,
+      calendarLoading: false,
       error: ""
     }
   }
@@ -49,6 +50,12 @@ class HomePage extends Component {
       })
   }
 
+  handleCalendarLoading = condition => {
+    this.setState({
+      calendarLoading: condition
+    })
+  }
+
   render() {
     return (
       <>
@@ -57,10 +64,12 @@ class HomePage extends Component {
           <Loader className="loader--pink" />
         ) : (
           <>
-            <CalendarContent homePage={true} />
-            <div className="home-page__sliders">
-              <Slider listOfContent={this.state.weekTvTrending} />
-            </div>
+            <CalendarContent homePage={true} handleCalendarLoading={this.handleCalendarLoading} />
+            {!this.state.calendarLoading && (
+              <div className="home-page__sliders">
+                <Slider listOfContent={this.state.weekTvTrending} />
+              </div>
+            )}
           </>
         )}
         <ScrollToTop />
