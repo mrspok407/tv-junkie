@@ -106,23 +106,31 @@ class Search extends Component {
   }
 
   handleClickOutside = e => {
-    if (this.searchContRef.current && !this.searchContRef.current.contains(e.target)) {
+    if (
+      this.searchContRef.current &&
+      this.props.navRef &&
+      !this.searchContRef.current.contains(e.target) &&
+      !this.props.navRef.current.contains(e.target)
+    ) {
       this.setState({
         listIsOpen: false
       })
+      console.log("test")
       this.onBlur()
     }
   }
 
   onFocus = () => {
-    const navItem = document.querySelectorAll(".nav__link")
-    const input = document.querySelector(".search__input")
+    if (this.props.navSearch) {
+      const navItem = document.querySelectorAll(".nav__link")
+      const input = document.querySelector(".search__input")
 
-    input.classList.add("search__input--focus")
-    navItem.forEach(item => {
-      item.classList.remove("nav__link-move-back")
-      item.classList.add("nav__link-move")
-    })
+      input.classList.add("search__input--focus")
+      navItem.forEach(item => {
+        item.classList.remove("nav__link-move-back")
+        item.classList.add("nav__link-move")
+      })
+    }
 
     this.setState({
       listIsOpen: true

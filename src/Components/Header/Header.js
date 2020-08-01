@@ -12,8 +12,14 @@ import "../UserAuth/UserAuth.scss"
 import Search from "Components/SearchPage/Search/Search"
 
 export default class Header extends Component {
-  state = {
-    navMobileOpen: false
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      navMobileOpen: false
+    }
+
+    this.nav = React.createRef()
   }
 
   closeNavMobile = () => {
@@ -27,6 +33,7 @@ export default class Header extends Component {
     return (
       <header className="header">
         <nav
+          ref={this.nav}
           className={classNames("nav", {
             "nav--mobile-open": this.state.navMobileOpen === true
           })}
@@ -110,7 +117,7 @@ export default class Header extends Component {
             )}
 
             <li className="nav__item nav__item--nav-search">
-              <Search navSearch={true} />
+              <Search navSearch={true} navRef={this.nav} />
             </li>
           </ul>
         </nav>
