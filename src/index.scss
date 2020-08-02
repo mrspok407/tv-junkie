@@ -34,7 +34,7 @@ a {
   height: 100vh;
   top: 0;
   left: 0;
-  @include mediaMaxW(#{$mobileViewPort}) {
+  @include mediaMaxW(#{$mobileViewPort + 80px}) {
     display: none;
   }
   &:after,

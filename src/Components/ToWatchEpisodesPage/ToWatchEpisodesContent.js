@@ -40,6 +40,8 @@ class ToWatchEpisodesContent extends Component {
       .once("value", snapshot => {
         let userShows = []
         snapshot.forEach(item => {
+          if (item.val().allEpisodesWatched) return
+
           userShows = [
             ...userShows,
             {
@@ -184,6 +186,7 @@ class ToWatchEpisodesContent extends Component {
   }
 
   render() {
+    console.log(this.state.watchingShows)
     return (
       <div className="content-results content-results--to-watch-page">
         {this.state.initialLoading ? (

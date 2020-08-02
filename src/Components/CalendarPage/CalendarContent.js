@@ -27,7 +27,7 @@ class CalendarContent extends Component {
     if (isInitialLoad) {
       this.setState({ initialLoading: true })
     }
-    if (this.props.homePage) this.props.handleCalendarLoading(true)
+    if (this.props.homePage) this.props.handleCalendarState({ loading: true })
 
     this.props.firebase
       .userShows(this.props.authUser.uid, database)
@@ -65,7 +65,7 @@ class CalendarContent extends Component {
             openMonths: this.props.homePage ? [months[0]] : months,
             initialLoading: false
           })
-          if (this.props.homePage) this.props.handleCalendarLoading(false)
+          if (this.props.homePage) this.props.handleCalendarState({ loading: false, willAirEpisodes })
         })
       })
   }
@@ -83,6 +83,7 @@ class CalendarContent extends Component {
   }
 
   render() {
+    console.log(this.props)
     const willAirEpisodes = this.props.homePage
       ? this.state.willAirEpisodes.slice(0, 2)
       : this.state.willAirEpisodes
@@ -91,7 +92,7 @@ class CalendarContent extends Component {
       <div className="content-results content-results--calendar">
         {this.state.initialLoading ? (
           <Loader className="loader--pink" />
-        ) : this.state.willAirEpisodes.length === 0 ? (
+        ) : this.state.willAirEpisodes.length === 0 && !this.props.homePage ? (
           <PlaceholderNoFutureEpisodes />
         ) : (
           <div className="episodes episodes--calendar">

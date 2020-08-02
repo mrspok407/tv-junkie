@@ -97,6 +97,11 @@
       flex-direction: column;
       justify-content: start;
     }
+
+    &--not-auth {
+      justify-content: center;
+      padding-left: 118px;
+    }
   }
 
   &__link {
@@ -119,6 +124,10 @@
     }
 
     &-move-back {
+      transform: translateX(0);
+    }
+
+    &--non-auth {
       transform: translateX(0);
     }
 
@@ -317,6 +326,12 @@
 
       .placeholder--no-results {
         top: calc(100% + 15px);
+      }
+
+      &__non-auth {
+        .search__input {
+          width: 100%;
+        }
       }
     }
   }

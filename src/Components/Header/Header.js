@@ -30,15 +30,21 @@ export default class Header extends Component {
     const { isLogoVisible = true } = this.props
     const authUser = this.context
 
+    console.log(authUser)
+
     return (
       <header className="header">
         <nav
           ref={this.nav}
           className={classNames("nav", {
-            "nav--mobile-open": this.state.navMobileOpen === true
+            "nav--mobile-open": this.state.navMobileOpen
           })}
         >
-          <ul className="nav__list">
+          <ul
+            className={classNames("nav__list", {
+              "nav__list--not-auth": !authUser
+            })}
+          >
             <NavLink
               exact
               to={ROUTES.HOME_PAGE}
@@ -54,7 +60,9 @@ export default class Header extends Component {
                 <NavLink
                   exact
                   to={ROUTES.CALENDAR}
-                  className="nav__link"
+                  className={classNames("nav__link", {
+                    "nav__link--non-auth": !authUser
+                  })}
                   activeClassName="nav__item--active"
                   onClick={() => this.closeNavMobile()}
                 >
@@ -64,7 +72,9 @@ export default class Header extends Component {
                 <NavLink
                   exact
                   to={ROUTES.TO_WATCH}
-                  className="nav__link"
+                  className={classNames("nav__link", {
+                    "nav__link--non-auth": !authUser
+                  })}
                   activeClassName="nav__item--active"
                   onClick={() => this.closeNavMobile()}
                 >
@@ -76,7 +86,9 @@ export default class Header extends Component {
             <NavLink
               exact
               to={ROUTES.SHOWS}
-              className="nav__link"
+              className={classNames("nav__link", {
+                "nav__link--non-auth": !authUser
+              })}
               activeClassName="nav__item--active"
               onClick={() => this.closeNavMobile()}
             >
@@ -86,7 +98,9 @@ export default class Header extends Component {
             <NavLink
               exact
               to={ROUTES.MOVIES}
-              className="nav__link"
+              className={classNames("nav__link", {
+                "nav__link--non-auth": !authUser
+              })}
               activeClassName="nav__item--active"
               onClick={() => this.closeNavMobile()}
             >
@@ -95,7 +109,13 @@ export default class Header extends Component {
 
             {authUser ? (
               <>
-                <NavLink exact to={ROUTES.PROFILE} className="nav__link">
+                <NavLink
+                  exact
+                  to={ROUTES.PROFILE}
+                  className={classNames("nav__link", {
+                    "nav__link--non-auth": !authUser
+                  })}
+                >
                   <li className="nav__item" onClick={() => this.closeNavMobile()}>
                     Profile
                   </li>
@@ -110,13 +130,19 @@ export default class Header extends Component {
                 )} */}
               </>
             ) : (
-              <Login
-                clearCurrentlyChosenContent={this.props.clearCurrentlyChosenContent}
-                closeNavMobile={this.closeNavMobile}
-              />
+              <>
+                <Login
+                  clearCurrentlyChosenContent={this.props.clearCurrentlyChosenContent}
+                  closeNavMobile={this.closeNavMobile}
+                />
+              </>
             )}
 
-            <li className="nav__item nav__item--nav-search">
+            <li
+              className={classNames("nav__item nav__item--nav-search", {
+                "nav__item--nav-search__non-auth": !authUser
+              })}
+            >
               <Search navSearch={true} navRef={this.nav} />
             </li>
           </ul>

@@ -36,7 +36,6 @@ export default class scrollToTop extends Component {
   })
 
   scrollToTop = () => {
-    console.log("test")
     this.setState({
       scrollToTopShown: false,
       scrollToPreviousShown: true,

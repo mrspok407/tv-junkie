@@ -1,7 +1,6 @@
 /* eslint-disable jsx-a11y/mouse-events-have-key-events */
 import React, { Component } from "react"
 import SearchCard from "./SearchCard"
-import classNames from "classnames"
 import "./SearchList.scss"
 
 export default class SearchList extends Component {

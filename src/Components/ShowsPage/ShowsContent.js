@@ -110,6 +110,8 @@ class ShowsContent extends Component {
             ]
           })
 
+          console.log(shows)
+
           Promise.all(
             shows.map(item => {
               const showsSubDatabase = item.status
