@@ -1,7 +1,7 @@
 import React, { Component } from "react"
 import { throttle } from "throttle-debounce"
 
-const scrollToTopThreshold = 1000
+const scrollToTopThreshold = 0
 
 export default class scrollToTop extends Component {
   constructor(props) {

@@ -18,7 +18,7 @@ class MoviesContent extends Component {
     this.state = {
       activeSection: "watchLaterMovies",
       sortBy: "title",
-      initialLoading: true,
+      initialLoading: false,
       loadingContent: false,
       sortByLoading: false,
       database: {
@@ -42,7 +42,6 @@ class MoviesContent extends Component {
   }
 
   componentWillUnmount() {
-    this.props.firebase.watchLaterMovies(this.props.authUser.uid).off()
     window.removeEventListener("scroll", this.handleScroll)
   }
 
@@ -209,8 +208,6 @@ class MoviesContent extends Component {
   renderContent = () => {
     const movies = this.props.authUser ? this.state.database.watchLaterMovies : this.context.watchLaterMovies
 
-    console.log(movies)
-
     return (
       <>
         {movies.map(item => {
@@ -351,10 +348,9 @@ class MoviesContent extends Component {
                         this.loadNewContent({ itemsToLoad: 1 })
                         this.handleMoviesOnClient(item.id)
                       } else {
-                        this.context.toggleContentLS({
+                        this.context.toggleMovieLS({
                           id: item.id,
-                          data: movies,
-                          type: "watchLaterMovies"
+                          data: movies
                         })
                       }
                     }}
@@ -386,37 +382,39 @@ class MoviesContent extends Component {
           />
         ) : (
           <>
-            <div className="content-results__sortby">
-              <div className="content-results__sortby-text">Sort by:</div>
-              <div className="content-results__sortby-buttons">
-                <div
-                  className={classNames("content-results__sortby-buttons", {
-                    "content-results__sortby-button--active": this.state.sortBy === "title"
-                  })}
-                >
-                  <button
-                    type="button"
-                    className="button button--sortby-shows"
-                    onClick={() => this.sortBy("title", true)}
+            {this.props.authUser && (
+              <div className="content-results__sortby">
+                <div className="content-results__sortby-text">Sort by:</div>
+                <div className="content-results__sortby-buttons">
+                  <div
+                    className={classNames("content-results__sortby-buttons", {
+                      "content-results__sortby-button--active": this.state.sortBy === "title"
+                    })}
                   >
-                    Alphabetically
-                  </button>
-                </div>
-                <div
-                  className={classNames("content-results__sortby-button", {
-                    "content-results__sortby-button--active": this.state.sortBy === "timeStamp"
-                  })}
-                >
-                  <button
-                    type="button"
-                    className="button button--sortby-shows"
-                    onClick={() => this.sortBy("timeStamp", true)}
+                    <button
+                      type="button"
+                      className="button button--sortby-shows"
+                      onClick={() => this.sortBy("title", true)}
+                    >
+                      Alphabetically
+                    </button>
+                  </div>
+                  <div
+                    className={classNames("content-results__sortby-button", {
+                      "content-results__sortby-button--active": this.state.sortBy === "timeStamp"
+                    })}
                   >
-                    Recently added
-                  </button>
+                    <button
+                      type="button"
+                      className="button button--sortby-shows"
+                      onClick={() => this.sortBy("timeStamp", true)}
+                    >
+                      Recently added
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
             <div
               className="content-results__wrapper"
               style={
@@ -437,16 +435,6 @@ class MoviesContent extends Component {
                   {this.state.loadingContent && <Loader className="loader--pink loader--new-page" />}
                 </>
               )}
-              {/* {this.state.initialLoading ? (
-              <Loader className="loader--pink" />
-            ) : watchLaterMovies.length === 0 ? (
-              <PlaceholderNoMovies />
-            ) : (
-              <>
-                {this.renderContent()}
-                {this.state.loadingContent && <Loader className="loader--pink loader--new-page" />}
-              </>
-            )} */}
             </div>
           </>
         )}

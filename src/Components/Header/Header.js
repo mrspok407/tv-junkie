@@ -27,10 +27,8 @@ export default class Header extends Component {
   }
 
   render() {
-    const { isLogoVisible = true } = this.props
+    const { isLogoVisible = true, hideLogin = false } = this.props
     const authUser = this.context
-
-    console.log(authUser)
 
     return (
       <header className="header">
@@ -130,12 +128,7 @@ export default class Header extends Component {
                 )} */}
               </>
             ) : (
-              <>
-                <Login
-                  clearCurrentlyChosenContent={this.props.clearCurrentlyChosenContent}
-                  closeNavMobile={this.closeNavMobile}
-                />
-              </>
+              <>{!hideLogin && <Login closeNavMobile={this.closeNavMobile} />}</>
             )}
 
             <li

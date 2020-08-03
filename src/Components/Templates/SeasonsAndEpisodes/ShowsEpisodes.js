@@ -42,10 +42,6 @@ class ShowsEpisodes extends Component {
     if (cancelRequest !== undefined) {
       cancelRequest()
     }
-
-    this.props.firebase
-      .userShowAllEpisodes(this.props.authUser.uid, this.props.id, this.props.showInDatabase.database)
-      .off()
   }
 
   initialFirstSeasonLoad = () => {
@@ -193,7 +189,6 @@ class ShowsEpisodes extends Component {
 
     seasonEpisodesFromDatabase.forEach((episode, episodeIndex) => {
       const indexOfEpisode = seasonLength - 1 - episodeIndex
-      // console.log(seasonEpisodesFromDatabase)
       if (!seasonEpisodes[indexOfEpisode].watched) {
         isAllEpisodesChecked = false
       }
@@ -245,9 +240,6 @@ class ShowsEpisodes extends Component {
     const show = this.props.showInDatabase
     const allEpisodesUser = show.info.episodes
 
-    // console.log(show.info.episodes)
-
-    // let allEpisodesDatabase = []
     let isAllEpisodesChecked = true
     let userEpisodesFormated = []
 
@@ -257,14 +249,6 @@ class ShowsEpisodes extends Component {
       userEpisodesFormated = [...userEpisodesFormated, ...episodes]
     })
 
-    console.log(userEpisodesFormated)
-
-    // show.info.episodes.forEach(item => {
-    //   allEpisodesDatabase = [...allEpisodesDatabase, ...item.episodes]
-    // })
-
-    // console.log(this.state.allEpisodesFromDatabase)
-
     this.state.allEpisodesFromDatabase.forEach((episode, episodeIndex) => {
       const indexOfEpisode = this.state.allEpisodesFromDatabase.length - 1 - episodeIndex
       if (!userEpisodesFormated[indexOfEpisode].watched) {
@@ -273,11 +257,6 @@ class ShowsEpisodes extends Component {
     })
 
     this.state.allEpisodesFromDatabase.forEach((episode, episodeIndex) => {
-      // console.log(userEpisodesFormated)
-      // console.log(episode)
-
-      // const indexOfEpisode = allEpisodesUser[episode.season_number - 1].episodes.length - 1 - episodeIndex
-      // allEpisodesUser[episode.season_number - 1].episodes[indexOfEpisode].watched = !isAllEpisodesChecked
       userEpisodesFormated[episodeIndex].watched = !isAllEpisodesChecked
     })
 

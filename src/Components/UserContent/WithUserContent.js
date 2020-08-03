@@ -123,7 +123,6 @@ const withUserContent = Component => {
     }
 
     addShowToDatabase = ({ id, show, userDatabase }) => {
-      console.log(show)
       this.getShowEpisodes({ id }).then(data => {
         const showsSubDatabase = data.status === "Ended" || data.status === "Canceled" ? "ended" : "ongoing"
 

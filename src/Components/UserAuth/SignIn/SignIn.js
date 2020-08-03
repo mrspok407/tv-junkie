@@ -63,9 +63,6 @@ class SignInFormBase extends Component {
 
         this.context.clearContentState()
         this.props.closeNavMobile()
-        if (this.props.location.pathname === "/") {
-          this.props.clearCurrentlyChosenContent()
-        }
 
         this.setState({ ...INITIAL_STATE })
         this.props.history.push("/")

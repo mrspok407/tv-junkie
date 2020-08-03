@@ -8,6 +8,7 @@ import HeaderBase from "Components/Header/Header"
 import CalendarContent from "Components/CalendarPage/CalendarContent"
 import Slider from "Utils/Slider/Slider"
 import PlaceholderHomePageNoFutureEpisodes from "Components/Placeholders/PlaceholderHomePageNoFutureEpisodes"
+import * as ROUTES from "Utils/Constants/routes"
 import "./HomePage.scss"
 
 const Header = withFirebase(HeaderBase)
@@ -121,7 +122,7 @@ class HomePage extends Component {
           </ul>
         </div>
         <div className="home-page__heading-register">
-          <Link to={"/"} className="home-page__heading-link">
+          <Link to={ROUTES.LOGIN_PAGE} className="home-page__heading-link">
             Register
           </Link>{" "}
           to get access to full features
@@ -180,33 +181,6 @@ class HomePage extends Component {
         <Header />
         <div className="home-page__wrapper">
           {!this.props.authUser ? this.renderNonAuthUser() : this.renderAuthUser()}
-
-          {/* {!this.state.calendarLoading && (
-            <>
-              {this.state.willAirEpisodes.length > 0 ? (
-                <div className="home-page__heading">
-                  <h1>Soon to watch</h1>
-                </div>
-              ) : (
-                <PlaceholderHomePageNoFutureEpisodes />
-              )}
-            </>
-          )}
-
-          <CalendarContent homePage={true} handleCalendarState={this.handleCalendarState} />
-
-          {!this.state.calendarLoading && !this.state.slidersLoading && (
-            <div className="home-page__sliders">
-              {Object.values(this.state.sliders).map(value => {
-                return (
-                  <div key={value.name} className="home-page__slider">
-                    <h2 className="home-page__slider-heading">{value.name}</h2>
-                    <Slider listOfContent={value.data} />
-                  </div>
-                )
-              })}
-            </div>
-          )} */}
         </div>
         <ScrollToTop />
       </>

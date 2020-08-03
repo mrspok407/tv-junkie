@@ -187,4 +187,10 @@
       background-color: #fff;
     }
   }
+
+  &-link {
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }

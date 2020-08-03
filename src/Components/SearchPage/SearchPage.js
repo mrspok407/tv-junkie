@@ -1,13 +1,10 @@
 import React, { Component } from "react"
 import axios, { CancelToken } from "axios"
 import { throttle } from "throttle-debounce"
-// import { compose } from "recompose"
 import Search from "./Search/Search"
 import AdvancedSearch from "Components/SearchPage/Search/AdvancedSearch/AdvancedSearch"
 import AdvSearchResults from "./AdvSearchResults/SearchResults/SearchResults"
-import SelectedContent from "./AdvSearchResults/SelectedContent/SelectedContent"
 import PlaceholderNoResults from "Components/Placeholders/PlaceholderNoResults"
-// import { withUserContent } from "Components/UserContent"
 import ScrollToTop from "Utils/ScrollToTop"
 import Header from "Components/Header/Header"
 import "./SearchPage.scss"
@@ -33,8 +30,7 @@ class SearchPage extends Component {
       searchingMovie: false,
       searchingAdvancedSearch: false,
       loadingNewPage: false,
-      error: "",
-      currentlyChosenContent: []
+      error: ""
     }
   }
 
@@ -291,27 +287,6 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
     }
   }
 
-  toggleCurrentlyChosenContent = (id, content) => {
-    const contentExists = this.state.currentlyChosenContent.find(item => item.id === id)
-    const newContent = content && content.find(item => item.id === id)
-
-    if (contentExists) {
-      this.setState(prevState => ({
-        currentlyChosenContent: [...prevState.currentlyChosenContent.filter(item => item.id !== id)]
-      }))
-    } else {
-      this.setState(prevState => ({
-        currentlyChosenContent: [...prevState.currentlyChosenContent, newContent]
-      }))
-    }
-  }
-
-  clearCurrentlyChosenContent = () => {
-    this.setState({
-      currentlyChosenContent: []
-    })
-  }
-
   renderAdvMovies = () => {
     const { advancedSearchContent, totalPagesAdvMovies } = this.state
     return !Array.isArray(advancedSearchContent) || totalPagesAdvMovies === 0 ? (
@@ -323,34 +298,16 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
         advancedSearchContent={this.state.advancedSearchContent}
         loadingNewPage={this.state.loadingNewPage}
         clearAdvSearchMovies={this.clearAdvSearchMovies}
-        toggleCurrentlyChosenContent={this.toggleCurrentlyChosenContent}
-        currentlyChosenContent={this.state.currentlyChosenContent}
       />
     )
   }
 
-  renderCurrentlyChosenContent = callback => (
-    <>
-      {this.state.currentlyChosenContent.length > 0 && (
-        <SelectedContent
-          currentlyChosenContent={this.state.currentlyChosenContent}
-          toggleCurrentlyChosenContent={this.toggleCurrentlyChosenContent}
-          updateContentInDbClient={callback}
-        />
-      )}
-    </>
-  )
-
   render() {
     return (
       <>
-        <Header clearCurrentlyChosenContent={this.clearCurrentlyChosenContent} />
+        <Header />
         <div className="search-page__search">
-          <Search
-          // toggleCurrentlyChosenContent={this.toggleCurrentlyChosenContent}
-          // currentlyChosenContent={this.state.currentlyChosenContent}
-          // renderCurrentlyChosenContent={this.renderCurrentlyChosenContent}
-          />
+          <Search />
           <AdvancedSearch
             advancedSearch={this.advancedSearch}
             searchingAdvancedSearch={this.state.searchingAdvancedSearch}
@@ -360,12 +317,6 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
           />
         </div>
         {this.renderAdvMovies()}
-        {/* {this.state.currentlyChosenContent.length > 0 && (
-          <ContentResultsSelected
-            currentlyChosenContent={this.state.currentlyChosenContent}
-            toggleCurrentlyChosenContent={this.toggleCurrentlyChosenContent}
-          />
-        )} */}
 
         <ScrollToTop />
         {/* <Footer /> */}

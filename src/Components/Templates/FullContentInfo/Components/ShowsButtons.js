@@ -2,6 +2,8 @@ import React, { Component } from "react"
 import classNames from "classnames"
 import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
 import { withUserContent } from "Components/UserContent"
+import { Link } from "react-router-dom"
+import * as ROUTES from "Utils/Constants/routes"
 
 class ShowsButtons extends Component {
   constructor(props) {
@@ -41,110 +43,60 @@ class ShowsButtons extends Component {
 
     return (
       <div className="buttons__row">
+        <div className="buttons__col">
+          <button
+            className={classNames("button", {
+              "button--pressed":
+                this.props.showDatabaseOnClient === "watchingShows" ||
+                this.context.watchingShows.find(item => item.id === Number(id))
+            })}
+            type="button"
+            onClick={() => {
+              if (authUser) {
+                this.props.changeShowDatabaseOnClient("watchingShows")
+                this.props.handleShowInDatabases({
+                  id: Number(id),
+                  data: infoToPass,
+                  database: "watchingShows"
+                })
+              } else {
+                this.context.addShowLS({
+                  id: Number(id),
+                  data: infoToPass
+                })
+              }
+            }}
+          >
+            Watching
+          </button>
+        </div>
 
-<div className="buttons__col">
-            <button
-              className={classNames("button", {
-                "button--pressed": this.props.showDatabaseOnClient === "watchingShows",
-                "button--not-logged-in": !authUser
-              })}
-              type="button"
-              onClick={() => {
-                if (this.props.authUser) {
-                  this.props.changeShowDatabaseOnClient("watchingShows")
-                  this.props.handleShowInDatabases({
-                    id: Number(id),
-                    data: infoToPass,
-                    database: "watchingShows"
-                  })
-                } else {
-                  this.context.toggleContentLS({
-                    id: Number(id),
-                    data: infoToPass,
-                    type: "watchingShows"
-                  })
-                }
-              }}
-            >
-              Watching
-            </button>
-          </div>
-
-          <div className="buttons__col">
-            <button
-              className={classNames("button", {
-                "button--pressed": this.props.showDatabaseOnClient === "notWatchingShows",
-                "button--not-logged-in": !authUser
-              })}
-              type="button"
-              onClick={() => {
-                if (this.props.authUser) {
-                  this.props.changeShowDatabaseOnClient("notWatchingShows")
-                  this.props.handleShowInDatabases({
-                    id: Number(id),
-                    data: infoToPass,
-                    database: "notWatchingShows"
-                  })
-                } else {
-                  this.context.toggleContentLS({
-                    id: Number(id),
-                    type: "watchingShows"
-                  })
-                }
-              }}
-            >
-              Not watching
-            </button>
-          </div>
-
-        {/* <div className="buttons__col">
-          {this.props.showDatabaseOnClient === "watchingShows" ? (
-            <button
-              className="button button--pressed"
-              type="button"
-              onClick={() => {
-                if (this.props.authUser) {
-                  this.props.changeShowDatabaseOnClient("notWatchingShows")
-                  this.props.handleShowInDatabases({
-                    id: Number(id),
-                    data: infoToPass,
-                    database: "notWatchingShows"
-                  })
-                } else {
-                  this.context.toggleContentLS({
-                    id: Number(id),
-                    type: "watchingShows"
-                  })
-                }
-              }}
-            >
-              Not watching
-            </button>
-          ) : (
-            <button
-              className="button"
-              type="button"
-              onClick={() => {
-                if (this.props.authUser) {
-                  this.props.changeShowDatabaseOnClient("watchingShows")
-                  this.props.handleShowInDatabases({
-                    id: Number(id),
-                    data: infoToPass,
-                    database: "watchingShows"
-                  })
-                } else {
-                  this.context.toggleContentLS({
-                    id: Number(id),
-                    data: infoToPass,
-                    type: "watchingShows"
-                  })
-                }
-              }}
-            >
-              Watching
-            </button>
-          )}
-        </div> */}
+        <div className="buttons__col">
+          <button
+            className={classNames("button", {
+              "button--pressed":
+                this.props.showDatabaseOnClient === "notWatchingShows" ||
+                !this.context.watchingShows.find(item => item.id === Number(id))
+            })}
+            type="button"
+            onClick={() => {
+              if (authUser) {
+                this.props.changeShowDatabaseOnClient("notWatchingShows")
+                this.props.handleShowInDatabases({
+                  id: Number(id),
+                  data: infoToPass,
+                  database: "notWatchingShows"
+                })
+              } else {
+                this.context.removeShowLS({
+                  id: Number(id)
+                })
+              }
+            }}
+          >
+            Not watching
+          </button>
+        </div>
         <div
           className="buttons__col-wrapper"
           ref={_notAuthButtons => {
@@ -159,13 +111,16 @@ class ShowsButtons extends Component {
               })}
               type="button"
               onClick={() => {
-                this.props.changeShowDatabaseOnClient("droppedShows")
-                this.props.handleShowInDatabases({
-                  id: Number(id),
-                  data: infoToPass,
-                  database: "droppedShows"
-                })
-                this.showDissableBtnWarning("dropBtn")
+                if (authUser) {
+                  this.props.changeShowDatabaseOnClient("droppedShows")
+                  this.props.handleShowInDatabases({
+                    id: Number(id),
+                    data: infoToPass,
+                    database: "droppedShows"
+                  })
+                } else {
+                  this.showDissableBtnWarning("dropBtn")
+                }
               }}
             >
               Drop
@@ -173,7 +128,11 @@ class ShowsButtons extends Component {
 
             {this.state.disableBtnWarning === "dropBtn" && (
               <div className="buttons__col-warning">
-                To use full features please register. Your allready selected shows will be saved.
+                To use full features please{" "}
+                <Link className="buttons__col-link" to={ROUTES.LOGIN_PAGE}>
+                  register
+                </Link>
+                . Your allready selected shows will be saved.
               </div>
             )}
           </div>
@@ -185,20 +144,27 @@ class ShowsButtons extends Component {
               })}
               type="button"
               onClick={() => {
-                this.props.changeShowDatabaseOnClient("willWatchShows")
-                this.props.handleShowInDatabases({
-                  id: Number(id),
-                  data: infoToPass,
-                  database: "willWatchShows"
-                })
-                this.showDissableBtnWarning("willWatchBtn")
+                if (authUser) {
+                  this.props.changeShowDatabaseOnClient("willWatchShows")
+                  this.props.handleShowInDatabases({
+                    id: Number(id),
+                    data: infoToPass,
+                    database: "willWatchShows"
+                  })
+                } else {
+                  this.showDissableBtnWarning("willWatchBtn")
+                }
               }}
             >
               Will Watch
             </button>
             {this.state.disableBtnWarning === "willWatchBtn" && (
               <div className="buttons__col-warning">
-                To use full features please register. Your allready selected shows will be saved.
+                To use full features please{" "}
+                <Link className="buttons__col-link" to={ROUTES.LOGIN_PAGE}>
+                  register
+                </Link>
+                . Your allready selected shows will be saved.
               </div>
             )}
           </div>

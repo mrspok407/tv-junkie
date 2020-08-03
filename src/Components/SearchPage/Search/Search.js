@@ -208,8 +208,6 @@ class Search extends Component {
                   updateContentInDbClient={this.updateContentInDbClient}
                   mediaTypeSearching={this.state.mediaTypeSearching}
                   handleClickOutside={this.handleClickOutside}
-                  toggleCurrentlyChosenContent={this.props.toggleCurrentlyChosenContent}
-                  currentlyChosenContent={this.props.currentlyChosenContent}
                 />
               )
             )}

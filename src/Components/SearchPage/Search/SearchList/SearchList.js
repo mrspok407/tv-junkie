@@ -63,8 +63,6 @@ export default class SearchList extends Component {
                 updateContentInDbClient={this.props.updateContentInDbClient}
                 mediaType={media_type}
                 mediaTypeSearching={this.props.mediaTypeSearching}
-                toggleCurrentlyChosenContent={this.props.toggleCurrentlyChosenContent}
-                currentlyChosenContent={this.props.currentlyChosenContent}
               />
             )
           }

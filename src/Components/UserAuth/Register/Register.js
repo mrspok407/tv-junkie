@@ -87,7 +87,7 @@ class RegisterBase extends Component {
               JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)) || []
 
             watchingShows.forEach(item => {
-              const newShowRef = this.props.firebase.watchingShows(authUser.user.uid).push()
+              const newShowRef = this.props.firebase.userShows(authUser.user.uid, "watchingShows").push()
               const key = newShowRef.key
 
               newShowRef.set({ ...item, key, userWatching: true })
@@ -106,10 +106,6 @@ class RegisterBase extends Component {
 
             this.context.clearContentState()
             this.props.closeNavMobile()
-
-            if (this.props.location.pathname === "/") {
-              this.props.clearCurrentlyChosenContent()
-            }
           })
       })
       .then(() => {

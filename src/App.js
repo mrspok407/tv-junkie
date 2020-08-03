@@ -3,6 +3,7 @@ import { HashRouter as Router, Switch, Route } from "react-router-dom"
 import { compose } from "recompose"
 import Profile from "Components/UserProfile/Profile"
 import Admin from "Components/Admin/Admin"
+import LoginPage from "Components/LoginPage/LoginPage"
 import SearchPage from "Components/SearchPage/SearchPage"
 import HomePage from "Components/HomePage/HomePage"
 import ShowsPage from "Components/ShowsPage/ShowsPage"
@@ -29,6 +30,7 @@ class App extends Component {
             <Route path={ROUTES.MOVIES} component={MoviesPage} />
             <Route path={ROUTES.FULL_CONTENT_INFO} component={FullContentInfo} />
             <Route path={ROUTES.PROFILE} component={Profile} />
+            <Route path={ROUTES.LOGIN_PAGE} component={LoginPage} />
             <Route path={ROUTES.ADMIN} component={Admin} />
             <Route path={ROUTES.GRID_TESTS} component={GridTests} />
           </Switch>

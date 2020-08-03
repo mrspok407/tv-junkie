@@ -4,33 +4,16 @@ import { compose } from "recompose"
 import { listOfGenres } from "Utils"
 import { withUserContent } from "Components/UserContent"
 import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
-import classNames from "classnames"
 import Loader from "Components/Placeholders/Loader"
 import "./SearchResults.scss"
 
 class AdvSearchResults extends Component {
-  constructor(props) {
-    super(props)
-
-    this.state = {
-      // watchingShows: []
-    }
-  }
-
   render() {
     const maxColumns = 4
     const currentNumOfColumns =
       this.props.advancedSearchContent.length <= maxColumns - 1
         ? this.props.advancedSearchContent.length
         : maxColumns
-
-    const watchingShows = this.props.authUser
-      ? this.props.userContent.watchingShows.filter(item => item.userWatching && item)
-      : this.context.watchingShows
-
-    const watchLaterMovies = this.props.authUser
-      ? this.props.userContent.watchLaterMovies
-      : this.context.watchLaterMovies
 
     return (
       <>
@@ -129,7 +112,7 @@ class AdvSearchResults extends Component {
                       </div>
                     </Link>
 
-                    <div className="content-results__item-links">
+                    {/* <div className="content-results__item-links">
                       {mediaType === "movie" ? (
                         this.props.userContent.loadingContent ? (
                           <Loader className="loader--small-pink" />
@@ -146,10 +129,9 @@ class AdvSearchResults extends Component {
                                   database: "watchLaterMovies"
                                 })
                               } else {
-                                this.context.toggleContentLS({
+                                this.context.toggleMovieLS({
                                   id,
-                                  data: this.props.advancedSearchContent,
-                                  type: "watchLaterMovies"
+                                  data: this.props.advancedSearchContent
                                 })
                               }
 
@@ -176,9 +158,8 @@ class AdvSearchResults extends Component {
                                 if (this.props.authUser) {
                                   this.props.removeWatchingShow(id)
                                 } else {
-                                  this.context.toggleContentLS({
-                                    id,
-                                    type: "watchingShows"
+                                  this.context.removeShowLS({
+                                    id
                                   })
                                 }
 
@@ -205,10 +186,9 @@ class AdvSearchResults extends Component {
                                       database: "watchingShows"
                                     })
                                   } else {
-                                    this.context.toggleContentLS({
+                                    this.context.addShowLS({
                                       id,
-                                      data: this.props.advancedSearchContent,
-                                      type: "watchingShows"
+                                      data: this.props.advancedSearchContent
                                     })
                                   }
                                   this.props.toggleCurrentlyChosenContent(
@@ -224,7 +204,7 @@ class AdvSearchResults extends Component {
                           )}
                         </>
                       )}
-                    </div>
+                    </div> */}
                   </div>
                 )
               }
@@ -238,6 +218,5 @@ class AdvSearchResults extends Component {
 }
 
 export default compose(withUserContent)(AdvSearchResults, "SearchResults")
-// export default AdvSearchResults
 
 AdvSearchResults.contextType = UserContentLocalStorageContext

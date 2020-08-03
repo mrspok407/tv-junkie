@@ -137,7 +137,9 @@ class MainInfo extends Component {
           {this.props.mediaType === "movie" && (
             <button
               className={classNames("button", {
-                "button--pressed": this.props.movieDatabaseOnClient === "watchLaterMovies"
+                "button--pressed":
+                  this.props.movieDatabaseOnClient === "watchLaterMovies" ||
+                  this.context.watchLaterMovies.find(item => item.id === Number(this.props.id))
               })}
               onClick={() => {
                 if (this.props.authUser) {
@@ -148,10 +150,9 @@ class MainInfo extends Component {
                     database: "watchLaterMovies"
                   })
                 } else {
-                  this.context.toggleContentLS({
+                  this.context.toggleMovieLS({
                     id: Number(this.props.id),
-                    data: this.props.infoToPass,
-                    type: "watchLaterMovies"
+                    data: this.props.infoToPass
                   })
                 }
               }}

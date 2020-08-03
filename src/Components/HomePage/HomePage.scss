@@ -56,8 +56,6 @@
   }
 
   &-link {
-    color: getColor(blueClr, $mainPalette);
-
     &:hover {
       text-decoration: underline;
     }

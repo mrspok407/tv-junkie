@@ -9,7 +9,7 @@ import PlaceholderLoadingContentResultsItem from "Components/Placeholders/Placeh
 import Loader from "Components/Placeholders/Loader"
 import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
 
-const SHOW_TO_LOAD_INITIAL = 20
+const SHOWS_TO_LOAD_INITIAL = 20
 const SCROLL_THRESHOLD = 1400
 
 const TIMEOUT_TO_UPDATE_WATCHING_SHOWS = 500
@@ -22,7 +22,7 @@ class ShowsContent extends Component {
     this.state = {
       activeSection: "watchingShows",
       sortBy: "name",
-      initialLoading: true,
+      initialLoading: false,
       loadingContent: false,
       sortByLoading: false,
       updateWatchingShowsLoading: false,
@@ -39,16 +39,17 @@ class ShowsContent extends Component {
         finishedShows: false
       },
       lastLoadedShow: {
-        watchingShows: SHOW_TO_LOAD_INITIAL,
-        droppedShows: SHOW_TO_LOAD_INITIAL,
-        willWatchShows: SHOW_TO_LOAD_INITIAL,
-        finishedShows: SHOW_TO_LOAD_INITIAL
+        watchingShows: SHOWS_TO_LOAD_INITIAL,
+        droppedShows: SHOWS_TO_LOAD_INITIAL,
+        willWatchShows: SHOWS_TO_LOAD_INITIAL,
+        finishedShows: SHOWS_TO_LOAD_INITIAL
       },
       loadedShows: {
-        watchingShows: SHOW_TO_LOAD_INITIAL,
-        droppedShows: SHOW_TO_LOAD_INITIAL,
-        willWatchShows: SHOW_TO_LOAD_INITIAL,
-        finishedShows: SHOW_TO_LOAD_INITIAL
+        watchingShows: SHOWS_TO_LOAD_INITIAL,
+        watchingShowsLS: SHOWS_TO_LOAD_INITIAL,
+        droppedShows: SHOWS_TO_LOAD_INITIAL,
+        willWatchShows: SHOWS_TO_LOAD_INITIAL,
+        finishedShows: SHOWS_TO_LOAD_INITIAL
       }
     }
   }
@@ -59,11 +60,6 @@ class ShowsContent extends Component {
   }
 
   componentWillUnmount() {
-    this.props.firebase.userShows(this.props.authUser.uid, "watchingShows").off()
-    this.props.firebase.userShows(this.props.authUser.uid, "droppedShows").off()
-    this.props.firebase.userShows(this.props.authUser.uid, "willWatchShows").off()
-    this.props.firebase.userShows(this.props.authUser.uid, "finishedShows").off()
-
     window.removeEventListener("scroll", this.handleScroll)
   }
 
@@ -110,8 +106,6 @@ class ShowsContent extends Component {
             ]
           })
 
-          console.log(shows)
-
           Promise.all(
             shows.map(item => {
               const showsSubDatabase = item.status
@@ -157,8 +151,6 @@ class ShowsContent extends Component {
       loadingContent: true
     })
 
-    console.log(this.state.lastLoadedShow[this.state.activeSection])
-
     this.props.firebase
       .userShows(this.props.authUser.uid, this.state.activeSection)
       .orderByChild(`finished_and_${this.state.sortBy}`)
@@ -170,7 +162,7 @@ class ShowsContent extends Component {
           ? "true_zzzzzzz"
           : "true_3190666598976"
       ) // Need zzzzzz's and true_3190666598976 so it will sure go to the end
-      .limitToFirst(SHOW_TO_LOAD_INITIAL + 1)
+      .limitToFirst(SHOWS_TO_LOAD_INITIAL + 1)
       .once("value", snapshot => {
         let shows = []
         snapshot.forEach(item => {
@@ -187,7 +179,7 @@ class ShowsContent extends Component {
           ]
         })
 
-        const disableLoadNewContent = shows.length !== SHOW_TO_LOAD_INITIAL + 1 ? true : false
+        const disableLoadNewContent = shows.length !== SHOWS_TO_LOAD_INITIAL + 1 ? true : false
         if (!disableLoadNewContent) shows.pop()
 
         Promise.all(
@@ -227,9 +219,19 @@ class ShowsContent extends Component {
       })
   }
 
+  loadNewContentLS = () => {
+    this.setState({
+      loadedShows: {
+        ...this.state.loadedShows,
+        watchingShowsLS: this.state.loadedShows.watchingShowsLS + 5
+      }
+    })
+  }
+
   handleScroll = throttle(500, () => {
     if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 800) {
       this.loadNewContent()
+      this.loadNewContentLS()
     }
   })
 
@@ -283,7 +285,7 @@ class ShowsContent extends Component {
       ? content
       : section !== "watchingShows"
       ? content
-      : this.context.watchingShows
+      : this.context.watchingShows.slice(0, this.state.loadedShows.watchingShowsLS)
 
     return (
       <>
@@ -356,9 +358,8 @@ class ShowsContent extends Component {
                             })
                             this.handleShowsOnClient(item.id)
                           } else {
-                            this.context.toggleContentLS({
-                              id: item.id,
-                              type: "watchingShows"
+                            this.context.removeShowLS({
+                              id: item.id
                             })
                           }
                         }}
@@ -404,10 +405,10 @@ class ShowsContent extends Component {
       ? content
       : this.state.activeSection !== "watchingShows"
       ? content
-      : this.context.watchingShows
+      : this.context.watchingShows.slice(0, this.state.loadedShows.watchingShowsLS)
 
     const maxColumns = 4
-    const currentNumOfColumns = content.length <= maxColumns - 1 ? content.length : maxColumns
+    const currentNumOfColumns = shows.length <= maxColumns - 1 ? shows.length : maxColumns
 
     return (
       <div className="content-results">
@@ -468,37 +469,39 @@ class ShowsContent extends Component {
           />
         ) : (
           <>
-            <div className="content-results__sortby">
-              <div className="content-results__sortby-text">Sort by:</div>
-              <div className="content-results__sortby-buttons">
-                <div
-                  className={classNames("content-results__sortby-buttons", {
-                    "content-results__sortby-button--active": this.state.sortBy === "name"
-                  })}
-                >
-                  <button
-                    type="button"
-                    className="button button--sortby-shows"
-                    onClick={() => this.sortBy("name", true)}
+            {this.props.authUser && (
+              <div className="content-results__sortby">
+                <div className="content-results__sortby-text">Sort by:</div>
+                <div className="content-results__sortby-buttons">
+                  <div
+                    className={classNames("content-results__sortby-buttons", {
+                      "content-results__sortby-button--active": this.state.sortBy === "name"
+                    })}
                   >
-                    Alphabetically
-                  </button>
-                </div>
-                <div
-                  className={classNames("content-results__sortby-button", {
-                    "content-results__sortby-button--active": this.state.sortBy === "timeStamp"
-                  })}
-                >
-                  <button
-                    type="button"
-                    className="button button--sortby-shows"
-                    onClick={() => this.sortBy("timeStamp", true)}
+                    <button
+                      type="button"
+                      className="button button--sortby-shows"
+                      onClick={() => this.sortBy("name", true)}
+                    >
+                      Alphabetically
+                    </button>
+                  </div>
+                  <div
+                    className={classNames("content-results__sortby-button", {
+                      "content-results__sortby-button--active": this.state.sortBy === "timeStamp"
+                    })}
                   >
-                    Recently added
-                  </button>
+                    <button
+                      type="button"
+                      className="button button--sortby-shows"
+                      onClick={() => this.sortBy("timeStamp", true)}
+                    >
+                      Recently added
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
             <div
               className="content-results__wrapper"
               style={

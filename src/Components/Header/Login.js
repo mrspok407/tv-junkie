@@ -1,19 +1,15 @@
 import React, { Component } from "react"
-import classNames from "classnames"
-import Register from "Components/UserAuth/Register/Register"
-import SignInForm from "Components/UserAuth/SignIn/SignIn"
-import PasswordForget from "Components/UserAuth/PasswordForget/PasswordForget"
-import "../UserAuth/UserAuth.scss"
+import UserAuthForm from "Components/UserAuth/UserAuthForm"
 
 export default class Login extends Component {
   constructor(props) {
     super(props)
 
     this.state = {
-      authContOpen: false,
-      activeSection: "signIn",
-      passwordForgetFormOpen: false
+      authContOpen: false
     }
+
+    this.authContRef = React.createRef()
   }
 
   componentDidMount() {
@@ -25,77 +21,17 @@ export default class Login extends Component {
   }
 
   handleClickOutside = e => {
-    if (this.loginButtonRef === e.target || !this.authContRef || this.authContRef.contains(e.target)) return
+    if (
+      this.loginButtonRef === e.target ||
+      !this.authContRef.current ||
+      this.authContRef.current.contains(e.target)
+    ) {
+      return
+    }
+
     this.setState({
       authContOpen: false
     })
-  }
-
-  togglePasswordForget = () => {
-    this.setState({ passwordForgetFormOpen: !this.state.passwordForgetFormOpen })
-  }
-
-  renderSection = () => {
-    return this.state.activeSection === "signIn" ? (
-      <>
-        <div className="auth__section">
-          <SignInForm
-            togglePasswordForget={this.togglePasswordForget}
-            clearCurrentlyChosenContent={this.props.clearCurrentlyChosenContent}
-            closeNavMobile={this.props.closeNavMobile}
-          />
-        </div>
-        {this.state.passwordForgetFormOpen ? (
-          <div className="auth__section">
-            <PasswordForget />
-          </div>
-        ) : (
-          ""
-        )}
-      </>
-    ) : (
-      this.state.activeSection === "Register" && (
-        <div className="auth__section">
-          <Register
-            clearCurrentlyChosenContent={this.props.clearCurrentlyChosenContent}
-            closeNavMobile={this.props.closeNavMobile}
-          />
-        </div>
-      )
-    )
-  }
-
-  renderAuthContainer = () => {
-    if (!this.state.authContOpen) return null
-
-    return (
-      <div
-        ref={_authCont => {
-          this.authContRef = _authCont
-        }}
-        className="auth"
-      >
-        <div className="auth__nav">
-          <div
-            onClick={() => this.setState({ activeSection: "signIn" })}
-            className={classNames("auth__nav-btn", {
-              "auth__nav-btn--active": this.state.activeSection === "signIn"
-            })}
-          >
-            Sign In
-          </div>
-          <div
-            onClick={() => this.setState({ activeSection: "Register" })}
-            className={classNames("auth__nav-btn", {
-              "auth__nav-btn--active": this.state.activeSection === "Register"
-            })}
-          >
-            Register
-          </div>
-        </div>
-        {this.renderSection()}
-      </div>
-    )
   }
 
   render() {
@@ -110,7 +46,7 @@ export default class Login extends Component {
         >
           Login
         </div>
-        {this.renderAuthContainer()}
+        {this.state.authContOpen && <UserAuthForm authContRef={this.authContRef} />}
       </div>
     )
   }

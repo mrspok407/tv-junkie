@@ -26,7 +26,7 @@ class Movies extends Component {
     }
   }
 
-  getMovieLinks = (id, showAllLinksPressed = false, title, date) => {
+  getMovieLinks = (id, showAllLinksPressed = false) => {
     if (this.state.moviesIds.includes(id) || this.state.showAllLinksPressed) return
 
     this.setState(prevState => ({
