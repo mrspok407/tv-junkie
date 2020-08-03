@@ -46,7 +46,9 @@ export default class Login extends Component {
         >
           Login
         </div>
-        {this.state.authContOpen && <UserAuthForm authContRef={this.authContRef} />}
+        {this.state.authContOpen && (
+          <UserAuthForm authContRef={this.authContRef} closeNavMobile={this.props.closeNavMobile} />
+        )}
       </div>
     )
   }
