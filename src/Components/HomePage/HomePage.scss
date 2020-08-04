@@ -66,6 +66,10 @@
   display: grid;
   row-gap: 40px;
   overflow: hidden;
+
+  &--non-auth {
+    padding-top: 50px;
+  }
 }
 
 .home-page__slider {

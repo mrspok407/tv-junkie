@@ -24,6 +24,10 @@
     left: 51px;
     width: 21px;
     height: 21px;
+
+    @include mediaMaxW(#{$mobileViewPort}) {
+      top: 6px;
+    }
   }
 
   &__link-to-adv {

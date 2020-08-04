@@ -186,6 +186,12 @@
       height: $dimensions;
       background-color: #fff;
     }
+
+    @include mediaMaxW(#{$mobileViewPort}) {
+      .full-detailes .buttons__col-warning:after {
+        left: 50%;
+      }
+    }
   }
 
   &-link {

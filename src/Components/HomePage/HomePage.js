@@ -63,7 +63,6 @@ class HomePage extends Component {
 
   componentDidMount() {
     this.getContentForSliders()
-    console.log(this.props)
   }
 
   getContentForSliders = () => {
@@ -130,7 +129,7 @@ class HomePage extends Component {
       </div>
 
       {!this.state.slidersLoading && (
-        <div className="home-page__sliders">
+        <div className="home-page__sliders home-page__sliders--non-auth">
           {Object.values(this.state.sliders).map(value => {
             return (
               <div key={value.name} className="home-page__slider">

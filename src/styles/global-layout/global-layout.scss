@@ -192,7 +192,6 @@ $font-sizes: (
 .content-results {
   display: flex;
   flex-direction: column;
-  padding-bottom: 100px;
   width: 100%;
   min-width: 350px;
   padding-bottom: 100px;
@@ -271,6 +270,7 @@ $font-sizes: (
 }
 
 .content-results__item {
+  position: relative;
   background-color: #171717;
   box-shadow: 0 3px 9px rgba(0, 0, 0, 0.884);
   opacity: 0;
@@ -279,6 +279,19 @@ $font-sizes: (
     to {
       opacity: 1;
     }
+  }
+
+  &:after {
+    @include hoverBoxShadow(0px, 0.2s);
+    z-index: -9999;
+    box-shadow: 0px 0px 6px 1px #66b4e6;
+    @include mediaMaxW(#{$mobileViewPort}) {
+      display: none;
+    }
+  }
+
+  &:hover:after {
+    opacity: 1;
   }
 
   &--shows,
@@ -298,18 +311,6 @@ $font-sizes: (
         to {
           opacity: 1;
         }
-      }
-
-      &:after {
-        @include hoverBoxShadow(0px, 0.2s);
-        z-index: -9999;
-        box-shadow: 0px 0px 6px 1px #66b4e6;
-        @include mediaMaxW(#{$mobileViewPort}) {
-          display: none;
-        }
-      }
-      &:hover:after {
-        opacity: 1;
       }
     }
   }

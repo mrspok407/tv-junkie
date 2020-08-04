@@ -64,9 +64,6 @@ class ToWatchEpisodesContent extends Component {
                 const show = this.state.watchingShows.find(item => item.id === snapshot.val().id)
 
                 const showsSubDatabase = snapshot.val().status
-                // snapshot.val().status === "Ended" || snapshot.val().status === "Canceled"
-                //   ? "ended"
-                //   : "ongoing"
 
                 if (show) {
                   show.episodes.forEach((season, seasonIndex) => {
@@ -186,7 +183,6 @@ class ToWatchEpisodesContent extends Component {
   }
 
   render() {
-    console.log(this.state.watchingShows)
     return (
       <div className="content-results content-results--to-watch-page">
         {this.state.initialLoading ? (
@@ -199,12 +195,22 @@ class ToWatchEpisodesContent extends Component {
               const showsSubDatabase =
                 show.info.status === "Ended" || show.info.status === "Canceled" ? "ended" : "ongoing"
 
+              const episodesToPass = show.episodes.reduce((acc, season) => {
+                const newEpisodes = season.episodes.reduce((acc, episode) => {
+                  acc.push({ watched: episode.watched })
+                  return acc
+                }, [])
+
+                acc.push({ ...season, episodes: newEpisodes })
+                return acc
+              }, [])
+
               const showInDatabase = show && {
                 database: "watchingShows",
                 info: {
                   ...show.info,
                   status: showsSubDatabase,
-                  episodes: show.episodes
+                  episodes: episodesToPass
                 }
               }
 

@@ -83,7 +83,6 @@ class CalendarContent extends Component {
   }
 
   render() {
-    console.log(this.props)
     const willAirEpisodes = this.props.homePage
       ? this.state.willAirEpisodes.slice(0, 2)
       : this.state.willAirEpisodes

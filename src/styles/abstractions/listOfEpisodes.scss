@@ -243,6 +243,7 @@ $font-sizes: (
     position: relative;
     font-size: map-get($font-sizes, episodeInfo);
     color: map-get($colors, seasonInfo);
+
     &:after {
       content: "";
       position: absolute;
@@ -396,6 +397,14 @@ $font-sizes: (
         left: -83px;
         color: #000;
         z-index: 9999;
+
+        @include mediaMaxW(#{$mobileViewPort}) {
+          left: -5px;
+
+          &:after {
+            left: 15px;
+          }
+        }
       }
     }
 
@@ -423,59 +432,26 @@ $font-sizes: (
         padding: 10px 0 10px 0;
       }
     }
+  }
 
-    // &--calendar {
-    // &-date {
-    //   @include mediaMaxW(#{$mobileViewPort}) {
-    //     padding-left: 10px;
-    //   }
-    // }
+  .fade-out-episode {
+    animation: fadeOutEpisode 500ms forwards;
+    @keyframes fadeOutEpisode {
+      to {
+        opacity: 0;
+      }
+    }
+  }
 
-    // &-days-to-air {
-    //   padding-right: 10px;
-    // }
-
-    // &-wrapper {
-    //   display: grid;
-    //   grid-template-columns: minmax(50px, 170px) max-content 1fr;
-    //   column-gap: 15px;
-    //   align-items: center;
-    // }
-
-    // &-show-name {
-    //   a {
-    //     color: getColor(orangeClr, $mainPalette);
-
-    //     &:hover {
-    //       text-decoration: underline;
-    //     }
-    //   }
-    // }
-
-    // .episodes__episode-wrapper {
-    //   grid-template-columns: minmax(75px, 1.05fr) 3fr 0.8fr;
-    //   cursor: initial;
-    // }
-
-    // .episodes__episode-wrapper {
-    //   &:before {
-    //     display: none;
-    //   }
-    // }
-
-    // &:after {
-    //   display: none;
-    // }
-    // }
-
-    // &--calendar:nth-child(odd) {
-    //   .episodes__episode-wrapper {
-    //     background-color: #7b7b7b14;
-    //   }
-    // }
-    // &--calendar:nth-child(even) {
-    //   .episodes__episode-wrapper {
-    //     background-color: transparent;
+  .move-up-episode {
+    --moveUpDistance: -45px;
+    transform: translateY(var(--moveUpDistance));
+    transition: 500ms;
+    transition-delay: 500ms;
+    // animation: moveUpEpisode 500ms 500ms forwards;
+    // @keyframes moveUpEpisode {
+    //   to {
+    //     transform: translateY(-45px);
     //   }
     // }
   }

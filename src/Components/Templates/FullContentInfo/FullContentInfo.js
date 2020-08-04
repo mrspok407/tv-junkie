@@ -2,7 +2,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/anchor-has-content */
 import React, { useState, useEffect } from "react"
-import { useLocation } from "react-router-dom"
 import axios, { CancelToken } from "axios"
 import { combineMergeObjects } from "Utils"
 import merge from "deepmerge"
@@ -61,12 +60,6 @@ function FullContentInfo({
   const [infoToPass, setInfoToPass] = useState({})
 
   const [error, setError] = useState()
-
-  // const { pathname } = useLocation()
-
-  // useEffect(() => {
-  //   window.scrollTo(0, 0)
-  // }, [pathname])
 
   useEffect(() => {
     if (mediaType === "show") {

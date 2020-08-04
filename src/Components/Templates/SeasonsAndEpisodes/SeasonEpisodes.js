@@ -11,11 +11,16 @@ export default class SeasonEpisodes extends Component {
 
     this.state = {
       showTorrentLinks: [],
+      fadeOutEpisodes: [],
+      moveUpEpisodes: [],
       disableCheckboxWarning: null
     }
 
+    this.episode = React.createRef()
     this.checkboxRef = React.createRef()
     this.registerWarningRef = React.createRef()
+
+    this.timer = null
   }
 
   componentDidMount() {
@@ -62,6 +67,8 @@ export default class SeasonEpisodes extends Component {
   }
 
   render() {
+    console.log(this.state.fadeOutEpisodes)
+
     const showCheckboxes =
       this.props.authUser &&
       this.props.showInDatabase.info &&
@@ -131,11 +138,21 @@ export default class SeasonEpisodes extends Component {
 
             return (
               <div
+                ref={this.episode}
                 key={episode.id}
                 className={classNames("episodes__episode", {
                   "episodes__episode--open": this.props.detailEpisodeInfo.includes(episode.id),
-                  "episodes__episode--to-watch-page": this.props.toWatchPage
+                  "fade-out-episode":
+                    this.props.toWatchPage && this.state.fadeOutEpisodes.find(item => item.id === episode.id),
+                  "move-up-episode": this.props.toWatchPage && this.state.moveUpEpisodes.includes(episode.id)
                 })}
+                style={{
+                  transform: `translateY(-${
+                    this.props.toWatchPage && this.state.moveUpEpisodes.includes(episode.id)
+                      ? this.state.fadeOutEpisodes.length * 45
+                      : 0
+                  }px)`
+                }}
               >
                 <div
                   className={classNames("episodes__episode-wrapper", {
@@ -250,9 +267,52 @@ export default class SeasonEpisodes extends Component {
                       <input
                         type="checkbox"
                         checked={showSeason && showSeason.episodes[indexOfEpisode].watched}
-                        onChange={() =>
-                          this.props.toggleWatchedEpisode(this.props.season.season_number, indexOfEpisode)
-                        }
+                        onChange={() => {
+                          // let tracker = []
+
+                          if (this.props.toWatchPage) {
+                            if (this.state.fadeOutEpisodes.find(item => item.id === episode.id)) return
+
+                            // tracker.push(indexOfEpisode)
+
+                            clearTimeout(this.timer)
+
+                            this.setState(prevState => ({
+                              fadeOutEpisodes: [
+                                ...prevState.fadeOutEpisodes,
+                                { id: episode.id, index: indexOfEpisode }
+                              ],
+                              moveUpEpisodes: item.episodes.map(item => item.id).slice(episodeIndex + 1)
+                            }))
+
+                            this.timer = setTimeout(() => {
+                              const test = this.state.fadeOutEpisodes
+                              console.log("test")
+                              this.setState({
+                                moveUpEpisodes: this.state.moveUpEpisodes.filter(item => item === episode.id),
+                                fadeOutEpisodes: []
+                              })
+
+                              test.forEach(item => {
+                                console.log(item)
+                                this.props.toggleWatchedEpisode(this.props.season.season_number, item.index)
+                              })
+
+                              // tracker = []
+                            }, 1000)
+
+                            // setTimeout(() => {
+                            //   this.setState({
+                            //     fadeOutEpisodes: this.state.fadeOutEpisodes.filter(
+                            //       item => item !== episode.id
+                            //     )
+                            //   })
+                            //   this.props.toggleWatchedEpisode(this.props.season.season_number, indexOfEpisode)
+                            // }, 1000)
+                          } else {
+                            this.props.toggleWatchedEpisode(this.props.season.season_number, indexOfEpisode)
+                          }
+                        }}
                         disabled={!showCheckboxes || !this.props.authUser}
                       />
                       <span

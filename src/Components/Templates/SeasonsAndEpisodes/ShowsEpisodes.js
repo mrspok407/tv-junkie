@@ -158,9 +158,6 @@ class ShowsEpisodes extends Component {
     if (!this.props.authUser) return
 
     const show = this.props.showInDatabase
-    console.log(show)
-    console.log(seasonNum)
-    console.log(episodeNum)
 
     this.props.firebase
       .userShowSingleEpisode(this.props.authUser.uid, show.info.id, show.database, seasonNum, episodeNum)
@@ -184,6 +181,8 @@ class ShowsEpisodes extends Component {
       item => item.season_number === seasonNum
     )
     const seasonLength = seasonEpisodesFromDatabase.length
+
+    console.log(seasonEpisodes)
 
     let isAllEpisodesChecked = true
 
@@ -365,14 +364,6 @@ class ShowsEpisodes extends Component {
                 {this.state.openSeasons.includes(seasonId) &&
                   (!this.state.loadingEpisodesIds.includes(seasonId) ? (
                     <>
-                      {/* {season.poster_path && (
-                        <div
-                          className="full-detailes__season-poster"
-                          style={{
-                            backgroundImage: `url(https://image.tmdb.org/t/p/w500/${season.poster_path})`
-                          }}
-                        />
-                      )} */}
                       {season.poster_path && this.props.fullContentPage && (
                         <div className="episodes__episode-group-poster-wrapper">
                           <div
