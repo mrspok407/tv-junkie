@@ -368,10 +368,18 @@ $font-sizes: (
           border-width: 0 3px 3px 0;
           transform: rotate(45deg);
         }
+
+        &--disabled {
+          background-color: #2f2f2f;
+        }
       }
 
       &:hover .custom-checkmark {
         background-color: #9bc5e0;
+      }
+
+      &:hover .custom-checkmark--disabled {
+        background-color: #2f2f2f;
       }
 
       input:checked ~ .custom-checkmark {
@@ -380,6 +388,14 @@ $font-sizes: (
         &:after {
           display: block;
         }
+      }
+
+      .buttons__col-warning {
+        width: 186px;
+        top: calc(100% + 8px);
+        left: -83px;
+        color: #000;
+        z-index: 9999;
       }
     }
 

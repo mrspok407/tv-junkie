@@ -2,17 +2,50 @@
 import React, { Component } from "react"
 import { differenceBtwDatesInDays } from "Utils"
 import classNames from "classnames"
+import { Link } from "react-router-dom"
+import * as ROUTES from "Utils/Constants/routes"
 
 export default class SeasonEpisodes extends Component {
   constructor(props) {
     super(props)
 
     this.state = {
-      showTorrentLinks: []
+      showTorrentLinks: [],
+      disableCheckboxWarning: null
+    }
+
+    this.checkboxRef = React.createRef()
+    this.registerWarningRef = React.createRef()
+  }
+
+  componentDidMount() {
+    document.addEventListener("mousedown", this.handleClickOutside)
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener("mousedown", this.handleClickOutside)
+  }
+
+  handleClickOutside = e => {
+    if (this.props.authUser) return
+    if (
+      this.checkboxRef.current &&
+      this.registerWarningRef.current &&
+      !this.checkboxRef.current.contains(e.target) &&
+      !this.registerWarningRef.current.contains(e.target)
+    ) {
+      this.setState({
+        disableCheckboxWarning: null
+      })
     }
   }
 
-  componentDidMount() {}
+  showDissableCheckboxWarning = checkboxId => {
+    if (this.props.authUser) return
+    this.setState({
+      disableCheckboxWarning: checkboxId
+    })
+  }
 
   toggleTorrentLinks = id => {
     const allreadyShowed = this.state.showTorrentLinks.includes(id)
@@ -207,25 +240,36 @@ export default class SeasonEpisodes extends Component {
                   )}
                 </div>
 
-                {showCheckboxes && daysToNewEpisode <= 0 && episode.air_date && (
-                  <div className="episodes__episode-checkbox">
+                {daysToNewEpisode <= 0 && episode.air_date && (
+                  <div
+                    ref={this.checkboxRef}
+                    className="episodes__episode-checkbox"
+                    onClick={() => this.showDissableCheckboxWarning(episode.id)}
+                  >
                     <label>
                       <input
                         type="checkbox"
-                        checked={
-                          // .episodes[episode.episode_number - 1].watched
-                          showSeason && showSeason.episodes[indexOfEpisode].watched
-                        }
+                        checked={showSeason && showSeason.episodes[indexOfEpisode].watched}
                         onChange={() =>
-                          this.props.toggleWatchedEpisode(
-                            this.props.season.season_number,
-                            // episode.episode_number
-                            indexOfEpisode
-                          )
+                          this.props.toggleWatchedEpisode(this.props.season.season_number, indexOfEpisode)
                         }
+                        disabled={!showCheckboxes || !this.props.authUser}
                       />
-                      <span className="custom-checkmark" />
+                      <span
+                        className={classNames("custom-checkmark", {
+                          "custom-checkmark--disabled": !showCheckboxes || !this.props.authUser
+                        })}
+                      />
                     </label>
+                    {this.state.disableCheckboxWarning === episode.id && (
+                      <div ref={this.registerWarningRef} className="buttons__col-warning">
+                        To use full features please{" "}
+                        <Link className="buttons__col-link" to={ROUTES.LOGIN_PAGE}>
+                          register
+                        </Link>
+                        . Your allready selected shows will be saved.
+                      </div>
+                    )}
                   </div>
                 )}
 

@@ -7,10 +7,8 @@ export default function ScrollToTopOnUpdate() {
 
   useEffect(() => {
     if (history.action === "PUSH") {
-      console.log("push")
       window.scrollTo(0, 0)
     }
-    console.log("back button")
   }, [pathname, history.action])
 
   return null

@@ -3,6 +3,7 @@ import UserAuthForm from "Components/UserAuth/UserAuthForm"
 import "./LoginPage.scss"
 import HeaderBase from "Components/Header/Header"
 import { withFirebase } from "Components/Firebase"
+import ScrollToTopOnMount from "Utils/ScrollToTopOnMount"
 
 const Header = withFirebase(HeaderBase)
 
@@ -13,6 +14,7 @@ export default function LoginPage() {
       <div className="login-page">
         <UserAuthForm loginPage={true} activeSection="register" />
       </div>
+      <ScrollToTopOnMount />
     </>
   )
 }

@@ -62,11 +62,11 @@ function FullContentInfo({
 
   const [error, setError] = useState()
 
-  const { pathname } = useLocation()
+  // const { pathname } = useLocation()
 
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [pathname])
+  // useEffect(() => {
+  //   window.scrollTo(0, 0)
+  // }, [pathname])
 
   useEffect(() => {
     if (mediaType === "show") {

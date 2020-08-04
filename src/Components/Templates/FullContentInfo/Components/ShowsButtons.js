@@ -76,7 +76,7 @@ class ShowsButtons extends Component {
             className={classNames("button", {
               "button--pressed":
                 this.props.showDatabaseOnClient === "notWatchingShows" ||
-                !this.context.watchingShows.find(item => item.id === Number(id))
+                (!this.props.authUser && !this.context.watchingShows.find(item => item.id === Number(id)))
             })}
             type="button"
             onClick={() => {
