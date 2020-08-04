@@ -57,7 +57,7 @@ class SignInFormBase extends Component {
 
     this.props.firebase
       .signInWithEmailAndPassword(email, password)
-      .then(authUser => {
+      .then(() => {
         localStorage.removeItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)
         localStorage.removeItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)
 
@@ -66,7 +66,6 @@ class SignInFormBase extends Component {
 
         this.setState({ ...INITIAL_STATE })
         this.props.history.push("/")
-        console.log(`user sign in: ${authUser}`)
       })
       .catch(error => {
         errors.error = error

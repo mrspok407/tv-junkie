@@ -24,7 +24,7 @@ const withUserContent = Component => {
 
       this.firebase = this.props.firebase
       this.authUser = this.props.authUser
-      this.userUid = this.authUser && this.props.authUser.uid
+      this.userUid = this.authUser && this.authUser.uid
     }
 
     componentDidUpdate(prevProps) {
@@ -122,7 +122,7 @@ const withUserContent = Component => {
       return promise
     }
 
-    addShowToDatabase = ({ id, show, userDatabase }) => {
+    addShowToDatabase = ({ id, show, userDatabase, userUid = this.userUid }) => {
       this.getShowEpisodes({ id }).then(data => {
         const showsSubDatabase = data.status === "Ended" || data.status === "Canceled" ? "ended" : "ongoing"
 
@@ -146,10 +146,8 @@ const withUserContent = Component => {
           userEpisodes.push(updatedSeason)
         })
 
-        console.log(this.firebase.timeStamp())
-
         this.firebase
-          .userShows(this.userUid, userDatabase)
+          .userShows(userUid, userDatabase)
           .child(id)
           .set({
             allEpisodesWatched: false,
@@ -165,14 +163,14 @@ const withUserContent = Component => {
           })
           .then(() => {
             this.firebase
-              .userShows(this.userUid, userDatabase)
+              .userShows(userUid, userDatabase)
               .child(id)
               .once("value", snapshot => {
                 const negativeTimestamp = snapshot.val().timeStamp * -1
                 const finishedTimestamp = 3190666598976 - snapshot.val().timeStamp
 
                 this.firebase
-                  .userShows(this.userUid, userDatabase)
+                  .userShows(userUid, userDatabase)
                   .child(id)
                   .update({
                     timeStamp: negativeTimestamp, // The negative time stamp needed for easier des order, cause firebase only provide asc order
@@ -281,33 +279,31 @@ const withUserContent = Component => {
       })
     }
 
-    toggleWatchLaterMovie = ({ id, data = [], database }) => {
-      if (this.authUser === null) return
-
+    toggleWatchLaterMovie = ({ id, data = [], userDatabase, userUid = this.userUid }) => {
       const movieToAdd = Array.isArray(data) ? data.find(item => item.id === id) : data
 
-      this.firebase[database](this.userUid)
+      this.firebase[userDatabase](userUid)
         .child(id)
         .once("value", snapshot => {
           if (snapshot.val() !== null) {
-            this.firebase[database](this.userUid)
+            this.firebase[userDatabase](userUid)
               .child(id)
               .set(null)
           } else {
-            this.firebase[database](this.userUid)
+            this.firebase[userDatabase](userUid)
               .child(id)
               .set({
                 ...movieToAdd,
                 timeStamp: this.firebase.timeStamp()
               })
               .then(() => {
-                this.firebase[database](this.userUid)
+                this.firebase[userDatabase](userUid)
                   .child(id)
                   .once("value", snapshot => {
                     if (snapshot.val() === null) return
 
                     const negativeTimestamp = snapshot.val().timeStamp * -1
-                    this.firebase[database](this.userUid)
+                    this.firebase[userDatabase](userUid)
                       .child(id)
                       .update({ timeStamp: negativeTimestamp }) // The negative time stamp needed for easier des order, cause firebase only provide as order
                   })
@@ -323,6 +319,7 @@ const withUserContent = Component => {
           userContent={this.state}
           toggleWatchLaterMovie={this.toggleWatchLaterMovie}
           handleShowInDatabases={this.handleShowInDatabases}
+          addShowToDatabase={this.addShowToDatabase}
         />
       )
     }

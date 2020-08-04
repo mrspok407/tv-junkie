@@ -343,7 +343,7 @@ class MoviesContent extends Component {
                         this.props.toggleWatchLaterMovie({
                           id: item.id,
                           data: item,
-                          database: "watchLaterMovies"
+                          userDatabase: "watchLaterMovies"
                         })
                         this.loadNewContent({ itemsToLoad: 1 })
                         this.handleMoviesOnClient(item.id)

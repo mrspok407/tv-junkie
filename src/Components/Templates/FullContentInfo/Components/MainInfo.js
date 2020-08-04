@@ -147,7 +147,7 @@ class MainInfo extends Component {
                   this.props.toggleWatchLaterMovie({
                     id: Number(this.props.id),
                     data: this.props.infoToPass,
-                    database: "watchLaterMovies"
+                    userDatabase: "watchLaterMovies"
                   })
                 } else {
                   this.context.toggleMovieLS({

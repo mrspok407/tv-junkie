@@ -2,12 +2,12 @@
 import React, { Component } from "react"
 import { withRouter } from "react-router-dom"
 import { compose } from "recompose"
-import { withFirebase } from "Components/Firebase"
 import { validEmailRegex } from "Utils"
 import * as ROLES from "Utils/Constants/roles"
 import classNames from "classnames"
 import Input from "../Input/Input"
 import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
+import { withUserContent } from "Components/UserContent"
 
 const LOCAL_STORAGE_KEY_WATCHING_SHOWS = "watchingShowsLocalS"
 const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = "watchLaterMoviesLocalS"
@@ -87,17 +87,21 @@ class RegisterBase extends Component {
               JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)) || []
 
             watchingShows.forEach(item => {
-              const newShowRef = this.props.firebase.userShows(authUser.user.uid, "watchingShows").push()
-              const key = newShowRef.key
-
-              newShowRef.set({ ...item, key, userWatching: true })
+              this.props.addShowToDatabase({
+                id: item.id,
+                show: item,
+                userDatabase: "watchingShows",
+                userUid: authUser.user.uid
+              })
             })
 
             watchLaterMovies.forEach(item => {
-              const newShowRef = this.props.firebase.watchLaterMovies(authUser.user.uid).push()
-              const key = newShowRef.key
-
-              newShowRef.set({ ...item, key })
+              this.props.toggleWatchLaterMovie({
+                id: item.id,
+                data: item,
+                userDatabase: "watchLaterMovies",
+                userUid: authUser.user.uid
+              })
             })
           })
           .then(() => {
@@ -330,7 +334,7 @@ class RegisterBase extends Component {
   }
 }
 
-const Register = compose(withRouter, withFirebase)(RegisterBase)
+const Register = compose(withRouter, withUserContent)(RegisterBase)
 
 export default Register
 

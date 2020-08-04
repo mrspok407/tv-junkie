@@ -126,7 +126,7 @@ class AdvSearchResults extends Component {
                                 this.props.toggleWatchLaterMovie({
                                   id: id,
                                   data: this.props.advancedSearchContent,
-                                  database: "watchLaterMovies"
+                                  userDatabase: "watchLaterMovies"
                                 })
                               } else {
                                 this.context.toggleMovieLS({
