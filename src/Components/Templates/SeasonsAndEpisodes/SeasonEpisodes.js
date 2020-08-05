@@ -4,6 +4,9 @@ import { differenceBtwDatesInDays } from "Utils"
 import classNames from "classnames"
 import { Link } from "react-router-dom"
 import * as ROUTES from "Utils/Constants/routes"
+import UserRating from "../FullContentInfo/Components/UserRating/UserRating"
+
+const FADE_OUT_SPEED = 300
 
 export default class SeasonEpisodes extends Component {
   constructor(props) {
@@ -20,7 +23,7 @@ export default class SeasonEpisodes extends Component {
     this.checkboxRef = React.createRef()
     this.registerWarningRef = React.createRef()
 
-    this.timer = null
+    this.episodeFadeOutTimeout = null
   }
 
   componentDidMount() {
@@ -66,9 +69,28 @@ export default class SeasonEpisodes extends Component {
     }
   }
 
-  render() {
-    console.log(this.state.fadeOutEpisodes)
+  handleFadeOut = (episodeId, episodeIndex) => {
+    if (this.state.fadeOutEpisodes.find(item => item.id === episodeId)) return
 
+    clearTimeout(this.episodeFadeOutTimeout)
+
+    this.setState({
+      fadeOutEpisodes: [...this.state.fadeOutEpisodes, { id: episodeId, index: episodeIndex }]
+    })
+
+    this.episodeFadeOutTimeout = setTimeout(() => {
+      const fadeOutEpisodes = this.state.fadeOutEpisodes
+      this.setState({
+        fadeOutEpisodes: []
+      })
+
+      fadeOutEpisodes.forEach(item => {
+        this.props.toggleWatchedEpisode(this.props.season.season_number, item.index)
+      })
+    }, FADE_OUT_SPEED)
+  }
+
+  render() {
     const showCheckboxes =
       this.props.authUser &&
       this.props.showInDatabase.info &&
@@ -77,10 +99,10 @@ export default class SeasonEpisodes extends Component {
       this.props.showInDatabase.info.episodes.length > 0 &&
       true
 
+    console.log(this.props.showInDatabase)
+
     const showSeason =
       showCheckboxes && this.props.showInDatabase.info.episodes[this.props.season.season_number - 1]
-
-    // console.log(this.props.showInDatabase)
 
     const seasons = this.props.toWatchPage ? this.props.seasonsArr : this.props.showEpisodes
 
@@ -97,13 +119,7 @@ export default class SeasonEpisodes extends Component {
 
           return item.episodes.map((episode, episodeIndex) => {
             if (this.props.toWatchPage && episode.watched) return
-            //console.log(episodeIndex)
-            // console.log(episode.episode_number)
-
             const indexOfEpisode = item.episodes.length - 1 - episodeIndex
-
-            // console.log(indexOfEpisode)
-            // console.log(episode.episode_number)
 
             const urlShowTitle = this.props.showTitle.split(" ").join("+")
             // Format Date //
@@ -143,16 +159,8 @@ export default class SeasonEpisodes extends Component {
                 className={classNames("episodes__episode", {
                   "episodes__episode--open": this.props.detailEpisodeInfo.includes(episode.id),
                   "fade-out-episode":
-                    this.props.toWatchPage && this.state.fadeOutEpisodes.find(item => item.id === episode.id),
-                  "move-up-episode": this.props.toWatchPage && this.state.moveUpEpisodes.includes(episode.id)
+                    this.props.toWatchPage && this.state.fadeOutEpisodes.find(item => item.id === episode.id)
                 })}
-                style={{
-                  transform: `translateY(-${
-                    this.props.toWatchPage && this.state.moveUpEpisodes.includes(episode.id)
-                      ? this.state.fadeOutEpisodes.length * 45
-                      : 0
-                  }px)`
-                }}
               >
                 <div
                   className={classNames("episodes__episode-wrapper", {
@@ -268,47 +276,8 @@ export default class SeasonEpisodes extends Component {
                         type="checkbox"
                         checked={showSeason && showSeason.episodes[indexOfEpisode].watched}
                         onChange={() => {
-                          // let tracker = []
-
                           if (this.props.toWatchPage) {
-                            if (this.state.fadeOutEpisodes.find(item => item.id === episode.id)) return
-
-                            // tracker.push(indexOfEpisode)
-
-                            clearTimeout(this.timer)
-
-                            this.setState(prevState => ({
-                              fadeOutEpisodes: [
-                                ...prevState.fadeOutEpisodes,
-                                { id: episode.id, index: indexOfEpisode }
-                              ],
-                              moveUpEpisodes: item.episodes.map(item => item.id).slice(episodeIndex + 1)
-                            }))
-
-                            this.timer = setTimeout(() => {
-                              const test = this.state.fadeOutEpisodes
-                              console.log("test")
-                              this.setState({
-                                moveUpEpisodes: this.state.moveUpEpisodes.filter(item => item === episode.id),
-                                fadeOutEpisodes: []
-                              })
-
-                              test.forEach(item => {
-                                console.log(item)
-                                this.props.toggleWatchedEpisode(this.props.season.season_number, item.index)
-                              })
-
-                              // tracker = []
-                            }, 1000)
-
-                            // setTimeout(() => {
-                            //   this.setState({
-                            //     fadeOutEpisodes: this.state.fadeOutEpisodes.filter(
-                            //       item => item !== episode.id
-                            //     )
-                            //   })
-                            //   this.props.toggleWatchedEpisode(this.props.season.season_number, indexOfEpisode)
-                            // }, 1000)
+                            this.handleFadeOut(episode.id, indexOfEpisode)
                           } else {
                             this.props.toggleWatchedEpisode(this.props.season.season_number, indexOfEpisode)
                           }
@@ -350,6 +319,13 @@ export default class SeasonEpisodes extends Component {
                     {episode.overview && (
                       <div className="episodes__episode-detailes-overview">{episode.overview}</div>
                     )}
+
+                    <UserRating
+                      id={this.props.showInDatabase.info.id}
+                      firebaseRef="userShowSingleEpisode"
+                      seasonNum={this.props.season.season_number}
+                      episodeNum={indexOfEpisode}
+                    />
 
                     {episodeAirDateAsDateObj < this.props.todayDate.getTime() && episode.air_date && (
                       <div className="torrent-links torrent-links--episodes">

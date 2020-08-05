@@ -4,6 +4,7 @@ import ShowsButtons from "./ShowsButtons"
 import classNames from "classnames"
 import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
 import { withUserContent } from "Components/UserContent"
+import UserRating from "./UserRating/UserRating"
 
 class MainInfo extends Component {
   render() {
@@ -71,7 +72,7 @@ class MainInfo extends Component {
           </div>
         </div>
         <div className="full-detailes__info-row">
-          <div className="full-detailes__info-option">Rating</div>
+          <div className="full-detailes__info-option">User rating</div>
           <div className="full-detailes__info-value">
             {detailes.rating !== "-" ? (
               detailes.rating
@@ -90,6 +91,19 @@ class MainInfo extends Component {
             )}
           </div>
         </div>
+
+        <div className="full-detailes__info-row">
+          <div className="full-detailes__info-option">My rating</div>
+          <div className="full-detailes__info-value">
+            <UserRating
+              id={this.props.id}
+              firebaseRef="userShow"
+              showDatabase={this.props.showDatabaseOnClient}
+              fullContentPage={true}
+            />
+          </div>
+        </div>
+
         {this.props.mediaType === "movie" && (
           <>
             <div className="full-detailes__info-row">

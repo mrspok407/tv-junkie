@@ -62,7 +62,7 @@ class SignInFormBase extends Component {
         localStorage.removeItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)
 
         this.context.clearContentState()
-        this.props.closeNavMobile()
+        if (this.props.closeNavMobile) this.props.closeNavMobile()
 
         this.setState({ ...INITIAL_STATE })
         this.props.history.push("/")

@@ -109,7 +109,8 @@ class RegisterBase extends Component {
             localStorage.removeItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)
 
             this.context.clearContentState()
-            this.props.closeNavMobile()
+
+            if (this.props.closeNavMobile) this.props.closeNavMobile()
           })
       })
       .then(() => {

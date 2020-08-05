@@ -133,7 +133,8 @@ const withUserContent = Component => {
 
           season.episodes.forEach(() => {
             const updatedEpisode = {
-              watched: false
+              watched: false,
+              userRating: 0
             }
             episodes.push(updatedEpisode)
           })

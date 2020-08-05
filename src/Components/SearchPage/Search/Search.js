@@ -156,10 +156,12 @@ class Search extends Component {
   }
 
   linkOnKeyPress = () => {
+    if (!this.state.listIsOpen || this.state.isSearchingList) return
+
     const content = this.state.searchResults[this.state.currentListItem]
     const mediaType = content.original_title ? "movie" : content.original_name ? "show" : null
 
-    if (!this.state.listIsOpen || this.state.isSearchingList || !mediaType) return
+    if (!mediaType) return
     if (this.state.searchResults.length === 0) return
 
     this.props.history.push(`/${mediaType}/${content.id}`)

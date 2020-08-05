@@ -284,7 +284,7 @@ function FullContentInfo({
                   })
 
                   const updatedEpisodesUser = mergedEpisodes.reduce((acc, episode) => {
-                    acc.push({ watched: episode.watched || false })
+                    acc.push({ watched: episode.watched || false, userRating: episode.userRating })
                     return acc
                   }, [])
 

@@ -16,7 +16,7 @@
     background-color: transparent;
     border: none;
     opacity: 0;
-    z-index: 10;
+    z-index: 20;
     animation: showNavBtn 0.5s forwards;
     @keyframes showNavBtn {
       to {
@@ -75,7 +75,7 @@
     transform: translate(0, 0);
     background-color: #000;
     transition: transform 0.25s;
-    z-index: 9999;
+    z-index: 10;
   }
 
   &--mobile-open {

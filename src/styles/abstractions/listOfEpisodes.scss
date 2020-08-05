@@ -240,6 +240,8 @@ $font-sizes: (
   }
 
   &__episode {
+    --fadeOutSpeed: 300ms;
+
     position: relative;
     font-size: map-get($font-sizes, episodeInfo);
     color: map-get($colors, seasonInfo);
@@ -435,24 +437,11 @@ $font-sizes: (
   }
 
   .fade-out-episode {
-    animation: fadeOutEpisode 500ms forwards;
+    animation: fadeOutEpisode var(--fadeOutSpeed) forwards;
     @keyframes fadeOutEpisode {
       to {
         opacity: 0;
       }
     }
-  }
-
-  .move-up-episode {
-    --moveUpDistance: -45px;
-    transform: translateY(var(--moveUpDistance));
-    transition: 500ms;
-    transition-delay: 500ms;
-    // animation: moveUpEpisode 500ms 500ms forwards;
-    // @keyframes moveUpEpisode {
-    //   to {
-    //     transform: translateY(-45px);
-    //   }
-    // }
   }
 }
