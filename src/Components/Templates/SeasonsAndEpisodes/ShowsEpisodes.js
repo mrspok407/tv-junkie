@@ -1,6 +1,7 @@
 import React, { Component } from "react"
 import { withUserContent } from "Components/UserContent"
 import axios, { CancelToken } from "axios"
+import debounce from "debounce"
 import { differenceBtwDatesInDays } from "Utils"
 import { checkIfAllEpisodesWatched } from "Components/UserContent/FirebaseHelpers"
 import Loader from "Components/Placeholders/Loader"
@@ -160,7 +161,13 @@ class ShowsEpisodes extends Component {
     const show = this.props.showInDatabase
 
     this.props.firebase
-      .userShowSingleEpisode(this.props.authUser.uid, show.info.id, show.database, seasonNum, episodeNum)
+      .userShowSingleEpisode({
+        uid: this.props.authUser.uid,
+        key: show.info.id,
+        database: show.database,
+        seasonNum,
+        episodeNum
+      })
       .update(
         {
           watched: !show.info.episodes[seasonNum - 1].episodes[episodeNum].watched
@@ -173,6 +180,8 @@ class ShowsEpisodes extends Component {
         })
       )
   }
+
+  toggleWatchedEpisodeDeb = debounce(this.toggleWatchedEpisode, 50)
 
   checkEverySeasonEpisode = seasonNum => {
     const show = this.props.showInDatabase
@@ -258,8 +267,6 @@ class ShowsEpisodes extends Component {
     this.state.allEpisodesFromDatabase.forEach((episode, episodeIndex) => {
       userEpisodesFormated[episodeIndex].watched = !isAllEpisodesChecked
     })
-
-    console.log(userEpisodesFormated)
 
     this.props.firebase.userShowAllEpisodes(this.props.authUser.uid, show.info.id, show.database).set(
       allEpisodesUser,
@@ -398,6 +405,7 @@ class ShowsEpisodes extends Component {
                         seasonId={seasonId}
                         authUser={this.props.authUser}
                         showInDatabase={this.props.showInDatabase}
+                        toggleWatchedEpisodeDeb={this.toggleWatchedEpisodeDeb}
                         toggleWatchedEpisode={this.toggleWatchedEpisode}
                         loadingFromDatabase={this.props.loadingFromDatabase}
                       />

@@ -71,14 +71,15 @@ class Firebase {
 
   /// User Content API ///
   userShows = (uid, subDatabase) => this.db.ref(`users/${uid}/content/shows/${subDatabase}`)
-  userShow = (uid, showKey, subDatabase) =>
-    this.db.ref(`users/${uid}/content/shows/${subDatabase}/${showKey}`)
+
+  userShow = ({ uid, key, database }) => this.db.ref(`users/${uid}/content/shows/${database}/${key}`)
+
   userShowAllEpisodes = (uid, showKey, subDatabase) =>
     this.db.ref(`users/${uid}/content/shows/${subDatabase}/${showKey}/episodes`)
 
-  userShowSingleEpisode = (uid, showKey, subDatabase, seasonNum, episodeNum) =>
+  userShowSingleEpisode = ({ uid, key, database, seasonNum, episodeNum }) =>
     this.db.ref(
-      `users/${uid}/content/shows/${subDatabase}/${showKey}/episodes/${seasonNum - 1}/episodes/${episodeNum}`
+      `users/${uid}/content/shows/${database}/${key}/episodes/${seasonNum - 1}/episodes/${episodeNum}`
     )
 
   userShowSeason = (uid, showKey, subDatabase, seasonNum) =>

@@ -24,7 +24,9 @@ class ToWatchEpisodesContent extends Component {
 
   componentWillUnmount() {
     this.state.watchingShows.forEach(show => {
-      this.props.firebase.userShow(this.props.authUser.uid, show.id, "watchingShows").off()
+      this.props.firebase
+        .userShow({ uid: this.props.authUser.uid, key: show.id, database: "watchingShows" })
+        .off()
     })
   }
 
@@ -56,7 +58,7 @@ class ToWatchEpisodesContent extends Component {
           ]
 
           this.props.firebase
-            .userShow(this.props.authUser.uid, item.val().id, database)
+            .userShow({ uid: this.props.authUser.uid, key: item.val().id, database })
             .on("value", snapshot => {
               if (snapshot.val() !== null) {
                 const index = this.state.watchingShows.findIndex(item => item.id === snapshot.val().id)

@@ -76,7 +76,7 @@ function FullContentInfo({
       if (!authUser) return
 
       userContent.showsDatabases.forEach(database => {
-        firebase.userShow(authUser.uid, Number(id), database).off()
+        firebase.userShow({ uid: authUser.uid, key: Number(id), database }).off()
       })
 
       firebase.watchLaterMovies(authUser.uid).off()
@@ -259,7 +259,7 @@ function FullContentInfo({
     userContent.showsDatabases.forEach(database => {
       counter++
 
-      firebase.userShow(authUser.uid, Number(id), database).on(
+      firebase.userShow({ uid: authUser.uid, key: Number(id), database }).on(
         "value",
         snapshot => {
           if (snapshot.val() !== null) {

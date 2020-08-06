@@ -92,17 +92,20 @@ class MainInfo extends Component {
           </div>
         </div>
 
-        <div className="full-detailes__info-row">
-          <div className="full-detailes__info-option">My rating</div>
-          <div className="full-detailes__info-value">
-            <UserRating
-              id={this.props.id}
-              firebaseRef="userShow"
-              showDatabase={this.props.showDatabaseOnClient}
-              fullContentPage={true}
-            />
+        {this.props.mediaType === "show" && (
+          <div className="full-detailes__info-row">
+            <div className="full-detailes__info-option">My rating</div>
+            <div className="full-detailes__info-value">
+              <UserRating
+                id={this.props.id}
+                firebaseRef="userShow"
+                showDatabase={this.props.showDatabaseOnClient}
+                fullContentPage={true}
+                mediaType={this.props.mediaType}
+              />
+            </div>
           </div>
-        </div>
+        )}
 
         {this.props.mediaType === "movie" && (
           <>

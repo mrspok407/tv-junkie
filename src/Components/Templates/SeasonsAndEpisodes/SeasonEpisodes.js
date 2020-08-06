@@ -99,8 +99,6 @@ export default class SeasonEpisodes extends Component {
       this.props.showInDatabase.info.episodes.length > 0 &&
       true
 
-    console.log(this.props.showInDatabase)
-
     const showSeason =
       showCheckboxes && this.props.showInDatabase.info.episodes[this.props.season.season_number - 1]
 
@@ -177,6 +175,17 @@ export default class SeasonEpisodes extends Component {
                         }
                   }
                 >
+                  {this.props.toWatchPage && (
+                    <UserRating
+                      id={this.props.showInDatabase.info.id}
+                      firebaseRef="userShowSingleEpisode"
+                      seasonNum={this.props.season.season_number}
+                      episodeNum={indexOfEpisode}
+                      episodeId={episode.id}
+                      handleFadeOut={this.handleFadeOut}
+                      toWatchPage={this.props.toWatchPage}
+                    />
+                  )}
                   <div className="episodes__episode-date">{episodeAirDate}</div>
                   <div className="episodes__episode-name">
                     <span className="episodes__episode-number">{episode.episode_number}.</span>
@@ -279,7 +288,10 @@ export default class SeasonEpisodes extends Component {
                           if (this.props.toWatchPage) {
                             this.handleFadeOut(episode.id, indexOfEpisode)
                           } else {
-                            this.props.toggleWatchedEpisode(this.props.season.season_number, indexOfEpisode)
+                            this.props.toggleWatchedEpisodeDeb(
+                              this.props.season.season_number,
+                              indexOfEpisode
+                            )
                           }
                         }}
                         disabled={!showCheckboxes || !this.props.authUser}
@@ -320,37 +332,41 @@ export default class SeasonEpisodes extends Component {
                       <div className="episodes__episode-detailes-overview">{episode.overview}</div>
                     )}
 
-                    <UserRating
-                      id={this.props.showInDatabase.info.id}
-                      firebaseRef="userShowSingleEpisode"
-                      seasonNum={this.props.season.season_number}
-                      episodeNum={indexOfEpisode}
-                    />
-
                     {episodeAirDateAsDateObj < this.props.todayDate.getTime() && episode.air_date && (
-                      <div className="torrent-links torrent-links--episodes">
-                        <a
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}+1080p&cat=41`}
-                        >
-                          1080p
-                        </a>
-                        <a
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}+720p&cat=41`}
-                        >
-                          720p
-                        </a>
-                        <a
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}&cat=5`}
-                        >
-                          480p
-                        </a>
-                      </div>
+                      <>
+                        {this.props.showInDatabase.info && (
+                          <UserRating
+                            id={this.props.showInDatabase.info.id}
+                            firebaseRef="userShowSingleEpisode"
+                            seasonNum={this.props.season.season_number}
+                            episodeNum={indexOfEpisode}
+                          />
+                        )}
+
+                        <div className="torrent-links torrent-links--episodes">
+                          <a
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}+1080p&cat=41`}
+                          >
+                            1080p
+                          </a>
+                          <a
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}+720p&cat=41`}
+                          >
+                            720p
+                          </a>
+                          <a
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}&cat=5`}
+                          >
+                            480p
+                          </a>
+                        </div>
+                      </>
                     )}
                   </div>
                 )}
