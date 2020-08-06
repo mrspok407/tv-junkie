@@ -12,7 +12,7 @@ export const checkIfAllEpisodesWatched = ({ show, firebase, authUser, todayDate 
 
     const releasedEpisodes = allEpisodesDatabase.filter(episode => {
       const daysToNewEpisode = differenceBtwDatesInDays(episode.air_date, todayDate)
-      return daysToNewEpisode < 0 && episode
+      return daysToNewEpisode <= 0 && episode
     })
 
     firebase.userShowAllEpisodes(authUser.uid, show.info.id, show.database).once("value", snapshot => {

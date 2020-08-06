@@ -8,6 +8,7 @@ import Loader from "Components/Placeholders/Loader"
 import classNames from "classnames"
 import SeasonEpisodes from "./SeasonEpisodes"
 import "../../../styles/abstractions/listOfEpisodes.scss"
+import UserRating from "../FullContentInfo/Components/UserRating/UserRating"
 
 let cancelRequest
 
@@ -191,8 +192,6 @@ class ShowsEpisodes extends Component {
     )
     const seasonLength = seasonEpisodesFromDatabase.length
 
-    console.log(seasonEpisodes)
-
     let isAllEpisodesChecked = true
 
     seasonEpisodesFromDatabase.forEach((episode, episodeIndex) => {
@@ -207,15 +206,22 @@ class ShowsEpisodes extends Component {
       seasonEpisodes[indexOfEpisode].watched = !isAllEpisodesChecked
     })
 
-    this.props.firebase.userShowSeason(this.props.authUser.uid, show.info.id, show.database, seasonNum).set(
-      seasonEpisodes,
-      checkIfAllEpisodesWatched({
-        show,
-        firebase: this.props.firebase,
-        authUser: this.props.authUser,
-        todayDate: this.props.todayDate
+    this.props.firebase
+      .userShowSeasonEpisodes({
+        uid: this.props.authUser.uid,
+        key: show.info.id,
+        database: show.database,
+        seasonNum
       })
-    )
+      .set(
+        seasonEpisodes,
+        checkIfAllEpisodesWatched({
+          show,
+          firebase: this.props.firebase,
+          authUser: this.props.authUser,
+          todayDate: this.props.todayDate
+        })
+      )
   }
 
   getAllEpisodesFromDatabase = () => {
@@ -234,7 +240,7 @@ class ShowsEpisodes extends Component {
 
         const releasedEpisodes = allEpisodes.filter(episode => {
           const daysToNewEpisode = differenceBtwDatesInDays(episode.air_date, this.props.todayDate)
-          return daysToNewEpisode < 0 && episode
+          return daysToNewEpisode <= 0 && episode
         })
 
         this.setState({
@@ -373,6 +379,15 @@ class ShowsEpisodes extends Component {
                     <>
                       {season.poster_path && this.props.fullContentPage && (
                         <div className="episodes__episode-group-poster-wrapper">
+                          {this.props.showInDatabase.info && (
+                            <UserRating
+                              id={this.props.showInDatabase.info.id}
+                              firebaseRef="userShowSeason"
+                              seasonNum={season.season_number}
+                              seasonRating={true}
+                            />
+                          )}
+
                           <div
                             className="episodes__episode-group-poster"
                             style={{

@@ -53,7 +53,7 @@ class UserRating extends Component {
   }
 
   onMouseMoveHandler = e => {
-    if (this.props.authUser === null) return
+    if (this.props.authUser === null || this.props.disableHover) return
 
     const buttonsNodeList = e.target.parentElement.getElementsByClassName("user-rating__button")
     const currentRating = e.target.dataset.rating
@@ -69,7 +69,7 @@ class UserRating extends Component {
   }
 
   onMouseLeaveHandler = e => {
-    if (this.props.authUser === null) return
+    if (this.props.authUser === null || this.props.disableHover) return
 
     const buttonsNodeList = e.target.parentElement.getElementsByClassName("user-rating__button")
 
@@ -83,7 +83,7 @@ class UserRating extends Component {
   }
 
   onClickHandler = e => {
-    if (this.props.authUser === null) return
+    if (this.props.authUser === null || this.props.disableHover) return
     if (this.props.toWatchPage) {
       this.props.handleFadeOut(this.props.episodeId, this.props.episodeNum)
     }
@@ -110,7 +110,10 @@ class UserRating extends Component {
           database,
           seasonNum: this.props.seasonNum,
           episodeNum: this.props.episodeNum
-        }).update({ userRating: rating, watched: this.props.toWatchPage ? snapshot.val().watched : true })
+        }).update({
+          userRating: rating,
+          watched: this.props.toWatchPage ? snapshot.val().watched : this.props.episodeRating ? true : null
+        })
       })
     })
   }

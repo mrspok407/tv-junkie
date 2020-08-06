@@ -64,6 +64,7 @@ class SearchCard extends Component {
                     {`${originCountry.length > 0 ? originCountry.join(", ") : ""}`}
                   </span>
                 </div>
+
                 <div className="search-card__info-wrapper">
                   {voteAverage !== 0 && (
                     <div className="search-card__info-rating">

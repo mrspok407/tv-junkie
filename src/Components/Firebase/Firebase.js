@@ -82,8 +82,11 @@ class Firebase {
       `users/${uid}/content/shows/${database}/${key}/episodes/${seasonNum - 1}/episodes/${episodeNum}`
     )
 
-  userShowSeason = (uid, showKey, subDatabase, seasonNum) =>
-    this.db.ref(`users/${uid}/content/shows/${subDatabase}/${showKey}/episodes/${seasonNum - 1}/episodes`)
+  userShowSeasonEpisodes = ({ uid, key, database, seasonNum }) =>
+    this.db.ref(`users/${uid}/content/shows/${database}/${key}/episodes/${seasonNum - 1}/episodes`)
+
+  userShowSeason = ({ uid, key, database, seasonNum }) =>
+    this.db.ref(`users/${uid}/content/shows/${database}/${key}/episodes/${seasonNum - 1}`)
 
   watchLaterMovies = uid => this.db.ref(`users/${uid}/content/movies/watchLaterMovies`)
 }

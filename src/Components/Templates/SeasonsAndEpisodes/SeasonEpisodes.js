@@ -340,6 +340,7 @@ export default class SeasonEpisodes extends Component {
                             firebaseRef="userShowSingleEpisode"
                             seasonNum={this.props.season.season_number}
                             episodeNum={indexOfEpisode}
+                            episodeRating={true}
                           />
                         )}
 

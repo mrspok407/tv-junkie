@@ -141,7 +141,8 @@ const withUserContent = Component => {
 
           const updatedSeason = {
             season_number: season.season_number,
-            episodes
+            episodes,
+            userRating: 0
           }
 
           userEpisodes.push(updatedSeason)

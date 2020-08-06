@@ -156,7 +156,8 @@ class ToWatchEpisodesContent extends Component {
 
               const updatedSeasonUser = {
                 season_number: season.season_number,
-                episodes: updatedEpisodesUser
+                episodes: updatedEpisodesUser,
+                userRating: seasonPath.userRating
               }
 
               updatedSeasons.push(updatedSeason)
