@@ -3,7 +3,9 @@ import { compose } from "recompose"
 import { withUserContent } from "Components/UserContent"
 import classNames from "classnames"
 import { Link } from "react-router-dom"
+import { checkIfAllEpisodesWatched } from "Components/UserContent/FirebaseHelpers"
 import * as ROUTES from "Utils/Constants/routes"
+import { todayDate } from "Utils"
 import "./UserRating.scss"
 
 const STAR_AMOUNT = 5
@@ -110,10 +112,21 @@ class UserRating extends Component {
           database,
           seasonNum: this.props.seasonNum,
           episodeNum: this.props.episodeNum
-        }).update({
-          userRating: rating,
-          watched: this.props.toWatchPage ? snapshot.val().watched : this.props.episodeRating ? true : null
-        })
+        }).update(
+          {
+            userRating: rating,
+            watched: this.props.toWatchPage ? snapshot.val().watched : this.props.episodeRating ? true : null
+          },
+          () => {
+            if (this.props.toWatchPage) return
+            checkIfAllEpisodesWatched({
+              show: this.props.show,
+              firebase: this.firebase,
+              authUser: this.props.authUser,
+              todayDate: todayDate
+            })
+          }
+        )
       })
     })
   }

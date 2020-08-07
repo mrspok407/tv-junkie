@@ -337,6 +337,7 @@ export default class SeasonEpisodes extends Component {
                         {this.props.showInDatabase.info && (
                           <UserRating
                             id={this.props.showInDatabase.info.id}
+                            show={this.props.showInDatabase}
                             firebaseRef="userShowSingleEpisode"
                             seasonNum={this.props.season.season_number}
                             episodeNum={indexOfEpisode}

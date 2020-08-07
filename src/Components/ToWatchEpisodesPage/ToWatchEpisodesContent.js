@@ -144,7 +144,7 @@ class ToWatchEpisodesContent extends Component {
               mergedEpisodes.forEach(episode => {
                 const updatedEpisode = {
                   watched: episode.watched || false,
-                  userRating: episode.userRating
+                  userRating: episode.userRating || 0
                 }
                 updatedEpisodesUser.push(updatedEpisode)
               })
@@ -157,7 +157,7 @@ class ToWatchEpisodesContent extends Component {
               const updatedSeasonUser = {
                 season_number: season.season_number,
                 episodes: updatedEpisodesUser,
-                userRating: seasonPath.userRating
+                userRating: (seasonPath && seasonPath.userRating) || 0
               }
 
               updatedSeasons.push(updatedSeason)

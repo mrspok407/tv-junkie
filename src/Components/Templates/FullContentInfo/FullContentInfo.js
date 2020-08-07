@@ -284,7 +284,7 @@ function FullContentInfo({
                   })
 
                   const updatedEpisodesUser = mergedEpisodes.reduce((acc, episode) => {
-                    acc.push({ watched: episode.watched || false, userRating: episode.userRating })
+                    acc.push({ watched: episode.watched || false, userRating: episode.userRating || 0 })
                     return acc
                   }, [])
 
@@ -296,7 +296,7 @@ function FullContentInfo({
                   const updatedSeasonUser = {
                     season_number: season.season_number,
                     episodes: updatedEpisodesUser,
-                    userRating: seasonPath.userRating
+                    userRating: (seasonPath && seasonPath.userRating) || 0
                   }
 
                   updatedSeasons.push(updatedSeason)
