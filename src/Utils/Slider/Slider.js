@@ -34,6 +34,8 @@ export default function Slider({ listOfContent }) {
   const [leftArrowVisible, setLeftArrowVisible] = useState(true)
   const [rightArrowVisible, setrightArrowVisible] = useState(true)
 
+  const [isMounted, setIsMounted] = useState(false)
+
   let startDragPoint = 0
 
   const sliderRef = useCallback(node => {
@@ -50,10 +52,18 @@ export default function Slider({ listOfContent }) {
       slider.style.cssText = ""
     }
 
+    if (!isMounted) return
     setSliderWidth(slider.getBoundingClientRect().width)
   }, [slider])
 
   const handleResizeDeb = debounce(() => handleResize(), 200)
+
+  useEffect(() => {
+    setIsMounted(true)
+    return () => {
+      setIsMounted(false)
+    }
+  }, [])
 
   useLayoutEffect(() => {
     if (!slider) return

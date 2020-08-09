@@ -231,7 +231,7 @@ class ShowsEpisodes extends Component {
     const showsSubDatabase = show.status === "Ended" || show.status === "Canceled" ? "ended" : "ongoing"
 
     this.props.firebase.showEpisodes(showsSubDatabase, show.id).once("value", snapshot => {
-      if (snapshot.val() !== null) {
+      if (snapshot.val() !== null && this._isMounted) {
         let allEpisodes = []
 
         snapshot.val().forEach(item => {
@@ -379,9 +379,10 @@ class ShowsEpisodes extends Component {
                     <>
                       {season.poster_path && this.props.fullContentPage && (
                         <div className="episodes__episode-group-poster-wrapper">
-                          {this.props.showInDatabase.info && (
+                          {this.props.showInDatabase.info && daysToNewSeason <= 0 && (
                             <UserRating
                               id={this.props.showInDatabase.info.id}
+                              show={this.props.showInDatabase}
                               firebaseRef="userShowSeason"
                               seasonNum={season.season_number}
                               seasonRating={true}

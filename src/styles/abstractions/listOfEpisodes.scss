@@ -72,6 +72,12 @@ $font-sizes: (
       @include mediaMaxW(#{$mobileViewPort}) {
         display: none;
       }
+
+      &-wrapper {
+        display: grid;
+        grid-auto-rows: max-content;
+        row-gap: 10px;
+      }
     }
 
     &--no-poster {
@@ -210,17 +216,6 @@ $font-sizes: (
             height: 18px;
           }
         }
-      }
-    }
-
-    &-check-all-episodes {
-      margin-top: 10px;
-      @include mediaMaxW(#{$mobileViewPort}) {
-        margin-top: 0px;
-      }
-
-      &--to-watch-page {
-        margin-top: 0;
       }
     }
   }

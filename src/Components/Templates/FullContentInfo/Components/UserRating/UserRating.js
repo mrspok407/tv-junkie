@@ -22,7 +22,7 @@ class UserRating extends Component {
     this.userRatingRef = React.createRef()
 
     this.firebase = this.props.firebase
-    this.uid = this.props.authUser.uid
+    this.uid = this.props.authUser && this.props.authUser.uid
   }
 
   componentDidMount() {
@@ -118,7 +118,7 @@ class UserRating extends Component {
             watched: this.props.toWatchPage ? snapshot.val().watched : this.props.episodeRating ? true : null
           },
           () => {
-            if (this.props.toWatchPage) return
+            if (this.props.toWatchPage || this.props.showRating) return
             checkIfAllEpisodesWatched({
               show: this.props.show,
               firebase: this.firebase,
@@ -142,7 +142,7 @@ class UserRating extends Component {
   render() {
     const disableRating =
       this.props.authUser === null ||
-      (this.props.showDatabase === null && this.props.fullContentPage && this.props.mediaType !== "movie")
+      (this.props.showDatabase === null && this.props.showRating && this.props.mediaType !== "movie")
     return (
       <div
         ref={this.userRatingRef}

@@ -20,6 +20,11 @@ class CalendarContent extends Component {
 
   componentDidMount() {
     this.getContent({})
+    this._isMounted = true
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false
   }
 
   getContent = ({ sortBy = "id", isInitialLoad = true, database = "watchingShows" }) => {
@@ -54,6 +59,8 @@ class CalendarContent extends Component {
               })
           })
         ).then(showsData => {
+          if (!this._isMounted) return
+
           const willAirEpisodes = organiseFutureEpisodesByMonth(showsData)
 
           const months = willAirEpisodes.map(item => {

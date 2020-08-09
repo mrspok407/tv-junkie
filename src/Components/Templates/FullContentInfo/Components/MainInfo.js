@@ -100,7 +100,7 @@ class MainInfo extends Component {
                 id={this.props.id}
                 firebaseRef="userShow"
                 showDatabase={this.props.showDatabaseOnClient}
-                fullContentPage={true}
+                showRating={true}
                 mediaType={this.props.mediaType}
               />
             </div>

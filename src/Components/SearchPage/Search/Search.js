@@ -29,6 +29,12 @@ class Search extends Component {
     this.searchContRef = React.createRef()
   }
 
+  componentWillUnmount() {
+    if (cancelRequest !== undefined) {
+      cancelRequest()
+    }
+  }
+
   handleSearch = (query, mediatype) => {
     if (cancelRequest !== undefined) {
       cancelRequest()
@@ -114,7 +120,6 @@ class Search extends Component {
       this.setState({
         listIsOpen: false
       })
-      console.log("test")
       this.onBlur()
     }
   }
@@ -164,9 +169,9 @@ class Search extends Component {
     if (!mediaType) return
     if (this.state.searchResults.length === 0) return
 
-    this.props.history.push(`/${mediaType}/${content.id}`)
-
     this.closeList()
+
+    this.props.history.push(`/${mediaType}/${content.id}`)
   }
 
   navigateSearchListByArrows = arrowKey => {

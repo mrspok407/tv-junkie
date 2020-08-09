@@ -63,6 +63,7 @@ class HomePage extends Component {
 
   componentDidMount() {
     this.getContentForSliders()
+    // this.testFun()
   }
 
   testFun = () => {
@@ -253,7 +254,7 @@ class HomePage extends Component {
       {!this.state.calendarLoading && (
         <>
           {this.state.willAirEpisodes.length > 0 ? (
-            <div onClick={() => this.testFun()} className="home-page__heading">
+            <div className="home-page__heading">
               <h1>Soon to watch</h1>
             </div>
           ) : (

@@ -20,6 +20,7 @@ class ToWatchEpisodesContent extends Component {
 
   componentDidMount() {
     this.getContent({})
+    this._isMounted = true
   }
 
   componentWillUnmount() {
@@ -28,6 +29,8 @@ class ToWatchEpisodesContent extends Component {
         .userShow({ uid: this.props.authUser.uid, key: show.id, database: "watchingShows" })
         .off()
     })
+
+    this._isMounted = false
   }
 
   getContent = ({ sortBy = "first_air_date", isInitialLoad = true, database = "watchingShows" }) => {
@@ -50,8 +53,8 @@ class ToWatchEpisodesContent extends Component {
               id: item.val().id,
               // name: item.val().name,
               status: item.val().status,
-              // timeStamp: item.val().timeStamp,
-              // allEpisodesWatched: item.val().allEpisodesWatched,
+              timeStamp: item.val().timeStamp,
+              allEpisodesWatched: item.val().allEpisodesWatched,
               // finished_and_timeStamp: item.val().finished_and_timeStamp,
               episodes: item.val().episodes
             }
@@ -76,8 +79,15 @@ class ToWatchEpisodesContent extends Component {
                       }
                     })
                   })
-                  show.info.timeStamp = snapshot.val().timeStamp
+                  show.info = {
+                    ...show.info,
+                    timeStamp: snapshot.val().timeStamp
+                  }
+                  show.allEpisodesWatched = snapshot.val().allEpisodesWatched
+
                   watchingShows.splice(index, 0, show)
+
+                  console.log(watchingShows)
 
                   this.setState({
                     watchingShows: watchingShows
@@ -120,10 +130,13 @@ class ToWatchEpisodesContent extends Component {
               })
           })
         ).then(showsData => {
+          if (!this._isMounted) return
+
           const updatedShows = []
 
           showsData.forEach(show => {
             const userShow = userShows.find(item => item.id === show.id)
+            console.log(userShow)
             if (userShow.allEpisodesWatched) return
 
             let updatedSeasons = []
@@ -166,6 +179,7 @@ class ToWatchEpisodesContent extends Component {
 
             updatedShows.push({
               ...show,
+              allEpisodesWatched: userShow.allEpisodesWatched,
               info: {
                 ...show.info,
                 timeStamp: userShow.timeStamp
@@ -191,7 +205,7 @@ class ToWatchEpisodesContent extends Component {
       <div className="content-results content-results--to-watch-page">
         {this.state.initialLoading ? (
           <Loader className="loader--pink" />
-        ) : this.state.watchingShows.length === 0 ? (
+        ) : !this.state.watchingShows.find(item => !item.allEpisodesWatched) ? (
           <PlaceholderNoToWatchEpisodes />
         ) : (
           <>

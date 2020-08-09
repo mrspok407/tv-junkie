@@ -4,11 +4,10 @@ export const checkIfAllEpisodesWatched = ({ show, firebase, authUser, todayDate 
   const showsSubDatabase = show.info.status
 
   firebase.showEpisodes(showsSubDatabase, show.info.id).once("value", snapshot => {
-    let allEpisodesDatabase = []
-
-    snapshot.val().forEach(item => {
-      allEpisodesDatabase = [...allEpisodesDatabase, ...item.episodes]
-    })
+    const allEpisodesDatabase = snapshot.val().reduce((acc, item) => {
+      acc.push(...item.episodes)
+      return acc
+    }, [])
 
     const releasedEpisodes = allEpisodesDatabase.filter(episode => {
       const daysToNewEpisode = differenceBtwDatesInDays(episode.air_date, todayDate)
@@ -16,11 +15,10 @@ export const checkIfAllEpisodesWatched = ({ show, firebase, authUser, todayDate 
     })
 
     firebase.userShowAllEpisodes(authUser.uid, show.info.id, show.database).once("value", snapshot => {
-      let allEpisodes = []
-
-      snapshot.val().forEach(item => {
-        allEpisodes = [...allEpisodes, ...item.episodes]
-      })
+      const allEpisodes = snapshot.val().reduce((acc, item) => {
+        acc.push(...item.episodes)
+        return acc
+      }, [])
 
       allEpisodes.splice(releasedEpisodes.length)
 

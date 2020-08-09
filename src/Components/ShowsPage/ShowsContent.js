@@ -57,10 +57,14 @@ class ShowsContent extends Component {
   componentDidMount() {
     this.getContent({ sortBy: "name", isInitialLoad: true })
     window.addEventListener("scroll", this.handleScroll)
+
+    this._isMounted = true
   }
 
   componentWillUnmount() {
     window.removeEventListener("scroll", this.handleScroll)
+
+    this._isMounted = false
   }
 
   toggleSection = section => {
@@ -118,8 +122,9 @@ class ShowsContent extends Component {
                 })
             })
           ).then(showsData => {
-            counter++
+            if (!this._isMounted) return
 
+            counter++
             this.setState({
               database: {
                 ...this.state.database,
@@ -194,6 +199,8 @@ class ShowsContent extends Component {
               })
           })
         ).then(showsData => {
+          if (!this._isMounted) return
+
           this.setState(prevState => ({
             database: {
               ...prevState.database,

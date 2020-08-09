@@ -161,7 +161,7 @@ const withUserContent = Component => {
             episodes: userEpisodes,
             id,
             finished_and_name: `false_${show.name || show.original_name}` // I need this cause Firebase can't filter by more than one query on the server
-            //  finished_and_timeStamp: `false_${3190666598976 - this.firebase.timeStamp()}` // This is one of the approach recommended by Firebase developer Puf
+            //  finished_and_timeStamp: `false_${3190666598976 - this.firebase.timeStamp()}` // This is one of the approaches recommended by Firebase developer Puf
           })
           .then(() => {
             this.firebase

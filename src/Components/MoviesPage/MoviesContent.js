@@ -39,10 +39,14 @@ class MoviesContent extends Component {
   componentDidMount() {
     this.getContent({ sortBy: "title", isInitialLoad: true })
     window.addEventListener("scroll", this.handleScroll)
+
+    this._isMounted = true
   }
 
   componentWillUnmount() {
     window.removeEventListener("scroll", this.handleScroll)
+
+    this._isMounted = false
   }
 
   getContent = ({ sortBy = "title", isInitialLoad = true }) => {
@@ -58,12 +62,12 @@ class MoviesContent extends Component {
         .orderByChild(sortBy)
         .limitToFirst(this.state.loadedMovies[database])
         .once("value", snapshot => {
+          if (!this._isMounted) return
+
           let movies = []
           snapshot.forEach(item => {
             movies = [...movies, item.val()]
           })
-
-          console.log(movies)
 
           this.setState({
             database: {
@@ -106,12 +110,12 @@ class MoviesContent extends Component {
       .startAt(this.state.lastLoadedMovie[this.state.activeSection] + 1)
       .limitToFirst(itemsToLoad)
       .once("value", snapshot => {
+        if (!this._isMounted) return
+
         let movies = []
         snapshot.forEach(item => {
           movies = [...movies, item.val()]
         })
-
-        console.log(movies)
 
         this.setState(prevState => ({
           database: {

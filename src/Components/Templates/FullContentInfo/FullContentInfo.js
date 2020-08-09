@@ -61,7 +61,11 @@ function FullContentInfo({
 
   const [error, setError] = useState()
 
+  const [isMounted, setIsMounted] = useState(true)
+
   useEffect(() => {
+    setIsMounted(true)
+
     if (mediaType === "show") {
       getFullShowInfo()
       getShowInDatabase()
@@ -72,6 +76,7 @@ function FullContentInfo({
     }
 
     return () => {
+      setIsMounted(false)
       if (cancelRequest !== undefined) cancelRequest()
       if (!authUser) return
 
@@ -156,6 +161,7 @@ function FullContentInfo({
             numberOfSeasons: number_of_seasons || "-",
             seasonsArr: seasons.reverse()
           })
+
           setSimilarContent(similarShowsSortByVotes)
           setLoadingPage(false)
         }
@@ -328,10 +334,14 @@ function FullContentInfo({
                 .set(null)
             }
 
-            setShowInDatabase({ database, info: userShow })
-            setShowDatabaseOnClient(database)
+            if (isMounted) {
+              setShowInDatabase({ database, info: userShow })
+              setShowDatabaseOnClient(database)
+            }
           } else {
-            setLoadingFromDatabase(false)
+            if (isMounted) {
+              setLoadingFromDatabase(false)
+            }
           }
         },
         error => {
