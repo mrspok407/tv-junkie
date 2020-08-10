@@ -4,6 +4,7 @@ import { withRouter } from "react-router-dom"
 import { compose } from "recompose"
 import { validEmailRegex } from "Utils"
 import * as ROLES from "Utils/Constants/roles"
+import * as ROUTES from "Utils/Constants/routes"
 import classNames from "classnames"
 import Input from "../Input/Input"
 import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
@@ -48,7 +49,6 @@ class RegisterBase extends Component {
 
     const { email, password } = this.state.requiredInputs
     const errors = { ...this.state.errors }
-    const roles = {}
 
     if (!this.isFormValid(errors, this.state.requiredInputs)) {
       for (const [key, value] of Object.entries(this.state.requiredInputs)) {
@@ -68,18 +68,14 @@ class RegisterBase extends Component {
     this.props.firebase
       .createUserWithEmailAndPassword(email, password)
       .then(authUser => {
-        if (email === "mr.spok407@gmail.com") {
-          roles[ROLES.ADMIN] = ROLES.ADMIN
-        } else {
-          roles[ROLES.USER] = ROLES.USER
-        }
+        const userRole = email === "mr.spok407@gmail.com" ? ROLES.ADMIN : ROLES.USER
 
         this.props.firebase
           .user(authUser.user.uid)
           .set({
             username: this.state.inputs.login,
             email,
-            roles
+            role: userRole
           })
           .then(() => {
             const watchingShows = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)) || []
@@ -118,7 +114,7 @@ class RegisterBase extends Component {
       })
       .then(() => {
         this.setState({ ...INITIAL_STATE })
-        this.props.history.push("/")
+        this.props.history.push(ROUTES.HOME_PAGE)
       })
       .catch(error => {
         errors.error = error

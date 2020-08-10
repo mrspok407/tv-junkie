@@ -4,7 +4,7 @@ import { differenceBtwDatesInDays } from "Utils"
 import classNames from "classnames"
 import { Link } from "react-router-dom"
 import * as ROUTES from "Utils/Constants/routes"
-import UserRating from "../FullContentInfo/Components/UserRating/UserRating"
+import UserRating from "../../UserRating/UserRating"
 
 const FADE_OUT_SPEED = 300
 

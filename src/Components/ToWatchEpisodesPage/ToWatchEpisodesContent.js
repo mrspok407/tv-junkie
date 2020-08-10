@@ -136,7 +136,6 @@ class ToWatchEpisodesContent extends Component {
 
           showsData.forEach(show => {
             const userShow = userShows.find(item => item.id === show.id)
-            console.log(userShow)
             if (userShow.allEpisodesWatched) return
 
             let updatedSeasons = []

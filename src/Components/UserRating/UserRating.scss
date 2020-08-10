@@ -19,7 +19,7 @@
     outline: 0;
     cursor: pointer;
     background-color: transparent;
-    background-image: url("../../../../../assets/images/icons/rate-star-button-white.png");
+    background-image: url("../../assets/images/icons/rate-star-button-white.png");
     background-size: $starNonActiveSize;
     background-position: 50% 50%;
     background-repeat: no-repeat;
@@ -32,7 +32,7 @@
       width: $starActiveSize;
       height: $starActiveSize;
       transform: translate(-50%, -50%);
-      background-image: url("../../../../../assets/images/icons/rate-star-button-peru.png");
+      background-image: url("../../assets/images/icons/rate-star-button-peru.png");
       background-size: $starActiveSize;
       background-position: 50% 50%;
       background-repeat: no-repeat;
@@ -54,7 +54,7 @@
     }
 
     &--disabled {
-      background-image: url("../../../../../assets/images/icons/rate-star-button-disabled.png");
+      background-image: url("../../assets/images/icons/rate-star-button-disabled.png");
     }
   }
 

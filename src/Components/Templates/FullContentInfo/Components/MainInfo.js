@@ -4,7 +4,7 @@ import ShowsButtons from "./ShowsButtons"
 import classNames from "classnames"
 import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
 import { withUserContent } from "Components/UserContent"
-import UserRating from "./UserRating/UserRating"
+import UserRating from "../../../UserRating/UserRating"
 
 class MainInfo extends Component {
   render() {

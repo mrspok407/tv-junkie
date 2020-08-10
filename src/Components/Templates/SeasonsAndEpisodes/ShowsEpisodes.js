@@ -8,7 +8,7 @@ import Loader from "Components/Placeholders/Loader"
 import classNames from "classnames"
 import SeasonEpisodes from "./SeasonEpisodes"
 import "../../../styles/abstractions/listOfEpisodes.scss"
-import UserRating from "../FullContentInfo/Components/UserRating/UserRating"
+import UserRating from "../../UserRating/UserRating"
 
 let cancelRequest
 

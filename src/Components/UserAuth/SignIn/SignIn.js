@@ -4,10 +4,12 @@ import { withRouter } from "react-router-dom"
 import { compose } from "recompose"
 import { withFirebase } from "Components/Firebase"
 import { validEmailRegex } from "Utils"
+import * as ROUTES from "Utils/Constants/routes"
 import classNames from "classnames"
 import Input from "../Input/Input"
 import { WithAuthenticationConsumer } from "../Session/WithAuthentication"
 import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
+import SignInWithGoogleForm from "./SignInWithGoogle"
 
 const LOCAL_STORAGE_KEY_WATCHING_SHOWS = "watchingShowsLocalS"
 const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = "watchLaterMoviesLocalS"
@@ -65,7 +67,7 @@ class SignInFormBase extends Component {
         if (this.props.closeNavMobile) this.props.closeNavMobile()
 
         this.setState({ ...INITIAL_STATE })
-        this.props.history.push("/")
+        this.props.history.push(ROUTES.HOME_PAGE)
       })
       .catch(error => {
         errors.error = error
@@ -233,6 +235,7 @@ class SignInFormBase extends Component {
         >
           {this.state.submitRequestLoading ? <span className="auth__form-loading"></span> : "Sign In"}
         </button>
+        <SignInWithGoogleForm />
       </form>
     )
   }
