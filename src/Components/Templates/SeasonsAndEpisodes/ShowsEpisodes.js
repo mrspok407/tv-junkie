@@ -361,7 +361,7 @@ class ShowsEpisodes extends Component {
 
                   {this.props.toWatchPage && (
                     <div className="episodes__episode-group-episodes-left">
-                      {seasonEpisodesNotWatched.length} episodes left from {episodeNumber}
+                      {seasonEpisodesNotWatched.length} episodes left <span>from {episodeNumber}</span>
                     </div>
                   )}
 

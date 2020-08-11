@@ -36,9 +36,9 @@ $font-sizes: (
   //   row-gap: 0px;
   // }
 
-  &--to-watch-page {
-    grid-auto-rows: minmax(35px, max-content);
-  }
+  // &--to-watch-page {
+  //   grid-auto-rows: minmax(35px, max-content);
+  // }
 
   &__check-all-episodes {
     grid-column: 1 / 2;
@@ -153,9 +153,9 @@ $font-sizes: (
     &-name {
       padding: 10px;
 
-      &--to-watch-page {
-        padding: 7px;
-      }
+      // &--to-watch-page {
+      //   padding: 7px;
+      // }
 
       // &--calendar {
       //   font-size: 1.8rem;
@@ -170,6 +170,12 @@ $font-sizes: (
 
     &-episodes-left {
       font-size: 0.9rem;
+
+      @include mediaMaxW(550px) {
+        span {
+          display: none;
+        }
+      }
 
       // &--calendar {
       //   display: flex;
@@ -187,9 +193,9 @@ $font-sizes: (
       grid-column: 3 / 4;
       padding: 10px 35px 10px 10px;
 
-      &--to-watch-page {
-        padding: 7px 35px 7px 10px;
-      }
+      // &--to-watch-page {
+      //   padding: 7px 35px 7px 10px;
+      // }
     }
 
     .loader--small-pink {
@@ -225,13 +231,13 @@ $font-sizes: (
     grid-auto-rows: max-content;
     grid-row-gap: 5px;
 
-    &--to-watch-page {
-      grid-column: 1 / 3;
+    // &--to-watch-page {
+    //   grid-column: 1 / 3;
 
-      @include mediaMaxW(#{$mobileViewPort}) {
-        grid-column: initial;
-      }
-    }
+    //   @include mediaMaxW(#{$mobileViewPort}) {
+    //     grid-column: initial;
+    //   }
+    // }
   }
 
   &__episode {
@@ -254,11 +260,11 @@ $font-sizes: (
       z-index: -1;
     }
 
-    &--to-watch-page {
-      &:after {
-        display: none;
-      }
-    }
+    // &--to-watch-page {
+    //   &:after {
+    //     display: none;
+    //   }
+    // }
 
     &--open {
       &:after {
@@ -303,19 +309,45 @@ $font-sizes: (
         opacity: 1;
       }
 
-      &--to-watch-page {
-        grid-template-columns: minmax(100px, 1.75fr) 1fr 3fr 1.1fr;
-        cursor: initial;
+      // &--to-watch-page {
+      //   grid-template-columns: minmax(100px, 1.75fr) 1.3fr 2.7fr 1.1fr;
+      //   cursor: initial;
 
-        .user-rating {
-          padding-left: 40px;
-        }
-      }
+      //   @include mediaMaxW(#{$mobileViewPort}) {
+      //     grid-template-columns: minmax(130px, 1fr) 2fr minmax(190px, 1fr);
+      //   }
+      //   @include mediaMaxW(550px) {
+      //     grid-template-columns: minmax(150px, max-content) 1fr;
+      //   }
+
+      //   .user-rating {
+      //     padding-left: 40px;
+
+      //     @include mediaMaxW(#{$mobileViewPort}) {
+      //       grid-column: 1 / 5;
+      //     }
+      //     @include mediaMaxW(550px) {
+      //       grid-column: 1 / 4;
+      //     }
+      //   }
+
+      //   .torrent-links--to-watch-page {
+      //     padding: 5px;
+
+      //     @include mediaMaxW(550px) {
+      //       grid-column: 1 / 4;
+      //     }
+      //   }
+      // }
     }
 
     &-date {
       padding-left: 33px;
       align-self: center;
+
+      @include mediaMaxW(550px) {
+        padding-left: 10px;
+      }
     }
 
     &-name {

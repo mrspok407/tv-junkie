@@ -13,7 +13,7 @@
   height: 50px;
   border: 0;
   outline: none;
-  background-color: #131313;
+  background-color: transparent;
   transition: width 0.3s;
   font: {
     size: 2rem;
@@ -27,7 +27,6 @@
 
 .search__media-type {
   position: relative;
-  background-color: #131313;
   border: none;
   color: #fff;
   outline: none;

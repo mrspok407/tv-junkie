@@ -174,6 +174,7 @@ class CalendarContent extends Component {
                           // const episodeAirDateAsDateObj = new Date(episode.air_date)
 
                           const daysToNewEpisode = differenceBtwDatesInDays(episode.air_date, todayDate)
+                          const willAirToday = daysToNewEpisode === 0
 
                           return (
                             <div key={episode.id} className="episodes__episode">
@@ -191,9 +192,17 @@ class CalendarContent extends Component {
                                   </div>
                                   <div className="episodes__episode-episode-title">{episode.name}</div>
                                 </div>
-                                {daysToNewEpisode > 0 && (
-                                  <div className="episodes__episode-days-to-air episodes__episode-days-to-air">
-                                    {daysToNewEpisode} {daysToNewEpisode > 1 ? "days" : "day"}
+                                {daysToNewEpisode >= 0 && (
+                                  <div
+                                    className={classNames("episodes__episode-days-to-air", {
+                                      "episodes__episode-days-to-air--today": willAirToday
+                                    })}
+                                  >
+                                    {daysToNewEpisode > 1
+                                      ? `${daysToNewEpisode} days`
+                                      : daysToNewEpisode === 1
+                                      ? "1 day"
+                                      : willAirToday && "Today"}
                                   </div>
                                 )}
                               </div>

@@ -66,6 +66,10 @@
     column-gap: 10px;
     row-gap: 3px;
 
+    @include mediaMaxW(350px) {
+      grid-template-columns: 4fr 1fr;
+    }
+
     &-image {
       --height: 62px;
       min-width: calc(var(--height) / 1.5);
@@ -74,6 +78,10 @@
       background-size: auto 100%;
       background-repeat: no-repeat;
       background-position: left top;
+
+      @include mediaMaxW(350px) {
+        display: none;
+      }
     }
 
     &-title {

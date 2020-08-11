@@ -34,6 +34,8 @@ const SignInWithGoogleBase = ({
       .then(authUser => {
         const userRole = authUser.user.email === "mr.spok407@gmail.com" ? ROLES.ADMIN : ROLES.USER
 
+        console.log(authUser)
+
         firebase
           .user(authUser.user.uid)
           .update({
@@ -42,6 +44,8 @@ const SignInWithGoogleBase = ({
             role: userRole
           })
           .then(() => {
+            if (!authUser.additionalUserInfo.isNewUser) return
+
             const watchingShows = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)) || []
             const watchLaterMovies =
               JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)) || []

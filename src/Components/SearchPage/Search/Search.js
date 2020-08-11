@@ -17,7 +17,6 @@ class Search extends Component {
     this.state = {
       query: "",
       searchResults: [],
-      contentInDatabase: [],
       isSearchingList: false,
       totalPages: null,
       listIsOpen: false,
@@ -83,22 +82,6 @@ class Search extends Component {
       })
   }
 
-  updateContentInDbClient = (id, contentArr) => {
-    console.log(this.state.contentInDatabase)
-    const content = this.state.contentInDatabase.find(item => item.id === id)
-    const contentToAdd = contentArr && contentArr.find(item => item.id === id)
-
-    if (content) {
-      this.setState(prevState => ({
-        contentInDatabase: prevState.contentInDatabase.filter(item => item.id !== id)
-      }))
-    } else {
-      this.setState(prevState => ({
-        contentInDatabase: [...prevState.contentInDatabase, contentToAdd]
-      }))
-    }
-  }
-
   renderSearch = list => {
     const { searchResults, error } = this.state
     return error || !Array.isArray(searchResults) ? (
@@ -112,10 +95,8 @@ class Search extends Component {
 
   handleClickOutside = e => {
     if (
-      this.searchContRef.current &&
-      this.props.navRef &&
-      !this.searchContRef.current.contains(e.target) &&
-      !this.props.navRef.current.contains(e.target)
+      (this.searchContRef.current && !this.searchContRef.current.contains(e.target)) ||
+      (this.props.navRef && !this.props.navRef.current.contains(e.target))
     ) {
       this.setState({
         listIsOpen: false
@@ -211,8 +192,6 @@ class Search extends Component {
                   isSearchingList={this.state.isSearchingList}
                   navSearch={this.props.navSearch}
                   currentListItem={this.state.currentListItem}
-                  contentInDatabase={this.state.contentInDatabase}
-                  updateContentInDbClient={this.updateContentInDbClient}
                   mediaTypeSearching={this.state.mediaTypeSearching}
                   handleClickOutside={this.handleClickOutside}
                 />
@@ -226,8 +205,6 @@ class Search extends Component {
             )}
           </div>
         </div>
-        {this.props.renderCurrentlyChosenContent &&
-          this.props.renderCurrentlyChosenContent(this.updateContentInDbClient)}
       </div>
     )
   }

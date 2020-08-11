@@ -155,6 +155,7 @@ export default class SeasonEpisodes extends Component {
                 ref={this.episode}
                 key={episode.id}
                 className={classNames("episodes__episode", {
+                  "episodes__episode--to-watch-page": this.props.toWatchPage,
                   "episodes__episode--open": this.props.detailEpisodeInfo.includes(episode.id),
                   "fade-out-episode":
                     this.props.toWatchPage && this.state.fadeOutEpisodes.find(item => item.id === episode.id)
@@ -229,14 +230,14 @@ export default class SeasonEpisodes extends Component {
                           </a>
                         </div>
 
-                        <button
+                        {/* <button
                           type="button"
                           className="torrent-links__link-button"
                           onClick={() => this.toggleTorrentLinks(episode.id)}
                         >
                           Links
-                        </button>
-
+                        </button> */}
+                        {/* 
                         {this.state.showTorrentLinks.includes(episode.id) && (
                           <div
                             className={classNames(
@@ -268,7 +269,7 @@ export default class SeasonEpisodes extends Component {
                               480p
                             </a>
                           </div>
-                        )}
+                        )} */}
                       </>
                     )
                   )}

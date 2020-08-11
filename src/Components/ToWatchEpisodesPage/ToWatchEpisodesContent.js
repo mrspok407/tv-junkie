@@ -199,6 +199,18 @@ class ToWatchEpisodesContent extends Component {
       })
   }
 
+  showEpisodeInfo = episodeId => {
+    if (this.state.detailEpisodeInfo.includes(episodeId)) {
+      this.setState(prevState => ({
+        detailEpisodeInfo: [...prevState.detailEpisodeInfo.filter(item => item !== episodeId)]
+      }))
+    } else {
+      this.setState(prevState => ({
+        detailEpisodeInfo: [...prevState.detailEpisodeInfo, episodeId]
+      }))
+    }
+  }
+
   render() {
     return (
       <div className="content-results content-results--to-watch-page">

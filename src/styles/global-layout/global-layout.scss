@@ -9,15 +9,8 @@
   margin-top: 45px;
   &__img {
     width: 85%;
+    align-self: flex-start; // This is for ios safari, the height of image is not changing rigth for some reason https://stackoverflow.com/a/61196907
     max-width: 517px;
-  }
-}
-
-.logo--footer {
-  margin: 0;
-
-  .logo__img {
-    max-width: 400px;
   }
 }
 
@@ -94,70 +87,6 @@
       &:hover:before {
         transform: translate(1px, -1px);
       }
-    }
-    // &--mobile {
-    //   display: none;
-    //   @include mediaMaxW(#{$mobileViewPort}) {
-    //     display: flex;
-    //     position: absolute;
-    //     top: 0;
-    //     right: 100%;
-    //     padding-top: 0;
-    //     z-index: 9999;
-    //   }
-    //   * {
-    //     @include mediaMaxW(#{$mobileViewPort}) {
-    //       padding: 5px 10px 5px 10px;
-    //       background-color: getColor(blueClr, $mainPalette);
-    //     }
-    //   }
-    // }
-  }
-
-  &--to-watch-page {
-    padding: 0 5px 0 0;
-
-    &-desktop {
-      @include mediaMaxW(#{$mobileViewPort}) {
-        display: none;
-      }
-    }
-
-    &-mobile {
-      display: none;
-      @include mediaMaxW(#{$mobileViewPort}) {
-        display: grid;
-        position: absolute;
-        right: -5px;
-        top: 37px;
-        width: 250px;
-        z-index: 5;
-
-        * {
-          background-color: getColor(blueClr, $mainPalette);
-          padding: 10px 4px 10px 4px;
-        }
-      }
-    }
-  }
-
-  &__link-button {
-    display: none;
-    padding: 5px 10px 5px 10px;
-    height: 33px;
-    justify-content: center;
-    align-items: center;
-    align-self: end;
-    font-size: 1.1rem;
-    background-color: getColor(orangeClr, $mainPalette);
-    border: none;
-    color: #fff;
-    font-weight: 600;
-    letter-spacing: 1px;
-
-    @include mediaMaxW(#{$mobileViewPort}) {
-      display: flex;
-      padding: 5px 0px 5px 0px;
     }
   }
 }
@@ -259,6 +188,10 @@ $font-sizes: (
   max-width: 1000px;
   padding-right: 0;
   padding-left: 0;
+
+  @include mediaMaxW(#{$mobileViewPort}) {
+    padding: 0 8px 100px 8px;
+  }
 }
 
 .content-results__wrapper {

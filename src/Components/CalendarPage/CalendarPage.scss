@@ -52,6 +52,19 @@
 
     &-days-to-air {
       padding-right: 10px;
+
+      @include mediaMaxW(#{$mobileViewPort}) {
+        grid-column: 3 / 4;
+        grid-row: 1 /2;
+      }
+
+      &--today {
+        color: getColor(orangeClr, $mainPalette);
+        font: {
+          size: 1.2rem;
+          weight: 600;
+        }
+      }
     }
 
     &-wrapper--calendar {
@@ -61,7 +74,8 @@
       align-items: center;
 
       @include mediaMaxW(#{$mobileViewPort}) {
-        grid-template-columns: minmax(50px, 130px) max-content 1fr;
+        grid-column: 1 / 4;
+        grid-template-columns: minmax(50px, 100px) max-content 1fr;
       }
     }
 
@@ -73,10 +87,14 @@
           text-decoration: underline;
         }
       }
+
+      @include mediaMaxW(#{$mobileViewPort}) {
+        padding-left: 10px;
+      }
     }
 
     .episodes__episode-wrapper {
-      grid-template-columns: minmax(75px, 1.05fr) 3fr 0.8fr;
+      grid-template-columns: minmax(75px, 1.05fr) 3fr 1.3fr;
       cursor: initial;
     }
 
@@ -93,6 +111,7 @@
     &:nth-child(odd) {
       .episodes__episode-wrapper {
         background-color: #7b7b7b14;
+        padding-bottom: 6px;
       }
     }
     &:nth-child(even) {

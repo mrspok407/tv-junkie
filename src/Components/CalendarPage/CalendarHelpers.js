@@ -5,7 +5,7 @@ export const organiseFutureEpisodesByMonth = data => {
     .flatMap(show =>
       show.episodes.flatMap(season =>
         season.episodes.reduce((acc, episode) => {
-          if (differenceBtwDatesInDays(episode.air_date, todayDate) > 0) {
+          if (differenceBtwDatesInDays(episode.air_date, todayDate) >= 0) {
             acc.push({ ...episode, show: show.info.name || show.info.original_name, showId: show.info.id })
           }
 

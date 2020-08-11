@@ -14,7 +14,7 @@ export default class SearchList extends Component {
 
   render() {
     return (
-      <div ref={this.searchList} className="search-list">
+      <div className="search-list">
         {this.props.searchResults.map(
           (
             {
@@ -59,8 +59,6 @@ export default class SearchList extends Component {
                 known_for_department={known_for_department}
                 searchResults={this.props.searchResults}
                 index={index}
-                contentInDatabase={this.props.contentInDatabase}
-                updateContentInDbClient={this.props.updateContentInDbClient}
                 mediaType={media_type}
                 mediaTypeSearching={this.props.mediaTypeSearching}
               />
