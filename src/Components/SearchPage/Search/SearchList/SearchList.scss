@@ -144,10 +144,6 @@
       }
     }
 
-    &--person {
-      padding: 10px;
-    }
-
     .user-rating {
       $buttonSize: 30px;
 
@@ -190,9 +186,14 @@
       grid-template-columns: max-content 1fr;
       grid-template-rows: repeat(3, max-content);
       row-gap: 4px;
+      padding: 10px;
 
       &-image {
         grid-row: 1 / 4;
+
+        @include mediaMaxW(350px) {
+          display: initial;
+        }
       }
 
       &-name,

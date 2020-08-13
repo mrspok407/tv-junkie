@@ -139,6 +139,7 @@ class Search extends Component {
       currentListItem: 0
     })
     this.onBlur()
+    this.props.closeNavMobile()
   }
 
   linkOnKeyPress = () => {

@@ -9,6 +9,7 @@
   width: 100%;
   height: 70px;
   padding: 10px 0 10px 0;
+  color: getColor(orangeClr, $mainPalette);
   overflow: hidden;
   background-color: getColor(backgroundColor, $searchCardPalette);
   opacity: 1;
@@ -23,7 +24,6 @@
     size: 1.5rem;
     weight: bold;
   }
-  color: #fff;
 }
 
 .placeholder--no-shows {

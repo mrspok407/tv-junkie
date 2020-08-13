@@ -87,8 +87,6 @@ class ToWatchEpisodesContent extends Component {
 
                   watchingShows.splice(index, 0, show)
 
-                  console.log(watchingShows)
-
                   this.setState({
                     watchingShows: watchingShows
                   })

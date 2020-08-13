@@ -200,6 +200,10 @@ $font-sizes: (
   grid-auto-rows: minmax(450px, max-content);
   grid-gap: $gridGap;
   justify-content: center;
+
+  &--finished-shows {
+    grid-auto-rows: minmax(380px, max-content);
+  }
 }
 
 .content-results__item {

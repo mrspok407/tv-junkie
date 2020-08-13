@@ -510,7 +510,9 @@ class ShowsContent extends Component {
               </div>
             )}
             <div
-              className="content-results__wrapper"
+              className={classNames("content-results__wrapper", {
+                "content-results__wrapper--finished-shows": this.state.activeSection === "finishedShows"
+              })}
               style={
                 currentNumOfColumns <= 3
                   ? {

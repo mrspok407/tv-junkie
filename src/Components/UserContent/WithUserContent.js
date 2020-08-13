@@ -82,6 +82,13 @@ const withUserContent = Component => {
 
             seasonsData.forEach((item, index) => {
               const season = item[`season/${index + 1}`]
+              if (
+                !Array.isArray(season.episodes) ||
+                season.episodes.length === 0 ||
+                season.air_date.length === 0
+              )
+                return
+
               let episodes = []
 
               season.episodes.forEach(item => {
@@ -153,7 +160,6 @@ const withUserContent = Component => {
           .child(id)
           .set({
             allEpisodesWatched: false,
-            // status: data.status,
             status: showsSubDatabase,
             firstAirDate: show.first_air_date,
             name: show.name || show.original_name,
@@ -197,15 +203,14 @@ const withUserContent = Component => {
                   usersWatching: 1
                 }
               } else {
-                console.log("allready exists")
                 return
               }
             },
             (error, committed, snapshot) => {
               if (error) {
-                console.log("Transaction failed abnormally!", error)
+                // console.log("Transaction failed abnormally!", error)
               } else if (!committed) {
-                console.log("We aborted the transaction (because allready exists).")
+                // console.log("We aborted the transaction (because allready exists).")
                 this.firebase
                   .allShowsList(showsSubDatabase)
                   .child(id)
@@ -213,7 +218,7 @@ const withUserContent = Component => {
                     usersWatching: snapshot.val().usersWatching + 1
                   })
               } else {
-                console.log("added!")
+                // console.log("added!")
               }
             }
           )

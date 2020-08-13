@@ -17,7 +17,6 @@ describe("Input works correctly", () => {
   const $close = ".input-clear"
 
   test("changes state value, without making a callback", () => {
-    console.log($input)
     expect(wrapper.state("query")).toBe("")
     $input.simulate("change", { target: { value: "check" } })
     expect(wrapper.state("query")).toBe("check")

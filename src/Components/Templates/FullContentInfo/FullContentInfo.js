@@ -14,6 +14,7 @@ import ShowsEpisodes from "Components/Templates/SeasonsAndEpisodes/ShowsEpisodes
 import PosterWrapper from "./Components/PosterWrapper"
 import "./FullContentInfo.scss"
 import { withUserContent } from "Components/UserContent"
+import ScrollToTopOnUpdate from "Utils/ScrollToTopOnUpdate"
 
 const todayDate = new Date()
 
@@ -458,6 +459,7 @@ function FullContentInfo({
         )}
       </div>
       <ScrollToTop />
+      <ScrollToTopOnUpdate />
     </>
   )
 }

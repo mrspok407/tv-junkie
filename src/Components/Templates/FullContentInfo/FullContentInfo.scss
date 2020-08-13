@@ -44,6 +44,7 @@ $font-sizes: (
   padding-top: 50px;
   @include mediaMaxW(#{$mobileViewPort}) {
     grid-template-columns: 1fr;
+    grid-gap: 20px;
   }
 
   &__error {
@@ -121,6 +122,7 @@ $font-sizes: (
       display: grid;
       grid-template-columns: 30% 70%;
       grid-template-rows: minmax(45px, max-content);
+      column-gap: 5px;
       align-items: center;
       border-bottom: 1px solid #86868647;
       padding: 3px 0 3px 0;
@@ -143,6 +145,12 @@ $font-sizes: (
       grid-template-columns: 1fr;
       padding-top: 5px;
       padding-bottom: 0;
+
+      .button {
+        @include mediaMaxW(500px) {
+          font-size: 1rem;
+        }
+      }
     }
     &-imdb {
       display: block;
@@ -173,11 +181,6 @@ $font-sizes: (
     @include mediaMaxW(#{$mobileViewPort}) {
       grid-column: inherit;
     }
-  }
-
-  &__check-all-episodes {
-    grid-column: 1 / 2;
-    margin-bottom: -30px;
   }
 
   &__check-season-episodes {

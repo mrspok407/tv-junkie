@@ -9,11 +9,11 @@ import ScrollToTop from "Utils/ScrollToTop"
 import Header from "Components/Header/Header"
 import "./SearchPage.scss"
 
-const LOCAL_STORAGE_KEY_ADV = "advancedSearchContent"
-const LOCAL_STORAGE_KEY_ACTORS = "addedActors"
-const LOCAL_STORAGE_KEY_INPUTS = "advSearchInputs"
-const LOCAL_STORAGE_KEY_PAGENUMBER = "pageNumber"
-const LOCAL_STORAGE_KEY_TOTALPAGES = "totalPages"
+const SESSION_STORAGE_KEY_ADV = "advancedSearchContent"
+const SESSION_STORAGE_KEY_ACTORS = "addedActors"
+const SESSION_STORAGE_KEY_INPUTS = "advSearchInputs"
+const SESSION_STORAGE_KEY_PAGENUMBER = "pageNumber"
+const SESSION_STORAGE_KEY_TOTALPAGES = "totalPages"
 
 const currentYear = new Date().getFullYear()
 
@@ -22,11 +22,11 @@ class SearchPage extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      advancedSearchContent: JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_ADV)) || [],
-      numOfPagesLoaded: JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_PAGENUMBER)) || 1,
-      advSearchInputValues: JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_INPUTS)) || {},
-      withActors: JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_ACTORS)) || [],
-      totalPagesAdvMovies: JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_TOTALPAGES)) || null,
+      advancedSearchContent: JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY_ADV)) || [],
+      numOfPagesLoaded: JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY_PAGENUMBER)) || 1,
+      advSearchInputValues: JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY_INPUTS)) || {},
+      withActors: JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY_ACTORS)) || [],
+      totalPagesAdvMovies: JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY_TOTALPAGES)) || null,
       searchingMovie: false,
       searchingAdvancedSearch: false,
       loadingNewPage: false,
@@ -46,11 +46,11 @@ class SearchPage extends Component {
   }
 
   componentDidUpdate() {
-    localStorage.setItem(LOCAL_STORAGE_KEY_ADV, JSON.stringify(this.state.advancedSearchContent))
-    localStorage.setItem(LOCAL_STORAGE_KEY_ACTORS, JSON.stringify(this.state.withActors))
-    localStorage.setItem(LOCAL_STORAGE_KEY_INPUTS, JSON.stringify(this.state.advSearchInputValues))
-    localStorage.setItem(LOCAL_STORAGE_KEY_PAGENUMBER, JSON.stringify(this.state.numOfPagesLoaded))
-    localStorage.setItem(LOCAL_STORAGE_KEY_TOTALPAGES, JSON.stringify(this.state.totalPagesAdvMovies))
+    sessionStorage.setItem(SESSION_STORAGE_KEY_ADV, JSON.stringify(this.state.advancedSearchContent))
+    sessionStorage.setItem(SESSION_STORAGE_KEY_ACTORS, JSON.stringify(this.state.withActors))
+    sessionStorage.setItem(SESSION_STORAGE_KEY_INPUTS, JSON.stringify(this.state.advSearchInputValues))
+    sessionStorage.setItem(SESSION_STORAGE_KEY_PAGENUMBER, JSON.stringify(this.state.numOfPagesLoaded))
+    sessionStorage.setItem(SESSION_STORAGE_KEY_TOTALPAGES, JSON.stringify(this.state.totalPagesAdvMovies))
   }
 
   advancedSearch = (

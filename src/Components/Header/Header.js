@@ -136,7 +136,7 @@ export default class Header extends Component {
                 "nav__item--nav-search__non-auth": !authUser
               })}
             >
-              <Search navSearch={true} navRef={this.nav} />
+              <Search navSearch={true} navRef={this.nav} closeNavMobile={this.closeNavMobile} />
             </li>
           </ul>
         </nav>

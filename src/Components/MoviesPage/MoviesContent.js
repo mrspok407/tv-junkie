@@ -154,7 +154,6 @@ class MoviesContent extends Component {
         [this.state.activeSection]: filteredMovies
       }
     })
-    console.log(filteredMovies)
   }
 
   updateWatchLaterMoviesDatabase = () => {
@@ -170,8 +169,6 @@ class MoviesContent extends Component {
         snapshot.forEach(item => {
           watchLaterMovies = [...watchLaterMovies, item.val()]
         })
-
-        console.log(snapshot.val())
 
         this.setState(prevState => ({
           database: {

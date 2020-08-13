@@ -76,6 +76,8 @@ export const updateDatabaseFromAPI = functions.pubsub
 
                 seasonsData.forEach((data, index) => {
                   const season = data[`season/${index + 1}`]
+                  if (!Array.isArray(season.episodes) || season.episodes.length === 0) return
+
                   const episodes: {
                     air_date: any
                     episode_number: any

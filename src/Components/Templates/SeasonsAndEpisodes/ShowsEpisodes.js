@@ -235,6 +235,8 @@ class ShowsEpisodes extends Component {
         let allEpisodes = []
 
         snapshot.val().forEach(item => {
+          if (!Array.isArray(item.episodes) || item.episodes.length === 0) return
+
           allEpisodes = [...allEpisodes, ...item.episodes]
         })
 
@@ -356,7 +358,7 @@ class ShowsEpisodes extends Component {
                     Season {season.season_number}
                   </div>
                   {daysToNewSeason > 0 && (
-                    <div className="episodes__episode-groupd-days-to-air">{daysToNewSeason} days to air</div>
+                    <div className="episodes__episode-group-days-to-air">{daysToNewSeason} days to air</div>
                   )}
 
                   {this.props.toWatchPage && (

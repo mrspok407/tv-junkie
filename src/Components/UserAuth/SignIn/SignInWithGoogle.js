@@ -18,7 +18,6 @@ const SignInWithGoogleBase = ({
   toggleWatchLaterMovie,
   closeNavMobile
 }) => {
-  //   const [error, setError] = useState()
   const [windowSize, setWindowSize] = useState(window.innerWidth)
 
   useEffect(() => {
@@ -33,8 +32,6 @@ const SignInWithGoogleBase = ({
     firebase[signInType]()
       .then(authUser => {
         const userRole = authUser.user.email === "mr.spok407@gmail.com" ? ROLES.ADMIN : ROLES.USER
-
-        console.log(authUser)
 
         firebase
           .user(authUser.user.uid)

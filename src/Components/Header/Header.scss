@@ -93,13 +93,14 @@ $navBackground: #352424;
     padding-bottom: 20px;
     transform: translate(0, 0);
     background-color: #000;
-    transition: transform 0.25s;
+    // transition: transform 0.25s;
     z-index: 10;
   }
 
   &--mobile-open {
     @include mediaMaxW(#{$mobileViewPort}) {
       transform: translate(100%, 0);
+      transition: transform 0.25s;
     }
   }
 
@@ -359,7 +360,9 @@ $navBackground: #352424;
       }
 
       .placeholder--no-results {
-        top: calc(100% + 15px);
+        top: calc(100% + 18px);
+        opacity: 0;
+        animation: showSearchList 0s 0.25s forwards;
       }
 
       &__non-auth {

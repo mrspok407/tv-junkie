@@ -13,24 +13,6 @@ import "./HomePage.scss"
 
 const Header = withFirebase(HeaderBase)
 
-const weekTvTrending = axios.get(
-  `https://api.themoviedb.org/3/trending/tv/week?api_key=${process.env.REACT_APP_TMDB_API}`
-)
-
-const popularDramasPromise = axios.get(`https://api.themoviedb.org/3/discover/tv?api_key=${process.env.REACT_APP_TMDB_API}&\
-language=en-US&page=1&sort_by=vote_count.desc&first_air_date.gte=&first_air_date.lte=&first_air_date_year=&vote_average.gte=&\
-vote_count.gte=25&include_null_first_air_dates=false&with_genres=18&without_genres=16,35,9648`)
-
-const popularComediesPromise = axios.get(`https://api.themoviedb.org/3/discover/tv?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US&\
-page=2&sort_by=vote_count.desc&first_air_date.gte=&first_air_date.lte=&first_air_date_year=&vote_average.gte=&vote_count.gte=25&\
-include_null_first_air_dates=false&with_genres=35&without_genres=16,18`)
-
-const popularCrimePromise = axios.get(`https://api.themoviedb.org/3/discover/tv?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US&\
-page=2&sort_by=vote_count.desc&first_air_date.gte=&first_air_date.lte=&first_air_date_year=&vote_average.gte=&vote_count.gte=25&\
-include_null_first_air_dates=false&with_genres=80&without_genres=16,35,9648,10759,10765`)
-
-const promises = [weekTvTrending, popularDramasPromise, popularComediesPromise, popularCrimePromise]
-
 class HomePage extends Component {
   constructor(props) {
     super(props)
@@ -125,6 +107,8 @@ class HomePage extends Component {
 
               seasonsData.forEach((item, index) => {
                 const season = item[`season/${index + 1}`]
+                if (!Array.isArray(season.episodes) || season.episodes.length === 0) return
+
                 let episodes = []
 
                 season.episodes.forEach(item => {
@@ -173,6 +157,24 @@ class HomePage extends Component {
 
   getContentForSliders = () => {
     this.setState({ slidersLoading: true })
+
+    const weekTvTrending = axios.get(
+      `https://api.themoviedb.org/3/trending/tv/week?api_key=${process.env.REACT_APP_TMDB_API}`
+    )
+
+    const popularDramasPromise = axios.get(`https://api.themoviedb.org/3/discover/tv?api_key=${process.env.REACT_APP_TMDB_API}&\
+    language=en-US&page=1&sort_by=vote_count.desc&first_air_date.gte=&first_air_date.lte=&first_air_date_year=&vote_average.gte=&\
+    vote_count.gte=25&include_null_first_air_dates=false&with_genres=18&without_genres=16,35,9648`)
+
+    const popularComediesPromise = axios.get(`https://api.themoviedb.org/3/discover/tv?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US&\
+    page=2&sort_by=vote_count.desc&first_air_date.gte=&first_air_date.lte=&first_air_date_year=&vote_average.gte=&vote_count.gte=25&\
+    include_null_first_air_dates=false&with_genres=35&without_genres=16,18`)
+
+    const popularCrimePromise = axios.get(`https://api.themoviedb.org/3/discover/tv?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US&\
+    page=2&sort_by=vote_count.desc&first_air_date.gte=&first_air_date.lte=&first_air_date_year=&vote_average.gte=&vote_count.gte=25&\
+    include_null_first_air_dates=false&with_genres=80&without_genres=16,35,9648,10759,10765`)
+
+    const promises = [weekTvTrending, popularDramasPromise, popularComediesPromise, popularCrimePromise]
 
     axios
       .all(promises)
@@ -255,7 +257,7 @@ class HomePage extends Component {
         <>
           {this.state.willAirEpisodes.length > 0 ? (
             <div className="home-page__heading">
-              <h1>Soon to watch</h1>
+              <h1 onClick={() => this.testFun()}>Soon to watch</h1>
             </div>
           ) : (
             <PlaceholderHomePageNoFutureEpisodes />

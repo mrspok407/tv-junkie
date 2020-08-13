@@ -9,6 +9,7 @@ import classNames from "classnames"
 import Input from "../Input/Input"
 import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
 import { withUserContent } from "Components/UserContent"
+import SignInWithGoogleForm from "../SignIn/SignInWithGoogle"
 
 const LOCAL_STORAGE_KEY_WATCHING_SHOWS = "watchingShowsLocalS"
 const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = "watchLaterMoviesLocalS"
@@ -326,6 +327,7 @@ class RegisterBase extends Component {
         >
           {this.state.submitRequestLoading ? <span className="auth__form-loading"></span> : "Register"}
         </button>
+        <SignInWithGoogleForm />
       </form>
     )
   }
