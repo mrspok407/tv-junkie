@@ -22,7 +22,6 @@ const SignInWithGoogleBase = ({
 
   useEffect(() => {
     setWindowSize(window.innerWidth)
-    console.log(firebase)
   }, [])
 
   const context = useContext(UserContentLocalStorageContext)
