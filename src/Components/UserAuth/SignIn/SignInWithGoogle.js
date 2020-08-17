@@ -22,14 +22,20 @@ const SignInWithGoogleBase = ({
 
   useEffect(() => {
     setWindowSize(window.innerWidth)
+    console.log(firebase)
   }, [])
 
   const context = useContext(UserContentLocalStorageContext)
 
-  const onSubmit = () => {
-    const signInType = windowSize < mobileLayout ? "signInWithGoogleRedirect" : "signInWithGooglePopUp"
+  const onSubmit = provider => {
+    // const signInType = windowSize < mobileLayout ? "signInWithGoogleRedirect" : "signInWithGooglePopUp"
+    const signInType = windowSize < mobileLayout ? "signInWithRedirect" : "signInWithPopup"
 
-    firebase[signInType]()
+    // const provider = new firebase.app.auth.GoogleAuthProvider()
+
+    firebase.app
+      .auth()
+      [signInType](provider)
       .then(authUser => {
         const userRole = authUser.user.email === "mr.spok407@gmail.com" ? ROLES.ADMIN : ROLES.USER
 
@@ -77,14 +83,19 @@ const SignInWithGoogleBase = ({
       .then(() => {
         history.push(ROUTES.HOME_PAGE)
       })
-    //   .catch(error => {
-    //     setError(error.message)
-    //   })
+      .catch(error => {
+        console.log(error)
+        // setError(error.message)
+      })
   }
 
   return (
     <div className="auth__form--google">
-      <button className="button button--auth__form" type="button" onClick={() => onSubmit()}>
+      <button
+        className="button button--auth__form"
+        type="button"
+        onClick={() => onSubmit(new firebase.app.auth.GoogleAuthProvider())}
+      >
         <div className="auth__form--google-icon"></div>
         <div className="auth__form--google-title">Google Sign In</div>
       </button>

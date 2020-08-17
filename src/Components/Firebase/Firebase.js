@@ -20,6 +20,8 @@ class Firebase {
     this.db = app.database()
 
     this.googleProvider = new app.auth.GoogleAuthProvider()
+
+    this.app = app
   }
 
   /// Auth API ///
