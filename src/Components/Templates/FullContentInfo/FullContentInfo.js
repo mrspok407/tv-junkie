@@ -388,7 +388,6 @@ function FullContentInfo({
           "value",
           snapshot => {
             if (isMounted) {
-              console.log("tttttt")
               if (snapshot.val() !== null) {
                 setMovieInDatabase(item)
               } else {

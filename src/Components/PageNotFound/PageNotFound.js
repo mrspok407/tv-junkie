@@ -21,7 +21,6 @@ class PageNotFound extends Component {
     }
 
     this.countdownTimer = null
-    this.redirectTimer = null
   }
 
   componentDidMount() {

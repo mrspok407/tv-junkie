@@ -9,7 +9,7 @@
   margin-top: 45px;
   &__img {
     width: 85%;
-    align-self: flex-start; // This is for ios safari, the height of image is not changing rigth for some reason https://stackoverflow.com/a/61196907
+    align-self: flex-start; // This is for ios safari, the height of image is not changing right for some reason https://stackoverflow.com/a/61196907
     max-width: 517px;
   }
 }
