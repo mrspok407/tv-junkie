@@ -2,6 +2,7 @@ import app from "firebase/app"
 import { database } from "firebase/app"
 import "firebase/auth"
 import "firebase/database"
+import "firebase/analytics"
 
 const config = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -9,7 +10,9 @@ const config = {
   databaseURL: process.env.REACT_APP_DATABASE_URL,
   projectId: process.env.REACT_APP_PROJECT_ID,
   storageBucket: process.env.REACT_APP_STORAGE_BUCKET,
-  messagingSenderId: process.env.REACT_APP_MESSAGING_SENDER_ID
+  messagingSenderId: process.env.REACT_APP_MESSAGING_SENDER_ID,
+  measurementId: process.env.REACT_APP_MEASUREMENT_ID,
+  appId: process.env.REACT_APP_APP_ID
 }
 
 class Firebase {
@@ -18,6 +21,7 @@ class Firebase {
 
     this.auth = app.auth()
     this.db = app.database()
+    this.analytics = app.analytics()
 
     this.googleProvider = new app.auth.GoogleAuthProvider()
 

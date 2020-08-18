@@ -1,5 +1,5 @@
 import React, { Component } from "react"
-import { HashRouter as Router, Switch, Route } from "react-router-dom"
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
 import { compose } from "recompose"
 import Profile from "Components/UserProfile/Profile"
 import Admin from "Components/Admin/Admin"

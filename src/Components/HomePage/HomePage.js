@@ -45,6 +45,7 @@ class HomePage extends Component {
 
   componentDidMount() {
     this.getContentForSliders()
+    this.props.firebase.analytics.logEvent("notification_received")
     // this.testFun()
   }
 
