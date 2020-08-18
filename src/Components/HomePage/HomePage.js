@@ -45,7 +45,6 @@ class HomePage extends Component {
 
   componentDidMount() {
     this.getContentForSliders()
-    console.log("testoviy test")
     // this.testFun()
   }
 
