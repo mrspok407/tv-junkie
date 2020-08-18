@@ -45,7 +45,7 @@ class HomePage extends Component {
 
   componentDidMount() {
     this.getContentForSliders()
-    console.log("test of developer branch AWS 2")
+    console.log("test of developer branch AWS 3")
     // this.testFun()
   }
 
