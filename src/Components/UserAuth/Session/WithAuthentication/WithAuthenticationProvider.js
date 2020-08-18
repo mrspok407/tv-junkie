@@ -18,7 +18,6 @@ const withAuthenticationProvider = Component => {
 
     componentWillUnmount() {
       this.authUserListener()
-      console.log("unmounted")
     }
 
     authUserListener = () => {

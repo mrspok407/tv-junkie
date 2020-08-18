@@ -1,6 +1,8 @@
 import app from "firebase/app"
+import { database } from "firebase/app"
 import "firebase/auth"
 import "firebase/database"
+import "firebase/analytics"
 
 const config = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -8,7 +10,9 @@ const config = {
   databaseURL: process.env.REACT_APP_DATABASE_URL,
   projectId: process.env.REACT_APP_PROJECT_ID,
   storageBucket: process.env.REACT_APP_STORAGE_BUCKET,
-  messagingSenderId: process.env.REACT_APP_MESSAGING_SENDER_ID
+  messagingSenderId: process.env.REACT_APP_MESSAGING_SENDER_ID,
+  measurementId: process.env.REACT_APP_MEASUREMENT_ID,
+  appId: process.env.REACT_APP_APP_ID
 }
 
 class Firebase {
@@ -17,6 +21,11 @@ class Firebase {
 
     this.auth = app.auth()
     this.db = app.database()
+    this.analytics = app.analytics()
+
+    this.googleProvider = new app.auth.GoogleAuthProvider()
+
+    this.app = app
   }
 
   /// Auth API ///
@@ -25,6 +34,9 @@ class Firebase {
     this.auth.createUserWithEmailAndPassword(email, password)
 
   signInWithEmailAndPassword = (email, password) => this.auth.signInWithEmailAndPassword(email, password)
+
+  signInWithGooglePopUp = () => this.auth.signInWithPopup(this.googleProvider)
+  signInWithGoogleRedirect = () => this.auth.signInWithRedirect(this.googleProvider)
 
   sendEmailVerification = () => this.auth.currentUser.sendEmailVerification()
 
@@ -56,17 +68,38 @@ class Firebase {
     })
   }
 
+  timeStamp = () => database.ServerValue.TIMESTAMP
+
+  /// Shows In Database ///
+  allShowsList = subDatabase => this.db.ref(`allShowsList/${subDatabase}`)
+  showInDatabase = (subDatabase, showKey) => this.db.ref(`allShowsList/${subDatabase}/${showKey}`)
+  showInfo = (subDatabase, showKey) => this.db.ref(`allShowsList/${subDatabase}/${showKey}/info`)
+  showEpisodes = (subDatabase, showKey) => this.db.ref(`allShowsList/${subDatabase}/${showKey}/episodes`)
+
   /// Users API ///
   user = uid => this.db.ref(`users/${uid}`)
   users = () => this.db.ref("users")
 
   /// User Content API ///
-  userContent = uid => this.db.ref(`users/${uid}/content`)
-  watchingShows = uid => this.db.ref(`users/${uid}/content/watchingShows`)
-  droppedShows = uid => this.db.ref(`users/${uid}/content/droppedShows`)
-  willWatchShows = uid => this.db.ref(`users/${uid}/content/willWatchShows`)
+  userShows = (uid, subDatabase) => this.db.ref(`users/${uid}/content/shows/${subDatabase}`)
 
-  watchLaterMovies = uid => this.db.ref(`users/${uid}/content/watchLaterMovies`)
+  userShow = ({ uid, key, database }) => this.db.ref(`users/${uid}/content/shows/${database}/${key}`)
+
+  userShowAllEpisodes = (uid, showKey, subDatabase) =>
+    this.db.ref(`users/${uid}/content/shows/${subDatabase}/${showKey}/episodes`)
+
+  userShowSingleEpisode = ({ uid, key, database, seasonNum, episodeNum }) =>
+    this.db.ref(
+      `users/${uid}/content/shows/${database}/${key}/episodes/${seasonNum - 1}/episodes/${episodeNum}`
+    )
+
+  userShowSeasonEpisodes = ({ uid, key, database, seasonNum }) =>
+    this.db.ref(`users/${uid}/content/shows/${database}/${key}/episodes/${seasonNum - 1}/episodes`)
+
+  userShowSeason = ({ uid, key, database, seasonNum }) =>
+    this.db.ref(`users/${uid}/content/shows/${database}/${key}/episodes/${seasonNum - 1}`)
+
+  watchLaterMovies = uid => this.db.ref(`users/${uid}/content/movies/watchLaterMovies`)
 }
 
 export default Firebase

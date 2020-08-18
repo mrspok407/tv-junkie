@@ -26,6 +26,7 @@
     "jsx-a11y/anchor-has-content": 0,
     "no-else-return": 0,
     "semi": 0,
+    "array-callback-return": 0,
     "react/jsx-props-no-spreading": 0,
     "react/prefer-stateless-function": 0,
     "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],

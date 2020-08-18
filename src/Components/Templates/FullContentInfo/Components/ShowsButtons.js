@@ -1,8 +1,11 @@
 import React, { Component } from "react"
 import classNames from "classnames"
 import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
+import { withUserContent } from "Components/UserContent"
+import { Link } from "react-router-dom"
+import * as ROUTES from "Utils/Constants/routes"
 
-export default class ShowsButtons extends Component {
+class ShowsButtons extends Component {
   constructor(props) {
     super(props)
 
@@ -36,42 +39,63 @@ export default class ShowsButtons extends Component {
   }
 
   render() {
-    const { userContent, id, authUser, infoToPass } = this.props
-    const watchingShows = this.props.authUser
-      ? this.props.userContent.watchingShows.filter(item => item.userWatching && item)
-      : this.context.watchingShows
+    const { id, authUser, infoToPass } = this.props
+
     return (
       <div className="buttons__row">
         <div className="buttons__col">
-          {watchingShows.some(item => item.id === Number(id) && item.userWatching) ? (
-            <button
-              className="button button--pressed"
-              type="button"
-              onClick={() => {
-                if (this.props.authUser) {
-                  userContent.removeWatchingShow(Number(id))
-                } else {
-                  this.context.toggleContentLS(Number(id), "watchingShows")
-                }
-              }}
-            >
-              Not watching
-            </button>
-          ) : (
-            <button
-              className="button"
-              type="button"
-              onClick={() => {
-                if (this.props.authUser) {
-                  userContent.addWatchingShow(Number(id), infoToPass)
-                } else {
-                  this.context.toggleContentLS(Number(id), "watchingShows", infoToPass)
-                }
-              }}
-            >
-              Watching
-            </button>
-          )}
+          <button
+            className={classNames("button", {
+              "button--pressed":
+                this.props.showDatabaseOnClient === "watchingShows" ||
+                this.context.watchingShows.find(item => item.id === Number(id))
+            })}
+            type="button"
+            onClick={() => {
+              if (authUser) {
+                this.props.changeShowDatabaseOnClient("watchingShows")
+                this.props.handleShowInDatabases({
+                  id: Number(id),
+                  data: infoToPass,
+                  database: "watchingShows"
+                })
+              } else {
+                this.context.addShowLS({
+                  id: Number(id),
+                  data: infoToPass
+                })
+              }
+            }}
+          >
+            Watching
+          </button>
+        </div>
+
+        <div className="buttons__col">
+          <button
+            className={classNames("button", {
+              "button--pressed":
+                this.props.showDatabaseOnClient === "notWatchingShows" ||
+                (!this.props.authUser && !this.context.watchingShows.find(item => item.id === Number(id)))
+            })}
+            type="button"
+            onClick={() => {
+              if (authUser) {
+                this.props.changeShowDatabaseOnClient("notWatchingShows")
+                this.props.handleShowInDatabases({
+                  id: Number(id),
+                  data: infoToPass,
+                  database: "notWatchingShows"
+                })
+              } else {
+                this.context.removeShowLS({
+                  id: Number(id)
+                })
+              }
+            }}
+          >
+            Not watching
+          </button>
         </div>
         <div
           className="buttons__col-wrapper"
@@ -82,13 +106,21 @@ export default class ShowsButtons extends Component {
           <div className="buttons__col">
             <button
               className={classNames("button", {
-                "button--pressed": userContent.droppedShows.some(item => item.id === Number(id)),
+                "button--pressed": this.props.showDatabaseOnClient === "droppedShows",
                 "button--not-logged-in": !authUser
               })}
               type="button"
               onClick={() => {
-                userContent.addShowToSubDatabase(Number(id), infoToPass, "droppedShows")
-                this.showDissableBtnWarning("dropBtn")
+                if (authUser) {
+                  this.props.changeShowDatabaseOnClient("droppedShows")
+                  this.props.handleShowInDatabases({
+                    id: Number(id),
+                    data: infoToPass,
+                    database: "droppedShows"
+                  })
+                } else {
+                  this.showDissableBtnWarning("dropBtn")
+                }
               }}
             >
               Drop
@@ -96,27 +128,43 @@ export default class ShowsButtons extends Component {
 
             {this.state.disableBtnWarning === "dropBtn" && (
               <div className="buttons__col-warning">
-                To use full features please register. Your allready selected shows will be saved.
+                To use full features please{" "}
+                <Link className="buttons__col-link" to={ROUTES.LOGIN_PAGE}>
+                  register
+                </Link>
+                . Your allready selected shows will be saved.
               </div>
             )}
           </div>
           <div className="buttons__col">
             <button
               className={classNames("button", {
-                "button--pressed": userContent.willWatchShows.some(item => item.id === Number(id)),
+                "button--pressed": this.props.showDatabaseOnClient === "willWatchShows",
                 "button--not-logged-in": !authUser
               })}
               type="button"
               onClick={() => {
-                userContent.addShowToSubDatabase(Number(id), infoToPass, "willWatchShows")
-                this.showDissableBtnWarning("willWatchBtn")
+                if (authUser) {
+                  this.props.changeShowDatabaseOnClient("willWatchShows")
+                  this.props.handleShowInDatabases({
+                    id: Number(id),
+                    data: infoToPass,
+                    database: "willWatchShows"
+                  })
+                } else {
+                  this.showDissableBtnWarning("willWatchBtn")
+                }
               }}
             >
               Will Watch
             </button>
             {this.state.disableBtnWarning === "willWatchBtn" && (
               <div className="buttons__col-warning">
-                To use full features please register. Your allready selected shows will be saved.
+                To use full features please{" "}
+                <Link className="buttons__col-link" to={ROUTES.LOGIN_PAGE}>
+                  register
+                </Link>
+                . Your allready selected shows will be saved.
               </div>
             )}
           </div>
@@ -125,5 +173,7 @@ export default class ShowsButtons extends Component {
     )
   }
 }
+
+export default withUserContent(ShowsButtons)
 
 ShowsButtons.contextType = UserContentLocalStorageContext

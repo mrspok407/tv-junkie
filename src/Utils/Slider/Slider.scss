@@ -7,7 +7,15 @@ $itemsInSlider: 20;
 
 $mobileLayout: 850px;
 
-:root {
+.slider-container {
+  position: relative;
+
+  @include mediaMaxW($mobileLayout) {
+    overflow-x: auto;
+  }
+}
+
+.slider {
   --sliderWidth: calc(1000px * 0.95);
   --itemsInRow: 5;
   --itemWidth: var(--itemsInRow);
@@ -22,28 +30,24 @@ $mobileLayout: 850px;
   @include mediaMaxW(500px) {
     --itemsInRow: 3;
   }
-}
 
-.slider-container {
-  position: relative;
-
-  @include mediaMaxW($mobileLayout) {
-    overflow-x: auto;
-  }
-}
-
-.slider {
   position: relative;
   display: grid;
   grid-template-columns: repeat($itemsInSlider, calc(var(--sliderWidth) / var(--itemWidth)));
   transform: translate3d(0, 0, 0);
   transition: 500ms;
   cursor: pointer;
+  @include mediaMaxW($mobileLayout) {
+    grid-template-columns: repeat($itemsInSlider, calc(200px * 0.65));
+  }
 
   &__item-wrapper {
     padding: 5px;
     height: calc(var(--sliderWidth) / var(--itemWidth) * 1.5);
     align-self: center;
+    @include mediaMaxW($mobileLayout) {
+      height: 200px;
+    }
   }
 
   &__item {

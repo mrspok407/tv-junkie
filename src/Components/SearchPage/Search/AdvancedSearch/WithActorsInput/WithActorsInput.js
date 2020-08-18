@@ -1,4 +1,5 @@
 import React, { Component } from "react"
+import { Link } from "react-router-dom"
 import debounce from "debounce"
 import axios, { CancelToken } from "axios"
 import Loader from "Components/Placeholders/Loader"
@@ -81,50 +82,47 @@ export default class WithActorsInput extends Component {
       </div>
     ) : (
       actors.map(({ name, profile_path, id, known_for, known_for_department }) => (
-        <div key={id} className="search-card search-card--person">
-          <div
-            className="search-card__image search-card__image--person"
-            style={
-              profile_path !== null
-                ? {
-                    backgroundImage: `url(https://image.tmdb.org/t/p/w500/${profile_path})`
-                  }
-                : {
-                    backgroundImage: `url(https://d32qys9a6wm9no.cloudfront.net/images/movies/poster/500x735.png)`
-                  }
-            }
-          />
-          <div className="search-card__info">
-            <div className="search-card__info-title">{name}</div>
+        <div key={id} className="search-card search-card--person search-card--with-actors">
+          <div className="search-card__info search-card__info--person">
+            <div
+              className="search-card__info-image"
+              style={
+                profile_path !== null
+                  ? {
+                      backgroundImage: `url(https://image.tmdb.org/t/p/w500/${profile_path})`
+                    }
+                  : {
+                      backgroundImage: `url(https://d32qys9a6wm9no.cloudfront.net/images/movies/poster/500x735.png)`
+                    }
+              }
+            />
+            <div className="search-card__info-name">{name}</div>
+            <div className="search-card__info-activity">Main activity: {known_for_department}</div>
+            <div className="search-card__info-known-movies">
+              {known_for.map((item, i) => {
+                const mediaType = item.media_type === "movie" ? "movie" : "show"
 
-            <div className="search-card__info-description">
-              {known_for && (
-                <div className="search-card__info-description--person">
-                  <div className="search-card__info-activity">Main activity: {known_for_department}</div>
-                  <div className="search-card__info-person-movies">
-                    {known_for.map((item, i) => {
-                      const mediaType = item.media_type
+                const title =
+                  item.media_type === "movie" ? item.original_title || "No title" : item.name || "No title"
 
-                      const title =
-                        mediaType === "movie" ? item.original_title || "No title" : item.name || "No title"
+                const releaseDate =
+                  item.media_type === "movie" ? item.release_date || "" : item.first_air_date || ""
 
-                      const releaseDate =
-                        mediaType === "movie" ? item.release_date || "" : item.first_air_date || ""
+                return (
+                  <span key={item.id}>
+                    <Link className="search-card__info-link" to={`/${mediaType}/${item.id}`}>
+                      {title}
+                    </Link>
 
-                      return (
-                        <span key={item.id}>
-                          {title}
-                          {known_for.length - 1 !== i
-                            ? ` (${releaseDate.slice(0, 4)}), `
-                            : ` (${releaseDate.slice(0, 4)})`}
-                        </span>
-                      )
-                    })}
-                  </div>
-                </div>
-              )}
+                    {known_for.length - 1 !== i
+                      ? ` (${releaseDate.slice(0, 4)}), `
+                      : ` (${releaseDate.slice(0, 4)})`}
+                  </span>
+                )
+              })}
             </div>
           </div>
+
           <div className="search-card__buttons search-card__buttons--person">
             {withActors.some(e => e.id === id) ? (
               <button
@@ -200,7 +198,9 @@ export default class WithActorsInput extends Component {
         {this.state.totalPages === 0 && this.state.query !== "" && this.state.listIsOpen ? (
           <PlaceholderNoResults message="No results found" handleClickOutside={this.handleClickOutside} />
         ) : (
-          this.state.listIsOpen && <div className="search-list">{this.renderActors()}</div>
+          this.state.listIsOpen && (
+            <div className="search-list search-list--with-actors">{this.renderActors()}</div>
+          )
         )}
         <div className="actors-added">
           {this.props.withActors.map(item => (

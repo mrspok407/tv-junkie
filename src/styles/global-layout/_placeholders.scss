@@ -7,10 +7,11 @@
   align-items: center;
   top: 50px;
   width: 100%;
-  height: 105px;
+  height: 70px;
   padding: 10px 0 10px 0;
+  color: getColor(orangeClr, $mainPalette);
   overflow: hidden;
-  background-color: getColor(backgroundColor, $movieListPalette);
+  background-color: getColor(backgroundColor, $searchCardPalette);
   opacity: 1;
   z-index: 1;
   animation: showPlaceholderNoResults 0.2s 0.25s forwards;
@@ -20,14 +21,12 @@
     }
   }
   font: {
-    size: 2rem;
+    size: 1.5rem;
     weight: bold;
   }
-  color: rgb(0, 0, 0);
 }
 
 .placeholder--no-shows {
-  grid-column: 1 / -1;
   text-align: center;
   color: getColor(orangeClr, $mainPalette);
 

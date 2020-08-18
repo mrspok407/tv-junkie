@@ -39,6 +39,7 @@ export default class Input extends Component {
       classNameInput,
       classNameLabel,
       name,
+      autocomplete,
       value,
       handleOnChange,
       handleValidation,
@@ -46,7 +47,9 @@ export default class Input extends Component {
       type,
       placeholder,
       labelText,
-      withLabel = false
+      withLabel = false,
+      hidePasswordBtn,
+      toggleShowPassword
     } = this.props
 
     return (
@@ -54,10 +57,19 @@ export default class Input extends Component {
         {withLabel && (
           <label className={classNameLabel} htmlFor={name}>
             {labelText}
+            {hidePasswordBtn && (
+              <span
+                className={
+                  type === "password" ? "auth__form-label-show-password" : "auth__form-label-hide-password"
+                }
+                onClick={() => toggleShowPassword()}
+              ></span>
+            )}
           </label>
         )}
         <input
           className={classNameInput}
+          autoComplete={autocomplete}
           name={name}
           value={value}
           onChange={handleOnChange}

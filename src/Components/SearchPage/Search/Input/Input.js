@@ -20,7 +20,7 @@ export default class Input extends Component {
 
   componentDidMount() {
     const windowWidth = window.innerWidth
-    if (this.inputRef && windowWidth > 1000) this.inputRef.focus()
+    if (this.inputRef && windowWidth > 1000 && !this.props.navSearch) this.inputRef.focus()
     document.addEventListener("mousedown", this.handleClickOutside)
   }
 
@@ -34,9 +34,18 @@ export default class Input extends Component {
 
   runSearchDeb = debounce(() => this._runSearch(this.state.mediaType), 300)
 
+  linkOnKeyPressDeb = debounce(() => {
+    if (this.inputRef) this.inputRef.blur()
+    this.props.linkOnKeyPress()
+  }, 300)
+
   resetSearch = () => this.setState({ query: "" }, this._runSearch)
 
-  handleKeyDown = e => e.which === 27 && this.resetSearch()
+  handleKeyDown = e => {
+    if (e.which === 27) this.resetSearch()
+    if (e.which === 13) this.linkOnKeyPressDeb()
+    if (e.which === 38 || e.which === 40) this.props.navigateSearchListByArrows(e.which)
+  }
 
   handleChange = e => {
     this.setState({ query: e.target.value }, this.runSearchDeb)
@@ -91,6 +100,9 @@ export default class Input extends Component {
                         className="media-type__button"
                         value={item.type}
                         onClick={e => {
+                          if (this.props.listIsOpen) {
+                            this.inputRef.focus()
+                          }
                           this.setState(
                             {
                               mediaType: {

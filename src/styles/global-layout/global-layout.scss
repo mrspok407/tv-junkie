@@ -9,15 +9,8 @@
   margin-top: 45px;
   &__img {
     width: 85%;
+    align-self: flex-start; // This is for ios safari, the height of image is not changing rigth for some reason https://stackoverflow.com/a/61196907
     max-width: 517px;
-  }
-}
-
-.logo--footer {
-  margin: 0;
-
-  .logo__img {
-    max-width: 400px;
   }
 }
 
@@ -36,7 +29,7 @@
     position: relative;
     text-align: center;
     padding: 15px 10px 15px 10px;
-    background-color: peru;
+    background-color: getColor(orangeClr, $mainPalette);
     color: #fff;
     text-decoration: none;
     transition: 0.3s;
@@ -51,7 +44,7 @@
       transition: 0.3s;
       background-color: #fff;
       z-index: -1;
-      @include mediaMaxW(1000px) {
+      @include mediaMaxW(#{$mobileViewPort}) {
         display: none;
       }
     }
@@ -74,7 +67,7 @@
     }
   }
 
-  &--full-content {
+  &--episodes {
     grid-template-columns: repeat(auto-fit, minmax(30px, 1fr));
     padding: 10px 0 10px 0;
 
@@ -85,7 +78,7 @@
       justify-content: center;
       align-items: center;
       align-self: end;
-      @include mediaMaxW(1000px) {
+      @include mediaMaxW(#{$mobileViewPort}) {
         padding: 5px 0px 5px 0px;
       }
       &:hover:after {
@@ -93,23 +86,6 @@
       }
       &:hover:before {
         transform: translate(1px, -1px);
-      }
-    }
-    &--mobile {
-      display: none;
-      @include mediaMaxW(580px) {
-        display: flex;
-        position: absolute;
-        top: 0;
-        right: 100%;
-        padding-top: 0;
-        z-index: 9999;
-      }
-      * {
-        @include mediaMaxW(580px) {
-          padding: 5px 10px 5px 10px;
-          background-color: getColor(blueClr, $mainPalette);
-        }
       }
     }
   }
@@ -145,14 +121,13 @@ $font-sizes: (
 .content-results {
   display: flex;
   flex-direction: column;
-  padding-bottom: 100px;
   width: 100%;
   min-width: 350px;
   padding-bottom: 100px;
-  @include mediaMaxW(1450px) {
+  @include mediaMaxW(#{$mainContainerMaxWidth + 40px}) {
     padding: 0 38px 100px 38px;
   }
-  @include mediaMaxW(850px) {
+  @include mediaMaxW(#{$mobileViewPort}) {
     padding: 0 8px 100px 8px;
   }
   @include mediaMaxW(400px) {
@@ -177,20 +152,62 @@ $font-sizes: (
       background-color: getColor(blueClr, $mainPalette);
     }
   }
+
+  &__sortby {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    column-gap: 20px;
+    padding-bottom: 25px;
+    color: #fff;
+
+    &-text {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.5rem;
+    }
+    &-buttons {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, max-content));
+      column-gap: 20px;
+    }
+    &-button--active {
+      .button--sortby-shows {
+        &:after {
+          opacity: 1;
+        }
+      }
+    }
+  }
+}
+
+.content-results--to-watch-page,
+.content-results--calendar {
+  display: grid;
+  row-gap: 40px;
+  max-width: 1000px;
+  padding-right: 0;
+  padding-left: 0;
+
+  @include mediaMaxW(#{$mobileViewPort}) {
+    padding: 0 8px 100px 8px;
+  }
 }
 
 .content-results__wrapper {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  grid-auto-rows: minmax(300px, max-content);
+  grid-auto-rows: minmax(450px, max-content);
   grid-gap: $gridGap;
   justify-content: center;
+
+  &--finished-shows {
+    grid-auto-rows: minmax(380px, max-content);
+  }
 }
 
 .content-results__item {
-  display: flex;
   position: relative;
-  flex-direction: column;
   background-color: #171717;
   box-shadow: 0 3px 9px rgba(0, 0, 0, 0.884);
   opacity: 0;
@@ -200,16 +217,39 @@ $font-sizes: (
       opacity: 1;
     }
   }
+
   &:after {
     @include hoverBoxShadow(0px, 0.2s);
     z-index: -9999;
     box-shadow: 0px 0px 6px 1px #66b4e6;
-    @include mediaMaxW(1000px) {
+    @include mediaMaxW(#{$mobileViewPort}) {
       display: none;
     }
   }
+
   &:hover:after {
     opacity: 1;
+  }
+
+  &--shows,
+  &--movies {
+    opacity: 1;
+    animation: none;
+
+    &-wrapper {
+      position: relative;
+      display: grid;
+      grid-template-rows: auto max-content;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+      animation: showFullDetailss 0.15s forwards;
+      @keyframes showFullDetailss {
+        to {
+          opacity: 1;
+        }
+      }
+    }
   }
 
   &-main-info {

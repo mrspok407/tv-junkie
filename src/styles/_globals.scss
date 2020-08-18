@@ -5,6 +5,8 @@
 $bodyBackgroundClr: #131313;
 $mainContainerMaxWidth: 1350px;
 
+$mobileViewPort: 1000px;
+
 $mainPalette: (
   orangeClr: peru,
   blueClr: #66b4e6
@@ -12,7 +14,7 @@ $mainPalette: (
 
 $btnPalette: (
   textColor: #fff,
-  bgColor: peru,
+  bgColor: getColor(orangeClr, $mainPalette),
   pressedBgColor: #66b4e6,
   hoverEffectBgColor: #fff
 );
@@ -22,14 +24,17 @@ $inputPalette: (
   placeholderColor: #cececea6
 );
 
-$movieListPalette: (
-  backgroundColor: #fdfdfd,
-  backgroundColorHover: #212121,
+$searchCardPalette: (
+  backgroundColor: #212121,
+  backgroundColorHover: #000000,
   separatorColor: #d0d0d0,
-  titleColor: #000000,
-  overviewColor: #1b1b1b,
+  titleColor: getColor(orangeClr, $mainPalette),
   titleColorHover: #ffffff,
-  overviewColorHover: #d6d6d6
+  yearColor: #e0e0e0,
+  countryColor: #e0e0e0,
+  ratingColor: #e0e0e0,
+  typeColor: getColor(orangeClr, $mainPalette),
+  linkColor: #4ba9f9
 );
 
 @import "mixins";

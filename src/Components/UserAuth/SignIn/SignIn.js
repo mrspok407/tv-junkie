@@ -4,10 +4,12 @@ import { withRouter } from "react-router-dom"
 import { compose } from "recompose"
 import { withFirebase } from "Components/Firebase"
 import { validEmailRegex } from "Utils"
+import * as ROUTES from "Utils/Constants/routes"
 import classNames from "classnames"
 import Input from "../Input/Input"
 import { WithAuthenticationConsumer } from "../Session/WithAuthentication"
 import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
+import SignInWithGoogleForm from "./SignInWithGoogle"
 
 const LOCAL_STORAGE_KEY_WATCHING_SHOWS = "watchingShowsLocalS"
 const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = "watchLaterMoviesLocalS"
@@ -25,7 +27,7 @@ const INITIAL_STATE = {
   },
   submitClicked: false,
   submitRequestLoading: false,
-  prevMovies: []
+  showPassword: false
 }
 
 class SignInFormBase extends Component {
@@ -57,19 +59,15 @@ class SignInFormBase extends Component {
 
     this.props.firebase
       .signInWithEmailAndPassword(email, password)
-      .then(authUser => {
+      .then(() => {
         localStorage.removeItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)
         localStorage.removeItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)
 
         this.context.clearContentState()
-        this.props.closeNavMobile()
-        if (this.props.location.pathname === "/") {
-          this.props.clearCurrentlyChosenContent()
-        }
+        if (this.props.closeNavMobile) this.props.closeNavMobile()
 
         this.setState({ ...INITIAL_STATE })
-        this.props.history.push("/")
-        console.log(`user sign in: ${authUser}`)
+        this.props.history.push(ROUTES.HOME_PAGE)
       })
       .catch(error => {
         errors.error = error
@@ -79,7 +77,9 @@ class SignInFormBase extends Component {
 
   handleOnChange = event => {
     event.preventDefault()
-    const { value, name } = event.target
+    const { value } = event.target
+
+    const name = event.target.name === "current-password" ? "password" : event.target.name
 
     const validation = () => {
       const { email } = this.state.requiredInputs
@@ -169,6 +169,12 @@ class SignInFormBase extends Component {
     return isValid
   }
 
+  toggleShowPassword = () => {
+    this.setState({
+      showPassword: !this.state.showPassword
+    })
+  }
+
   render() {
     const { errors, requiredInputs } = this.state
     const { email, password } = this.state.requiredInputs
@@ -196,17 +202,20 @@ class SignInFormBase extends Component {
         <div className="auth__form-error">{emailError}</div>
 
         <Input
-          classNameInput={classNames("auth__form-input", {
+          classNameInput={classNames("auth__form-input auth__form-input--password", {
             "auth__form-input--error": passwordError
           })}
           classNameLabel="auth__form-label"
-          name="password"
+          name="current-password"
+          autocomplete="current-password"
           value={password}
           handleOnChange={this.handleOnChange}
           handleKeyDown={this.handleKeyDown}
-          type="password"
+          type={!this.state.showPassword ? "password" : "text"}
           placeholder="Password"
           labelText="Password"
+          hidePasswordBtn={true}
+          toggleShowPassword={this.toggleShowPassword}
           withLabel
         />
 
@@ -226,6 +235,7 @@ class SignInFormBase extends Component {
         >
           {this.state.submitRequestLoading ? <span className="auth__form-loading"></span> : "Sign In"}
         </button>
+        <SignInWithGoogleForm />
       </form>
     )
   }

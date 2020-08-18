@@ -24,7 +24,6 @@ class GridTests extends Component {
   }
 
   render() {
-    console.log(this.state.content)
     const content = this.state.content
     return (
       <div className="grid">

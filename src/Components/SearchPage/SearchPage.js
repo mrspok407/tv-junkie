@@ -1,38 +1,36 @@
 import React, { Component } from "react"
 import axios, { CancelToken } from "axios"
 import { throttle } from "throttle-debounce"
-// import { compose } from "recompose"
 import Search from "./Search/Search"
+import AdvancedSearch from "Components/SearchPage/Search/AdvancedSearch/AdvancedSearch"
 import AdvSearchResults from "./AdvSearchResults/SearchResults/SearchResults"
-import ContentResultsSelected from "./AdvSearchResults/SelectedContent/SelectedContent"
 import PlaceholderNoResults from "Components/Placeholders/PlaceholderNoResults"
-// import { withUserContent } from "Components/UserContent"
 import ScrollToTop from "Utils/ScrollToTop"
 import Header from "Components/Header/Header"
+import "./SearchPage.scss"
 
-const LOCAL_STORAGE_KEY_ADV = "advancedSearchContent"
-const LOCAL_STORAGE_KEY_ACTORS = "addedActors"
-const LOCAL_STORAGE_KEY_INPUTS = "advSearchInputs"
-const LOCAL_STORAGE_KEY_PAGENUMBER = "pageNumber"
-const LOCAL_STORAGE_KEY_TOTALPAGES = "totalPages"
+const SESSION_STORAGE_KEY_ADV = "advancedSearchContent"
+const SESSION_STORAGE_KEY_ACTORS = "addedActors"
+const SESSION_STORAGE_KEY_INPUTS = "advSearchInputs"
+const SESSION_STORAGE_KEY_PAGENUMBER = "pageNumber"
+const SESSION_STORAGE_KEY_TOTALPAGES = "totalPages"
 
 const currentYear = new Date().getFullYear()
 
 let cancelRequestAdvSearch
-class MainPage extends Component {
+class SearchPage extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      advancedSearchContent: JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_ADV)) || [],
-      numOfPagesLoaded: JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_PAGENUMBER)) || 1,
-      advSearchInputValues: JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_INPUTS)) || {},
-      withActors: JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_ACTORS)) || [],
-      totalPagesAdvMovies: JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_TOTALPAGES)) || null,
+      advancedSearchContent: JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY_ADV)) || [],
+      numOfPagesLoaded: JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY_PAGENUMBER)) || 1,
+      advSearchInputValues: JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY_INPUTS)) || {},
+      withActors: JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY_ACTORS)) || [],
+      totalPagesAdvMovies: JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY_TOTALPAGES)) || null,
       searchingMovie: false,
       searchingAdvancedSearch: false,
       loadingNewPage: false,
-      error: "",
-      currentlyChosenContent: []
+      error: ""
     }
   }
 
@@ -48,11 +46,11 @@ class MainPage extends Component {
   }
 
   componentDidUpdate() {
-    localStorage.setItem(LOCAL_STORAGE_KEY_ADV, JSON.stringify(this.state.advancedSearchContent))
-    localStorage.setItem(LOCAL_STORAGE_KEY_ACTORS, JSON.stringify(this.state.withActors))
-    localStorage.setItem(LOCAL_STORAGE_KEY_INPUTS, JSON.stringify(this.state.advSearchInputValues))
-    localStorage.setItem(LOCAL_STORAGE_KEY_PAGENUMBER, JSON.stringify(this.state.numOfPagesLoaded))
-    localStorage.setItem(LOCAL_STORAGE_KEY_TOTALPAGES, JSON.stringify(this.state.totalPagesAdvMovies))
+    sessionStorage.setItem(SESSION_STORAGE_KEY_ADV, JSON.stringify(this.state.advancedSearchContent))
+    sessionStorage.setItem(SESSION_STORAGE_KEY_ACTORS, JSON.stringify(this.state.withActors))
+    sessionStorage.setItem(SESSION_STORAGE_KEY_INPUTS, JSON.stringify(this.state.advSearchInputValues))
+    sessionStorage.setItem(SESSION_STORAGE_KEY_PAGENUMBER, JSON.stringify(this.state.numOfPagesLoaded))
+    sessionStorage.setItem(SESSION_STORAGE_KEY_TOTALPAGES, JSON.stringify(this.state.totalPagesAdvMovies))
   }
 
   advancedSearch = (
@@ -289,27 +287,6 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
     }
   }
 
-  toggleCurrentlyChosenContent = (id, content) => {
-    const contentExists = this.state.currentlyChosenContent.find(item => item.id === id)
-    const newContent = content && content.find(item => item.id === id)
-
-    if (contentExists) {
-      this.setState(prevState => ({
-        currentlyChosenContent: [...prevState.currentlyChosenContent.filter(item => item.id !== id)]
-      }))
-    } else {
-      this.setState(prevState => ({
-        currentlyChosenContent: [...prevState.currentlyChosenContent, newContent]
-      }))
-    }
-  }
-
-  clearCurrentlyChosenContent = () => {
-    this.setState({
-      currentlyChosenContent: []
-    })
-  }
-
   renderAdvMovies = () => {
     const { advancedSearchContent, totalPagesAdvMovies } = this.state
     return !Array.isArray(advancedSearchContent) || totalPagesAdvMovies === 0 ? (
@@ -321,8 +298,6 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
         advancedSearchContent={this.state.advancedSearchContent}
         loadingNewPage={this.state.loadingNewPage}
         clearAdvSearchMovies={this.clearAdvSearchMovies}
-        toggleCurrentlyChosenContent={this.toggleCurrentlyChosenContent}
-        currentlyChosenContent={this.state.currentlyChosenContent}
       />
     )
   }
@@ -330,25 +305,18 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
   render() {
     return (
       <>
-        <Header clearCurrentlyChosenContent={this.clearCurrentlyChosenContent} />
-        <Search
-          handleClickOutside={this.handleClickOutside}
-          onSearch={this.handleSearch}
-          searchingAdvancedSearch={this.state.searchingAdvancedSearch}
-          toggleActor={this.toggleActor}
-          withActors={this.state.withActors}
-          advancedSearch={this.advancedSearch}
-          clearWithActors={this.clearWithActors}
-          toggleCurrentlyChosenContent={this.toggleCurrentlyChosenContent}
-          currentlyChosenContent={this.state.currentlyChosenContent}
-        />
-        {this.renderAdvMovies()}
-        {this.state.currentlyChosenContent.length > 0 && (
-          <ContentResultsSelected
-            currentlyChosenContent={this.state.currentlyChosenContent}
-            toggleCurrentlyChosenContent={this.toggleCurrentlyChosenContent}
+        <Header />
+        <div className="search-page__search">
+          <Search />
+          <AdvancedSearch
+            advancedSearch={this.advancedSearch}
+            searchingAdvancedSearch={this.state.searchingAdvancedSearch}
+            toggleActor={this.toggleActor}
+            withActors={this.state.withActors}
+            clearWithActors={this.clearWithActors}
           />
-        )}
+        </div>
+        {this.renderAdvMovies()}
 
         <ScrollToTop />
         {/* <Footer /> */}
@@ -357,4 +325,4 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
   }
 }
 
-export default MainPage
+export default SearchPage

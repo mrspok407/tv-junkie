@@ -1,11 +1,9 @@
 import React, { Component } from "react"
 import axios, { CancelToken } from "axios"
-// import ContentResults from "Components/Templates/ContentResults/ContentResults"
-// import PlaceholderNoSelectedContent from "Components/Placeholders/PlaceholderNoSelectedContent"
-import ScrollToTop from "Utils/ScrollToTop"
-import "./MoviesPage.scss"
+import { withRouter } from "react-router-dom"
 import Header from "../Header/Header"
 import MoviesContent from "./MoviesContent"
+import ScrollToTop from "Utils/ScrollToTop"
 
 let cancelRequest
 
@@ -28,7 +26,7 @@ class Movies extends Component {
     }
   }
 
-  getMovieLinks = (id, showAllLinksPressed = false, title, date) => {
+  getMovieLinks = (id, showAllLinksPressed = false) => {
     if (this.state.moviesIds.includes(id) || this.state.showAllLinksPressed) return
 
     this.setState(prevState => ({
@@ -38,14 +36,24 @@ class Movies extends Component {
     }))
 
     axios
-      .get(`https://yts.mx/api/v2/list_movies.json?query_term=${title}`, {
-        cancelToken: new CancelToken(function executor(c) {
-          cancelRequest = c
+      .get(
+        `https://api.themoviedb.org/3/movie/${id}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US&append_to_response=similar_movies,external_ids`,
+        {
+          cancelToken: new CancelToken(function executor(c) {
+            cancelRequest = c
+          })
+        }
+      )
+      .then(({ data: { external_ids } }) => {
+        const imdbId = external_ids.imdb_id
+        return axios.get(`https://yts.mx/api/v2/list_movies.json?query_term=${imdbId}`, {
+          cancelToken: new CancelToken(function executor(c) {
+            cancelRequest = c
+          })
         })
       })
       .then(res => {
-        const year = Number(date.slice(0, 4))
-        const movie = res.data.data.movies.find(item => item.year === year)
+        const movie = res.data.data.movies[0]
         movie.id = id
         this.setState(prevState => ({
           moviesArr: [...prevState.moviesArr, movie],
@@ -64,6 +72,8 @@ class Movies extends Component {
     return (
       <>
         <Header />
+        {/* <ScrollToTopOnMount /> */}
+        {/* <ScrollToTopOnUpdate /> */}
         <MoviesContent
           moviesArr={this.state.moviesArr}
           getMovieLinks={this.getMovieLinks}
@@ -78,4 +88,4 @@ class Movies extends Component {
   }
 }
 
-export default Movies
+export default withRouter(Movies)

@@ -1,0 +1,11 @@
+@import "../../styles/globals";
+
+.search-page__search {
+  width: 600px;
+  z-index: 5;
+
+  @include mediaMaxW(#{$mobileViewPort}) {
+    width: 100%;
+    padding: 0 8px 0 8px;
+  }
+}

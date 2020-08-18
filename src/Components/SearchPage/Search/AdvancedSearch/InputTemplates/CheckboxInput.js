@@ -2,12 +2,7 @@
 import React from "react"
 import { useField } from "formik"
 
-export default function CheckboxInput({
-  label,
-  isChecked,
-  className = "",
-  ...props
-}) {
+export default function CheckboxInput({ label, isChecked, className = "", ...props }) {
   const [field, meta] = useField(props)
   return (
     <div className={`checkbox-input-container ${className}`}>

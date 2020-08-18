@@ -1,3 +1,26 @@
+@import "../../styles/globals";
+
 .user-profile {
+  display: grid;
+  grid-template-columns: max-content;
+  row-gap: 10px;
+  justify-content: center;
   color: #fff;
+  width: 100%;
+
+  &__email {
+    padding-bottom: 10px;
+    text-align: center;
+
+    span {
+      color: getColor(orangeClr, $mainPalette);
+    }
+  }
+
+  &__verified {
+    display: grid;
+    grid-template-columns: 1fr;
+    row-gap: 5px;
+    text-align: center;
+  }
 }

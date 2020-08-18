@@ -2,28 +2,32 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/anchor-has-content */
 import React, { useState, useEffect } from "react"
-import { useLocation } from "react-router-dom"
 import axios, { CancelToken } from "axios"
-import { withUserContent } from "Components/UserContent"
+import { combineMergeObjects } from "Utils"
+import merge from "deepmerge"
 import PlaceholderLoadingFullInfo from "Components/Placeholders/PlaceholderLoadingFullInfo/PlaceholderLoadingFullInfo"
 import ScrollToTop from "Utils/ScrollToTop"
 import Header from "Components/Header/Header"
 import Slider from "Utils/Slider/Slider"
 import MainInfo from "./Components/MainInfo"
-import ShowsEpisodes from "./Components/ShowsEpisodes"
+import ShowsEpisodes from "Components/Templates/SeasonsAndEpisodes/ShowsEpisodes"
 import PosterWrapper from "./Components/PosterWrapper"
 import "./FullContentInfo.scss"
+import { withUserContent } from "Components/UserContent"
+import ScrollToTopOnUpdate from "Utils/ScrollToTopOnUpdate"
 
 const todayDate = new Date()
+
 let cancelRequest
 
-const FullContentInfo = ({
+function FullContentInfo({
   match: {
     params: { id, mediaType }
   },
   userContent,
+  firebase,
   authUser
-}) => {
+}) {
   const [detailes, setDetailes] = useState({
     poster: "",
     posterMobile: "",
@@ -47,145 +51,46 @@ const FullContentInfo = ({
   const [similarContent, setSimilarContent] = useState([])
 
   const [loadingPage, setLoadingPage] = useState(true)
+  const [loadingFromDatabase, setLoadingFromDatabase] = useState(false)
+  const [showInDatabase, setShowInDatabase] = useState({ database: null, info: null, episodes: null })
+  const [showDatabaseOnClient, setShowDatabaseOnClient] = useState(null)
 
-  const [infoToPass, setInfoToPass] = useState([])
+  const [movieInDatabase, setMovieInDatabase] = useState(null)
+  const [movieDatabaseOnClient, setMovieDatabaseOnClient] = useState(null)
+
+  const [infoToPass, setInfoToPass] = useState({})
 
   const [error, setError] = useState()
 
-  const { pathname } = useLocation()
+  const [isMounted, setIsMounted] = useState(true)
 
   useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [pathname])
-
-  useEffect(() => {
-    // getFullContentInfo(mediaType)
+    setIsMounted(true)
 
     if (mediaType === "show") {
       getFullShowInfo()
-    } else if (mediaType === "movie") {
+      getShowInDatabase()
+    }
+    if (mediaType === "movie") {
       getFullMovieInfo()
+      getMovieInDatabase()
     }
 
     return () => {
-      if (cancelRequest !== undefined) {
-        cancelRequest()
-      }
+      setIsMounted(false)
+      if (cancelRequest !== undefined) cancelRequest()
+      if (!authUser) return
+
+      userContent.showsDatabases.forEach(database => {
+        firebase.userShow({ uid: authUser.uid, key: Number(id), database }).off()
+      })
+
+      firebase.watchLaterMovies(authUser.uid).off()
+
+      setShowInDatabase({ database: null, info: null })
+      setShowDatabaseOnClient(null)
     }
   }, [mediaType, id])
-
-  // const getFullContentInfo = mediaType => {
-  //   const contentType = mediaType === "show" ? "tv" : "movie"
-  //   setLoadingPage(true)
-
-  //   axios
-  //     .get(
-  //       `https://api.themoviedb.org/3/${contentType}/${id}?api_key=${
-  //         process.env.REACT_APP_TMDB_API
-  //       }&language=en-US&append_to_response=${contentType === "tv" ? "similar" : "similar_movies"}`,
-  //       {
-  //         cancelToken: new CancelToken(function executor(c) {
-  //           cancelRequest = c
-  //         })
-  //       }
-  //     )
-  //     .then(
-  //       ({
-  //         data,
-  //         data: {
-  //           poster_path,
-  //           backdrop_path,
-  //           original_title,
-  //           original_name,
-  //           title,
-  //           name,
-  //           release_date,
-  //           first_air_date,
-  //           last_air_date,
-  //           runtime,
-  //           episode_run_rime,
-  //           status,
-  //           genres,
-  //           production_companies,
-  //           networks,
-  //           number_of_seasons,
-  //           seasons,
-  //           vote_average,
-  //           vote_count,
-  //           overview,
-  //           tagline,
-  //           budget,
-  //           imdb_id,
-  //           similar_movies,
-  //           similar
-  //         }
-  //       }) => {
-  //         const contentGenres =
-  //           contentType === "movie" ? genres.map(item => item.name).join(", ") : genres.map(item => item.id)
-
-  //         const genresIds = contentGenres.map(item => item.id) || []
-
-  //         const prodComp =
-  //           production_companies.length === 0 || !production_companies ? "-" : production_companies[0].name
-
-  //         const networkNames = networks && networks.length ? networks.map(item => item.name).join(", ") : "-"
-
-  //         // const similarContent = similar_movies.results
-  //         //   .filter(item => item.poster_path)
-  //         //   .sort((a, b) => b.vote_count - a.vote_count)
-
-  //         console.log(similarContent)
-
-  //         // setInfoToPass([
-  //         //   {
-  //         //     title,
-  //         //     name,
-  //         //     original_title,
-  //         //     original_name,
-  //         //     id: data.id,
-  //         //     release_date,
-  //         //     first_air_date,
-  //         //     vote_average,
-  //         //     genre_ids: genresIds,
-  //         //     overview,
-  //         //     backdrop_path,
-  //         //     poster_path,
-  //         //     vote_count
-  //         //   }
-  //         // ])
-
-  //         setDetailes({
-  //           poster: poster_path,
-  //           posterMobile: backdrop_path,
-  //           title: title || original_title || name || original_name || "-",
-  //           releaseDate: release_date || first_air_date || "-",
-  //           lastAirDate: last_air_date || "-",
-  //           runtime: runtime || episode_run_rime[0] || "-",
-  //           status: status || "-",
-  //           genres: contentGenres || "-",
-  //           productionCompany: prodComp,
-  //           network: networkNames || "-",
-  //           rating: vote_average || "-",
-  //           description: overview || "-",
-  //           numberOfSeasons: number_of_seasons || "-",
-  //           tagline: tagline || "-",
-  //           budget: budget || "-",
-  //           imdbId: imdb_id || "",
-  //           seasonsArr: seasons.reverse()
-  //         })
-
-  //         console.log("test")
-
-  //         setSimilarContent(similarContent)
-  //         setLoadingPage(false)
-  //       }
-  //     )
-  //     .catch(err => {
-  //       if (axios.isCancel(err)) return
-  //       setError("Something went wrong, sorry")
-  //       setLoadingPage(false)
-  //     })
-  // }
 
   const getFullShowInfo = () => {
     setLoadingPage(true)
@@ -200,8 +105,8 @@ const FullContentInfo = ({
       )
       .then(
         ({
-          data,
           data: {
+            id,
             name,
             original_name,
             first_air_date,
@@ -227,22 +132,22 @@ const FullContentInfo = ({
           const similarShows = similar.results.filter(item => item.poster_path)
           const similarShowsSortByVotes = similarShows.sort((a, b) => b.vote_count - a.vote_count)
 
-          setInfoToPass([
-            {
-              name,
-              original_name,
-              id: data.id,
-              first_air_date,
-              vote_average,
-              genre_ids: genreIds,
-              overview,
-              backdrop_path,
-              poster_path,
-              vote_count
-            }
-          ])
+          setInfoToPass({
+            name,
+            original_name,
+            id: id,
+            first_air_date,
+            vote_average,
+            genre_ids: genreIds,
+            overview,
+            backdrop_path,
+            poster_path,
+            vote_count,
+            status
+          })
 
           setDetailes({
+            ...detailes,
             poster: poster_path,
             posterMobile: backdrop_path,
             title: name || original_name || "-",
@@ -257,6 +162,7 @@ const FullContentInfo = ({
             numberOfSeasons: number_of_seasons || "-",
             seasonsArr: seasons.reverse()
           })
+
           setSimilarContent(similarShowsSortByVotes)
           setLoadingPage(false)
         }
@@ -281,8 +187,8 @@ const FullContentInfo = ({
       )
       .then(
         ({
-          data,
           data: {
+            id,
             poster_path,
             backdrop_path,
             original_title,
@@ -310,22 +216,21 @@ const FullContentInfo = ({
           const similarMovies = similar_movies.results.filter(item => item.poster_path)
           const similarMoviesSortByVotes = similarMovies.sort((a, b) => b.vote_count - a.vote_count)
 
-          setInfoToPass([
-            {
-              title,
-              original_title,
-              id: data.id,
-              release_date,
-              vote_average,
-              genre_ids: genresIds,
-              overview,
-              backdrop_path,
-              poster_path,
-              vote_count
-            }
-          ])
+          setInfoToPass({
+            title,
+            original_title,
+            id: id,
+            release_date,
+            vote_average,
+            genre_ids: genresIds,
+            overview,
+            backdrop_path,
+            poster_path,
+            vote_count
+          })
 
           setDetailes({
+            ...detailes,
             poster: poster_path,
             posterMobile: backdrop_path,
             title: title || original_title || "-",
@@ -352,6 +257,145 @@ const FullContentInfo = ({
       })
   }
 
+  const getShowInDatabase = () => {
+    if (!authUser) return
+    setLoadingFromDatabase(true)
+
+    let counter = 0
+
+    userContent.showsDatabases.forEach(database => {
+      counter++
+
+      firebase.userShow({ uid: authUser.uid, key: Number(id), database }).on(
+        "value",
+        snapshot => {
+          if (snapshot.val() !== null) {
+            const userShow = snapshot.val()
+            const showsSubDatabase = userShow.status
+
+            firebase
+              .showInDatabase(showsSubDatabase, Number(id))
+              .once("value", snapshot => {
+                const show = snapshot.val()
+
+                let updatedSeasons = []
+                let updatedSeasonsUser = []
+
+                show.episodes.forEach((season, indexSeason) => {
+                  const seasonPath = userShow.episodes[indexSeason]
+                  const databaseEpisodes = season.episodes
+                  const userEpisodes = seasonPath ? userShow.episodes[indexSeason].episodes : []
+
+                  const mergedEpisodes = merge(databaseEpisodes, userEpisodes, {
+                    arrayMerge: combineMergeObjects
+                  })
+
+                  const updatedEpisodesUser = mergedEpisodes.reduce((acc, episode) => {
+                    acc.push({ watched: episode.watched || false, userRating: episode.userRating || 0 })
+                    return acc
+                  }, [])
+
+                  const updatedSeason = {
+                    ...season,
+                    episodes: mergedEpisodes
+                  }
+
+                  const updatedSeasonUser = {
+                    season_number: season.season_number,
+                    episodes: updatedEpisodesUser,
+                    userRating: (seasonPath && seasonPath.userRating) || 0
+                  }
+
+                  updatedSeasons.push(updatedSeason)
+                  updatedSeasonsUser.push(updatedSeasonUser)
+                })
+
+                firebase.userShowAllEpisodes(authUser.uid, Number(id), database).set(updatedSeasonsUser)
+              })
+              .then(() => {
+                if (counter === userContent.showsDatabases.length) {
+                  setLoadingFromDatabase(false)
+                }
+              })
+
+            if (userShow.allEpisodesWatched && showsSubDatabase === "ended") {
+              firebase
+                .userShows(authUser.uid, "finishedShows")
+                .child(Number(id))
+                .set({
+                  id: userShow.id,
+                  status: userShow.status,
+                  finished_and_name: userShow.finished_and_name,
+                  finished_and_timeStamp: userShow.finished_and_timeStamp
+                })
+            } else {
+              firebase
+                .userShows(authUser.uid, "finishedShows")
+                .child(Number(id))
+                .set(null)
+            }
+
+            if (isMounted) {
+              setShowInDatabase({ database, info: userShow })
+              setShowDatabaseOnClient(database)
+            }
+          } else {
+            if (isMounted) {
+              setLoadingFromDatabase(false)
+            }
+          }
+        },
+        error => {
+          console.log(`Error in database occured. ${error}`)
+
+          setShowDatabaseOnClient(showInDatabase.database)
+        }
+      )
+    })
+  }
+
+  const changeShowDatabaseOnClient = database => {
+    setShowDatabaseOnClient(database)
+  }
+
+  const getMovieInDatabase = () => {
+    if (!authUser) return
+    setLoadingFromDatabase(true)
+
+    userContent.moviesDatabases.forEach(item => {
+      firebase[item](authUser.uid)
+        .child(Number(id))
+        .on(
+          "value",
+          snapshot => {
+            if (snapshot.val() !== null) {
+              setMovieInDatabase(item)
+            } else {
+              setMovieInDatabase(null)
+            }
+            setLoadingFromDatabase(false)
+          },
+          error => {
+            console.log(`Error in database occured. ${error}`)
+
+            setMovieDatabaseOnClient(movieInDatabase)
+          }
+        )
+    })
+  }
+
+  useEffect(() => {
+    setMovieDatabaseOnClient(movieInDatabase)
+  }, [movieInDatabase])
+
+  const changeMovieDatabaseOnClient = database => {
+    if (movieDatabaseOnClient === "watchLaterMovies") {
+      setMovieDatabaseOnClient(null)
+    } else {
+      setMovieDatabaseOnClient(database)
+    }
+  }
+
   return (
     <>
       <Header isLogoVisible={false} />
@@ -360,7 +404,7 @@ const FullContentInfo = ({
           <div className="full-detailes__error">
             <h1>{error}</h1>
           </div>
-        ) : !loadingPage ? (
+        ) : !loadingPage && !loadingFromDatabase ? (
           <div className="full-detailes">
             <PosterWrapper
               poster={detailes.poster}
@@ -372,34 +416,33 @@ const FullContentInfo = ({
             />
 
             <MainInfo
-              title={detailes.title}
+              detailes={detailes}
               mediaType={mediaType}
-              releaseDate={detailes.releaseDate}
-              lastAirDate={detailes.lastAirDate}
-              status={detailes.status}
-              genres={detailes.genres}
-              network={detailes.network}
-              productionCompany={detailes.productionCompany}
-              rating={detailes.rating}
-              runtime={detailes.runtime}
-              tagline={detailes.tagline}
-              budget={detailes.budget}
-              imdbId={detailes.imdbId}
               id={id}
-              authUser={authUser}
               infoToPass={infoToPass}
-              userContent={userContent}
+              showInDatabase={showInDatabase}
+              getShowInDatabase={getShowInDatabase}
+              changeShowDatabaseOnClient={changeShowDatabaseOnClient}
+              changeMovieDatabaseOnClient={changeMovieDatabaseOnClient}
+              showDatabaseOnClient={showDatabaseOnClient}
+              movieDatabaseOnClient={movieDatabaseOnClient}
+              movieInDatabase={movieInDatabase}
             />
 
             <div className="full-detailes__description">{detailes.description}</div>
 
             {mediaType === "show" && (
-              <ShowsEpisodes
-                seasonsArr={detailes.seasonsArr}
-                todayDate={todayDate}
-                id={id}
-                showTitle={detailes.title}
-              />
+              <>
+                <ShowsEpisodes
+                  fullContentPage={true}
+                  seasonsArr={detailes.seasonsArr}
+                  showTitle={detailes.title}
+                  todayDate={todayDate}
+                  id={id}
+                  showInDatabase={showInDatabase}
+                  infoToPass={infoToPass}
+                />
+              </>
             )}
             {similarContent.length > 0 && (
               <div className="full-detailes__slider">
@@ -416,8 +459,9 @@ const FullContentInfo = ({
         )}
       </div>
       <ScrollToTop />
+      <ScrollToTopOnUpdate />
     </>
   )
 }
 
-export default withUserContent(FullContentInfo)
+export default withUserContent(FullContentInfo, "FullContentInfo")

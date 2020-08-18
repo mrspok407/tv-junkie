@@ -12,9 +12,7 @@ const userContentLocalStorageProvider = Component => {
 
       this.state = {
         watchingShows: JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)) || [],
-        watchLaterMovies: JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)) || [],
-        toggleContentLS: this.toggleContentLS,
-        clearContentState: this.clearContentState
+        watchLaterMovies: JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)) || []
       }
     }
 
@@ -23,20 +21,35 @@ const userContentLocalStorageProvider = Component => {
       localStorage.setItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES, JSON.stringify(this.state.watchLaterMovies))
     }
 
-    toggleContentLS = (id, type, contentArr) => {
-      console.log(id)
-      const contentExists = this.state[type].find(item => item.id === id)
-      const newContent = contentArr && contentArr.find(item => item.id === id)
+    toggleMovieLS = ({ id, data = [] }) => {
+      const movieExists = this.state.watchLaterMovies.find(item => item.id === id)
+      const movie = Array.isArray(data) ? data.find(item => item.id === id) : data
 
-      if (contentExists) {
+      if (movieExists) {
         this.setState(prevState => ({
-          [type]: [...prevState[type].filter(item => item.id !== id)]
+          watchLaterMovies: [...prevState.watchLaterMovies.filter(item => item.id !== id)]
         }))
       } else {
-        this.setState(prevState => ({
-          [type]: [...prevState[type], { ...newContent, userWatching: newContent && true }]
-        }))
+        this.setState({
+          watchLaterMovies: [...this.state.watchLaterMovies, { ...movie, userWatching: movie && true }]
+        })
       }
+    }
+
+    addShowLS = ({ id, data = [] }) => {
+      if (this.state.watchingShows.find(item => item.id === id)) return
+
+      const show = Array.isArray(data) ? data.find(item => item.id === id) : data
+
+      this.setState({
+        watchingShows: [...this.state.watchingShows, { ...show, userWatching: show && true }]
+      })
+    }
+
+    removeShowLS = ({ id }) => {
+      this.setState(prevState => ({
+        watchingShows: [...prevState.watchingShows.filter(item => item.id !== id)]
+      }))
     }
 
     clearContentState = () => {
@@ -48,7 +61,15 @@ const userContentLocalStorageProvider = Component => {
 
     render() {
       return (
-        <UserContentLocalStorageContext.Provider value={this.state}>
+        <UserContentLocalStorageContext.Provider
+          value={{
+            ...this.state,
+            toggleMovieLS: this.toggleMovieLS,
+            addShowLS: this.addShowLS,
+            removeShowLS: this.removeShowLS,
+            clearContentState: this.clearContentState
+          }}
+        >
           <Component {...this.props} />
         </UserContentLocalStorageContext.Provider>
       )

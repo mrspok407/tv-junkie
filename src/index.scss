@@ -17,6 +17,7 @@ body {
 
 a {
   text-decoration: none;
+  color: getColor(blueClr, $mainPalette);
 }
 
 .container {
@@ -34,7 +35,7 @@ a {
   height: 100vh;
   top: 0;
   left: 0;
-  @include mediaMaxW(850px) {
+  @include mediaMaxW(#{$mobileViewPort + 80px}) {
     display: none;
   }
   &:after,

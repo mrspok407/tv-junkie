@@ -4,19 +4,10 @@ import { compose } from "recompose"
 import { listOfGenres } from "Utils"
 import { withUserContent } from "Components/UserContent"
 import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
-import classNames from "classnames"
 import Loader from "Components/Placeholders/Loader"
 import "./SearchResults.scss"
 
 class AdvSearchResults extends Component {
-  constructor(props) {
-    super(props)
-
-    this.state = {
-      // watchingShows: []
-    }
-  }
-
   render() {
     const maxColumns = 4
     const currentNumOfColumns =
@@ -24,13 +15,6 @@ class AdvSearchResults extends Component {
         ? this.props.advancedSearchContent.length
         : maxColumns
 
-    const watchingShows = this.props.authUser
-      ? this.props.userContent.watchingShows.filter(item => item.userWatching && item)
-      : this.context.watchingShows
-
-    const watchLaterMovies = this.props.authUser
-      ? this.props.userContent.watchLaterMovies
-      : this.context.watchLaterMovies
     return (
       <>
         <div className="content-results">
@@ -123,52 +107,60 @@ class AdvSearchResults extends Component {
                           />
                         </div>
                         <div className="content-results__item-description">
-                          {overview.length > 150 ? `${overview.substring(0, 150)}...` : overview}
+                          {overview.length > 250 ? `${overview.substring(0, 250)}...` : overview}
                         </div>
                       </div>
                     </Link>
 
-                    <div className="content-results__item-links">
+                    {/* <div className="content-results__item-links">
                       {mediaType === "movie" ? (
-                        <button
-                          className={classNames("button", {
-                            "button--pressed": watchLaterMovies.find(item => item.id === id)
-                          })}
-                          onClick={() => {
-                            if (this.props.authUser) {
-                              this.props.userContent.toggleWatchLaterMovie(
-                                id,
-                                this.props.advancedSearchContent
-                              )
-                            } else {
-                              this.context.toggleContentLS(
-                                id,
-                                "watchLaterMovies",
-                                this.props.advancedSearchContent
-                              )
-                            }
+                        this.props.userContent.loadingContent ? (
+                          <Loader className="loader--small-pink" />
+                        ) : (
+                          <button
+                            className={classNames("button", {
+                              "button--pressed": watchLaterMovies.find(item => item.id === id)
+                            })}
+                            onClick={() => {
+                              if (this.props.authUser) {
+                                this.props.toggleWatchLaterMovie({
+                                  id: id,
+                                  data: this.props.advancedSearchContent,
+                                  userDatabase: "watchLaterMovies"
+                                })
+                              } else {
+                                this.context.toggleMovieLS({
+                                  id,
+                                  data: this.props.advancedSearchContent
+                                })
+                              }
 
-                            if (
-                              !watchLaterMovies.find(item => item.id === id) ||
-                              this.props.currentlyChosenContent.find(item => item.id === id)
-                            ) {
-                              this.props.toggleCurrentlyChosenContent(id, this.props.advancedSearchContent)
-                            }
-                          }}
-                          type="button"
-                        >
-                          {watchLaterMovies.find(item => item.id === id) ? "Remove" : "Watch later"}
-                        </button>
+                              if (
+                                !watchLaterMovies.find(item => item.id === id) ||
+                                this.props.currentlyChosenContent.find(item => item.id === id)
+                              ) {
+                                this.props.toggleCurrentlyChosenContent(id, this.props.advancedSearchContent)
+                              }
+                            }}
+                            type="button"
+                          >
+                            {watchLaterMovies.find(item => item.id === id) ? "Remove" : "Watch later"}
+                          </button>
+                        )
                       ) : (
                         <>
-                          {watchingShows.find(e => e.id === id && e.userWatching === true) ? (
+                          {this.props.userContent.loadingContent ? (
+                            <Loader className="loader--small-pink" />
+                          ) : watchingShows.find(e => e.id === id && e.userWatching === true) ? (
                             <button
                               className="button button--pressed"
                               onClick={() => {
                                 if (this.props.authUser) {
-                                  this.props.userContent.removeWatchingShow(id)
+                                  this.props.removeWatchingShow(id)
                                 } else {
-                                  this.context.toggleContentLS(id, "watchingShows")
+                                  this.context.removeShowLS({
+                                    id
+                                  })
                                 }
 
                                 if (this.props.currentlyChosenContent.find(item => item.id === id)) {
@@ -188,16 +180,16 @@ class AdvSearchResults extends Component {
                                 className="button"
                                 onClick={() => {
                                   if (this.props.authUser) {
-                                    this.props.userContent.addWatchingShow(
-                                      id,
-                                      this.props.advancedSearchContent
-                                    )
+                                    this.props.handleShowInDatabases({
+                                      id: id,
+                                      data: this.props.advancedSearchContent,
+                                      database: "watchingShows"
+                                    })
                                   } else {
-                                    this.context.toggleContentLS(
+                                    this.context.addShowLS({
                                       id,
-                                      "watchingShows",
-                                      this.props.advancedSearchContent
-                                    )
+                                      data: this.props.advancedSearchContent
+                                    })
                                   }
                                   this.props.toggleCurrentlyChosenContent(
                                     id,
@@ -212,19 +204,19 @@ class AdvSearchResults extends Component {
                           )}
                         </>
                       )}
-                    </div>
+                    </div> */}
                   </div>
                 )
               }
             )}
+            {this.props.loadingNewPage && <Loader className="loader--new-page" />}
           </div>
         </div>
-        {this.props.loadingNewPage && <Loader className="loader--new-page" />}
       </>
     )
   }
 }
 
-export default compose(withUserContent)(AdvSearchResults)
+export default compose(withUserContent)(AdvSearchResults, "SearchResults")
 
 AdvSearchResults.contextType = UserContentLocalStorageContext

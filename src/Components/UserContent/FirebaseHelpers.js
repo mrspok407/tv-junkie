@@ -1,28 +1,36 @@
-export const toggleWatchingShowsDatabase = (firebase, userUid, key, userWatching) => {
-  firebase
-    .watchingShows(userUid)
-    .child(key)
-    .update({ userWatching: userWatching })
-}
+import { differenceBtwDatesInDays } from "Utils"
 
-export const deleteShowFromSubDatabase = (firebase, userUid, dataBases, key) => {
-  if (!key) return Promise.resolve()
+export const checkIfAllEpisodesWatched = ({ show, firebase, authUser, todayDate }) => {
+  const showsSubDatabase = show.info.status
 
-  const promises = []
+  firebase.showEpisodes(showsSubDatabase, show.info.id).once("value", snapshot => {
+    const allEpisodesDatabase = snapshot.val().reduce((acc, item) => {
+      acc.push(...item.episodes)
+      return acc
+    }, [])
 
-  dataBases.forEach(item => {
-    const promise = firebase[item](userUid)
-      .child(key)
-      .once("value", snapshot => {
-        if (snapshot.val() !== null) {
-          firebase[item](userUid)
-            .child(key)
-            .remove()
-        }
+    const releasedEpisodes = allEpisodesDatabase.filter(episode => {
+      const daysToNewEpisode = differenceBtwDatesInDays(episode.air_date, todayDate)
+      return daysToNewEpisode <= 0 && episode
+    })
+
+    firebase.userShowAllEpisodes(authUser.uid, show.info.id, show.database).once("value", snapshot => {
+      const allEpisodes = snapshot.val().reduce((acc, item) => {
+        acc.push(...item.episodes)
+        return acc
+      }, [])
+
+      allEpisodes.splice(releasedEpisodes.length)
+
+      const allEpisodesWatched = !allEpisodes.some(episode => !episode.watched)
+
+      const finished = showsSubDatabase === "ended" && allEpisodesWatched ? true : false
+
+      firebase.userShow({ uid: authUser.uid, key: show.info.id, database: show.database }).update({
+        allEpisodesWatched,
+        finished_and_name: `${finished}_${show.info.name || show.info.original_name}`,
+        finished_and_timeStamp: `${finished}_${3190666598976 - show.info.timeStamp * -1}`
       })
-
-    promises.push(promise)
+    })
   })
-
-  return Promise.all(promises)
 }

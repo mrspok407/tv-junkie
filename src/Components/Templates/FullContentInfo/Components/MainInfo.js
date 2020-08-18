@@ -3,21 +3,27 @@ import React, { Component } from "react"
 import ShowsButtons from "./ShowsButtons"
 import classNames from "classnames"
 import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
+import { withUserContent } from "Components/UserContent"
+import UserRating from "../../../UserRating/UserRating"
 
-export default class MainInfo extends Component {
+class MainInfo extends Component {
   render() {
-    const yearRelease = this.props.releaseDate.slice(0, 4)
-    const yearEnded = this.props.mediaType === "show" && this.props.lastAirDate.slice(0, 4)
+    const detailes = this.props.detailes
 
-    const yearRange = this.props.status !== "Ended" ? `${yearRelease} - ...` : `${yearRelease} - ${yearEnded}`
+    const yearRelease = detailes.releaseDate.slice(0, 4)
+    const yearEnded = this.props.mediaType === "show" && detailes.lastAirDate.slice(0, 4)
+    const yearRange =
+      detailes.status === "Ended" || detailes.status === "Canceled"
+        ? `${yearRelease} - ${yearEnded}`
+        : `${yearRelease} - ...`
 
     const formatedBudget =
-      this.props.budget !== 0 && this.props.budget !== "-" ? (
+      detailes.budget !== 0 && detailes.budget !== "-" ? (
         new Intl.NumberFormat("en-US", {
           style: "currency",
           currency: "USD"
         })
-          .format(this.props.budget)
+          .format(detailes.budget)
           .slice(0, -3)
           .split(",")
           .join(".")
@@ -25,14 +31,10 @@ export default class MainInfo extends Component {
         <span className="full-detailes__info-no-info">-</span>
       )
 
-    const watchLaterMovies = this.props.authUser
-      ? this.props.userContent.watchLaterMovies
-      : this.context.watchLaterMovies
-
     return (
       <div className="full-detailes__info">
         <div className="full-detailes__info-title">
-          {this.props.title}
+          {detailes.title}
           <span>{this.props.mediaType === "show" && yearRelease !== "-" ? ` (${yearRange})` : ""}</span>
         </div>
         <div className="full-detailes__info-row">
@@ -45,59 +47,75 @@ export default class MainInfo extends Component {
             )}
           </div>
         </div>
-        {this.props.status !== "Released" && (
+        {detailes.status !== "Released" && (
           <div className="full-detailes__info-row">
             <div className="full-detailes__info-option">Status</div>
-            <div className="full-detailes__info-value">{this.props.status}</div>
+            <div className="full-detailes__info-value">{detailes.status}</div>
           </div>
         )}
 
         <div className="full-detailes__info-row">
           <div className="full-detailes__info-option">Genres</div>
-          <div className="full-detailes__info-value">{this.props.genres}</div>
+          <div className="full-detailes__info-value">{detailes.genres}</div>
         </div>
         <div className="full-detailes__info-row">
           <div className="full-detailes__info-option">Company</div>
           <div className="full-detailes__info-value">
             {this.props.mediaType === "show"
-              ? this.props.network
+              ? detailes.network
               : this.props.mediaType === "movie" &&
-                (this.props.productionCompany !== "-" ? (
-                  this.props.productionCompany
+                (detailes.productionCompany !== "-" ? (
+                  detailes.productionCompany
                 ) : (
                   <span className="full-detailes__info-no-info">-</span>
                 ))}
           </div>
         </div>
         <div className="full-detailes__info-row">
-          <div className="full-detailes__info-option">Rating</div>
+          <div className="full-detailes__info-option">User rating</div>
           <div className="full-detailes__info-value">
-            {this.props.rating !== "-" ? (
-              this.props.rating
+            {detailes.rating !== "-" ? (
+              detailes.rating
             ) : (
-              <span className="full-detailes__info-no-info">{this.props.rating}</span>
+              <span className="full-detailes__info-no-info">{detailes.rating}</span>
             )}
           </div>
         </div>
         <div className="full-detailes__info-row">
           <div className="full-detailes__info-option">Runtime</div>
           <div className="full-detailes__info-value">
-            {this.props.runtime !== "-" ? (
-              `${this.props.runtime} min`
+            {detailes.runtime !== "-" ? (
+              `${detailes.runtime} min`
             ) : (
-              <span className="full-detailes__info-no-info">{this.props.runtime}</span>
+              <span className="full-detailes__info-no-info">{detailes.runtime}</span>
             )}
           </div>
         </div>
+
+        {this.props.mediaType === "show" && (
+          <div className="full-detailes__info-row">
+            <div className="full-detailes__info-option">My rating</div>
+            <div className="full-detailes__info-value">
+              <UserRating
+                id={this.props.id}
+                firebaseRef="userShow"
+                showDatabase={this.props.showDatabaseOnClient}
+                showRating={true}
+                mediaType={this.props.mediaType}
+              />
+            </div>
+          </div>
+        )}
+
         {this.props.mediaType === "movie" && (
           <>
             <div className="full-detailes__info-row">
               <div className="full-detailes__info-option">Tagline</div>
               <div className="full-detailes__info-value">
-                {this.props.tagline !== "-" ? (
-                  `${this.props.tagline}`
+                {detailes.tagline !== "-" ? (
+                  `${detailes.tagline}`
                 ) : (
-                  <span className="full-detailes__info-no-info">{this.props.tagline}</span>
+                  <span className="full-detailes__info-no-info">{detailes.tagline}</span>
                 )}
               </div>
             </div>
@@ -109,7 +127,7 @@ export default class MainInfo extends Component {
               <div className="full-detailes__info-option">External links</div>
               <div className="full-detailes__info-value">
                 <a
-                  href={`https://www.imdb.com/title/${this.props.imdbId}`}
+                  href={`https://www.imdb.com/title/${detailes.imdbId}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="full-detailes__info-imdb"
@@ -126,28 +144,38 @@ export default class MainInfo extends Component {
               userContent={this.props.userContent}
               authUser={this.props.authUser}
               infoToPass={this.props.infoToPass}
+              showInDatabase={this.props.showInDatabase}
+              getShowInDatabase={this.props.getShowInDatabase}
+              changeShowDatabaseOnClient={this.props.changeShowDatabaseOnClient}
+              showDatabaseOnClient={this.props.showDatabaseOnClient}
             />
           )}
 
           {this.props.mediaType === "movie" && (
             <button
               className={classNames("button", {
-                "button--pressed": watchLaterMovies.some(item => item.id === Number(this.props.id))
+                "button--pressed":
+                  this.props.movieDatabaseOnClient === "watchLaterMovies" ||
+                  this.context.watchLaterMovies.find(item => item.id === Number(this.props.id))
               })}
               onClick={() => {
                 if (this.props.authUser) {
-                  this.props.userContent.toggleWatchLaterMovie(Number(this.props.id), this.props.infoToPass)
+                  this.props.changeMovieDatabaseOnClient("watchLaterMovies")
+                  this.props.toggleWatchLaterMovie({
+                    id: Number(this.props.id),
+                    data: this.props.infoToPass,
+                    userDatabase: "watchLaterMovies"
+                  })
                 } else {
-                  this.context.toggleContentLS(
-                    Number(this.props.id),
-                    "watchLaterMovies",
-                    this.props.infoToPass
-                  )
+                  this.context.toggleMovieLS({
+                    id: Number(this.props.id),
+                    data: this.props.infoToPass
+                  })
                 }
               }}
               type="button"
             >
-              {watchLaterMovies.some(item => item.id === Number(this.props.id)) ? "Remove" : "Watch later"}
+              {this.props.movieDatabaseOnClient === "watchLaterMovies" ? "Remove" : "Watch later"}
             </button>
           )}
         </div>
@@ -155,5 +183,7 @@ export default class MainInfo extends Component {
     )
   }
 }
+
+export default withUserContent(MainInfo)
 
 MainInfo.contextType = UserContentLocalStorageContext

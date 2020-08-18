@@ -2,12 +2,14 @@
 import React, { Component } from "react"
 import { withRouter } from "react-router-dom"
 import { compose } from "recompose"
-import { withFirebase } from "Components/Firebase"
 import { validEmailRegex } from "Utils"
 import * as ROLES from "Utils/Constants/roles"
+import * as ROUTES from "Utils/Constants/routes"
 import classNames from "classnames"
 import Input from "../Input/Input"
 import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
+import { withUserContent } from "Components/UserContent"
+import SignInWithGoogleForm from "../SignIn/SignInWithGoogle"
 
 const LOCAL_STORAGE_KEY_WATCHING_SHOWS = "watchingShowsLocalS"
 const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = "watchLaterMoviesLocalS"
@@ -32,7 +34,8 @@ const INITIAL_STATE = {
   },
   isAdmin: false,
   submitClicked: false,
-  submitRequestLoading: false
+  submitRequestLoading: false,
+  showPassword: false
 }
 
 class RegisterBase extends Component {
@@ -47,7 +50,6 @@ class RegisterBase extends Component {
 
     const { email, password } = this.state.requiredInputs
     const errors = { ...this.state.errors }
-    const roles = {}
 
     if (!this.isFormValid(errors, this.state.requiredInputs)) {
       for (const [key, value] of Object.entries(this.state.requiredInputs)) {
@@ -67,18 +69,14 @@ class RegisterBase extends Component {
     this.props.firebase
       .createUserWithEmailAndPassword(email, password)
       .then(authUser => {
-        if (email === "mr.spok407@gmail.com") {
-          roles[ROLES.ADMIN] = ROLES.ADMIN
-        } else {
-          roles[ROLES.USER] = ROLES.USER
-        }
+        const userRole = email === "mr.spok407@gmail.com" ? ROLES.ADMIN : ROLES.USER
 
         this.props.firebase
           .user(authUser.user.uid)
           .set({
             username: this.state.inputs.login,
             email,
-            roles
+            role: userRole
           })
           .then(() => {
             const watchingShows = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)) || []
@@ -86,17 +84,21 @@ class RegisterBase extends Component {
               JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)) || []
 
             watchingShows.forEach(item => {
-              const newShowRef = this.props.firebase.watchingShows(authUser.user.uid).push()
-              const key = newShowRef.key
-
-              newShowRef.set({ ...item, key, userWatching: true })
+              this.props.addShowToDatabase({
+                id: item.id,
+                show: item,
+                userDatabase: "watchingShows",
+                userUid: authUser.user.uid
+              })
             })
 
             watchLaterMovies.forEach(item => {
-              const newShowRef = this.props.firebase.watchLaterMovies(authUser.user.uid).push()
-              const key = newShowRef.key
-
-              newShowRef.set({ ...item, key })
+              this.props.toggleWatchLaterMovie({
+                id: item.id,
+                data: item,
+                userDatabase: "watchLaterMovies",
+                userUid: authUser.user.uid
+              })
             })
           })
           .then(() => {
@@ -104,11 +106,8 @@ class RegisterBase extends Component {
             localStorage.removeItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)
 
             this.context.clearContentState()
-            this.props.closeNavMobile()
 
-            if (this.props.location.pathname === "/") {
-              this.props.clearCurrentlyChosenContent()
-            }
+            if (this.props.closeNavMobile) this.props.closeNavMobile()
           })
       })
       .then(() => {
@@ -116,7 +115,7 @@ class RegisterBase extends Component {
       })
       .then(() => {
         this.setState({ ...INITIAL_STATE })
-        this.props.history.push("/")
+        this.props.history.push(ROUTES.HOME_PAGE)
       })
       .catch(error => {
         errors.error = error
@@ -126,7 +125,8 @@ class RegisterBase extends Component {
 
   handleOnChange = event => {
     event.preventDefault()
-    const { value, name } = event.target
+    const { value } = event.target
+    const name = event.target.name === "new-password" ? "password" : event.target.name
 
     const validation = () => {
       const { email, password, passwordConfirm } = this.state.requiredInputs
@@ -173,7 +173,9 @@ class RegisterBase extends Component {
   handleValidationOnblur = event => {
     event.preventDefault()
 
-    const { value, name } = event.target
+    const { value } = event.target
+    const name = event.target.name === "new-password" ? "password" : event.target.name
+
     const { email, password, passwordConfirm } = this.state.requiredInputs
     const errors = { ...this.state.errors }
 
@@ -232,6 +234,12 @@ class RegisterBase extends Component {
     return isValid
   }
 
+  toggleShowPassword = () => {
+    this.setState({
+      showPassword: !this.state.showPassword
+    })
+  }
+
   render() {
     const { errors, requiredInputs } = this.state
     const { login } = this.state.inputs
@@ -273,24 +281,27 @@ class RegisterBase extends Component {
         <div className="auth__form-error">{emailError}</div>
 
         <Input
-          classNameInput={classNames("auth__form-input", {
+          classNameInput={classNames("auth__form-input  auth__form-input--password", {
             "auth__form-input--error": passwordError
           })}
           classNameLabel="auth__form-label"
-          name="password"
+          name="new-password"
+          autocomplete="new-password"
           value={password}
           handleOnChange={this.handleOnChange}
           handleValidation={this.handleValidationOnblur}
           handleKeyDown={this.handleKeyDown}
-          type="password"
+          type={!this.state.showPassword ? "password" : "text"}
           placeholder="Password"
           labelText="Password"
+          hidePasswordBtn={true}
+          toggleShowPassword={this.toggleShowPassword}
           withLabel
         />
         <div className="auth__form-error">{passwordError}</div>
 
         <Input
-          classNameInput={classNames("auth__form-input", {
+          classNameInput={classNames("auth__form-input auth__form-input--password", {
             "auth__form-input--error": passwordConfirmError
           })}
           classNameLabel="auth__form-label"
@@ -299,7 +310,7 @@ class RegisterBase extends Component {
           handleOnChange={this.handleOnChange}
           handleValidation={this.handleValidationOnblur}
           handleKeyDown={this.handleKeyDown}
-          type="password"
+          type={!this.state.showPassword ? "password" : "text"}
           placeholder="Password"
           labelText="Confirm Password"
           withLabel
@@ -316,12 +327,13 @@ class RegisterBase extends Component {
         >
           {this.state.submitRequestLoading ? <span className="auth__form-loading"></span> : "Register"}
         </button>
+        <SignInWithGoogleForm />
       </form>
     )
   }
 }
 
-const Register = compose(withRouter, withFirebase)(RegisterBase)
+const Register = compose(withRouter, withUserContent)(RegisterBase)
 
 export default Register
 

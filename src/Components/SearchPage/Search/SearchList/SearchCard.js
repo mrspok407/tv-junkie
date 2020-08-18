@@ -5,78 +5,10 @@ import { withUserContent } from "Components/UserContent"
 import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
 
 class SearchCard extends Component {
-  renderButtons = () => {
-    const { id, searchResults, mediaType } = this.props
+  constructor(props) {
+    super(props)
 
-    const watchLaterMovies = this.props.authUser
-      ? this.props.userContent.watchLaterMovies
-      : this.context.watchLaterMovies
-
-    const watchingShows = this.props.authUser
-      ? this.props.userContent.watchingShows
-      : this.context.watchingShows
-    return (
-      <div className="search-card__buttons">
-        {mediaType === "movie" ? (
-          <button
-            className={classNames("button", {
-              "button--pressed": watchLaterMovies.find(item => item.id === id)
-            })}
-            onClick={() => {
-              if (this.props.authUser) {
-                this.props.userContent.toggleWatchLaterMovie(id, searchResults)
-              } else {
-                this.context.toggleContentLS(id, "watchLaterMovies", searchResults)
-              }
-
-              if (
-                !watchLaterMovies.find(item => item.id === id) ||
-                this.props.currentlyChosenContent.find(item => item.id === id)
-              ) {
-                this.props.toggleCurrentlyChosenContent(id, searchResults)
-              }
-            }}
-            type="button"
-          >
-            {watchLaterMovies.find(item => item.id === id) ? "Remove" : "Watch later"}
-          </button>
-        ) : (
-          <>
-            {watchingShows.find(item => item.id === id && item.userWatching === true) ? (
-              <button
-                className="button button--searchlist button--pressed"
-                onClick={() => {
-                  if (this.props.authUser) {
-                    this.props.userContent.removeWatchingShow(id)
-                  } else {
-                    this.context.toggleContentLS(id, "watchingShows")
-                  }
-                }}
-                type="button"
-              >
-                Not watching
-              </button>
-            ) : (
-              <button
-                className="button button--searchlist"
-                onClick={() => {
-                  if (this.props.authUser) {
-                    this.props.userContent.addWatchingShow(id, searchResults)
-                  } else {
-                    this.context.toggleContentLS(id, "watchingShows", searchResults)
-                  }
-
-                  this.props.toggleCurrentlyChosenContent(id, searchResults)
-                }}
-                type="button"
-              >
-                Watching
-              </button>
-            )}
-          </>
-        )}
-      </div>
-    )
+    this.state = {}
   }
 
   render() {
@@ -84,10 +16,12 @@ class SearchCard extends Component {
       movieTitle,
       showTitle,
       personName,
+      releaseDate,
+      voteAverage,
+      originCountry,
       poster,
       personImage,
       posterBackdrop,
-      overview,
       id,
       known_for,
       known_for_department,
@@ -101,85 +35,91 @@ class SearchCard extends Component {
       <div
         key={id}
         className={classNames("search-card", {
-          "search-card--person": mediaType === "person" || mediaTypeSearching === "person"
+          "search-card--person": mediaType === "person" || mediaTypeSearching === "person",
+          "search-card__active": this.props.index === this.props.currentListItem
         })}
       >
         {mediaType !== "person" && mediaTypeSearching !== "person" ? (
           <>
-            <Link className="search-card__image-link" to={`/${type}/${id}`}>
+            <Link className="search-card__link" to={`/${type}/${id}`} onClick={() => this.props.closeList()}>
+              <div className="search-card__info">
+                <div
+                  className="search-card__info-image"
+                  style={
+                    poster !== null
+                      ? {
+                          backgroundImage: `url(https://image.tmdb.org/t/p/w500/${poster || posterBackdrop})`
+                        }
+                      : {
+                          backgroundImage: `url(https://d32qys9a6wm9no.cloudfront.net/images/movies/poster/500x735.png)`
+                        }
+                  }
+                />
+                <div className="search-card__info-title">
+                  {movieTitle || showTitle}
+                  <span className="search-card__info-year">
+                    {releaseDate && `(${releaseDate.slice(0, 4)})`}
+                  </span>
+                  <span className="search-card__info-country">
+                    {`${originCountry.length > 0 ? originCountry.join(", ") : ""}`}
+                  </span>
+                </div>
+
+                <div className="search-card__info-wrapper">
+                  {voteAverage !== 0 && (
+                    <div className="search-card__info-rating">
+                      {
+                        <>
+                          {voteAverage}
+                          <span>/10</span>
+                        </>
+                      }
+                    </div>
+                  )}
+                  <div className="search-card__info-type">{movieTitle ? "Movie" : "Show"}</div>
+                </div>
+              </div>
+            </Link>
+          </>
+        ) : (
+          <>
+            <div className="search-card__info search-card__info--person">
               <div
-                className="search-card__image"
+                className="search-card__info-image"
                 style={
-                  poster !== null
+                  personImage !== null
                     ? {
-                        backgroundImage: `url(https://image.tmdb.org/t/p/w500/${poster || posterBackdrop})`
+                        backgroundImage: `url(https://image.tmdb.org/t/p/w500/${personImage})`
                       }
                     : {
                         backgroundImage: `url(https://d32qys9a6wm9no.cloudfront.net/images/movies/poster/500x735.png)`
                       }
                 }
               />
-            </Link>
-            <Link className="search-card__info-link" to={`/${type}/${id}`}>
-              <div className="search-card__info">
-                <div className="search-card__info-title">{movieTitle || showTitle}</div>
+              <div className="search-card__info-name">{movieTitle || showTitle || personName}</div>
+              <div className="search-card__info-activity">Main activity: {known_for_department}</div>
+              <div className="search-card__info-known-movies">
+                {known_for.map((item, i) => {
+                  const mediaType = item.media_type === "movie" ? "movie" : "show"
 
-                <div className="search-card__info-description">
-                  <div className="search-card__info-description--movie">
-                    {overview.length > 150 ? `${overview.substring(0, 150)}...` : overview}
-                  </div>
-                </div>
-              </div>
-            </Link>
-            {this.renderButtons()}
-          </>
-        ) : (
-          <>
-            <div
-              className="search-card__image"
-              style={
-                personImage !== null
-                  ? {
-                      backgroundImage: `url(https://image.tmdb.org/t/p/w500/${personImage})`
-                    }
-                  : {
-                      backgroundImage: `url(https://d32qys9a6wm9no.cloudfront.net/images/movies/poster/500x735.png)`
-                    }
-              }
-            />
-            <div className="search-card__info">
-              <div className="search-card__info-title">{movieTitle || showTitle || personName}</div>
+                  const title =
+                    item.media_type === "movie" ? item.original_title || "No title" : item.name || "No title"
 
-              <div className="search-card__info-description">
-                {mediaTypeSearching !== "person" && (
-                  <div className="search-card__info-description--movie">
-                    {overview.length > 150 ? `${overview.substring(0, 150)}...` : overview}
-                  </div>
-                )}
+                  const releaseDate =
+                    item.media_type === "movie" ? item.release_date || "" : item.first_air_date || ""
 
-                <div className="search-card__info-description--person">
-                  <div className="search-card__info-activity">Main activity: {known_for_department}</div>
-                  <div className="search-card__info-person-movies">
-                    {known_for.map((item, i) => {
-                      const title =
-                        item.media_type === "movie"
-                          ? item.original_title || "No title"
-                          : item.name || "No title"
+                  return (
+                    <span key={item.id}>
+                      <Link className="search-card__info-link" to={`/${mediaType}/${item.id}`}>
+                        {title}
+                      </Link>
 
-                      const releaseDate =
-                        item.media_type === "movie" ? item.release_date || "" : item.first_air_date || ""
-
-                      return (
-                        <span key={item.id}>
-                          {title}
-                          {known_for.length - 1 !== i
-                            ? ` (${releaseDate.slice(0, 4)}), `
-                            : ` (${releaseDate.slice(0, 4)})`}
-                        </span>
-                      )
-                    })}
-                  </div>
-                </div>
+                      {known_for.length - 1 !== i
+                        ? ` (${releaseDate.slice(0, 4)}), `
+                        : ` (${releaseDate.slice(0, 4)})`}
+                    </span>
+                  )
+                })}
               </div>
             </div>
           </>

@@ -1,0 +1,75 @@
+.user-rating {
+  $starAmount: 5;
+  $buttonSize: 40px;
+  $starNonActiveSize: 30px;
+  $starActiveSize: 36px;
+  $transition: 200ms;
+
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax($buttonSize, $buttonSize));
+
+  &__button {
+    position: relative;
+    width: $buttonSize;
+    height: $buttonSize;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    outline: 0;
+    cursor: pointer;
+    background-color: transparent;
+    background-image: url("../../assets/images/icons/rate-star-button-white.png");
+    background-size: $starNonActiveSize;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+
+    &:after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: $starActiveSize;
+      height: $starActiveSize;
+      transform: translate(-50%, -50%);
+      background-image: url("../../assets/images/icons/rate-star-button-peru.png");
+      background-size: $starActiveSize;
+      background-position: 50% 50%;
+      background-repeat: no-repeat;
+      transition: $transition;
+      opacity: 0;
+    }
+
+    &-rated {
+      &:after {
+        transition: 0ms;
+        opacity: 1;
+      }
+    }
+
+    &-hovered {
+      &:after {
+        opacity: 1;
+      }
+    }
+
+    &--disabled {
+      background-image: url("../../assets/images/icons/rate-star-button-disabled.png");
+    }
+  }
+
+  &__warning {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    padding: 5px;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #000;
+    background-color: #fff;
+    border-radius: 5px;
+    z-index: 9999;
+    opacity: 0;
+    animation: showNotAuthWarning 0.5s forwards;
+  }
+}

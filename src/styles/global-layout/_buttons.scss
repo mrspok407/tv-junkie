@@ -4,6 +4,7 @@
   position: relative;
   background-color: getColor(bgColor, $btnPalette);
   line-height: 40px;
+  height: 40px;
   letter-spacing: 1px;
   width: 100%;
   padding: 0;
@@ -28,7 +29,7 @@
     transition: 0.3s;
     background-color: getColor(hoverEffectBgColor, $btnPalette);
     z-index: -1;
-    @include mediaMaxW(1000px) {
+    @include mediaMaxW(#{$mobileViewPort}) {
       display: none;
     }
   }
@@ -72,7 +73,7 @@
 
 .button--pressed {
   background-color: getColor(pressedBgColor, $btnPalette);
-  transition: 0.5s;
+  /// transition: 0.5s;
   &:after,
   &:before {
     top: 0;
@@ -88,6 +89,27 @@
   }
 }
 
+.button--sortby-shows {
+  background-color: transparent;
+
+  &:before {
+    display: none;
+  }
+  &:after {
+    top: 100%;
+    width: 100%;
+    height: 3px;
+    border-radius: 5px;
+    transition: 0.15s;
+    opacity: 0;
+    background-color: getColor(blueClr, $mainPalette);
+  }
+  &:hover:after {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+}
+
 .button--not-logged-in {
   background-color: #5f442a;
   color: #ffffff7a;
@@ -98,9 +120,15 @@
   }
 }
 
+.button--search-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .buttons__row {
   display: grid;
-  grid-template-columns: 1fr 2fr;
+  grid-template-columns: 1fr 1fr 2fr;
   column-gap: 5px;
 
   &--shows-page {
@@ -108,12 +136,12 @@
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   }
 
-  @include mediaMaxW(800px) {
+  @include mediaMaxW(#{$mobileViewPort}) {
     padding-bottom: 15px;
   }
 
-  @include mediaMaxW(650px) {
-    grid-template-columns: 1fr;
+  @include mediaMaxW(#{$mobileViewPort}) {
+    grid-template-columns: 1fr 1fr;
     row-gap: 5px;
   }
 }
@@ -125,6 +153,9 @@
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     column-gap: 5px;
+    @include mediaMaxW(#{$mobileViewPort}) {
+      grid-column: 1 / 3;
+    }
   }
 
   &-warning {
@@ -154,6 +185,18 @@
       width: $dimensions;
       height: $dimensions;
       background-color: #fff;
+    }
+
+    @include mediaMaxW(#{$mobileViewPort}) {
+      .full-detailes .buttons__col-warning:after {
+        left: 50%;
+      }
+    }
+  }
+
+  &-link {
+    &:hover {
+      text-decoration: underline;
     }
   }
 }

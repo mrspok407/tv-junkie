@@ -70,6 +70,26 @@
   }
 }
 
+.loader--new-page {
+  grid-column: 1 / -1;
+  margin-top: 25px;
+  animation-delay: 0.2s;
+}
+
+.loader--pink {
+  animation-delay: 0.5s;
+  .loader-dots {
+    div {
+      background-color: #fff;
+    }
+  }
+  .loader-shadow {
+    div {
+      box-shadow: 0px 0px 15px 3px rgb(238, 54, 106);
+    }
+  }
+}
+
 .loader--small-pink {
   position: absolute;
   top: 16px;
