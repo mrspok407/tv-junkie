@@ -1,6 +1,7 @@
 import React, { Component } from "react"
 import { withFirebase } from "Components/Firebase"
 import { compose } from "recompose"
+import { Helmet } from "react-helmet"
 import * as ROLES from "Utils/Constants/roles"
 import WithAuthorization from "Components/UserAuth/Session/WithAuthorization/WithAuthorization"
 import Header from "Components/Header/Header"
@@ -41,6 +42,9 @@ class AdminPage extends Component {
   render() {
     return (
       <>
+        <Helmet>
+          <title>Tv Junkie | Admin page</title>
+        </Helmet>
         <Header />
         <div className="admin">
           <h1>Admin</h1>
@@ -59,6 +63,6 @@ class AdminPage extends Component {
   }
 }
 
-const condition = authUser => authUser && !!authUser.roles[ROLES.ADMIN]
+const condition = authUser => authUser && !!authUser.role === ROLES.ADMIN
 
 export default compose(withFirebase, WithAuthorization(condition))(AdminPage)

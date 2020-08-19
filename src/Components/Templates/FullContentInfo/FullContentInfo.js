@@ -6,6 +6,7 @@ import axios, { CancelToken } from "axios"
 import { useHistory } from "react-router-dom"
 import { combineMergeObjects } from "Utils"
 import { withUserContent } from "Components/UserContent"
+import { Helmet } from "react-helmet"
 import merge from "deepmerge"
 import PlaceholderLoadingFullInfo from "Components/Placeholders/PlaceholderLoadingFullInfo/PlaceholderLoadingFullInfo"
 import ScrollToTop from "Utils/ScrollToTop"
@@ -17,6 +18,7 @@ import PosterWrapper from "./Components/PosterWrapper"
 import * as ROUTES from "Utils/Constants/routes"
 import ScrollToTopOnUpdate from "Utils/ScrollToTopOnUpdate"
 import "./FullContentInfo.scss"
+import Footer from "Components/Footer/Footer"
 
 const todayDate = new Date()
 
@@ -419,6 +421,12 @@ function FullContentInfo({
 
   return (
     <>
+      <Helmet>
+        <title>
+          Tv Junkie | {detailes.title}{" "}
+          {detailes.releaseDate !== "-" ? `(${detailes.releaseDate.slice(0, 4)})` : ""}
+        </title>
+      </Helmet>
       <Header isLogoVisible={false} />
       <div className="full-detailes-container">
         {error ? (
@@ -479,6 +487,7 @@ function FullContentInfo({
           <PlaceholderLoadingFullInfo delayAnimation="0.4s" />
         )}
       </div>
+      <Footer />
       <ScrollToTop />
       <ScrollToTopOnUpdate />
     </>

@@ -1,9 +1,11 @@
 import React, { Component } from "react"
 import axios, { CancelToken } from "axios"
 import { withRouter } from "react-router-dom"
+import { Helmet } from "react-helmet"
 import Header from "../Header/Header"
 import MoviesContent from "./MoviesContent"
 import ScrollToTop from "Utils/ScrollToTop"
+import Footer from "Components/Footer/Footer"
 
 let cancelRequest
 
@@ -71,9 +73,10 @@ class Movies extends Component {
   render() {
     return (
       <>
+        <Helmet>
+          <title>Tv Junkie | All your movies</title>
+        </Helmet>
         <Header />
-        {/* <ScrollToTopOnMount /> */}
-        {/* <ScrollToTopOnUpdate /> */}
         <MoviesContent
           moviesArr={this.state.moviesArr}
           getMovieLinks={this.getMovieLinks}
@@ -82,6 +85,7 @@ class Movies extends Component {
           showAllLinksPressed={this.state.showAllLinksPressed}
           error={this.state.error}
         />
+        <Footer />
         <ScrollToTop />
       </>
     )

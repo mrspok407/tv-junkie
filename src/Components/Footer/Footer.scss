@@ -1,6 +1,44 @@
+@import "../../styles/globals";
+
 .footer {
+  $parentRef: &;
+  display: flex;
+  justify-content: center;
   width: 100%;
-  background-color: #131313;
+  background-color: $bodyBackgroundClr;
   margin-top: auto;
-  min-height: 150px;
+  min-height: 50px;
+
+  @mixin hovered {
+    #{$parentRef}:hover & {
+      @content;
+    }
+  }
+
+  &__admin-info {
+    color: #fff;
+    opacity: 0.05;
+    transition: 0.2s;
+
+    @include hovered {
+      opacity: 1;
+    }
+
+    a {
+      color: initial;
+    }
+
+    .fab {
+      padding-left: 5px;
+      cursor: pointer;
+    }
+
+    .fa-github {
+      color: #fff;
+    }
+
+    .fa-twitter {
+      color: #1da1f2;
+    }
+  }
 }
