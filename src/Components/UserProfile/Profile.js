@@ -23,11 +23,10 @@ class Profile extends Component {
   }
 
   render() {
-    console.log(this.props)
     return (
       <>
         <Helmet>
-          <title>Tv Junkie | Profile</title>
+          <title>Profile | TV Junkie</title>
         </Helmet>
         <Header />
         <div className="user-profile">

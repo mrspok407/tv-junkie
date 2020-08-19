@@ -289,7 +289,7 @@ class HomePage extends Component {
       <>
         <Helmet>
           <meta charSet="utf-8" />
-          <title>Tv Junkie</title>
+          <title>TV Junkie</title>
         </Helmet>
         <Header />
         <div className="home-page__wrapper">

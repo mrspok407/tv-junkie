@@ -74,7 +74,7 @@ class Movies extends Component {
     return (
       <>
         <Helmet>
-          <title>Tv Junkie | All your movies</title>
+          <title>All your movies | TV Junkie</title>
         </Helmet>
         <Header />
         <MoviesContent

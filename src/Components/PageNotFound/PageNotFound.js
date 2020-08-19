@@ -46,7 +46,7 @@ class PageNotFound extends Component {
     return (
       <>
         <Helmet>
-          <title>Tv Junkie | So empty page</title>
+          <title>So empty page | TV Junkie</title>
         </Helmet>
         <Header isLogoVisible={false} />
         <div className="page-not-found">
