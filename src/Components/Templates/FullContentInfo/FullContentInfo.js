@@ -3,7 +3,9 @@
 /* eslint-disable jsx-a11y/anchor-has-content */
 import React, { useState, useEffect } from "react"
 import axios, { CancelToken } from "axios"
+import { useHistory } from "react-router-dom"
 import { combineMergeObjects } from "Utils"
+import { withUserContent } from "Components/UserContent"
 import merge from "deepmerge"
 import PlaceholderLoadingFullInfo from "Components/Placeholders/PlaceholderLoadingFullInfo/PlaceholderLoadingFullInfo"
 import ScrollToTop from "Utils/ScrollToTop"
@@ -12,9 +14,9 @@ import Slider from "Utils/Slider/Slider"
 import MainInfo from "./Components/MainInfo"
 import ShowsEpisodes from "Components/Templates/SeasonsAndEpisodes/ShowsEpisodes"
 import PosterWrapper from "./Components/PosterWrapper"
-import "./FullContentInfo.scss"
-import { withUserContent } from "Components/UserContent"
+import * as ROUTES from "Utils/Constants/routes"
 import ScrollToTopOnUpdate from "Utils/ScrollToTopOnUpdate"
+import "./FullContentInfo.scss"
 
 const todayDate = new Date()
 
@@ -64,6 +66,8 @@ function FullContentInfo({
 
   const [isMounted, setIsMounted] = useState(true)
 
+  const history = useHistory()
+
   useEffect(() => {
     setIsMounted(true)
 
@@ -85,10 +89,15 @@ function FullContentInfo({
         firebase.userShow({ uid: authUser.uid, key: Number(id), database }).off()
       })
 
-      firebase.watchLaterMovies(authUser.uid).off()
+      firebase
+        .watchLaterMovies(authUser.uid)
+        .child(Number(id))
+        .off()
 
       setShowInDatabase({ database: null, info: null })
+      setMovieInDatabase(null)
       setShowDatabaseOnClient(null)
+      setMovieDatabaseOnClient(null)
     }
   }, [mediaType, id])
 
@@ -169,6 +178,11 @@ function FullContentInfo({
       )
       .catch(err => {
         if (axios.isCancel(err)) return
+        if (err.response.status === 404) {
+          history.push(ROUTES.PAGE_DOESNT_EXISTS)
+          return
+        }
+
         setError("Something went wrong, sorry")
         setLoadingPage(false)
       })
@@ -252,7 +266,12 @@ function FullContentInfo({
       )
       .catch(err => {
         if (axios.isCancel(err)) return
-        setError("Something went wrong, sorry. Try to reload the page.")
+        if (err.response.status === 404) {
+          history.push(ROUTES.PAGE_DOESNT_EXISTS)
+          return
+        }
+
+        setError("Something went wrong, sorry")
         setLoadingPage(false)
       })
   }
@@ -368,12 +387,14 @@ function FullContentInfo({
         .on(
           "value",
           snapshot => {
-            if (snapshot.val() !== null) {
-              setMovieInDatabase(item)
-            } else {
-              setMovieInDatabase(null)
+            if (isMounted) {
+              if (snapshot.val() !== null) {
+                setMovieInDatabase(item)
+              } else {
+                setMovieInDatabase(null)
+              }
+              setLoadingFromDatabase(false)
             }
-            setLoadingFromDatabase(false)
           },
           error => {
             console.log(`Error in database occured. ${error}`)

@@ -15,6 +15,7 @@ import GridTests from "Utils/GridTests/GridTests"
 import * as ROUTES from "Utils/Constants/routes"
 import { WithAuthenticationProvider } from "Components/UserAuth/Session/WithAuthentication"
 import userContentLocalStorageProvider from "Components/UserContent/UserContentLocalStorageContext"
+import PageNotFound from "Components/PageNotFound/PageNotFound"
 
 class App extends Component {
   render() {
@@ -25,14 +26,15 @@ class App extends Component {
             <Route path={ROUTES.HOME_PAGE} exact component={HomePage} />
             <Route path={ROUTES.SEARCH_PAGE} exact component={SearchPage} />
             <Route path={ROUTES.SHOWS} exact component={ShowsPage} />
-            <Route path={ROUTES.TO_WATCH} component={ToWatchEpisodesPage} />
-            <Route path={ROUTES.CALENDAR} component={CalendarPage} />
-            <Route path={ROUTES.MOVIES} component={MoviesPage} />
-            <Route path={ROUTES.FULL_CONTENT_INFO} component={FullContentInfo} />
-            <Route path={ROUTES.PROFILE} component={Profile} />
-            <Route path={ROUTES.LOGIN_PAGE} component={LoginPage} />
-            <Route path={ROUTES.ADMIN} component={Admin} />
-            <Route path={ROUTES.GRID_TESTS} component={GridTests} />
+            <Route path={ROUTES.TO_WATCH} exact component={ToWatchEpisodesPage} />
+            <Route path={ROUTES.CALENDAR} exact component={CalendarPage} />
+            <Route path={ROUTES.MOVIES} exact component={MoviesPage} />
+            <Route path={ROUTES.FULL_CONTENT_INFO} exact component={FullContentInfo} />
+            <Route path={ROUTES.PROFILE} exact component={Profile} />
+            <Route path={ROUTES.LOGIN_PAGE} exact component={LoginPage} />
+            <Route path={ROUTES.ADMIN} exact component={Admin} />
+            <Route path={ROUTES.GRID_TESTS} exact component={GridTests} />
+            <Route component={PageNotFound} />
           </Switch>
         </div>
       </Router>

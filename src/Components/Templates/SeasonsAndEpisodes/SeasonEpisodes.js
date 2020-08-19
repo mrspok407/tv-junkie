@@ -105,11 +105,7 @@ export default class SeasonEpisodes extends Component {
     const seasons = this.props.toWatchPage ? this.props.seasonsArr : this.props.showEpisodes
 
     return (
-      <div
-        className={classNames("episodes__episode-list", {
-          "episodes__episode-list--to-watch-page": this.props.toWatchPage
-        })}
-      >
+      <div className="episodes__episode-list">
         {seasons.map(item => {
           const seasonId = this.props.toWatchPage ? item.id : item.seasonId
 
@@ -155,16 +151,13 @@ export default class SeasonEpisodes extends Component {
                 ref={this.episode}
                 key={episode.id}
                 className={classNames("episodes__episode", {
-                  "episodes__episode--to-watch-page": this.props.toWatchPage,
                   "episodes__episode--open": this.props.detailEpisodeInfo.includes(episode.id),
                   "fade-out-episode":
                     this.props.toWatchPage && this.state.fadeOutEpisodes.find(item => item.id === episode.id)
                 })}
               >
                 <div
-                  className={classNames("episodes__episode-wrapper", {
-                    "episodes__episode-wrapper--to-watch-page": this.props.toWatchPage
-                  })}
+                  className="episodes__episode-wrapper"
                   onClick={() => this.props.fullContentPage && this.props.showEpisodeInfo(episode.id)}
                   style={
                     daysToNewEpisode > 0 || !episode.air_date
@@ -229,47 +222,6 @@ export default class SeasonEpisodes extends Component {
                             480p
                           </a>
                         </div>
-
-                        {/* <button
-                          type="button"
-                          className="torrent-links__link-button"
-                          onClick={() => this.toggleTorrentLinks(episode.id)}
-                        >
-                          Links
-                        </button> */}
-                        {/* 
-                        {this.state.showTorrentLinks.includes(episode.id) && (
-                          <div
-                            className={classNames(
-                              "torrent-links torrent-links--episodes torrent-links--to-watch-page-mobile",
-                              {
-                                "torrent-links--to-watch-page": this.props.toWatchPage
-                              }
-                            )}
-                          >
-                            <a
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}+1080p&cat=41`}
-                            >
-                              1080p
-                            </a>
-                            <a
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}+720p&cat=41`}
-                            >
-                              720p
-                            </a>
-                            <a
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}&cat=5`}
-                            >
-                              480p
-                            </a>
-                          </div>
-                        )} */}
                       </>
                     )
                   )}

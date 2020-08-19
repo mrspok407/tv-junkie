@@ -302,11 +302,7 @@ class ShowsEpisodes extends Component {
             </button>
           </div>
         )}
-        <div
-          className={classNames("episodes", {
-            "episodes--to-watch-page": this.props.toWatchPage
-          })}
-        >
+        <div className="episodes">
           {this.props.seasonsArr.map(season => {
             if (season.season_number === 0 || season.name === "Specials" || !season.air_date) return null
 
@@ -350,13 +346,7 @@ class ShowsEpisodes extends Component {
                   }
                   onClick={() => this.showSeasonsEpisodes(seasonId, season.season_number)}
                 >
-                  <div
-                    className={classNames("episodes__episode-group-name", {
-                      "episodes__episode-group-name--to-watch-page": this.props.toWatchPage
-                    })}
-                  >
-                    Season {season.season_number}
-                  </div>
+                  <div className="episodes__episode-group-name">Season {season.season_number}</div>
                   {daysToNewSeason > 0 && (
                     <div className="episodes__episode-group-days-to-air">{daysToNewSeason} days to air</div>
                   )}
@@ -367,11 +357,7 @@ class ShowsEpisodes extends Component {
                     </div>
                   )}
 
-                  <div
-                    className={classNames("episodes__episode-group-date", {
-                      "episodes__episode-group-date--to-watch-page": this.props.toWatchPage
-                    })}
-                  >
+                  <div className="episodes__episode-group-date">
                     {season.air_date && season.air_date.slice(0, 4)}
                   </div>
                 </div>
@@ -428,12 +414,7 @@ class ShowsEpisodes extends Component {
                         loadingFromDatabase={this.props.loadingFromDatabase}
                       />
                       {this.props.toWatchPage && (
-                        <div
-                          className={classNames("episodes__episode-group-check-all-episodes", {
-                            "episodes__episode-group-check-all-episodes--to-watch-page": this.props
-                              .toWatchPage
-                          })}
-                        >
+                        <div className="episodes__episode-group-check-all-episodes">
                           <button
                             type="button"
                             className="button"
