@@ -43,7 +43,7 @@ class AdminPage extends Component {
     return (
       <>
         <Helmet>
-          <title>Tv Junkie | Admin page</title>
+          <title>Admin page | TV Junkie</title>
         </Helmet>
         <Header />
         <div className="admin">
