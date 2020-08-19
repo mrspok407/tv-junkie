@@ -45,7 +45,6 @@ class HomePage extends Component {
 
   componentDidMount() {
     this.getContentForSliders()
-    console.log("test rename repoo")
     // this.testFun()
   }
 
