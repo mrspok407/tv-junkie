@@ -1,4 +1,5 @@
 import React, { Component } from "react"
+import { Helmet } from "react-helmet"
 import { Link } from "react-router-dom"
 import { withFirebase } from "Components/Firebase/FirebaseContext"
 import { withUserContent } from "Components/UserContent"
@@ -10,6 +11,7 @@ import Slider from "Utils/Slider/Slider"
 import PlaceholderHomePageNoFutureEpisodes from "Components/Placeholders/PlaceholderHomePageNoFutureEpisodes"
 import * as ROUTES from "Utils/Constants/routes"
 import "./HomePage.scss"
+import Footer from "Components/Footer/Footer"
 
 const Header = withFirebase(HeaderBase)
 
@@ -45,7 +47,6 @@ class HomePage extends Component {
 
   componentDidMount() {
     this.getContentForSliders()
-    console.log("test rename repoo")
     // this.testFun()
   }
 
@@ -286,10 +287,15 @@ class HomePage extends Component {
   render() {
     return (
       <>
+        <Helmet>
+          <meta charSet="utf-8" />
+          <title>Tv Junkie</title>
+        </Helmet>
         <Header />
         <div className="home-page__wrapper">
           {!this.props.authUser ? this.renderNonAuthUser() : this.renderAuthUser()}
         </div>
+        <Footer />
         <ScrollToTop />
       </>
     )

@@ -1,6 +1,7 @@
 import React, { Component } from "react"
 import axios, { CancelToken } from "axios"
 import { throttle } from "throttle-debounce"
+import { Helmet } from "react-helmet"
 import Search from "./Search/Search"
 import AdvancedSearch from "Components/SearchPage/Search/AdvancedSearch/AdvancedSearch"
 import AdvSearchResults from "./AdvSearchResults/SearchResults/SearchResults"
@@ -8,6 +9,7 @@ import PlaceholderNoResults from "Components/Placeholders/PlaceholderNoResults"
 import ScrollToTop from "Utils/ScrollToTop"
 import Header from "Components/Header/Header"
 import "./SearchPage.scss"
+import Footer from "Components/Footer/Footer"
 
 const SESSION_STORAGE_KEY_ADV = "advancedSearchContent"
 const SESSION_STORAGE_KEY_ACTORS = "addedActors"
@@ -305,6 +307,9 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
   render() {
     return (
       <>
+        <Helmet>
+          <title>Tv Junkie | Advanced search</title>
+        </Helmet>
         <Header />
         <div className="search-page__search">
           <Search />
@@ -318,6 +323,7 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
         </div>
         {this.renderAdvMovies()}
 
+        <Footer />
         <ScrollToTop />
         {/* <Footer /> */}
       </>

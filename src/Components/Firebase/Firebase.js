@@ -57,7 +57,7 @@ class Firebase {
             authUser = {
               uid: authUser.uid,
               email: authUser.email,
-              roles: dbUser.roles || {},
+              role: dbUser.role,
               emailVerified: authUser.emailVerified
             }
             next(authUser)

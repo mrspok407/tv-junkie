@@ -2,10 +2,12 @@ import React, { Component } from "react"
 import { Link, withRouter } from "react-router-dom"
 import { withFirebase } from "Components/Firebase"
 import { compose } from "recompose"
+import { Helmet } from "react-helmet"
 import * as ROUTES from "Utils/Constants/routes"
 import HeaderBase from "Components/Header/Header"
 import logo404 from "assets/images/doge-404.png"
 import "./PageNotFound.scss"
+import Footer from "Components/Footer/Footer"
 
 const Header = withFirebase(HeaderBase)
 
@@ -43,6 +45,9 @@ class PageNotFound extends Component {
   render() {
     return (
       <>
+        <Helmet>
+          <title>Tv Junkie | So empty page</title>
+        </Helmet>
         <Header isLogoVisible={false} />
         <div className="page-not-found">
           <img className="page-not-found__img" src={logo404} alt="page not found" />
@@ -57,6 +62,7 @@ class PageNotFound extends Component {
             </span>
           </h1>
         </div>
+        <Footer />
       </>
     )
   }

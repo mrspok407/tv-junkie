@@ -1,10 +1,12 @@
 import React, { Component } from "react"
 import { compose } from "recompose"
+import { Helmet } from "react-helmet"
 import SignOutButton from "Components/UserAuth/SignOut/SignOutButton"
 import WithAuthorization from "Components/UserAuth/Session/WithAuthorization/WithAuthorization"
 import { WithAuthenticationConsumer } from "Components/UserAuth/Session/WithAuthentication"
 import Header from "Components/Header/Header"
 import "./Profile.scss"
+import Footer from "Components/Footer/Footer"
 
 class Profile extends Component {
   constructor(props) {
@@ -21,8 +23,12 @@ class Profile extends Component {
   }
 
   render() {
+    console.log(this.props)
     return (
       <>
+        <Helmet>
+          <title>Tv Junkie | Profile</title>
+        </Helmet>
         <Header />
         <div className="user-profile">
           <div className="user-profile__email">
@@ -43,8 +49,8 @@ class Profile extends Component {
           <div className="user-profile__signout">
             <SignOutButton />
           </div>
-          <div></div>
         </div>
+        <Footer />
       </>
     )
   }
