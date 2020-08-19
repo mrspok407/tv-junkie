@@ -16,7 +16,7 @@ class CalendarPage extends Component {
     return (
       <>
         <Helmet>
-          <title>Tv Junkie | Calendar of upcoming shows</title>
+          <title>Calendar of upcoming shows | TV Junkie</title>
         </Helmet>
         <Header />
         <CalendarContent />

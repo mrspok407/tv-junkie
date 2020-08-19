@@ -16,7 +16,7 @@ class ToWatchEpisodesPage extends Component {
     return (
       <>
         <Helmet>
-          <title>Tv Junkie | Shows to watch</title>
+          <title>Shows to watch | TV Junkie</title>
         </Helmet>
         <Header />
         <ToWatchEpisodesContent />

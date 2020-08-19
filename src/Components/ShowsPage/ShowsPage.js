@@ -19,7 +19,7 @@ class Shows extends Component {
     return (
       <>
         <Helmet>
-          <title>Tv Junkie | All your shows</title>
+          <title>All your shows | TV Junkie</title>
         </Helmet>
         <Header />
         <ShowsContent />

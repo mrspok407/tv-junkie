@@ -423,8 +423,8 @@ function FullContentInfo({
     <>
       <Helmet>
         <title>
-          Tv Junkie | {detailes.title}{" "}
-          {detailes.releaseDate !== "-" ? `(${detailes.releaseDate.slice(0, 4)})` : ""}
+          {detailes.title} {detailes.releaseDate !== "-" ? `(${detailes.releaseDate.slice(0, 4)})` : ""} | TV
+          Junkie
         </title>
       </Helmet>
       <Header isLogoVisible={false} />

@@ -29,7 +29,7 @@ const LoginPage = ({ firebase }) => {
   return (
     <>
       <Helmet>
-        <title>Tv Junkie | Login</title>
+        <title>Login | TV Junkie</title>
       </Helmet>
       <Header isLogoVisible={false} hideLogin={true} />
       <div className="login-page">

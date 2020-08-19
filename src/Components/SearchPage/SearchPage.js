@@ -308,7 +308,7 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
     return (
       <>
         <Helmet>
-          <title>Tv Junkie | Advanced search</title>
+          <title>Advanced search | TV Junkie</title>
         </Helmet>
         <Header />
         <div className="search-page__search">
