@@ -1,6 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <script>
+      ;(function(w, d, s, l, n, nst, ist) {
+        var appendWidgetScript = function() {
+          nst = d.createElement(s)
+          ist = d.getElementsByTagName(s)[0]
+          nst.async = 1
+          nst.src = l
+          ist.parentNode.insertBefore(nst, ist)
+        }
+
+        w.onload = function() {
+          var body = document.body
+          var pixiboExist = d.getElementById("pixiboTest")
+          var config = {
+            childList: true,
+            subtree: true
+          }
+
+          if (pixiboExist) {
+            appendWidgetScript()
+          }
+
+          var mutationHandler = mutations => {
+            mutations.forEach(mutation => {
+              console.log(mutation)
+              if (mutation.addedNodes.length) {
+                mutation.addedNodes.forEach(item => {
+                  console.log("observer 2")
+                  if (item.id !== "pixiboTest") return
+
+                  appendWidgetScript()
+                })
+              }
+              if (mutation.removedNodes.length) {
+                mutation.removedNodes.forEach(item => {
+                  if (item.id !== "pixiboTest") return
+
+                  document.head.removeChild(nst)
+                })
+              }
+            })
+          }
+
+          var observer = new MutationObserver(mutationHandler)
+          observer.observe(body, config)
+        }
+      })(
+        window,
+        document,
+        "script",
+        "https://cdn.jsdelivr.net/gh/mrspok407/pixibo-widget-test/dist/widgett.bundle.js",
+        "pw"
+      )
+    </script>
+
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />

@@ -291,6 +291,8 @@ class HomePage extends Component {
           <meta charSet="utf-8" />
           <title>TV Junkie</title>
         </Helmet>
+        <div id="pixiboTest"></div>
+
         <Header />
         <div className="home-page__wrapper">
           {!this.props.authUser ? this.renderNonAuthUser() : this.renderAuthUser()}
