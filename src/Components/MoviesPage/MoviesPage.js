@@ -18,7 +18,8 @@ class Movies extends Component {
       error: [],
       loadingIds: [],
       moviesIds: [],
-      showAllLinksPressed: false
+      showAllLinksPressed: false,
+      showPixBtn: false
     }
   }
 
@@ -70,12 +71,23 @@ class Movies extends Component {
       })
   }
 
+  togglePixBtn = () => {
+    this.setState({
+      showPixBtn: !this.state.showPixBtn
+    })
+  }
+
   render() {
     return (
       <>
         <Helmet>
           <title>All your movies | TV Junkie</title>
         </Helmet>
+        <button className="button" onClick={() => this.togglePixBtn()}>
+          Toggle Pix Btn
+        </button>
+        {this.state.showPixBtn && <div id="pixiboTest"></div>}
+
         <Header />
         <MoviesContent
           moviesArr={this.state.moviesArr}

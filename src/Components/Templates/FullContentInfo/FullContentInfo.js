@@ -428,6 +428,8 @@ function FullContentInfo({
         </title>
       </Helmet>
       <Header isLogoVisible={false} />
+      <div id="pixiboTest"></div>
+
       <div className="full-detailes-container">
         {error ? (
           <div className="full-detailes__error">
