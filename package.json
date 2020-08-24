@@ -22,10 +22,11 @@
     "normalize.css": "^8.0.1",
     "rarbg-api": "^1.1.4",
     "react": "^16.13.1",
+    "react-app-polyfill": "^1.0.6",
     "react-dom": "^16.13.1",
     "react-helmet": "^6.1.0",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "3.4.0",
+    "react-scripts": "^3.4.3",
     "react-transition-group": "^1.2.1",
     "recompose": "^0.30.0",
     "throttle-debounce": "^2.2.1",
@@ -48,6 +49,7 @@
       "not op_mini all"
     ],
     "development": [
+      "ie 11",
       "last 1 chrome version",
       "last 1 firefox version",
       "last 1 safari version"
