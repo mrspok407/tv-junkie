@@ -1,66 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <script>
-      ;(function(w, d, s, l, spa, nst, ist) {
-        var appendWidgetScript = function() {
-          nst = d.createElement(s)
-          ist = d.getElementsByTagName(s)[0]
-          nst.async = 1
-          nst.src = l
-          nst.id = "pixibo-widget-script"
-          ist.parentNode.insertBefore(nst, ist)
-        }
-
-        w.onload = function() {
-          var body = document.body
-          var pixiboExist = d.getElementById("pixiboTest")
-          var configObserver = {
-            childList: true,
-            subtree: true
-          }
-
-          if (pixiboExist) {
-            appendWidgetScript()
-          }
-
-          if (!spa) return
-
-          var mutationHandler = mutations => {
-            mutations.forEach(mutation => {
-              if (mutation.addedNodes.length) {
-                mutation.addedNodes.forEach(item => {
-                  var script = d.getElementById("pixibo-widget-script")
-
-                  if (item.id !== "pixiboTest" || script) return
-
-                  appendWidgetScript()
-                })
-              }
-              if (mutation.removedNodes.length) {
-                mutation.removedNodes.forEach(item => {
-                  if (item.id !== "pixiboTest") return
-
-                  var styles = d.getElementById("pixibo-widget-styles")
-
-                  document.head.removeChild(nst)
-                  document.head.removeChild(styles)
-                })
-              }
-            })
-          }
-
-          var observer = new MutationObserver(mutationHandler)
-          observer.observe(body, configObserver)
-        }
-      })(
-        window,
-        document,
-        "script",
-        "https://cdn.jsdelivr.net/gh/mrspok407/pixibo-widget/dist/widget.bundle.js",
-        true
-      )
-    </script>
+    <!-- prettier-ignore -->
+    <script> !function(e,t,d,i,o,n,r){var s=function(){n=t.createElement(d),r=t.getElementsByTagName(d)[0],n.async=1,n.src=i,n.id="pixibo-widget-script",r.parentNode.insertBefore(n,r)};e.onload=function(){var e=document.body;t.getElementById("pixiboTest")&&s();if(!o)return;new MutationObserver(e=>{e.forEach(e=>{e.addedNodes.length&&e.addedNodes.forEach(e=>{var d=t.getElementById("pixibo-widget-script");"pixiboTest"!==e.id||d||s()}),e.removedNodes.length&&e.removedNodes.forEach(e=>{if("pixiboTest"===e.id){var d=t.getElementById("pixibo-widget-styles");document.head.removeChild(n),document.head.removeChild(d)}})})}).observe(e,{childList:!0,subtree:!0})}}(window,document,"script", "https://cdn.jsdelivr.net/gh/mrspok407/pixibo-widget/dist/widget.bundle.js", true) </script>
 
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
