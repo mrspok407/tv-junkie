@@ -2,19 +2,20 @@
 <html lang="en">
   <head>
     <script>
-      ;(function(w, d, s, l, n, nst, ist) {
+      ;(function(w, d, s, l, spa, nst, ist) {
         var appendWidgetScript = function() {
           nst = d.createElement(s)
           ist = d.getElementsByTagName(s)[0]
           nst.async = 1
           nst.src = l
+          nst.id = "pixibo-widget-script"
           ist.parentNode.insertBefore(nst, ist)
         }
 
         w.onload = function() {
           var body = document.body
           var pixiboExist = d.getElementById("pixiboTest")
-          var config = {
+          var configObserver = {
             childList: true,
             subtree: true
           }
@@ -23,13 +24,15 @@
             appendWidgetScript()
           }
 
+          if (!spa) return
+
           var mutationHandler = mutations => {
             mutations.forEach(mutation => {
-              console.log(mutation)
               if (mutation.addedNodes.length) {
                 mutation.addedNodes.forEach(item => {
-                  console.log("observer 2")
-                  if (item.id !== "pixiboTest") return
+                  var script = d.getElementById("pixibo-widget-script")
+
+                  if (item.id !== "pixiboTest" || script) return
 
                   appendWidgetScript()
                 })
@@ -38,21 +41,24 @@
                 mutation.removedNodes.forEach(item => {
                   if (item.id !== "pixiboTest") return
 
+                  var styles = d.getElementById("pixibo-widget-styles")
+
                   document.head.removeChild(nst)
+                  document.head.removeChild(styles)
                 })
               }
             })
           }
 
           var observer = new MutationObserver(mutationHandler)
-          observer.observe(body, config)
+          observer.observe(body, configObserver)
         }
       })(
         window,
         document,
         "script",
-        "https://cdn.jsdelivr.net/gh/mrspok407/pixibo-widget-test/dist/widgeeet.bundle.js",
-        "pw"
+        "https://cdn.jsdelivr.net/gh/mrspok407/tv-junkie/src/widget.bundle.js",
+        true
       )
     </script>
 

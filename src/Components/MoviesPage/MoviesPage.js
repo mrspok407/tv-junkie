@@ -83,12 +83,15 @@ class Movies extends Component {
         <Helmet>
           <title>All your movies | TV Junkie</title>
         </Helmet>
-        <button className="button" onClick={() => this.togglePixBtn()}>
+        <Header />
+        <button
+          style={{ width: `250px`, margin: "0px" }}
+          className="button"
+          onClick={() => this.togglePixBtn()}
+        >
           Toggle Pix Btn
         </button>
         {this.state.showPixBtn && <div id="pixiboTest"></div>}
-
-        <Header />
         <MoviesContent
           moviesArr={this.state.moviesArr}
           getMovieLinks={this.getMovieLinks}

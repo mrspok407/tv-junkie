@@ -7,6 +7,10 @@ body {
   @include scrollbar(5px, getColor(blueClr, $mainPalette), #c5bbb1);
 }
 
+#pixiboTest {
+  margin: 15px !important;
+}
+
 *,
 *:before,
 *:after {
