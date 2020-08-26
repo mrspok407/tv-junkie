@@ -37,10 +37,9 @@ class MoviesContent extends Component {
   }
 
   componentDidMount() {
+    this._isMounted = true
     this.getContent({ sortBy: "title", isInitialLoad: true })
     window.addEventListener("scroll", this.handleScroll)
-
-    this._isMounted = true
   }
 
   componentWillUnmount() {
@@ -60,9 +59,10 @@ class MoviesContent extends Component {
     Object.keys(this.state.database).forEach(database => {
       const promise = this.props.firebase[database](this.props.authUser.uid)
         .orderByChild(sortBy)
-        .limitToFirst(this.state.loadedMovies[database])
-        .once("value", snapshot => {
+        // .limitToFirst(this.state.loadedMovies[database])
+        .on("value", snapshot => {
           if (!this._isMounted) return
+          console.log(snapshot.val())
 
           let movies = []
           snapshot.forEach(item => {

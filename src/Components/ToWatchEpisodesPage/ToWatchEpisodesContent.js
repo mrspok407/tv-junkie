@@ -19,8 +19,8 @@ class ToWatchEpisodesContent extends Component {
   }
 
   componentDidMount() {
-    this.getContent({})
     this._isMounted = true
+    this.getContent({})
   }
 
   componentWillUnmount() {
@@ -42,7 +42,7 @@ class ToWatchEpisodesContent extends Component {
     this.props.firebase
       .userShows(this.props.authUser.uid, database)
       .orderByChild(sortBy)
-      .once("value", snapshot => {
+      .on("value", snapshot => {
         let userShows = []
         snapshot.forEach(item => {
           if (item.val().allEpisodesWatched) return

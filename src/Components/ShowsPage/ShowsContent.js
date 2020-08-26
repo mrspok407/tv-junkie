@@ -9,7 +9,7 @@ import PlaceholderLoadingContentResultsItem from "Components/Placeholders/Placeh
 import Loader from "Components/Placeholders/Loader"
 import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
 
-const SHOWS_TO_LOAD_INITIAL = 20
+const SHOWS_TO_LOAD_INITIAL = 10
 const SCROLL_THRESHOLD = 1400
 
 const TIMEOUT_TO_UPDATE_WATCHING_SHOWS = 500
@@ -55,10 +55,10 @@ class ShowsContent extends Component {
   }
 
   componentDidMount() {
+    this._isMounted = true
+
     this.getContent({ sortBy: "name", isInitialLoad: true })
     window.addEventListener("scroll", this.handleScroll)
-
-    this._isMounted = true
   }
 
   componentWillUnmount() {
@@ -94,7 +94,7 @@ class ShowsContent extends Component {
           database !== "finishedShows" ? "true" : sortBy === "name" ? "true_zzzzzzz" : "true_3190666598976"
         ) // Need zzzzzz's and true_3190666598976 so it will sure go to the end
         .limitToFirst(!isInitialLoad ? limitTo : limitTo)
-        .once("value", snapshot => {
+        .on("value", snapshot => {
           let shows = []
           snapshot.forEach(item => {
             shows = [
