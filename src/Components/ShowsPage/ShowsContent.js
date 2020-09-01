@@ -94,7 +94,7 @@ class ShowsContent extends Component {
           database !== "finishedShows" ? "true" : sortBy === "name" ? "true_zzzzzzz" : "true_3190666598976"
         ) // Need zzzzzz's and true_3190666598976 so it will sure go to the end
         .limitToFirst(!isInitialLoad ? limitTo : limitTo)
-        .on("value", snapshot => {
+        .once("value", snapshot => {
           let shows = []
           snapshot.forEach(item => {
             shows = [

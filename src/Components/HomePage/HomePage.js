@@ -47,7 +47,41 @@ class HomePage extends Component {
 
   componentDidMount() {
     this.getContentForSliders()
+    // this.databaseModify()
     // this.testFun()
+  }
+
+  databaseModify = () => {
+    this.props.firebase.users().once("value", snapshot => {
+      let users = []
+      snapshot.forEach(item => {
+        users = [...users, { ...item.val(), key: item.key }]
+      })
+
+      users.forEach(user => {
+        this.props.userContent.showsDatabases.forEach(database => {
+          this.props.firebase.userShows(user.key, database).once("value", snapshot => {
+            let shows = []
+            snapshot.forEach(item => {
+              shows = [...shows, item.val()]
+            })
+
+            shows.forEach(show => {
+              if (!show.episodes) return
+
+              this.props.firebase
+                .userEpisodes(user.key)
+                .child(show.id)
+                .set(show.episodes)
+
+              this.props.firebase
+                .userShow({ uid: user.key, key: show.id, database })
+                .update({ episodes: null })
+            })
+          })
+        })
+      })
+    })
   }
 
   testFun = () => {
@@ -259,7 +293,7 @@ class HomePage extends Component {
         <>
           {this.state.willAirEpisodes.length > 0 ? (
             <div className="home-page__heading">
-              <h1 onClick={() => this.testFun()}>Soon to watch</h1>
+              <h1>Soon to watch</h1>
             </div>
           ) : (
             <PlaceholderHomePageNoFutureEpisodes />
@@ -292,7 +326,6 @@ class HomePage extends Component {
           <title>TV Junkie</title>
         </Helmet>
         <Header />
-        <div id="pixiboTest"></div>
         <div className="home-page__wrapper">
           {!this.props.authUser ? this.renderNonAuthUser() : this.renderAuthUser()}
         </div>

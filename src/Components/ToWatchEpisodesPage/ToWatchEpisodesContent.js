@@ -42,7 +42,7 @@ class ToWatchEpisodesContent extends Component {
     this.props.firebase
       .userShows(this.props.authUser.uid, database)
       .orderByChild(sortBy)
-      .on("value", snapshot => {
+      .once("value", snapshot => {
         let userShows = []
         snapshot.forEach(item => {
           if (item.val().allEpisodesWatched) return
@@ -184,9 +184,7 @@ class ToWatchEpisodesContent extends Component {
               episodes: updatedSeasons
             })
 
-            this.props.firebase
-              .userShowAllEpisodes(this.props.authUser.uid, show.id, database)
-              .set(updatedSeasonsUser)
+            this.props.firebase.userShowAllEpisodes(this.props.authUser.uid, show.id).set(updatedSeasonsUser)
           })
 
           this.setState({

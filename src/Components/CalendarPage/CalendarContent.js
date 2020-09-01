@@ -37,7 +37,7 @@ class CalendarContent extends Component {
     this.props.firebase
       .userShows(this.props.authUser.uid, database)
       .orderByChild(sortBy)
-      .on("value", snapshot => {
+      .once("value", snapshot => {
         let userShows = []
 
         snapshot.forEach(show => {

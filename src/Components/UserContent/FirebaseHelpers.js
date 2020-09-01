@@ -14,7 +14,7 @@ export const checkIfAllEpisodesWatched = ({ show, firebase, authUser, todayDate 
       return daysToNewEpisode <= 0 && episode
     })
 
-    firebase.userShowAllEpisodes(authUser.uid, show.info.id, show.database).once("value", snapshot => {
+    firebase.userShowAllEpisodes(authUser.uid, show.info.id).once("value", snapshot => {
       const allEpisodes = snapshot.val().reduce((acc, item) => {
         acc.push(...item.episodes)
         return acc

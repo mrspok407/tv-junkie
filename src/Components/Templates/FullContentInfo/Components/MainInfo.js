@@ -141,11 +141,8 @@ class MainInfo extends Component {
           {this.props.mediaType === "show" && (
             <ShowsButtons
               id={this.props.id}
-              userContent={this.props.userContent}
               authUser={this.props.authUser}
               infoToPass={this.props.infoToPass}
-              showInDatabase={this.props.showInDatabase}
-              getShowInDatabase={this.props.getShowInDatabase}
               changeShowDatabaseOnClient={this.props.changeShowDatabaseOnClient}
               showDatabaseOnClient={this.props.showDatabaseOnClient}
             />

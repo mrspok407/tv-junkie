@@ -18,6 +18,7 @@ class ShowsEpisodes extends Component {
 
     this.state = {
       loadingEpisodesIds: [],
+      loadingRequestToDB: false,
       openSeasons: [],
       showEpisodes: [],
       detailEpisodeInfo: [],
@@ -157,7 +158,9 @@ class ShowsEpisodes extends Component {
   }
 
   toggleWatchedEpisode = (seasonNum, episodeNum) => {
-    if (!this.props.authUser) return
+    if (!this.props.authUser || this.state.loadingRequestToDB) return
+
+    this.setState({ loadingRequestToDB: true })
 
     const show = this.props.showInDatabase
 
@@ -165,28 +168,34 @@ class ShowsEpisodes extends Component {
       .userShowSingleEpisode({
         uid: this.props.authUser.uid,
         key: show.info.id,
-        database: show.database,
         seasonNum,
         episodeNum
       })
       .update(
         {
-          watched: !show.info.episodes[seasonNum - 1].episodes[episodeNum].watched
+          watched: !show.episodes[seasonNum - 1].episodes[episodeNum].watched
         },
-        checkIfAllEpisodesWatched({
-          show,
-          firebase: this.props.firebase,
-          authUser: this.props.authUser,
-          todayDate: this.props.todayDate
-        })
+        () => {
+          this.setState({ loadingRequestToDB: false })
+          checkIfAllEpisodesWatched({
+            show,
+            firebase: this.props.firebase,
+            authUser: this.props.authUser,
+            todayDate: this.props.todayDate
+          })
+        }
       )
   }
 
   toggleWatchedEpisodeDeb = debounce(this.toggleWatchedEpisode, 50)
 
   checkEverySeasonEpisode = seasonNum => {
+    if (this.state.loadingRequestToDB) return
+
+    this.setState({ loadingRequestToDB: true })
+
     const show = this.props.showInDatabase
-    const seasonEpisodes = show.info.episodes[seasonNum - 1].episodes
+    const seasonEpisodes = show.episodes[seasonNum - 1].episodes
     const seasonEpisodesFromDatabase = this.state.allEpisodesFromDatabase.filter(
       item => item.season_number === seasonNum
     )
@@ -210,18 +219,17 @@ class ShowsEpisodes extends Component {
       .userShowSeasonEpisodes({
         uid: this.props.authUser.uid,
         key: show.info.id,
-        database: show.database,
         seasonNum
       })
-      .set(
-        seasonEpisodes,
+      .set(seasonEpisodes, () => {
+        this.setState({ loadingRequestToDB: false })
         checkIfAllEpisodesWatched({
           show,
           firebase: this.props.firebase,
           authUser: this.props.authUser,
           todayDate: this.props.todayDate
         })
-      )
+      })
   }
 
   getAllEpisodesFromDatabase = () => {
@@ -253,8 +261,12 @@ class ShowsEpisodes extends Component {
   }
 
   checkEveryShowEpisode = () => {
+    if (this.state.loadingRequestToDB) return
+
+    this.setState({ loadingRequestToDB: true })
+
     const show = this.props.showInDatabase
-    const allEpisodesUser = show.info.episodes
+    const allEpisodesUser = show.episodes
 
     let isAllEpisodesChecked = true
     let userEpisodesFormated = []
@@ -276,15 +288,17 @@ class ShowsEpisodes extends Component {
       userEpisodesFormated[episodeIndex].watched = !isAllEpisodesChecked
     })
 
-    this.props.firebase.userShowAllEpisodes(this.props.authUser.uid, show.info.id, show.database).set(
-      allEpisodesUser,
-      checkIfAllEpisodesWatched({
-        show,
-        firebase: this.props.firebase,
-        authUser: this.props.authUser,
-        todayDate: this.props.todayDate
+    this.props.firebase
+      .userShowAllEpisodes(this.props.authUser.uid, show.info.id)
+      .set(allEpisodesUser, () => {
+        this.setState({ loadingRequestToDB: false })
+        checkIfAllEpisodesWatched({
+          show,
+          firebase: this.props.firebase,
+          authUser: this.props.authUser,
+          todayDate: this.props.todayDate
+        })
       })
-    )
   }
 
   render() {

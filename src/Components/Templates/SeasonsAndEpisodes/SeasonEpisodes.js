@@ -95,12 +95,12 @@ export default class SeasonEpisodes extends Component {
       this.props.authUser &&
       this.props.showInDatabase.info &&
       this.props.showInDatabase.database !== "notWatchingShows" &&
-      this.props.showInDatabase.info.episodes &&
-      this.props.showInDatabase.info.episodes.length > 0 &&
+      this.props.showInDatabase.episodes &&
+      this.props.showInDatabase.episodes.length > 0 &&
       true
 
     const showSeason =
-      showCheckboxes && this.props.showInDatabase.info.episodes[this.props.season.season_number - 1]
+      showCheckboxes && this.props.showInDatabase.episodes[this.props.season.season_number - 1]
 
     const seasons = this.props.toWatchPage ? this.props.seasonsArr : this.props.showEpisodes
 
@@ -241,10 +241,7 @@ export default class SeasonEpisodes extends Component {
                           if (this.props.toWatchPage) {
                             this.handleFadeOut(episode.id, indexOfEpisode)
                           } else {
-                            this.props.toggleWatchedEpisodeDeb(
-                              this.props.season.season_number,
-                              indexOfEpisode
-                            )
+                            this.props.toggleWatchedEpisode(this.props.season.season_number, indexOfEpisode)
                           }
                         }}
                         disabled={!showCheckboxes || !this.props.authUser}

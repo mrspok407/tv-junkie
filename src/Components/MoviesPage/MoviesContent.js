@@ -62,8 +62,6 @@ class MoviesContent extends Component {
         // .limitToFirst(this.state.loadedMovies[database])
         .on("value", snapshot => {
           if (!this._isMounted) return
-          console.log(snapshot.val())
-
           let movies = []
           snapshot.forEach(item => {
             movies = [...movies, item.val()]
