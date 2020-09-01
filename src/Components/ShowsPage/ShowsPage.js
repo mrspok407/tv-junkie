@@ -9,12 +9,6 @@ import Footer from "Components/Footer/Footer"
 const Header = withFirebase(HeaderBase)
 
 class Shows extends Component {
-  constructor(props) {
-    super(props)
-
-    this.state = {}
-  }
-
   render() {
     return (
       <>

@@ -45,6 +45,11 @@ class ShowsEpisodes extends Component {
     if (cancelRequest !== undefined) {
       cancelRequest()
     }
+
+    const show = this.props.infoToPass
+    const showsSubDatabase = show.status === "Ended" || show.status === "Canceled" ? "ended" : "ongoing"
+
+    this.props.firebase.showEpisodes(showsSubDatabase, show.id).off()
   }
 
   initialFirstSeasonLoad = () => {
@@ -238,7 +243,7 @@ class ShowsEpisodes extends Component {
     const show = this.props.infoToPass
     const showsSubDatabase = show.status === "Ended" || show.status === "Canceled" ? "ended" : "ongoing"
 
-    this.props.firebase.showEpisodes(showsSubDatabase, show.id).once("value", snapshot => {
+    this.props.firebase.showEpisodes(showsSubDatabase, show.id).on("value", snapshot => {
       if (snapshot.val() !== null && this._isMounted) {
         let allEpisodes = []
 
