@@ -281,6 +281,8 @@ function FullContentInfo({
   }
 
   const mergeEpisodesFromDatabase = () => {
+    if (!authUser) return
+
     userContent.showsDatabases.forEach(database => {
       firebase.userShow({ uid: authUser.uid, key: Number(id), database }).once("value", snapshot => {
         if (snapshot.val() === null) return

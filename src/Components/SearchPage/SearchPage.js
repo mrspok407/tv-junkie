@@ -324,7 +324,7 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
         {this.renderAdvMovies()}
 
         <Footer />
-        <ScrollToTop />
+        {/* <ScrollToTop /> */}
         {/* <Footer /> */}
       </>
     )

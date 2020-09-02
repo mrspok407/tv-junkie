@@ -76,8 +76,8 @@ class Firebase {
   /// User Content API ///
   userShows = (uid, subDatabase) => this.db.ref(`users/${uid}/content/shows/${subDatabase}`)
 
-  // userEpisodes = uid => this.db.ref(`users/${uid}/content/shows/episodes`)
-  // userShowEpisodes = (uid, key) => this.db.ref(`users/${uid}/content/shows/episodes/${key}`)
+  userEpisodes = uid => this.db.ref(`users/${uid}/content/shows/episodes`)
+  userShowEpisodes = (uid, key) => this.db.ref(`users/${uid}/content/shows/episodes/${key}`)
 
   userShow = ({ uid, key, database }) => this.db.ref(`users/${uid}/content/shows/${database}/${key}`)
 

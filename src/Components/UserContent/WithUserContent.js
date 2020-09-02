@@ -10,9 +10,13 @@ const withUserContent = Component => {
       super(props)
 
       this.state = {
-        watchingShows: [],
-        droppedShows: [],
-        willWatchShows: [],
+        userShowsDatabases: {
+          watchingShows: [],
+          droppedShows: [],
+          willWatchShows: [],
+          finishedShows: []
+        },
+        loadingShows: false,
         watchLaterMovies: [],
         showsDatabases: ["watchingShows", "notWatchingShows", "droppedShows", "willWatchShows"],
         moviesDatabases: ["watchLaterMovies"],
@@ -25,6 +29,10 @@ const withUserContent = Component => {
       this.firebase = this.props.firebase
       this.authUser = this.props.authUser
       this.userUid = this.authUser && this.authUser.uid
+    }
+
+    componentDidMount() {
+      this.handleShowsListener()
     }
 
     componentDidUpdate(prevProps) {
@@ -319,6 +327,70 @@ const withUserContent = Component => {
         })
     }
 
+    handleShowsListener = () => {
+      this.setState({ loadingShows: true })
+
+      let userContentTemp = {
+        watchingShows: [],
+        droppedShows: [],
+        willWatchShows: [],
+        finishedShows: []
+      }
+
+      Object.keys(this.state.userShowsDatabases).forEach(database => {
+        this.firebase.userShows(this.userUid, database).on("value", snapshot => {
+          let counter = 0
+
+          let shows = []
+          snapshot.forEach(item => {
+            shows = [...shows, item.val()]
+          })
+          const showsLength = shows.length
+
+          let mergedShows = []
+
+          shows.forEach(show => {
+            this.firebase.showInfo(show.status, show.id).on("value", snapshot => {
+              counter++
+
+              mergedShows = [...mergedShows, { ...show, ...snapshot.val() }]
+
+              userContentTemp = {
+                ...userContentTemp,
+                [database]:
+                  database === "watchingShows"
+                    ? mergedShows.filter(item => item.finished_and_name.slice(0, 5) === "false")
+                    : mergedShows
+              }
+
+              if (counter === showsLength) {
+                this.setState({
+                  userShowsDatabases: userContentTemp,
+                  loadingShows: false
+                })
+              }
+            })
+          })
+        })
+      })
+    }
+
+    handleShowsListenerOnClient = ({ activeSection = "watchingShows", id }) => {
+      const removedShow = this.state.userShowsDatabases[activeSection].find(item => item.id === id)
+      const filteredShows = this.state.userShowsDatabases[activeSection].filter(item => item.id !== id)
+
+      this.setState({
+        userShowsDatabases: {
+          ...this.state.userShowsDatabases,
+          watchingShows: activeSection !== "watchingShows" && [
+            ...this.state.userShowsDatabases.watchingShows,
+            removedShow
+          ],
+          [activeSection]: filteredShows
+        }
+      })
+    }
+
     render() {
       return (
         <Component
@@ -327,6 +399,8 @@ const withUserContent = Component => {
           toggleWatchLaterMovie={this.toggleWatchLaterMovie}
           handleShowInDatabases={this.handleShowInDatabases}
           addShowToDatabase={this.addShowToDatabase}
+          handleShowsListener={this.handleShowsListener}
+          handleShowsListenerOnClient={this.handleShowsListenerOnClient}
         />
       )
     }

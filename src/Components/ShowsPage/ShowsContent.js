@@ -5,15 +5,11 @@ import { listOfGenres } from "Utils"
 import { throttle } from "throttle-debounce"
 import classNames from "classnames"
 import PlaceholderNoShows from "Components/Placeholders/PlaceholderNoShows"
-import PlaceholderLoadingContentResultsItem from "Components/Placeholders/PlaceholderLoadingSortBy/PlaceholderLoadingContentResultsItem"
 import Loader from "Components/Placeholders/Loader"
 import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
 
-const SHOWS_TO_LOAD_INITIAL = 100
-const SCROLL_THRESHOLD = 1400
-
-const TIMEOUT_TO_UPDATE_WATCHING_SHOWS = 500
-let timeoutUpdateWatchingShows
+const SHOWS_TO_LOAD_INITIAL = 15
+const SCROLL_THRESHOLD = 800
 
 class ShowsContent extends Component {
   constructor(props) {
@@ -22,10 +18,6 @@ class ShowsContent extends Component {
     this.state = {
       activeSection: "watchingShows",
       sortBy: "name",
-      initialLoading: false,
-      loadingContent: false,
-      sortByLoading: false,
-      updateWatchingShowsLoading: false,
       database: {
         watchingShows: [],
         droppedShows: [],
@@ -37,12 +29,6 @@ class ShowsContent extends Component {
         droppedShows: false,
         willWatchShows: false,
         finishedShows: false
-      },
-      lastLoadedShow: {
-        watchingShows: SHOWS_TO_LOAD_INITIAL,
-        droppedShows: SHOWS_TO_LOAD_INITIAL,
-        willWatchShows: SHOWS_TO_LOAD_INITIAL,
-        finishedShows: SHOWS_TO_LOAD_INITIAL
       },
       loadedShows: {
         watchingShows: SHOWS_TO_LOAD_INITIAL,
@@ -57,7 +43,6 @@ class ShowsContent extends Component {
   componentDidMount() {
     this._isMounted = true
 
-    this.getContent({ sortBy: "name", isInitialLoad: true })
     window.addEventListener("scroll", this.handleScroll)
   }
 
@@ -73,157 +58,21 @@ class ShowsContent extends Component {
     })
   }
 
-  getContent = ({ sortBy = "name", isInitialLoad = true, databases = [] }) => {
-    if (this.props.authUser === null || this.state.updateWatchingShowsLoading) return
-    if (isInitialLoad) {
-      this.setState({ initialLoading: true })
-    }
-
-    let counter = 0
-
-    const getContentFromDatabases = databases.length > 0 ? databases : Object.keys(this.state.database)
-
-    getContentFromDatabases.forEach(database => {
-      const limitTo = this.state.loadedShows[database] <= 0 ? 1 : this.state.loadedShows[database]
-
-      this.props.firebase
-        .userShows(this.props.authUser.uid, database)
-        .orderByChild(`finished_and_${sortBy}`)
-        .startAt(database !== "finishedShows" ? "false" : "true")
-        .endAt(
-          database !== "finishedShows" ? "true" : sortBy === "name" ? "true_zzzzzzz" : "true_3190666598976"
-        ) // Need zzzzzz's and true_3190666598976 so it will sure go to the end
-        .limitToFirst(!isInitialLoad ? limitTo : limitTo)
-        .on("value", snapshot => {
-          let shows = []
-          snapshot.forEach(item => {
-            shows = [
-              ...shows,
-              {
-                id: item.val().id,
-                finished_and_name: item.val().finished_and_name,
-                // name: item.val().name,
-                finished_and_timeStamp: item.val().finished_and_timeStamp,
-                status: item.val().status
-                // timeStamp: item.val().timeStamp
-              }
-            ]
-          })
-
-          Promise.all(
-            shows.map(item => {
-              const showsSubDatabase = item.status
-
-              return this.props.firebase
-                .showInfo(showsSubDatabase, item.id)
-                .once("value")
-                .then(snapshot => {
-                  return snapshot.val()
-                })
-            })
-          ).then(showsData => {
-            if (!this._isMounted) return
-
-            counter++
-            this.setState({
-              database: {
-                ...this.state.database,
-                [database]: showsData
-              },
-              lastLoadedShow: {
-                ...this.state.lastLoadedShow,
-                [database]: shows.length !== 0 && shows[shows.length - 1][`finished_and_${sortBy}`]
-              }
-            })
-
-            if (counter === getContentFromDatabases.length) {
-              this.setState({
-                sortByLoading: false,
-                initialLoading: false
-              })
-            }
-          })
-        })
-    })
-  }
-
   loadNewContent = () => {
-    if (this.props.authUser === null) return
-    if (this.state.disableLoad[this.state.activeSection] || this.state.loadingContent) return
-    if (document.body.scrollHeight < SCROLL_THRESHOLD) return
+    if (this.state.disableLoad[this.state.activeSection]) return
 
     this.setState({
-      loadingContent: true
+      loadedShows: {
+        ...this.state.loadedShows,
+        [this.state.activeSection]: this.state.loadedShows[this.state.activeSection] + SHOWS_TO_LOAD_INITIAL
+      },
+      disableLoad: {
+        ...this.state.disableLoad,
+        [this.state.activeSection]:
+          this.state.loadedShows[this.state.activeSection] >=
+            this.props.userContent.userShowsDatabases[this.state.activeSection].length && true
+      }
     })
-
-    this.props.firebase
-      .userShows(this.props.authUser.uid, this.state.activeSection)
-      .orderByChild(`finished_and_${this.state.sortBy}`)
-      .startAt(this.state.lastLoadedShow[this.state.activeSection] + 1)
-      .endAt(
-        this.state.activeSection !== "finishedShows"
-          ? "true"
-          : this.state.sortBy === "name"
-          ? "true_zzzzzzz"
-          : "true_3190666598976"
-      ) // Need zzzzzz's and true_3190666598976 so it will sure go to the end
-      .limitToFirst(SHOWS_TO_LOAD_INITIAL + 1)
-      .once("value", snapshot => {
-        let shows = []
-        snapshot.forEach(item => {
-          shows = [
-            ...shows,
-            {
-              id: item.val().id,
-              finished_and_name: item.val().finished_and_name,
-              finished_and_timeStamp: item.val().finished_and_timeStamp,
-              // name: item.val().name,
-              // timeStamp: item.val().timeStamp,
-              status: item.val().status
-            }
-          ]
-        })
-
-        const disableLoadNewContent = shows.length !== SHOWS_TO_LOAD_INITIAL + 1 ? true : false
-        if (!disableLoadNewContent) shows.pop()
-
-        Promise.all(
-          shows.map(item => {
-            const showsSubDatabase = item.status
-
-            return this.props.firebase
-              .showInfo(showsSubDatabase, item.id)
-              .once("value")
-              .then(snapshot => {
-                return snapshot.val()
-              })
-          })
-        ).then(showsData => {
-          if (!this._isMounted) return
-
-          this.setState(prevState => ({
-            database: {
-              ...prevState.database,
-              [this.state.activeSection]: [...prevState.database[this.state.activeSection], ...showsData]
-            },
-            disableLoad: {
-              ...prevState.disableLoad,
-              [this.state.activeSection]: disableLoadNewContent
-            },
-            lastLoadedShow: {
-              ...prevState.lastLoadedShow,
-              [this.state.activeSection]:
-                shows.length !== 0 && shows[shows.length - 1][`finished_and_${this.state.sortBy}`]
-            },
-            loadedShows: {
-              ...prevState.loadedShows,
-              [this.state.activeSection]:
-                prevState.database[this.state.activeSection].length + showsData.length
-            },
-            loadingContent: false
-          }))
-        })
-      })
   }
 
   loadNewContentLS = () => {
@@ -236,57 +85,22 @@ class ShowsContent extends Component {
   }
 
   handleScroll = throttle(500, () => {
-    if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 800) {
+    if (window.innerHeight + window.scrollY >= document.body.scrollHeight - SCROLL_THRESHOLD) {
       this.loadNewContent()
       this.loadNewContentLS()
     }
   })
 
-  handleShowsOnClient = showId => {
-    const filteredShows = this.state.database[this.state.activeSection].filter(item => item.id !== showId)
-
-    clearTimeout(timeoutUpdateWatchingShows)
-
-    this.setState({
-      database: {
-        ...this.state.database,
-        [this.state.activeSection]: filteredShows
-      }
-    })
-  }
-
-  updateWatchingShowsDatabase = () => {
-    const activeSectionSavedState = this.state.database[this.state.activeSection]
-    const watchingShowsSavedState = this.state.database.watchingShows
-
-    if (!this.props.userContent.errorInDatabase.error) {
-      timeoutUpdateWatchingShows = setTimeout(() => {
-        this.getContent({
-          sortBy: this.state.sortBy,
-          isInitialLoad: false,
-          databases: ["watchingShows", this.state.activeSection]
-        })
-      }, TIMEOUT_TO_UPDATE_WATCHING_SHOWS)
-    } else {
-      this.setState({
-        database: {
-          ...this.state.database,
-          [this.state.activeSection]: activeSectionSavedState,
-          watchingShows: watchingShowsSavedState
-        }
-      })
-    }
-  }
-
   sortBy = sortBy => {
     if (this.state.sortBy === sortBy) return
 
-    this.setState({ sortBy, sortByLoading: true })
-    this.getContent({ sortBy, isInitialLoad: false })
+    this.setState({ sortBy })
   }
 
   renderContent = section => {
-    const content = this.state.database[section]
+    const content = this.props.userContent.userShowsDatabases[this.state.activeSection]
+      .sort((a, b) => (a[this.state.sortBy] > b[this.state.sortBy] ? 1 : -1))
+      .slice(0, this.state.loadedShows[section])
 
     const shows = this.props.authUser
       ? content
@@ -305,99 +119,99 @@ class ShowsContent extends Component {
 
           return (
             <div key={item.id} className="content-results__item content-results__item--shows">
-              {this.state.sortByLoading ? (
-                <PlaceholderLoadingContentResultsItem delayAnimation="0.5s" />
-              ) : (
-                <div className="content-results__item--shows-wrapper">
-                  <Link to={`/show/${item.id}`}>
-                    <div className="content-results__item-main-info">
-                      <div className="content-results__item-title">
-                        {!showTitle ? "No title available" : showTitle}
-                      </div>
-                      <div className="content-results__item-year">
-                        {!item.first_air_date ? "" : `(${item.first_air_date.slice(0, 4)})`}
-                      </div>
-                      {item.vote_average !== 0 && (
-                        <div className="content-results__item-rating">
-                          {item.vote_average}
-                          <span>/10</span>
-                          <span className="content-results__item-rating-vote-count">({item.vote_count})</span>
-                        </div>
-                      )}
+              <div className="content-results__item--shows-wrapper">
+                <Link to={`/show/${item.id}`}>
+                  <div className="content-results__item-main-info">
+                    <div className="content-results__item-title">
+                      {!showTitle ? "No title available" : showTitle}
                     </div>
-                    <div className="content-results__item-genres">
-                      {filteredGenres.map(item => (
-                        <span key={item[0].id}>{item[0].name}</span>
-                      ))}
+                    <div className="content-results__item-year">
+                      {!item.first_air_date ? "" : `(${item.first_air_date.slice(0, 4)})`}
                     </div>
-                    <div className="content-results__item-overview">
-                      <div className="content-results__item-poster">
-                        <div
-                          style={
-                            item.backdrop_path !== null
-                              ? {
-                                  backgroundImage: `url(https://image.tmdb.org/t/p/w500/${item.backdrop_path ||
-                                    item.poster_path})`
-                                }
-                              : {
-                                  backgroundImage: `url(https://homestaymatch.com/images/no-image-available.png)`
-                                }
-                          }
-                        />
+                    {item.vote_average !== 0 && (
+                      <div className="content-results__item-rating">
+                        {item.vote_average}
+                        <span>/10</span>
+                        <span className="content-results__item-rating-vote-count">({item.vote_count})</span>
                       </div>
-                      <div className="content-results__item-description">
-                        {item.overview.length > 150 ? `${item.overview.substring(0, 150)}...` : item.overview}
-                      </div>
+                    )}
+                  </div>
+                  <div className="content-results__item-genres">
+                    {filteredGenres.map(item => (
+                      <span key={item[0].id}>{item[0].name}</span>
+                    ))}
+                  </div>
+                  <div className="content-results__item-overview">
+                    <div className="content-results__item-poster">
+                      <div
+                        style={
+                          item.backdrop_path !== null
+                            ? {
+                                backgroundImage: `url(https://image.tmdb.org/t/p/w500/${item.backdrop_path ||
+                                  item.poster_path})`
+                              }
+                            : {
+                                backgroundImage: `url(https://homestaymatch.com/images/no-image-available.png)`
+                              }
+                        }
+                      />
                     </div>
-                  </Link>
+                    <div className="content-results__item-description">
+                      {item.overview.length > 150 ? `${item.overview.substring(0, 150)}...` : item.overview}
+                    </div>
+                  </div>
+                </Link>
 
-                  {section === "watchingShows" ? (
+                {section === "watchingShows" ? (
+                  <div className="content-results__item-links content-results__item-links--adv-search">
+                    <button
+                      className="button"
+                      onClick={() => {
+                        if (this.props.authUser) {
+                          this.props.handleShowInDatabases({
+                            id: item.id,
+                            data: item,
+                            database: "notWatchingShows"
+                          })
+                          this.props.handleShowsListenerOnClient({
+                            activeSection: this.state.activeSection,
+                            id: item.id
+                          })
+                        } else {
+                          this.context.removeShowLS({
+                            id: item.id
+                          })
+                        }
+                      }}
+                      type="button"
+                    >
+                      Not watching
+                    </button>
+                  </div>
+                ) : (
+                  section !== "finishedShows" && (
                     <div className="content-results__item-links content-results__item-links--adv-search">
                       <button
                         className="button"
                         onClick={() => {
-                          if (this.props.authUser) {
-                            this.props.handleShowInDatabases({
-                              id: item.id,
-                              data: item,
-                              database: "notWatchingShows",
-                              callback: this.updateWatchingShowsDatabase
-                            })
-                            this.handleShowsOnClient(item.id)
-                          } else {
-                            this.context.removeShowLS({
-                              id: item.id
-                            })
-                          }
+                          this.props.handleShowInDatabases({
+                            id: item.id,
+                            data: item,
+                            database: "watchingShows"
+                          })
+                          this.props.handleShowsListenerOnClient({
+                            activeSection: this.state.activeSection,
+                            id: item.id
+                          })
                         }}
                         type="button"
                       >
-                        Not watching
+                        Watching
                       </button>
                     </div>
-                  ) : (
-                    section !== "finishedShows" && (
-                      <div className="content-results__item-links content-results__item-links--adv-search">
-                        <button
-                          className="button"
-                          onClick={() => {
-                            this.props.handleShowInDatabases({
-                              id: item.id,
-                              data: item,
-                              database: "watchingShows",
-                              callback: this.updateWatchingShowsDatabase
-                            })
-                            this.handleShowsOnClient(item.id)
-                          }}
-                          type="button"
-                        >
-                          Watching
-                        </button>
-                      </div>
-                    )
-                  )}
-                </div>
-              )}
+                  )
+                )}
+              </div>
             </div>
           )
         })}
@@ -406,7 +220,7 @@ class ShowsContent extends Component {
   }
 
   render() {
-    const content = this.state.database[this.state.activeSection]
+    const content = this.props.userContent.userShowsDatabases[this.state.activeSection]
 
     const shows = this.props.authUser
       ? content
@@ -416,6 +230,8 @@ class ShowsContent extends Component {
 
     const maxColumns = 4
     const currentNumOfColumns = shows.length <= maxColumns - 1 ? shows.length : maxColumns
+
+    const loadingShows = this.props.authUser ? this.props.userContent.loadingShows : false
 
     return (
       <div className="content-results">
@@ -466,7 +282,7 @@ class ShowsContent extends Component {
           </div>
         </div>
 
-        {this.state.initialLoading ? (
+        {loadingShows ? (
           <Loader className="loader--pink" />
         ) : shows.length === 0 ? (
           <PlaceholderNoShows
@@ -526,10 +342,7 @@ class ShowsContent extends Component {
               {this.state.initialLoading ? (
                 <Loader className="loader--pink" />
               ) : (
-                <>
-                  {this.renderContent(this.state.activeSection)}
-                  {this.state.loadingContent && <Loader className="loader--pink loader--new-page" />}
-                </>
+                this.renderContent(this.state.activeSection)
               )}
             </div>
           </>
