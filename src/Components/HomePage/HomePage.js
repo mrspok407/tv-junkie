@@ -67,16 +67,30 @@ class HomePage extends Component {
             })
 
             shows.forEach(show => {
-              if (!show.episodes) return
+              // this.props.firebase
+              //   .userEpisodes(user.key)
+              //   .child(show.id)
+              //   .once("value", snapshot => {
+              //     const userEpisodes = {
+              //       episodes: snapshot.val(),
+              //       info: {
+              //         allEpisodesWatched: show.allEpisodesWatched,
+              //         finished: show.finished_and_name.slice(0, 4) === "true" ? true : false
+              //       }
+              //     }
 
-              this.props.firebase
-                .userEpisodes(user.key)
-                .child(show.id)
-                .set(show.episodes)
+              //     this.props.firebase
+              //       .userEpisodes(user.key)
+              //       .child(show.id)
+              //       .set(userEpisodes)
+              //   })
 
-              this.props.firebase
-                .userShow({ uid: user.key, key: show.id, database })
-                .update({ episodes: null })
+              this.props.firebase.userShow({ uid: user.key, key: show.id, database }).update({
+                episodes: null,
+                allEpisodesWatched: null,
+                finished_and_name: null,
+                finished_and_timeStamp: null
+              })
             })
           })
         })

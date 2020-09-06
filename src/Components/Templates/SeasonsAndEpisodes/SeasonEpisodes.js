@@ -104,6 +104,8 @@ export default class SeasonEpisodes extends Component {
 
     const seasons = this.props.toWatchPage ? this.props.seasonsArr : this.props.showEpisodes
 
+    console.log(showSeason)
+
     return (
       <div className="episodes__episode-list">
         {seasons.map(item => {

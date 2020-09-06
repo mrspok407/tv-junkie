@@ -358,9 +358,7 @@ const withUserContent = Component => {
               userContentTemp = {
                 ...userContentTemp,
                 [database]:
-                  database === "watchingShows"
-                    ? mergedShows.filter(item => item.finished_and_name.slice(0, 5) === "false")
-                    : mergedShows
+                  database === "watchingShows" ? mergedShows.filter(item => !item.finished) : mergedShows
               }
 
               if (counter === showsLength) {

@@ -7,6 +7,7 @@ import { WithAuthenticationConsumer } from "Components/UserAuth/Session/WithAuth
 import Header from "Components/Header/Header"
 import "./Profile.scss"
 import Footer from "Components/Footer/Footer"
+import { withUserContent } from "Components/UserContent"
 
 class Profile extends Component {
   constructor(props) {
@@ -20,6 +21,60 @@ class Profile extends Component {
   sendEmailVerification = () => {
     this.props.firebase.sendEmailVerification()
     this.setState({ verificationSent: true })
+  }
+
+  componentDidMount() {
+    // this.databaseModify()
+  }
+
+  databaseModify = () => {
+    this.props.firebase.users().once("value", snapshot => {
+      let users = []
+      snapshot.forEach(item => {
+        users = [...users, { ...item.val(), key: item.key }]
+      })
+
+      users.forEach(user => {
+        this.props.userContent.showsDatabases.forEach(database => {
+          this.props.firebase.userShows(user.key, database).once("value", snapshot => {
+            let shows = []
+            snapshot.forEach(item => {
+              shows = [...shows, item.val()]
+            })
+
+            shows.forEach(show => {
+              this.props.firebase
+                .userEpisodes(user.key)
+                .child(show.id)
+                .once("value", snapshot => {
+                  // const userEpisodes = {
+                  //   episodes: snapshot.val(),
+                  //   info: {
+                  //     allEpisodesWatched: show.allEpisodesWatched,
+                  //     finished: show.finished_and_name.slice(0, 4) === "true" ? true : false
+                  //   }
+                  // }
+
+                  // this.props.firebase
+                  //   .userEpisodes(user.key)
+                  //   .child(show.id)
+                  //   .set(userEpisodes)
+
+                  const finished = snapshot.val().info.finished
+
+                  this.props.firebase.userShow({ uid: user.key, key: show.id, database }).update({
+                    episodes: null,
+                    allEpisodesWatched: null,
+                    finished_and_name: null,
+                    finished_and_timeStamp: null,
+                    finished
+                  })
+                })
+            })
+          })
+        })
+      })
+    })
   }
 
   render() {
@@ -57,4 +112,4 @@ class Profile extends Component {
 
 const condition = authUser => authUser !== null
 
-export default compose(WithAuthenticationConsumer, WithAuthorization(condition))(Profile)
+export default compose(WithAuthenticationConsumer, withUserContent, WithAuthorization(condition))(Profile)
