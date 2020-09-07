@@ -431,6 +431,7 @@ class ShowsEpisodes extends Component {
                         seasonId={seasonId}
                         authUser={this.props.authUser}
                         showInDatabase={this.props.showInDatabase}
+                        showDatabaseOnClient={this.props.showDatabaseOnClient}
                         toggleWatchedEpisodeDeb={this.toggleWatchedEpisodeDeb}
                         toggleWatchedEpisode={this.toggleWatchedEpisode}
                         loadingFromDatabase={this.props.loadingFromDatabase}

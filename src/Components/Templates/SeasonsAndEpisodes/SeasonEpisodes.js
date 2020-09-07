@@ -94,7 +94,8 @@ export default class SeasonEpisodes extends Component {
     const showCheckboxes =
       this.props.authUser &&
       this.props.showInDatabase.info &&
-      this.props.showInDatabase.database !== "notWatchingShows" &&
+      // this.props.showInDatabase.database !== "notWatchingShows" &&
+      this.props.showDatabaseOnClient !== "notWatchingShows" &&
       this.props.showInDatabase.episodes &&
       this.props.showInDatabase.episodes.length > 0 &&
       true
@@ -103,8 +104,6 @@ export default class SeasonEpisodes extends Component {
       showCheckboxes && this.props.showInDatabase.episodes[this.props.season.season_number - 1]
 
     const seasons = this.props.toWatchPage ? this.props.seasonsArr : this.props.showEpisodes
-
-    console.log(showSeason)
 
     return (
       <div className="episodes__episode-list">

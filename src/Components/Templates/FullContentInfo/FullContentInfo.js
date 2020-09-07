@@ -1,6 +1,7 @@
 /* eslint-disable no-prototype-builtins */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/anchor-has-content */
+/* eslint-disable array-callback-return */
 import React, { useState, useEffect } from "react"
 import axios, { CancelToken } from "axios"
 import { useHistory } from "react-router-dom"
@@ -56,7 +57,7 @@ function FullContentInfo({
   const [similarContent, setSimilarContent] = useState([])
 
   const [loadingPage, setLoadingPage] = useState(true)
-  const [loadingFromDatabase, setLoadingFromDatabase] = useState(false)
+  const [loadingFromDatabase, setLoadingFromDatabase] = useState(true)
   const [showInDatabase, setShowInDatabase] = useState({ database: null, info: null, episodes: null })
   const [showDatabaseOnClient, setShowDatabaseOnClient] = useState(null)
 
@@ -76,8 +77,8 @@ function FullContentInfo({
 
     if (mediaType === "show") {
       getFullShowInfo()
-      getShowInDatabase()
-      mergeEpisodesFromDatabase()
+      // getShowInDatabase()
+      // mergeEpisodesFromDatabase()
     }
     if (mediaType === "movie") {
       getFullMovieInfo()
@@ -104,7 +105,7 @@ function FullContentInfo({
       setShowDatabaseOnClient(null)
       setMovieDatabaseOnClient(null)
     }
-  }, [mediaType, id])
+  }, [mediaType, id, userContent])
 
   const getFullShowInfo = () => {
     setLoadingPage(true)
@@ -176,6 +177,8 @@ function FullContentInfo({
             numberOfSeasons: number_of_seasons || "-",
             seasonsArr: seasons.reverse()
           })
+
+          mergeEpisodesFromDatabase({ numberOfSeasons: number_of_seasons })
 
           setSimilarContent(similarShowsSortByVotes)
           setLoadingPage(false)
@@ -281,25 +284,134 @@ function FullContentInfo({
       })
   }
 
-  const mergeEpisodesFromDatabase = () => {
-    if (!authUser) return
+  const mergeEpisodesFromDatabase = ({ numberOfSeasons }) => {
+    if (!authUser) {
+      setLoadingFromDatabase(false)
+      return
+    }
+    if (userContent.loadingShows) return
 
-    userContent.showsDatabases.forEach(database => {
-      firebase.userShow({ uid: authUser.uid, key: Number(id), database }).once("value", snapshot => {
-        if (snapshot.val() === null) return
+    setLoadingFromDatabase(true)
 
-        const showsSubDatabase = snapshot.val().status
+    const userShows = Object.entries(userContent.userShowsDatabases).flatMap(([key, value]) => {
+      const shows = value.reduce((acc, show) => {
+        acc.push({ ...show, database: key })
+        return acc
+      }, [])
+      return shows
+    })
 
-        firebase.userShowAllEpisodes(authUser.uid, Number(id)).once("value", snapshot => {
-          const userEpisodes = snapshot.val()
+    const show = userShows.find(item => item.id === Number(id))
+    const status = show.status === "Ended" || show.status === "Canceled" ? "ended" : "ongoing"
 
-          firebase.showInDatabase(showsSubDatabase, Number(id)).once("value", snapshot => {
-            const show = snapshot.val()
+    if (show === undefined) {
+      setLoadingFromDatabase(false)
+      return
+    }
+
+    const maxSeasonsInChunk = 20
+    const allSeasons = []
+    const seasonChunks = []
+    const apiRequests = []
+
+    for (let i = 1; i <= numberOfSeasons; i += 1) {
+      allSeasons.push(`season/${i}`)
+    }
+
+    for (let i = 0; i <= allSeasons.length; i += maxSeasonsInChunk) {
+      const chunk = allSeasons.slice(i, i + maxSeasonsInChunk)
+      seasonChunks.push(chunk.join())
+    }
+
+    seasonChunks.forEach(item => {
+      const request = axios.get(
+        `https://api.themoviedb.org/3/tv/${Number(id)}?api_key=${
+          process.env.REACT_APP_TMDB_API
+        }&append_to_response=${item}`
+      )
+      apiRequests.push(request)
+    })
+
+    axios
+      .all([...apiRequests])
+      .then(
+        axios.spread((...responses) => {
+          const rowData = []
+          const seasonsData = []
+
+          responses.forEach(item => {
+            rowData.push(item.data)
+          })
+
+          const mergedRowData = Object.assign({}, ...rowData)
+
+          Object.entries(mergedRowData).forEach(([key, value]) => {
+            if (!key.indexOf("season/")) {
+              seasonsData.push({ [key]: { ...value } })
+            }
+          })
+
+          const allEpisodes = []
+
+          seasonsData.forEach((data, index) => {
+            const season = data[`season/${index + 1}`]
+            if (!Array.isArray(season.episodes) || season.episodes.length === 0) return
+
+            const episodes = []
+
+            season.episodes.forEach(item => {
+              const updatedEpisode = {
+                air_date: item.air_date,
+                episode_number: item.episode_number,
+                name: item.name,
+                season_number: item.season_number,
+                id: item.id
+              }
+              episodes.push(updatedEpisode)
+            })
+
+            const updatedSeason = {
+              air_date: season.air_date,
+              season_number: season.season_number,
+              id: season._id,
+              poster_path: season.poster_path,
+              name: season.name,
+              episodes
+            }
+
+            allEpisodes.push(updatedSeason)
+          })
+
+          const dataToPass = {
+            episodes: allEpisodes,
+            status: mergedRowData.status
+          }
+
+          return dataToPass
+        })
+      )
+      .then(data => {
+        firebase
+          .allShowsList(status)
+          .child(Number(id))
+          .update({ episodes: data.episodes })
+          .catch(err => {
+            console.log(err)
+          })
+
+        // const showsSubDatabase = snapshot.val().status
+
+        firebase
+          .userShowAllEpisodes(authUser.uid, Number(id))
+          .once("value", snapshot => {
+            const userEpisodes = snapshot.val()
+
+            const databaseEpisodes = data.episodes
 
             let updatedSeasons = []
             let updatedSeasonsUser = []
 
-            show.episodes.forEach((season, indexSeason) => {
+            databaseEpisodes.forEach((season, indexSeason) => {
               const seasonPath = userEpisodes[indexSeason]
               const databaseEpisodes = season.episodes
               const episodes = seasonPath ? userEpisodes[indexSeason].episodes : []
@@ -330,98 +442,106 @@ function FullContentInfo({
 
             firebase.userShowAllEpisodes(authUser.uid, Number(id)).set(updatedSeasonsUser)
           })
-        })
-      })
-    })
-  }
-
-  const getShowInDatabase = () => {
-    if (!authUser) return
-    setLoadingFromDatabase(true)
-
-    userContent.showsDatabases.forEach(database => {
-      firebase.userShow({ uid: authUser.uid, key: Number(id), database }).once("value", snapshot => {
-        if (snapshot.val() === null) return
-
-        const status = snapshot.val().status
-
-        firebase
-          .showEpisodes(status, Number(id))
-          .once("value")
-          .then(snapshot => {
-            const allEpisodes = snapshot.val().reduce((acc, item) => {
-              if (!Array.isArray(item.episodes) || item.episodes.length === 0) return
-              acc.push(...item.episodes)
-              return acc
-            }, [])
-
-            const releasedEpisodes = allEpisodes.filter(episode => {
-              const daysToNewEpisode = differenceBtwDatesInDays(episode.air_date, todayDate)
-              return daysToNewEpisode <= 0 && episode
-            })
-
-            firebase.userShowAllEpisodes(authUser.uid, Number(id)).on("value", snapshot => {
-              if (snapshot.val() === null) setLoadingFromDatabase(false)
-
-              const userEpisodes = snapshot.val()
-
-              const allEpisodes = userEpisodes.reduce((acc, item) => {
-                acc.push(...item.episodes)
-                return acc
-              }, [])
-
-              allEpisodes.splice(releasedEpisodes.length)
-
-              const allEpisodesWatched = !allEpisodes.some(episode => !episode.watched)
-              const finished = status === "ended" && allEpisodesWatched ? true : false
-
-              firebase.userShowAllEpisodesInfo(authUser.uid, Number(id)).set({
-                allEpisodesWatched,
-                finished
-              })
-
-              if (finished) {
-                firebase
-                  .userShows(authUser.uid, "finishedShows")
-                  .child(Number(id))
-                  .set({
-                    id: Number(id),
-                    status: status
-                  })
-              } else {
-                firebase
-                  .userShows(authUser.uid, "finishedShows")
-                  .child(Number(id))
-                  .set(null)
-              }
-
-              firebase.userShow({ uid: authUser.uid, key: Number(id), database }).on(
-                "value",
-                snapshot => {
-                  const userShow = snapshot.val()
-
-                  if (isMounted) {
-                    setShowInDatabase({
-                      database,
-                      info: userShow,
-                      episodes: userEpisodes,
-                      allEpisodesFromDatabase: releasedEpisodes
-                    })
-                    setShowDatabaseOnClient(database)
-
-                    setLoadingFromDatabase(false)
-                  }
-                },
-                error => {
-                  console.log(`Error in database occured. ${error}`)
-
-                  setShowDatabaseOnClient(showInDatabase.database)
-                }
-              )
-            })
+          .then(() => {
+            getShowInDatabase({ show: show, database: show.database })
           })
       })
-    })
+  }
+
+  const getShowInDatabase = ({ show }) => {
+    if (!authUser) return
+
+    // userContent.showsDatabases.forEach((database, index) => {
+    // firebase.userShow({ uid: authUser.uid, key: Number(id), database }).once("value", snapshot => {
+    // if (snapshot.val() === null) return
+
+    // const status = show.status
+
+    const status = show.status === "Ended" || show.status === "Canceled" ? "ended" : "ongoing"
+
+    firebase
+      .showEpisodes(status, Number(id))
+      .once("value")
+      .then(snapshot => {
+        const allEpisodes = snapshot.val().reduce((acc, item) => {
+          if (!Array.isArray(item.episodes) || item.episodes.length === 0) return
+          acc.push(...item.episodes)
+          return acc
+        }, [])
+
+        const releasedEpisodes = allEpisodes.filter(episode => {
+          const daysToNewEpisode = differenceBtwDatesInDays(episode.air_date, todayDate)
+          return daysToNewEpisode <= 0 && episode
+        })
+
+        firebase.userShowAllEpisodes(authUser.uid, Number(id)).on("value", snapshot => {
+          const userEpisodes = snapshot.val()
+
+          const allEpisodes = userEpisodes.reduce((acc, item) => {
+            acc.push(...item.episodes)
+            return acc
+          }, [])
+
+          allEpisodes.splice(releasedEpisodes.length)
+
+          const allEpisodesWatched = !allEpisodes.some(episode => !episode.watched)
+          const finished = status === "ended" && allEpisodesWatched ? true : false
+
+          firebase.userShowAllEpisodesInfo(authUser.uid, Number(id)).set({
+            allEpisodesWatched,
+            finished
+          })
+
+          if (finished) {
+            firebase
+              .userShows(authUser.uid, "finishedShows")
+              .child(Number(id))
+              .set({
+                id: Number(id),
+                status: status
+              })
+          } else {
+            firebase
+              .userShows(authUser.uid, "finishedShows")
+              .child(Number(id))
+              .set(null)
+          }
+
+          userContent.showsDatabases.forEach(database => {
+            firebase.userShow({ uid: authUser.uid, key: Number(id), database }).once(
+              "value",
+              snapshot => {
+                if (snapshot.val() === null) return
+
+                const userShow = snapshot.val()
+
+                firebase.userShow({ uid: authUser.uid, key: Number(id), database }).update({
+                  finished
+                })
+
+                if (isMounted) {
+                  setShowInDatabase({
+                    database,
+                    info: userShow,
+                    episodes: userEpisodes,
+                    allEpisodesFromDatabase: releasedEpisodes
+                  })
+                  setShowDatabaseOnClient(database)
+                  console.log("test")
+                  setLoadingFromDatabase(false)
+                }
+              },
+              error => {
+                console.log(`Error in database occured. ${error}`)
+
+                setShowDatabaseOnClient(showInDatabase.database)
+              }
+            )
+          })
+        })
+      })
+    // })
+    // })
   }
 
   const changeShowDatabaseOnClient = database => {
@@ -519,6 +639,7 @@ function FullContentInfo({
                   todayDate={todayDate}
                   id={id}
                   showInDatabase={showInDatabase}
+                  showDatabaseOnClient={showDatabaseOnClient}
                   infoToPass={infoToPass}
                 />
               </>

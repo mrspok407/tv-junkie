@@ -4,7 +4,7 @@ import ShowsButtons from "./ShowsButtons"
 import classNames from "classnames"
 import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
 import { withUserContent } from "Components/UserContent"
-import UserRating from "../../../UserRating/UserRating"
+import UserRating from "Components/UserRating/UserRating"
 
 class MainInfo extends Component {
   render() {
@@ -100,6 +100,7 @@ class MainInfo extends Component {
                 id={this.props.id}
                 firebaseRef="userShow"
                 showDatabase={this.props.showDatabaseOnClient}
+                // showDatabase={this.props.showInDatabase.database}
                 showRating={true}
                 mediaType={this.props.mediaType}
               />
@@ -145,6 +146,7 @@ class MainInfo extends Component {
               infoToPass={this.props.infoToPass}
               changeShowDatabaseOnClient={this.props.changeShowDatabaseOnClient}
               showDatabaseOnClient={this.props.showDatabaseOnClient}
+              showInDatabase={this.props.showInDatabase}
             />
           )}
 
