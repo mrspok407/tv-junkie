@@ -18,6 +18,7 @@
     "firebase-functions": "^3.9.0",
     "formik": "^2.1.5",
     "formik-persist": "^1.1.0",
+    "lodash.isequal": "^4.5.0",
     "moment-timezone": "^0.5.31",
     "normalize.css": "^8.0.1",
     "rarbg-api": "^1.1.4",

@@ -176,21 +176,9 @@ class ShowsEpisodes extends Component {
         seasonNum,
         episodeNum
       })
-      .update(
-        {
-          watched: !show.episodes[seasonNum - 1].episodes[episodeNum].watched
-        },
-        () => {
-          // this.setState({ loadingRequestToDB: false })
-          // checkIfAllEpisodesWatched({
-          //   allEpisodesFromDatabase: this.state.allEpisodesFromDatabase,
-          //   show,
-          //   firebase: this.props.firebase,
-          //   authUser: this.props.authUser,
-          //   todayDate: this.props.todayDate
-          // })
-        }
-      )
+      .update({
+        watched: !show.episodes[seasonNum - 1].episodes[episodeNum].watched
+      })
   }
 
   toggleWatchedEpisodeDeb = debounce(this.toggleWatchedEpisode, 50)
@@ -313,7 +301,7 @@ class ShowsEpisodes extends Component {
     const showCheckboxes =
       this.props.authUser &&
       this.props.showInDatabase.info &&
-      this.props.showInDatabase.database !== "notWatchingShows"
+      this.props.showDatabaseOnClient !== "notWatchingShows"
 
     return (
       <>

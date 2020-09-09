@@ -70,7 +70,8 @@ class ShowsContent extends Component {
         ...this.state.disableLoad,
         [this.state.activeSection]:
           this.state.loadedShows[this.state.activeSection] >=
-            this.props.userContent.userShowsDatabases[this.state.activeSection].length && true
+            this.props.userContent.userShows.filter(show => show.database === this.state.activeSection)
+              .length && true
       }
     })
   }
@@ -98,8 +99,23 @@ class ShowsContent extends Component {
   }
 
   renderContent = section => {
-    const content = this.props.userContent.userShowsDatabases[this.state.activeSection]
-      .sort((a, b) => (a[this.state.sortBy] > b[this.state.sortBy] ? 1 : -1))
+    const content = this.props.userContent.userShows
+      .filter(show => {
+        if (section === "finishedShows") {
+          return show.finished
+        } else {
+          return show.database === section && !show.finished
+        }
+      })
+      .sort((a, b) =>
+        a[this.state.sortBy] > b[this.state.sortBy]
+          ? this.state.sortBy === "timeStamp"
+            ? -1
+            : 1
+          : this.state.sortBy !== "timeStamp"
+          ? -1
+          : 1
+      )
       .slice(0, this.state.loadedShows[section])
 
     const shows = this.props.authUser
@@ -173,10 +189,10 @@ class ShowsContent extends Component {
                             data: item,
                             database: "notWatchingShows"
                           })
-                          this.props.handleShowsListenerOnClient({
-                            activeSection: this.state.activeSection,
-                            id: item.id
-                          })
+                          // this.props.handleShowsListenerOnClient({
+                          //   activeSection: this.state.activeSection,
+                          //   id: item.id
+                          // })
                         } else {
                           this.context.removeShowLS({
                             id: item.id
@@ -199,10 +215,10 @@ class ShowsContent extends Component {
                             data: item,
                             database: "watchingShows"
                           })
-                          this.props.handleShowsListenerOnClient({
-                            activeSection: this.state.activeSection,
-                            id: item.id
-                          })
+                          // this.props.handleShowsListenerOnClient({
+                          //   activeSection: this.state.activeSection,
+                          //   id: item.id
+                          // })
                         }}
                         type="button"
                       >
@@ -220,7 +236,13 @@ class ShowsContent extends Component {
   }
 
   render() {
-    const content = this.props.userContent.userShowsDatabases[this.state.activeSection]
+    const content = this.props.userContent.userShows.filter(show => {
+      if (this.state.activeSection === "finishedShows") {
+        return show.finished
+      } else {
+        return show.database === this.state.activeSection && !show.finished
+      }
+    })
 
     const shows = this.props.authUser
       ? content
@@ -232,6 +254,8 @@ class ShowsContent extends Component {
     const currentNumOfColumns = shows.length <= maxColumns - 1 ? shows.length : maxColumns
 
     const loadingShows = this.props.authUser ? this.props.userContent.loadingShows : false
+
+    console.log(content)
 
     return (
       <div className="content-results">

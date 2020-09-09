@@ -57,7 +57,8 @@ function FullContentInfo({
   const [similarContent, setSimilarContent] = useState([])
 
   const [loadingPage, setLoadingPage] = useState(true)
-  const [loadingFromDatabase, setLoadingFromDatabase] = useState(true)
+  const [initialLoading, setInitialLoading] = useState(true)
+  const [loadingFromDatabase, setLoadingFromDatabase] = useState(false)
   const [showInDatabase, setShowInDatabase] = useState({ database: null, info: null, episodes: null })
   const [showDatabaseOnClient, setShowDatabaseOnClient] = useState(null)
 
@@ -90,10 +91,11 @@ function FullContentInfo({
       if (cancelRequest !== undefined) cancelRequest()
       if (!authUser) return
 
-      userContent.showsDatabases.forEach(database => {
-        firebase.userShow({ uid: authUser.uid, key: Number(id), database }).off()
-      })
+      // userContent.showsDatabases.forEach(database => {
+      //   firebase.userShow({ uid: authUser.uid, key: Number(id), database }).off()
+      // })
       firebase.userShowAllEpisodes(authUser.uid, Number(id)).off()
+      firebase.showEpisodes(detailes.status, Number(id)).off()
 
       firebase
         .watchLaterMovies(authUser.uid)
@@ -108,8 +110,12 @@ function FullContentInfo({
   }, [mediaType, id])
 
   useEffect(() => {
+    getShowInDatabase()
+  }, [userContent])
+
+  useEffect(() => {
     mergeEpisodesFromDatabase({ numberOfSeasons: detailes.numberOfSeasons })
-  }, [userContent, detailes])
+  }, [detailes])
 
   const getFullShowInfo = () => {
     setLoadingPage(true)
@@ -294,260 +300,283 @@ function FullContentInfo({
       setLoadingFromDatabase(false)
       return
     }
-    if (userContent.loadingShows || !detailes.numberOfSeasons) return
+    if (!detailes.numberOfSeasons) return
+
+    console.log("test")
 
     // setLoadingFromDatabase(true)
 
-    const userShows = Object.entries(userContent.userShowsDatabases).flatMap(([key, value]) => {
-      const shows = value.reduce((acc, show) => {
-        acc.push({ ...show, database: key })
-        return acc
-      }, [])
-      return shows
-    })
+    // const userShows = Object.entries(userContent.userShowsDatabases).flatMap(([key, value]) => {
+    //   const shows = value.reduce((acc, show) => {
+    //     acc.push({ ...show, database: key })
+    //     return acc
+    //   }, [])
+    //   return shows
+    // })
+    const status = detailes.status === "Ended" || detailes.status === "Canceled" ? "ended" : "ongoing"
+    // const show = userContent.userShows.find(show => show.id === Number(id))
+    firebase
+      .allShowsList(status)
+      .child(Number(id))
+      .once("value", snapshot => {
+        if (snapshot.val() === null) return
 
-    const show = userShows.find(item => item.id === Number(id))
+        const maxSeasonsInChunk = 20
+        const allSeasons = []
+        const seasonChunks = []
+        const apiRequests = []
 
-    if (show === undefined) {
-      setLoadingFromDatabase(false)
-      return
-    }
+        for (let i = 1; i <= numberOfSeasons; i += 1) {
+          allSeasons.push(`season/${i}`)
+        }
 
-    const status = show.status === "Ended" || show.status === "Canceled" ? "ended" : "ongoing"
+        for (let i = 0; i <= allSeasons.length; i += maxSeasonsInChunk) {
+          const chunk = allSeasons.slice(i, i + maxSeasonsInChunk)
+          seasonChunks.push(chunk.join())
+        }
 
-    const maxSeasonsInChunk = 20
-    const allSeasons = []
-    const seasonChunks = []
-    const apiRequests = []
-
-    for (let i = 1; i <= numberOfSeasons; i += 1) {
-      allSeasons.push(`season/${i}`)
-    }
-
-    for (let i = 0; i <= allSeasons.length; i += maxSeasonsInChunk) {
-      const chunk = allSeasons.slice(i, i + maxSeasonsInChunk)
-      seasonChunks.push(chunk.join())
-    }
-
-    seasonChunks.forEach(item => {
-      const request = axios.get(
-        `https://api.themoviedb.org/3/tv/${Number(id)}?api_key=${
-          process.env.REACT_APP_TMDB_API
-        }&append_to_response=${item}`
-      )
-      apiRequests.push(request)
-    })
-
-    axios
-      .all([...apiRequests])
-      .then(
-        axios.spread((...responses) => {
-          const rowData = []
-          const seasonsData = []
-
-          responses.forEach(item => {
-            rowData.push(item.data)
-          })
-
-          const mergedRowData = Object.assign({}, ...rowData)
-
-          Object.entries(mergedRowData).forEach(([key, value]) => {
-            if (!key.indexOf("season/")) {
-              seasonsData.push({ [key]: { ...value } })
-            }
-          })
-
-          const allEpisodes = []
-
-          seasonsData.forEach((data, index) => {
-            const season = data[`season/${index + 1}`]
-            if (!Array.isArray(season.episodes) || season.episodes.length === 0) return
-
-            const episodes = []
-
-            season.episodes.forEach(item => {
-              const updatedEpisode = {
-                air_date: item.air_date,
-                episode_number: item.episode_number,
-                name: item.name,
-                season_number: item.season_number,
-                id: item.id
-              }
-              episodes.push(updatedEpisode)
-            })
-
-            const updatedSeason = {
-              air_date: season.air_date,
-              season_number: season.season_number,
-              id: season._id,
-              poster_path: season.poster_path,
-              name: season.name,
-              episodes
-            }
-
-            allEpisodes.push(updatedSeason)
-          })
-
-          const dataToPass = {
-            episodes: allEpisodes,
-            status: mergedRowData.status
-          }
-
-          return dataToPass
+        seasonChunks.forEach(item => {
+          const request = axios.get(
+            `https://api.themoviedb.org/3/tv/${Number(id)}?api_key=${
+              process.env.REACT_APP_TMDB_API
+            }&append_to_response=${item}`
+          )
+          apiRequests.push(request)
         })
-      )
-      .then(data => {
-        firebase
-          .allShowsList(status)
-          .child(Number(id))
-          .update({ episodes: data.episodes })
-          .catch(err => {
-            console.log(err)
-          })
 
-        // const showsSubDatabase = snapshot.val().status
+        axios
+          .all([...apiRequests])
+          .then(
+            axios.spread((...responses) => {
+              const rowData = []
+              const seasonsData = []
 
-        firebase
-          .userShowAllEpisodes(authUser.uid, Number(id))
-          .once("value", snapshot => {
-            const userEpisodes = snapshot.val()
-            console.log(userEpisodes)
-
-            const databaseEpisodes = data.episodes
-
-            let updatedSeasons = []
-            let updatedSeasonsUser = []
-
-            databaseEpisodes.forEach((season, indexSeason) => {
-              const seasonPath = userEpisodes[indexSeason]
-              const databaseEpisodes = season.episodes
-              const episodes = seasonPath ? userEpisodes[indexSeason].episodes : []
-
-              const mergedEpisodes = merge(databaseEpisodes, episodes, {
-                arrayMerge: combineMergeObjects
+              responses.forEach(item => {
+                rowData.push(item.data)
               })
 
-              const updatedEpisodesUser = mergedEpisodes.reduce((acc, episode) => {
-                acc.push({ watched: episode.watched || false, userRating: episode.userRating || 0 })
-                return acc
-              }, [])
+              const mergedRowData = Object.assign({}, ...rowData)
 
-              const updatedSeason = {
-                ...season,
-                episodes: mergedEpisodes
+              Object.entries(mergedRowData).forEach(([key, value]) => {
+                if (!key.indexOf("season/")) {
+                  seasonsData.push({ [key]: { ...value } })
+                }
+              })
+
+              const allEpisodes = []
+
+              seasonsData.forEach((data, index) => {
+                const season = data[`season/${index + 1}`]
+                if (!Array.isArray(season.episodes) || season.episodes.length === 0) return
+
+                const episodes = []
+
+                season.episodes.forEach(item => {
+                  const updatedEpisode = {
+                    air_date: item.air_date,
+                    episode_number: item.episode_number,
+                    name: item.name,
+                    season_number: item.season_number,
+                    id: item.id
+                  }
+                  episodes.push(updatedEpisode)
+                })
+
+                const updatedSeason = {
+                  air_date: season.air_date,
+                  season_number: season.season_number,
+                  id: season._id,
+                  poster_path: season.poster_path,
+                  name: season.name,
+                  episodes
+                }
+
+                allEpisodes.push(updatedSeason)
+              })
+
+              const dataToPass = {
+                episodes: allEpisodes,
+                status: mergedRowData.status
               }
 
-              const updatedSeasonUser = {
-                season_number: season.season_number,
-                episodes: updatedEpisodesUser,
-                userRating: (seasonPath && seasonPath.userRating) || 0
-              }
-
-              updatedSeasons.push(updatedSeason)
-              updatedSeasonsUser.push(updatedSeasonUser)
+              return dataToPass
             })
+          )
+          .then(data => {
+            firebase
+              .allShowsList(status)
+              .child(Number(id))
+              .update({ episodes: data.episodes })
+              .catch(err => {
+                console.log(err)
+              })
 
-            firebase.userShowAllEpisodes(authUser.uid, Number(id)).set(updatedSeasonsUser)
-          })
-          .then(() => {
-            getShowInDatabase({ show: show, database: show.database })
+            firebase.userShowAllEpisodes(authUser.uid, Number(id)).once("value", snapshot => {
+              if (snapshot.val() === null) {
+                setInitialLoading(false)
+                return
+              }
+
+              const userEpisodes = snapshot.val()
+              console.log(userEpisodes)
+
+              const databaseEpisodes = data.episodes
+
+              let updatedSeasons = []
+              let updatedSeasonsUser = []
+
+              databaseEpisodes.forEach((season, indexSeason) => {
+                const seasonPath = userEpisodes[indexSeason]
+                const databaseEpisodes = season.episodes
+                const episodes = seasonPath ? userEpisodes[indexSeason].episodes : []
+
+                const mergedEpisodes = merge(databaseEpisodes, episodes, {
+                  arrayMerge: combineMergeObjects
+                })
+
+                const updatedEpisodesUser = mergedEpisodes.reduce((acc, episode) => {
+                  acc.push({ watched: episode.watched || false, userRating: episode.userRating || 0 })
+                  return acc
+                }, [])
+
+                const updatedSeason = {
+                  ...season,
+                  episodes: mergedEpisodes
+                }
+
+                const updatedSeasonUser = {
+                  season_number: season.season_number,
+                  episodes: updatedEpisodesUser,
+                  userRating: (seasonPath && seasonPath.userRating) || 0
+                }
+
+                updatedSeasons.push(updatedSeason)
+                updatedSeasonsUser.push(updatedSeasonUser)
+              })
+
+              firebase.userShowAllEpisodes(authUser.uid, Number(id)).set(updatedSeasonsUser)
+            })
+            // .then(() => {
+            //   getShowInDatabase({ show })
+            // })
           })
       })
+
+    // if (show === undefined) {
+    //   setLoadingFromDatabase(false)
+    //   return
+    // }
   }
 
-  const getShowInDatabase = ({ show }) => {
+  const getShowInDatabase = () => {
     if (!authUser) return
+    // setLoadingFromDatabase(true)
 
     // userContent.showsDatabases.forEach((database, index) => {
     // firebase.userShow({ uid: authUser.uid, key: Number(id), database }).once("value", snapshot => {
     // if (snapshot.val() === null) return
 
     // const status = show.status
+    const show = userContent.userShows.find(show => show.id === Number(id))
+    if (!show) return
 
-    const status = show.status
-    console.log(show)
+    const status = show.status === "Ended" || show.status === "Canceled" ? "ended" : "ongoing"
+    // console.log(show)
 
-    firebase
-      .showEpisodes(status, Number(id))
-      .once("value")
-      .then(snapshot => {
-        const allEpisodes = snapshot.val().reduce((acc, item) => {
-          if (!Array.isArray(item.episodes) || item.episodes.length === 0) return
+    firebase.showEpisodes(status, Number(id)).on("value", snapshot => {
+      const allEpisodes = snapshot.val().reduce((acc, item) => {
+        if (!Array.isArray(item.episodes) || item.episodes.length === 0) return
+        acc.push(...item.episodes)
+        return acc
+      }, [])
+
+      const releasedEpisodes = allEpisodes.filter(episode => {
+        const daysToNewEpisode = differenceBtwDatesInDays(episode.air_date, todayDate)
+        return daysToNewEpisode <= 0 && episode
+      })
+
+      console.log(releasedEpisodes)
+
+      firebase.userShowAllEpisodes(authUser.uid, Number(id)).on("value", snapshot => {
+        const userEpisodes = snapshot.val()
+
+        const allEpisodes = userEpisodes.reduce((acc, item) => {
           acc.push(...item.episodes)
           return acc
         }, [])
 
-        const releasedEpisodes = allEpisodes.filter(episode => {
-          const daysToNewEpisode = differenceBtwDatesInDays(episode.air_date, todayDate)
-          return daysToNewEpisode <= 0 && episode
+        allEpisodes.splice(releasedEpisodes.length)
+
+        const allEpisodesWatched = !allEpisodes.some(episode => !episode.watched)
+        const finished = status === "ended" && allEpisodesWatched ? true : false
+
+        firebase.userShowAllEpisodesInfo(authUser.uid, Number(id)).set({
+          allEpisodesWatched,
+          finished
         })
 
-        firebase.userShowAllEpisodes(authUser.uid, Number(id)).on("value", snapshot => {
-          const userEpisodes = snapshot.val()
+        firebase.userShow({ uid: authUser.uid, key: Number(id) }).update({ finished })
 
-          const allEpisodes = userEpisodes.reduce((acc, item) => {
-            acc.push(...item.episodes)
-            return acc
-          }, [])
-
-          allEpisodes.splice(releasedEpisodes.length)
-
-          const allEpisodesWatched = !allEpisodes.some(episode => !episode.watched)
-          const finished = status === "ended" && allEpisodesWatched ? true : false
-
-          firebase.userShowAllEpisodesInfo(authUser.uid, Number(id)).set({
-            allEpisodesWatched,
-            finished
+        if (isMounted) {
+          setShowInDatabase({
+            database: show.database,
+            info: show,
+            episodes: userEpisodes,
+            allEpisodesFromDatabase: releasedEpisodes
           })
+          setShowDatabaseOnClient(show.database)
+          setLoadingFromDatabase(false)
+          setInitialLoading(false)
+        }
 
-          if (finished) {
-            firebase
-              .userShows(authUser.uid, "finishedShows")
-              .child(Number(id))
-              .set({
-                id: Number(id),
-                status: status
-              })
-          } else {
-            firebase
-              .userShows(authUser.uid, "finishedShows")
-              .child(Number(id))
-              .set(null)
-          }
+        // if (finished) {
+        //   firebase
+        //     .userShows(authUser.uid, "finishedShows")
+        //     .child(Number(id))
+        //     .set({
+        //       id: Number(id),
+        //       status: status
+        //     })
+        // } else {
+        //   firebase
+        //     .userShows(authUser.uid, "finishedShows")
+        //     .child(Number(id))
+        //     .set(null)
+        // }
 
-          userContent.showsDatabases.forEach(database => {
-            firebase.userShow({ uid: authUser.uid, key: Number(id), database }).once(
-              "value",
-              snapshot => {
-                if (snapshot.val() === null) return
+        // userContent.showsDatabases.forEach(database => {
+        //   firebase.userShow({ uid: authUser.uid, key: Number(id), database }).once(
+        //     "value",
+        //     snapshot => {
+        //       if (snapshot.val() === null) return
 
-                const userShow = snapshot.val()
+        //       const userShow = snapshot.val()
 
-                // firebase.userShow({ uid: authUser.uid, key: Number(id), database }).update({
-                //   finished
-                // })
+        //       // firebase.userShow({ uid: authUser.uid, key: Number(id), database }).update({
+        //       //   finished
+        //       // })
 
-                if (isMounted) {
-                  setShowInDatabase({
-                    database,
-                    info: userShow,
-                    episodes: userEpisodes,
-                    allEpisodesFromDatabase: releasedEpisodes
-                  })
-                  setShowDatabaseOnClient(database)
-                  console.log("test")
-                  setLoadingFromDatabase(false)
-                }
-              },
-              error => {
-                console.log(`Error in database occured. ${error}`)
+        //       if (isMounted) {
+        //         setShowInDatabase({
+        //           database,
+        //           info: userShow,
+        //           episodes: userEpisodes,
+        //           allEpisodesFromDatabase: releasedEpisodes
+        //         })
+        //         setShowDatabaseOnClient(database)
+        //         console.log("test")
+        //         setLoadingFromDatabase(false)
+        //       }
+        //     },
+        //     error => {
+        //       console.log(`Error in database occured. ${error}`)
 
-                setShowDatabaseOnClient(showInDatabase.database)
-              }
-            )
-          })
-        })
+        //       setShowDatabaseOnClient(showInDatabase.database)
+        //     }
+        //   )
+        // })
       })
+    })
     // })
     // })
   }
@@ -611,7 +640,7 @@ function FullContentInfo({
           <div className="full-detailes__error">
             <h1>{error}</h1>
           </div>
-        ) : !loadingPage && !loadingFromDatabase ? (
+        ) : !loadingPage && !loadingFromDatabase && !initialLoading ? (
           <div className="full-detailes">
             <PosterWrapper
               poster={detailes.poster}
