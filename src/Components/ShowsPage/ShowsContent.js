@@ -6,7 +6,8 @@ import { throttle } from "throttle-debounce"
 import classNames from "classnames"
 import PlaceholderNoShows from "Components/Placeholders/PlaceholderNoShows"
 import Loader from "Components/Placeholders/Loader"
-import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
+import { AppContext } from "Components/AppContext/AppContextHOC"
+// import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
 
 const SHOWS_TO_LOAD_INITIAL = 15
 const SCROLL_THRESHOLD = 800
@@ -70,7 +71,7 @@ class ShowsContent extends Component {
         ...this.state.disableLoad,
         [this.state.activeSection]:
           this.state.loadedShows[this.state.activeSection] >=
-            this.props.userContent.userShows.filter(show => show.database === this.state.activeSection)
+            this.context.userContent.userShows.filter(show => show.database === this.state.activeSection)
               .length && true
       }
     })
@@ -99,7 +100,7 @@ class ShowsContent extends Component {
   }
 
   renderContent = section => {
-    const content = this.props.userContent.userShows
+    const content = this.context.userContent.userShows
       .filter(show => {
         if (section === "finishedShows") {
           return show.finished
@@ -122,14 +123,17 @@ class ShowsContent extends Component {
       ? content
       : section !== "watchingShows"
       ? content
-      : this.context.watchingShows.slice(0, this.state.loadedShows.watchingShowsLS)
+      : this.context.userContentLocalStorage.watchingShows.slice(0, this.state.loadedShows.watchingShowsLS)
+
+    console.log(this.props.userContent.userShows)
+    console.log(this.context)
 
     return (
       <>
         {shows.map(item => {
-          const filteredGenres = item.genre_ids.map(genreId =>
-            listOfGenres.filter(item => item.id === genreId)
-          )
+          // const filteredGenres = item.genre_ids.map(genreId =>
+          //   listOfGenres.filter(item => item.id === genreId)
+          // )
 
           const showTitle = item.name || item.original_name
 
@@ -141,7 +145,7 @@ class ShowsContent extends Component {
                     <div className="content-results__item-title">
                       {!showTitle ? "No title available" : showTitle}
                     </div>
-                    <div className="content-results__item-year">
+                    {/* <div className="content-results__item-year">
                       {!item.first_air_date ? "" : `(${item.first_air_date.slice(0, 4)})`}
                     </div>
                     {item.vote_average !== 0 && (
@@ -150,14 +154,14 @@ class ShowsContent extends Component {
                         <span>/10</span>
                         <span className="content-results__item-rating-vote-count">({item.vote_count})</span>
                       </div>
-                    )}
+                    )} */}
                   </div>
-                  <div className="content-results__item-genres">
+                  {/* <div className="content-results__item-genres">
                     {filteredGenres.map(item => (
                       <span key={item[0].id}>{item[0].name}</span>
                     ))}
-                  </div>
-                  <div className="content-results__item-overview">
+                  </div> */}
+                  {/* <div className="content-results__item-overview">
                     <div className="content-results__item-poster">
                       <div
                         style={
@@ -175,7 +179,7 @@ class ShowsContent extends Component {
                     <div className="content-results__item-description">
                       {item.overview.length > 150 ? `${item.overview.substring(0, 150)}...` : item.overview}
                     </div>
-                  </div>
+                  </div> */}
                 </Link>
 
                 {section === "watchingShows" ? (
@@ -194,7 +198,7 @@ class ShowsContent extends Component {
                           //   id: item.id
                           // })
                         } else {
-                          this.context.removeShowLS({
+                          this.context.userContentLocalStorage.removeShowLS({
                             id: item.id
                           })
                         }
@@ -236,7 +240,7 @@ class ShowsContent extends Component {
   }
 
   render() {
-    const content = this.props.userContent.userShows.filter(show => {
+    const content = this.context.userContent.userShows.filter(show => {
       if (this.state.activeSection === "finishedShows") {
         return show.finished
       } else {
@@ -248,14 +252,12 @@ class ShowsContent extends Component {
       ? content
       : this.state.activeSection !== "watchingShows"
       ? content
-      : this.context.watchingShows.slice(0, this.state.loadedShows.watchingShowsLS)
+      : this.context.userContentLocalStorage.watchingShows.slice(0, this.state.loadedShows.watchingShowsLS)
 
     const maxColumns = 4
     const currentNumOfColumns = shows.length <= maxColumns - 1 ? shows.length : maxColumns
 
-    const loadingShows = this.props.authUser ? this.props.userContent.loadingShows : false
-
-    console.log(content)
+    const loadingShows = this.props.authUser ? this.context.userContent.loadingShows : false
 
     return (
       <div className="content-results">
@@ -378,4 +380,5 @@ class ShowsContent extends Component {
 
 export default withUserContent(ShowsContent)
 
-ShowsContent.contextType = UserContentLocalStorageContext
+// ShowsContent.contextType = UserContentLocalStorageContext
+ShowsContent.contextType = AppContext

@@ -14,8 +14,9 @@ import FullContentInfo from "Components/Templates/FullContentInfo/FullContentInf
 import GridTests from "Utils/GridTests/GridTests"
 import * as ROUTES from "Utils/Constants/routes"
 import { WithAuthenticationProvider } from "Components/UserAuth/Session/WithAuthentication"
-import userContentLocalStorageProvider from "Components/UserContent/UserContentLocalStorageContext"
+// import userContentLocalStorageProvider from "Components/UserContent/UserContentLocalStorageContext"
 import PageNotFound from "Components/PageNotFound/PageNotFound"
+import AppContextHOC from "Components/AppContext/AppContextHOC"
 
 class App extends Component {
   render() {
@@ -42,4 +43,5 @@ class App extends Component {
   }
 }
 
-export default compose(WithAuthenticationProvider, userContentLocalStorageProvider)(App)
+// export default compose(WithAuthenticationProvider, userContentLocalStorageProvider)(App)
+export default compose(WithAuthenticationProvider, AppContextHOC)(App)

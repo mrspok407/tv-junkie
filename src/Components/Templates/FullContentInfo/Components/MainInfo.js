@@ -2,7 +2,8 @@
 import React, { Component } from "react"
 import ShowsButtons from "./ShowsButtons"
 import classNames from "classnames"
-import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
+// import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
+import { AppContext } from "Components/AppContext/AppContextHOC"
 import { withUserContent } from "Components/UserContent"
 import UserRating from "Components/UserRating/UserRating"
 
@@ -155,7 +156,9 @@ class MainInfo extends Component {
               className={classNames("button", {
                 "button--pressed":
                   this.props.movieDatabaseOnClient === "watchLaterMovies" ||
-                  this.context.watchLaterMovies.find(item => item.id === Number(this.props.id))
+                  this.context.userContentLocalStorage.watchLaterMovies.find(
+                    item => item.id === Number(this.props.id)
+                  )
               })}
               onClick={() => {
                 if (this.props.authUser) {
@@ -166,7 +169,7 @@ class MainInfo extends Component {
                     userDatabase: "watchLaterMovies"
                   })
                 } else {
-                  this.context.toggleMovieLS({
+                  this.context.userContentLocalStorage.toggleMovieLS({
                     id: Number(this.props.id),
                     data: this.props.infoToPass
                   })
@@ -185,4 +188,5 @@ class MainInfo extends Component {
 
 export default withUserContent(MainInfo)
 
-MainInfo.contextType = UserContentLocalStorageContext
+// MainInfo.contextType = UserContentLocalStorageContext
+MainInfo.contextType = AppContext

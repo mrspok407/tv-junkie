@@ -8,7 +8,8 @@ import * as ROUTES from "Utils/Constants/routes"
 import classNames from "classnames"
 import Input from "../Input/Input"
 import { WithAuthenticationConsumer } from "../Session/WithAuthentication"
-import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
+// import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
+import { AppContext } from "Components/AppContext/AppContextHOC"
 import SignInWithGoogleForm from "./SignInWithGoogle"
 
 const LOCAL_STORAGE_KEY_WATCHING_SHOWS = "watchingShowsLocalS"
@@ -63,7 +64,7 @@ class SignInFormBase extends Component {
         localStorage.removeItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)
         localStorage.removeItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)
 
-        this.context.clearContentState()
+        this.context.userContentLocalStorage.clearContentState()
         if (this.props.closeNavMobile) this.props.closeNavMobile()
 
         this.setState({ ...INITIAL_STATE })
@@ -245,4 +246,5 @@ const SignInForm = compose(WithAuthenticationConsumer, withRouter, withFirebase)
 
 export default SignInForm
 
-SignInFormBase.contextType = UserContentLocalStorageContext
+// SignInFormBase.contextType = UserContentLocalStorageContext
+SignInFormBase.contextType = AppContext

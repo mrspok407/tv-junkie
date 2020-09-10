@@ -1,6 +1,7 @@
 import React, { Component } from "react"
 import classNames from "classnames"
-import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
+// import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
+import { AppContext } from "Components/AppContext/AppContextHOC"
 import { withUserContent } from "Components/UserContent"
 import { Link } from "react-router-dom"
 import * as ROUTES from "Utils/Constants/routes"
@@ -41,6 +42,9 @@ class ShowsButtons extends Component {
   render() {
     const { id, authUser, infoToPass } = this.props
 
+    console.log(this.props)
+    console.log(this.context)
+
     return (
       <div className="buttons__row">
         <div className="buttons__col">
@@ -49,7 +53,7 @@ class ShowsButtons extends Component {
               "button--pressed":
                 this.props.showDatabaseOnClient === "watchingShows" ||
                 this.props.showDatabaseOnClient === "finishedShows" ||
-                this.context.watchingShows.find(item => item.id === Number(id))
+                this.context.userContentLocalStorage.watchingShows.find(item => item.id === Number(id))
             })}
             type="button"
             onClick={() => {
@@ -61,7 +65,7 @@ class ShowsButtons extends Component {
                   database: "watchingShows"
                 })
               } else {
-                this.context.addShowLS({
+                this.context.userContentLocalStorage.addShowLS({
                   id: Number(id),
                   data: infoToPass
                 })
@@ -77,7 +81,8 @@ class ShowsButtons extends Component {
             className={classNames("button", {
               "button--pressed":
                 this.props.showDatabaseOnClient === "notWatchingShows" ||
-                (!this.props.authUser && !this.context.watchingShows.find(item => item.id === Number(id)))
+                (!this.props.authUser &&
+                  !this.context.userContentLocalStorage.watchingShows.find(item => item.id === Number(id)))
             })}
             type="button"
             onClick={() => {
@@ -89,7 +94,7 @@ class ShowsButtons extends Component {
                   database: "notWatchingShows"
                 })
               } else {
-                this.context.removeShowLS({
+                this.context.userContentLocalStorage.removeShowLS({
                   id: Number(id)
                 })
               }
@@ -177,4 +182,5 @@ class ShowsButtons extends Component {
 
 export default withUserContent(ShowsButtons)
 
-ShowsButtons.contextType = UserContentLocalStorageContext
+// ShowsButtons.contextType = UserContentLocalStorageContext
+ShowsButtons.contextType = AppContext

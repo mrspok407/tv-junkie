@@ -4,7 +4,8 @@ import { withUserContent } from "Components/UserContent"
 import { listOfGenres } from "Utils"
 import { throttle } from "throttle-debounce"
 import classNames from "classnames"
-import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
+// import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
+import { AppContext } from "Components/AppContext/AppContextHOC"
 import Loader from "Components/Placeholders/Loader"
 import PlaceholderNoMovies from "Components/Placeholders/PlaceholderNoMovies"
 import PlaceholderLoadingContentResultsItem from "Components/Placeholders/PlaceholderLoadingSortBy/PlaceholderLoadingContentResultsItem"
@@ -205,7 +206,9 @@ class MoviesContent extends Component {
   }
 
   renderContent = () => {
-    const movies = this.props.authUser ? this.state.database.watchLaterMovies : this.context.watchLaterMovies
+    const movies = this.props.authUser
+      ? this.state.database.watchLaterMovies
+      : this.context.userContentLocalStorage.watchLaterMovies
 
     return (
       <>
@@ -347,7 +350,7 @@ class MoviesContent extends Component {
                         this.loadNewContent({ itemsToLoad: 1 })
                         this.handleMoviesOnClient(item.id)
                       } else {
-                        this.context.toggleMovieLS({
+                        this.context.userContentLocalStorage.toggleMovieLS({
                           id: item.id,
                           data: movies
                         })
@@ -365,7 +368,9 @@ class MoviesContent extends Component {
   }
 
   render() {
-    const movies = this.props.authUser ? this.state.database.watchLaterMovies : this.context.watchLaterMovies
+    const movies = this.props.authUser
+      ? this.state.database.watchLaterMovies
+      : this.context.userContentLocalStorage.watchLaterMovies
     const maxColumns = 4
     const currentNumOfColumns = movies.length <= maxColumns - 1 ? movies.length : maxColumns
 
@@ -444,4 +449,5 @@ class MoviesContent extends Component {
 
 export default withUserContent(MoviesContent)
 
-MoviesContent.contextType = UserContentLocalStorageContext
+// MoviesContent.contextType = UserContentLocalStorageContext
+MoviesContent.contextType = AppContext

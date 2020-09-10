@@ -37,6 +37,10 @@ const withUserContent = Component => {
       this.handleShowsListenerNew()
     }
 
+    componentWillUnmount() {
+      // this.firebase.userAllShows(this.userUid).off()
+    }
+
     componentDidUpdate(prevProps) {
       if (this.props.authUser && this.props.authUser !== prevProps.authUser) {
         this.authUser = this.props.authUser
@@ -254,8 +258,7 @@ const withUserContent = Component => {
 
       if (allreadyInDatabase) {
         this.firebase
-          .userAllShows(this.userUid)
-          .child(id)
+          .userShow({ uid: this.userUid, key: id })
           .update({
             database
           })
@@ -394,22 +397,29 @@ const withUserContent = Component => {
           return show
         })
 
-        let mergedShows = []
+        console.log("updated userContent")
 
-        userShows.forEach((show, index, array) => {
-          this.firebase.showInfo(show.status, show.id).on("value", snapshot => {
-            mergedShows = [...mergedShows, { ...show, ...snapshot.val() }]
-
-            if (array.length === index + 1) {
-              console.log("updated userContent")
-
-              this.setState({
-                userShows: mergedShows,
-                loadingShows: false
-              })
-            }
-          })
+        this.setState({
+          userShows: userShows,
+          loadingShows: false
         })
+
+        // let mergedShows = []
+
+        // userShows.forEach((show, index, array) => {
+        //   this.firebase.showInfo(show.status, show.id).on("value", snapshot => {
+        //     mergedShows = [...mergedShows, { ...show, ...snapshot.val() }]
+
+        //     if (array.length === index + 1) {
+        //       console.log("updated userContent")
+
+        //       this.setState({
+        //         userShows: mergedShows,
+        //         loadingShows: false
+        //       })
+        //     }
+        //   })
+        // })
       })
     }
 
@@ -573,7 +583,6 @@ const withUserContent = Component => {
           toggleWatchLaterMovie={this.toggleWatchLaterMovie}
           handleShowInDatabases={this.handleShowInDatabases}
           addShowToDatabase={this.addShowToDatabase}
-          handleShowsListener={this.handleShowsListener}
           handleShowsListenerOnClient={this.handleShowsListenerOnClient}
         />
       )

@@ -57,7 +57,7 @@ function FullContentInfo({
   const [similarContent, setSimilarContent] = useState([])
 
   const [loadingPage, setLoadingPage] = useState(true)
-  const [initialLoading, setInitialLoading] = useState(true)
+  const [initialLoading, setInitialLoading] = useState(false)
   const [loadingFromDatabase, setLoadingFromDatabase] = useState(false)
   const [showInDatabase, setShowInDatabase] = useState({ database: null, info: null, episodes: null })
   const [showDatabaseOnClient, setShowDatabaseOnClient] = useState(null)
@@ -469,7 +469,10 @@ function FullContentInfo({
   }
 
   const getShowInDatabase = () => {
-    if (!authUser) return
+    if (!authUser) {
+      setLoadingFromDatabase(false)
+      return
+    }
     // setLoadingFromDatabase(true)
 
     // userContent.showsDatabases.forEach((database, index) => {
@@ -480,7 +483,8 @@ function FullContentInfo({
     const show = userContent.userShows.find(show => show.id === Number(id))
     if (!show) return
 
-    const status = show.status === "Ended" || show.status === "Canceled" ? "ended" : "ongoing"
+    // const status = show.status === "Ended" || show.status === "Canceled" ? "ended" : "ongoing"
+    const status = show.status
     // console.log(show)
 
     firebase.showEpisodes(status, Number(id)).on("value", snapshot => {

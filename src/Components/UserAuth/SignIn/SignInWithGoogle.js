@@ -2,7 +2,8 @@ import React, { useState, useEffect, useContext } from "react"
 import { compose } from "recompose"
 import { withRouter } from "react-router-dom"
 import { withUserContent } from "Components/UserContent"
-import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
+// import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
+import { AppContext } from "Components/AppContext/AppContextHOC"
 import * as ROLES from "Utils/Constants/roles"
 import * as ROUTES from "Utils/Constants/routes"
 
@@ -24,7 +25,7 @@ const SignInWithGoogleBase = ({
     setWindowSize(window.innerWidth)
   }, [])
 
-  const context = useContext(UserContentLocalStorageContext)
+  const context = useContext(AppContext)
 
   const onSubmit = provider => {
     // const signInType = windowSize < mobileLayout ? "signInWithGoogleRedirect" : "signInWithGooglePopUp"

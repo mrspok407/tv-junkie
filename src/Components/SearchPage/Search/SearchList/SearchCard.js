@@ -2,7 +2,6 @@ import React, { Component } from "react"
 import { Link } from "react-router-dom"
 import classNames from "classnames"
 import { withUserContent } from "Components/UserContent"
-import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
 
 class SearchCard extends Component {
   constructor(props) {
@@ -130,5 +129,3 @@ class SearchCard extends Component {
 }
 
 export default withUserContent(SearchCard)
-
-SearchCard.contextType = UserContentLocalStorageContext
