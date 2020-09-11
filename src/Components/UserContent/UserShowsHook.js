@@ -2,11 +2,13 @@ import { useState, useEffect } from "react"
 
 const useUserShows = firebase => {
   const [userShows, setUserShows] = useState([])
+  const [showsTemp, setShowsTemp] = useState([])
   const [loadingShows, setLoadingShows] = useState(true)
 
   useEffect(() => {
     console.log("userShowsHook mounted")
     authUserListener()
+    // mergedHandler()
     return () => {
       authUserListener()
     }
@@ -15,39 +17,46 @@ const useUserShows = firebase => {
   const authUserListener = () => {
     firebase.onAuthUserListener(
       authUser => {
+        let shows = []
+
         firebase.userAllShows(authUser.uid).on("value", snapshot => {
           if (snapshot.val() === null) {
             setLoadingShows(false)
             return
           }
 
-          const shows = Object.values(snapshot.val()).map(show => {
+          shows = Object.values(snapshot.val()).map(show => {
             return show
           })
+
+          // const shows = Object.values(snapshot.val()).map(show => {
+          //   return show
+          // })
 
           // console.log("updated userContent")
 
           // setUserShows(shows)
           // setLoadingShows(false)
 
-          let mergedShows = []
+          // setShowsTemp(shows)
 
-          shows.forEach((show, index, array) => {
-            firebase.showInfo(show.status, show.id).on("value", snapshot => {
-              mergedShows = [...mergedShows, { ...show, ...snapshot.val() }]
+          // let mergedShows = []
+        })
 
-              if (array.length === index + 1) {
-                console.log("updated userContent")
+        let mergedShows = []
 
-                setUserShows(mergedShows)
-                setLoadingShows(false)
+        console.log(shows)
 
-                // this.setState({
-                //   userShows: mergedShows,
-                //   loadingShows: false
-                // })
-              }
-            })
+        shows.forEach((show, index, array) => {
+          firebase.showInfo(show.status, show.id).on("value", snapshot => {
+            mergedShows = [...mergedShows, { ...show, ...snapshot.val() }]
+
+            if (array.length === index + 1) {
+              console.log("updated userContent")
+
+              setUserShows(mergedShows)
+              setLoadingShows(false)
+            }
           })
         })
       },
@@ -55,6 +64,25 @@ const useUserShows = firebase => {
         console.log("user is not logged in")
       }
     )
+  }
+
+  const mergedHandler = () => {
+    let mergedShows = []
+
+    console.log(showsTemp)
+
+    showsTemp.forEach((show, index, array) => {
+      firebase.showInfo(show.status, show.id).on("value", snapshot => {
+        mergedShows = [...mergedShows, { ...show, ...snapshot.val() }]
+
+        if (array.length === index + 1) {
+          console.log("updated userContent")
+
+          setUserShows(mergedShows)
+          setLoadingShows(false)
+        }
+      })
+    })
   }
 
   return {

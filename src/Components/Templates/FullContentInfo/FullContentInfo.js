@@ -60,7 +60,12 @@ function FullContentInfo({
   const [loadingPage, setLoadingPage] = useState(true)
   const [initialLoading, setInitialLoading] = useState(true)
   const [loadingFromDatabase, setLoadingFromDatabase] = useState(false)
-  const [showInDatabase, setShowInDatabase] = useState({ database: null, info: null, episodes: null })
+  const [showInDatabase, setShowInDatabase] = useState({
+    database: null,
+    info: null,
+    episodes: null,
+    allEpisodesFromDatabase: null
+  })
   const [showDatabaseOnClient, setShowDatabaseOnClient] = useState(null)
 
   const [movieInDatabase, setMovieInDatabase] = useState(null)
@@ -105,7 +110,7 @@ function FullContentInfo({
         .child(Number(id))
         .off()
 
-      setShowInDatabase({ database: null, info: null, episodes: null })
+      setShowInDatabase({ database: null, info: null, episodes: null, allEpisodesFromDatabase: null })
       setMovieInDatabase(null)
       setShowDatabaseOnClient(null)
       setMovieDatabaseOnClient(null)
@@ -114,11 +119,11 @@ function FullContentInfo({
 
   useEffect(() => {
     getShowInDatabase()
-  }, [context])
+  }, [context, id])
 
   useEffect(() => {
     mergeEpisodesFromDatabase({ numberOfSeasons: detailes.numberOfSeasons })
-  }, [detailes])
+  }, [detailes, id])
 
   const getFullShowInfo = () => {
     setLoadingPage(true)
@@ -192,6 +197,7 @@ function FullContentInfo({
           })
 
           // mergeEpisodesFromDatabase({ numberOfSeasons: number_of_seasons })
+          handleListeners({ status })
 
           setSimilarContent(similarShowsSortByVotes)
           setLoadingPage(false)
@@ -301,11 +307,10 @@ function FullContentInfo({
     // console.log(userContent.userShowsDatabases)
     if (!authUser) {
       setLoadingFromDatabase(false)
+      setInitialLoading(false)
       return
     }
     if (!detailes.numberOfSeasons) return
-
-    console.log("test")
 
     // setLoadingFromDatabase(true)
 
@@ -470,26 +475,14 @@ function FullContentInfo({
     // }
   }
 
-  const getShowInDatabase = () => {
-    if (!authUser) {
-      setLoadingFromDatabase(false)
-      return
-    }
-    // setLoadingFromDatabase(true)
+  const handleListeners = ({ status }) => {
+    const statusDatabase = status === "Ended" || status === "Canceled" ? "ended" : "ongoing"
 
-    // userContent.showsDatabases.forEach((database, index) => {
-    // firebase.userShow({ uid: authUser.uid, key: Number(id), database }).once("value", snapshot => {
-    // if (snapshot.val() === null) return
+    console.log("handleListeners")
 
-    // const status = show.status
-    const show = context.userContent.userShows.find(show => show.id === Number(id))
-    if (!show) return
+    firebase.showEpisodes(statusDatabase, Number(id)).on("value", snapshot => {
+      console.log("test")
 
-    const status = show.status === "Ended" || show.status === "Canceled" ? "ended" : "ongoing"
-    // const status = show.status
-    // console.log(show)
-
-    firebase.showEpisodes(status, Number(id)).on("value", snapshot => {
       const allEpisodes = snapshot.val().reduce((acc, item) => {
         if (!Array.isArray(item.episodes) || item.episodes.length === 0) return
         acc.push(...item.episodes)
@@ -504,6 +497,8 @@ function FullContentInfo({
       // console.log(releasedEpisodes)
 
       firebase.userShowAllEpisodes(authUser.uid, Number(id)).on("value", snapshot => {
+        // console.log("test2")
+
         const userEpisodes = snapshot.val()
 
         const allEpisodes = userEpisodes.reduce((acc, item) => {
@@ -514,75 +509,61 @@ function FullContentInfo({
         allEpisodes.splice(releasedEpisodes.length)
 
         const allEpisodesWatched = !allEpisodes.some(episode => !episode.watched)
-        const finished = status === "ended" && allEpisodesWatched ? true : false
+        const finished = statusDatabase === "ended" && allEpisodesWatched ? true : false
 
         firebase.userShowAllEpisodesInfo(authUser.uid, Number(id)).set({
           allEpisodesWatched,
           finished
         })
 
-        firebase.userShow({ uid: authUser.uid, key: Number(id) }).update({ finished })
+        firebase
+          .userShow({ uid: authUser.uid, key: Number(id) })
+          .child("finished")
+          .set(finished)
 
-        if (isMounted) {
-          setShowInDatabase({
-            database: show.database,
-            info: show,
-            episodes: userEpisodes,
-            allEpisodesFromDatabase: releasedEpisodes
-          })
-          setShowDatabaseOnClient(show.database)
-          setLoadingFromDatabase(false)
-          setInitialLoading(false)
-        }
-
-        // if (finished) {
-        //   firebase
-        //     .userShows(authUser.uid, "finishedShows")
-        //     .child(Number(id))
-        //     .set({
-        //       id: Number(id),
-        //       status: status
-        //     })
-        // } else {
-        //   firebase
-        //     .userShows(authUser.uid, "finishedShows")
-        //     .child(Number(id))
-        //     .set(null)
-        // }
-
-        // userContent.showsDatabases.forEach(database => {
-        //   firebase.userShow({ uid: authUser.uid, key: Number(id), database }).once(
-        //     "value",
-        //     snapshot => {
-        //       if (snapshot.val() === null) return
-
-        //       const userShow = snapshot.val()
-
-        //       // firebase.userShow({ uid: authUser.uid, key: Number(id), database }).update({
-        //       //   finished
-        //       // })
-
-        //       if (isMounted) {
-        //         setShowInDatabase({
-        //           database,
-        //           info: userShow,
-        //           episodes: userEpisodes,
-        //           allEpisodesFromDatabase: releasedEpisodes
-        //         })
-        //         setShowDatabaseOnClient(database)
-        //         console.log("test")
-        //         setLoadingFromDatabase(false)
-        //       }
-        //     },
-        //     error => {
-        //       console.log(`Error in database occured. ${error}`)
-
-        //       setShowDatabaseOnClient(showInDatabase.database)
-        //     }
-        //   )
-        // })
+        setShowInDatabase(prevState => ({
+          ...prevState,
+          episodes: userEpisodes,
+          allEpisodesFromDatabase: releasedEpisodes
+        }))
       })
     })
+  }
+
+  const getShowInDatabase = () => {
+    if (!authUser) {
+      setLoadingFromDatabase(false)
+      setInitialLoading(false)
+      return
+    }
+    // setLoadingFromDatabase(true)
+
+    // userContent.showsDatabases.forEach((database, index) => {
+    // firebase.userShow({ uid: authUser.uid, key: Number(id), database }).once("value", snapshot => {
+    // if (snapshot.val() === null) return
+
+    // const status = show.status
+
+    const show = context.userContent.userShows.find(show => show.id === Number(id))
+    if (!show) return
+
+    if (isMounted) {
+      // console.log("test3")
+      setShowInDatabase(prevState => ({
+        ...prevState,
+        database: show.database,
+        info: show
+      }))
+      setShowDatabaseOnClient(show.database)
+      setLoadingFromDatabase(false)
+      setInitialLoading(false)
+    }
+
+    // const statusDatabase = status === "Ended" || status === "Canceled" ? "ended" : "ongoing"
+
+    // const status = show.status
+    // console.log(show)
+
     // })
     // })
   }

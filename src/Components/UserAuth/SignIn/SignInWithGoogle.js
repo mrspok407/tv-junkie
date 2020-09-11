@@ -75,7 +75,7 @@ const SignInWithGoogleBase = ({
             localStorage.removeItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)
             localStorage.removeItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)
 
-            context.clearContentState()
+            context.userContentLocalStorage.clearContentState()
 
             if (closeNavMobile) closeNavMobile()
           })

@@ -115,7 +115,7 @@ class ShowsContent extends Component {
         if (section === "finishedShows") {
           return show.finished
         } else {
-          return show.database === section && !show.finished
+          return show.database === section
         }
       })
       .sort((a, b) =>
