@@ -2,7 +2,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/anchor-has-content */
 /* eslint-disable array-callback-return */
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useContext } from "react"
 import axios, { CancelToken } from "axios"
 import { useHistory } from "react-router-dom"
 import { combineMergeObjects } from "Utils"
@@ -21,6 +21,7 @@ import * as ROUTES from "Utils/Constants/routes"
 import ScrollToTopOnUpdate from "Utils/ScrollToTopOnUpdate"
 import "./FullContentInfo.scss"
 import Footer from "Components/Footer/Footer"
+import { AppContext } from "Components/AppContext/AppContextHOC"
 
 const todayDate = new Date()
 
@@ -57,7 +58,7 @@ function FullContentInfo({
   const [similarContent, setSimilarContent] = useState([])
 
   const [loadingPage, setLoadingPage] = useState(true)
-  const [initialLoading, setInitialLoading] = useState(false)
+  const [initialLoading, setInitialLoading] = useState(true)
   const [loadingFromDatabase, setLoadingFromDatabase] = useState(false)
   const [showInDatabase, setShowInDatabase] = useState({ database: null, info: null, episodes: null })
   const [showDatabaseOnClient, setShowDatabaseOnClient] = useState(null)
@@ -72,6 +73,8 @@ function FullContentInfo({
   const [isMounted, setIsMounted] = useState(true)
 
   const history = useHistory()
+
+  const context = useContext(AppContext)
 
   useEffect(() => {
     setIsMounted(true)
@@ -111,7 +114,7 @@ function FullContentInfo({
 
   useEffect(() => {
     getShowInDatabase()
-  }, [userContent])
+  }, [context])
 
   useEffect(() => {
     mergeEpisodesFromDatabase({ numberOfSeasons: detailes.numberOfSeasons })
@@ -418,7 +421,6 @@ function FullContentInfo({
               }
 
               const userEpisodes = snapshot.val()
-              console.log(userEpisodes)
 
               const databaseEpisodes = data.episodes
 
@@ -480,11 +482,11 @@ function FullContentInfo({
     // if (snapshot.val() === null) return
 
     // const status = show.status
-    const show = userContent.userShows.find(show => show.id === Number(id))
+    const show = context.userContent.userShows.find(show => show.id === Number(id))
     if (!show) return
 
-    // const status = show.status === "Ended" || show.status === "Canceled" ? "ended" : "ongoing"
-    const status = show.status
+    const status = show.status === "Ended" || show.status === "Canceled" ? "ended" : "ongoing"
+    // const status = show.status
     // console.log(show)
 
     firebase.showEpisodes(status, Number(id)).on("value", snapshot => {
@@ -499,7 +501,7 @@ function FullContentInfo({
         return daysToNewEpisode <= 0 && episode
       })
 
-      console.log(releasedEpisodes)
+      // console.log(releasedEpisodes)
 
       firebase.userShowAllEpisodes(authUser.uid, Number(id)).on("value", snapshot => {
         const userEpisodes = snapshot.val()

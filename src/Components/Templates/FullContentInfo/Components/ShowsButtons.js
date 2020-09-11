@@ -42,9 +42,6 @@ class ShowsButtons extends Component {
   render() {
     const { id, authUser, infoToPass } = this.props
 
-    console.log(this.props)
-    console.log(this.context)
-
     return (
       <div className="buttons__row">
         <div className="buttons__col">

@@ -9,6 +9,17 @@ const AppContextHOC = Component =>
     const userContentLocalStorage = useUserContentLocalStorage()
     const userContent = useUserShows(props.firebase)
 
+    // console.log(userContent)
+
+    // const [state, setState] = useState({
+    //   userContentLocalStorage,
+    //   userContent
+    // })
+
+    // useEffect(() => {
+    //   setState({ userContentLocalStorage, userContent })
+    // }, [userContent])
+
     return (
       <AppContext.Provider value={{ userContentLocalStorage, userContent }}>
         <Component {...props} />

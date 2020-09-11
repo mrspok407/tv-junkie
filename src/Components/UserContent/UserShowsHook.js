@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 
 const useUserShows = firebase => {
   const [userShows, setUserShows] = useState([])
-  const [loadingShows, setLoadingShows] = useState(false)
+  const [loadingShows, setLoadingShows] = useState(true)
 
   useEffect(() => {
     console.log("userShowsHook mounted")
@@ -15,7 +15,6 @@ const useUserShows = firebase => {
   const authUserListener = () => {
     firebase.onAuthUserListener(
       authUser => {
-        console.log(authUser)
         firebase.userAllShows(authUser.uid).on("value", snapshot => {
           if (snapshot.val() === null) {
             setLoadingShows(false)
@@ -26,10 +25,30 @@ const useUserShows = firebase => {
             return show
           })
 
-          console.log("updated userContent")
+          // console.log("updated userContent")
 
-          setUserShows(shows)
-          setLoadingShows(false)
+          // setUserShows(shows)
+          // setLoadingShows(false)
+
+          let mergedShows = []
+
+          shows.forEach((show, index, array) => {
+            firebase.showInfo(show.status, show.id).on("value", snapshot => {
+              mergedShows = [...mergedShows, { ...show, ...snapshot.val() }]
+
+              if (array.length === index + 1) {
+                console.log("updated userContent")
+
+                setUserShows(mergedShows)
+                setLoadingShows(false)
+
+                // this.setState({
+                //   userShows: mergedShows,
+                //   loadingShows: false
+                // })
+              }
+            })
+          })
         })
       },
       () => {

@@ -29,7 +29,8 @@ class ShowsContent extends Component {
         watchingShows: false,
         droppedShows: false,
         willWatchShows: false,
-        finishedShows: false
+        finishedShows: false,
+        watchingShowsLS: false
       },
       loadedShows: {
         watchingShows: SHOWS_TO_LOAD_INITIAL,
@@ -78,16 +79,25 @@ class ShowsContent extends Component {
   }
 
   loadNewContentLS = () => {
+    if (this.state.disableLoad.watchingShowsLS || this.props.firebase.authUser === null) return
+
     this.setState({
       loadedShows: {
         ...this.state.loadedShows,
         watchingShowsLS: this.state.loadedShows.watchingShowsLS + 5
+      },
+      disableLoad: {
+        ...this.state.disableLoad,
+        watchingShowsLS:
+          this.state.loadedShows.watchingShowsLS >=
+            this.context.userContentLocalStorage.watchingShows.length && true
       }
     })
   }
 
   handleScroll = throttle(500, () => {
     if (window.innerHeight + window.scrollY >= document.body.scrollHeight - SCROLL_THRESHOLD) {
+      console.log(this.state.disableLoad)
       this.loadNewContent()
       this.loadNewContentLS()
     }
@@ -125,15 +135,14 @@ class ShowsContent extends Component {
       ? content
       : this.context.userContentLocalStorage.watchingShows.slice(0, this.state.loadedShows.watchingShowsLS)
 
-    console.log(this.props.userContent.userShows)
-    console.log(this.context)
+    // console.log(this.context.userContent.userShows)
 
     return (
       <>
         {shows.map(item => {
-          // const filteredGenres = item.genre_ids.map(genreId =>
-          //   listOfGenres.filter(item => item.id === genreId)
-          // )
+          const filteredGenres = item.genre_ids.map(genreId =>
+            listOfGenres.filter(item => item.id === genreId)
+          )
 
           const showTitle = item.name || item.original_name
 
@@ -145,7 +154,7 @@ class ShowsContent extends Component {
                     <div className="content-results__item-title">
                       {!showTitle ? "No title available" : showTitle}
                     </div>
-                    {/* <div className="content-results__item-year">
+                    <div className="content-results__item-year">
                       {!item.first_air_date ? "" : `(${item.first_air_date.slice(0, 4)})`}
                     </div>
                     {item.vote_average !== 0 && (
@@ -154,14 +163,14 @@ class ShowsContent extends Component {
                         <span>/10</span>
                         <span className="content-results__item-rating-vote-count">({item.vote_count})</span>
                       </div>
-                    )} */}
+                    )}
                   </div>
-                  {/* <div className="content-results__item-genres">
+                  <div className="content-results__item-genres">
                     {filteredGenres.map(item => (
                       <span key={item[0].id}>{item[0].name}</span>
                     ))}
-                  </div> */}
-                  {/* <div className="content-results__item-overview">
+                  </div>
+                  <div className="content-results__item-overview">
                     <div className="content-results__item-poster">
                       <div
                         style={
@@ -179,7 +188,7 @@ class ShowsContent extends Component {
                     <div className="content-results__item-description">
                       {item.overview.length > 150 ? `${item.overview.substring(0, 150)}...` : item.overview}
                     </div>
-                  </div> */}
+                  </div>
                 </Link>
 
                 {section === "watchingShows" ? (
