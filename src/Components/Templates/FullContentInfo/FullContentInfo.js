@@ -57,9 +57,10 @@ function FullContentInfo({
 
   const [similarContent, setSimilarContent] = useState([])
 
-  const [loadingPage, setLoadingPage] = useState(true)
-  const [initialLoading, setInitialLoading] = useState(true)
+  const [loadingPage, setLoadingPage] = useState(false)
+  const [initialLoading, setInitialLoading] = useState(false)
   const [loadingFromDatabase, setLoadingFromDatabase] = useState(false)
+
   const [showInDatabase, setShowInDatabase] = useState({
     database: null,
     info: null,
@@ -127,6 +128,7 @@ function FullContentInfo({
 
   const getFullShowInfo = () => {
     setLoadingPage(true)
+    setInitialLoading(true)
     axios
       .get(
         `https://api.themoviedb.org/3/tv/${id}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US&append_to_response=similar`,
@@ -476,11 +478,18 @@ function FullContentInfo({
   }
 
   const handleListeners = ({ status }) => {
+    if (!authUser) {
+      setLoadingFromDatabase(false)
+      setInitialLoading(false)
+      return
+    }
+
     const statusDatabase = status === "Ended" || status === "Canceled" ? "ended" : "ongoing"
 
     console.log("handleListeners")
 
     firebase.showEpisodes(statusDatabase, Number(id)).on("value", snapshot => {
+      if (snapshot.val() === null) return
       console.log("test")
 
       const allEpisodes = snapshot.val().reduce((acc, item) => {
@@ -497,6 +506,7 @@ function FullContentInfo({
       // console.log(releasedEpisodes)
 
       firebase.userShowAllEpisodes(authUser.uid, Number(id)).on("value", snapshot => {
+        if (snapshot.val() === null) return
         // console.log("test2")
 
         const userEpisodes = snapshot.val()
@@ -536,6 +546,8 @@ function FullContentInfo({
       setInitialLoading(false)
       return
     }
+
+    console.log("tt")
     // setLoadingFromDatabase(true)
 
     // userContent.showsDatabases.forEach((database, index) => {
@@ -545,7 +557,13 @@ function FullContentInfo({
     // const status = show.status
 
     const show = context.userContent.userShows.find(show => show.id === Number(id))
-    if (!show) return
+    console.log(context.userContent.userShows)
+    // console.log(context.userContent.userShows)
+    if (!show) {
+      setLoadingFromDatabase(false)
+      setInitialLoading(false)
+      return
+    }
 
     if (isMounted) {
       // console.log("test3")
