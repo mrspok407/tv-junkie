@@ -59,7 +59,12 @@ class ShowsButtons extends Component {
                 this.props.handleShowInDatabases({
                   id: Number(id),
                   data: infoToPass,
-                  database: "watchingShows"
+                  database: "watchingShows",
+                  userShows: this.context.userContent.userShows
+                })
+                this.context.userContent.handleUserShowsOnClient({
+                  database: "watchingShows",
+                  id: Number(id)
                 })
               } else {
                 this.context.userContentLocalStorage.addShowLS({
@@ -88,7 +93,12 @@ class ShowsButtons extends Component {
                 this.props.handleShowInDatabases({
                   id: Number(id),
                   data: infoToPass,
-                  database: "notWatchingShows"
+                  database: "notWatchingShows",
+                  userShows: this.context.userContent.userShows
+                })
+                this.context.userContent.handleUserShowsOnClient({
+                  database: "notWatchingShows",
+                  id: Number(id)
                 })
               } else {
                 this.context.userContentLocalStorage.removeShowLS({
@@ -119,7 +129,12 @@ class ShowsButtons extends Component {
                   this.props.handleShowInDatabases({
                     id: Number(id),
                     data: infoToPass,
-                    database: "droppedShows"
+                    database: "droppedShows",
+                    userShows: this.context.userContent.userShows
+                  })
+                  this.context.userContent.handleUserShowsOnClient({
+                    database: "droppedShows",
+                    id: Number(id)
                   })
                 } else {
                   this.showDissableBtnWarning("dropBtn")
@@ -152,7 +167,12 @@ class ShowsButtons extends Component {
                   this.props.handleShowInDatabases({
                     id: Number(id),
                     data: infoToPass,
-                    database: "willWatchShows"
+                    database: "willWatchShows",
+                    userShows: this.context.userContent.userShows
+                  })
+                  this.context.userContent.handleUserShowsOnClient({
+                    database: "willWatchShows",
+                    id: Number(id)
                   })
                 } else {
                   this.showDissableBtnWarning("willWatchBtn")

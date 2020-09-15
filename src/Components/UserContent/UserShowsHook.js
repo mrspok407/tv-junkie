@@ -78,71 +78,18 @@ const useUserShows = firebase => {
                 setLoadingShows(false)
               })
             })
-          } else if (userShowsSSLength === shows.length) {
-            const mergedShows = merge(userShowsSS, shows, {
-              arrayMerge: combineMergeObjects
-            })
-
-            console.log("length equal")
-
-            setUserShows(mergedShows)
-            setLoadingShows(false)
           }
+          // else if (userShowsSSLength === shows.length) {
+          //   const mergedShows = merge(userShowsSS, shows, {
+          //     arrayMerge: combineMergeObjects
+          //   })
+
+          //   console.log("length equal")
+
+          //   setUserShows(mergedShows)
+          //   setLoadingShows(false)
+          // }
         })
-
-        // firebase.userAllShows(authUser.uid).once("value", snapshot => {
-        //   console.log("test")
-        //   Promise.all(
-        //     Object.values(snapshot.val()).map(show => {
-        //       return firebase
-        //         .showInfo(show.status, show.id)
-        //         .once("value")
-        //         .then(snapshot => {
-        //           return {
-        //             ...show,
-        //             ...snapshot.val()
-        //           }
-        //         })
-        //     })
-        //   ).then(showsData => {
-        //     firebase.userAllShows(authUser.uid).on("child_changed", snapshot => {
-        //       const show = showsData.find(show => show.id === snapshot.val().id)
-        //       const showIndex = showsData.findIndex(show => show.id === snapshot.val().id)
-        //       const initialData = [...showsData].filter(show => show.id !== snapshot.val().id)
-
-        //       console.log(showsData)
-
-        //       console.log(initialData)
-
-        //       if (show) {
-        //         console.log(`changing child ${snapshot.val()}`)
-
-        //         const mergedShow = { ...show, database: snapshot.val().database }
-
-        //         initialData.splice(showIndex, 0, mergedShow)
-
-        //         console.log(initialData)
-        //         setUserShows(initialData)
-        //       } else {
-        //         console.log(`adding child`)
-        //         console.log(snapshot.val())
-
-        //         firebase.showInfo(snapshot.val().status, snapshot.val().id).once("value", showDatabase => {
-        //           const mergedShow = { ...snapshot.val(), ...showDatabase }
-
-        //           console.log(mergedShow)
-
-        //           setUserShows([...initialData, mergedShow])
-        //         })
-        //       }
-        //     })
-
-        //     console.log(showsData)
-
-        //     setUserShows(showsData)
-        //     setLoadingShows(false)
-        //   })
-        // })
       },
       () => {
         console.log("user is not logged in")
@@ -150,26 +97,19 @@ const useUserShows = firebase => {
     )
   }
 
-  // const mergedHandler = () => {
-  //   let mergedShows = []
+  const handleUserShowsOnClient = ({ database, id }) => {
+    const userShowsSS = JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY_SHOWS))
+    const updatedShows = userShowsSS.map(show => (show.id === id ? { ...show, database } : show))
 
-  //   showsTemp.forEach((show, index, array) => {
-  //     // firebase.showInfo(show.status, show.id).on("value", snapshot => {
-  //     //   mergedShows = [...mergedShows, { ...show, ...snapshot.val() }]
+    console.log("upd on client")
 
-  //     //   if (array.length === index + 1) {
-  //     //     console.log("updated userContent")
-
-  //     //     setUserShows(mergedShows)
-  //     //     setLoadingShows(false)
-  //     //   }
-  //     // })
-  //   })
-  // }
+    setUserShows(updatedShows)
+  }
 
   return {
     userShows,
-    loadingShows
+    loadingShows,
+    handleUserShowsOnClient
   }
 }
 

@@ -200,7 +200,12 @@ class ShowsContent extends Component {
                           this.props.handleShowInDatabases({
                             id: item.id,
                             data: item,
-                            database: "notWatchingShows"
+                            database: "notWatchingShows",
+                            userShows: this.context.userContent.userShows
+                          })
+                          this.context.userContent.handleUserShowsOnClient({
+                            database: "notWatchingShows",
+                            id: item.id
                           })
                           // this.props.handleShowsListenerOnClient({
                           //   activeSection: this.state.activeSection,
@@ -226,7 +231,12 @@ class ShowsContent extends Component {
                           this.props.handleShowInDatabases({
                             id: item.id,
                             data: item,
-                            database: "watchingShows"
+                            database: "watchingShows",
+                            userShows: this.context.userContent.userShows
+                          })
+                          this.context.userContent.handleUserShowsOnClient({
+                            database: "watchingShows",
+                            id: item.id
                           })
                           // this.props.handleShowsListenerOnClient({
                           //   activeSection: this.state.activeSection,

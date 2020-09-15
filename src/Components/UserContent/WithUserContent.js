@@ -158,6 +158,8 @@ const withUserContent = Component => {
           return acc
         }, [])
 
+        console.log("hhhhhhhhhh")
+
         this.firebase
           .userAllShows(userUid)
           .child(id)
@@ -170,39 +172,6 @@ const withUserContent = Component => {
             finished: false,
             id
           })
-
-        // this.firebase
-        //   .userShows(userUid, userDatabase)
-        //   .child(id)
-        //   .set({
-        //     // allEpisodesWatched: false,
-        //     status: showsSubDatabase,
-        //     firstAirDate: show.first_air_date,
-        //     name: show.name || show.original_name,
-        //     timeStamp: this.firebase.timeStamp(),
-        //     finished: false,
-        //     // episodes: userEpisodes,
-        //     id
-        //     // finished_and_name: `false_${show.name || show.original_name}` // I need this cause Firebase can't filter by more than one query on the server
-        //     //  finished_and_timeStamp: `false_${3190666598976 - this.firebase.timeStamp()}` // This is one of the approaches recommended by Firebase developer Puf
-        //   })
-        //   .then(() => {
-        //     this.firebase
-        //       .userShows(userUid, userDatabase)
-        //       .child(id)
-        //       .once("value", snapshot => {
-        //         const negativeTimestamp = snapshot.val().timeStamp * -1
-        //         // const finishedTimestamp = 3190666598976 - snapshot.val().timeStamp
-
-        //         this.firebase
-        //           .userShows(userUid, userDatabase)
-        //           .child(id)
-        //           .update({
-        //             timeStamp: negativeTimestamp // The negative time stamp needed for easier des order, cause firebase only provide asc order
-        //             // finished_and_timeStamp: `false_${finishedTimestamp}`
-        //           })
-        //       })
-        //   })
 
         this.props.firebase
           .userEpisodes(userUid)
@@ -253,8 +222,8 @@ const withUserContent = Component => {
       })
     }
 
-    handleShowInDatabases = ({ id, data = [], database }) => {
-      const allreadyInDatabase = this.state.userShows.find(show => show.id === id)
+    handleShowInDatabases = ({ id, data = [], database, userShows }) => {
+      const allreadyInDatabase = userShows.find(show => show.id === id)
 
       if (allreadyInDatabase) {
         this.firebase
@@ -276,79 +245,6 @@ const withUserContent = Component => {
         const showData = Array.isArray(data) ? data.find(item => item.id === id) : data
         this.addShowToDatabase({ id, show: showData, userDatabase: database })
       }
-
-      // showRef.once("value", snapshot => {
-      //   if (snapshot.val() !== null) {
-      //     showRef.update(
-      //       {
-      //         database
-      //       },
-      //       error => {
-      //         console.log(`Error in database occured. ${error}`)
-
-      //         this.setState({
-      //           errorInDatabase: {
-      //             error: true,
-      //             message: `Error in database occured. ${error}`
-      //           }
-      //         })
-      //       }
-      //     )
-      //   } else {
-      //     this.addShowToDatabase({ id, show: showData, userDatabase: database })
-      //   }
-      // })
-
-      // const otherDatabases = this.state.showsDatabases.filter(item => item !== database)
-
-      // const promises = []
-
-      // otherDatabases.forEach(item => {
-      //   const promise = this.firebase
-      //     .userShows(this.userUid, item)
-      //     .child(id)
-      //     .once(
-      //       "value",
-      //       snapshot => {
-      //         if (snapshot.val() !== null) {
-      //           this.firebase
-      //             .userShows(this.userUid, database)
-      //             .child(id)
-      //             .set({
-      //               ...snapshot.val()
-      //             })
-      //             .then(() => {
-      //               this.firebase
-      //                 .userShows(this.userUid, item)
-      //                 .child(id)
-      //                 .set(null)
-      //             })
-      //         }
-      //       },
-      //       error => {
-      //         console.log(`Error in database occured. ${error}`)
-
-      //         this.setState({
-      //           errorInDatabase: {
-      //             error: true,
-      //             message: `Error in database occured. ${error}`
-      //           }
-      //         })
-      //       }
-      //     )
-
-      //   promises.push(promise)
-      // })
-
-      // Promise.all(promises).then(() => {
-      //   this.firebase
-      //     .userShows(this.userUid, database)
-      //     .child(id)
-      //     .once("value", snapshot => {
-      //       if (snapshot.val() !== null) return
-      //       this.addShowToDatabase({ id, show: showData, userDatabase: database })
-      //     })
-      // })
     }
 
     toggleWatchLaterMovie = ({ id, data = [], userDatabase, userUid = this.userUid }) => {
@@ -382,45 +278,6 @@ const withUserContent = Component => {
               })
           }
         })
-    }
-
-    handleShowsListenerNew = () => {
-      this.setState({ loadingShows: true })
-
-      this.firebase.userAllShows(this.userUid).on("value", snapshot => {
-        if (snapshot.val() === null) {
-          this.setState({ loadingShows: false })
-          return
-        }
-
-        console.log("jjjjjjjjjjjjj")
-
-        const userShows = Object.values(snapshot.val()).map(show => {
-          return show
-        })
-
-        this.setState({
-          userShows: userShows,
-          loadingShows: false
-        })
-
-        // let mergedShows = []
-
-        // userShows.forEach((show, index, array) => {
-        //   this.firebase.showInfo(show.status, show.id).on("value", snapshot => {
-        //     mergedShows = [...mergedShows, { ...show, ...snapshot.val() }]
-
-        //     if (array.length === index + 1) {
-        //       console.log("updated userContent")
-
-        //       this.setState({
-        //         userShows: mergedShows,
-        //         loadingShows: false
-        //       })
-        //     }
-        //   })
-        // })
-      })
     }
 
     handleShowsListenerOnClient = ({ activeSection = "watchingShows", id }) => {
