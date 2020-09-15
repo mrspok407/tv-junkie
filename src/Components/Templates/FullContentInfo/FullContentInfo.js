@@ -547,7 +547,7 @@ function FullContentInfo({
       return
     }
 
-    console.log("tt")
+    //console.log("tt")
     // setLoadingFromDatabase(true)
 
     // userContent.showsDatabases.forEach((database, index) => {
@@ -557,7 +557,7 @@ function FullContentInfo({
     // const status = show.status
 
     const show = context.userContent.userShows.find(show => show.id === Number(id))
-    console.log(context.userContent.userShows)
+    // console.log(context.userContent.userShows)
     // console.log(context.userContent.userShows)
     if (!show) {
       setLoadingFromDatabase(false)

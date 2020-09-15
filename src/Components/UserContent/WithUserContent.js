@@ -34,7 +34,7 @@ const withUserContent = Component => {
 
     componentDidMount() {
       // this.handleShowsListener()
-      this.handleShowsListenerNew()
+      // this.handleShowsListenerNew()
     }
 
     componentWillUnmount() {
@@ -393,11 +393,11 @@ const withUserContent = Component => {
           return
         }
 
+        console.log("jjjjjjjjjjjjj")
+
         const userShows = Object.values(snapshot.val()).map(show => {
           return show
         })
-
-        // console.log("updated userContent")
 
         this.setState({
           userShows: userShows,
