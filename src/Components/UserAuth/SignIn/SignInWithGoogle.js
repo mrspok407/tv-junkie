@@ -16,7 +16,7 @@ const SignInWithGoogleBase = ({
   firebase,
   history,
   addShowToDatabase,
-  toggleWatchLaterMovie,
+  handleMovieInDatabases,
   closeNavMobile
 }) => {
   const [windowSize, setWindowSize] = useState(window.innerWidth)
@@ -57,17 +57,15 @@ const SignInWithGoogleBase = ({
               addShowToDatabase({
                 id: item.id,
                 show: item,
-                userDatabase: "watchingShows",
-                userUid: authUser.user.uid
+                userDatabase: "watchingShows"
               })
             })
 
             watchLaterMovies.forEach(item => {
-              toggleWatchLaterMovie({
+              handleMovieInDatabases({
                 id: item.id,
                 data: item,
-                userDatabase: "watchLaterMovies",
-                userUid: authUser.user.uid
+                userDatabase: "watchLaterMovies"
               })
             })
           })

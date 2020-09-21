@@ -62,7 +62,7 @@ class ToWatchEpisodesContent extends Component {
 
           this.props.firebase
             .userShow({ uid: this.props.authUser.uid, key: item.val().id, database })
-            .on("value", snapshot => {
+            .once("value", snapshot => {
               if (snapshot.val() !== null) {
                 const index = this.state.watchingShows.findIndex(item => item.id === snapshot.val().id)
                 const watchingShows = this.state.watchingShows.filter(item => item.id !== snapshot.val().id)

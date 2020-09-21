@@ -2,10 +2,11 @@ import React, { Component } from "react"
 import { Link } from "react-router-dom"
 import { withUserContent } from "Components/UserContent"
 import { differenceBtwDatesInDays, todayDate } from "Utils"
-import { organiseFutureEpisodesByMonth, organizeMonthEpisodesByEpisodeNumber } from "./CalendarHelpers"
+import { organizeMonthEpisodesByEpisodeNumber } from "./CalendarHelpers"
 import classNames from "classnames"
 import Loader from "Components/Placeholders/Loader"
 import PlaceholderNoFutureEpisodes from "Components/Placeholders/PlaceholderNoFutureEpisodes"
+import { AppContext } from "Components/AppContext/AppContextHOC"
 
 class CalendarContent extends Component {
   constructor(props) {
@@ -14,67 +15,46 @@ class CalendarContent extends Component {
     this.state = {
       willAirEpisodes: [],
       openMonths: [],
-      initialLoading: true
+      initialLoading: false
     }
   }
 
   componentDidMount() {
     this._isMounted = true
-    this.getContent({})
+    this.prevContext = this.context
+
+    this.getContent()
+  }
+
+  componentDidUpdate() {
+    if (this.prevContext.userContent !== this.context.userContent) {
+      this.getContent()
+    }
+    this.prevContext = this.context
   }
 
   componentWillUnmount() {
     this._isMounted = false
   }
 
-  getContent = ({ sortBy = "id", isInitialLoad = true, database = "watchingShows" }) => {
+  getContent = () => {
     if (this.props.authUser === null) return
-    if (isInitialLoad) {
-      this.setState({ initialLoading: true })
-    }
-    if (this.props.homePage) this.props.handleCalendarState({ loading: true })
+    if (this.context.userContent.userShows === 0) return
 
-    this.props.firebase
-      .userShows(this.props.authUser.uid, database)
-      .orderByChild(sortBy)
-      .once("value", snapshot => {
-        let userShows = []
+    console.log(this.context.userContent.userWillAirEpisodes)
 
-        snapshot.forEach(show => {
-          if (show.val().status === "ended") return
+    const willAirEpisodes = this.props.homePage
+      ? this.context.userContent.userWillAirEpisodes.slice(0, 2)
+      : this.context.userContent.userWillAirEpisodes
 
-          userShows.push({
-            id: show.val().id,
-            status: show.val().status
-          })
-        })
+    const months = willAirEpisodes.map(item => {
+      return Object.values(item)[0]
+    })
 
-        Promise.all(
-          userShows.map(show => {
-            return this.props.firebase
-              .showInDatabase(show.status, show.id)
-              .once("value")
-              .then(snapshot => {
-                return snapshot.val()
-              })
-          })
-        ).then(showsData => {
-          if (!this._isMounted) return
-
-          const willAirEpisodes = organiseFutureEpisodesByMonth(showsData)
-
-          const months = willAirEpisodes.map(item => {
-            return Object.values(item)[0]
-          })
-
-          this.setState({
-            willAirEpisodes,
-            openMonths: this.props.homePage ? [months[0]] : months,
-            initialLoading: false
-          })
-          if (this.props.homePage) this.props.handleCalendarState({ loading: false, willAirEpisodes })
-        })
-      })
+    this.setState({
+      willAirEpisodes,
+      openMonths: this.props.homePage ? [months[0]] : months
+    })
   }
 
   showMonthEpisodes = month => {
@@ -90,19 +70,19 @@ class CalendarContent extends Component {
   }
 
   render() {
-    const willAirEpisodes = this.props.homePage
-      ? this.state.willAirEpisodes.slice(0, 2)
-      : this.state.willAirEpisodes
+    // const willAirEpisodes = this.props.homePage
+    //   ? this.context.userContent.userWillAirEpisodes.slice(0, 2)
+    //   : this.context.userContent.userWillAirEpisodes
 
     return (
       <div className="content-results content-results--calendar">
-        {this.state.initialLoading ? (
+        {this.context.userContent.loadingShows ? (
           <Loader className="loader--pink" />
         ) : this.state.willAirEpisodes.length === 0 && !this.props.homePage ? (
           <PlaceholderNoFutureEpisodes />
         ) : (
           <div className="episodes episodes--calendar">
-            {willAirEpisodes.map(month => {
+            {this.state.willAirEpisodes.map(month => {
               const date = new Date(month.month)
               const monthLongName = date.toLocaleString("en", { month: "long" })
 
@@ -223,3 +203,5 @@ class CalendarContent extends Component {
 }
 
 export default withUserContent(CalendarContent)
+
+CalendarContent.contextType = AppContext

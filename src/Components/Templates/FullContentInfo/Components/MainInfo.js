@@ -155,15 +155,14 @@ class MainInfo extends Component {
             <button
               className={classNames("button", {
                 "button--pressed":
-                  this.props.movieDatabaseOnClient === "watchLaterMovies" ||
+                  this.props.movieInDatabase ||
                   this.context.userContentLocalStorage.watchLaterMovies.find(
                     item => item.id === Number(this.props.id)
                   )
               })}
               onClick={() => {
                 if (this.props.authUser) {
-                  this.props.changeMovieDatabaseOnClient("watchLaterMovies")
-                  this.props.toggleWatchLaterMovie({
+                  this.props.handleMovieInDatabases({
                     id: Number(this.props.id),
                     data: this.props.infoToPass,
                     userDatabase: "watchLaterMovies"
@@ -177,7 +176,7 @@ class MainInfo extends Component {
               }}
               type="button"
             >
-              {this.props.movieDatabaseOnClient === "watchLaterMovies" ? "Remove" : "Watch later"}
+              {this.props.movieInDatabase === "watchLaterMovies" ? "Remove" : "Watch later"}
             </button>
           )}
         </div>

@@ -12,6 +12,7 @@ import PlaceholderHomePageNoFutureEpisodes from "Components/Placeholders/Placeho
 import * as ROUTES from "Utils/Constants/routes"
 import "./HomePage.scss"
 import Footer from "Components/Footer/Footer"
+import { AppContext } from "Components/AppContext/AppContextHOC"
 
 const Header = withFirebase(HeaderBase)
 
@@ -334,11 +335,11 @@ class HomePage extends Component {
 
   renderAuthUser = () => (
     <>
-      {!this.state.calendarLoading && (
+      {!this.context.userContent.loadingShows && (
         <>
-          {this.state.willAirEpisodes.length > 0 ? (
+          {this.context.userContent.userWillAirEpisodes.length > 0 ? (
             <div className="home-page__heading">
-              <h1 onClick={() => this.databaseModify()}>Soon to watch</h1>
+              <h1>Soon to watch</h1>
             </div>
           ) : (
             <PlaceholderHomePageNoFutureEpisodes />
@@ -348,7 +349,7 @@ class HomePage extends Component {
 
       <CalendarContent homePage={true} handleCalendarState={this.handleCalendarState} />
 
-      {!this.state.calendarLoading && !this.state.slidersLoading && (
+      {!this.context.userContent.loadingShows && !this.state.slidersLoading && (
         <div className="home-page__sliders">
           {Object.values(this.state.sliders).map(value => {
             return (
@@ -382,3 +383,5 @@ class HomePage extends Component {
 }
 
 export default withUserContent(HomePage)
+
+HomePage.contextType = AppContext

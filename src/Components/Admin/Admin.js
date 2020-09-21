@@ -20,7 +20,7 @@ class AdminPage extends Component {
   componentDidMount() {
     this.setState({ loading: true })
 
-    this.props.firebase.users().on("value", snapshot => {
+    this.props.firebase.users().once("value", snapshot => {
       const usersObject = snapshot.val()
 
       const userList = Object.keys(usersObject).map(key => ({

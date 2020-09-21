@@ -1,28 +1,18 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { combineMergeObjects } from "Utils"
+import { organiseFutureEpisodesByMonth } from "Components/CalendarPage/CalendarHelpers"
 import merge from "deepmerge"
 
 const SESSION_STORAGE_KEY_SHOWS = "userShows"
 
 const useUserShows = firebase => {
   const [userShows, setUserShows] = useState([])
-  // const [showsFromDatabase, setShowsFromDatabase] = useState([])
+  const [userMovies, setUserMovies] = useState([])
+  const [userWillAirEpisodes, setUserWillAirEpisodes] = useState([])
   const [loadingShows, setLoadingShows] = useState(true)
+  const [loadingMovies, setLoadingMovies] = useState(true)
 
-  useEffect(() => {
-    console.log("userShowsHook mounted")
-    authUserListener()
-    return () => {
-      authUserListener()
-    }
-  }, [])
-
-  useEffect(() => {
-    sessionStorage.setItem(SESSION_STORAGE_KEY_SHOWS, JSON.stringify(userShows))
-    console.log("comp updated")
-  }, [userShows])
-
-  const authUserListener = () => {
+  const authUserListener = useCallback(() => {
     firebase.onAuthUserListener(
       authUser => {
         console.log("function run")
@@ -44,12 +34,13 @@ const useUserShows = firebase => {
             Promise.all(
               Object.values(snapshot.val()).map(show => {
                 return firebase
-                  .showInfo(show.status, show.id)
+                  .showInDatabase(show.status, show.id)
                   .once("value")
                   .then(snapshot => {
                     return {
                       ...show,
-                      ...snapshot.val()
+                      ...snapshot.val().info,
+                      episodes: snapshot.val().episodes
                     }
                   })
               })
@@ -58,8 +49,13 @@ const useUserShows = firebase => {
                 arrayMerge: combineMergeObjects
               })
 
+              console.log(mergedShows)
+
+              const willAirEpisodes = organiseFutureEpisodesByMonth(mergedShows)
+
               console.log("length 0")
               setUserShows(mergedShows)
+              setUserWillAirEpisodes(willAirEpisodes)
               setLoadingShows(false)
             })
           } else if (userShowsSSLength < shows.length) {
@@ -68,34 +64,56 @@ const useUserShows = firebase => {
 
               console.log("length less")
 
-              firebase.showInfo(show.status, show.id).once("value", snapshot => {
-                const mergedShow = { ...show, ...snapshot.val() }
+              firebase.showInDatabase(show.status, show.id).once("value", snapshot => {
+                const mergedShow = { ...show, ...snapshot.val().info, episodes: snapshot.val().episodes }
                 const updatedShows = userShowsSS.splice(index, 0, mergedShow)
+
+                const willAirEpisodes = organiseFutureEpisodesByMonth(updatedShows)
 
                 console.log(updatedShows)
 
                 setUserShows(updatedShows)
+                setUserWillAirEpisodes(willAirEpisodes)
                 setLoadingShows(false)
               })
             })
           }
-          // else if (userShowsSSLength === shows.length) {
-          //   const mergedShows = merge(userShowsSS, shows, {
-          //     arrayMerge: combineMergeObjects
-          //   })
+        })
 
-          //   console.log("length equal")
+        firebase.watchLaterMovies(authUser.uid).on("value", snapshot => {
+          if (snapshot.val() === null) {
+            setLoadingMovies(false)
+            return
+          }
 
-          //   setUserShows(mergedShows)
-          //   setLoadingShows(false)
-          // }
+          const movies = Object.values(snapshot.val()).map(movie => {
+            return movie
+          })
+
+          setUserMovies(movies)
+          setLoadingMovies(false)
         })
       },
       () => {
+        setLoadingShows(false)
+        setLoadingMovies(false)
         console.log("user is not logged in")
       }
     )
-  }
+  }, [firebase])
+
+  useEffect(() => {
+    console.log("userShowsHook mounted")
+    authUserListener()
+    return () => {
+      authUserListener()
+    }
+  }, [authUserListener])
+
+  useEffect(() => {
+    sessionStorage.setItem(SESSION_STORAGE_KEY_SHOWS, JSON.stringify(userShows))
+    console.log("comp updated")
+  }, [userShows])
 
   const handleUserShowsOnClient = ({ database, id }) => {
     const userShowsSS = JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY_SHOWS))
@@ -106,10 +124,22 @@ const useUserShows = firebase => {
     setUserShows(updatedShows)
   }
 
+  const handleUserMoviesOnClient = ({ id }) => {
+    const updatedMovies = userMovies.filter(movie => movie.id !== id)
+
+    console.log("upd on client movies")
+
+    setUserMovies(updatedMovies)
+  }
+
   return {
     userShows,
+    userWillAirEpisodes,
+    userMovies,
     loadingShows,
-    handleUserShowsOnClient
+    loadingMovies,
+    handleUserShowsOnClient,
+    handleUserMoviesOnClient
   }
 }
 

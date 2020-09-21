@@ -31,7 +31,6 @@ function FullContentInfo({
   match: {
     params: { id, mediaType }
   },
-  userContent,
   firebase,
   authUser
 }) {
@@ -57,9 +56,7 @@ function FullContentInfo({
 
   const [similarContent, setSimilarContent] = useState([])
 
-  const [loadingPage, setLoadingPage] = useState(false)
-  const [initialLoading, setInitialLoading] = useState(false)
-  const [loadingFromDatabase, setLoadingFromDatabase] = useState(false)
+  const [loadingPage, setLoadingPage] = useState(true)
 
   const [showInDatabase, setShowInDatabase] = useState({
     database: null,
@@ -70,7 +67,6 @@ function FullContentInfo({
   const [showDatabaseOnClient, setShowDatabaseOnClient] = useState(null)
 
   const [movieInDatabase, setMovieInDatabase] = useState(null)
-  const [movieDatabaseOnClient, setMovieDatabaseOnClient] = useState(null)
 
   const [infoToPass, setInfoToPass] = useState({})
 
@@ -92,7 +88,7 @@ function FullContentInfo({
     }
     if (mediaType === "movie") {
       getFullMovieInfo()
-      getMovieInDatabase()
+      // getMovieInDatabase()
     }
 
     return () => {
@@ -106,20 +102,20 @@ function FullContentInfo({
       firebase.userShowAllEpisodes(authUser.uid, Number(id)).off()
       firebase.showEpisodes(detailes.status, Number(id)).off()
 
-      firebase
-        .watchLaterMovies(authUser.uid)
-        .child(Number(id))
-        .off()
-
       setShowInDatabase({ database: null, info: null, episodes: null, allEpisodesFromDatabase: null })
       setMovieInDatabase(null)
       setShowDatabaseOnClient(null)
-      setMovieDatabaseOnClient(null)
     }
   }, [mediaType, id])
 
   useEffect(() => {
-    getShowInDatabase()
+    if (mediaType === "show") {
+      getShowInDatabase()
+    }
+
+    if (mediaType === "movie") {
+      getMovieInDatabase()
+    }
   }, [context, id])
 
   useEffect(() => {
@@ -127,8 +123,6 @@ function FullContentInfo({
   }, [detailes, id])
 
   const getFullShowInfo = () => {
-    setLoadingPage(true)
-    setInitialLoading(true)
     axios
       .get(
         `https://api.themoviedb.org/3/tv/${id}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US&append_to_response=similar`,
@@ -306,25 +300,10 @@ function FullContentInfo({
   }
 
   const mergeEpisodesFromDatabase = ({ numberOfSeasons }) => {
-    // console.log(userContent.userShowsDatabases)
-    if (!authUser) {
-      setLoadingFromDatabase(false)
-      setInitialLoading(false)
-      return
-    }
-    if (!detailes.numberOfSeasons) return
+    if (!authUser || !detailes.numberOfSeasons) return
 
-    // setLoadingFromDatabase(true)
-
-    // const userShows = Object.entries(userContent.userShowsDatabases).flatMap(([key, value]) => {
-    //   const shows = value.reduce((acc, show) => {
-    //     acc.push({ ...show, database: key })
-    //     return acc
-    //   }, [])
-    //   return shows
-    // })
     const status = detailes.status === "Ended" || detailes.status === "Canceled" ? "ended" : "ongoing"
-    // const show = userContent.userShows.find(show => show.id === Number(id))
+
     firebase
       .allShowsList(status)
       .child(Number(id))
@@ -422,10 +401,7 @@ function FullContentInfo({
               })
 
             firebase.userShowAllEpisodes(authUser.uid, Number(id)).once("value", snapshot => {
-              if (snapshot.val() === null) {
-                setInitialLoading(false)
-                return
-              }
+              if (snapshot.val() === null) return
 
               const userEpisodes = snapshot.val()
 
@@ -465,24 +441,12 @@ function FullContentInfo({
 
               firebase.userShowAllEpisodes(authUser.uid, Number(id)).set(updatedSeasonsUser)
             })
-            // .then(() => {
-            //   getShowInDatabase({ show })
-            // })
           })
       })
-
-    // if (show === undefined) {
-    //   setLoadingFromDatabase(false)
-    //   return
-    // }
   }
 
   const handleListeners = ({ status }) => {
-    if (!authUser) {
-      setLoadingFromDatabase(false)
-      setInitialLoading(false)
-      return
-    }
+    if (!authUser) return
 
     const statusDatabase = status === "Ended" || status === "Canceled" ? "ended" : "ongoing"
 
@@ -541,49 +505,18 @@ function FullContentInfo({
   }
 
   const getShowInDatabase = () => {
-    if (!authUser) {
-      setLoadingFromDatabase(false)
-      setInitialLoading(false)
-      return
-    }
-
-    //console.log("tt")
-    // setLoadingFromDatabase(true)
-
-    // userContent.showsDatabases.forEach((database, index) => {
-    // firebase.userShow({ uid: authUser.uid, key: Number(id), database }).once("value", snapshot => {
-    // if (snapshot.val() === null) return
-
-    // const status = show.status
-
     const show = context.userContent.userShows.find(show => show.id === Number(id))
-    // console.log(context.userContent.userShows)
-    // console.log(context.userContent.userShows)
-    if (!show) {
-      setLoadingFromDatabase(false)
-      setInitialLoading(false)
-      return
-    }
+
+    if (!authUser || !show) return
 
     if (isMounted) {
-      // console.log("test3")
       setShowInDatabase(prevState => ({
         ...prevState,
         database: show.database,
         info: show
       }))
       setShowDatabaseOnClient(show.database)
-      setLoadingFromDatabase(false)
-      setInitialLoading(false)
     }
-
-    // const statusDatabase = status === "Ended" || status === "Canceled" ? "ended" : "ongoing"
-
-    // const status = show.status
-    // console.log(show)
-
-    // })
-    // })
   }
 
   const changeShowDatabaseOnClient = database => {
@@ -591,42 +524,15 @@ function FullContentInfo({
   }
 
   const getMovieInDatabase = () => {
-    if (!authUser) return
-    setLoadingFromDatabase(true)
+    const movie = context.userContent.userMovies.find(movie => movie.id === Number(id))
 
-    userContent.moviesDatabases.forEach(item => {
-      firebase[item](authUser.uid)
-        .child(Number(id))
-        .on(
-          "value",
-          snapshot => {
-            if (isMounted) {
-              if (snapshot.val() !== null) {
-                setMovieInDatabase(item)
-              } else {
-                setMovieInDatabase(null)
-              }
-              setLoadingFromDatabase(false)
-            }
-          },
-          error => {
-            console.log(`Error in database occured. ${error}`)
+    if (!authUser || !movie) {
+      setMovieInDatabase(null)
+    }
 
-            setMovieDatabaseOnClient(movieInDatabase)
-          }
-        )
-    })
-  }
-
-  useEffect(() => {
-    setMovieDatabaseOnClient(movieInDatabase)
-  }, [movieInDatabase])
-
-  const changeMovieDatabaseOnClient = database => {
-    if (movieDatabaseOnClient === "watchLaterMovies") {
-      setMovieDatabaseOnClient(null)
-    } else {
-      setMovieDatabaseOnClient(database)
+    if (isMounted) {
+      console.log(movie)
+      setMovieInDatabase(movie)
     }
   }
 
@@ -645,7 +551,7 @@ function FullContentInfo({
           <div className="full-detailes__error">
             <h1>{error}</h1>
           </div>
-        ) : !loadingPage && !loadingFromDatabase && !initialLoading ? (
+        ) : !loadingPage && !context.userContent.loadingShows ? (
           <div className="full-detailes">
             <PosterWrapper
               poster={detailes.poster}
@@ -664,9 +570,7 @@ function FullContentInfo({
               showInDatabase={showInDatabase}
               getShowInDatabase={getShowInDatabase}
               changeShowDatabaseOnClient={changeShowDatabaseOnClient}
-              changeMovieDatabaseOnClient={changeMovieDatabaseOnClient}
               showDatabaseOnClient={showDatabaseOnClient}
-              movieDatabaseOnClient={movieDatabaseOnClient}
               movieInDatabase={movieInDatabase}
             />
 

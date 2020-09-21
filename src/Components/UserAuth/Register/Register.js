@@ -88,17 +88,15 @@ class RegisterBase extends Component {
               this.props.addShowToDatabase({
                 id: item.id,
                 show: item,
-                userDatabase: "watchingShows",
-                userUid: authUser.user.uid
+                userDatabase: "watchingShows"
               })
             })
 
             watchLaterMovies.forEach(item => {
-              this.props.toggleWatchLaterMovie({
+              this.props.handleMovieInDatabases({
                 id: item.id,
                 data: item,
-                userDatabase: "watchLaterMovies",
-                userUid: authUser.user.uid
+                userDatabase: "watchLaterMovies"
               })
             })
           })

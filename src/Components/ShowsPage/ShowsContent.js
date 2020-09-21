@@ -19,12 +19,6 @@ class ShowsContent extends Component {
     this.state = {
       activeSection: "watchingShows",
       sortBy: "name",
-      database: {
-        watchingShows: [],
-        droppedShows: [],
-        willWatchShows: [],
-        finishedShows: []
-      },
       disableLoad: {
         watchingShows: false,
         droppedShows: false,
@@ -84,7 +78,7 @@ class ShowsContent extends Component {
     this.setState({
       loadedShows: {
         ...this.state.loadedShows,
-        watchingShowsLS: this.state.loadedShows.watchingShowsLS + 5
+        watchingShowsLS: this.state.loadedShows.watchingShowsLS + SHOWS_TO_LOAD_INITIAL
       },
       disableLoad: {
         ...this.state.disableLoad,
@@ -134,8 +128,6 @@ class ShowsContent extends Component {
       : section !== "watchingShows"
       ? content
       : this.context.userContentLocalStorage.watchingShows.slice(0, this.state.loadedShows.watchingShowsLS)
-
-    // console.log(this.context.userContent.userShows)
 
     return (
       <>
@@ -207,10 +199,6 @@ class ShowsContent extends Component {
                             database: "notWatchingShows",
                             id: item.id
                           })
-                          // this.props.handleShowsListenerOnClient({
-                          //   activeSection: this.state.activeSection,
-                          //   id: item.id
-                          // })
                         } else {
                           this.context.userContentLocalStorage.removeShowLS({
                             id: item.id
@@ -238,10 +226,6 @@ class ShowsContent extends Component {
                             database: "watchingShows",
                             id: item.id
                           })
-                          // this.props.handleShowsListenerOnClient({
-                          //   activeSection: this.state.activeSection,
-                          //   id: item.id
-                          // })
                         }}
                         type="button"
                       >
@@ -384,11 +368,7 @@ class ShowsContent extends Component {
                     }
               }
             >
-              {this.state.initialLoading ? (
-                <Loader className="loader--pink" />
-              ) : (
-                this.renderContent(this.state.activeSection)
-              )}
+              {this.renderContent(this.state.activeSection)}
             </div>
           </>
         )}

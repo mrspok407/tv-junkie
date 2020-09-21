@@ -143,7 +143,7 @@ const withUserContent = Component => {
       return promise
     }
 
-    addShowToDatabase = ({ id, show, userDatabase, userUid = this.userUid }) => {
+    addShowToDatabase = ({ id, show, userDatabase }) => {
       this.getShowEpisodes({ id }).then(data => {
         const showsSubDatabase = data.status === "Ended" || data.status === "Canceled" ? "ended" : "ongoing"
 
@@ -161,7 +161,7 @@ const withUserContent = Component => {
         console.log("hhhhhhhhhh")
 
         this.firebase
-          .userAllShows(userUid)
+          .userAllShows(this.userUid)
           .child(id)
           .set({
             database: userDatabase,
@@ -174,7 +174,7 @@ const withUserContent = Component => {
           })
 
         this.props.firebase
-          .userEpisodes(userUid)
+          .userEpisodes(this.userUid)
           .child(id)
           .set({
             episodes: userEpisodes,
@@ -247,53 +247,25 @@ const withUserContent = Component => {
       }
     }
 
-    toggleWatchLaterMovie = ({ id, data = [], userDatabase, userUid = this.userUid }) => {
+    handleMovieInDatabases = ({ id, data = [], userDatabase }) => {
       const movieToAdd = Array.isArray(data) ? data.find(item => item.id === id) : data
 
-      this.firebase[userDatabase](userUid)
+      this.firebase[userDatabase](this.userUid)
         .child(id)
         .once("value", snapshot => {
           if (snapshot.val() !== null) {
-            this.firebase[userDatabase](userUid)
+            this.firebase[userDatabase](this.userUid)
               .child(id)
               .set(null)
           } else {
-            this.firebase[userDatabase](userUid)
+            this.firebase[userDatabase](this.userUid)
               .child(id)
               .set({
                 ...movieToAdd,
                 timeStamp: this.firebase.timeStamp()
               })
-              .then(() => {
-                this.firebase[userDatabase](userUid)
-                  .child(id)
-                  .once("value", snapshot => {
-                    if (snapshot.val() === null) return
-
-                    const negativeTimestamp = snapshot.val().timeStamp * -1
-                    this.firebase[userDatabase](userUid)
-                      .child(id)
-                      .update({ timeStamp: negativeTimestamp }) // The negative time stamp needed for easier des order, cause firebase only provide as order
-                  })
-              })
           }
         })
-    }
-
-    handleShowsListenerOnClient = ({ activeSection = "watchingShows", id }) => {
-      const removedShow = this.state.userShowsDatabases[activeSection].find(item => item.id === id)
-      const filteredShows = this.state.userShowsDatabases[activeSection].filter(item => item.id !== id)
-
-      this.setState({
-        userShowsDatabases: {
-          ...this.state.userShowsDatabases,
-          watchingShows: activeSection !== "watchingShows" && [
-            ...this.state.userShowsDatabases.watchingShows,
-            removedShow
-          ],
-          [activeSection]: filteredShows
-        }
-      })
     }
 
     render() {
@@ -301,10 +273,9 @@ const withUserContent = Component => {
         <Component
           {...this.props}
           userContent={this.state}
-          toggleWatchLaterMovie={this.toggleWatchLaterMovie}
+          handleMovieInDatabases={this.handleMovieInDatabases}
           handleShowInDatabases={this.handleShowInDatabases}
           addShowToDatabase={this.addShowToDatabase}
-          handleShowsListenerOnClient={this.handleShowsListenerOnClient}
         />
       )
     }
