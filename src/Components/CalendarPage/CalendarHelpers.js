@@ -1,6 +1,7 @@
 import { differenceBtwDatesInDays, todayDate } from "Utils"
 
 export const organiseFutureEpisodesByMonth = data => {
+  console.log(data)
   const sortedAndFiltered = data
     .flatMap(show =>
       show.episodes.flatMap(season =>

@@ -60,72 +60,64 @@ class HomePage extends Component {
       })
 
       users.forEach(user => {
-        if (user.email !== "mr.spok407@gmail.com") return
+        // if (user.email !== "mr.spok407@gmail.com") return
 
-        let allShowsList = {}
+        this.props.firebase.userAllShows(user.key).once("value", snapshot => {
+          const shows = Object.values(snapshot.val()).map(show => {
+            return show
+          })
 
-        this.props.userContent.showsDatabases.forEach((database, index, array) => {
-          // let allNewShows = {}
-          this.props.firebase.userShows(user.key, database).once("value", snapshot => {
-            //  if (database !== "watchingShows") return
-            let shows = []
-            // snapshot.forEach(item => {
-            //   shows = [...shows, item.val()]
-            // })
-
-            // console.log(snapshot.val())
-
-            let showsModifiedWithDB = {}
-
-            Object.entries(snapshot.val()).forEach(([key, value]) => {
-              showsModifiedWithDB = {
-                ...showsModifiedWithDB,
-                [key]: {
-                  ...value,
-                  database: database
-                }
-              }
-            })
-
-            allShowsList = {
-              ...allShowsList,
-              ...showsModifiedWithDB
-            }
-
-            if (array.length === index + 1) {
-              // let shows = []
-              // Object.values(allShowsList).forEach(item => {
-              //   shows = [...shows, item]
-              // })
-              console.log(allShowsList)
-              this.props.firebase.userAllShows(user.key).set(allShowsList)
-            }
-
-            // console.log(showsModifiedWithDB)
-
-            shows.forEach(show => {
-              // this.props.firebase.userShowAllEpisodesOld(user.key, show.id).once("value", snapshot => {
-              //   const userEpisodes = {
-              //     episodes: snapshot.val(),
-              //     info: {
-              //       allEpisodesWatched: show.allEpisodesWatched,
-              //       finished: show.finished_and_name.slice(0, 4) === "true" ? true : false
-              //     }
-              //   }
-              //   this.props.firebase
-              //     .userEpisodes(user.key)
-              //     .child(show.id)
-              //     .set(userEpisodes)
-              // })
-              // this.props.firebase.userShowOld({ uid: user.key, key: show.id, database }).update({
-              //   allEpisodesWatched: null,
-              //   finished_and_name: null,
-              //   finished_and_timeStamp: null,
-              //   finished: show.allEpisodesWatched
-              // })
+          shows.forEach(show => {
+            this.props.firebase.userShowAllEpisodesInfo(user.key, show.id).once("value", snapshot => {
+              this.props.firebase
+                .userShow({ uid: user.key, key: show.id })
+                .update({ allEpisodesWatched: snapshot.val().allEpisodesWatched })
             })
           })
         })
+
+        // let allShowsList = {}
+
+        // this.props.userContent.showsDatabases.forEach((database, index, array) => {
+        //   // let allNewShows = {}
+        //   this.props.firebase.userShows(user.key, database).once("value", snapshot => {
+        //     //  if (database !== "watchingShows") return
+        //     let shows = []
+        //     // snapshot.forEach(item => {
+        //     //   shows = [...shows, item.val()]
+        //     // })
+
+        //     // console.log(snapshot.val())
+
+        //     let showsModifiedWithDB = {}
+
+        //     Object.entries(snapshot.val()).forEach(([key, value]) => {
+        //       showsModifiedWithDB = {
+        //         ...showsModifiedWithDB,
+        //         [key]: {
+        //           ...value,
+        //           database: database
+        //         }
+        //       }
+        //     })
+
+        //     allShowsList = {
+        //       ...allShowsList,
+        //       ...showsModifiedWithDB
+        //     }
+
+        //     if (array.length === index + 1) {
+        //       // let shows = []
+        //       // Object.values(allShowsList).forEach(item => {
+        //       //   shows = [...shows, item]
+        //       // })
+        //       console.log(allShowsList)
+        //       this.props.firebase.userAllShows(user.key).set(allShowsList)
+        //     }
+
+        //     // console.log(showsModifiedWithDB)
+        //   })
+        // })
       })
     })
   }

@@ -31,13 +31,6 @@ class ShowsEpisodes extends Component {
   componentDidMount() {
     this._isMounted = true
     this.initialFirstSeasonLoad()
-    // this.getAllEpisodesFromDatabase()
-  }
-
-  componentDidUpdate(prevProps) {
-    if (this.props.showInDatabase.info !== prevProps.showInDatabase.info) {
-      // this.getAllEpisodesFromDatabase()
-    }
   }
 
   componentWillUnmount() {
@@ -215,44 +208,7 @@ class ShowsEpisodes extends Component {
         key: show.info.id,
         seasonNum
       })
-      .set(seasonEpisodes, () => {
-        // this.setState({ loadingRequestToDB: false })
-        // checkIfAllEpisodesWatched({
-        //   allEpisodesFromDatabase: this.state.allEpisodesFromDatabase,
-        //   show,
-        //   firebase: this.props.firebase,
-        //   authUser: this.props.authUser,
-        //   todayDate: this.props.todayDate
-        // })
-      })
-  }
-
-  getAllEpisodesFromDatabase = () => {
-    if (!this.props.authUser) return
-
-    const show = this.props.infoToPass
-    const showsSubDatabase = show.status === "Ended" || show.status === "Canceled" ? "ended" : "ongoing"
-
-    this.props.firebase.showEpisodes(showsSubDatabase, show.id).once("value", snapshot => {
-      if (snapshot.val() !== null && this._isMounted) {
-        let allEpisodes = []
-
-        snapshot.val().forEach(item => {
-          if (!Array.isArray(item.episodes) || item.episodes.length === 0) return
-
-          allEpisodes = [...allEpisodes, ...item.episodes]
-        })
-
-        const releasedEpisodes = allEpisodes.filter(episode => {
-          const daysToNewEpisode = differenceBtwDatesInDays(episode.air_date, this.props.todayDate)
-          return daysToNewEpisode <= 0 && episode
-        })
-
-        this.setState({
-          allEpisodesFromDatabase: releasedEpisodes
-        })
-      }
-    })
+      .set(seasonEpisodes)
   }
 
   checkEveryShowEpisode = () => {
@@ -283,18 +239,7 @@ class ShowsEpisodes extends Component {
       userEpisodesFormated[episodeIndex].watched = !isAllEpisodesChecked
     })
 
-    this.props.firebase
-      .userShowAllEpisodes(this.props.authUser.uid, show.info.id)
-      .set(allEpisodesUser, () => {
-        // this.setState({ loadingRequestToDB: false })
-        // checkIfAllEpisodesWatched({
-        //   allEpisodesFromDatabase: this.state.allEpisodesFromDatabase,
-        //   show,
-        //   firebase: this.props.firebase,
-        //   authUser: this.props.authUser,
-        //   todayDate: this.props.todayDate
-        // })
-      })
+    this.props.firebase.userShowAllEpisodes(this.props.authUser.uid, show.info.id).set(allEpisodesUser)
   }
 
   render() {

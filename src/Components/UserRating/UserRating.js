@@ -27,6 +27,7 @@ class UserRating extends Component {
 
   componentDidMount() {
     this.getRating()
+    console.log("user rating mounted")
     document.addEventListener("mousedown", this.handleClickOutside)
   }
 
@@ -37,19 +38,16 @@ class UserRating extends Component {
   getRating = () => {
     if (this.props.authUser === null) return
 
-    this.props.userContent.showsDatabases.forEach(database => {
-      this.firebase[this.props.firebaseRef]({
-        uid: this.uid,
-        key: Number(this.props.id),
-        database,
-        seasonNum: this.props.seasonNum,
-        episodeNum: this.props.episodeNum
-      }).once("value", snapshot => {
-        if (snapshot.val() === null) return
+    this.firebase[this.props.firebaseRef]({
+      uid: this.uid,
+      key: Number(this.props.id),
+      seasonNum: this.props.seasonNum,
+      episodeNum: this.props.episodeNum
+    }).once("value", snapshot => {
+      if (snapshot.val() === null) return
 
-        this.setState({
-          userRating: this.props.toWatchPage ? 0 : snapshot.val().userRating
-        })
+      this.setState({
+        userRating: this.props.toWatchPage ? 0 : snapshot.val().userRating
       })
     })
   }
@@ -92,41 +90,28 @@ class UserRating extends Component {
 
     const rating = e.target.dataset.rating
 
-    this.props.userContent.showsDatabases.forEach(database => {
+    this.firebase[this.props.firebaseRef]({
+      uid: this.uid,
+      key: Number(this.props.id),
+      seasonNum: this.props.seasonNum,
+      episodeNum: this.props.episodeNum
+    }).once("value", snapshot => {
+      if (snapshot.val() === null) return
+
+      console.log(rating)
+
+      this.setState({
+        userRating: rating
+      })
+
       this.firebase[this.props.firebaseRef]({
         uid: this.uid,
         key: Number(this.props.id),
-        database,
         seasonNum: this.props.seasonNum,
         episodeNum: this.props.episodeNum
-      }).once("value", snapshot => {
-        if (snapshot.val() === null) return
-
-        this.setState({
-          userRating: rating
-        })
-
-        this.firebase[this.props.firebaseRef]({
-          uid: this.uid,
-          key: Number(this.props.id),
-          database,
-          seasonNum: this.props.seasonNum,
-          episodeNum: this.props.episodeNum
-        }).update(
-          {
-            userRating: rating,
-            watched: this.props.toWatchPage ? snapshot.val().watched : this.props.episodeRating ? true : null
-          },
-          () => {
-            if (this.props.toWatchPage || this.props.showRating) return
-            // checkIfAllEpisodesWatched({
-            //   show: this.props.show,
-            //   firebase: this.firebase,
-            //   authUser: this.props.authUser,
-            //   todayDate: todayDate
-            // })
-          }
-        )
+      }).update({
+        userRating: rating,
+        watched: this.props.toWatchPage ? snapshot.val().watched : this.props.episodeRating ? true : null
       })
     })
   }

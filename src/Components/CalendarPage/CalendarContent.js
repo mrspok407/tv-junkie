@@ -1,6 +1,5 @@
 import React, { Component } from "react"
 import { Link } from "react-router-dom"
-import { withUserContent } from "Components/UserContent"
 import { differenceBtwDatesInDays, todayDate } from "Utils"
 import { organizeMonthEpisodesByEpisodeNumber } from "./CalendarHelpers"
 import classNames from "classnames"
@@ -70,10 +69,6 @@ class CalendarContent extends Component {
   }
 
   render() {
-    // const willAirEpisodes = this.props.homePage
-    //   ? this.context.userContent.userWillAirEpisodes.slice(0, 2)
-    //   : this.context.userContent.userWillAirEpisodes
-
     return (
       <div className="content-results content-results--calendar">
         {this.context.userContent.loadingShows ? (
@@ -94,7 +89,6 @@ class CalendarContent extends Component {
                     className={classNames("episodes__episode-group-info", {
                       "episodes__episode-group-info--open": this.state.openMonths.includes(month.month)
                     })}
-                    // onClick={() => this.showSeasonsEpisode(seasonId, season.season_number)}
                     onClick={() => this.showMonthEpisodes(month.month)}
                   >
                     <div className="episodes__episode-group-name">
@@ -202,6 +196,6 @@ class CalendarContent extends Component {
   }
 }
 
-export default withUserContent(CalendarContent)
+export default CalendarContent
 
 CalendarContent.contextType = AppContext

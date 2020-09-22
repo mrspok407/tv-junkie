@@ -83,12 +83,9 @@ function FullContentInfo({
 
     if (mediaType === "show") {
       getFullShowInfo()
-      // getShowInDatabase()
-      // mergeEpisodesFromDatabase()
     }
     if (mediaType === "movie") {
       getFullMovieInfo()
-      // getMovieInDatabase()
     }
 
     return () => {
@@ -96,9 +93,6 @@ function FullContentInfo({
       if (cancelRequest !== undefined) cancelRequest()
       if (!authUser) return
 
-      // userContent.showsDatabases.forEach(database => {
-      //   firebase.userShow({ uid: authUser.uid, key: Number(id), database }).off()
-      // })
       firebase.userShowAllEpisodes(authUser.uid, Number(id)).off()
       firebase.showEpisodes(detailes.status, Number(id)).off()
 
@@ -123,6 +117,8 @@ function FullContentInfo({
   }, [detailes, id])
 
   const getFullShowInfo = () => {
+    setLoadingPage(true)
+
     axios
       .get(
         `https://api.themoviedb.org/3/tv/${id}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US&append_to_response=similar`,
@@ -490,10 +486,7 @@ function FullContentInfo({
           finished
         })
 
-        firebase
-          .userShow({ uid: authUser.uid, key: Number(id) })
-          .child("finished")
-          .set(finished)
+        firebase.userShow({ uid: authUser.uid, key: Number(id) }).update({ finished, allEpisodesWatched })
 
         setShowInDatabase(prevState => ({
           ...prevState,
