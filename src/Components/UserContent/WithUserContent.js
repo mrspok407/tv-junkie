@@ -179,6 +179,7 @@ const withUserContent = Component => {
           .set({
             episodes: userEpisodes,
             info: {
+              database: userDatabase,
               allEpisodesWatched: false,
               finished: false
             }
@@ -222,25 +223,49 @@ const withUserContent = Component => {
       })
     }
 
-    handleShowInDatabases = ({ id, data = [], database, userShows }) => {
+    handleShowInDatabases = ({ id, data = [], database, userShows, fullContentPage = false }) => {
       const allreadyInDatabase = userShows.find(show => show.id === id)
 
       if (allreadyInDatabase) {
-        this.firebase
-          .userShow({ uid: this.userUid, key: id })
-          .update({
+        this.firebase.userShow({ uid: this.userUid, key: id }).update({
+          database
+        })
+
+        if (fullContentPage) {
+          this.props.firebase.userShowAllEpisodesInfo(this.userUid, id).update({
             database
           })
-          .catch(error => {
-            console.log(`Error in database occured. ${error}`)
+        }
+        if (!fullContentPage) {
+          this.props.firebase.userShowAllEpisodesInfo(this.userUid, id).update(
+            {
+              database
+            },
+            () => {
+              this.props.firebase.userShowEpisodes(this.userUid, id).once("value", snapshot => {
+                const show = snapshot.val()
 
-            this.setState({
-              errorInDatabase: {
-                error: true,
-                message: `Error in database occured. ${error}`
-              }
-            })
-          })
+                this.props.firebase
+                  .userShowAllEpisodesNotFinished(this.userUid, id)
+                  .set(
+                    show.info.allEpisodesWatched || show.info.database !== "watchingShows"
+                      ? null
+                      : show.episodes
+                  )
+              })
+            }
+          )
+        }
+        // .catch(error => {
+        //   console.log(`Error in database occured. ${error}`)
+
+        //   this.setState({
+        //     errorInDatabase: {
+        //       error: true,
+        //       message: `Error in database occured. ${error}`
+        //     }
+        //   })
+        // })
       } else {
         const showData = Array.isArray(data) ? data.find(item => item.id === id) : data
         this.addShowToDatabase({ id, show: showData, userDatabase: database })

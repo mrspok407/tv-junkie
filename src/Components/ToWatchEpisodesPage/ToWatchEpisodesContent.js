@@ -34,20 +34,6 @@ class ToWatchEpisodesContent extends Component {
   }
 
   componentWillUnmount() {
-    this.state.watchingShows.forEach(show => {
-      this.props.firebase
-        .userShow({ uid: this.props.authUser.uid, key: show.id, database: "watchingShows" })
-        .off()
-    })
-
-    const watchingShows = this.context.userContent.userShows.filter(
-      show => show.database === "watchingShows" && !show.allEpisodesWatched
-    )
-
-    watchingShows.forEach(show => {
-      this.props.firebase.userShowAllEpisodes(this.props.authUser.uid, show.id).off()
-    })
-
     this._isMounted = false
   }
 
@@ -58,27 +44,38 @@ class ToWatchEpisodesContent extends Component {
 
     if (watchingShows.length === 0) return
 
-    const updatedShows = Promise.all(
-      watchingShows.map(show => {
-        return this.props.firebase
-          .userShowAllEpisodes(this.props.authUser.uid, show.id)
-          .once("value")
-          .then(snapshot => {
-            const mergedEpisodes = merge(show.episodes, snapshot.val(), {
-              arrayMerge: combineMergeObjects
-            })
-            const updatedShow = { ...show, episodes: mergedEpisodes }
-            return updatedShow
-          })
-      })
-    )
+    const toWatchEpisodes = this.context.userContent.userToWatchShows
 
-    updatedShows.then(data => {
-      this.setState({
-        watchingShows: data,
-        initialLoading: false
-      })
+    const mergedShows = merge(watchingShows, toWatchEpisodes, {
+      arrayMerge: combineMergeObjects
     })
+
+    this.setState({
+      watchingShows: mergedShows,
+      initialLoading: false
+    })
+
+    // const updatedShows = Promise.all(
+    //   watchingShows.map(show => {
+    //     return this.props.firebase
+    //       .userShowAllEpisodes(this.props.authUser.uid, show.id)
+    //       .once("value")
+    //       .then(snapshot => {
+    //         const mergedEpisodes = merge(show.episodes, snapshot.val(), {
+    //           arrayMerge: combineMergeObjects
+    //         })
+    //         const updatedShow = { ...show, episodes: mergedEpisodes }
+    //         return updatedShow
+    //       })
+    //   })
+    // )
+
+    // updatedShows.then(data => {
+    //   this.setState({
+    //     watchingShows: data,
+    //     initialLoading: false
+    //   })
+    // })
   }
 
   getContent = ({ sortBy = "firstAirDate", isInitialLoad = true }) => {
@@ -264,50 +261,36 @@ class ToWatchEpisodesContent extends Component {
           <PlaceholderNoToWatchEpisodes />
         ) : (
           <>
-            {this.state.watchingShows.map(show => {
-              const showsSubDatabase =
-                show.status === "Ended" || show.status === "Canceled" ? "ended" : "ongoing"
+            {this.state.watchingShows.map((show, index) => {
+              const toWatchEpisodes = show.episodes.reduce((acc, season) => {
+                const seasonEpisodes = season.episodes.reduce((acc, episode) => {
+                  if (episode.air_date && new Date(episode.air_date) < todayDate.getTime()) {
+                    acc.push(episode)
+                  }
+                  return acc
+                }, [])
+
+                seasonEpisodes.reverse()
+
+                if (seasonEpisodes.length !== 0 && seasonEpisodes.some(item => !item.watched)) {
+                  acc.push({ ...season, episodes: seasonEpisodes })
+                }
+
+                return acc
+              }, [])
+
+              toWatchEpisodes.reverse()
 
               const showInDatabase = {
                 info: {
                   ...show,
-                  status: showsSubDatabase,
-                  episodes: show.episodes
-                }
+                  index
+                },
+                episodes: show.episodes,
+                releasedEpisodes: toWatchEpisodes
               }
 
-              const infoToPass = show && {
-                id: show.id,
-                status: show.status
-              }
-
-              let newEpisodes = []
-
-              show.episodes.forEach(season => {
-                let newSeason = {}
-                let episodes = []
-
-                season.episodes.forEach(episode => {
-                  if (episode.air_date && new Date(episode.air_date) < todayDate.getTime()) {
-                    episodes.push(episode)
-                  }
-                })
-
-                episodes.reverse()
-
-                newSeason = {
-                  ...season,
-                  episodes
-                }
-
-                if (newSeason.episodes.length !== 0 && newSeason.episodes.some(item => !item.watched)) {
-                  newEpisodes = [...newEpisodes, newSeason]
-                }
-              })
-
-              newEpisodes.reverse()
-
-              if (newEpisodes.length === 0) return
+              if (toWatchEpisodes.length === 0) return
 
               return (
                 <div key={show.id} className="towatch__show">
@@ -316,12 +299,11 @@ class ToWatchEpisodesContent extends Component {
                   </Link>
                   <ShowsEpisodes
                     toWatchPage={true}
-                    seasonsArr={newEpisodes}
+                    seasonsArr={toWatchEpisodes}
                     showTitle={show.name || show.original_name}
                     todayDate={todayDate}
                     id={show.id}
                     showInDatabase={showInDatabase}
-                    infoToPass={infoToPass}
                   />
                 </div>
               )

@@ -60,7 +60,8 @@ class ShowsButtons extends Component {
                   id: Number(id),
                   data: infoToPass,
                   database: "watchingShows",
-                  userShows: this.context.userContent.userShows
+                  userShows: this.context.userContent.userShows,
+                  fullContentPage: true
                 })
                 this.context.userContent.handleUserShowsOnClient({
                   database: "watchingShows",
@@ -94,7 +95,8 @@ class ShowsButtons extends Component {
                   id: Number(id),
                   data: infoToPass,
                   database: "notWatchingShows",
-                  userShows: this.context.userContent.userShows
+                  userShows: this.context.userContent.userShows,
+                  fullContentPage: true
                 })
                 this.context.userContent.handleUserShowsOnClient({
                   database: "notWatchingShows",
@@ -130,7 +132,8 @@ class ShowsButtons extends Component {
                     id: Number(id),
                     data: infoToPass,
                     database: "droppedShows",
-                    userShows: this.context.userContent.userShows
+                    userShows: this.context.userContent.userShows,
+                    fullContentPage: true
                   })
                   this.context.userContent.handleUserShowsOnClient({
                     database: "droppedShows",
@@ -168,7 +171,8 @@ class ShowsButtons extends Component {
                     id: Number(id),
                     data: infoToPass,
                     database: "willWatchShows",
-                    userShows: this.context.userContent.userShows
+                    userShows: this.context.userContent.userShows,
+                    fullContentPage: true
                   })
                   this.context.userContent.handleUserShowsOnClient({
                     database: "willWatchShows",

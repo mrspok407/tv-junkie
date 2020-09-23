@@ -9,6 +9,7 @@ const useUserShows = firebase => {
   const [userShows, setUserShows] = useState([])
   const [userMovies, setUserMovies] = useState([])
   const [userWillAirEpisodes, setUserWillAirEpisodes] = useState([])
+  const [userToWatchShows, setUserToWatchShows] = useState([])
   const [loadingShows, setLoadingShows] = useState(true)
   const [loadingMovies, setLoadingMovies] = useState(true)
 
@@ -91,6 +92,41 @@ const useUserShows = firebase => {
           }
         })
 
+        firebase.userEpisodesNotFinished(authUser.uid).on("value", snapshot => {
+          const userEpisodes = Object.values(snapshot.val()).map(show => show)
+
+          Object.entries(snapshot.val()).forEach(([key, value]) => {
+            const allEpisodes = value.episodes.reduce((acc, item) => {
+              acc.push(...item.episodes)
+              return acc
+            }, [])
+            const allEpisodesWatched = !allEpisodes.some(episode => !episode.watched)
+
+            firebase
+              .userShow({ uid: authUser.uid, key })
+              .child("status")
+              .once("value", snapshot => {
+                const status = snapshot.val()
+                const finished = status === "ended" && allEpisodesWatched ? true : false
+
+                firebase.userShowAllEpisodesInfo(authUser.uid, key).update({
+                  allEpisodesWatched,
+                  finished
+                })
+
+                firebase.userShow({ uid: authUser.uid, key }).update({ finished, allEpisodesWatched })
+
+                console.log(allEpisodesWatched)
+
+                if (allEpisodesWatched) {
+                  firebase.userShowAllEpisodesNotFinished(authUser.uid, key).set(null)
+                }
+              })
+          })
+
+          setUserToWatchShows(userEpisodes)
+        })
+
         firebase.watchLaterMovies(authUser.uid).on("value", snapshot => {
           if (snapshot.val() === null) {
             setLoadingMovies(false)
@@ -153,6 +189,7 @@ const useUserShows = firebase => {
   return {
     userShows,
     userWillAirEpisodes,
+    userToWatchShows,
     userMovies,
     loadingShows,
     loadingMovies,

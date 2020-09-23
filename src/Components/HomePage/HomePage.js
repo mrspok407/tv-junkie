@@ -60,21 +60,60 @@ class HomePage extends Component {
       })
 
       users.forEach(user => {
-        // if (user.email !== "mr.spok407@gmail.com") return
+        if (user.email !== "test@test.com") return
 
         this.props.firebase.userAllShows(user.key).once("value", snapshot => {
-          const shows = Object.values(snapshot.val()).map(show => {
-            return show
+          if (snapshot.val() === null) return
+
+          Object.entries(snapshot.val()).forEach(([key, value]) => {
+            this.props.firebase.userShowAllEpisodesInfo(user.key, key).update({ database: value.database })
           })
 
-          shows.forEach(show => {
-            this.props.firebase.userShowAllEpisodesInfo(user.key, show.id).once("value", snapshot => {
-              this.props.firebase
-                .userShow({ uid: user.key, key: show.id })
-                .update({ allEpisodesWatched: snapshot.val().allEpisodesWatched })
-            })
-          })
+          // const notFinishedShows = Object.entries(snapshot.val()).reduce((acc, [key, value]) => {
+          //   if (!value.info.allEpisodesWatched) {
+          //     acc[key] = value
+          //   }
+          //   return acc
+          // }, {})
+
+          // console.log(notFinishedShows)
+
+          // this.props.firebase.userEpisodes(user.key).set(null)
+
+          // this.props.firebase
+          //   .userEpisodesNotFinished(user.key)
+          //   .once("value", snapshot => {
+          //     const ttt = Object.entries(snapshot.val()).reduce((acc, [key, value]) => {
+          //       acc[key] = { episodes: value.episodes }
+          //       return acc
+          //     }, {})
+
+          //     this.props.firebase.userEpisodesNotFinished(user.key).set(ttt)
+          //   })
+
+          // this.props.firebase
+          //   .userEpisodes(user.key)
+          //   .child("notFinished")
+          //   .set(notFinishedShows)
+          // this.props.firebase
+          //   .userEpisodes(user.key)
+          //   .child("all")
+          //   .set(snapshot.val())
         })
+
+        // this.props.firebase.userAllShows(user.key).once("value", snapshot => {
+        //   const shows = Object.values(snapshot.val()).map(show => {
+        //     return show
+        //   })
+
+        //   shows.forEach(show => {
+        //     this.props.firebase.userShowAllEpisodesInfo(user.key, show.id).once("value", snapshot => {
+        //       this.props.firebase
+        //         .userShow({ uid: user.key, key: show.id })
+        //         .update({ allEpisodesWatched: snapshot.val().allEpisodesWatched })
+        //     })
+        //   })
+        // })
 
         // let allShowsList = {}
 
@@ -331,7 +370,7 @@ class HomePage extends Component {
         <>
           {this.context.userContent.userWillAirEpisodes.length > 0 ? (
             <div className="home-page__heading">
-              <h1>Soon to watch</h1>
+              <h1 onClick={() => this.databaseModify()}>Soon to watch</h1>
             </div>
           ) : (
             <PlaceholderHomePageNoFutureEpisodes />

@@ -27,7 +27,6 @@ class UserRating extends Component {
 
   componentDidMount() {
     this.getRating()
-    console.log("user rating mounted")
     document.addEventListener("mousedown", this.handleClickOutside)
   }
 

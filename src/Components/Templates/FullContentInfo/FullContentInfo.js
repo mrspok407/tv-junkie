@@ -59,10 +59,9 @@ function FullContentInfo({
   const [loadingPage, setLoadingPage] = useState(true)
 
   const [showInDatabase, setShowInDatabase] = useState({
-    database: null,
     info: null,
     episodes: null,
-    allEpisodesFromDatabase: null
+    releasedEpisodes: null
   })
   const [showDatabaseOnClient, setShowDatabaseOnClient] = useState(null)
 
@@ -93,10 +92,10 @@ function FullContentInfo({
       if (cancelRequest !== undefined) cancelRequest()
       if (!authUser) return
 
-      firebase.userShowAllEpisodes(authUser.uid, Number(id)).off()
+      firebase.userShowEpisodes(authUser.uid, Number(id)).off()
       firebase.showEpisodes(detailes.status, Number(id)).off()
 
-      setShowInDatabase({ database: null, info: null, episodes: null, allEpisodesFromDatabase: null })
+      setShowInDatabase({ info: null, episodes: null, releasedEpisodes: null })
       setMovieInDatabase(null)
       setShowDatabaseOnClient(null)
     }
@@ -192,7 +191,7 @@ function FullContentInfo({
           handleListeners({ status })
 
           setSimilarContent(similarShowsSortByVotes)
-          setLoadingPage(false)
+          // setLoadingPage(false)
         }
       )
       .catch(err => {
@@ -463,13 +462,13 @@ function FullContentInfo({
         return daysToNewEpisode <= 0 && episode
       })
 
-      // console.log(releasedEpisodes)
+      firebase.userShowEpisodes(authUser.uid, Number(id)).on("value", snapshot => {
+        if (snapshot.val() === null) {
+          setLoadingPage(false)
+          return
+        }
 
-      firebase.userShowAllEpisodes(authUser.uid, Number(id)).on("value", snapshot => {
-        if (snapshot.val() === null) return
-        // console.log("test2")
-
-        const userEpisodes = snapshot.val()
+        const userEpisodes = snapshot.val().episodes
 
         const allEpisodes = userEpisodes.reduce((acc, item) => {
           acc.push(...item.episodes)
@@ -481,18 +480,23 @@ function FullContentInfo({
         const allEpisodesWatched = !allEpisodes.some(episode => !episode.watched)
         const finished = statusDatabase === "ended" && allEpisodesWatched ? true : false
 
-        firebase.userShowAllEpisodesInfo(authUser.uid, Number(id)).set({
+        firebase.userShowAllEpisodesInfo(authUser.uid, Number(id)).update({
           allEpisodesWatched,
           finished
         })
 
         firebase.userShow({ uid: authUser.uid, key: Number(id) }).update({ finished, allEpisodesWatched })
 
+        firebase
+          .userShowAllEpisodesNotFinished(authUser.uid, Number(id))
+          .set(allEpisodesWatched || snapshot.val().info.database !== "watchingShows" ? null : userEpisodes)
+
         setShowInDatabase(prevState => ({
           ...prevState,
           episodes: userEpisodes,
-          allEpisodesFromDatabase: releasedEpisodes
+          releasedEpisodes
         }))
+        setLoadingPage(false)
       })
     })
   }
@@ -505,7 +509,6 @@ function FullContentInfo({
     if (isMounted) {
       setShowInDatabase(prevState => ({
         ...prevState,
-        database: show.database,
         info: show
       }))
       setShowDatabaseOnClient(show.database)
@@ -579,7 +582,6 @@ function FullContentInfo({
                   id={id}
                   showInDatabase={showInDatabase}
                   showDatabaseOnClient={showDatabaseOnClient}
-                  infoToPass={infoToPass}
                 />
               </>
             )}
