@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { combineMergeObjects } from "Utils"
 import { organiseFutureEpisodesByMonth } from "Components/CalendarPage/CalendarHelpers"
+import { releasedEpisodesModifier } from "Utils"
 import merge from "deepmerge"
 
 const SESSION_STORAGE_KEY_SHOWS = "userShows"
@@ -11,6 +12,7 @@ const useUserShows = firebase => {
   const [userWillAirEpisodes, setUserWillAirEpisodes] = useState([])
   const [userToWatchShows, setUserToWatchShows] = useState([])
   const [loadingShows, setLoadingShows] = useState(true)
+  const [loadingNotFinishedShows, setLoadingNotFinishedShows] = useState(true)
   const [loadingMovies, setLoadingMovies] = useState(true)
 
   const authUserListener = useCallback(() => {
@@ -93,38 +95,55 @@ const useUserShows = firebase => {
         })
 
         firebase.userEpisodesNotFinished(authUser.uid).on("value", snapshot => {
+          if (snapshot.val() === null) {
+            setLoadingNotFinishedShows(false)
+            return
+          }
+
+          console.log("not finished episodes ON")
+
+          const userEpisodesObj = snapshot.val()
+
+          console.log(userEpisodesObj)
+
           const userEpisodes = Object.values(snapshot.val()).map(show => show)
 
+          // console.log(snapshot.val()["76479"].episodes)
+
           Object.entries(snapshot.val()).forEach(([key, value]) => {
-            const allEpisodes = value.episodes.reduce((acc, item) => {
-              acc.push(...item.episodes)
-              return acc
-            }, [])
-            const allEpisodesWatched = !allEpisodes.some(episode => !episode.watched)
+            const releasedEpisodes = releasedEpisodesModifier({ data: value.episodes })
+            const allEpisodesWatched = !releasedEpisodes.some(episode => !episode.watched)
 
-            firebase
-              .userShow({ uid: authUser.uid, key })
-              .child("status")
-              .once("value", snapshot => {
-                const status = snapshot.val()
-                const finished = status === "ended" && allEpisodesWatched ? true : false
+            console.log(allEpisodesWatched)
 
-                firebase.userShowAllEpisodesInfo(authUser.uid, key).update({
-                  allEpisodesWatched,
-                  finished
-                })
+            if (allEpisodesWatched) {
+              console.log("all true")
 
-                firebase.userShow({ uid: authUser.uid, key }).update({ finished, allEpisodesWatched })
+              firebase
+                .userShow({ uid: authUser.uid, key })
+                .child("status")
+                .once("value", snapshot => {
+                  const status = snapshot.val()
+                  const finished = status === "ended" && allEpisodesWatched ? true : false
 
-                console.log(allEpisodesWatched)
+                  firebase.userShowAllEpisodesInfo(authUser.uid, key).update({
+                    allEpisodesWatched,
+                    finished
+                  })
 
-                if (allEpisodesWatched) {
+                  firebase.userShow({ uid: authUser.uid, key }).update({ finished, allEpisodesWatched })
                   firebase.userShowAllEpisodesNotFinished(authUser.uid, key).set(null)
-                }
-              })
-          })
 
-          setUserToWatchShows(userEpisodes)
+                  delete userEpisodesObj[key]
+                  const userEpisodes = Object.values(userEpisodesObj).map(show => show)
+                  setUserToWatchShows(userEpisodes)
+                })
+            } else {
+              console.log("all false")
+              setUserToWatchShows(userEpisodes)
+              setLoadingNotFinishedShows(false)
+            }
+          })
         })
 
         firebase.watchLaterMovies(authUser.uid).on("value", snapshot => {
@@ -192,6 +211,7 @@ const useUserShows = firebase => {
     userToWatchShows,
     userMovies,
     loadingShows,
+    loadingNotFinishedShows,
     loadingMovies,
     handleUserShowsOnClient,
     handleUserMoviesOnClient

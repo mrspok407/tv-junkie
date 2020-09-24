@@ -8,7 +8,7 @@ import { useHistory } from "react-router-dom"
 import { combineMergeObjects } from "Utils"
 import { withUserContent } from "Components/UserContent"
 import { Helmet } from "react-helmet"
-import { differenceBtwDatesInDays } from "Utils"
+import { releasedEpisodesModifier } from "Utils"
 import merge from "deepmerge"
 import PlaceholderLoadingFullInfo from "Components/Placeholders/PlaceholderLoadingFullInfo/PlaceholderLoadingFullInfo"
 import ScrollToTop from "Utils/ScrollToTop"
@@ -448,21 +448,19 @@ function FullContentInfo({
     console.log("handleListeners")
 
     firebase.showEpisodes(statusDatabase, Number(id)).on("value", snapshot => {
-      if (snapshot.val() === null) return
-      console.log("test")
+      if (snapshot.val() === null) {
+        setLoadingPage(false)
+        return
+      }
 
-      const allEpisodes = snapshot.val().reduce((acc, item) => {
-        if (!Array.isArray(item.episodes) || item.episodes.length === 0) return
-        acc.push(...item.episodes)
-        return acc
-      }, [])
+      const episodesFullData = snapshot.val()
 
-      const releasedEpisodes = allEpisodes.filter(episode => {
-        const daysToNewEpisode = differenceBtwDatesInDays(episode.air_date, todayDate)
-        return daysToNewEpisode <= 0 && episode
-      })
+      const releasedEpisodes = releasedEpisodesModifier({ data: snapshot.val() })
+
+      console.log(releasedEpisodes)
 
       firebase.userShowEpisodes(authUser.uid, Number(id)).on("value", snapshot => {
+        console.log(snapshot.val())
         if (snapshot.val() === null) {
           setLoadingPage(false)
           return
@@ -477,6 +475,17 @@ function FullContentInfo({
 
         allEpisodes.splice(releasedEpisodes.length)
 
+        const episodesAirDate = merge(episodesFullData, userEpisodes, {
+          arrayMerge: combineMergeObjects
+        }).reduce((acc, season) => {
+          const episodes = season.episodes.reduce((acc, episode) => {
+            acc.push({ air_date: episode.air_date, userRating: episode.userRating, watched: episode.watched })
+            return acc
+          }, [])
+          acc.push({ season_number: season.season_number, userRating: season.userRating, episodes })
+          return acc
+        }, [])
+
         const allEpisodesWatched = !allEpisodes.some(episode => !episode.watched)
         const finished = statusDatabase === "ended" && allEpisodesWatched ? true : false
 
@@ -489,7 +498,9 @@ function FullContentInfo({
 
         firebase
           .userShowAllEpisodesNotFinished(authUser.uid, Number(id))
-          .set(allEpisodesWatched || snapshot.val().info.database !== "watchingShows" ? null : userEpisodes)
+          .set(
+            allEpisodesWatched || snapshot.val().info.database !== "watchingShows" ? null : episodesAirDate
+          )
 
         setShowInDatabase(prevState => ({
           ...prevState,

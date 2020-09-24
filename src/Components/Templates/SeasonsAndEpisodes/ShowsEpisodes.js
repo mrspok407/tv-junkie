@@ -28,6 +28,7 @@ class ShowsEpisodes extends Component {
   componentDidMount() {
     this._isMounted = true
     this.initialFirstSeasonLoad()
+    console.log(this.props.showInDatabase.releasedEpisodes)
   }
 
   componentWillUnmount() {
@@ -171,9 +172,25 @@ class ShowsEpisodes extends Component {
           seasonNum,
           episodeNum
         })
-        .update({
-          watched: !show.episodes[seasonNum - 1].episodes[episodeNum].watched
-        })
+        .update(
+          {
+            watched: !show.episodes[seasonNum - 1].episodes[episodeNum].watched
+          }
+          // () => {
+          //   this.props.firebase
+          //     .userShowAllEpisodesInfo(this.props.authUser.uid, show.info.id)
+          //     .once("value", snapshot => {
+          //       const allEpisodesWatched = snapshot.val().allEpisodesWatched
+          //       const database = snapshot.val().database
+
+          //       if (allEpisodesWatched || database !== "watchingShows") {
+          //         this.props.firebase
+          //           .userShowAllEpisodesNotFinished(this.props.authUser.uid, show.info.id)
+          //           .set(null)
+          //       }
+          //     })
+          // }
+        )
     }
   }
 
@@ -193,6 +210,8 @@ class ShowsEpisodes extends Component {
         isAllEpisodesChecked = false
       }
     })
+
+    console.log(isAllEpisodesChecked)
 
     seasonEpisodesFromDatabase.forEach((episode, episodeIndex) => {
       const indexOfEpisode = seasonLength - 1 - episodeIndex

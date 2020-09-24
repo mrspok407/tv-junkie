@@ -2,7 +2,7 @@
 import React, { Component } from "react"
 import { Link } from "react-router-dom"
 import ShowsEpisodes from "Components/Templates/SeasonsAndEpisodes/ShowsEpisodes"
-import { todayDate, combineMergeObjects } from "Utils"
+import { todayDate, combineMergeObjects, releasedEpisodesModifier } from "Utils"
 import Loader from "Components/Placeholders/Loader"
 import PlaceholderNoToWatchEpisodes from "Components/Placeholders/PlaceholderNoToWatchEpisodes"
 import merge from "deepmerge"
@@ -42,9 +42,16 @@ class ToWatchEpisodesContent extends Component {
       show => show.database === "watchingShows" && !show.allEpisodesWatched
     )
 
-    if (watchingShows.length === 0) return
+    if (watchingShows.length === 0) {
+      this.setState({
+        watchingShows: []
+      })
+      return
+    }
 
     const toWatchEpisodes = this.context.userContent.userToWatchShows
+
+    console.log(toWatchEpisodes)
 
     const mergedShows = merge(watchingShows, toWatchEpisodes, {
       arrayMerge: combineMergeObjects
@@ -54,28 +61,6 @@ class ToWatchEpisodesContent extends Component {
       watchingShows: mergedShows,
       initialLoading: false
     })
-
-    // const updatedShows = Promise.all(
-    //   watchingShows.map(show => {
-    //     return this.props.firebase
-    //       .userShowAllEpisodes(this.props.authUser.uid, show.id)
-    //       .once("value")
-    //       .then(snapshot => {
-    //         const mergedEpisodes = merge(show.episodes, snapshot.val(), {
-    //           arrayMerge: combineMergeObjects
-    //         })
-    //         const updatedShow = { ...show, episodes: mergedEpisodes }
-    //         return updatedShow
-    //       })
-    //   })
-    // )
-
-    // updatedShows.then(data => {
-    //   this.setState({
-    //     watchingShows: data,
-    //     initialLoading: false
-    //   })
-    // })
   }
 
   getContent = ({ sortBy = "firstAirDate", isInitialLoad = true }) => {
@@ -255,7 +240,7 @@ class ToWatchEpisodesContent extends Component {
   render() {
     return (
       <div className="content-results content-results--to-watch-page">
-        {this.state.initialLoading ? (
+        {this.context.userContent.loadingNotFinishedShows ? (
           <Loader className="loader--pink" />
         ) : this.state.watchingShows.length === 0 ? (
           <PlaceholderNoToWatchEpisodes />
@@ -278,8 +263,9 @@ class ToWatchEpisodesContent extends Component {
 
                 return acc
               }, [])
-
               toWatchEpisodes.reverse()
+
+              const releasedEpisodes = releasedEpisodesModifier({ data: toWatchEpisodes })
 
               const showInDatabase = {
                 info: {
@@ -287,7 +273,7 @@ class ToWatchEpisodesContent extends Component {
                   index
                 },
                 episodes: show.episodes,
-                releasedEpisodes: toWatchEpisodes
+                releasedEpisodes
               }
 
               if (toWatchEpisodes.length === 0) return

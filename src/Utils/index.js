@@ -3,6 +3,7 @@ import iconMediaTypeMulti from "assets/images/icons/media-type-multi.png"
 import iconMediaTypeMovie from "assets/images/icons/media-type-movie.png"
 import iconMediaTypePerson from "assets/images/icons/media-type-person.png"
 import iconMediaTypeTv from "assets/images/icons/media-type-tv.png"
+import releasedEpisodesModifier from "./releasedEpisodesModifier"
 import merge from "deepmerge"
 
 export const todayDate = new Date()
@@ -186,3 +187,5 @@ export const combineMergeObjects = (target, source, options) => {
   })
   return destination
 }
+
+export { releasedEpisodesModifier }
