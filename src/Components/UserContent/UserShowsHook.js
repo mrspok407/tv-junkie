@@ -25,15 +25,13 @@ const useUserShows = firebase => {
             return
           }
 
-          console.log("listener on")
+          console.log("listener on All User Shows")
 
           const shows = Object.values(snapshot.val()).map(show => {
             return show
           })
           const userShowsSS = JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY_SHOWS))
           const userShowsSSLength = userShowsSS.length
-
-          console.log(userShowsSS)
 
           if (userShowsSSLength === 0) {
             Promise.all(
@@ -56,11 +54,8 @@ const useUserShows = firebase => {
 
               const watchingShows = mergedShows.filter(show => show.database === "watchingShows")
 
-              console.log(mergedShows)
-
               const willAirEpisodes = organiseFutureEpisodesByMonth(watchingShows)
 
-              console.log("length 0")
               setUserShows(mergedShows)
               setUserWillAirEpisodes(willAirEpisodes)
               setLoadingShows(false)
@@ -69,16 +64,12 @@ const useUserShows = firebase => {
             shows.forEach((show, index) => {
               if (userShowsSS.find(item => item.id === show.id)) return
 
-              console.log("length less")
-
               firebase.showInDatabase(show.status, show.id).once("value", snapshot => {
                 const updatedShows = [...userShowsSS]
                 const mergedShow = { ...show, ...snapshot.val().info, episodes: snapshot.val().episodes }
 
                 updatedShows.splice(index, 0, mergedShow)
                 const willAirEpisodes = organiseFutureEpisodesByMonth(updatedShows)
-
-                console.log(updatedShows)
 
                 setUserShows(updatedShows)
                 setUserWillAirEpisodes(willAirEpisodes)
@@ -89,7 +80,6 @@ const useUserShows = firebase => {
             const mergedShows = merge(userShowsSS, shows, {
               arrayMerge: combineMergeObjects
             })
-            console.log(mergedShows)
             setUserShows(mergedShows)
           }
         })
@@ -102,22 +92,17 @@ const useUserShows = firebase => {
 
           console.log("not finished episodes ON")
 
-          const userEpisodesObj = snapshot.val()
-
-          console.log(userEpisodesObj)
+          // const userEpisodesObj = snapshot.val()
 
           const userEpisodes = Object.values(snapshot.val()).map(show => show)
-
-          // console.log(snapshot.val()["76479"].episodes)
+          console.log(userEpisodes)
 
           Object.entries(snapshot.val()).forEach(([key, value]) => {
             const releasedEpisodes = releasedEpisodesModifier({ data: value.episodes })
             const allEpisodesWatched = !releasedEpisodes.some(episode => !episode.watched)
 
-            console.log(allEpisodesWatched)
-
             if (allEpisodesWatched) {
-              console.log("all true")
+              console.log("all watched")
 
               firebase
                 .userShow({ uid: authUser.uid, key })
@@ -134,16 +119,20 @@ const useUserShows = firebase => {
                   firebase.userShow({ uid: authUser.uid, key }).update({ finished, allEpisodesWatched })
                   firebase.userShowAllEpisodesNotFinished(authUser.uid, key).set(null)
 
-                  delete userEpisodesObj[key]
-                  const userEpisodes = Object.values(userEpisodesObj).map(show => show)
-                  setUserToWatchShows(userEpisodes)
+                  // delete userEpisodesObj[key]
+                  // const userEpisodes = Object.values(userEpisodesObj).map(show => show)
+
+                  // setUserToWatchShows(userEpisodes)
                 })
             } else {
-              console.log("all false")
-              setUserToWatchShows(userEpisodes)
-              setLoadingNotFinishedShows(false)
+              // console.log("not watched all")
+              // setUserToWatchShows(userEpisodes)
+              // setLoadingNotFinishedShows(false)
             }
           })
+
+          setUserToWatchShows(userEpisodes)
+          setLoadingNotFinishedShows(false)
         })
 
         firebase.watchLaterMovies(authUser.uid).on("value", snapshot => {

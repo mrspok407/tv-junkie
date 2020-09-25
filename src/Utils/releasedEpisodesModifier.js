@@ -5,7 +5,6 @@ export const releasedEpisodes = ({ data }) => {
   if (!Array.isArray(data)) {
     throw new Error("Provided data should be an array")
   }
-  console.log(data)
   const modifiedData = data
     .reduce((acc, season) => {
       if (!Array.isArray(season.episodes) || season.episodes.length === 0) return

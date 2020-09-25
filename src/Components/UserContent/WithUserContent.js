@@ -231,17 +231,14 @@ const withUserContent = Component => {
           database
         })
 
-        if (fullContentPage) {
-          this.props.firebase.userShowAllEpisodesInfo(this.userUid, id).update({
-            database
-          })
-        }
-        if (!fullContentPage) {
-          this.props.firebase.userShowAllEpisodesInfo(this.userUid, id).update(
+        this.props.firebase
+          .userShowAllEpisodesInfo(this.userUid, id)
+          .update(
             {
               database
             },
             () => {
+              if (fullContentPage) return
               this.props.firebase.userShowEpisodes(this.userUid, id).once("value", snapshot => {
                 const show = snapshot.val()
 
@@ -255,17 +252,16 @@ const withUserContent = Component => {
               })
             }
           )
-        }
-        // .catch(error => {
-        //   console.log(`Error in database occured. ${error}`)
+          .catch(error => {
+            console.log(`Error in database occured. ${error}`)
 
-        //   this.setState({
-        //     errorInDatabase: {
-        //       error: true,
-        //       message: `Error in database occured. ${error}`
-        //     }
-        //   })
-        // })
+            this.setState({
+              errorInDatabase: {
+                error: true,
+                message: `Error in database occured. ${error}`
+              }
+            })
+          })
       } else {
         const showData = Array.isArray(data) ? data.find(item => item.id === id) : data
         this.addShowToDatabase({ id, show: showData, userDatabase: database })

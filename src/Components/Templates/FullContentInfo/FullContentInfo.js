@@ -445,8 +445,6 @@ function FullContentInfo({
 
     const statusDatabase = status === "Ended" || status === "Canceled" ? "ended" : "ongoing"
 
-    console.log("handleListeners")
-
     firebase.showEpisodes(statusDatabase, Number(id)).on("value", snapshot => {
       if (snapshot.val() === null) {
         setLoadingPage(false)
@@ -457,15 +455,12 @@ function FullContentInfo({
 
       const releasedEpisodes = releasedEpisodesModifier({ data: snapshot.val() })
 
-      console.log(releasedEpisodes)
-
       firebase.userShowEpisodes(authUser.uid, Number(id)).on("value", snapshot => {
-        console.log(snapshot.val())
         if (snapshot.val() === null) {
           setLoadingPage(false)
           return
         }
-
+        const show = snapshot.val()
         const userEpisodes = snapshot.val().episodes
 
         const allEpisodes = userEpisodes.reduce((acc, item) => {
@@ -479,10 +474,18 @@ function FullContentInfo({
           arrayMerge: combineMergeObjects
         }).reduce((acc, season) => {
           const episodes = season.episodes.reduce((acc, episode) => {
-            acc.push({ air_date: episode.air_date, userRating: episode.userRating, watched: episode.watched })
+            acc.push({
+              air_date: episode.air_date || null,
+              userRating: episode.userRating,
+              watched: episode.watched
+            })
             return acc
           }, [])
-          acc.push({ season_number: season.season_number, userRating: season.userRating, episodes })
+          acc.push({
+            season_number: season.season_number,
+            userRating: season.userRating,
+            episodes
+          })
           return acc
         }, [])
 
@@ -496,11 +499,27 @@ function FullContentInfo({
 
         firebase.userShow({ uid: authUser.uid, key: Number(id) }).update({ finished, allEpisodesWatched })
 
-        firebase
-          .userShowAllEpisodesNotFinished(authUser.uid, Number(id))
-          .set(
-            allEpisodesWatched || snapshot.val().info.database !== "watchingShows" ? null : episodesAirDate
-          )
+        firebase.userShowAllEpisodesNotFinished(authUser.uid, Number(id)).once("value", snapshot => {
+          if (show.info.database !== "watchingShows") {
+            firebase.userShowAllEpisodesNotFinished(authUser.uid, Number(id)).set(null)
+          } else {
+            if (snapshot.val() === null && !allEpisodesWatched) {
+              firebase.userShowAllEpisodesNotFinished(authUser.uid, Number(id)).set(episodesAirDate)
+            }
+            if (snapshot.val() !== null) {
+              if (!allEpisodesWatched) {
+                firebase.userShowAllEpisodesNotFinished(authUser.uid, Number(id)).set(episodesAirDate)
+              } else {
+                firebase.userShowAllEpisodesNotFinished(authUser.uid, Number(id)).set(null)
+              }
+            }
+          }
+
+          // if (snapshot.val() === null && !allEpisodesWatched && show.info.database === "watchingShows") {
+          //   console.log("test")
+          //   firebase.userShowAllEpisodesNotFinished(authUser.uid, Number(id)).set(episodesAirDate)
+          // }
+        })
 
         setShowInDatabase(prevState => ({
           ...prevState,
@@ -538,7 +557,6 @@ function FullContentInfo({
     }
 
     if (isMounted) {
-      console.log(movie)
       setMovieInDatabase(movie)
     }
   }
