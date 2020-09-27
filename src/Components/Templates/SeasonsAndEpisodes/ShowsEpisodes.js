@@ -28,7 +28,6 @@ class ShowsEpisodes extends Component {
   componentDidMount() {
     this._isMounted = true
     this.initialFirstSeasonLoad()
-    console.log(this.props.showInDatabase.releasedEpisodes)
   }
 
   componentWillUnmount() {
@@ -172,9 +171,33 @@ class ShowsEpisodes extends Component {
           seasonNum,
           episodeNum
         })
-        .update({
-          watched: !show.episodes[seasonNum - 1].episodes[episodeNum].watched
-        })
+        .update(
+          {
+            watched: !show.episodes[seasonNum - 1].episodes[episodeNum].watched
+          },
+          () => {
+            const status =
+              show.info.status === "Ended" || show.info.status === "Canceled" ? "ended" : "ongoing"
+            const allEpisodesWatched = show.releasedEpisodes.filter(episode => !episode.watched).length === 1
+            const finished =
+              (status === "ended" || show.info.status === "ended") && allEpisodesWatched ? true : false
+
+            if (allEpisodesWatched) {
+              this.props.firebase.userShowAllEpisodesInfo(this.props.authUser.uid, show.info.id).update({
+                allEpisodesWatched,
+                finished
+              })
+
+              this.props.firebase
+                .userShow({ uid: this.props.authUser.uid, key: show.info.id })
+                .update({ finished, allEpisodesWatched })
+
+              this.props.firebase
+                .userShowAllEpisodesNotFinished(this.props.authUser.uid, show.info.id)
+                .set(null)
+            }
+          }
+        )
     }
   }
 
@@ -224,7 +247,32 @@ class ShowsEpisodes extends Component {
           key: show.info.id,
           seasonNum
         })
-        .set(seasonEpisodesAirDate)
+        .set(seasonEpisodesAirDate, () => {
+          console.log(show)
+          const status = show.info.status === "Ended" || show.info.status === "Canceled" ? "ended" : "ongoing"
+          const allEpisodesWatched =
+            show.releasedEpisodes
+              .map(episode => episode.season_number)
+              .filter((episode, index, array) => array.indexOf(episode) === index).length === 1
+
+          const finished =
+            (status === "ended" || show.info.status === "ended") && allEpisodesWatched ? true : false
+
+          if (allEpisodesWatched) {
+            this.props.firebase.userShowAllEpisodesInfo(this.props.authUser.uid, show.info.id).update({
+              allEpisodesWatched,
+              finished
+            })
+
+            this.props.firebase
+              .userShow({ uid: this.props.authUser.uid, key: show.info.id })
+              .update({ finished, allEpisodesWatched })
+
+            this.props.firebase
+              .userShowAllEpisodesNotFinished(this.props.authUser.uid, show.info.id)
+              .set(null)
+          }
+        })
     }
   }
 
@@ -272,7 +320,7 @@ class ShowsEpisodes extends Component {
         )}
         <div className="episodes">
           {this.props.seasonsArr.map(season => {
-            if (season.season_number === 0 || season.name === "Specials" || !season.air_date) return null
+            if (season.season_number === 0 || season.name === "Specials") return null
 
             const seasonId = season.id
 

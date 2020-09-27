@@ -60,7 +60,7 @@ class HomePage extends Component {
       })
 
       users.forEach(user => {
-        if (user.email !== "test@test.com") return
+        if (user.email !== "mr.spok407@gmail.com") return
 
         this.props.firebase.userAllShows(user.key).once("value", snapshot => {
           if (snapshot.val() === null) return

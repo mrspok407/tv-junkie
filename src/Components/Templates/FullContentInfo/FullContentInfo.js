@@ -187,11 +187,11 @@ function FullContentInfo({
             seasonsArr: seasons.reverse()
           })
 
-          // mergeEpisodesFromDatabase({ numberOfSeasons: number_of_seasons })
+          console.log(seasons)
+
           handleListeners({ status })
 
           setSimilarContent(similarShowsSortByVotes)
-          // setLoadingPage(false)
         }
       )
       .catch(err => {
@@ -499,27 +499,11 @@ function FullContentInfo({
 
         firebase.userShow({ uid: authUser.uid, key: Number(id) }).update({ finished, allEpisodesWatched })
 
-        firebase.userShowAllEpisodesNotFinished(authUser.uid, Number(id)).once("value", snapshot => {
-          if (show.info.database !== "watchingShows") {
-            firebase.userShowAllEpisodesNotFinished(authUser.uid, Number(id)).set(null)
-          } else {
-            if (snapshot.val() === null && !allEpisodesWatched) {
-              firebase.userShowAllEpisodesNotFinished(authUser.uid, Number(id)).set(episodesAirDate)
-            }
-            if (snapshot.val() !== null) {
-              if (!allEpisodesWatched) {
-                firebase.userShowAllEpisodesNotFinished(authUser.uid, Number(id)).set(episodesAirDate)
-              } else {
-                firebase.userShowAllEpisodesNotFinished(authUser.uid, Number(id)).set(null)
-              }
-            }
-          }
-
-          // if (snapshot.val() === null && !allEpisodesWatched && show.info.database === "watchingShows") {
-          //   console.log("test")
-          //   firebase.userShowAllEpisodesNotFinished(authUser.uid, Number(id)).set(episodesAirDate)
-          // }
-        })
+        firebase
+          .userShowAllEpisodesNotFinished(authUser.uid, Number(id))
+          .set(
+            allEpisodesWatched || snapshot.val().info.database !== "watchingShows" ? null : episodesAirDate
+          )
 
         setShowInDatabase(prevState => ({
           ...prevState,

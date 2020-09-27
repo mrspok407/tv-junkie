@@ -277,6 +277,8 @@ class ToWatchEpisodesContent extends Component {
                 releasedEpisodes
               }
 
+              console.log(toWatchEpisodes)
+
               if (toWatchEpisodes.length === 0) return
 
               return (

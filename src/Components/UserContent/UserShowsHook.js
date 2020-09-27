@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from "react"
 import { combineMergeObjects } from "Utils"
 import { organiseFutureEpisodesByMonth } from "Components/CalendarPage/CalendarHelpers"
-import { releasedEpisodesModifier } from "Utils"
 import merge from "deepmerge"
 
 const SESSION_STORAGE_KEY_SHOWS = "userShows"
@@ -89,47 +88,7 @@ const useUserShows = firebase => {
             setLoadingNotFinishedShows(false)
             return
           }
-
-          console.log("not finished episodes ON")
-
-          // const userEpisodesObj = snapshot.val()
-
           const userEpisodes = Object.values(snapshot.val()).map(show => show)
-          console.log(userEpisodes)
-
-          Object.entries(snapshot.val()).forEach(([key, value]) => {
-            const releasedEpisodes = releasedEpisodesModifier({ data: value.episodes })
-            const allEpisodesWatched = !releasedEpisodes.some(episode => !episode.watched)
-
-            if (allEpisodesWatched) {
-              console.log("all watched")
-
-              firebase
-                .userShow({ uid: authUser.uid, key })
-                .child("status")
-                .once("value", snapshot => {
-                  const status = snapshot.val()
-                  const finished = status === "ended" && allEpisodesWatched ? true : false
-
-                  firebase.userShowAllEpisodesInfo(authUser.uid, key).update({
-                    allEpisodesWatched,
-                    finished
-                  })
-
-                  firebase.userShow({ uid: authUser.uid, key }).update({ finished, allEpisodesWatched })
-                  firebase.userShowAllEpisodesNotFinished(authUser.uid, key).set(null)
-
-                  // delete userEpisodesObj[key]
-                  // const userEpisodes = Object.values(userEpisodesObj).map(show => show)
-
-                  // setUserToWatchShows(userEpisodes)
-                })
-            } else {
-              // console.log("not watched all")
-              // setUserToWatchShows(userEpisodes)
-              // setLoadingNotFinishedShows(false)
-            }
-          })
 
           setUserToWatchShows(userEpisodes)
           setLoadingNotFinishedShows(false)
