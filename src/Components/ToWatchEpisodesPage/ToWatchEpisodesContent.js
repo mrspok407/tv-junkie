@@ -268,17 +268,6 @@ class ToWatchEpisodesContent extends Component {
 
               const releasedEpisodes = releasedEpisodesModifier({ data: toWatchEpisodes })
 
-              const showInDatabase = {
-                info: {
-                  ...show,
-                  index
-                },
-                episodes: show.episodes,
-                releasedEpisodes
-              }
-
-              console.log(toWatchEpisodes)
-
               if (toWatchEpisodes.length === 0) return
 
               return (
@@ -292,7 +281,9 @@ class ToWatchEpisodesContent extends Component {
                     showTitle={show.name || show.original_name}
                     todayDate={todayDate}
                     id={show.id}
-                    showInDatabase={showInDatabase}
+                    showInfo={show}
+                    episodesFromDatabase={show.episodes}
+                    releasedEpisodes={releasedEpisodes}
                   />
                 </div>
               )

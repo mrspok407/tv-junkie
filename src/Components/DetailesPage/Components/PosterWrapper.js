@@ -77,9 +77,9 @@ export default class PosterWrapper extends Component {
 
   render() {
     return (
-      <div className="full-detailes__poster-wrapper">
+      <div className="detailes-page__poster-wrapper">
         <div
-          className="full-detailes__poster"
+          className="detailes-page__poster"
           style={
             this.props.poster
               ? {
@@ -92,7 +92,7 @@ export default class PosterWrapper extends Component {
         />
         {this.props.posterMobile && (
           <div
-            className="full-detailes__poster full-detailes__poster--mobile"
+            className="detailes-page__poster detailes-page__poster--mobile"
             style={{
               backgroundImage: `url(https://image.tmdb.org/t/p/w500/${this.props.posterMobile})`
             }}
@@ -102,7 +102,7 @@ export default class PosterWrapper extends Component {
         {this.props.mediaType === "movie" &&
         new Date(this.props.releaseDate).getTime() < this.props.todayDate.getTime() &&
         this.state.movieAvailable ? (
-          <div className="full-detailes__movie-links">
+          <div className="detailes-page__movie-links">
             {!this.state.loadingTorrentLinks ? (
               <div className="torrent-links">
                 {this.state.movieHash1080p && (

@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import { Helmet } from "react-helmet"
-import ScrollToTop from "Utils/ScrollToTop"
+import ScrollToTop from "Utils/ScrollToTopBar"
 import HeaderBase from "Components/Header/Header"
 import { withFirebase } from "Components/Firebase/FirebaseContext"
 import ShowsContent from "./ShowsContent"

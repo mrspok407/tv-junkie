@@ -93,14 +93,13 @@ export default class SeasonEpisodes extends Component {
   render() {
     const showCheckboxes =
       this.props.authUser &&
-      this.props.showInDatabase.info &&
+      this.props.showInfo &&
       this.props.showDatabaseOnClient !== "notWatchingShows" &&
-      this.props.showInDatabase.episodes &&
-      this.props.showInDatabase.episodes.length > 0 &&
+      this.props.episodesFromDatabase &&
+      this.props.episodesFromDatabase.length > 0 &&
       true
 
-    const showSeason =
-      showCheckboxes && this.props.showInDatabase.episodes[this.props.season.season_number - 1]
+    const showSeason = showCheckboxes && this.props.episodesFromDatabase[this.props.season.season_number - 1]
 
     const seasons = this.props.toWatchPage ? this.props.seasonsArr : this.props.showEpisodes
 
@@ -158,7 +157,7 @@ export default class SeasonEpisodes extends Component {
               >
                 <div
                   className="episodes__episode-wrapper"
-                  onClick={() => this.props.fullContentPage && this.props.showEpisodeInfo(episode.id)}
+                  onClick={() => this.props.detailesPage && this.props.showEpisodeInfo(episode.id)}
                   style={
                     daysToNewEpisode > 0 || !episode.air_date
                       ? {
@@ -171,7 +170,7 @@ export default class SeasonEpisodes extends Component {
                 >
                   {this.props.toWatchPage && (
                     <UserRating
-                      id={this.props.showInDatabase.info.id}
+                      id={this.props.showInfo.id}
                       firebaseRef="userShowSingleEpisode"
                       seasonNum={this.props.season.season_number}
                       episodeNum={indexOfEpisode}
@@ -284,10 +283,9 @@ export default class SeasonEpisodes extends Component {
 
                     {episodeAirDateAsDateObj < this.props.todayDate.getTime() && episode.air_date && (
                       <>
-                        {this.props.showInDatabase.info && (
+                        {this.props.showInfo && (
                           <UserRating
-                            id={this.props.showInDatabase.info.id}
-                            show={this.props.showInDatabase}
+                            id={this.props.showInfo.id}
                             firebaseRef="userShowSingleEpisode"
                             seasonNum={this.props.season.season_number}
                             episodeNum={indexOfEpisode}

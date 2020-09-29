@@ -4,7 +4,7 @@ import { withRouter } from "react-router-dom"
 import { Helmet } from "react-helmet"
 import Header from "../Header/Header"
 import MoviesContent from "./MoviesContent"
-import ScrollToTop from "Utils/ScrollToTop"
+import ScrollToTop from "Utils/ScrollToTopBar"
 import Footer from "Components/Footer/Footer"
 
 let cancelRequest
