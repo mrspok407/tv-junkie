@@ -158,16 +158,14 @@ const withUserContent = Component => {
           return acc
         }, [])
 
-        console.log("hhhhhhhhhh")
-
         this.firebase
           .userAllShows(this.userUid)
           .child(id)
           .set({
             database: userDatabase,
             status: showsSubDatabase,
-            firstAirDate: show.first_air_date,
-            name: show.name || show.original_name,
+            firstAirDate: show.releaseDate,
+            name: show.title,
             timeStamp: this.firebase.timeStamp(),
             finished: false,
             id
@@ -193,7 +191,16 @@ const withUserContent = Component => {
               if (snapshot === null) {
                 return {
                   info: {
-                    ...show,
+                    backdrop_path: show.posterMobile,
+                    first_air_date: show.releaseDate,
+                    genre_ids: show.genre_ids,
+                    id: show.id,
+                    name: show.title,
+                    original_name: show.titleOriginal,
+                    overview: show.description,
+                    poster_path: show.poster,
+                    vote_average: show.rating,
+                    vote_count: show.voteCount,
                     status: data.status
                   },
                   episodes: data.episodes,
@@ -269,7 +276,9 @@ const withUserContent = Component => {
     }
 
     handleMovieInDatabases = ({ id, data = [], userDatabase }) => {
-      const movieToAdd = Array.isArray(data) ? data.find(item => item.id === id) : data
+      const movie = Array.isArray(data) ? data.find(item => item.id === id) : data
+
+      console.log(movie)
 
       this.firebase[userDatabase](this.userUid)
         .child(id)
@@ -282,7 +291,14 @@ const withUserContent = Component => {
             this.firebase[userDatabase](this.userUid)
               .child(id)
               .set({
-                ...movieToAdd,
+                id: movie.id,
+                title: movie.title,
+                release_date: movie.releaseDate,
+                vote_average: movie.rating,
+                vote_count: movie.voteCount,
+                backdrop_path: movie.posterMobile,
+                overview: movie.description,
+                genre_ids: movie.genre_ids,
                 timeStamp: this.firebase.timeStamp()
               })
           }

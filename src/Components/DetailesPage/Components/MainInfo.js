@@ -143,7 +143,7 @@ class MainInfo extends Component {
             <ShowsButtons
               id={this.props.id}
               authUser={this.props.authUser}
-              infoToPass={this.props.infoToPass}
+              detailes={this.props.detailes}
               changeShowDatabaseOnClient={this.props.changeShowDatabaseOnClient}
               showDatabaseOnClient={this.props.showDatabaseOnClient}
             />
@@ -162,13 +162,13 @@ class MainInfo extends Component {
                 if (this.props.authUser) {
                   this.props.handleMovieInDatabases({
                     id: Number(this.props.id),
-                    data: this.props.infoToPass,
+                    data: this.props.detailes,
                     userDatabase: "watchLaterMovies"
                   })
                 } else {
                   this.context.userContentLocalStorage.toggleMovieLS({
                     id: Number(this.props.id),
-                    data: this.props.infoToPass
+                    data: this.props.detailes
                   })
                 }
               }}

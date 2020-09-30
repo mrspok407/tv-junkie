@@ -79,6 +79,7 @@ const useHandleListeners = ({ id, authUser, firebase }) => {
 
   useEffect(() => {
     return () => {
+      console.log("unmounted listeners")
       firebase.userShowEpisodes(authUser.uid, id).off()
       firebase.showEpisodes("ended", id).off()
       firebase.showEpisodes("ongoing", id).off()

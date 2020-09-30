@@ -62,7 +62,6 @@ function FullContentInfo({
     authUser,
     firebase
   })
-  // const [loadingFirebaseListeners, setLoadingFirebaseListeners] = useState(false)
 
   const [showInfo, setShowInfo] = useState()
 
@@ -77,47 +76,29 @@ function FullContentInfo({
     firebase
   })
 
-  // const [showInDatabase, setShowInDatabase] = useState({
-  //   info: null,
-  //   episodes: null,
-  //   releasedEpisodes: null
-  // })
-
   const [showDatabaseOnClient, setShowDatabaseOnClient] = useState(null)
 
   const [movieInDatabase, setMovieInDatabase] = useState(null)
 
-  const [infoToPass, setInfoToPass] = useState({})
-
   const [error, setError] = useState()
 
-  const [isMounted, setIsMounted] = useState(true)
+  // const [isMounted, setIsMounted] = useState(true)
 
   const history = useHistory()
 
   const context = useContext(AppContext)
 
   useEffect(() => {
-    setIsMounted(true)
-
-    if (mediaType === "show") {
-      getFullShowInfo()
-    }
-    if (mediaType === "movie") {
-      getFullMovieInfo()
-    }
+    // setIsMounted(true)
+    getContent()
 
     return () => {
-      setIsMounted(false)
+      // setIsMounted(false)
       if (cancelRequest !== undefined) cancelRequest()
       if (!authUser) return
 
-      // firebase.userShowEpisodes(authUser.uid, Number(id)).off()
-      // firebase.showEpisodes(detailes.status, Number(id)).off()
-
       setShowInfo(null)
 
-      // setShowInDatabase({ info: null, episodes: null, releasedEpisodes: null })
       setMovieInDatabase(null)
       setShowDatabaseOnClient(null)
     }
@@ -137,12 +118,14 @@ function FullContentInfo({
     mergeEpisodes()
   }, [detailes, id])
 
-  const getFullShowInfo = () => {
+  const getContent = () => {
     setLoadingAPIrequest(true)
 
     axios
       .get(
-        `https://api.themoviedb.org/3/tv/${id}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US&append_to_response=similar`,
+        `https://api.themoviedb.org/3/${mediaType === "show" ? "tv" : "movie"}/${id}?api_key=${
+          process.env.REACT_APP_TMDB_API
+        }&language=en-US&append_to_response=${mediaType === "show" ? "similar" : "similar_movies"}`,
         {
           cancelToken: new CancelToken(function executor(c) {
             cancelRequest = c
@@ -155,7 +138,10 @@ function FullContentInfo({
             id,
             name,
             original_name,
+            original_title,
+            title,
             first_air_date,
+            release_date,
             vote_average,
             genres,
             overview,
@@ -163,144 +149,61 @@ function FullContentInfo({
             poster_path,
             vote_count,
             episode_run_time,
+            runtime,
+            tagline,
             status,
             networks,
+            production_companies,
+            budget,
             last_air_date,
             number_of_seasons,
+            imdb_id,
             seasons,
-            similar
+            similar,
+            similar_movies
           }
         }) => {
           const genreIds = genres && genres.length ? genres.map(item => item.id) : "-"
           const genreNames = genres && genres.length ? genres.map(item => item.name).join(", ") : "-"
           const networkNames = networks && networks.length ? networks.map(item => item.name).join(", ") : "-"
-
-          const similarShows = similar.results.filter(item => item.poster_path)
-          const similarShowsSortByVotes = similarShows.sort((a, b) => b.vote_count - a.vote_count)
-
-          setInfoToPass({
-            name,
-            original_name,
-            id: id,
-            first_air_date,
-            vote_average,
-            genre_ids: genreIds,
-            overview,
-            backdrop_path,
-            poster_path,
-            vote_count,
-            status
-          })
-
-          setDetailes({
-            ...detailes,
-            poster: poster_path,
-            posterMobile: backdrop_path,
-            title: name || original_name || "-",
-            releaseDate: first_air_date || "-",
-            lastAirDate: last_air_date || "-",
-            runtime: episode_run_time[0] || "-",
-            status: status || "-",
-            genres: genreNames || "-",
-            network: networkNames || "-",
-            rating: vote_average || "-",
-            description: overview || "-",
-            numberOfSeasons: number_of_seasons || "-",
-            seasonsArr: seasons.reverse()
-          })
-
-          handleListeners(status)
-
-          setLoadingAPIrequest(false)
-          setSimilarContent(similarShowsSortByVotes)
-        }
-      )
-      .catch(err => {
-        if (axios.isCancel(err)) return
-        if (err.response.status === 404) {
-          history.push(ROUTES.PAGE_DOESNT_EXISTS)
-          return
-        }
-
-        setError("Something went wrong, sorry")
-        setLoadingAPIrequest(false)
-      })
-  }
-
-  const getFullMovieInfo = () => {
-    setLoadingAPIrequest(true)
-    axios
-      .get(
-        `https://api.themoviedb.org/3/movie/${id}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US&append_to_response=similar_movies`,
-        {
-          cancelToken: new CancelToken(function executor(c) {
-            cancelRequest = c
-          })
-        }
-      )
-      .then(
-        ({
-          data: {
-            id,
-            poster_path,
-            backdrop_path,
-            original_title,
-            title,
-            release_date,
-            runtime,
-            status,
-            genres,
-            production_companies,
-            vote_average,
-            vote_count,
-            overview,
-            tagline,
-            budget,
-            imdb_id,
-            similar_movies
-          }
-        }) => {
-          const movieGenres = genres.map(item => item.name).join(", ")
-          const genresIds = genres.map(item => item.id)
-
           const prodComp =
             production_companies.length === 0 || !production_companies ? "-" : production_companies[0].name
 
-          const similarMovies = similar_movies.results.filter(item => item.poster_path)
-          const similarMoviesSortByVotes = similarMovies.sort((a, b) => b.vote_count - a.vote_count)
-
-          setInfoToPass({
-            title,
-            original_title,
-            id: id,
-            release_date,
-            vote_average,
-            genre_ids: genresIds,
-            overview,
-            backdrop_path,
-            poster_path,
-            vote_count
-          })
+          const similarType = similar || similar_movies
+          const similarContent = similarType.results.filter(item => item.poster_path)
+          const similarContentSortByVotes = similarContent.sort((a, b) => b.vote_count - a.vote_count)
 
           setDetailes({
             ...detailes,
+            id: id,
             poster: poster_path,
             posterMobile: backdrop_path,
-            title: title || original_title || "-",
-            releaseDate: release_date || "-",
-            runtime: runtime || "-",
+            title: name || original_name || title || original_title || "-",
+            titleOriginal: original_name || original_title || "-",
+            releaseDate: first_air_date || release_date || "-",
+            lastAirDate: last_air_date || "-",
+            runtime: episode_run_time || runtime || "-",
             status: status || "-",
-            genres: movieGenres || "-",
-            productionCompany: prodComp,
+            genres: genreNames || "-",
+            genre_ids: genreIds,
+            network: networkNames || "-",
+            productionCompany: prodComp || "-",
             rating: vote_average || "-",
+            voteCount: vote_count || "-",
             description: overview || "-",
             tagline: tagline || "-",
             budget: budget || "-",
-            imdbId: imdb_id || ""
+            numberOfSeasons: number_of_seasons || "-",
+            imdbId: imdb_id || "",
+            seasonsArr: seasons && seasons.reverse()
           })
 
-          setSimilarContent(similarMoviesSortByVotes)
+          if (mediaType === "show") {
+            handleListeners(status)
+          }
+
           setLoadingAPIrequest(false)
+          setSimilarContent(similarContentSortByVotes)
         }
       )
       .catch(err => {
@@ -314,89 +217,14 @@ function FullContentInfo({
         setLoadingAPIrequest(false)
       })
   }
-
-  // const handleListeners = ({ status }) => {
-  //   if (!authUser) return
-  //   setLoadingFirebaseListeners(true)
-
-  //   const statusDatabase = status === "Ended" || status === "Canceled" ? "ended" : "ongoing"
-
-  //   firebase.showEpisodes(statusDatabase, Number(id)).on("value", snapshot => {
-  //     if (snapshot.val() === null) {
-  //       setLoadingFirebaseListeners(false)
-  //       return
-  //     }
-
-  //     const episodesFullData = snapshot.val()
-  //     const releasedEpisodes = releasedEpisodesModifier({ data: snapshot.val() })
-
-  //     firebase.userShowEpisodes(authUser.uid, Number(id)).on("value", snapshot => {
-  //       if (snapshot.val() === null) {
-  //         setLoadingFirebaseListeners(false)
-  //         return
-  //       }
-
-  //       const userEpisodes = snapshot.val().episodes
-
-  //       const allEpisodes = userEpisodes.reduce((acc, item) => {
-  //         acc.push(...item.episodes)
-  //         return acc
-  //       }, [])
-
-  //       allEpisodes.splice(releasedEpisodes.length)
-
-  //       const episodesAirDate = merge(episodesFullData, userEpisodes, {
-  //         arrayMerge: combineMergeObjects
-  //       }).reduce((acc, season) => {
-  //         const episodes = season.episodes.reduce((acc, episode) => {
-  //           acc.push({
-  //             air_date: episode.air_date || null,
-  //             userRating: episode.userRating,
-  //             watched: episode.watched
-  //           })
-  //           return acc
-  //         }, [])
-  //         acc.push({
-  //           season_number: season.season_number,
-  //           userRating: season.userRating,
-  //           episodes
-  //         })
-  //         return acc
-  //       }, [])
-
-  //       const allEpisodesWatched = !allEpisodes.some(episode => !episode.watched)
-  //       const finished = statusDatabase === "ended" && allEpisodesWatched ? true : false
-
-  //       firebase.userShowAllEpisodesInfo(authUser.uid, Number(id)).update({
-  //         allEpisodesWatched,
-  //         finished
-  //       })
-  //       firebase.userShow({ uid: authUser.uid, key: Number(id) }).update({ finished, allEpisodesWatched })
-  //       firebase
-  //         .userShowAllEpisodesNotFinished(authUser.uid, Number(id))
-  //         .set(
-  //           allEpisodesWatched || snapshot.val().info.database !== "watchingShows" ? null : episodesAirDate
-  //         )
-
-  //       setShowInDatabase(prevState => ({
-  //         ...prevState,
-  //         episodes: userEpisodes,
-  //         releasedEpisodes
-  //       }))
-  //       setLoadingFirebaseListeners(false)
-  //     })
-  //   })
-  // }
 
   const getShowInDatabase = () => {
     const show = context.userContent.userShows.find(show => show.id === Number(id))
 
     if (!authUser || !show) return
 
-    if (isMounted) {
-      setShowInfo(show)
-      setShowDatabaseOnClient(show.database)
-    }
+    setShowInfo(show)
+    setShowDatabaseOnClient(show.database)
   }
 
   const changeShowDatabaseOnClient = database => {
@@ -406,16 +234,8 @@ function FullContentInfo({
   const getMovieInDatabase = () => {
     const movie = context.userContent.userMovies.find(movie => movie.id === Number(id))
 
-    if (!authUser || !movie) {
-      setMovieInDatabase(null)
-    }
-
-    if (isMounted) {
-      setMovieInDatabase(movie)
-    }
+    setMovieInDatabase(!authUser || !movie ? null : movie)
   }
-
-  console.log(loadingEpisodeMerging)
 
   return (
     <>
@@ -450,7 +270,6 @@ function FullContentInfo({
               detailes={detailes}
               mediaType={mediaType}
               id={id}
-              infoToPass={infoToPass}
               showInfo={showInfo}
               changeShowDatabaseOnClient={changeShowDatabaseOnClient}
               showDatabaseOnClient={showDatabaseOnClient}

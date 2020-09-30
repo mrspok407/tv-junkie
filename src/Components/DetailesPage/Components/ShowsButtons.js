@@ -39,7 +39,7 @@ class ShowsButtons extends Component {
   }
 
   render() {
-    const { id, authUser, infoToPass } = this.props
+    const { id, authUser, detailes } = this.props
 
     return (
       <div className="buttons__row">
@@ -57,7 +57,7 @@ class ShowsButtons extends Component {
                 this.props.changeShowDatabaseOnClient("watchingShows")
                 this.props.handleShowInDatabases({
                   id: Number(id),
-                  data: infoToPass,
+                  data: detailes,
                   database: "watchingShows",
                   userShows: this.context.userContent.userShows,
                   fullContentPage: true
@@ -69,7 +69,7 @@ class ShowsButtons extends Component {
               } else {
                 this.context.userContentLocalStorage.addShowLS({
                   id: Number(id),
-                  data: infoToPass
+                  data: detailes
                 })
               }
             }}
@@ -92,7 +92,7 @@ class ShowsButtons extends Component {
                 this.props.changeShowDatabaseOnClient("notWatchingShows")
                 this.props.handleShowInDatabases({
                   id: Number(id),
-                  data: infoToPass,
+                  data: detailes,
                   database: "notWatchingShows",
                   userShows: this.context.userContent.userShows,
                   fullContentPage: true
@@ -129,7 +129,7 @@ class ShowsButtons extends Component {
                   this.props.changeShowDatabaseOnClient("droppedShows")
                   this.props.handleShowInDatabases({
                     id: Number(id),
-                    data: infoToPass,
+                    data: detailes,
                     database: "droppedShows",
                     userShows: this.context.userContent.userShows,
                     fullContentPage: true
@@ -168,7 +168,7 @@ class ShowsButtons extends Component {
                   this.props.changeShowDatabaseOnClient("willWatchShows")
                   this.props.handleShowInDatabases({
                     id: Number(id),
-                    data: infoToPass,
+                    data: detailes,
                     database: "willWatchShows",
                     userShows: this.context.userContent.userShows,
                     fullContentPage: true

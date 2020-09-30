@@ -340,6 +340,3 @@ class MoviesContent extends Component {
 }
 
 export default compose(withUserContent, AppContextConsumer)(MoviesContent)
-
-// MoviesContent.contextType = UserContentLocalStorageContext
-// MoviesContent.contextType = AppContext
