@@ -41,16 +41,16 @@ class ToWatchEpisodesContent extends Component {
     const watchingShows = this.context.userContent.userShows.filter(
       show => show.database === "watchingShows" && !show.allEpisodesWatched
     )
+    const toWatchEpisodes = this.context.userContent.userToWatchShows
 
-    if (watchingShows.length === 0) {
+    if (watchingShows.length === 0 || watchingShows.length !== toWatchEpisodes.length) {
       this.setState({
         watchingShows: []
       })
       return
     }
 
-    const toWatchEpisodes = this.context.userContent.userToWatchShows
-
+    console.log(watchingShows)
     console.log(toWatchEpisodes)
 
     const mergedShows = merge(watchingShows, toWatchEpisodes, {
@@ -238,10 +238,9 @@ class ToWatchEpisodesContent extends Component {
   }
 
   render() {
-    console.log(this.state.watchingShows)
     return (
       <div className="content-results content-results--to-watch-page">
-        {this.context.userContent.loadingNotFinishedShows ? (
+        {this.state.initialLoading ? (
           <Loader className="loader--pink" />
         ) : this.state.watchingShows.length === 0 ? (
           <PlaceholderNoToWatchEpisodes />

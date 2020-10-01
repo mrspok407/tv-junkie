@@ -88,8 +88,9 @@ const useUserShows = firebase => {
             setLoadingNotFinishedShows(false)
             return
           }
-          const userEpisodes = Object.values(snapshot.val()).map(show => show)
 
+          const userEpisodes = Object.values(snapshot.val()).map(show => show)
+          console.log(userEpisodes)
           setUserToWatchShows(userEpisodes)
           setLoadingNotFinishedShows(false)
         })

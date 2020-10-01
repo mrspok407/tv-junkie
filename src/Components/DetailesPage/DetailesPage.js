@@ -82,18 +82,14 @@ function FullContentInfo({
 
   const [error, setError] = useState()
 
-  // const [isMounted, setIsMounted] = useState(true)
-
   const history = useHistory()
 
   const context = useContext(AppContext)
 
   useEffect(() => {
-    // setIsMounted(true)
     getContent()
 
     return () => {
-      // setIsMounted(false)
       if (cancelRequest !== undefined) cancelRequest()
       if (!authUser) return
 

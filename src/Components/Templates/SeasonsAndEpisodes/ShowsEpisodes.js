@@ -2,6 +2,7 @@ import React, { Component } from "react"
 import { withUserContent } from "Components/UserContent"
 import axios, { CancelToken } from "axios"
 import { differenceBtwDatesInDays } from "Utils"
+import isAllEpisodesWatched from "./FirebaseHelpers/isAllEpisodesWatched"
 import Loader from "Components/Placeholders/Loader"
 import classNames from "classnames"
 import SeasonEpisodes from "./SeasonEpisodes"
@@ -178,25 +179,13 @@ class ShowsEpisodes extends Component {
             watched: !episodesFromDatabase[seasonNum - 1].episodes[episodeNum].watched
           },
           () => {
-            const status = showInfo.status === "Ended" || showInfo.status === "Canceled" ? "ended" : "ongoing"
-            const allEpisodesWatched = releasedEpisodes.filter(episode => !episode.watched).length === 1
-            const finished =
-              (status === "ended" || showInfo.status === "ended") && allEpisodesWatched ? true : false
-
-            if (allEpisodesWatched) {
-              this.props.firebase.userShowAllEpisodesInfo(this.props.authUser.uid, showInfo.id).update({
-                allEpisodesWatched,
-                finished
-              })
-
-              this.props.firebase
-                .userShow({ uid: this.props.authUser.uid, key: showInfo.id })
-                .update({ finished, allEpisodesWatched })
-
-              this.props.firebase
-                .userShowAllEpisodesNotFinished(this.props.authUser.uid, showInfo.id)
-                .set(null)
-            }
+            isAllEpisodesWatched({
+              showInfo,
+              releasedEpisodes,
+              authUser: this.props.authUser,
+              firebase: this.props.firebase,
+              singleEpisode: true
+            })
           }
         )
     }
@@ -250,27 +239,13 @@ class ShowsEpisodes extends Component {
           seasonNum
         })
         .set(seasonEpisodesAirDate, () => {
-          const status = showInfo.status === "Ended" || showInfo.status === "Canceled" ? "ended" : "ongoing"
-          const allEpisodesWatched =
-            releasedEpisodes
-              .map(episode => episode.season_number)
-              .filter((episode, index, array) => array.indexOf(episode) === index).length === 1
-
-          const finished =
-            (status === "ended" || showInfo.status === "ended") && allEpisodesWatched ? true : false
-
-          if (allEpisodesWatched) {
-            this.props.firebase.userShowAllEpisodesInfo(this.props.authUser.uid, showInfo.id).update({
-              allEpisodesWatched,
-              finished
-            })
-
-            this.props.firebase
-              .userShow({ uid: this.props.authUser.uid, key: showInfo.id })
-              .update({ finished, allEpisodesWatched })
-
-            this.props.firebase.userShowAllEpisodesNotFinished(this.props.authUser.uid, showInfo.id).set(null)
-          }
+          isAllEpisodesWatched({
+            showInfo,
+            releasedEpisodes,
+            authUser: this.props.authUser,
+            firebase: this.props.firebase,
+            singleEpisode: false
+          })
         })
     }
   }
@@ -306,7 +281,7 @@ class ShowsEpisodes extends Component {
   render() {
     const showCheckboxes =
       this.props.authUser && this.props.showInfo && this.props.showDatabaseOnClient !== "notWatchingShows"
-
+    console.log(this.props.seasonsArr)
     return (
       <>
         {showCheckboxes && this.props.detailesPage && (
