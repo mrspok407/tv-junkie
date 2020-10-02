@@ -1,5 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect, useCallback } from "react"
-import { combineMergeObjects } from "Utils"
+import { combineMergeObjects, releasedEpisodesToOneArray } from "Utils"
 import { organiseFutureEpisodesByMonth } from "Components/CalendarPage/CalendarHelpers"
 import merge from "deepmerge"
 
@@ -13,6 +14,7 @@ const useUserShows = firebase => {
   const [loadingShows, setLoadingShows] = useState(true)
   const [loadingNotFinishedShows, setLoadingNotFinishedShows] = useState(true)
   const [loadingMovies, setLoadingMovies] = useState(true)
+  const [firebaseListeners, setFirebaseListeners] = useState([])
 
   const authUserListener = useCallback(() => {
     firebase.onAuthUserListener(
@@ -68,7 +70,10 @@ const useUserShows = firebase => {
                 const mergedShow = { ...show, ...snapshot.val().info, episodes: snapshot.val().episodes }
 
                 updatedShows.splice(index, 0, mergedShow)
-                const willAirEpisodes = organiseFutureEpisodesByMonth(updatedShows)
+
+                const watchingShows = updatedShows.filter(show => show.database === "watchingShows")
+
+                const willAirEpisodes = organiseFutureEpisodesByMonth(watchingShows)
 
                 setUserShows(updatedShows)
                 setUserWillAirEpisodes(willAirEpisodes)
@@ -85,12 +90,20 @@ const useUserShows = firebase => {
 
         firebase.userEpisodesNotFinished(authUser.uid).on("value", snapshot => {
           if (snapshot.val() === null) {
+            setUserToWatchShows([])
             setLoadingNotFinishedShows(false)
             return
           }
 
-          const userEpisodes = Object.values(snapshot.val()).map(show => show)
-          console.log(userEpisodes)
+          const userEpisodes = Object.entries(snapshot.val()).reduce((acc, [key, value]) => {
+            const releasedEpisodes = releasedEpisodesToOneArray({ data: value.episodes })
+
+            if (releasedEpisodes.find(episode => !episode.watched)) {
+              acc.push({ id: Number(key), episodes: value.episodes })
+            }
+            return acc
+          }, [])
+
           setUserToWatchShows(userEpisodes)
           setLoadingNotFinishedShows(false)
         })
@@ -107,6 +120,11 @@ const useUserShows = firebase => {
 
           setUserMovies(movies)
           setLoadingMovies(false)
+          setFirebaseListeners([
+            firebase.userAllShows(authUser.uid),
+            firebase.userEpisodesNotFinished(authUser.uid),
+            firebase.watchLaterMovies(authUser.uid)
+          ])
         })
       },
       () => {
@@ -121,7 +139,9 @@ const useUserShows = firebase => {
     console.log("userShowsHook mounted")
     authUserListener()
     return () => {
-      authUserListener()
+      firebaseListeners.forEach(listener => {
+        listener.off()
+      })
     }
   }, [authUserListener])
 
@@ -137,7 +157,6 @@ const useUserShows = firebase => {
     const updatedShows = userShowsSS.map(show => (show.id === id ? { ...show, database } : show))
 
     const watchingShows = updatedShows.filter(show => show.database === "watchingShows")
-    console.log(watchingShows)
     const willAirEpisodes = organiseFutureEpisodesByMonth(watchingShows)
 
     setUserShows(updatedShows)

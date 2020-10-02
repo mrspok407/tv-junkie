@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { combineMergeObjects, releasedEpisodesModifier } from "Utils"
+import { combineMergeObjects, releasedEpisodesToOneArray } from "Utils"
 import merge from "deepmerge"
 
 const useHandleListeners = ({ id, authUser, firebase }) => {
@@ -20,7 +20,7 @@ const useHandleListeners = ({ id, authUser, firebase }) => {
       }
 
       const episodesFullData = snapshot.val()
-      const releasedEpisodes = releasedEpisodesModifier({ data: snapshot.val() })
+      const releasedEpisodes = releasedEpisodesToOneArray({ data: snapshot.val() })
 
       firebase.userShowEpisodes(authUser.uid, id).on("value", snapshot => {
         if (snapshot.val() === null) {

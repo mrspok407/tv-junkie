@@ -13,7 +13,7 @@ class UserRating extends Component {
     super(props)
 
     this.state = {
-      userRating: null,
+      userRating: 0,
       nonAuthWarning: false
     }
 
@@ -33,7 +33,7 @@ class UserRating extends Component {
   }
 
   getRating = () => {
-    if (this.props.authUser === null) return
+    if (this.props.authUser === null || this.props.toWatchPage) return
 
     this.firebase[this.props.firebaseRef]({
       uid: this.uid,
@@ -44,7 +44,7 @@ class UserRating extends Component {
       if (snapshot.val() === null) return
 
       this.setState({
-        userRating: this.props.toWatchPage ? 0 : snapshot.val().userRating
+        userRating: snapshot.val().userRating
       })
     })
   }

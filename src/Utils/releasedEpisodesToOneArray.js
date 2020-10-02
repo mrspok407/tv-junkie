@@ -2,6 +2,7 @@
 import { differenceBtwDatesInDays, todayDate } from "Utils"
 
 export const releasedEpisodes = ({ data }) => {
+  console.log(data)
   if (!Array.isArray(data)) {
     throw new Error("Provided data should be an array")
   }
