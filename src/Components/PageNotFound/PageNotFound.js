@@ -6,8 +6,8 @@ import { Helmet } from "react-helmet"
 import * as ROUTES from "Utils/Constants/routes"
 import HeaderBase from "Components/Header/Header"
 import logo404 from "assets/images/doge-404.png"
-import "./PageNotFound.scss"
 import Footer from "Components/Footer/Footer"
+import "./PageNotFound.scss"
 
 const Header = withFirebase(HeaderBase)
 
@@ -31,6 +31,7 @@ class PageNotFound extends Component {
   }
 
   componentWillUnmount() {
+    console.log("not found unmounted")
     clearTimeout(this.countdownTimer)
   }
 

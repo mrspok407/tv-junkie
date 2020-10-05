@@ -115,8 +115,6 @@ class MoviesContent extends Component {
             listOfGenres.filter(item => item.id === genreId)
           )
 
-          const contentTitle = item.title || item.original_title
-
           // Movies //
           let movie
           let urlMovieTitle
@@ -151,7 +149,7 @@ class MoviesContent extends Component {
                   >
                     <div className="content-results__item-main-info">
                       <div className="content-results__item-title">
-                        {!contentTitle ? "No title available" : contentTitle}
+                        {!item.title ? "No title available" : item.title}
                       </div>
                       <div className="content-results__item-year">
                         {!item.release_date ? "" : `(${item.release_date.slice(0, 4)})`}

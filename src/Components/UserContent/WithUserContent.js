@@ -147,8 +147,6 @@ const withUserContent = Component => {
       this.getShowEpisodes({ id }).then(data => {
         const showsSubDatabase = data.status === "Ended" || data.status === "Canceled" ? "ended" : "ongoing"
 
-        // const userEpisodes = []
-
         const userEpisodes = data.episodes.reduce((acc, season) => {
           const episodes = season.episodes.map(() => {
             return { watched: false, userRating: 0 }
@@ -164,8 +162,8 @@ const withUserContent = Component => {
           .set({
             database: userDatabase,
             status: showsSubDatabase,
-            firstAirDate: show.releaseDate,
-            name: show.title,
+            firstAirDate: show.first_air_date,
+            name: show.name,
             timeStamp: this.firebase.timeStamp(),
             finished: false,
             id
@@ -191,16 +189,16 @@ const withUserContent = Component => {
               if (snapshot === null) {
                 return {
                   info: {
-                    backdrop_path: show.posterMobile,
-                    first_air_date: show.releaseDate,
+                    backdrop_path: show.backdrop_path,
+                    first_air_date: show.first_air_date,
                     genre_ids: show.genre_ids,
                     id: show.id,
-                    name: show.title,
-                    original_name: show.titleOriginal,
-                    overview: show.description,
-                    poster_path: show.poster,
-                    vote_average: show.rating,
-                    vote_count: show.voteCount,
+                    name: show.name,
+                    original_name: show.original_name,
+                    overview: show.overview,
+                    poster_path: show.poster_path,
+                    vote_average: show.vote_average,
+                    vote_count: show.vote_count,
                     status: data.status
                   },
                   episodes: data.episodes,
@@ -278,8 +276,6 @@ const withUserContent = Component => {
     handleMovieInDatabases = ({ id, data = [], userDatabase }) => {
       const movie = Array.isArray(data) ? data.find(item => item.id === id) : data
 
-      console.log(movie)
-
       this.firebase[userDatabase](this.userUid)
         .child(id)
         .once("value", snapshot => {
@@ -293,11 +289,11 @@ const withUserContent = Component => {
               .set({
                 id: movie.id,
                 title: movie.title,
-                release_date: movie.releaseDate,
+                release_date: movie.release_date,
                 vote_average: movie.rating,
-                vote_count: movie.voteCount,
-                backdrop_path: movie.posterMobile,
-                overview: movie.description,
+                vote_count: movie.vote_count,
+                backdrop_path: movie.backdrop_path,
+                overview: movie.overview,
                 genre_ids: movie.genre_ids,
                 timeStamp: this.firebase.timeStamp()
               })

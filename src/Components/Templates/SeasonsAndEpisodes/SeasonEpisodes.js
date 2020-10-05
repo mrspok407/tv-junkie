@@ -1,6 +1,6 @@
 /* eslint-disable array-callback-return */
 import React, { Component } from "react"
-import { differenceBtwDatesInDays } from "Utils"
+import { differenceBtwDatesInDays, todayDate } from "Utils"
 import classNames from "classnames"
 import { Link } from "react-router-dom"
 import * as ROUTES from "Utils/Constants/routes"
@@ -16,7 +16,8 @@ export default class SeasonEpisodes extends Component {
       showTorrentLinks: [],
       fadeOutEpisodes: [],
       moveUpEpisodes: [],
-      disableCheckboxWarning: null
+      disableCheckboxWarning: null,
+      checkbox: ""
     }
 
     this.episode = React.createRef()
@@ -143,7 +144,7 @@ export default class SeasonEpisodes extends Component {
 
             const episodeAirDateAsDateObj = new Date(episode.air_date)
 
-            const daysToNewEpisode = differenceBtwDatesInDays(episode.air_date, this.props.todayDate)
+            const daysToNewEpisode = differenceBtwDatesInDays(episode.air_date, todayDate)
 
             return (
               <div
@@ -187,7 +188,7 @@ export default class SeasonEpisodes extends Component {
                   {daysToNewEpisode > 0 ? (
                     <div className="episodes__episode-days-to-air">{daysToNewEpisode} days</div>
                   ) : (
-                    episodeAirDateAsDateObj < this.props.todayDate.getTime() &&
+                    episodeAirDateAsDateObj < todayDate.getTime() &&
                     episode.air_date &&
                     this.props.toWatchPage && (
                       <>
@@ -235,7 +236,7 @@ export default class SeasonEpisodes extends Component {
                     <label>
                       <input
                         type="checkbox"
-                        checked={showSeason && showSeason.episodes[indexOfEpisode].watched}
+                        checked={showSeason ? showSeason.episodes[indexOfEpisode].watched : false}
                         onChange={() => {
                           if (this.props.toWatchPage) {
                             this.handleFadeOut(episode.id, indexOfEpisode)
@@ -281,7 +282,7 @@ export default class SeasonEpisodes extends Component {
                       <div className="episodes__episode-detailes-overview">{episode.overview}</div>
                     )}
 
-                    {episodeAirDateAsDateObj < this.props.todayDate.getTime() && episode.air_date && (
+                    {episodeAirDateAsDateObj < todayDate.getTime() && episode.air_date && (
                       <>
                         {this.props.showInfo && (
                           <UserRating

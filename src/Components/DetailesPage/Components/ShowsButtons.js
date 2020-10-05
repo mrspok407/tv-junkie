@@ -201,6 +201,4 @@ class ShowsButtons extends Component {
 }
 
 export default withUserContent(ShowsButtons)
-
-// ShowsButtons.contextType = UserContentLocalStorageContext
 ShowsButtons.contextType = AppContext

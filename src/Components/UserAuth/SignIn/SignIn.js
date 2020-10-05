@@ -8,7 +8,6 @@ import * as ROUTES from "Utils/Constants/routes"
 import classNames from "classnames"
 import Input from "../Input/Input"
 import { WithAuthenticationConsumer } from "../Session/WithAuthentication"
-// import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import SignInWithGoogleForm from "./SignInWithGoogle"
 

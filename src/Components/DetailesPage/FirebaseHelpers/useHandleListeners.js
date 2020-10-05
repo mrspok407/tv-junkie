@@ -79,14 +79,16 @@ const useHandleListeners = ({ id, authUser, firebase }) => {
 
   useEffect(() => {
     return () => {
-      console.log("unmounted listeners")
+      if (!authUser) return
+
       firebase.userShowEpisodes(authUser.uid, id).off()
       firebase.showEpisodes("ended", id).off()
       firebase.showEpisodes("ongoing", id).off()
       setEpisodes(null)
       setReleasedEpisodes(null)
     }
-  }, [authUser.uid, firebase, id])
+    // eslint-disable-next-line
+  }, [])
 
   return [loading, episodes, releasedEpisodes, handleListeners]
 }

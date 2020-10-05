@@ -22,40 +22,19 @@ import useMergeEpisodes from "./FirebaseHelpers/useMergeEpisodes"
 import useHandleListeners from "./FirebaseHelpers/useHandleListeners"
 import "./DetailesPage.scss"
 
-const todayDate = new Date()
-
 let cancelRequest
 
-function FullContentInfo({
+function DetailesPage({
   match: {
     params: { id, mediaType }
   },
   firebase,
   authUser
 }) {
-  const [detailes, setDetailes] = useState({
-    poster: "",
-    posterMobile: "",
-    title: "",
-    releaseDate: "",
-    lastAirDate: "",
-    runtime: "",
-    status: "",
-    genres: [],
-    network: "",
-    productionCompany: "",
-    rating: "",
-    description: "",
-    numberOfSeasons: "",
-    seasonsArr: [],
-    tagline: "",
-    budget: "",
-    imdbId: ""
-  })
-
+  const [detailes, setDetailes] = useState()
   const [similarContent, setSimilarContent] = useState([])
 
-  const [loadingAPIrequest, setLoadingAPIrequest] = useState(false)
+  const [loadingAPIrequest, setLoadingAPIrequest] = useState(true)
   const [loadingEpisodeMerging, mergeEpisodes] = useMergeEpisodes({
     detailes,
     id: Number(id),
@@ -64,6 +43,7 @@ function FullContentInfo({
   })
 
   const [showInfo, setShowInfo] = useState()
+  const [movieInDatabase, setMovieInDatabase] = useState(null)
 
   const [
     loadingFirebaseListeners,
@@ -77,8 +57,6 @@ function FullContentInfo({
   })
 
   const [showDatabaseOnClient, setShowDatabaseOnClient] = useState(null)
-
-  const [movieInDatabase, setMovieInDatabase] = useState(null)
 
   const [error, setError] = useState()
 
@@ -134,9 +112,10 @@ function FullContentInfo({
             id,
             name,
             original_name,
-            original_title,
             title,
+            original_title,
             first_air_date,
+            last_air_date,
             release_date,
             vote_average,
             genres,
@@ -151,7 +130,6 @@ function FullContentInfo({
             networks,
             production_companies,
             budget,
-            last_air_date,
             number_of_seasons,
             imdb_id,
             seasons,
@@ -172,25 +150,28 @@ function FullContentInfo({
           setDetailes({
             ...detailes,
             id: id,
-            poster: poster_path,
-            posterMobile: backdrop_path,
-            title: name || original_name || title || original_title || "-",
-            titleOriginal: original_name || original_title || "-",
-            releaseDate: first_air_date || release_date || "-",
-            lastAirDate: last_air_date || "-",
-            runtime: episode_run_time || runtime || "-",
+            poster_path: poster_path,
+            backdrop_path: backdrop_path,
+            name: name || original_name || "-",
+            original_name: original_name || "-",
+            title: title || original_title || "-",
+            first_air_date: first_air_date || "-",
+            release_date: release_date || "-",
+            last_air_date: last_air_date || "-",
+            episode_run_time: episode_run_time || "-",
+            runtime: runtime || "-",
             status: status || "-",
             genres: genreNames || "-",
             genre_ids: genreIds,
             network: networkNames || "-",
-            productionCompany: prodComp || "-",
-            rating: vote_average || "-",
-            voteCount: vote_count || "-",
-            description: overview || "-",
+            production_companies: prodComp || "-",
+            vote_average: vote_average || "-",
+            vote_count: vote_count || "-",
+            overview: overview || "-",
             tagline: tagline || "-",
             budget: budget || "-",
-            numberOfSeasons: number_of_seasons || "-",
-            imdbId: imdb_id || "",
+            number_of_seasons: number_of_seasons || "-",
+            imdb_id: imdb_id || "",
             seasonsArr: seasons && seasons.reverse()
           })
 
@@ -236,10 +217,21 @@ function FullContentInfo({
   return (
     <>
       <Helmet>
-        <title>
-          {detailes.title} {detailes.releaseDate !== "-" ? `(${detailes.releaseDate.slice(0, 4)})` : ""} | TV
-          Junkie
-        </title>
+        {detailes && (
+          <title>
+            {mediaType === "show"
+              ? `
+                ${detailes.name}
+                ${
+                  detailes.first_air_date !== "-" ? `(${detailes.first_air_date.slice(0, 4)})` : ""
+                } | TV Junkie
+              `
+              : `
+              ${detailes.title}
+              ${detailes.release_date !== "-" ? `(${detailes.release_date.slice(0, 4)})` : ""} | TV Junkie
+              `}
+          </title>
+        )}
       </Helmet>
       <Header isLogoVisible={false} />
 
@@ -254,11 +246,11 @@ function FullContentInfo({
           !context.userContent.loadingShows ? (
           <div className="detailes-page">
             <PosterWrapper
-              poster={detailes.poster}
-              posterMobile={detailes.posterMobile}
-              imdbId={detailes.imdbId}
-              releaseDate={detailes.releaseDate}
-              todayDate={todayDate}
+              poster_path={detailes.poster_path}
+              backdrop_path={detailes.backdrop_path}
+              imdb_id={detailes.imdb_id}
+              release_date={detailes.release_date}
+              first_air_date={detailes.first_air_date}
               mediaType={mediaType}
             />
 
@@ -275,19 +267,16 @@ function FullContentInfo({
             <div className="detailes-page__description">{detailes.description}</div>
 
             {mediaType === "show" && (
-              <>
-                <ShowsEpisodes
-                  detailesPage={true}
-                  seasonsArr={detailes.seasonsArr}
-                  showTitle={detailes.title}
-                  todayDate={todayDate}
-                  id={id}
-                  showInfo={showInfo}
-                  episodesFromDatabase={episodesFromDatabase}
-                  releasedEpisodes={releasedEpisodes}
-                  showDatabaseOnClient={showDatabaseOnClient}
-                />
-              </>
+              <ShowsEpisodes
+                detailesPage={true}
+                seasonsArr={detailes.seasonsArr}
+                showTitle={detailes.name}
+                id={id}
+                showInfo={showInfo}
+                episodesFromDatabase={episodesFromDatabase}
+                releasedEpisodes={releasedEpisodes}
+                showDatabaseOnClient={showDatabaseOnClient}
+              />
             )}
             {similarContent.length > 0 && (
               <div className="detailes-page__slider">
@@ -310,4 +299,4 @@ function FullContentInfo({
   )
 }
 
-export default withUserContent(FullContentInfo, "FullContentInfo")
+export default withUserContent(DetailesPage)

@@ -7,7 +7,6 @@ import classNames from "classnames"
 import PlaceholderNoShows from "Components/Placeholders/PlaceholderNoShows"
 import Loader from "Components/Placeholders/Loader"
 import { AppContext } from "Components/AppContext/AppContextHOC"
-// import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
 
 const SHOWS_TO_LOAD_INITIAL = 15
 const SCROLL_THRESHOLD = 800
@@ -125,9 +124,9 @@ class ShowsContent extends Component {
 
     const shows = this.props.authUser
       ? content
-      : section !== "watchingShows"
-      ? content
       : this.context.userContentLocalStorage.watchingShows.slice(0, this.state.loadedShows.watchingShowsLS)
+
+    console.log(shows)
 
     return (
       <>
@@ -136,15 +135,13 @@ class ShowsContent extends Component {
             listOfGenres.filter(item => item.id === genreId)
           )
 
-          const showTitle = item.name || item.original_name
-
           return (
             <div key={item.id} className="content-results__item content-results__item--shows">
               <div className="content-results__item--shows-wrapper">
                 <Link to={`/show/${item.id}`}>
                   <div className="content-results__item-main-info">
                     <div className="content-results__item-title">
-                      {!showTitle ? "No title available" : showTitle}
+                      {!item.name ? "No title available" : item.name}
                     </div>
                     <div className="content-results__item-year">
                       {!item.first_air_date ? "" : `(${item.first_air_date.slice(0, 4)})`}
@@ -252,8 +249,6 @@ class ShowsContent extends Component {
     })
 
     const shows = this.props.authUser
-      ? content
-      : this.state.activeSection !== "watchingShows"
       ? content
       : this.context.userContentLocalStorage.watchingShows.slice(0, this.state.loadedShows.watchingShowsLS)
 
@@ -378,6 +373,4 @@ class ShowsContent extends Component {
 }
 
 export default withUserContent(ShowsContent)
-
-// ShowsContent.contextType = UserContentLocalStorageContext
 ShowsContent.contextType = AppContext

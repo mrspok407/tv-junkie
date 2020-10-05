@@ -1,7 +1,7 @@
 import React, { Component } from "react"
 import { withUserContent } from "Components/UserContent"
 import axios, { CancelToken } from "axios"
-import { differenceBtwDatesInDays } from "Utils"
+import { differenceBtwDatesInDays, todayDate } from "Utils"
 import isAllEpisodesWatched from "./FirebaseHelpers/isAllEpisodesWatched"
 import Loader from "Components/Placeholders/Loader"
 import classNames from "classnames"
@@ -299,7 +299,7 @@ class ShowsEpisodes extends Component {
             const seasonEpisodesNotWatched =
               this.props.toWatchPage && season.episodes.filter(episode => !episode.watched)
 
-            const daysToNewSeason = differenceBtwDatesInDays(season.air_date, this.props.todayDate)
+            const daysToNewSeason = differenceBtwDatesInDays(season.air_date, todayDate)
 
             const episodeToString =
               this.props.toWatchPage &&
@@ -389,7 +389,6 @@ class ShowsEpisodes extends Component {
                         showEpisodes={this.state.showEpisodes}
                         toWatchPage={this.props.toWatchPage}
                         showTitle={this.props.showTitle}
-                        todayDate={this.props.todayDate}
                         detailEpisodeInfo={this.state.detailEpisodeInfo}
                         showEpisodeInfo={this.showEpisodeInfo}
                         season={season}

@@ -42,5 +42,4 @@ class App extends Component {
   }
 }
 
-// export default compose(WithAuthenticationProvider, userContentLocalStorageProvider)(App)
 export default compose(WithAuthenticationProvider, AppContextHOC)(App)

@@ -2,7 +2,6 @@
 import React, { Component } from "react"
 import ShowsButtons from "./ShowsButtons"
 import classNames from "classnames"
-// import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { withUserContent } from "Components/UserContent"
 import UserRating from "Components/UserRating/UserRating"
@@ -10,13 +9,18 @@ import UserRating from "Components/UserRating/UserRating"
 class MainInfo extends Component {
   render() {
     const detailes = this.props.detailes
+    const isMediaTypeTV = this.props.mediaType === "show"
 
-    const yearRelease = detailes.releaseDate.slice(0, 4)
-    const yearEnded = this.props.mediaType === "show" && detailes.lastAirDate.slice(0, 4)
+    const title = isMediaTypeTV ? detailes.name : detailes.title
+    const yearRelease = isMediaTypeTV
+      ? detailes.first_air_date.slice(0, 4)
+      : detailes.release_date.slice(0, 4)
+    const yearEnded = isMediaTypeTV && detailes.last_air_date.slice(0, 4)
     const yearRange =
       detailes.status === "Ended" || detailes.status === "Canceled"
         ? `${yearRelease} - ${yearEnded}`
         : `${yearRelease} - ...`
+    const runtime = isMediaTypeTV ? detailes.episode_run_time[0] : detailes.runtime
 
     const formatedBudget =
       detailes.budget !== 0 && detailes.budget !== "-" ? (
@@ -35,8 +39,8 @@ class MainInfo extends Component {
     return (
       <div className="detailes-page__info">
         <div className="detailes-page__info-title">
-          {detailes.title}
-          <span>{this.props.mediaType === "show" && yearRelease !== "-" ? ` (${yearRange})` : ""}</span>
+          {title}
+          <span>{isMediaTypeTV && yearRelease !== "-" ? ` (${yearRange})` : ""}</span>
         </div>
         <div className="detailes-page__info-row">
           <div className="detailes-page__info-option">Year</div>
@@ -62,38 +66,33 @@ class MainInfo extends Component {
         <div className="detailes-page__info-row">
           <div className="detailes-page__info-option">Company</div>
           <div className="detailes-page__info-value">
-            {this.props.mediaType === "show"
-              ? detailes.network
-              : this.props.mediaType === "movie" &&
-                (detailes.productionCompany !== "-" ? (
-                  detailes.productionCompany
-                ) : (
-                  <span className="detailes-page__info-no-info">-</span>
-                ))}
+            {isMediaTypeTV ? (
+              detailes.network
+            ) : detailes.production_companies !== "-" ? (
+              detailes.production_companies
+            ) : (
+              <span className="detailes-page__info-no-info">-</span>
+            )}
           </div>
         </div>
         <div className="detailes-page__info-row">
           <div className="detailes-page__info-option">User rating</div>
           <div className="detailes-page__info-value">
-            {detailes.rating !== "-" ? (
-              detailes.rating
+            {detailes.vote_average !== "-" ? (
+              detailes.vote_average
             ) : (
-              <span className="detailes-page__info-no-info">{detailes.rating}</span>
+              <span className="detailes-page__info-no-info">-</span>
             )}
           </div>
         </div>
         <div className="detailes-page__info-row">
           <div className="detailes-page__info-option">Runtime</div>
           <div className="detailes-page__info-value">
-            {detailes.runtime !== "-" ? (
-              `${detailes.runtime} min`
-            ) : (
-              <span className="detailes-page__info-no-info">{detailes.runtime}</span>
-            )}
+            {runtime !== "-" ? `${runtime} min` : <span className="detailes-page__info-no-info">-</span>}
           </div>
         </div>
 
-        {this.props.mediaType === "show" && (
+        {isMediaTypeTV && (
           <div className="detailes-page__info-row">
             <div className="detailes-page__info-option">My rating</div>
             <div className="detailes-page__info-value">
@@ -108,7 +107,7 @@ class MainInfo extends Component {
           </div>
         )}
 
-        {this.props.mediaType === "movie" && (
+        {!isMediaTypeTV && (
           <>
             <div className="detailes-page__info-row">
               <div className="detailes-page__info-option">Tagline</div>
@@ -128,7 +127,7 @@ class MainInfo extends Component {
               <div className="detailes-page__info-option">External links</div>
               <div className="detailes-page__info-value">
                 <a
-                  href={`https://www.imdb.com/title/${detailes.imdbId}`}
+                  href={`https://www.imdb.com/title/${detailes.imdb_id}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="detailes-page__info-imdb"
@@ -139,7 +138,7 @@ class MainInfo extends Component {
         )}
 
         <div className="detailes-page__info-row detailes-page__info--button">
-          {this.props.mediaType === "show" && (
+          {isMediaTypeTV && (
             <ShowsButtons
               id={this.props.id}
               authUser={this.props.authUser}
@@ -149,7 +148,7 @@ class MainInfo extends Component {
             />
           )}
 
-          {this.props.mediaType === "movie" && (
+          {!isMediaTypeTV && (
             <button
               className={classNames("button", {
                 "button--pressed":

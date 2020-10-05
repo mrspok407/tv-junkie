@@ -7,7 +7,7 @@ const useMergeEpisodes = ({ detailes, id, authUser, firebase }) => {
   const [loading, setLoading] = useState(false)
 
   const mergeEpisodes = () => {
-    if (!authUser || !detailes.numberOfSeasons) return
+    if (!authUser || !detailes) return
 
     const status = detailes.status === "Ended" || detailes.status === "Canceled" ? "ended" : "ongoing"
 
@@ -23,7 +23,7 @@ const useMergeEpisodes = ({ detailes, id, authUser, firebase }) => {
         const seasonChunks = []
         const apiRequests = []
 
-        for (let i = 1; i <= detailes.numberOfSeasons; i += 1) {
+        for (let i = 1; i <= detailes.number_of_seasons; i += 1) {
           allSeasons.push(`season/${i}`)
         }
 

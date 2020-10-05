@@ -139,11 +139,12 @@ const useUserShows = firebase => {
     console.log("userShowsHook mounted")
     authUserListener()
     return () => {
+      console.log("userShowsHook unmounted")
       firebaseListeners.forEach(listener => {
         listener.off()
       })
     }
-  }, [authUserListener])
+  }, [])
 
   useEffect(() => {
     sessionStorage.setItem(SESSION_STORAGE_KEY_SHOWS, JSON.stringify(userShows))

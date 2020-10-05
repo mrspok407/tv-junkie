@@ -333,7 +333,7 @@ class HomePage extends Component {
         <>
           {this.context.userContent.userWillAirEpisodes.length > 0 ? (
             <div className="home-page__heading">
-              <h1 onClick={() => this.databaseModify()}>Soon to watch</h1>
+              <h1>Soon to watch</h1>
             </div>
           ) : (
             <PlaceholderHomePageNoFutureEpisodes />
