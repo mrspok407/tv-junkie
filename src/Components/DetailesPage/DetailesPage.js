@@ -196,6 +196,7 @@ function DetailesPage({
   }
 
   const getShowInDatabase = () => {
+    console.log("test")
     const show = context.userContent.userShows.find(show => show.id === Number(id))
 
     if (!authUser || !show) return
