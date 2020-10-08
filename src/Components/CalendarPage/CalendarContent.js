@@ -14,7 +14,7 @@ class CalendarContent extends Component {
     this.state = {
       willAirEpisodes: [],
       openMonths: [],
-      initialLoading: false
+      initialLoading: false,
     }
   }
 
@@ -40,30 +40,28 @@ class CalendarContent extends Component {
     if (this.props.authUser === null) return
     if (this.context.userContent.userShows === 0) return
 
-    console.log(this.context.userContent.userWillAirEpisodes)
-
     const willAirEpisodes = this.props.homePage
       ? this.context.userContent.userWillAirEpisodes.slice(0, 2)
       : this.context.userContent.userWillAirEpisodes
 
-    const months = willAirEpisodes.map(item => {
+    const months = willAirEpisodes.map((item) => {
       return Object.values(item)[0]
     })
 
     this.setState({
       willAirEpisodes,
-      openMonths: this.props.homePage ? [months[0]] : months
+      openMonths: this.props.homePage ? [months[0]] : months,
     })
   }
 
-  showMonthEpisodes = month => {
+  showMonthEpisodes = (month) => {
     if (this.state.openMonths.includes(month)) {
       this.setState({
-        openMonths: this.state.openMonths.filter(item => item !== month)
+        openMonths: this.state.openMonths.filter((item) => item !== month),
       })
     } else {
       this.setState({
-        openMonths: [...this.state.openMonths, month]
+        openMonths: [...this.state.openMonths, month],
       })
     }
   }
@@ -77,7 +75,7 @@ class CalendarContent extends Component {
           <PlaceholderNoFutureEpisodes />
         ) : (
           <div className="episodes episodes--calendar">
-            {this.state.willAirEpisodes.map(month => {
+            {this.state.willAirEpisodes.map((month) => {
               const date = new Date(month.month)
               const monthLongName = date.toLocaleString("en", { month: "long" })
 
@@ -87,7 +85,7 @@ class CalendarContent extends Component {
                 <div key={month.month} className="episodes__episode-group">
                   <div
                     className={classNames("episodes__episode-group-info", {
-                      "episodes__episode-group-info--open": this.state.openMonths.includes(month.month)
+                      "episodes__episode-group-info--open": this.state.openMonths.includes(month.month),
                     })}
                     onClick={() => this.showMonthEpisodes(month.month)}
                   >
@@ -118,7 +116,7 @@ class CalendarContent extends Component {
 
                           const options = {
                             weekday: "short",
-                            day: "numeric"
+                            day: "numeric",
                           }
 
                           const formatedDate = new Date(airDateISO)
@@ -169,7 +167,7 @@ class CalendarContent extends Component {
                                 {daysToNewEpisode >= 0 && (
                                   <div
                                     className={classNames("episodes__episode-days-to-air", {
-                                      "episodes__episode-days-to-air--today": willAirToday
+                                      "episodes__episode-days-to-air--today": willAirToday,
                                     })}
                                   >
                                     {daysToNewEpisode > 1

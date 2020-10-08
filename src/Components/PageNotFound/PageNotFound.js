@@ -19,7 +19,7 @@ class PageNotFound extends Component {
     super(props)
 
     this.state = {
-      countdownToRedirect: TIME_TO_REDIRECT
+      countdownToRedirect: TIME_TO_REDIRECT,
     }
 
     this.countdownTimer = null
@@ -31,7 +31,6 @@ class PageNotFound extends Component {
   }
 
   componentWillUnmount() {
-    console.log("not found unmounted")
     clearTimeout(this.countdownTimer)
   }
 

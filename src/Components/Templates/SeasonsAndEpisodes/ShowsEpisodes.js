@@ -1,7 +1,6 @@
 import React, { Component } from "react"
 import { withUserContent } from "Components/UserContent"
 import axios, { CancelToken } from "axios"
-// import { get as _get } from "lodash.get"
 import { differenceBtwDatesInDays, todayDate } from "Utils"
 import isAllEpisodesWatched from "./FirebaseHelpers/isAllEpisodesWatched"
 import Loader from "Components/Placeholders/Loader"
@@ -280,11 +279,7 @@ class ShowsEpisodes extends Component {
   }
 
   render() {
-    const test_test = "test"
-    console.log(test_test)
-
-    const showCheckboxes =
-      this.props.authUser && this.props.showInfo && this.props.showDatabaseOnClient !== "notWatchingShows"
+    const showCheckboxes = this.props.showInfo && this.props.showDatabaseOnClient !== "notWatchingShows"
     return (
       <>
         {showCheckboxes && this.props.detailesPage && (

@@ -7,13 +7,13 @@ const useHandleListeners = ({ id, authUser, firebase }) => {
   const [episodes, setEpisodes] = useState()
   const [releasedEpisodes, setReleasedEpisodes] = useState()
 
-  const handleListeners = status => {
+  const handleListeners = (status) => {
     if (!authUser) return
     setLoading(true)
 
     const statusDatabase = status === "Ended" || status === "Canceled" ? "ended" : "ongoing"
 
-    firebase.showEpisodes(statusDatabase, id).on("value", snapshot => {
+    firebase.showEpisodes(statusDatabase, id).once("value", (snapshot) => {
       if (snapshot.val() === null) {
         setLoading(false)
         return
@@ -22,7 +22,7 @@ const useHandleListeners = ({ id, authUser, firebase }) => {
       const episodesFullData = snapshot.val()
       const releasedEpisodes = releasedEpisodesToOneArray({ data: snapshot.val() })
 
-      firebase.userShowEpisodes(authUser.uid, id).on("value", snapshot => {
+      firebase.userShowEpisodes(authUser.uid, id).on("value", (snapshot) => {
         if (snapshot.val() === null) {
           setLoading(false)
           return
@@ -38,30 +38,30 @@ const useHandleListeners = ({ id, authUser, firebase }) => {
         allEpisodes.splice(releasedEpisodes.length)
 
         const episodesAirDate = merge(episodesFullData, userEpisodes, {
-          arrayMerge: combineMergeObjects
+          arrayMerge: combineMergeObjects,
         }).reduce((acc, season) => {
           const episodes = season.episodes.reduce((acc, episode) => {
             acc.push({
               air_date: episode.air_date || null,
               userRating: episode.userRating,
-              watched: episode.watched
+              watched: episode.watched,
             })
             return acc
           }, [])
           acc.push({
             season_number: season.season_number,
             userRating: season.userRating,
-            episodes
+            episodes,
           })
           return acc
         }, [])
 
-        const allEpisodesWatched = !allEpisodes.some(episode => !episode.watched)
+        const allEpisodesWatched = !allEpisodes.some((episode) => !episode.watched)
         const finished = statusDatabase === "ended" && allEpisodesWatched ? true : false
 
         firebase.userShowAllEpisodesInfo(authUser.uid, id).update({
           allEpisodesWatched,
-          finished
+          finished,
         })
         firebase.userShow({ uid: authUser.uid, key: id }).update({ finished, allEpisodesWatched })
         firebase

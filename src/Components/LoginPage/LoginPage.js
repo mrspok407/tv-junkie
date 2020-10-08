@@ -16,7 +16,7 @@ const Header = withFirebase(HeaderBase)
 const LoginPage = ({ firebase }) => {
   const history = useHistory()
 
-  const authListener = firebase.auth.onAuthStateChanged(authUser => {
+  const authListener = firebase.auth.onAuthStateChanged((authUser) => {
     if (authUser) {
       history.push(ROUTES.HOME_PAGE)
     }
@@ -24,7 +24,8 @@ const LoginPage = ({ firebase }) => {
 
   useEffect(() => {
     authListener()
-  }, [authListener])
+    // eslint-disable-next-line
+  }, [])
 
   return (
     <>
@@ -40,7 +41,5 @@ const LoginPage = ({ firebase }) => {
     </>
   )
 }
-
-// const condition = authUser => authUser !== null
 
 export default compose(withFirebase, WithAuthenticationConsumer)(LoginPage)

@@ -15,7 +15,7 @@ class ToWatchEpisodesContent extends Component {
 
     this.state = {
       watchingShows: [],
-      initialLoading: true
+      initialLoading: true,
     }
   }
 
@@ -38,12 +38,12 @@ class ToWatchEpisodesContent extends Component {
 
   getContent = () => {
     const watchingShows = this.context.userContent.userShows.filter(
-      show => show.database === "watchingShows" && !show.allEpisodesWatched
+      (show) => show.database === "watchingShows" && !show.allEpisodesWatched
     )
     const toWatchEpisodes = this.context.userContent.userToWatchShows
 
     const watchingShowsModified = watchingShows.reduce((acc, show) => {
-      if (toWatchEpisodes.find(item => item.id === show.id)) {
+      if (toWatchEpisodes.find((item) => item.id === show.id)) {
         acc.push(show)
       }
       return acc
@@ -59,20 +59,20 @@ class ToWatchEpisodesContent extends Component {
     }
 
     const mergedShows = merge(watchingShowsModified, toWatchEpisodes, {
-      arrayMerge: combineMergeObjects
+      arrayMerge: combineMergeObjects,
     })
 
     this.setState({ watchingShows: mergedShows, initialLoading: false })
   }
 
-  showEpisodeInfo = episodeId => {
+  showEpisodeInfo = (episodeId) => {
     if (this.state.detailEpisodeInfo.includes(episodeId)) {
-      this.setState(prevState => ({
-        detailEpisodeInfo: [...prevState.detailEpisodeInfo.filter(item => item !== episodeId)]
+      this.setState((prevState) => ({
+        detailEpisodeInfo: [...prevState.detailEpisodeInfo.filter((item) => item !== episodeId)],
       }))
     } else {
-      this.setState(prevState => ({
-        detailEpisodeInfo: [...prevState.detailEpisodeInfo, episodeId]
+      this.setState((prevState) => ({
+        detailEpisodeInfo: [...prevState.detailEpisodeInfo, episodeId],
       }))
     }
   }
@@ -97,7 +97,7 @@ class ToWatchEpisodesContent extends Component {
 
                 seasonEpisodes.reverse()
 
-                if (seasonEpisodes.length !== 0 && seasonEpisodes.some(item => !item.watched)) {
+                if (seasonEpisodes.length !== 0 && seasonEpisodes.some((item) => !item.watched)) {
                   acc.push({ ...season, episodes: seasonEpisodes })
                 }
 
@@ -106,8 +106,6 @@ class ToWatchEpisodesContent extends Component {
               toWatchEpisodes.reverse()
 
               const releasedEpisodes = releasedEpisodesToOneArray({ data: toWatchEpisodes })
-
-              // if (toWatchEpisodes.length === 0) return
 
               return (
                 <div key={show.id} className="towatch__show">

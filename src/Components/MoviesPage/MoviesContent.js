@@ -19,12 +19,12 @@ class MoviesContent extends Component {
     sortBy: "title",
     disableLoad: {
       watchLaterMovies: false,
-      watchLaterMoviesLS: false
+      watchLaterMoviesLS: false,
     },
     loadedMovies: {
       watchLaterMovies: MOVIES_TO_LOAD_INITIAL,
-      watchLaterMoviesLS: MOVIES_TO_LOAD_INITIAL
-    }
+      watchLaterMoviesLS: MOVIES_TO_LOAD_INITIAL,
+    },
   }
 
   componentDidMount() {
@@ -44,16 +44,17 @@ class MoviesContent extends Component {
     this.setState({
       loadedMovies: {
         ...this.state.loadedMovies,
-        [this.state.activeSection]: this.state.loadedMovies[this.state.activeSection] + MOVIES_TO_LOAD_INITIAL
+        [this.state.activeSection]:
+          this.state.loadedMovies[this.state.activeSection] + MOVIES_TO_LOAD_INITIAL,
       },
       disableLoad: {
         ...this.state.disableLoad,
         [this.state.activeSection]:
           this.state.loadedMovies[this.state.activeSection] >=
             this.props.context.userContent.userMovies.filter(
-              movie => movie.database === this.state.activeSection
-            ).length && true
-      }
+              (movie) => movie.database === this.state.activeSection
+            ).length && true,
+      },
     })
   }
 
@@ -63,18 +64,18 @@ class MoviesContent extends Component {
     this.setState({
       loadedMovies: {
         ...this.state.loadedMovies,
-        watchLaterMoviesLS: this.state.loadedMovies.watchLaterMoviesLS + MOVIES_TO_LOAD_INITIAL
+        watchLaterMoviesLS: this.state.loadedMovies.watchLaterMoviesLS + MOVIES_TO_LOAD_INITIAL,
       },
       disableLoad: {
         ...this.state.disableLoad,
         watchLaterMoviesLS:
           this.state.loadedMovies.watchLaterMoviesLS >=
-            this.props.context.userContentLocalStorage.watchLaterMovies.length && true
-      }
+            this.props.context.userContentLocalStorage.watchLaterMovies.length && true,
+      },
     })
   }
 
-  sortBy = sortBy => {
+  sortBy = (sortBy) => {
     if (this.state.sortBy === sortBy) return
 
     this.setState({ sortBy })
@@ -82,13 +83,12 @@ class MoviesContent extends Component {
 
   handleScroll = throttle(500, () => {
     if (window.innerHeight + window.scrollY >= document.body.scrollHeight - SCROLL_THRESHOLD) {
-      console.log(this.state.disableLoad)
       this.loadNewContent()
       this.loadNewContentLS()
     }
   })
 
-  renderContent = section => {
+  renderContent = (section) => {
     const content = this.props.context.userContent.userMovies
       .sort((a, b) =>
         a[this.state.sortBy] > b[this.state.sortBy]
@@ -110,9 +110,9 @@ class MoviesContent extends Component {
 
     return (
       <>
-        {movies.map(item => {
-          const filteredGenres = item.genre_ids.map(genreId =>
-            listOfGenres.filter(item => item.id === genreId)
+        {movies.map((item) => {
+          const filteredGenres = item.genre_ids.map((genreId) =>
+            listOfGenres.filter((item) => item.id === genreId)
           )
 
           // Movies //
@@ -122,14 +122,14 @@ class MoviesContent extends Component {
           let movieHash720p
 
           if (this.props.moviesArr) {
-            movie = this.props.moviesArr.find(movie => movie.id === item.id)
+            movie = this.props.moviesArr.find((movie) => movie.id === item.id)
           }
 
           if (movie) {
-            const hash1080p = movie.torrents.find(item => item.quality === "1080p")
+            const hash1080p = movie.torrents.find((item) => item.quality === "1080p")
             movieHash1080p = hash1080p && hash1080p.hash
 
-            const hash720p = movie.torrents.find(item => item.quality === "720p")
+            const hash720p = movie.torrents.find((item) => item.quality === "720p")
             movieHash720p = hash720p && hash720p.hash
 
             urlMovieTitle = movie.title.split(" ").join("+")
@@ -144,7 +144,7 @@ class MoviesContent extends Component {
                   <Link
                     to={{
                       pathname: `/movie/${item.id}`,
-                      state: { logoDisable: true, y: 300 }
+                      state: { logoDisable: true, y: 300 },
                     }}
                   >
                     <div className="content-results__item-main-info">
@@ -163,7 +163,7 @@ class MoviesContent extends Component {
                       )}
                     </div>
                     <div className="content-results__item-genres">
-                      {filteredGenres.map(item => (
+                      {filteredGenres.map((item) => (
                         <span key={item[0].id}>{item[0].name}</span>
                       ))}
                     </div>
@@ -173,11 +173,12 @@ class MoviesContent extends Component {
                           style={
                             item.backdrop_path !== null
                               ? {
-                                  backgroundImage: `url(https://image.tmdb.org/t/p/w500/${item.backdrop_path ||
-                                    item.poster_path})`
+                                  backgroundImage: `url(https://image.tmdb.org/t/p/w500/${
+                                    item.backdrop_path || item.poster_path
+                                  })`,
                                 }
                               : {
-                                  backgroundImage: `url(https://homestaymatch.com/images/no-image-available.png)`
+                                  backgroundImage: `url(https://homestaymatch.com/images/no-image-available.png)`,
                                 }
                           }
                         />
@@ -241,13 +242,13 @@ class MoviesContent extends Component {
                         this.props.handleMovieInDatabases({
                           id: item.id,
                           data: item,
-                          userDatabase: "watchLaterMovies"
+                          userDatabase: "watchLaterMovies",
                         })
                         this.props.context.userContent.handleUserMoviesOnClient({ id: item.id })
                       } else {
                         this.props.context.userContentLocalStorage.toggleMovieLS({
                           id: item.id,
-                          data: movies
+                          data: movies,
                         })
                       }
                     }}
@@ -289,7 +290,7 @@ class MoviesContent extends Component {
                 <div className="content-results__sortby-buttons">
                   <div
                     className={classNames("content-results__sortby-buttons", {
-                      "content-results__sortby-button--active": this.state.sortBy === "title"
+                      "content-results__sortby-button--active": this.state.sortBy === "title",
                     })}
                   >
                     <button
@@ -302,7 +303,7 @@ class MoviesContent extends Component {
                   </div>
                   <div
                     className={classNames("content-results__sortby-button", {
-                      "content-results__sortby-button--active": this.state.sortBy === "timeStamp"
+                      "content-results__sortby-button--active": this.state.sortBy === "timeStamp",
                     })}
                   >
                     <button
@@ -321,10 +322,10 @@ class MoviesContent extends Component {
               style={
                 currentNumOfColumns <= 3
                   ? {
-                      gridTemplateColumns: "repeat(auto-fit, minmax(300px, 350px))"
+                      gridTemplateColumns: "repeat(auto-fit, minmax(300px, 350px))",
                     }
                   : {
-                      gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))"
+                      gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
                     }
               }
             >

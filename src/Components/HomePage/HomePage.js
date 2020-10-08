@@ -24,45 +24,43 @@ class HomePage extends Component {
       sliders: {
         weekTvTrending: {
           name: "Trending this week",
-          data: []
+          data: [],
         },
         popularDramas: {
           name: "Popular dramas",
-          data: []
+          data: [],
         },
         popularComedies: {
           name: "Popular comedies",
-          data: []
+          data: [],
         },
         popularCrime: {
           name: "Popular crime",
-          data: []
-        }
+          data: [],
+        },
       },
       slidersLoading: false,
       calendarLoading: false,
       willAirEpisodes: [],
-      error: ""
+      error: "",
     }
   }
 
   componentDidMount() {
     this.getContentForSliders()
-    // this.databaseModify()
-    // this.testFun()
   }
 
   databaseModify = () => {
-    this.props.firebase.users().once("value", snapshot => {
+    this.props.firebase.users().once("value", (snapshot) => {
       let users = []
-      snapshot.forEach(item => {
+      snapshot.forEach((item) => {
         users = [...users, { ...item.val(), key: item.key }]
       })
 
-      users.forEach(user => {
+      users.forEach((user) => {
         if (user.email !== "mr.spok407@gmail.com") return
 
-        this.props.firebase.userAllShows(user.key).once("value", snapshot => {
+        this.props.firebase.userAllShows(user.key).once("value", (snapshot) => {
           let episodes = {}
 
           const shows = Object.entries(snapshot.val()).reduce((acc, [key, value]) => {
@@ -79,8 +77,8 @@ class HomePage extends Component {
                   id: show.id,
                   name: show.name,
                   status: show.status,
-                  timeStamp: show.timeStamp * -1
-                }
+                  timeStamp: show.timeStamp * -1,
+                },
               }
 
               episodes = {
@@ -90,9 +88,9 @@ class HomePage extends Component {
                   info: {
                     allEpisodesWatched: show.allEpisodesWatched,
                     database: key,
-                    finished: show.finished_and_name.slice(0, 4) === "true" ? true : false
-                  }
-                }
+                    finished: show.finished_and_name.slice(0, 4) === "true" ? true : false,
+                  },
+                },
               }
 
               return acc
@@ -100,7 +98,7 @@ class HomePage extends Component {
 
             acc = {
               ...acc,
-              ...showsInOneDatabase
+              ...showsInOneDatabase,
             }
 
             return acc
@@ -120,113 +118,6 @@ class HomePage extends Component {
         //     this.props.firebase.userShowAllEpisodesInfo(user.key, key).update({ database: value.database })
         //   })
         // })
-      })
-    })
-  }
-
-  testFun = () => {
-    this.props.firebase.allShowsList("ongoing").once("value", snapshot => {
-      if (snapshot.val() === null) return
-
-      let shows = []
-      snapshot.forEach(item => {
-        shows = [...shows, item.val()]
-      })
-
-      shows.forEach(show => {
-        axios
-          .get(
-            `https://api.themoviedb.org/3/tv/${show.id}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US`
-          )
-          .then(({ data: { number_of_seasons } }) => {
-            const maxSeasonsInChunk = 20
-            const allSeasons = []
-            const seasonChunks = []
-            const apiRequests = []
-
-            for (let i = 1; i <= number_of_seasons; i += 1) {
-              allSeasons.push(`season/${i}`)
-            }
-
-            for (let i = 0; i <= allSeasons.length; i += maxSeasonsInChunk) {
-              const chunk = allSeasons.slice(i, i + maxSeasonsInChunk)
-              seasonChunks.push(chunk.join())
-            }
-
-            seasonChunks.forEach(item => {
-              const request = axios.get(
-                `https://api.themoviedb.org/3/tv/${show.id}?api_key=${process.env.REACT_APP_TMDB_API}&append_to_response=${item}`
-              )
-              apiRequests.push(request)
-            })
-
-            return axios.all([...apiRequests])
-          })
-          .then(
-            axios.spread((...responses) => {
-              const rowData = []
-              const seasonsData = []
-
-              responses.forEach(item => {
-                rowData.push(item.data)
-              })
-
-              const mergedRowData = Object.assign({}, ...rowData)
-
-              Object.entries(mergedRowData).forEach(([key, value]) => {
-                if (!key.indexOf("season/")) {
-                  seasonsData.push({ [key]: { ...value } })
-                }
-              })
-
-              let allEpisodes = []
-
-              seasonsData.forEach((item, index) => {
-                const season = item[`season/${index + 1}`]
-                if (!Array.isArray(season.episodes) || season.episodes.length === 0) return
-
-                let episodes = []
-
-                season.episodes.forEach(item => {
-                  const updatedEpisode = {
-                    air_date: item.air_date,
-                    episode_number: item.episode_number,
-                    name: item.name,
-                    season_number: item.season_number,
-                    id: item.id
-                  }
-                  episodes.push(updatedEpisode)
-                })
-
-                const updatedSeason = {
-                  air_date: season.air_date,
-                  season_number: season.season_number,
-                  id: season._id,
-                  poster_path: season.poster_path,
-                  name: season.name,
-                  episodes
-                }
-
-                allEpisodes.push(updatedSeason)
-              })
-
-              const dataToPass = {
-                episodes: allEpisodes,
-                status: mergedRowData.status
-              }
-
-              return dataToPass
-            })
-          )
-          .then(data => {
-            this.props.firebase
-              .allShowsList("ongoing")
-              .child(show.id)
-              .update({ episodes: data.episodes })
-          })
-          .catch(err => {
-            console.log(err)
-          })
       })
     })
   }
@@ -256,26 +147,28 @@ class HomePage extends Component {
       .all(promises)
       .then(
         axios.spread((...responses) => {
-          responses.forEach((res, index) => {
+          const sliders = responses.reduce((acc, value, index) => {
             const key = Object.keys(this.state.sliders)[index]
-            this.setState({
-              sliders: {
-                ...this.state.sliders,
-                [key]: {
-                  ...this.state.sliders[key],
-                  data: res.data.results
-                }
-              }
-            })
-          })
+            acc = {
+              ...acc,
+              [key]: {
+                name: this.state.sliders[key].name,
+                data: value.data.results,
+              },
+            }
+            return acc
+          }, {})
 
-          this.setState({ slidersLoading: false })
+          this.setState({
+            sliders,
+            slidersLoading: false,
+          })
         })
       )
-      .catch(err => {
+      .catch((err) => {
         this.setState({
           error: `Something went wrong, sorry. ${err}`,
-          slidersLoading: false
+          slidersLoading: false,
         })
       })
   }
@@ -283,7 +176,7 @@ class HomePage extends Component {
   handleCalendarState = ({ loading = false, willAirEpisodes = [] }) => {
     this.setState({
       calendarLoading: loading,
-      willAirEpisodes
+      willAirEpisodes,
     })
   }
 
@@ -314,7 +207,7 @@ class HomePage extends Component {
 
       {!this.state.slidersLoading && (
         <div className="home-page__sliders home-page__sliders--non-auth">
-          {Object.values(this.state.sliders).map(value => {
+          {Object.values(this.state.sliders).map((value) => {
             return (
               <div key={value.name} className="home-page__slider">
                 <h2 className="home-page__slider-heading">{value.name}</h2>
@@ -345,7 +238,7 @@ class HomePage extends Component {
 
       {!this.context.userContent.loadingShows && !this.state.slidersLoading && (
         <div className="home-page__sliders">
-          {Object.values(this.state.sliders).map(value => {
+          {Object.values(this.state.sliders).map((value) => {
             return (
               <div key={value.name} className="home-page__slider">
                 <h2 className="home-page__slider-heading">{value.name}</h2>

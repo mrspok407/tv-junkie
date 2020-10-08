@@ -1,7 +1,4 @@
-/* eslint-disable no-prototype-builtins */
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable jsx-a11y/anchor-has-content */
-/* eslint-disable array-callback-return */
 import React, { useState, useEffect, useContext } from "react"
 import { useHistory } from "react-router-dom"
 import axios, { CancelToken } from "axios"
@@ -26,10 +23,10 @@ let cancelRequest
 
 function DetailesPage({
   match: {
-    params: { id, mediaType }
+    params: { id, mediaType },
   },
   firebase,
-  authUser
+  authUser,
 }) {
   const [detailes, setDetailes] = useState()
   const [similarContent, setSimilarContent] = useState([])
@@ -39,7 +36,7 @@ function DetailesPage({
     detailes,
     id: Number(id),
     authUser,
-    firebase
+    firebase,
   })
 
   const [showInfo, setShowInfo] = useState()
@@ -49,11 +46,11 @@ function DetailesPage({
     loadingFirebaseListeners,
     episodesFromDatabase,
     releasedEpisodes,
-    handleListeners
+    handleListeners,
   ] = useHandleListeners({
     id: Number(id),
     authUser,
-    firebase
+    firebase,
   })
 
   const [showDatabaseOnClient, setShowDatabaseOnClient] = useState(null)
@@ -103,7 +100,7 @@ function DetailesPage({
         {
           cancelToken: new CancelToken(function executor(c) {
             cancelRequest = c
-          })
+          }),
         }
       )
       .then(
@@ -134,17 +131,18 @@ function DetailesPage({
             imdb_id,
             seasons,
             similar,
-            similar_movies
-          }
+            similar_movies,
+          },
         }) => {
-          const genreIds = genres && genres.length ? genres.map(item => item.id) : "-"
-          const genreNames = genres && genres.length ? genres.map(item => item.name).join(", ") : "-"
-          const networkNames = networks && networks.length ? networks.map(item => item.name).join(", ") : "-"
+          const genreIds = genres && genres.length ? genres.map((item) => item.id) : "-"
+          const genreNames = genres && genres.length ? genres.map((item) => item.name).join(", ") : "-"
+          const networkNames =
+            networks && networks.length ? networks.map((item) => item.name).join(", ") : "-"
           const prodComp =
             production_companies.length === 0 || !production_companies ? "-" : production_companies[0].name
 
           const similarType = similar || similar_movies
-          const similarContent = similarType.results.filter(item => item.poster_path)
+          const similarContent = similarType.results.filter((item) => item.poster_path)
           const similarContentSortByVotes = similarContent.sort((a, b) => b.vote_count - a.vote_count)
 
           setDetailes({
@@ -172,7 +170,7 @@ function DetailesPage({
             budget: budget || "-",
             number_of_seasons: number_of_seasons || "-",
             imdb_id: imdb_id || "",
-            seasonsArr: seasons && seasons.reverse()
+            seasonsArr: seasons && seasons.reverse(),
           })
 
           if (mediaType === "show") {
@@ -183,7 +181,7 @@ function DetailesPage({
           setSimilarContent(similarContentSortByVotes)
         }
       )
-      .catch(err => {
+      .catch((err) => {
         if (axios.isCancel(err)) return
         if (err.response.status === 404) {
           history.push(ROUTES.PAGE_DOESNT_EXISTS)
@@ -196,8 +194,7 @@ function DetailesPage({
   }
 
   const getShowInDatabase = () => {
-    console.log("test")
-    const show = context.userContent.userShows.find(show => show.id === Number(id))
+    const show = context.userContent.userShows.find((show) => show.id === Number(id))
 
     if (!authUser || !show) return
 
@@ -205,12 +202,12 @@ function DetailesPage({
     setShowDatabaseOnClient(show.database)
   }
 
-  const changeShowDatabaseOnClient = database => {
+  const changeShowDatabaseOnClient = (database) => {
     setShowDatabaseOnClient(database)
   }
 
   const getMovieInDatabase = () => {
-    const movie = context.userContent.userMovies.find(movie => movie.id === Number(id))
+    const movie = context.userContent.userMovies.find((movie) => movie.id === Number(id))
 
     setMovieInDatabase(!authUser || !movie ? null : movie)
   }

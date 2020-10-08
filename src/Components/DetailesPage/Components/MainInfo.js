@@ -12,21 +12,25 @@ class MainInfo extends Component {
     const isMediaTypeTV = this.props.mediaType === "show"
 
     const title = isMediaTypeTV ? detailes.name : detailes.title
+
     const yearRelease = isMediaTypeTV
       ? detailes.first_air_date.slice(0, 4)
       : detailes.release_date.slice(0, 4)
+
     const yearEnded = isMediaTypeTV && detailes.last_air_date.slice(0, 4)
+
     const yearRange =
       detailes.status === "Ended" || detailes.status === "Canceled"
         ? `${yearRelease} - ${yearEnded}`
         : `${yearRelease} - ...`
+
     const runtime = isMediaTypeTV ? detailes.episode_run_time[0] : detailes.runtime
 
     const formatedBudget =
       detailes.budget !== 0 && detailes.budget !== "-" ? (
         new Intl.NumberFormat("en-US", {
           style: "currency",
-          currency: "USD"
+          currency: "USD",
         })
           .format(detailes.budget)
           .slice(0, -3)
@@ -154,20 +158,20 @@ class MainInfo extends Component {
                 "button--pressed":
                   this.props.movieInDatabase ||
                   this.context.userContentLocalStorage.watchLaterMovies.find(
-                    item => item.id === Number(this.props.id)
-                  )
+                    (item) => item.id === Number(this.props.id)
+                  ),
               })}
               onClick={() => {
                 if (this.props.authUser) {
                   this.props.handleMovieInDatabases({
                     id: Number(this.props.id),
                     data: this.props.detailes,
-                    userDatabase: "watchLaterMovies"
+                    userDatabase: "watchLaterMovies",
                   })
                 } else {
                   this.context.userContentLocalStorage.toggleMovieLS({
                     id: Number(this.props.id),
-                    data: this.props.detailes
+                    data: this.props.detailes,
                   })
                 }
               }}
