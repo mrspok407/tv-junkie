@@ -2,6 +2,7 @@
 import React, { Component } from "react"
 import { differenceBtwDatesInDays, todayDate } from "Utils"
 import classNames from "classnames"
+import * as _get from "lodash.get"
 import { Link } from "react-router-dom"
 import * as ROUTES from "Utils/Constants/routes"
 import UserRating from "../../UserRating/UserRating"
@@ -17,7 +18,7 @@ export default class SeasonEpisodes extends Component {
       fadeOutEpisodes: [],
       moveUpEpisodes: [],
       disableCheckboxWarning: null,
-      checkbox: ""
+      checkbox: "",
     }
 
     this.episode = React.createRef()
@@ -35,7 +36,7 @@ export default class SeasonEpisodes extends Component {
     document.removeEventListener("mousedown", this.handleClickOutside)
   }
 
-  handleClickOutside = e => {
+  handleClickOutside = (e) => {
     if (this.props.authUser) return
     if (
       this.checkboxRef.current &&
@@ -44,48 +45,48 @@ export default class SeasonEpisodes extends Component {
       !this.registerWarningRef.current.contains(e.target)
     ) {
       this.setState({
-        disableCheckboxWarning: null
+        disableCheckboxWarning: null,
       })
     }
   }
 
-  showDissableCheckboxWarning = checkboxId => {
+  showDissableCheckboxWarning = (checkboxId) => {
     if (this.props.authUser) return
     this.setState({
-      disableCheckboxWarning: checkboxId
+      disableCheckboxWarning: checkboxId,
     })
   }
 
-  toggleTorrentLinks = id => {
+  toggleTorrentLinks = (id) => {
     const allreadyShowed = this.state.showTorrentLinks.includes(id)
 
     if (allreadyShowed) {
       this.setState({
-        showTorrentLinks: this.state.showTorrentLinks.filter(item => item !== id)
+        showTorrentLinks: this.state.showTorrentLinks.filter((item) => item !== id),
       })
     } else {
       this.setState({
-        showTorrentLinks: [...this.state.showTorrentLinks, id]
+        showTorrentLinks: [...this.state.showTorrentLinks, id],
       })
     }
   }
 
   handleFadeOut = (episodeId, episodeIndex) => {
-    if (this.state.fadeOutEpisodes.find(item => item.id === episodeId)) return
+    if (this.state.fadeOutEpisodes.find((item) => item.id === episodeId)) return
 
     clearTimeout(this.episodeFadeOutTimeout)
 
     this.setState({
-      fadeOutEpisodes: [...this.state.fadeOutEpisodes, { id: episodeId, index: episodeIndex }]
+      fadeOutEpisodes: [...this.state.fadeOutEpisodes, { id: episodeId, index: episodeIndex }],
     })
 
     this.episodeFadeOutTimeout = setTimeout(() => {
       const fadeOutEpisodes = this.state.fadeOutEpisodes
       this.setState({
-        fadeOutEpisodes: []
+        fadeOutEpisodes: [],
       })
 
-      fadeOutEpisodes.forEach(item => {
+      fadeOutEpisodes.forEach((item) => {
         this.props.toggleWatchedEpisode(this.props.season.season_number, item.index)
       })
     }, FADE_OUT_SPEED)
@@ -93,7 +94,6 @@ export default class SeasonEpisodes extends Component {
 
   render() {
     const showCheckboxes =
-      this.props.authUser &&
       this.props.showInfo &&
       this.props.showDatabaseOnClient !== "notWatchingShows" &&
       this.props.episodesFromDatabase &&
@@ -106,7 +106,7 @@ export default class SeasonEpisodes extends Component {
 
     return (
       <div className="episodes__episode-list">
-        {seasons.map(item => {
+        {seasons.map((item) => {
           const seasonId = this.props.toWatchPage ? item.id : item.seasonId
 
           if (seasonId !== this.props.seasonId) return null
@@ -122,7 +122,7 @@ export default class SeasonEpisodes extends Component {
             const optionss = {
               month: "long",
               day: "numeric",
-              year: "numeric"
+              year: "numeric",
             }
 
             const formatedDate = new Date(airDateISO)
@@ -153,7 +153,8 @@ export default class SeasonEpisodes extends Component {
                 className={classNames("episodes__episode", {
                   "episodes__episode--open": this.props.detailEpisodeInfo.includes(episode.id),
                   "fade-out-episode":
-                    this.props.toWatchPage && this.state.fadeOutEpisodes.find(item => item.id === episode.id)
+                    this.props.toWatchPage &&
+                    this.state.fadeOutEpisodes.find((item) => item.id === episode.id),
                 })}
               >
                 <div
@@ -162,10 +163,10 @@ export default class SeasonEpisodes extends Component {
                   style={
                     daysToNewEpisode > 0 || !episode.air_date
                       ? {
-                          backgroundColor: "rgba(132, 90, 90, 0.3)"
+                          backgroundColor: "rgba(132, 90, 90, 0.3)",
                         }
                       : {
-                          backgroundColor: "#1d1d1d96"
+                          backgroundColor: "#1d1d1d96",
                         }
                   }
                 >
@@ -196,7 +197,7 @@ export default class SeasonEpisodes extends Component {
                           className={classNames(
                             "torrent-links torrent-links--episodes torrent-links--to-watch-page-desktop",
                             {
-                              "torrent-links--to-watch-page": this.props.toWatchPage
+                              "torrent-links--to-watch-page": this.props.toWatchPage,
                             }
                           )}
                         >
@@ -236,7 +237,7 @@ export default class SeasonEpisodes extends Component {
                     <label>
                       <input
                         type="checkbox"
-                        checked={showSeason ? showSeason.episodes[indexOfEpisode].watched : false}
+                        checked={_get(showSeason, `episodes.${indexOfEpisode}.watched`, false)}
                         onChange={() => {
                           if (this.props.toWatchPage) {
                             this.handleFadeOut(episode.id, indexOfEpisode)
@@ -248,7 +249,7 @@ export default class SeasonEpisodes extends Component {
                       />
                       <span
                         className={classNames("custom-checkmark", {
-                          "custom-checkmark--disabled": !showCheckboxes || !this.props.authUser
+                          "custom-checkmark--disabled": !showCheckboxes || !this.props.authUser,
                         })}
                       />
                     </label>
@@ -267,14 +268,14 @@ export default class SeasonEpisodes extends Component {
                 {this.props.detailEpisodeInfo.includes(episode.id) && (
                   <div
                     className={classNames("episodes__episode-detailes", {
-                      "episodes__episode-detailes--no-image": !episode.still_path
+                      "episodes__episode-detailes--no-image": !episode.still_path,
                     })}
                   >
                     {episode.still_path && (
                       <div
                         className="episodes__episode-detailes-image"
                         style={{
-                          backgroundImage: `url(https://image.tmdb.org/t/p/w500${episode.still_path})`
+                          backgroundImage: `url(https://image.tmdb.org/t/p/w500${episode.still_path})`,
                         }}
                       />
                     )}

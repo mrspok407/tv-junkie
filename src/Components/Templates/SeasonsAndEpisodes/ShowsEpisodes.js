@@ -1,6 +1,7 @@
 import React, { Component } from "react"
 import { withUserContent } from "Components/UserContent"
 import axios, { CancelToken } from "axios"
+// import { get as _get } from "lodash.get"
 import { differenceBtwDatesInDays, todayDate } from "Utils"
 import isAllEpisodesWatched from "./FirebaseHelpers/isAllEpisodesWatched"
 import Loader from "Components/Placeholders/Loader"
@@ -22,7 +23,7 @@ class ShowsEpisodes extends Component {
       showEpisodes: [],
       detailEpisodeInfo: [],
       releasedSeasonEpisodes: {},
-      errorShowEpisodes: ""
+      errorShowEpisodes: "",
     }
   }
 
@@ -39,18 +40,18 @@ class ShowsEpisodes extends Component {
   }
 
   initialFirstSeasonLoad = () => {
-    const seasons = this.props.seasonsArr.filter(item => item.name !== "Specials")
+    const seasons = this.props.seasonsArr.filter((item) => item.name !== "Specials")
     if (seasons.length === 0) return
 
     const firstSeason = seasons[seasons.length - 1]
 
     this.setState({
-      openSeasons: firstSeason && [firstSeason.id]
+      openSeasons: firstSeason && [firstSeason.id],
     })
 
     if (this.props.toWatchPage) {
       this.setState({
-        showEpisodes: [{ seasonId: firstSeason.id, episodes: firstSeason.episodes }]
+        showEpisodes: [{ seasonId: firstSeason.id, episodes: firstSeason.episodes }],
       })
     } else {
       axios
@@ -59,7 +60,7 @@ class ShowsEpisodes extends Component {
           {
             cancelToken: new CancelToken(function executor(c) {
               cancelRequest = c
-            })
+            }),
           }
         )
         .then(({ data: { episodes } }) => {
@@ -67,23 +68,23 @@ class ShowsEpisodes extends Component {
 
           const episodesReverse = episodes.reverse()
 
-          this.setState(prevState => ({
+          this.setState((prevState) => ({
             showEpisodes: [
               ...prevState.showEpisodes,
               {
                 seasonId: firstSeason.id,
-                episodes: episodesReverse
-              }
+                episodes: episodesReverse,
+              },
             ],
-            loadingEpisodesIds: [...prevState.loadingEpisodesIds.filter(item => item !== firstSeason.id)],
-            errorShowEpisodes: ""
+            loadingEpisodesIds: [...prevState.loadingEpisodesIds.filter((item) => item !== firstSeason.id)],
+            errorShowEpisodes: "",
           }))
         })
-        .catch(err => {
+        .catch((err) => {
           if (axios.isCancel(err) || !this._isMounted) return
           this.setState({
             loadingEpisodesIds: [],
-            errorShowEpisodes: "Something went wrong, sorry"
+            errorShowEpisodes: "Something went wrong, sorry",
           })
         })
     }
@@ -91,20 +92,20 @@ class ShowsEpisodes extends Component {
 
   showSeasonsEpisodes = (seasonId, seasonNum) => {
     if (this.state.openSeasons.includes(seasonId)) {
-      this.setState(prevState => ({
-        openSeasons: [...prevState.openSeasons.filter(item => item !== seasonId)]
+      this.setState((prevState) => ({
+        openSeasons: [...prevState.openSeasons.filter((item) => item !== seasonId)],
       }))
     } else {
       this.setState({
-        openSeasons: [...this.state.openSeasons, seasonId]
+        openSeasons: [...this.state.openSeasons, seasonId],
       })
     }
 
     if (this.props.toWatchPage) return
-    if (this.state.showEpisodes.some(item => item.seasonId === seasonId)) return
+    if (this.state.showEpisodes.some((item) => item.seasonId === seasonId)) return
 
-    this.setState(prevState => ({
-      loadingEpisodesIds: [...prevState.loadingEpisodesIds, seasonId]
+    this.setState((prevState) => ({
+      loadingEpisodesIds: [...prevState.loadingEpisodesIds, seasonId],
     }))
 
     axios
@@ -113,7 +114,7 @@ class ShowsEpisodes extends Component {
         {
           cancelToken: new CancelToken(function executor(c) {
             cancelRequest = c
-          })
+          }),
         }
       )
       .then(({ data: { episodes } }) => {
@@ -121,29 +122,29 @@ class ShowsEpisodes extends Component {
 
         const episodesReverse = episodes.reverse()
 
-        this.setState(prevState => ({
+        this.setState((prevState) => ({
           showEpisodes: [...prevState.showEpisodes, { seasonId, episodes: episodesReverse }],
-          loadingEpisodesIds: [...prevState.loadingEpisodesIds.filter(item => item !== seasonId)],
-          errorShowEpisodes: ""
+          loadingEpisodesIds: [...prevState.loadingEpisodesIds.filter((item) => item !== seasonId)],
+          errorShowEpisodes: "",
         }))
       })
-      .catch(err => {
+      .catch((err) => {
         if (axios.isCancel(err) || !this._isMounted) return
         this.setState({
           loadingEpisodesIds: [],
-          errorShowEpisodes: "Something went wrong, sorry"
+          errorShowEpisodes: "Something went wrong, sorry",
         })
       })
   }
 
-  showEpisodeInfo = episodeId => {
+  showEpisodeInfo = (episodeId) => {
     if (this.state.detailEpisodeInfo.includes(episodeId)) {
-      this.setState(prevState => ({
-        detailEpisodeInfo: [...prevState.detailEpisodeInfo.filter(item => item !== episodeId)]
+      this.setState((prevState) => ({
+        detailEpisodeInfo: [...prevState.detailEpisodeInfo.filter((item) => item !== episodeId)],
       }))
     } else {
-      this.setState(prevState => ({
-        detailEpisodeInfo: [...prevState.detailEpisodeInfo, episodeId]
+      this.setState((prevState) => ({
+        detailEpisodeInfo: [...prevState.detailEpisodeInfo, episodeId],
       }))
     }
   }
@@ -160,10 +161,10 @@ class ShowsEpisodes extends Component {
         uid: this.props.authUser.uid,
         key: showInfo.id,
         seasonNum,
-        episodeNum
+        episodeNum,
       })
       .update({
-        watched: !episodesFromDatabase[seasonNum - 1].episodes[episodeNum].watched
+        watched: !episodesFromDatabase[seasonNum - 1].episodes[episodeNum].watched,
       })
 
     if (this.props.toWatchPage) {
@@ -172,11 +173,11 @@ class ShowsEpisodes extends Component {
           uid: this.props.authUser.uid,
           key: showInfo.id,
           seasonNum,
-          episodeNum
+          episodeNum,
         })
         .update(
           {
-            watched: !episodesFromDatabase[seasonNum - 1].episodes[episodeNum].watched
+            watched: !episodesFromDatabase[seasonNum - 1].episodes[episodeNum].watched,
           },
           () => {
             isAllEpisodesWatched({
@@ -184,14 +185,14 @@ class ShowsEpisodes extends Component {
               releasedEpisodes,
               authUser: this.props.authUser,
               firebase: this.props.firebase,
-              singleEpisode: true
+              singleEpisode: true,
             })
           }
         )
     }
   }
 
-  checkEverySeasonEpisode = seasonNum => {
+  checkEverySeasonEpisode = (seasonNum) => {
     const showInfo = this.props.showInfo
     const episodesFromDatabase = this.props.episodesFromDatabase
     const releasedEpisodes = this.props.releasedEpisodes
@@ -205,7 +206,7 @@ class ShowsEpisodes extends Component {
       return acc
     }, [])
 
-    const seasonEpisodesFromDatabase = releasedEpisodes.filter(item => item.season_number === seasonNum)
+    const seasonEpisodesFromDatabase = releasedEpisodes.filter((item) => item.season_number === seasonNum)
     const seasonLength = seasonEpisodesFromDatabase.length
 
     let isAllEpisodesChecked = true
@@ -227,7 +228,7 @@ class ShowsEpisodes extends Component {
       .userShowSeasonEpisodes({
         uid: this.props.authUser.uid,
         key: showInfo.id,
-        seasonNum
+        seasonNum,
       })
       .set(seasonEpisodes)
 
@@ -236,7 +237,7 @@ class ShowsEpisodes extends Component {
         .userShowSeasonEpisodesNotFinished({
           uid: this.props.authUser.uid,
           key: showInfo.id,
-          seasonNum
+          seasonNum,
         })
         .set(seasonEpisodesAirDate, () => {
           isAllEpisodesWatched({
@@ -244,7 +245,7 @@ class ShowsEpisodes extends Component {
             releasedEpisodes,
             authUser: this.props.authUser,
             firebase: this.props.firebase,
-            singleEpisode: false
+            singleEpisode: false,
           })
         })
     }
@@ -258,7 +259,7 @@ class ShowsEpisodes extends Component {
     let isAllEpisodesChecked = true
     let userEpisodesFormated = []
 
-    episodesFromDatabase.forEach(season => {
+    episodesFromDatabase.forEach((season) => {
       const episodes = season.episodes
 
       userEpisodesFormated = [...userEpisodesFormated, ...episodes]
@@ -279,6 +280,9 @@ class ShowsEpisodes extends Component {
   }
 
   render() {
+    const test_test = "test"
+    console.log(test_test)
+
     const showCheckboxes =
       this.props.authUser && this.props.showInfo && this.props.showDatabaseOnClient !== "notWatchingShows"
     return (
@@ -291,13 +295,13 @@ class ShowsEpisodes extends Component {
           </div>
         )}
         <div className="episodes">
-          {this.props.seasonsArr.map(season => {
+          {this.props.seasonsArr.map((season) => {
             if (season.season_number === 0 || season.name === "Specials") return null
 
             const seasonId = season.id
 
             const seasonEpisodesNotWatched =
-              this.props.toWatchPage && season.episodes.filter(episode => !episode.watched)
+              this.props.toWatchPage && season.episodes.filter((episode) => !episode.watched)
 
             const daysToNewSeason = differenceBtwDatesInDays(season.air_date, todayDate)
 
@@ -313,7 +317,7 @@ class ShowsEpisodes extends Component {
               <div
                 key={seasonId}
                 className={classNames("episodes__episode-group", {
-                  "episodes__episode-group--no-poster": !season.poster_path
+                  "episodes__episode-group--no-poster": !season.poster_path,
                 })}
                 style={
                   !this.state.loadingEpisodesIds.includes(seasonId) ? { rowGap: "10px" } : { rowGap: "0px" }
@@ -321,15 +325,15 @@ class ShowsEpisodes extends Component {
               >
                 <div
                   className={classNames("episodes__episode-group-info", {
-                    "episodes__episode-group-info--open": this.state.openSeasons.includes(seasonId)
+                    "episodes__episode-group-info--open": this.state.openSeasons.includes(seasonId),
                   })}
                   style={
                     daysToNewSeason > 0
                       ? {
-                          backgroundColor: "rgba(132, 90, 90, 0.3)"
+                          backgroundColor: "rgba(132, 90, 90, 0.3)",
                         }
                       : {
-                          backgroundColor: "#1d1d1d96"
+                          backgroundColor: "#1d1d1d96",
                         }
                   }
                   onClick={() => this.showSeasonsEpisodes(seasonId, season.season_number)}
@@ -367,7 +371,7 @@ class ShowsEpisodes extends Component {
                           <div
                             className="episodes__episode-group-poster"
                             style={{
-                              backgroundImage: `url(https://image.tmdb.org/t/p/w500/${season.poster_path})`
+                              backgroundImage: `url(https://image.tmdb.org/t/p/w500/${season.poster_path})`,
                             }}
                           />
                           {showCheckboxes && daysToNewSeason < 0 && (
