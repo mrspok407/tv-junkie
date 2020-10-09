@@ -149,6 +149,7 @@ class MainInfo extends Component {
               detailes={this.props.detailes}
               changeShowDatabaseOnClient={this.props.changeShowDatabaseOnClient}
               showDatabaseOnClient={this.props.showDatabaseOnClient}
+              handleListeners={this.props.handleListeners}
             />
           )}
 

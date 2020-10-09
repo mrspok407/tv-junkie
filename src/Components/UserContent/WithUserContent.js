@@ -134,7 +134,7 @@ const withUserContent = (Component) => {
       return promise
     }
 
-    addShowToDatabase = ({ id, show, userDatabase }) => {
+    addShowToDatabase = ({ id, show, userDatabase, callback }) => {
       this.getShowEpisodes({ id }).then((data) => {
         const showsSubDatabase = data.status === "Ended" || data.status === "Canceled" ? "ended" : "ongoing"
 
@@ -209,14 +209,22 @@ const withUserContent = (Component) => {
                     usersWatching: snapshot.val().usersWatching + 1,
                   })
               } else {
-                // console.log("added!")
+                callback({ status: data.status, runOnMount: false })
+                console.log("added!")
               }
             }
           )
       })
     }
 
-    handleShowInDatabases = ({ id, data = [], database, userShows, fullContentPage = false }) => {
+    handleShowInDatabases = ({
+      id,
+      data = [],
+      database,
+      userShows,
+      fullContentPage = false,
+      callback = () => {},
+    }) => {
       const allreadyInDatabase = userShows.find((show) => show.id === id)
 
       if (allreadyInDatabase) {
@@ -257,7 +265,7 @@ const withUserContent = (Component) => {
           })
       } else {
         const showData = Array.isArray(data) ? data.find((item) => item.id === id) : data
-        this.addShowToDatabase({ id, show: showData, userDatabase: database })
+        this.addShowToDatabase({ id, show: showData, userDatabase: database, callback })
       }
     }
 

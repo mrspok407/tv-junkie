@@ -130,7 +130,7 @@ const useUserShows = (firebase) => {
       () => {
         setLoadingShows(false)
         setLoadingMovies(false)
-        console.log("user is not logged in")
+        console.log("user is nhhafot logged in")
       }
     )
   }, [firebase])

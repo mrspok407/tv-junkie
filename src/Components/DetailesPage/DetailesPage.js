@@ -174,7 +174,7 @@ function DetailesPage({
           })
 
           if (mediaType === "show") {
-            handleListeners(status)
+            handleListeners({ status, runOnMount: true })
           }
 
           setLoadingAPIrequest(false)
@@ -254,6 +254,7 @@ function DetailesPage({
 
             <MainInfo
               detailes={detailes}
+              handleListeners={handleListeners}
               mediaType={mediaType}
               id={id}
               showInfo={showInfo}

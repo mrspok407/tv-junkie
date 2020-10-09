@@ -6,6 +6,7 @@ import * as _get from "lodash.get"
 import { Link } from "react-router-dom"
 import * as ROUTES from "Utils/Constants/routes"
 import UserRating from "../../UserRating/UserRating"
+import TorrentLinksEpisodes from "./Components/TorrentLinksEpisodes"
 
 const FADE_OUT_SPEED = 300
 
@@ -115,7 +116,6 @@ export default class SeasonEpisodes extends Component {
             if (this.props.toWatchPage && episode.watched) return
             const indexOfEpisode = item.episodes.length - 1 - episodeIndex
 
-            const urlShowTitle = this.props.showTitle.split(" ").join("+")
             // Format Date //
             const airDateISO = episode.air_date && new Date(episode.air_date).toISOString()
 
@@ -131,16 +131,6 @@ export default class SeasonEpisodes extends Component {
               ? new Intl.DateTimeFormat("en-US", optionss).format(formatedDate)
               : "No date available"
             // Format Date End //
-
-            // Format Seasons And Episode Numbers //
-            const seasonToString = this.props.season.season_number.toString()
-            const episodeToString = episode.episode_number.toString()
-
-            const seasonNumber =
-              seasonToString.length === 1 ? "s0".concat(seasonToString) : "s".concat(seasonToString)
-            const episodeNumber =
-              episodeToString.length === 1 ? "e0".concat(episodeToString) : "e".concat(episodeToString)
-            // Format Seasons And Episode Numbers End //
 
             const episodeAirDateAsDateObj = new Date(episode.air_date)
 
@@ -187,43 +177,19 @@ export default class SeasonEpisodes extends Component {
                     {episode.name}
                   </div>
                   {daysToNewEpisode > 0 ? (
-                    <div className="episodes__episode-days-to-air">{daysToNewEpisode} days</div>
+                    <div className="episodes__episode-days-to-air">
+                      {daysToNewEpisode === 1 ? `${daysToNewEpisode} day` : `${daysToNewEpisode} days`}
+                    </div>
                   ) : (
                     episodeAirDateAsDateObj < todayDate.getTime() &&
                     episode.air_date &&
                     this.props.toWatchPage && (
-                      <>
-                        <div
-                          className={classNames(
-                            "torrent-links torrent-links--episodes torrent-links--to-watch-page-desktop",
-                            {
-                              "torrent-links--to-watch-page": this.props.toWatchPage,
-                            }
-                          )}
-                        >
-                          <a
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}+1080p&cat=41`}
-                          >
-                            1080p
-                          </a>
-                          <a
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}+720p&cat=41`}
-                          >
-                            720p
-                          </a>
-                          <a
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}&cat=5`}
-                          >
-                            480p
-                          </a>
-                        </div>
-                      </>
+                      <TorrentLinksEpisodes
+                        toWatchPage={true}
+                        showTitle={this.props.showTitle}
+                        seasonNumber={this.props.season.season_number}
+                        episodeNumber={episode.episode_number}
+                      />
                     )
                   )}
                 </div>
@@ -294,30 +260,11 @@ export default class SeasonEpisodes extends Component {
                             episodeRating={true}
                           />
                         )}
-
-                        <div className="torrent-links torrent-links--episodes">
-                          <a
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}+1080p&cat=41`}
-                          >
-                            1080p
-                          </a>
-                          <a
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}+720p&cat=41`}
-                          >
-                            720p
-                          </a>
-                          <a
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}&cat=5`}
-                          >
-                            480p
-                          </a>
-                        </div>
+                        <TorrentLinksEpisodes
+                          showTitle={this.props.showTitle}
+                          seasonNumber={this.props.season.season_number}
+                          episodeNumber={episode.episode_number}
+                        />
                       </>
                     )}
                   </div>

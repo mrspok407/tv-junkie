@@ -6,6 +6,7 @@ import classNames from "classnames"
 import Loader from "Components/Placeholders/Loader"
 import PlaceholderNoFutureEpisodes from "Components/Placeholders/PlaceholderNoFutureEpisodes"
 import { AppContext } from "Components/AppContext/AppContextHOC"
+import TorrentLinksEpisodes from "Components/Templates/SeasonsAndEpisodes/Components/TorrentLinksEpisodes"
 
 class CalendarContent extends Component {
   constructor(props) {
@@ -143,13 +144,16 @@ class CalendarContent extends Component {
                               : "e".concat(episodeToString)
                           // Format Seasons And Episode Numbers End //
 
-                          // const episodeAirDateAsDateObj = new Date(episode.air_date)
-
                           const daysToNewEpisode = differenceBtwDatesInDays(episode.air_date, todayDate)
                           const willAirToday = daysToNewEpisode === 0
 
                           return (
-                            <div key={episode.id} className="episodes__episode">
+                            <div
+                              key={episode.id}
+                              className={classNames("episodes__episode", {
+                                "episodes__episode--today": willAirToday,
+                              })}
+                            >
                               <div className="episodes__episode-wrapper">
                                 <div className="episodes__episode-date">
                                   {episode.air_date !== prevEpisodeAirDate && episodeAirDate}
@@ -164,17 +168,27 @@ class CalendarContent extends Component {
                                   </div>
                                   <div className="episodes__episode-episode-title">{episode.name}</div>
                                 </div>
+
                                 {daysToNewEpisode >= 0 && (
                                   <div
                                     className={classNames("episodes__episode-days-to-air", {
-                                      "episodes__episode-days-to-air--today": willAirToday,
+                                      "episodes__episode-days-to-air": willAirToday,
                                     })}
                                   >
-                                    {daysToNewEpisode > 1
-                                      ? `${daysToNewEpisode} days`
-                                      : daysToNewEpisode === 1
-                                      ? "1 day"
-                                      : willAirToday && "Today"}
+                                    {willAirToday && (
+                                      <TorrentLinksEpisodes
+                                        showTitle={episode.show}
+                                        seasonNumber={episode.season_number}
+                                        episodeNumber={episode.episode_number}
+                                      />
+                                    )}
+                                    <span>
+                                      {daysToNewEpisode > 1
+                                        ? `${daysToNewEpisode} days`
+                                        : daysToNewEpisode === 1
+                                        ? "1 day"
+                                        : willAirToday && "Today"}
+                                    </span>
                                   </div>
                                 )}
                               </div>
