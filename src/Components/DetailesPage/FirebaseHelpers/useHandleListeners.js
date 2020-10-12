@@ -67,6 +67,7 @@ const useHandleListeners = ({ id, authUser, firebase }) => {
           finished,
         })
         firebase.userShow({ uid: authUser.uid, key: id }).update({ finished, allEpisodesWatched })
+        console.log(allEpisodesWatched)
         firebase
           .userShowAllEpisodesNotFinished(authUser.uid, id)
           .set(

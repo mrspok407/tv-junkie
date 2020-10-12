@@ -41,10 +41,12 @@ const useUserShows = (firebase) => {
                   .showInDatabase(show.status, show.id)
                   .once("value")
                   .then((snapshot) => {
-                    return {
-                      ...show,
-                      ...snapshot.val().info,
-                      episodes: snapshot.val().episodes,
+                    if (snapshot.val() !== null) {
+                      return {
+                        ...show,
+                        ...snapshot.val().info,
+                        episodes: snapshot.val().episodes,
+                      }
                     }
                   })
               })
@@ -53,7 +55,9 @@ const useUserShows = (firebase) => {
                 arrayMerge: combineMergeObjects,
               })
 
-              const watchingShows = mergedShows.filter((show) => show.database === "watchingShows")
+              console.log(mergedShows)
+
+              const watchingShows = mergedShows.filter((show) => show && show.database === "watchingShows")
 
               const willAirEpisodes = organiseFutureEpisodesByMonth(watchingShows)
 

@@ -1,5 +1,4 @@
 import { useState } from "react"
-import axios from "axios"
 import merge from "deepmerge"
 import { combineMergeObjects } from "Utils"
 
@@ -14,148 +13,206 @@ const useMergeEpisodes = ({ detailes, id, authUser, firebase }) => {
     firebase
       .allShowsList(status)
       .child(id)
-      .once("value", snapshot => {
+      .once("value", (snapshot) => {
         if (snapshot.val() === null) return
         setLoading(true)
 
-        const maxSeasonsInChunk = 20
-        const allSeasons = []
-        const seasonChunks = []
-        const apiRequests = []
+        const databaseEpisodes = snapshot.val().episodes
 
-        for (let i = 1; i <= detailes.number_of_seasons; i += 1) {
-          allSeasons.push(`season/${i}`)
-        }
+        firebase.userShowAllEpisodes(authUser.uid, id).once("value", (snapshot) => {
+          if (snapshot.val() === null) {
+            setLoading(false)
+            return
+          }
 
-        for (let i = 0; i <= allSeasons.length; i += maxSeasonsInChunk) {
-          const chunk = allSeasons.slice(i, i + maxSeasonsInChunk)
-          seasonChunks.push(chunk.join())
-        }
+          const userEpisodes = snapshot.val()
 
-        seasonChunks.forEach(item => {
-          const request = axios.get(
-            `https://api.themoviedb.org/3/tv/${id}?api_key=${process.env.REACT_APP_TMDB_API}&append_to_response=${item}`
-          )
-          apiRequests.push(request)
+          // const databaseEpisodes = data.episodes
+
+          console.log(databaseEpisodes)
+
+          let updatedSeasons = []
+          let updatedSeasonsUser = []
+
+          databaseEpisodes.forEach((season, indexSeason) => {
+            const seasonPath = userEpisodes[indexSeason]
+            const databaseEpisodes = season.episodes
+            const episodes = seasonPath ? userEpisodes[indexSeason].episodes : []
+
+            const mergedEpisodes = merge(databaseEpisodes, episodes, {
+              arrayMerge: combineMergeObjects,
+            })
+
+            const updatedEpisodesUser = mergedEpisodes.reduce((acc, episode) => {
+              acc.push({ watched: episode.watched || false, userRating: episode.userRating || 0 })
+              return acc
+            }, [])
+
+            const updatedSeason = {
+              ...season,
+              episodes: mergedEpisodes,
+            }
+
+            const updatedSeasonUser = {
+              season_number: season.season_number,
+              episodes: updatedEpisodesUser,
+              userRating: (seasonPath && seasonPath.userRating) || 0,
+            }
+
+            updatedSeasons.push(updatedSeason)
+            updatedSeasonsUser.push(updatedSeasonUser)
+          })
+
+          setLoading(false)
+
+          console.log(updatedSeasonsUser)
+
+          firebase.userShowAllEpisodes(authUser.uid, id).set(updatedSeasonsUser, () => setLoading(false))
         })
 
-        axios
-          .all([...apiRequests])
-          .then(
-            axios.spread((...responses) => {
-              const rowData = []
-              const seasonsData = []
+        // const maxSeasonsInChunk = 20
+        // const allSeasons = []
+        // const seasonChunks = []
+        // const apiRequests = []
 
-              responses.forEach(item => {
-                rowData.push(item.data)
-              })
+        // for (let i = 1; i <= detailes.number_of_seasons; i += 1) {
+        //   allSeasons.push(`season/${i}`)
+        // }
 
-              const mergedRowData = Object.assign({}, ...rowData)
+        // for (let i = 0; i <= allSeasons.length; i += maxSeasonsInChunk) {
+        //   const chunk = allSeasons.slice(i, i + maxSeasonsInChunk)
+        //   seasonChunks.push(chunk.join())
+        // }
 
-              Object.entries(mergedRowData).forEach(([key, value]) => {
-                if (!key.indexOf("season/")) {
-                  seasonsData.push({ [key]: { ...value } })
-                }
-              })
+        // seasonChunks.forEach((item) => {
+        //   const request = axios.get(
+        //     `https://api.themoviedb.org/3/tv/${id}?api_key=${process.env.REACT_APP_TMDB_API}&append_to_response=${item}`
+        //   )
+        //   apiRequests.push(request)
+        // })
 
-              const allEpisodes = []
+        // axios
+        //   .all([...apiRequests])
+        //   .then(
+        //     axios.spread((...responses) => {
+        //       const rowData = []
+        //       const seasonsData = []
 
-              seasonsData.forEach((data, index) => {
-                const season = data[`season/${index + 1}`]
-                if (!Array.isArray(season.episodes) || season.episodes.length === 0) return
+        //       responses.forEach((item) => {
+        //         rowData.push(item.data)
+        //       })
 
-                const episodes = []
+        //       const mergedRowData = Object.assign({}, ...rowData)
 
-                season.episodes.forEach(item => {
-                  const updatedEpisode = {
-                    air_date: item.air_date,
-                    episode_number: item.episode_number,
-                    name: item.name,
-                    season_number: item.season_number,
-                    id: item.id
-                  }
-                  episodes.push(updatedEpisode)
-                })
+        //       Object.entries(mergedRowData).forEach(([key, value]) => {
+        //         if (!key.indexOf("season/")) {
+        //           seasonsData.push({ [key]: { ...value } })
+        //         }
+        //       })
 
-                const updatedSeason = {
-                  air_date: season.air_date,
-                  season_number: season.season_number,
-                  id: season._id,
-                  poster_path: season.poster_path,
-                  name: season.name,
-                  episodes
-                }
+        //       const allEpisodes = []
 
-                allEpisodes.push(updatedSeason)
-              })
+        //       seasonsData.forEach((data, index) => {
+        //         const season = data[`season/${index + 1}`]
+        //         if (!Array.isArray(season.episodes) || season.episodes.length === 0) return
 
-              const dataToPass = {
-                episodes: allEpisodes,
-                status: mergedRowData.status
-              }
+        //         const episodes = []
 
-              return dataToPass
-            })
-          )
-          .then(data => {
-            firebase
-              .allShowsList(status)
-              .child(id)
-              .update({ episodes: data.episodes })
-              .catch(err => {
-                console.log(err)
-              })
+        //         season.episodes.forEach((item) => {
+        //           const updatedEpisode = {
+        //             air_date: item.air_date,
+        //             episode_number: item.episode_number,
+        //             name: item.name,
+        //             season_number: item.season_number,
+        //             id: item.id,
+        //           }
+        //           episodes.push(updatedEpisode)
+        //         })
 
-            firebase.userShowAllEpisodes(authUser.uid, id).once("value", snapshot => {
-              if (snapshot.val() === null) {
-                setLoading(false)
-                return
-              }
+        //         const updatedSeason = {
+        //           air_date: season.air_date,
+        //           season_number: season.season_number,
+        //           id: season._id,
+        //           poster_path: season.poster_path,
+        //           name: season.name,
+        //           episodes,
+        //         }
 
-              const userEpisodes = snapshot.val()
+        //         allEpisodes.push(updatedSeason)
+        //       })
 
-              const databaseEpisodes = data.episodes
+        //       const dataToPass = {
+        //         episodes: allEpisodes,
+        //         status: mergedRowData.status,
+        //       }
 
-              let updatedSeasons = []
-              let updatedSeasonsUser = []
+        //       return dataToPass
+        //     })
+        //   )
+        //   .then((data) => {
+        // firebase
+        //   .allShowsList(status)
+        //   .child(id)
+        //   .update({ episodes: data.episodes })
+        //   .catch((err) => {
+        //     console.log(err)
+        //   })
 
-              databaseEpisodes.forEach((season, indexSeason) => {
-                const seasonPath = userEpisodes[indexSeason]
-                const databaseEpisodes = season.episodes
-                const episodes = seasonPath ? userEpisodes[indexSeason].episodes : []
+        // firebase.userShowAllEpisodes(authUser.uid, id).once("value", (snapshot) => {
+        //   if (snapshot.val() === null) {
+        //     setLoading(false)
+        //     return
+        //   }
 
-                const mergedEpisodes = merge(databaseEpisodes, episodes, {
-                  arrayMerge: combineMergeObjects
-                })
+        //   const userEpisodes = snapshot.val()
 
-                const updatedEpisodesUser = mergedEpisodes.reduce((acc, episode) => {
-                  acc.push({ watched: episode.watched || false, userRating: episode.userRating || 0 })
-                  return acc
-                }, [])
+        //   const databaseEpisodes = data.episodes
 
-                const updatedSeason = {
-                  ...season,
-                  episodes: mergedEpisodes
-                }
+        //   console.log(databaseEpisodes)
 
-                const updatedSeasonUser = {
-                  season_number: season.season_number,
-                  episodes: updatedEpisodesUser,
-                  userRating: (seasonPath && seasonPath.userRating) || 0
-                }
+        //   let updatedSeasons = []
+        //   let updatedSeasonsUser = []
 
-                updatedSeasons.push(updatedSeason)
-                updatedSeasonsUser.push(updatedSeasonUser)
-              })
+        //   databaseEpisodes.forEach((season, indexSeason) => {
+        //     const seasonPath = userEpisodes[indexSeason]
+        //     const databaseEpisodes = season.episodes
+        //     const episodes = seasonPath ? userEpisodes[indexSeason].episodes : []
 
-              firebase.userShowAllEpisodes(authUser.uid, id).set(updatedSeasonsUser, () => setLoading(false))
-            })
-          })
+        //     const mergedEpisodes = merge(databaseEpisodes, episodes, {
+        //       arrayMerge: combineMergeObjects,
+        //     })
+
+        //     const updatedEpisodesUser = mergedEpisodes.reduce((acc, episode) => {
+        //       acc.push({ watched: episode.watched || false, userRating: episode.userRating || 0 })
+        //       return acc
+        //     }, [])
+
+        //     const updatedSeason = {
+        //       ...season,
+        //       episodes: mergedEpisodes,
+        //     }
+
+        //     const updatedSeasonUser = {
+        //       season_number: season.season_number,
+        //       episodes: updatedEpisodesUser,
+        //       userRating: (seasonPath && seasonPath.userRating) || 0,
+        //     }
+
+        //     updatedSeasons.push(updatedSeason)
+        //     updatedSeasonsUser.push(updatedSeasonUser)
+        //   })
+
+        //   setLoading(false)
+
+        //   console.log(updatedSeasonsUser)
+
+        //   firebase.userShowAllEpisodes(authUser.uid, id).set(updatedSeasonsUser, () => setLoading(false))
+        // })
       })
-      .catch(err => {
-        console.log(err)
-        setLoading(false)
-      })
+    // .catch((err) => {
+    //   console.log(err)
+    //   setLoading(false)
+    // })
   }
 
   return [loading, mergeEpisodes]

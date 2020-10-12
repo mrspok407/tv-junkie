@@ -48,79 +48,86 @@ class HomePage extends Component {
 
   componentDidMount() {
     this.getContentForSliders()
+    console.log(this.props.firebase)
   }
 
   databaseModify = () => {
-    this.props.firebase.users().once("value", (snapshot) => {
-      let users = []
-      snapshot.forEach((item) => {
-        users = [...users, { ...item.val(), key: item.key }]
-      })
-
-      users.forEach((user) => {
-        if (user.email !== "mr.spok407@gmail.com") return
-
-        this.props.firebase.userAllShows(user.key).once("value", (snapshot) => {
-          let episodes = {}
-
-          const shows = Object.entries(snapshot.val()).reduce((acc, [key, value]) => {
-            if (key === "finishedShows") return acc
-
-            const showsInOneDatabase = Object.values(value).reduce((acc, show) => {
-              acc = {
-                ...acc,
-                [show.id]: {
-                  allEpisodesWatched: show.allEpisodesWatched,
-                  database: key,
-                  finished: show.finished_and_name.slice(0, 4) === "true" ? true : false,
-                  firstAirDate: show.firstAirDate,
-                  id: show.id,
-                  name: show.name,
-                  status: show.status,
-                  timeStamp: show.timeStamp * -1,
-                },
-              }
-
-              episodes = {
-                ...episodes,
-                [show.id]: {
-                  episodes: show.episodes,
-                  info: {
-                    allEpisodesWatched: show.allEpisodesWatched,
-                    database: key,
-                    finished: show.finished_and_name.slice(0, 4) === "true" ? true : false,
-                  },
-                },
-              }
-
-              return acc
-            }, {})
-
-            acc = {
-              ...acc,
-              ...showsInOneDatabase,
-            }
-
-            return acc
-          }, {})
-
-          console.log(episodes)
-          console.log(shows)
-
-          this.props.firebase.userAllShows(user.key).set(shows)
-          this.props.firebase.userEpisodes(user.key).set(episodes)
-        })
-
-        // this.props.firebase.userAllShows(user.key).once("value", snapshot => {
-        //   if (snapshot.val() === null) return
-
-        //   Object.entries(snapshot.val()).forEach(([key, value]) => {
-        //     this.props.firebase.userShowAllEpisodesInfo(user.key, key).update({ database: value.database })
-        //   })
-        // })
-      })
+    this.props.firebase.allShowsList("ongoing").child("1402").set({
+      roflan: "tigran",
     })
   }
+
+  // databaseModify = () => {
+  //   this.props.firebase.users().once("value", (snapshot) => {
+  //     let users = []
+  //     snapshot.forEach((item) => {
+  //       users = [...users, { ...item.val(), key: item.key }]
+  //     })
+
+  //     users.forEach((user) => {
+  //       if (user.email !== "mr.spok407@gmail.com") return
+
+  //       this.props.firebase.userAllShows(user.key).once("value", (snapshot) => {
+  //         let episodes = {}
+
+  //         const shows = Object.entries(snapshot.val()).reduce((acc, [key, value]) => {
+  //           if (key === "finishedShows") return acc
+
+  //           const showsInOneDatabase = Object.values(value).reduce((acc, show) => {
+  //             acc = {
+  //               ...acc,
+  //               [show.id]: {
+  //                 allEpisodesWatched: show.allEpisodesWatched,
+  //                 database: key,
+  //                 finished: show.finished_and_name.slice(0, 4) === "true" ? true : false,
+  //                 firstAirDate: show.firstAirDate,
+  //                 id: show.id,
+  //                 name: show.name,
+  //                 status: show.status,
+  //                 timeStamp: show.timeStamp * -1,
+  //               },
+  //             }
+
+  //             episodes = {
+  //               ...episodes,
+  //               [show.id]: {
+  //                 episodes: show.episodes,
+  //                 info: {
+  //                   allEpisodesWatched: show.allEpisodesWatched,
+  //                   database: key,
+  //                   finished: show.finished_and_name.slice(0, 4) === "true" ? true : false,
+  //                 },
+  //               },
+  //             }
+
+  //             return acc
+  //           }, {})
+
+  //           acc = {
+  //             ...acc,
+  //             ...showsInOneDatabase,
+  //           }
+
+  //           return acc
+  //         }, {})
+
+  //         console.log(episodes)
+  //         console.log(shows)
+
+  //         this.props.firebase.userAllShows(user.key).set(shows)
+  //         this.props.firebase.userEpisodes(user.key).set(episodes)
+  //       })
+
+  //       // this.props.firebase.userAllShows(user.key).once("value", snapshot => {
+  //       //   if (snapshot.val() === null) return
+
+  //       //   Object.entries(snapshot.val()).forEach(([key, value]) => {
+  //       //     this.props.firebase.userShowAllEpisodesInfo(user.key, key).update({ database: value.database })
+  //       //   })
+  //       // })
+  //     })
+  //   })
+  // }
 
   getContentForSliders = () => {
     this.setState({ slidersLoading: true })
@@ -226,7 +233,7 @@ class HomePage extends Component {
         <>
           {this.context.userContent.userWillAirEpisodes.length > 0 ? (
             <div className="home-page__heading">
-              <h1>Soon to watch</h1>
+              <h1 onClick={() => this.databaseModify()}>Soon to watch</h1>
             </div>
           ) : (
             <PlaceholderHomePageNoFutureEpisodes />
