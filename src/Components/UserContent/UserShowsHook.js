@@ -55,9 +55,9 @@ const useUserShows = (firebase) => {
                 arrayMerge: combineMergeObjects,
               })
 
-              console.log(mergedShows)
-
               const watchingShows = mergedShows.filter((show) => show && show.database === "watchingShows")
+
+              console.log(watchingShows)
 
               const willAirEpisodes = organiseFutureEpisodesByMonth(watchingShows)
 

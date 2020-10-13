@@ -15,7 +15,7 @@ import ScrollToTop from "Utils/ScrollToTopBar"
 import ScrollToTopOnUpdate from "Utils/ScrollToTopOnUpdate"
 import Footer from "Components/Footer/Footer"
 import PlaceholderLoadingFullInfo from "Components/Placeholders/PlaceholderLoadingFullInfo/PlaceholderLoadingFullInfo"
-import useMergeEpisodes from "./FirebaseHelpers/useMergeEpisodes"
+import mergeEpisodes from "./FirebaseHelpers/mergeEpisodes"
 import useHandleListeners from "./FirebaseHelpers/useHandleListeners"
 import "./DetailesPage.scss"
 
@@ -32,26 +32,17 @@ function DetailesPage({
   const [similarContent, setSimilarContent] = useState([])
 
   const [loadingAPIrequest, setLoadingAPIrequest] = useState(true)
-  const [loadingEpisodeMerging, mergeEpisodes] = useMergeEpisodes({
-    detailes,
-    id: Number(id),
-    authUser,
-    firebase,
-  })
 
   const [showInfo, setShowInfo] = useState()
   const [movieInDatabase, setMovieInDatabase] = useState(null)
 
-  const [
-    loadingFirebaseListeners,
-    episodesFromDatabase,
-    releasedEpisodes,
-    handleListeners,
-  ] = useHandleListeners({
+  const [episodesFromDatabase, releasedEpisodes, handleListeners] = useHandleListeners({
     id: Number(id),
     authUser,
     firebase,
   })
+
+  const [loadingFromDatabase, setLoadingFromDatabase] = useState(true)
 
   const [showDatabaseOnClient, setShowDatabaseOnClient] = useState(null)
 
@@ -85,12 +76,13 @@ function DetailesPage({
     }
   }, [context, id])
 
-  useEffect(() => {
-    mergeEpisodes()
-  }, [detailes, id])
+  const handleLoading = (isLoading) => {
+    setLoadingFromDatabase(isLoading)
+  }
 
   const getContent = () => {
     setLoadingAPIrequest(true)
+    setLoadingFromDatabase(true)
 
     axios
       .get(
@@ -173,8 +165,19 @@ function DetailesPage({
             seasonsArr: seasons && seasons.reverse(),
           })
 
-          if (mediaType === "show") {
-            handleListeners({ status, runOnMount: true })
+          if (mediaType === "show" && authUser) {
+            mergeEpisodes({
+              status,
+              handleLoading,
+              id: Number(id),
+              authUser,
+              firebase,
+              context,
+              callback: handleListeners,
+            })
+          }
+          if (!authUser) {
+            setLoadingFromDatabase(false)
           }
 
           setLoadingAPIrequest(false)
@@ -210,6 +213,7 @@ function DetailesPage({
     const movie = context.userContent.userMovies.find((movie) => movie.id === Number(id))
 
     setMovieInDatabase(!authUser || !movie ? null : movie)
+    setLoadingFromDatabase(false)
   }
 
   return (
@@ -238,10 +242,7 @@ function DetailesPage({
           <div className="detailes-page__error">
             <h1>{error}</h1>
           </div>
-        ) : !loadingAPIrequest &&
-          !loadingFirebaseListeners &&
-          !loadingEpisodeMerging &&
-          !context.userContent.loadingShows ? (
+        ) : !loadingAPIrequest && !loadingFromDatabase && !context.userContent.loadingShows ? (
           <div className="detailes-page">
             <PosterWrapper
               poster_path={detailes.poster_path}

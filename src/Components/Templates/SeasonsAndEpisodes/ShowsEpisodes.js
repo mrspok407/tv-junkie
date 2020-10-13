@@ -201,7 +201,11 @@ class ShowsEpisodes extends Component {
       return acc
     }, [])
     const seasonEpisodesAirDate = episodesFromDatabase[seasonNum - 1].episodes.reduce((acc, episode) => {
-      acc.push({ userRating: episode.userRating, watched: episode.watched, air_date: episode.air_date })
+      acc.push({
+        userRating: episode.userRating,
+        watched: episode.watched,
+        air_date: episode.air_date || null,
+      })
       return acc
     }, [])
 
@@ -230,6 +234,8 @@ class ShowsEpisodes extends Component {
         seasonNum,
       })
       .set(seasonEpisodes)
+
+    console.log(seasonEpisodesAirDate)
 
     if (this.props.toWatchPage) {
       this.props.firebase

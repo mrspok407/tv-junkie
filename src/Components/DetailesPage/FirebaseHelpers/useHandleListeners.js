@@ -3,31 +3,29 @@ import { combineMergeObjects, releasedEpisodesToOneArray } from "Utils"
 import merge from "deepmerge"
 
 const useHandleListeners = ({ id, authUser, firebase }) => {
-  const [loading, setLoading] = useState(false)
   const [episodes, setEpisodes] = useState()
   const [releasedEpisodes, setReleasedEpisodes] = useState()
 
-  const handleListeners = ({ status, runOnMount }) => {
+  const handleListeners = ({ status, handleLoading = () => {} }) => {
     if (!authUser) return
-    setLoading(runOnMount)
 
     const statusDatabase = status === "Ended" || status === "Canceled" ? "ended" : "ongoing"
 
     firebase.showEpisodes(statusDatabase, id).once("value", (snapshot) => {
       if (snapshot.val() === null) {
-        setLoading(false)
+        handleLoading(false)
         console.log("early return showsEpisodes")
         return
       }
 
-      console.log("showEpisodes run")
+      console.log("handleListeners run")
 
       const episodesFullData = snapshot.val()
       const releasedEpisodes = releasedEpisodesToOneArray({ data: snapshot.val() })
 
       firebase.userShowEpisodes(authUser.uid, id).on("value", (snapshot) => {
         if (snapshot.val() === null) {
-          setLoading(false)
+          handleLoading(false)
           return
         }
 
@@ -66,8 +64,9 @@ const useHandleListeners = ({ id, authUser, firebase }) => {
           allEpisodesWatched,
           finished,
         })
+
         firebase.userShow({ uid: authUser.uid, key: id }).update({ finished, allEpisodesWatched })
-        console.log(allEpisodesWatched)
+
         firebase
           .userShowAllEpisodesNotFinished(authUser.uid, id)
           .set(
@@ -76,7 +75,7 @@ const useHandleListeners = ({ id, authUser, firebase }) => {
 
         setEpisodes(userEpisodes)
         setReleasedEpisodes(releasedEpisodes)
-        setLoading(false)
+        handleLoading(false)
       })
     })
   }
@@ -84,6 +83,7 @@ const useHandleListeners = ({ id, authUser, firebase }) => {
   useEffect(() => {
     return () => {
       if (!authUser) return
+      console.log("unmount")
 
       firebase.userShowEpisodes(authUser.uid, id).off()
       firebase.showEpisodes("ended", id).off()
@@ -92,9 +92,9 @@ const useHandleListeners = ({ id, authUser, firebase }) => {
       setReleasedEpisodes(null)
     }
     // eslint-disable-next-line
-  }, [])
+  }, [id])
 
-  return [loading, episodes, releasedEpisodes, handleListeners]
+  return [episodes, releasedEpisodes, handleListeners]
 }
 
 export default useHandleListeners

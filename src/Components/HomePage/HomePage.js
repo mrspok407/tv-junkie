@@ -51,12 +51,6 @@ class HomePage extends Component {
     console.log(this.props.firebase)
   }
 
-  databaseModify = () => {
-    this.props.firebase.allShowsList("ongoing").child("1402").set({
-      roflan: "tigran",
-    })
-  }
-
   // databaseModify = () => {
   //   this.props.firebase.users().once("value", (snapshot) => {
   //     let users = []
@@ -233,7 +227,7 @@ class HomePage extends Component {
         <>
           {this.context.userContent.userWillAirEpisodes.length > 0 ? (
             <div className="home-page__heading">
-              <h1 onClick={() => this.databaseModify()}>Soon to watch</h1>
+              <h1>Soon to watch</h1>
             </div>
           ) : (
             <PlaceholderHomePageNoFutureEpisodes />

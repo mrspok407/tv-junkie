@@ -3,6 +3,7 @@ import { withFirebase } from "Components/Firebase"
 import { compose } from "recompose"
 import axios from "axios"
 import { WithAuthenticationConsumer } from "Components/UserAuth/Session/WithAuthentication"
+import { AppContext } from "Components/AppContext/AppContextHOC"
 
 const withUserContent = (Component) => {
   class WithUserContent extends React.Component {
@@ -160,14 +161,19 @@ const withUserContent = (Component) => {
         this.props.firebase
           .userEpisodes(this.userUid)
           .child(id)
-          .set({
-            episodes: userEpisodes,
-            info: {
-              database: userDatabase,
-              allEpisodesWatched: false,
-              finished: false,
+          .set(
+            {
+              episodes: userEpisodes,
+              info: {
+                database: userDatabase,
+                allEpisodesWatched: false,
+                finished: false,
+              },
             },
-          })
+            () => {
+              this.context.userMergedShows.handleMergedShows(id)
+            }
+          )
 
         this.firebase
           .allShowsList(showsSubDatabase)
@@ -208,8 +214,10 @@ const withUserContent = (Component) => {
                   .update({
                     usersWatching: snapshot.val().usersWatching + 1,
                   })
+
+                callback({ status: data.status })
               } else {
-                callback({ status: data.status, runOnMount: false })
+                callback({ status: data.status })
                 console.log("added!")
               }
             }
@@ -282,7 +290,7 @@ const withUserContent = (Component) => {
               id: movie.id,
               title: movie.title,
               release_date: movie.release_date,
-              vote_average: movie.rating,
+              vote_average: movie.vote_average,
               vote_count: movie.vote_count,
               backdrop_path: movie.backdrop_path,
               overview: movie.overview,
@@ -305,6 +313,7 @@ const withUserContent = (Component) => {
       )
     }
   }
+  WithUserContent.contextType = AppContext
   return compose(withFirebase, WithAuthenticationConsumer)(WithUserContent)
 }
 
