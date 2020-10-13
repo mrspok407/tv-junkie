@@ -4,7 +4,6 @@ export const organiseFutureEpisodesByMonth = (data) => {
   console.log(data)
   const sortedAndFiltered = data
     .flatMap((show) => {
-      console.log(show.episodes)
       return show.episodes.flatMap((season) =>
         season.episodes.reduce((acc, episode) => {
           if (differenceBtwDatesInDays(episode.air_date, todayDate) >= 0) {
