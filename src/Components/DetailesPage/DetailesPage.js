@@ -162,7 +162,7 @@ function DetailesPage({
             budget: budget || "-",
             number_of_seasons: number_of_seasons || "-",
             imdb_id: imdb_id || "",
-            seasonsArr: seasons && seasons.reverse(),
+            seasonsArr: seasons ? seasons.reverse() : [],
           })
 
           if (mediaType === "show" && authUser) {
