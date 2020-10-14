@@ -2,7 +2,6 @@
 import { differenceBtwDatesInDays, todayDate } from "Utils"
 
 export const releasedEpisodes = ({ data }) => {
-  console.log(data)
   if (!Array.isArray(data)) {
     throw new Error("Provided data should be an array")
   }
@@ -12,7 +11,7 @@ export const releasedEpisodes = ({ data }) => {
       acc.push(...season.episodes)
       return acc
     }, [])
-    .filter(episode => {
+    .filter((episode) => {
       const daysToNewEpisode = differenceBtwDatesInDays(episode.air_date, todayDate)
       return daysToNewEpisode <= 0 && episode
     })

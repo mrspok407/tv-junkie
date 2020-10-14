@@ -5,12 +5,10 @@ const mergeEpisodes = ({ status, handleLoading, id, authUser, firebase, context,
   if (!authUser) return
 
   const statusDatabase = status === "Ended" || status === "Canceled" ? "ended" : "ongoing"
-  if (context.userMergedShows.mergedShows.includes(id)) {
-    callback({ status, handleLoading })
-    return
-  }
-
-  console.log(context.userMergedShows.mergedShows)
+  // if (context.userMergedShows.mergedShows.includes(id)) {
+  //   callback({ status, handleLoading })
+  //   return
+  // }
 
   firebase
     .showInDatabase(statusDatabase, id)

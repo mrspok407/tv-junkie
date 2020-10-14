@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
-import { combineMergeObjects, releasedEpisodesToOneArray } from "Utils"
-import merge from "deepmerge"
+import { releasedEpisodesToOneArray } from "Utils"
+import mergeEpisodesWithAirDate from "Utils/mergeEpisodesWithAirDate"
 
 const useHandleListeners = ({ id, authUser, firebase }) => {
   const [episodes, setEpisodes] = useState()
@@ -38,24 +38,10 @@ const useHandleListeners = ({ id, authUser, firebase }) => {
 
         allEpisodes.splice(releasedEpisodes.length)
 
-        const episodesAirDate = merge(episodesFullData, userEpisodes, {
-          arrayMerge: combineMergeObjects,
-        }).reduce((acc, season) => {
-          const episodes = season.episodes.reduce((acc, episode) => {
-            acc.push({
-              air_date: episode.air_date || null,
-              userRating: episode.userRating,
-              watched: episode.watched,
-            })
-            return acc
-          }, [])
-          acc.push({
-            season_number: season.season_number,
-            userRating: season.userRating,
-            episodes,
-          })
-          return acc
-        }, [])
+        const episodesWithAirDate = mergeEpisodesWithAirDate({
+          fullData: episodesFullData,
+          userData: userEpisodes,
+        })
 
         const allEpisodesWatched = !allEpisodes.some((episode) => !episode.watched)
         const finished = statusDatabase === "ended" && allEpisodesWatched ? true : false
@@ -70,7 +56,9 @@ const useHandleListeners = ({ id, authUser, firebase }) => {
         firebase
           .userShowAllEpisodesNotFinished(authUser.uid, id)
           .set(
-            allEpisodesWatched || snapshot.val().info.database !== "watchingShows" ? null : episodesAirDate
+            allEpisodesWatched || snapshot.val().info.database !== "watchingShows"
+              ? null
+              : episodesWithAirDate
           )
 
         setEpisodes(userEpisodes)

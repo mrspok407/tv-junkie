@@ -2,6 +2,8 @@ import React from "react"
 import { withFirebase } from "Components/Firebase"
 import { compose } from "recompose"
 import axios from "axios"
+import * as _get from "lodash.get"
+import mergeEpisodesWithAirDate from "Utils/mergeEpisodesWithAirDate"
 import { WithAuthenticationConsumer } from "Components/UserAuth/Session/WithAuthentication"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 
@@ -251,12 +253,23 @@ const withUserContent = (Component) => {
               this.props.firebase.userShowEpisodes(this.userUid, id).once("value", (snapshot) => {
                 const show = snapshot.val()
 
+                const episodesFullData = _get(
+                  this.context.userContent.userShows.find((show) => show.id === id),
+                  "episodes",
+                  []
+                )
+
+                const episodesWithAirDate = mergeEpisodesWithAirDate({
+                  fullData: episodesFullData,
+                  userData: show.episodes,
+                })
+
                 this.props.firebase
                   .userShowAllEpisodesNotFinished(this.userUid, id)
                   .set(
                     show.info.allEpisodesWatched || show.info.database !== "watchingShows"
                       ? null
-                      : show.episodes
+                      : episodesWithAirDate
                   )
               })
             }

@@ -286,7 +286,6 @@ class ShowsEpisodes extends Component {
 
   render() {
     const showCheckboxes = this.props.showInfo && this.props.showDatabaseOnClient !== "notWatchingShows"
-    console.log(this.props.seasonsArr)
     return (
       <>
         {showCheckboxes && this.props.detailesPage && (

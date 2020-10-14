@@ -1,13 +1,14 @@
 import React, { Component } from "react"
 import axios, { CancelToken } from "axios"
-import { compose } from "recompose"
 import { Link, withRouter } from "react-router-dom"
+import { compose } from "recompose"
+import * as _result from "lodash.result"
 import * as ROUTES from "Utils/Constants/routes"
 import SearchList from "./SearchList/SearchList"
 import Input from "./Input/Input"
-import "./Search.scss"
 import PlaceholderNoResults from "Components/Placeholders/PlaceholderNoResults"
 import { withUserContent } from "Components/UserContent"
+import "./Search.scss"
 
 let cancelRequest
 
@@ -22,7 +23,7 @@ class Search extends Component {
       listIsOpen: false,
       currentListItem: 0,
       mediaTypeSearching: "",
-      error: ""
+      error: "",
     }
 
     this.searchContRef = React.createRef()
@@ -43,7 +44,7 @@ class Search extends Component {
         query: "",
         searchResults: [],
         isSearchingList: false,
-        error: ""
+        error: "",
       })
 
     this.setState({ query, error: "", isSearchingList: true })
@@ -56,7 +57,7 @@ class Search extends Component {
         {
           cancelToken: new CancelToken(function executor(c) {
             cancelRequest = c
-          })
+          }),
         }
       )
       .then(({ data: { results, total_pages: totalPages } }) => {
@@ -69,20 +70,20 @@ class Search extends Component {
           searchResults: contentSortByPopularity,
           isSearchingList: false,
           totalPages,
-          mediaTypeSearching: mediatype.type.toLowerCase()
+          mediaTypeSearching: mediatype.type.toLowerCase(),
         })
       })
-      .catch(err => {
+      .catch((err) => {
         if (axios.isCancel(err)) return
         this.setState({
           searchResults: [],
           isSearchingList: false,
-          error: "Something went wrong"
+          error: "Something went wrong",
         })
       })
   }
 
-  renderSearch = list => {
+  renderSearch = (list) => {
     const { searchResults, error } = this.state
     return error || !Array.isArray(searchResults) ? (
       <div className="error">
@@ -93,13 +94,13 @@ class Search extends Component {
     )
   }
 
-  handleClickOutside = e => {
+  handleClickOutside = (e) => {
     if (
       (this.searchContRef.current && !this.searchContRef.current.contains(e.target)) ||
       (this.props.navRef && !this.props.navRef.current.contains(e.target))
     ) {
       this.setState({
-        listIsOpen: false
+        listIsOpen: false,
       })
       this.onBlur()
     }
@@ -111,14 +112,14 @@ class Search extends Component {
       const input = document.querySelector(".search__input")
 
       input.classList.add("search__input--focus")
-      navItem.forEach(item => {
+      navItem.forEach((item) => {
         item.classList.remove("nav__link-move-back")
         item.classList.add("nav__link-move")
       })
     }
 
     this.setState({
-      listIsOpen: true
+      listIsOpen: true,
     })
   }
 
@@ -127,7 +128,7 @@ class Search extends Component {
     const input = document.querySelector(".search__input")
 
     input.classList.remove("search__input--focus")
-    navItem.forEach(item => {
+    navItem.forEach((item) => {
       item.classList.remove("nav__link-move")
       item.classList.add("nav__link-move-back")
     })
@@ -136,10 +137,10 @@ class Search extends Component {
   closeList = () => {
     this.setState({
       listIsOpen: false,
-      currentListItem: 0
+      currentListItem: 0,
     })
     this.onBlur()
-    this.props.closeNavMobile()
+    _result(this.props, "closeNavMobile")
   }
 
   linkOnKeyPress = () => {
@@ -156,7 +157,7 @@ class Search extends Component {
     this.props.history.push(`/${mediaType}/${content.id}`)
   }
 
-  navigateSearchListByArrows = arrowKey => {
+  navigateSearchListByArrows = (arrowKey) => {
     if (!this.state.listIsOpen || this.state.isSearchingList) return
     if (this.state.searchResults.length === 0) return
 
