@@ -7,7 +7,8 @@ import * as ROLES from "Utils/Constants/roles"
 import * as ROUTES from "Utils/Constants/routes"
 import classNames from "classnames"
 import Input from "../Input/Input"
-import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
+// import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
+import { AppContext } from "Components/AppContext/AppContextHOC"
 import { withUserContent } from "Components/UserContent"
 import SignInWithGoogleForm from "../SignIn/SignInWithGoogle"
 
@@ -87,17 +88,15 @@ class RegisterBase extends Component {
               this.props.addShowToDatabase({
                 id: item.id,
                 show: item,
-                userDatabase: "watchingShows",
-                userUid: authUser.user.uid
+                userDatabase: "watchingShows"
               })
             })
 
             watchLaterMovies.forEach(item => {
-              this.props.toggleWatchLaterMovie({
+              this.props.handleMovieInDatabases({
                 id: item.id,
                 data: item,
-                userDatabase: "watchLaterMovies",
-                userUid: authUser.user.uid
+                userDatabase: "watchLaterMovies"
               })
             })
           })
@@ -105,7 +104,7 @@ class RegisterBase extends Component {
             localStorage.removeItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)
             localStorage.removeItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)
 
-            this.context.clearContentState()
+            this.context.userContentLocalStorage.clearContentState()
 
             if (this.props.closeNavMobile) this.props.closeNavMobile()
           })
@@ -337,4 +336,5 @@ const Register = compose(withRouter, withUserContent)(RegisterBase)
 
 export default Register
 
-RegisterBase.contextType = UserContentLocalStorageContext
+// RegisterBase.contextType = UserContentLocalStorageContext
+RegisterBase.contextType = AppContext

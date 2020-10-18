@@ -1,12 +1,13 @@
 /* eslint-disable array-callback-return */
 import React, { Component } from "react"
 import { Link } from "react-router-dom"
-import { withUserContent } from "Components/UserContent"
 import ShowsEpisodes from "Components/Templates/SeasonsAndEpisodes/ShowsEpisodes"
-import { todayDate, combineMergeObjects } from "Utils"
+import { todayDate, combineMergeObjects, releasedEpisodesToOneArray } from "Utils"
 import Loader from "Components/Placeholders/Loader"
 import PlaceholderNoToWatchEpisodes from "Components/Placeholders/PlaceholderNoToWatchEpisodes"
 import merge from "deepmerge"
+import { AppContext } from "Components/AppContext/AppContextHOC"
+import { withUserContent } from "Components/UserContent"
 
 class ToWatchEpisodesContent extends Component {
   constructor(props) {
@@ -14,197 +15,64 @@ class ToWatchEpisodesContent extends Component {
 
     this.state = {
       watchingShows: [],
-      initialLoading: true
+      initialLoading: true,
     }
   }
 
   componentDidMount() {
-    this.getContent({})
     this._isMounted = true
+    this.prevContext = this.context
+    this.getContent()
+  }
+
+  componentDidUpdate() {
+    if (this.prevContext.userContent !== this.context.userContent) {
+      this.getContent()
+    }
+    this.prevContext = this.context
   }
 
   componentWillUnmount() {
-    this.state.watchingShows.forEach(show => {
-      this.props.firebase
-        .userShow({ uid: this.props.authUser.uid, key: show.id, database: "watchingShows" })
-        .off()
-    })
-
     this._isMounted = false
   }
 
-  getContent = ({ sortBy = "first_air_date", isInitialLoad = true, database = "watchingShows" }) => {
-    if (this.props.authUser === null) return
-    if (isInitialLoad) {
-      this.setState({ initialLoading: true })
+  getContent = () => {
+    const watchingShows = this.context.userContent.userShows.filter(
+      (show) => show.database === "watchingShows" && !show.allEpisodesWatched
+    )
+    const toWatchEpisodes = this.context.userContent.userToWatchShows
+
+    const watchingShowsModified = watchingShows.reduce((acc, show) => {
+      if (toWatchEpisodes.find((item) => item.id === show.id)) {
+        acc.push(show)
+      }
+      return acc
+    }, [])
+
+    if (watchingShowsModified.length === 0) {
+      this.setState({ watchingShows: [] })
+
+      if (!this.context.userContent.loadingNotFinishedShows && !this.context.userContent.loadingShows) {
+        this.setState({ initialLoading: false })
+      }
+      return
     }
 
-    this.props.firebase
-      .userShows(this.props.authUser.uid, database)
-      .orderByChild(sortBy)
-      .once("value", snapshot => {
-        let userShows = []
-        snapshot.forEach(item => {
-          if (item.val().allEpisodesWatched) return
+    const mergedShows = merge(watchingShowsModified, toWatchEpisodes, {
+      arrayMerge: combineMergeObjects,
+    })
 
-          userShows = [
-            ...userShows,
-            {
-              id: item.val().id,
-              // name: item.val().name,
-              status: item.val().status,
-              timeStamp: item.val().timeStamp,
-              allEpisodesWatched: item.val().allEpisodesWatched,
-              // finished_and_timeStamp: item.val().finished_and_timeStamp,
-              episodes: item.val().episodes
-            }
-          ]
-
-          this.props.firebase
-            .userShow({ uid: this.props.authUser.uid, key: item.val().id, database })
-            .on("value", snapshot => {
-              if (snapshot.val() !== null) {
-                const index = this.state.watchingShows.findIndex(item => item.id === snapshot.val().id)
-                const watchingShows = this.state.watchingShows.filter(item => item.id !== snapshot.val().id)
-                const show = this.state.watchingShows.find(item => item.id === snapshot.val().id)
-
-                const showsSubDatabase = snapshot.val().status
-
-                if (show) {
-                  show.episodes.forEach((season, seasonIndex) => {
-                    season.episodes.forEach((episode, episodeIndex) => {
-                      show.episodes[seasonIndex].episodes[episodeIndex] = {
-                        ...episode,
-                        watched: snapshot.val().episodes[seasonIndex].episodes[episodeIndex].watched
-                      }
-                    })
-                  })
-                  show.info = {
-                    ...show.info,
-                    timeStamp: snapshot.val().timeStamp
-                  }
-                  show.allEpisodesWatched = snapshot.val().allEpisodesWatched
-
-                  watchingShows.splice(index, 0, show)
-
-                  this.setState({
-                    watchingShows: watchingShows
-                  })
-                }
-
-                if (snapshot.val().allEpisodesWatched && showsSubDatabase === "ended") {
-                  this.props.firebase
-                    .userShows(this.props.authUser.uid, "finishedShows")
-                    .child(snapshot.val().id)
-                    .set({
-                      // timeStamp: snapshot.val().timeStamp,
-                      // firstAirDate: snapshot.val().firstAirDate,
-                      id: snapshot.val().id,
-                      // name: snapshot.val().name,
-                      status: snapshot.val().status,
-                      finished_and_name: snapshot.val().finished_and_name,
-                      // timeStamp: snapshot.val().timeStamp,
-                      finished_and_timeStamp: snapshot.val().finished_and_timeStamp
-                    })
-                } else {
-                  this.props.firebase
-                    .userShows(this.props.authUser.uid, "finishedShows")
-                    .child(snapshot.val().id)
-                    .set(null)
-                }
-              }
-            })
-        })
-
-        Promise.all(
-          userShows.map(show => {
-            const showsSubDatabase = show.status
-
-            return this.props.firebase
-              .showInDatabase(showsSubDatabase, show.id)
-              .once("value")
-              .then(snapshot => {
-                return snapshot.val()
-              })
-          })
-        ).then(showsData => {
-          if (!this._isMounted) return
-
-          const updatedShows = []
-
-          showsData.forEach(show => {
-            const userShow = userShows.find(item => item.id === show.id)
-            if (userShow.allEpisodesWatched) return
-
-            let updatedSeasons = []
-            let updatedSeasonsUser = []
-
-            show.episodes.forEach((season, indexSeason) => {
-              let updatedEpisodesUser = []
-              const seasonPath = userShows.find(item => item.id === show.id).episodes[indexSeason]
-              const databaseEpisodes = season.episodes
-              const userEpisodes = seasonPath
-                ? userShows.find(item => item.id === show.id).episodes[indexSeason].episodes
-                : []
-
-              const mergedEpisodes = merge(databaseEpisodes, userEpisodes, {
-                arrayMerge: combineMergeObjects
-              })
-
-              mergedEpisodes.forEach(episode => {
-                const updatedEpisode = {
-                  watched: episode.watched || false,
-                  userRating: episode.userRating || 0
-                }
-                updatedEpisodesUser.push(updatedEpisode)
-              })
-
-              const updatedSeason = {
-                ...season,
-                episodes: mergedEpisodes
-              }
-
-              const updatedSeasonUser = {
-                season_number: season.season_number,
-                episodes: updatedEpisodesUser,
-                userRating: (seasonPath && seasonPath.userRating) || 0
-              }
-
-              updatedSeasons.push(updatedSeason)
-              updatedSeasonsUser.push(updatedSeasonUser)
-            })
-
-            updatedShows.push({
-              ...show,
-              allEpisodesWatched: userShow.allEpisodesWatched,
-              info: {
-                ...show.info,
-                timeStamp: userShow.timeStamp
-              },
-              episodes: updatedSeasons
-            })
-
-            this.props.firebase
-              .userShowAllEpisodes(this.props.authUser.uid, show.id, database)
-              .set(updatedSeasonsUser)
-          })
-
-          this.setState({
-            watchingShows: updatedShows.reverse(),
-            initialLoading: false
-          })
-        })
-      })
+    this.setState({ watchingShows: mergedShows, initialLoading: false })
   }
 
-  showEpisodeInfo = episodeId => {
+  showEpisodeInfo = (episodeId) => {
     if (this.state.detailEpisodeInfo.includes(episodeId)) {
-      this.setState(prevState => ({
-        detailEpisodeInfo: [...prevState.detailEpisodeInfo.filter(item => item !== episodeId)]
+      this.setState((prevState) => ({
+        detailEpisodeInfo: [...prevState.detailEpisodeInfo.filter((item) => item !== episodeId)],
       }))
     } else {
-      this.setState(prevState => ({
-        detailEpisodeInfo: [...prevState.detailEpisodeInfo, episodeId]
+      this.setState((prevState) => ({
+        detailEpisodeInfo: [...prevState.detailEpisodeInfo, episodeId],
       }))
     }
   }
@@ -214,79 +82,45 @@ class ToWatchEpisodesContent extends Component {
       <div className="content-results content-results--to-watch-page">
         {this.state.initialLoading ? (
           <Loader className="loader--pink" />
-        ) : !this.state.watchingShows.find(item => !item.allEpisodesWatched) ? (
+        ) : this.state.watchingShows.length === 0 ? (
           <PlaceholderNoToWatchEpisodes />
         ) : (
           <>
-            {this.state.watchingShows.map(show => {
-              const showsSubDatabase =
-                show.info.status === "Ended" || show.info.status === "Canceled" ? "ended" : "ongoing"
-
-              const episodesToPass = show.episodes.reduce((acc, season) => {
-                const newEpisodes = season.episodes.reduce((acc, episode) => {
-                  acc.push({ watched: episode.watched, userRating: episode.userRating })
+            {this.state.watchingShows.map((show, index) => {
+              const toWatchEpisodes = show.episodes.reduce((acc, season) => {
+                const seasonEpisodes = season.episodes.reduce((acc, episode) => {
+                  if (episode.air_date && new Date(episode.air_date) < todayDate.getTime()) {
+                    acc.push(episode)
+                  }
                   return acc
                 }, [])
 
-                acc.push({ ...season, episodes: newEpisodes })
+                seasonEpisodes.reverse()
+
+                if (seasonEpisodes.length !== 0 && seasonEpisodes.some((item) => !item.watched)) {
+                  acc.push({ ...season, episodes: seasonEpisodes })
+                }
+
                 return acc
               }, [])
+              toWatchEpisodes.reverse()
 
-              const showInDatabase = show && {
-                database: "watchingShows",
-                info: {
-                  ...show.info,
-                  status: showsSubDatabase,
-                  episodes: episodesToPass
-                }
-              }
-
-              const infoToPass = show && {
-                id: show.info.id,
-                status: show.info.status
-              }
-
-              let newEpisodes = []
-
-              show.episodes.forEach(season => {
-                let newSeason = {}
-                let episodes = []
-
-                season.episodes.forEach(episode => {
-                  if (episode.air_date && new Date(episode.air_date) < todayDate.getTime()) {
-                    episodes.push(episode)
-                  }
-                })
-
-                episodes.reverse()
-
-                newSeason = {
-                  ...season,
-                  episodes
-                }
-
-                if (newSeason.episodes.length !== 0 && newSeason.episodes.some(item => !item.watched)) {
-                  newEpisodes = [...newEpisodes, newSeason]
-                }
-              })
-
-              newEpisodes.reverse()
-
-              if (newEpisodes.length === 0) return
+              const releasedEpisodes = releasedEpisodesToOneArray({ data: toWatchEpisodes })
 
               return (
                 <div key={show.id} className="towatch__show">
-                  <Link className="towatch__show-name" to={`/show/${show.info.id}`}>
-                    {show.info.name}
+                  <Link className="towatch__show-name" to={`/show/${show.id}`}>
+                    {show.name}
                   </Link>
                   <ShowsEpisodes
                     toWatchPage={true}
-                    seasonsArr={newEpisodes}
-                    showTitle={show.info.name || show.info.original_name}
+                    seasonsArr={toWatchEpisodes}
+                    showTitle={show.name || show.original_name}
                     todayDate={todayDate}
                     id={show.id}
-                    showInDatabase={showInDatabase}
-                    infoToPass={infoToPass}
+                    showInfo={show}
+                    episodesFromDatabase={show.episodes}
+                    releasedEpisodes={releasedEpisodes}
                   />
                 </div>
               )
@@ -299,3 +133,5 @@ class ToWatchEpisodesContent extends Component {
 }
 
 export default withUserContent(ToWatchEpisodesContent)
+
+ToWatchEpisodesContent.contextType = AppContext

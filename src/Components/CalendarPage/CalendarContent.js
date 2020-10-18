@@ -1,11 +1,12 @@
 import React, { Component } from "react"
 import { Link } from "react-router-dom"
-import { withUserContent } from "Components/UserContent"
 import { differenceBtwDatesInDays, todayDate } from "Utils"
-import { organiseFutureEpisodesByMonth, organizeMonthEpisodesByEpisodeNumber } from "./CalendarHelpers"
+import { organizeMonthEpisodesByEpisodeNumber } from "./CalendarHelpers"
 import classNames from "classnames"
 import Loader from "Components/Placeholders/Loader"
 import PlaceholderNoFutureEpisodes from "Components/Placeholders/PlaceholderNoFutureEpisodes"
+import { AppContext } from "Components/AppContext/AppContextHOC"
+import TorrentLinksEpisodes from "Components/Templates/SeasonsAndEpisodes/Components/TorrentLinksEpisodes"
 
 class CalendarContent extends Component {
   constructor(props) {
@@ -14,95 +15,68 @@ class CalendarContent extends Component {
     this.state = {
       willAirEpisodes: [],
       openMonths: [],
-      initialLoading: true
+      initialLoading: false,
     }
   }
 
   componentDidMount() {
-    this.getContent({})
     this._isMounted = true
+    this.prevContext = this.context
+
+    this.getContent()
+  }
+
+  componentDidUpdate() {
+    if (this.prevContext.userContent !== this.context.userContent) {
+      this.getContent()
+    }
+    this.prevContext = this.context
   }
 
   componentWillUnmount() {
     this._isMounted = false
   }
 
-  getContent = ({ sortBy = "id", isInitialLoad = true, database = "watchingShows" }) => {
+  getContent = () => {
     if (this.props.authUser === null) return
-    if (isInitialLoad) {
-      this.setState({ initialLoading: true })
-    }
-    if (this.props.homePage) this.props.handleCalendarState({ loading: true })
+    if (this.context.userContent.userShows === 0) return
 
-    this.props.firebase
-      .userShows(this.props.authUser.uid, database)
-      .orderByChild(sortBy)
-      .once("value", snapshot => {
-        let userShows = []
+    const willAirEpisodes = this.props.homePage
+      ? this.context.userContent.userWillAirEpisodes.slice(0, 2)
+      : this.context.userContent.userWillAirEpisodes
 
-        snapshot.forEach(show => {
-          if (show.val().status === "ended") return
+    const months = willAirEpisodes.map((item) => {
+      return Object.values(item)[0]
+    })
 
-          userShows.push({
-            id: show.val().id,
-            status: show.val().status
-          })
-        })
-
-        Promise.all(
-          userShows.map(show => {
-            return this.props.firebase
-              .showInDatabase(show.status, show.id)
-              .once("value")
-              .then(snapshot => {
-                return snapshot.val()
-              })
-          })
-        ).then(showsData => {
-          if (!this._isMounted) return
-
-          const willAirEpisodes = organiseFutureEpisodesByMonth(showsData)
-
-          const months = willAirEpisodes.map(item => {
-            return Object.values(item)[0]
-          })
-
-          this.setState({
-            willAirEpisodes,
-            openMonths: this.props.homePage ? [months[0]] : months,
-            initialLoading: false
-          })
-          if (this.props.homePage) this.props.handleCalendarState({ loading: false, willAirEpisodes })
-        })
-      })
+    this.setState({
+      willAirEpisodes,
+      openMonths: this.props.homePage ? [months[0]] : months,
+    })
   }
 
-  showMonthEpisodes = month => {
+  showMonthEpisodes = (month) => {
     if (this.state.openMonths.includes(month)) {
       this.setState({
-        openMonths: this.state.openMonths.filter(item => item !== month)
+        openMonths: this.state.openMonths.filter((item) => item !== month),
       })
     } else {
       this.setState({
-        openMonths: [...this.state.openMonths, month]
+        openMonths: [...this.state.openMonths, month],
       })
     }
   }
 
   render() {
-    const willAirEpisodes = this.props.homePage
-      ? this.state.willAirEpisodes.slice(0, 2)
-      : this.state.willAirEpisodes
-
     return (
       <div className="content-results content-results--calendar">
-        {this.state.initialLoading ? (
+        {this.context.userContent.loadingShows ? (
           <Loader className="loader--pink" />
         ) : this.state.willAirEpisodes.length === 0 && !this.props.homePage ? (
           <PlaceholderNoFutureEpisodes />
         ) : (
           <div className="episodes episodes--calendar">
-            {willAirEpisodes.map(month => {
+            {this.state.willAirEpisodes.map((month) => {
               const date = new Date(month.month)
               const monthLongName = date.toLocaleString("en", { month: "long" })
 
@@ -112,9 +86,8 @@ class CalendarContent extends Component {
                 <div key={month.month} className="episodes__episode-group">
                   <div
                     className={classNames("episodes__episode-group-info", {
-                      "episodes__episode-group-info--open": this.state.openMonths.includes(month.month)
+                      "episodes__episode-group-info--open": this.state.openMonths.includes(month.month),
                     })}
-                    // onClick={() => this.showSeasonsEpisode(seasonId, season.season_number)}
                     onClick={() => this.showMonthEpisodes(month.month)}
                   >
                     <div className="episodes__episode-group-name">
@@ -144,7 +117,7 @@ class CalendarContent extends Component {
 
                           const options = {
                             weekday: "short",
-                            day: "numeric"
+                            day: "numeric",
                           }
 
                           const formatedDate = new Date(airDateISO)
@@ -171,13 +144,16 @@ class CalendarContent extends Component {
                               : "e".concat(episodeToString)
                           // Format Seasons And Episode Numbers End //
 
-                          // const episodeAirDateAsDateObj = new Date(episode.air_date)
-
                           const daysToNewEpisode = differenceBtwDatesInDays(episode.air_date, todayDate)
                           const willAirToday = daysToNewEpisode === 0
 
                           return (
-                            <div key={episode.id} className="episodes__episode">
+                            <div
+                              key={episode.id}
+                              className={classNames("episodes__episode", {
+                                "episodes__episode--today": willAirToday,
+                              })}
+                            >
                               <div className="episodes__episode-wrapper">
                                 <div className="episodes__episode-date">
                                   {episode.air_date !== prevEpisodeAirDate && episodeAirDate}
@@ -192,17 +168,27 @@ class CalendarContent extends Component {
                                   </div>
                                   <div className="episodes__episode-episode-title">{episode.name}</div>
                                 </div>
+
                                 {daysToNewEpisode >= 0 && (
                                   <div
                                     className={classNames("episodes__episode-days-to-air", {
-                                      "episodes__episode-days-to-air--today": willAirToday
+                                      "episodes__episode-days-to-air": willAirToday,
                                     })}
                                   >
-                                    {daysToNewEpisode > 1
-                                      ? `${daysToNewEpisode} days`
-                                      : daysToNewEpisode === 1
-                                      ? "1 day"
-                                      : willAirToday && "Today"}
+                                    {willAirToday && (
+                                      <TorrentLinksEpisodes
+                                        showTitle={episode.show}
+                                        seasonNumber={episode.season_number}
+                                        episodeNumber={episode.episode_number}
+                                      />
+                                    )}
+                                    <span>
+                                      {daysToNewEpisode > 1
+                                        ? `${daysToNewEpisode} days`
+                                        : daysToNewEpisode === 1
+                                        ? "1 day"
+                                        : willAirToday && "Today"}
+                                    </span>
                                   </div>
                                 )}
                               </div>
@@ -222,4 +208,6 @@ class CalendarContent extends Component {
   }
 }
 
-export default withUserContent(CalendarContent)
+export default CalendarContent
+
+CalendarContent.contextType = AppContext

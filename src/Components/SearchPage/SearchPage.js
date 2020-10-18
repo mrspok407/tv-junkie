@@ -6,7 +6,6 @@ import Search from "./Search/Search"
 import AdvancedSearch from "Components/SearchPage/Search/AdvancedSearch/AdvancedSearch"
 import AdvSearchResults from "./AdvSearchResults/SearchResults/SearchResults"
 import PlaceholderNoResults from "Components/Placeholders/PlaceholderNoResults"
-import ScrollToTop from "Utils/ScrollToTop"
 import Header from "Components/Header/Header"
 import "./SearchPage.scss"
 import Footer from "Components/Footer/Footer"
@@ -324,8 +323,6 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
         {this.renderAdvMovies()}
 
         <Footer />
-        <ScrollToTop />
-        {/* <Footer /> */}
       </>
     )
   }

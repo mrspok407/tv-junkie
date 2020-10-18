@@ -4,7 +4,7 @@ import { withRouter } from "react-router-dom"
 import { Helmet } from "react-helmet"
 import Header from "../Header/Header"
 import MoviesContent from "./MoviesContent"
-import ScrollToTop from "Utils/ScrollToTop"
+import ScrollToTop from "Utils/ScrollToTopBar"
 import Footer from "Components/Footer/Footer"
 
 let cancelRequest
@@ -18,8 +18,7 @@ class Movies extends Component {
       error: [],
       loadingIds: [],
       moviesIds: [],
-      showAllLinksPressed: false,
-      showPixBtn: false
+      showAllLinksPressed: false
     }
   }
 
@@ -71,12 +70,6 @@ class Movies extends Component {
       })
   }
 
-  togglePixBtn = () => {
-    this.setState({
-      showPixBtn: !this.state.showPixBtn
-    })
-  }
-
   render() {
     return (
       <>
@@ -84,14 +77,6 @@ class Movies extends Component {
           <title>All your movies | TV Junkie</title>
         </Helmet>
         <Header />
-        <button
-          style={{ width: `250px`, margin: "0px" }}
-          className="button"
-          onClick={() => this.togglePixBtn()}
-        >
-          Toggle Pix Btn
-        </button>
-        {this.state.showPixBtn && <div id="pixiboTest"></div>}
         <MoviesContent
           moviesArr={this.state.moviesArr}
           getMovieLinks={this.getMovieLinks}

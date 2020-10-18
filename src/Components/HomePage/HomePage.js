@@ -4,7 +4,7 @@ import { Link } from "react-router-dom"
 import { withFirebase } from "Components/Firebase/FirebaseContext"
 import { withUserContent } from "Components/UserContent"
 import axios from "axios"
-import ScrollToTop from "Utils/ScrollToTop"
+import ScrollToTop from "Utils/ScrollToTopBar"
 import HeaderBase from "Components/Header/Header"
 import CalendarContent from "Components/CalendarPage/CalendarContent"
 import Slider from "Utils/Slider/Slider"
@@ -12,6 +12,7 @@ import PlaceholderHomePageNoFutureEpisodes from "Components/Placeholders/Placeho
 import * as ROUTES from "Utils/Constants/routes"
 import "./HomePage.scss"
 import Footer from "Components/Footer/Footer"
+import { AppContext } from "Components/AppContext/AppContextHOC"
 
 const Header = withFirebase(HeaderBase)
 
@@ -23,139 +24,104 @@ class HomePage extends Component {
       sliders: {
         weekTvTrending: {
           name: "Trending this week",
-          data: []
+          data: [],
         },
         popularDramas: {
           name: "Popular dramas",
-          data: []
+          data: [],
         },
         popularComedies: {
           name: "Popular comedies",
-          data: []
+          data: [],
         },
         popularCrime: {
           name: "Popular crime",
-          data: []
-        }
+          data: [],
+        },
       },
       slidersLoading: false,
       calendarLoading: false,
       willAirEpisodes: [],
-      error: ""
+      error: "",
     }
   }
 
   componentDidMount() {
     this.getContentForSliders()
-    // this.testFun()
+    console.log(this.props.firebase)
   }
 
-  testFun = () => {
-    this.props.firebase.allShowsList("ongoing").once("value", snapshot => {
-      if (snapshot.val() === null) return
+  // databaseModify = () => {
+  //   this.props.firebase.users().once("value", (snapshot) => {
+  //     let users = []
+  //     snapshot.forEach((item) => {
+  //       users = [...users, { ...item.val(), key: item.key }]
+  //     })
 
-      let shows = []
-      snapshot.forEach(item => {
-        shows = [...shows, item.val()]
-      })
+  //     users.forEach((user) => {
+  //       if (user.email !== "mr.spok407@gmail.com") return
 
-      shows.forEach(show => {
-        axios
-          .get(
-            `https://api.themoviedb.org/3/tv/${show.id}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US`
-          )
-          .then(({ data: { number_of_seasons } }) => {
-            const maxSeasonsInChunk = 20
-            const allSeasons = []
-            const seasonChunks = []
-            const apiRequests = []
+  //       this.props.firebase.userAllShows(user.key).once("value", (snapshot) => {
+  //         let episodes = {}
 
-            for (let i = 1; i <= number_of_seasons; i += 1) {
-              allSeasons.push(`season/${i}`)
-            }
+  //         const shows = Object.entries(snapshot.val()).reduce((acc, [key, value]) => {
+  //           if (key === "finishedShows") return acc
 
-            for (let i = 0; i <= allSeasons.length; i += maxSeasonsInChunk) {
-              const chunk = allSeasons.slice(i, i + maxSeasonsInChunk)
-              seasonChunks.push(chunk.join())
-            }
+  //           const showsInOneDatabase = Object.values(value).reduce((acc, show) => {
+  //             acc = {
+  //               ...acc,
+  //               [show.id]: {
+  //                 allEpisodesWatched: show.allEpisodesWatched,
+  //                 database: key,
+  //                 finished: show.finished_and_name.slice(0, 4) === "true" ? true : false,
+  //                 firstAirDate: show.firstAirDate,
+  //                 id: show.id,
+  //                 name: show.name,
+  //                 status: show.status,
+  //                 timeStamp: show.timeStamp * -1,
+  //               },
+  //             }
 
-            seasonChunks.forEach(item => {
-              const request = axios.get(
-                `https://api.themoviedb.org/3/tv/${show.id}?api_key=${process.env.REACT_APP_TMDB_API}&append_to_response=${item}`
-              )
-              apiRequests.push(request)
-            })
+  //             episodes = {
+  //               ...episodes,
+  //               [show.id]: {
+  //                 episodes: show.episodes,
+  //                 info: {
+  //                   allEpisodesWatched: show.allEpisodesWatched,
+  //                   database: key,
+  //                   finished: show.finished_and_name.slice(0, 4) === "true" ? true : false,
+  //                 },
+  //               },
+  //             }
 
-            return axios.all([...apiRequests])
-          })
-          .then(
-            axios.spread((...responses) => {
-              const rowData = []
-              const seasonsData = []
+  //             return acc
+  //           }, {})
 
-              responses.forEach(item => {
-                rowData.push(item.data)
-              })
+  //           acc = {
+  //             ...acc,
+  //             ...showsInOneDatabase,
+  //           }
 
-              const mergedRowData = Object.assign({}, ...rowData)
+  //           return acc
+  //         }, {})
 
-              Object.entries(mergedRowData).forEach(([key, value]) => {
-                if (!key.indexOf("season/")) {
-                  seasonsData.push({ [key]: { ...value } })
-                }
-              })
+  //         console.log(episodes)
+  //         console.log(shows)
 
-              let allEpisodes = []
+  //         this.props.firebase.userAllShows(user.key).set(shows)
+  //         this.props.firebase.userEpisodes(user.key).set(episodes)
+  //       })
 
-              seasonsData.forEach((item, index) => {
-                const season = item[`season/${index + 1}`]
-                if (!Array.isArray(season.episodes) || season.episodes.length === 0) return
+  //       // this.props.firebase.userAllShows(user.key).once("value", snapshot => {
+  //       //   if (snapshot.val() === null) return
 
-                let episodes = []
-
-                season.episodes.forEach(item => {
-                  const updatedEpisode = {
-                    air_date: item.air_date,
-                    episode_number: item.episode_number,
-                    name: item.name,
-                    season_number: item.season_number,
-                    id: item.id
-                  }
-                  episodes.push(updatedEpisode)
-                })
-
-                const updatedSeason = {
-                  air_date: season.air_date,
-                  season_number: season.season_number,
-                  id: season._id,
-                  poster_path: season.poster_path,
-                  name: season.name,
-                  episodes
-                }
-
-                allEpisodes.push(updatedSeason)
-              })
-
-              const dataToPass = {
-                episodes: allEpisodes,
-                status: mergedRowData.status
-              }
-
-              return dataToPass
-            })
-          )
-          .then(data => {
-            this.props.firebase
-              .allShowsList("ongoing")
-              .child(show.id)
-              .update({ episodes: data.episodes })
-          })
-          .catch(err => {
-            console.log(err)
-          })
-      })
-    })
-  }
+  //       //   Object.entries(snapshot.val()).forEach(([key, value]) => {
+  //       //     this.props.firebase.userShowAllEpisodesInfo(user.key, key).update({ database: value.database })
+  //       //   })
+  //       // })
+  //     })
+  //   })
+  // }
 
   getContentForSliders = () => {
     this.setState({ slidersLoading: true })
@@ -182,26 +148,28 @@ class HomePage extends Component {
       .all(promises)
       .then(
         axios.spread((...responses) => {
-          responses.forEach((res, index) => {
+          const sliders = responses.reduce((acc, value, index) => {
             const key = Object.keys(this.state.sliders)[index]
-            this.setState({
-              sliders: {
-                ...this.state.sliders,
-                [key]: {
-                  ...this.state.sliders[key],
-                  data: res.data.results
-                }
-              }
-            })
-          })
+            acc = {
+              ...acc,
+              [key]: {
+                name: this.state.sliders[key].name,
+                data: value.data.results,
+              },
+            }
+            return acc
+          }, {})
 
-          this.setState({ slidersLoading: false })
+          this.setState({
+            sliders,
+            slidersLoading: false,
+          })
         })
       )
-      .catch(err => {
+      .catch((err) => {
         this.setState({
           error: `Something went wrong, sorry. ${err}`,
-          slidersLoading: false
+          slidersLoading: false,
         })
       })
   }
@@ -209,7 +177,7 @@ class HomePage extends Component {
   handleCalendarState = ({ loading = false, willAirEpisodes = [] }) => {
     this.setState({
       calendarLoading: loading,
-      willAirEpisodes
+      willAirEpisodes,
     })
   }
 
@@ -240,7 +208,7 @@ class HomePage extends Component {
 
       {!this.state.slidersLoading && (
         <div className="home-page__sliders home-page__sliders--non-auth">
-          {Object.values(this.state.sliders).map(value => {
+          {Object.values(this.state.sliders).map((value) => {
             return (
               <div key={value.name} className="home-page__slider">
                 <h2 className="home-page__slider-heading">{value.name}</h2>
@@ -255,11 +223,11 @@ class HomePage extends Component {
 
   renderAuthUser = () => (
     <>
-      {!this.state.calendarLoading && (
+      {!this.context.userContent.loadingShows && (
         <>
-          {this.state.willAirEpisodes.length > 0 ? (
+          {this.context.userContent.userWillAirEpisodes.length > 0 ? (
             <div className="home-page__heading">
-              <h1 onClick={() => this.testFun()}>Soon to watch</h1>
+              <h1>Soon to watch</h1>
             </div>
           ) : (
             <PlaceholderHomePageNoFutureEpisodes />
@@ -269,9 +237,9 @@ class HomePage extends Component {
 
       <CalendarContent homePage={true} handleCalendarState={this.handleCalendarState} />
 
-      {!this.state.calendarLoading && !this.state.slidersLoading && (
+      {!this.context.userContent.loadingShows && !this.state.slidersLoading && (
         <div className="home-page__sliders">
-          {Object.values(this.state.sliders).map(value => {
+          {Object.values(this.state.sliders).map((value) => {
             return (
               <div key={value.name} className="home-page__slider">
                 <h2 className="home-page__slider-heading">{value.name}</h2>
@@ -292,7 +260,6 @@ class HomePage extends Component {
           <title>TV Junkie</title>
         </Helmet>
         <Header />
-        <div id="pixiboTest"></div>
         <div className="home-page__wrapper">
           {!this.props.authUser ? this.renderNonAuthUser() : this.renderAuthUser()}
         </div>
@@ -304,3 +271,5 @@ class HomePage extends Component {
 }
 
 export default withUserContent(HomePage)
+
+HomePage.contextType = AppContext

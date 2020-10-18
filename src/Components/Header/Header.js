@@ -1,11 +1,9 @@
-/* eslint-disable jsx-a11y/mouse-events-have-key-events */
 import React, { Component } from "react"
 import { NavLink } from "react-router-dom"
 import classNames from "classnames"
 import logo from "assets/images/main-page-logo.png"
 import Login from "./Login"
 import * as ROUTES from "Utils/Constants/routes"
-// import * as ROLES from "Utils/Constants/roles"
 import { AuthUserContext } from "Components/UserAuth/Session/WithAuthentication"
 import "./Header.scss"
 import "../UserAuth/UserAuth.scss"
@@ -16,7 +14,7 @@ export default class Header extends Component {
     super(props)
 
     this.state = {
-      navMobileOpen: false
+      navMobileOpen: false,
     }
 
     this.nav = React.createRef()
@@ -35,12 +33,12 @@ export default class Header extends Component {
         <nav
           ref={this.nav}
           className={classNames("nav", {
-            "nav--mobile-open": this.state.navMobileOpen
+            "nav--mobile-open": this.state.navMobileOpen,
           })}
         >
           <ul
             className={classNames("nav__list", {
-              "nav__list--not-auth": !authUser
+              "nav__list--not-auth": !authUser,
             })}
           >
             <NavLink
@@ -59,7 +57,7 @@ export default class Header extends Component {
                   exact
                   to={ROUTES.CALENDAR}
                   className={classNames("nav__link", {
-                    "nav__link--non-auth": !authUser
+                    "nav__link--non-auth": !authUser,
                   })}
                   activeClassName="nav__item--active"
                   onClick={() => this.closeNavMobile()}
@@ -71,7 +69,7 @@ export default class Header extends Component {
                   exact
                   to={ROUTES.TO_WATCH}
                   className={classNames("nav__link", {
-                    "nav__link--non-auth": !authUser
+                    "nav__link--non-auth": !authUser,
                   })}
                   activeClassName="nav__item--active"
                   onClick={() => this.closeNavMobile()}
@@ -85,7 +83,7 @@ export default class Header extends Component {
               exact
               to={ROUTES.SHOWS}
               className={classNames("nav__link", {
-                "nav__link--non-auth": !authUser
+                "nav__link--non-auth": !authUser,
               })}
               activeClassName="nav__item--active"
               onClick={() => this.closeNavMobile()}
@@ -97,7 +95,7 @@ export default class Header extends Component {
               exact
               to={ROUTES.MOVIES}
               className={classNames("nav__link", {
-                "nav__link--non-auth": !authUser
+                "nav__link--non-auth": !authUser,
               })}
               activeClassName="nav__item--active"
               onClick={() => this.closeNavMobile()}
@@ -111,7 +109,7 @@ export default class Header extends Component {
                   exact
                   to={ROUTES.PROFILE}
                   className={classNames("nav__link", {
-                    "nav__link--non-auth": !authUser
+                    "nav__link--non-auth": !authUser,
                   })}
                 >
                   <li className="nav__item" onClick={() => this.closeNavMobile()}>
@@ -133,7 +131,7 @@ export default class Header extends Component {
 
             <li
               className={classNames("nav__item nav__item--nav-search", {
-                "nav__item--nav-search__non-auth": !authUser
+                "nav__item--nav-search__non-auth": !authUser,
               })}
             >
               <Search navSearch={true} navRef={this.nav} closeNavMobile={this.closeNavMobile} />
@@ -143,11 +141,11 @@ export default class Header extends Component {
         <button
           type="button"
           className={classNames("header__show-nav", {
-            "header__show-nav--open": this.state.navMobileOpen
+            "header__show-nav--open": this.state.navMobileOpen,
           })}
           onClick={() =>
-            this.setState(prevState => ({
-              navMobileOpen: !prevState.navMobileOpen
+            this.setState((prevState) => ({
+              navMobileOpen: !prevState.navMobileOpen,
             }))
           }
         >
@@ -160,10 +158,10 @@ export default class Header extends Component {
           style={
             isLogoVisible
               ? {
-                  display: "inherit"
+                  display: "inherit",
                 }
               : {
-                  display: "none"
+                  display: "none",
                 }
           }
         >

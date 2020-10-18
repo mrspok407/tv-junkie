@@ -1,4 +1,4 @@
-@import "../../../styles/globals";
+@import "../../styles/globals";
 
 $maxContainerWidth: 1000px;
 
@@ -24,7 +24,7 @@ $font-sizes: (
   episodeInfo: 1rem
 );
 
-.full-detailes-container {
+.detailes-page-container {
   max-width: $maxContainerWidth;
   width: 100%;
   padding-bottom: 100px;
@@ -36,7 +36,7 @@ $font-sizes: (
   }
 }
 
-.full-detailes {
+.detailes-page {
   display: grid;
   grid-template-columns: 0.8fr 2fr;
   grid-auto-rows: max-content;
@@ -154,7 +154,7 @@ $font-sizes: (
     }
     &-imdb {
       display: block;
-      background-image: url("../../../assets/images/icons/imdb-logo.svg");
+      background-image: url("../../assets/images/icons/imdb-logo.svg");
       background-size: contain;
       background-repeat: no-repeat;
       width: 78px;

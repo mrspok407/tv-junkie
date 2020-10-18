@@ -1,6 +1,6 @@
 @import "../../../styles/globals";
 
-.full-detailes--placeholder {
+.detailes-page--placeholder {
   opacity: 0;
   animation: showFullDetails 0.5s forwards;
   @keyframes showFullDetails {
@@ -10,7 +10,7 @@
   }
 }
 
-.full-detailes__info-row--placeholder {
+.detailes-page__info-row--placeholder {
   position: relative;
   .loader--small-pink {
     top: 50%;
@@ -32,7 +32,7 @@
   }
 }
 
-.full-detailes__info-value--placeholder {
+.detailes-page__info-value--placeholder {
   position: relative;
   grid-column: 1 / 3;
   height: 80%;

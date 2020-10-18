@@ -4,43 +4,32 @@ import { withUserContent } from "Components/UserContent"
 import { listOfGenres } from "Utils"
 import { throttle } from "throttle-debounce"
 import classNames from "classnames"
-import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
+import AppContextConsumer from "Components/AppContext/AppContextConsumer"
 import Loader from "Components/Placeholders/Loader"
 import PlaceholderNoMovies from "Components/Placeholders/PlaceholderNoMovies"
 import PlaceholderLoadingContentResultsItem from "Components/Placeholders/PlaceholderLoadingSortBy/PlaceholderLoadingContentResultsItem"
+import { compose } from "recompose"
 
-const moviesToLoad = 5
+const MOVIES_TO_LOAD_INITIAL = 15
+const SCROLL_THRESHOLD = 800
 
 class MoviesContent extends Component {
-  constructor(props) {
-    super(props)
-
-    this.state = {
-      activeSection: "watchLaterMovies",
-      sortBy: "title",
-      initialLoading: false,
-      loadingContent: false,
-      sortByLoading: false,
-      database: {
-        watchLaterMovies: []
-      },
-      disableLoad: {
-        watchLaterMovies: false
-      },
-      lastLoadedMovie: {
-        watchLaterMovies: moviesToLoad
-      },
-      loadedMovies: {
-        watchLaterMovies: moviesToLoad
-      }
-    }
+  state = {
+    activeSection: "watchLaterMovies",
+    sortBy: "title",
+    disableLoad: {
+      watchLaterMovies: false,
+      watchLaterMoviesLS: false,
+    },
+    loadedMovies: {
+      watchLaterMovies: MOVIES_TO_LOAD_INITIAL,
+      watchLaterMoviesLS: MOVIES_TO_LOAD_INITIAL,
+    },
   }
 
   componentDidMount() {
-    this.getContent({ sortBy: "title", isInitialLoad: true })
-    window.addEventListener("scroll", this.handleScroll)
-
     this._isMounted = true
+    window.addEventListener("scroll", this.handleScroll)
   }
 
   componentWillUnmount() {
@@ -49,174 +38,82 @@ class MoviesContent extends Component {
     this._isMounted = false
   }
 
-  getContent = ({ sortBy = "title", isInitialLoad = true }) => {
-    if (this.props.authUser === null) return
-    if (isInitialLoad) {
-      this.setState({ initialLoading: true })
-    }
-
-    const promises = []
-
-    Object.keys(this.state.database).forEach(database => {
-      const promise = this.props.firebase[database](this.props.authUser.uid)
-        .orderByChild(sortBy)
-        .limitToFirst(this.state.loadedMovies[database])
-        .once("value", snapshot => {
-          if (!this._isMounted) return
-
-          let movies = []
-          snapshot.forEach(item => {
-            movies = [...movies, item.val()]
-          })
-
-          this.setState({
-            database: {
-              ...this.state.database,
-              [database]: movies
-            },
-            lastLoadedMovie: {
-              ...this.state.lastLoadedMovie,
-              [database]: movies.length !== 0 && movies[movies.length - 1][sortBy]
-            }
-          })
-        })
-
-      promises.push(promise)
-    })
-
-    Promise.all(promises).then(() =>
-      this.setState({
-        sortByLoading: false,
-        initialLoading: false
-      })
-    )
-  }
-
-  loadNewContent = ({ itemsToLoad = moviesToLoad }) => {
-    if (this.props.authUser === null) return
-    if (
-      this.state.disableLoad[this.state.activeSection] ||
-      this.state.loadingContent ||
-      document.body.scrollHeight < 1400
-    )
-      return
+  loadNewContent = () => {
+    if (this.state.disableLoad[this.state.activeSection]) return
 
     this.setState({
-      loadingContent: true
+      loadedMovies: {
+        ...this.state.loadedMovies,
+        [this.state.activeSection]:
+          this.state.loadedMovies[this.state.activeSection] + MOVIES_TO_LOAD_INITIAL,
+      },
+      disableLoad: {
+        ...this.state.disableLoad,
+        [this.state.activeSection]:
+          this.state.loadedMovies[this.state.activeSection] >=
+            this.props.context.userContent.userMovies.filter(
+              (movie) => movie.database === this.state.activeSection
+            ).length && true,
+      },
     })
+  }
 
-    this.props.firebase[this.state.activeSection](this.props.authUser.uid)
-      .orderByChild(this.state.sortBy)
-      .startAt(this.state.lastLoadedMovie[this.state.activeSection] + 1)
-      .limitToFirst(itemsToLoad)
-      .once("value", snapshot => {
-        if (!this._isMounted) return
+  loadNewContentLS = () => {
+    if (this.state.disableLoad.watchLaterMoviesLS || this.props.firebase.authUser === null) return
 
-        let movies = []
-        snapshot.forEach(item => {
-          movies = [...movies, item.val()]
-        })
+    this.setState({
+      loadedMovies: {
+        ...this.state.loadedMovies,
+        watchLaterMoviesLS: this.state.loadedMovies.watchLaterMoviesLS + MOVIES_TO_LOAD_INITIAL,
+      },
+      disableLoad: {
+        ...this.state.disableLoad,
+        watchLaterMoviesLS:
+          this.state.loadedMovies.watchLaterMoviesLS >=
+            this.props.context.userContentLocalStorage.watchLaterMovies.length && true,
+      },
+    })
+  }
 
-        this.setState(prevState => ({
-          database: {
-            ...prevState.database,
-            [this.state.activeSection]: [...prevState.database[this.state.activeSection], ...movies]
-          },
-          disableLoad: {
-            ...prevState.disableLoad,
-            [this.state.activeSection]: movies.length === 0
-          },
-          lastLoadedMovie: {
-            ...prevState.lastLoadedMovie,
-            [this.state.activeSection]: movies.length !== 0 && movies[movies.length - 1][this.state.sortBy]
-          },
-          loadedMovies: {
-            ...prevState.loadedMovies,
-            [this.state.activeSection]: prevState.database[this.state.activeSection].length + movies.length
-          },
-          loadingContent: false
-        }))
-      })
+  sortBy = (sortBy) => {
+    if (this.state.sortBy === sortBy) return
+
+    this.setState({ sortBy })
   }
 
   handleScroll = throttle(500, () => {
-    if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 100) {
-      this.loadNewContent({ itemsToLoad: moviesToLoad })
+    if (window.innerHeight + window.scrollY >= document.body.scrollHeight - SCROLL_THRESHOLD) {
+      this.loadNewContent()
+      this.loadNewContentLS()
     }
   })
 
-  handleMoviesOnClient = movieId => {
-    const filteredMovies = this.state.database[this.state.activeSection].filter(item => item.id !== movieId)
+  renderContent = (section) => {
+    const content = this.props.context.userContent.userMovies
+      .sort((a, b) =>
+        a[this.state.sortBy] > b[this.state.sortBy]
+          ? this.state.sortBy === "timeStamp"
+            ? -1
+            : 1
+          : this.state.sortBy !== "timeStamp"
+          ? -1
+          : 1
+      )
+      .slice(0, this.state.loadedMovies[section])
 
-    this.setState({
-      database: {
-        ...this.state.database,
-        [this.state.activeSection]: filteredMovies
-      }
-    })
-  }
-
-  updateWatchLaterMoviesDatabase = () => {
-    const activeSectionSavedState = this.state.database[this.state.activeSection]
-    const watchLaterMoviesSavedState = this.state.database.watchLaterMovies
-
-    this.props.firebase
-      .watchLaterMovies(this.props.authUser.uid)
-      .orderByChild(this.state.sortBy)
-      .limitToFirst(this.state.loadedShows.watchLaterMovies + 1)
-      .once("value", snapshot => {
-        let watchLaterMovies = []
-        snapshot.forEach(item => {
-          watchLaterMovies = [...watchLaterMovies, item.val()]
-        })
-
-        this.setState(prevState => ({
-          database: {
-            ...this.state.database,
-            watchLaterMovies
-          },
-          lastLoadedShow: {
-            ...this.state.lastLoadedShow,
-            watchLaterMovies:
-              watchLaterMovies.length !== 0 &&
-              watchLaterMovies[watchLaterMovies.length - 1][this.state.sortBy]
-          },
-          loadedShows: {
-            ...prevState.loadedShows,
-            watchLaterMovies: watchLaterMovies.length
-          }
-        }))
-      })
-
-    if (this.props.userContent.errorInDatabase.error) {
-      this.setState({
-        database: {
-          ...this.state.database,
-          [this.state.activeSection]: activeSectionSavedState,
-          watchLaterMovies: watchLaterMoviesSavedState
-        }
-      })
-    }
-  }
-
-  sortBy = sortBy => {
-    if (this.state.sortBy === sortBy) return
-
-    this.setState({ sortBy, sortByLoading: true })
-    this.getContent({ sortBy, isInitialLoad: false })
-  }
-
-  renderContent = () => {
-    const movies = this.props.authUser ? this.state.database.watchLaterMovies : this.context.watchLaterMovies
+    const movies = this.props.authUser
+      ? content
+      : this.props.context.userContentLocalStorage.watchLaterMovies.slice(
+          0,
+          this.state.loadedMovies.watchLaterMoviesLS
+        )
 
     return (
       <>
-        {movies.map(item => {
-          const filteredGenres = item.genre_ids.map(genreId =>
-            listOfGenres.filter(item => item.id === genreId)
+        {movies.map((item) => {
+          const filteredGenres = item.genre_ids.map((genreId) =>
+            listOfGenres.filter((item) => item.id === genreId)
           )
-
-          const contentTitle = item.title || item.original_title
 
           // Movies //
           let movie
@@ -225,14 +122,14 @@ class MoviesContent extends Component {
           let movieHash720p
 
           if (this.props.moviesArr) {
-            movie = this.props.moviesArr.find(movie => movie.id === item.id)
+            movie = this.props.moviesArr.find((movie) => movie.id === item.id)
           }
 
           if (movie) {
-            const hash1080p = movie.torrents.find(item => item.quality === "1080p")
+            const hash1080p = movie.torrents.find((item) => item.quality === "1080p")
             movieHash1080p = hash1080p && hash1080p.hash
 
-            const hash720p = movie.torrents.find(item => item.quality === "720p")
+            const hash720p = movie.torrents.find((item) => item.quality === "720p")
             movieHash720p = hash720p && hash720p.hash
 
             urlMovieTitle = movie.title.split(" ").join("+")
@@ -247,12 +144,12 @@ class MoviesContent extends Component {
                   <Link
                     to={{
                       pathname: `/movie/${item.id}`,
-                      state: { logoDisable: true, y: 300 }
+                      state: { logoDisable: true, y: 300 },
                     }}
                   >
                     <div className="content-results__item-main-info">
                       <div className="content-results__item-title">
-                        {!contentTitle ? "No title available" : contentTitle}
+                        {!item.title ? "No title available" : item.title}
                       </div>
                       <div className="content-results__item-year">
                         {!item.release_date ? "" : `(${item.release_date.slice(0, 4)})`}
@@ -266,7 +163,7 @@ class MoviesContent extends Component {
                       )}
                     </div>
                     <div className="content-results__item-genres">
-                      {filteredGenres.map(item => (
+                      {filteredGenres.map((item) => (
                         <span key={item[0].id}>{item[0].name}</span>
                       ))}
                     </div>
@@ -276,11 +173,12 @@ class MoviesContent extends Component {
                           style={
                             item.backdrop_path !== null
                               ? {
-                                  backgroundImage: `url(https://image.tmdb.org/t/p/w500/${item.backdrop_path ||
-                                    item.poster_path})`
+                                  backgroundImage: `url(https://image.tmdb.org/t/p/w500/${
+                                    item.backdrop_path || item.poster_path
+                                  })`,
                                 }
                               : {
-                                  backgroundImage: `url(https://homestaymatch.com/images/no-image-available.png)`
+                                  backgroundImage: `url(https://homestaymatch.com/images/no-image-available.png)`,
                                 }
                           }
                         />
@@ -341,17 +239,16 @@ class MoviesContent extends Component {
                     className="button--del-item"
                     onClick={() => {
                       if (this.props.authUser) {
-                        this.props.toggleWatchLaterMovie({
+                        this.props.handleMovieInDatabases({
                           id: item.id,
                           data: item,
-                          userDatabase: "watchLaterMovies"
+                          userDatabase: "watchLaterMovies",
                         })
-                        this.loadNewContent({ itemsToLoad: 1 })
-                        this.handleMoviesOnClient(item.id)
+                        this.props.context.userContent.handleUserMoviesOnClient({ id: item.id })
                       } else {
-                        this.context.toggleMovieLS({
+                        this.props.context.userContentLocalStorage.toggleMovieLS({
                           id: item.id,
-                          data: movies
+                          data: movies,
                         })
                       }
                     }}
@@ -367,13 +264,17 @@ class MoviesContent extends Component {
   }
 
   render() {
-    const movies = this.props.authUser ? this.state.database.watchLaterMovies : this.context.watchLaterMovies
+    const movies = this.props.authUser
+      ? this.props.context.userContent.userMovies
+      : this.props.context.userContentLocalStorage.watchLaterMovies
     const maxColumns = 4
     const currentNumOfColumns = movies.length <= maxColumns - 1 ? movies.length : maxColumns
 
+    const loadingMovies = this.props.authUser ? this.props.context.userContent.loadingMovies : false
+
     return (
       <div className="content-results">
-        {this.state.initialLoading ? (
+        {loadingMovies ? (
           <Loader className="loader--pink" />
         ) : movies.length === 0 ? (
           <PlaceholderNoMovies
@@ -389,7 +290,7 @@ class MoviesContent extends Component {
                 <div className="content-results__sortby-buttons">
                   <div
                     className={classNames("content-results__sortby-buttons", {
-                      "content-results__sortby-button--active": this.state.sortBy === "title"
+                      "content-results__sortby-button--active": this.state.sortBy === "title",
                     })}
                   >
                     <button
@@ -402,7 +303,7 @@ class MoviesContent extends Component {
                   </div>
                   <div
                     className={classNames("content-results__sortby-button", {
-                      "content-results__sortby-button--active": this.state.sortBy === "timeStamp"
+                      "content-results__sortby-button--active": this.state.sortBy === "timeStamp",
                     })}
                   >
                     <button
@@ -421,21 +322,14 @@ class MoviesContent extends Component {
               style={
                 currentNumOfColumns <= 3
                   ? {
-                      gridTemplateColumns: "repeat(auto-fit, minmax(300px, 350px))"
+                      gridTemplateColumns: "repeat(auto-fit, minmax(300px, 350px))",
                     }
                   : {
-                      gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))"
+                      gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
                     }
               }
             >
-              {this.state.initialLoading ? (
-                <Loader className="loader--pink" />
-              ) : (
-                <>
-                  {this.renderContent(this.state.activeSection)}
-                  {this.state.loadingContent && <Loader className="loader--pink loader--new-page" />}
-                </>
-              )}
+              {this.renderContent(this.state.activeSection)}
             </div>
           </>
         )}
@@ -444,6 +338,4 @@ class MoviesContent extends Component {
   }
 }
 
-export default withUserContent(MoviesContent)
-
-MoviesContent.contextType = UserContentLocalStorageContext
+export default compose(withUserContent, AppContextConsumer)(MoviesContent)

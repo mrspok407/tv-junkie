@@ -3,9 +3,7 @@ import { compose } from "recompose"
 import { withUserContent } from "Components/UserContent"
 import classNames from "classnames"
 import { Link } from "react-router-dom"
-import { checkIfAllEpisodesWatched } from "Components/UserContent/FirebaseHelpers"
 import * as ROUTES from "Utils/Constants/routes"
-import { todayDate } from "Utils"
 import "./UserRating.scss"
 
 const STAR_AMOUNT = 5
@@ -15,7 +13,7 @@ class UserRating extends Component {
     super(props)
 
     this.state = {
-      userRating: null,
+      userRating: 0,
       nonAuthWarning: false
     }
 
@@ -35,21 +33,18 @@ class UserRating extends Component {
   }
 
   getRating = () => {
-    if (this.props.authUser === null) return
+    if (this.props.authUser === null || this.props.toWatchPage) return
 
-    this.props.userContent.showsDatabases.forEach(database => {
-      this.firebase[this.props.firebaseRef]({
-        uid: this.uid,
-        key: Number(this.props.id),
-        database,
-        seasonNum: this.props.seasonNum,
-        episodeNum: this.props.episodeNum
-      }).once("value", snapshot => {
-        if (snapshot.val() === null) return
+    this.firebase[this.props.firebaseRef]({
+      uid: this.uid,
+      key: Number(this.props.id),
+      seasonNum: this.props.seasonNum,
+      episodeNum: this.props.episodeNum
+    }).once("value", snapshot => {
+      if (snapshot.val() === null) return
 
-        this.setState({
-          userRating: this.props.toWatchPage ? 0 : snapshot.val().userRating
-        })
+      this.setState({
+        userRating: snapshot.val().userRating
       })
     })
   }
@@ -92,41 +87,28 @@ class UserRating extends Component {
 
     const rating = e.target.dataset.rating
 
-    this.props.userContent.showsDatabases.forEach(database => {
+    this.firebase[this.props.firebaseRef]({
+      uid: this.uid,
+      key: Number(this.props.id),
+      seasonNum: this.props.seasonNum,
+      episodeNum: this.props.episodeNum
+    }).once("value", snapshot => {
+      if (snapshot.val() === null) return
+
+      console.log(rating)
+
+      this.setState({
+        userRating: rating
+      })
+
       this.firebase[this.props.firebaseRef]({
         uid: this.uid,
         key: Number(this.props.id),
-        database,
         seasonNum: this.props.seasonNum,
         episodeNum: this.props.episodeNum
-      }).once("value", snapshot => {
-        if (snapshot.val() === null) return
-
-        this.setState({
-          userRating: rating
-        })
-
-        this.firebase[this.props.firebaseRef]({
-          uid: this.uid,
-          key: Number(this.props.id),
-          database,
-          seasonNum: this.props.seasonNum,
-          episodeNum: this.props.episodeNum
-        }).update(
-          {
-            userRating: rating,
-            watched: this.props.toWatchPage ? snapshot.val().watched : this.props.episodeRating ? true : null
-          },
-          () => {
-            if (this.props.toWatchPage || this.props.showRating) return
-            checkIfAllEpisodesWatched({
-              show: this.props.show,
-              firebase: this.firebase,
-              authUser: this.props.authUser,
-              todayDate: todayDate
-            })
-          }
-        )
+      }).update({
+        userRating: rating,
+        watched: this.props.toWatchPage ? snapshot.val().watched : this.props.episodeRating ? true : null
       })
     })
   }

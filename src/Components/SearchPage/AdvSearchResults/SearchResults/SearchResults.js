@@ -3,7 +3,6 @@ import { Link } from "react-router-dom"
 import { compose } from "recompose"
 import { listOfGenres } from "Utils"
 import { withUserContent } from "Components/UserContent"
-import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
 import Loader from "Components/Placeholders/Loader"
 import "./SearchResults.scss"
 
@@ -111,100 +110,6 @@ class AdvSearchResults extends Component {
                         </div>
                       </div>
                     </Link>
-
-                    {/* <div className="content-results__item-links">
-                      {mediaType === "movie" ? (
-                        this.props.userContent.loadingContent ? (
-                          <Loader className="loader--small-pink" />
-                        ) : (
-                          <button
-                            className={classNames("button", {
-                              "button--pressed": watchLaterMovies.find(item => item.id === id)
-                            })}
-                            onClick={() => {
-                              if (this.props.authUser) {
-                                this.props.toggleWatchLaterMovie({
-                                  id: id,
-                                  data: this.props.advancedSearchContent,
-                                  userDatabase: "watchLaterMovies"
-                                })
-                              } else {
-                                this.context.toggleMovieLS({
-                                  id,
-                                  data: this.props.advancedSearchContent
-                                })
-                              }
-
-                              if (
-                                !watchLaterMovies.find(item => item.id === id) ||
-                                this.props.currentlyChosenContent.find(item => item.id === id)
-                              ) {
-                                this.props.toggleCurrentlyChosenContent(id, this.props.advancedSearchContent)
-                              }
-                            }}
-                            type="button"
-                          >
-                            {watchLaterMovies.find(item => item.id === id) ? "Remove" : "Watch later"}
-                          </button>
-                        )
-                      ) : (
-                        <>
-                          {this.props.userContent.loadingContent ? (
-                            <Loader className="loader--small-pink" />
-                          ) : watchingShows.find(e => e.id === id && e.userWatching === true) ? (
-                            <button
-                              className="button button--pressed"
-                              onClick={() => {
-                                if (this.props.authUser) {
-                                  this.props.removeWatchingShow(id)
-                                } else {
-                                  this.context.removeShowLS({
-                                    id
-                                  })
-                                }
-
-                                if (this.props.currentlyChosenContent.find(item => item.id === id)) {
-                                  this.props.toggleCurrentlyChosenContent(
-                                    id,
-                                    this.props.advancedSearchContent
-                                  )
-                                }
-                              }}
-                              type="button"
-                            >
-                              Not watching
-                            </button>
-                          ) : (
-                            <>
-                              <button
-                                className="button"
-                                onClick={() => {
-                                  if (this.props.authUser) {
-                                    this.props.handleShowInDatabases({
-                                      id: id,
-                                      data: this.props.advancedSearchContent,
-                                      database: "watchingShows"
-                                    })
-                                  } else {
-                                    this.context.addShowLS({
-                                      id,
-                                      data: this.props.advancedSearchContent
-                                    })
-                                  }
-                                  this.props.toggleCurrentlyChosenContent(
-                                    id,
-                                    this.props.advancedSearchContent
-                                  )
-                                }}
-                                type="button"
-                              >
-                                Watching
-                              </button>
-                            </>
-                          )}
-                        </>
-                      )}
-                    </div> */}
                   </div>
                 )
               }
@@ -218,5 +123,3 @@ class AdvSearchResults extends Component {
 }
 
 export default compose(withUserContent)(AdvSearchResults, "SearchResults")
-
-AdvSearchResults.contextType = UserContentLocalStorageContext

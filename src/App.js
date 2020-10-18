@@ -2,7 +2,7 @@ import React, { Component } from "react"
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
 import { compose } from "recompose"
 import Profile from "Components/UserProfile/Profile"
-import Admin from "Components/Admin/Admin"
+import Admin from "Components/AdminPage/Admin"
 import LoginPage from "Components/LoginPage/LoginPage"
 import SearchPage from "Components/SearchPage/SearchPage"
 import HomePage from "Components/HomePage/HomePage"
@@ -10,12 +10,12 @@ import ShowsPage from "Components/ShowsPage/ShowsPage"
 import ToWatchEpisodesPage from "Components/ToWatchEpisodesPage/ToWatchEpisodesPage"
 import CalendarPage from "Components/CalendarPage/CalendarPage"
 import MoviesPage from "Components/MoviesPage/MoviesPage"
-import FullContentInfo from "Components/Templates/FullContentInfo/FullContentInfo"
+import DetailesPage from "Components/DetailesPage/DetailesPage"
 import GridTests from "Utils/GridTests/GridTests"
 import * as ROUTES from "Utils/Constants/routes"
 import { WithAuthenticationProvider } from "Components/UserAuth/Session/WithAuthentication"
-import userContentLocalStorageProvider from "Components/UserContent/UserContentLocalStorageContext"
 import PageNotFound from "Components/PageNotFound/PageNotFound"
+import AppContextHOC from "Components/AppContext/AppContextHOC"
 
 class App extends Component {
   render() {
@@ -29,7 +29,7 @@ class App extends Component {
             <Route path={ROUTES.TO_WATCH} exact component={ToWatchEpisodesPage} />
             <Route path={ROUTES.CALENDAR} exact component={CalendarPage} />
             <Route path={ROUTES.MOVIES} exact component={MoviesPage} />
-            <Route path={ROUTES.FULL_CONTENT_INFO} exact component={FullContentInfo} />
+            <Route path={ROUTES.DETAILES_PAGE} exact component={DetailesPage} />
             <Route path={ROUTES.PROFILE} exact component={Profile} />
             <Route path={ROUTES.LOGIN_PAGE} exact component={LoginPage} />
             <Route path={ROUTES.ADMIN} exact component={Admin} />
@@ -42,4 +42,4 @@ class App extends Component {
   }
 }
 
-export default compose(WithAuthenticationProvider, userContentLocalStorageProvider)(App)
+export default compose(WithAuthenticationProvider, AppContextHOC)(App)

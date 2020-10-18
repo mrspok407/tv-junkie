@@ -7,6 +7,7 @@ import { WithAuthenticationConsumer } from "Components/UserAuth/Session/WithAuth
 import Header from "Components/Header/Header"
 import "./Profile.scss"
 import Footer from "Components/Footer/Footer"
+import { withUserContent } from "Components/UserContent"
 
 class Profile extends Component {
   constructor(props) {
@@ -57,4 +58,4 @@ class Profile extends Component {
 
 const condition = authUser => authUser !== null
 
-export default compose(WithAuthenticationConsumer, WithAuthorization(condition))(Profile)
+export default compose(WithAuthenticationConsumer, withUserContent, WithAuthorization(condition))(Profile)

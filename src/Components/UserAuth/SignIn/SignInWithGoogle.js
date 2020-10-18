@@ -2,7 +2,8 @@ import React, { useState, useEffect, useContext } from "react"
 import { compose } from "recompose"
 import { withRouter } from "react-router-dom"
 import { withUserContent } from "Components/UserContent"
-import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
+// import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
+import { AppContext } from "Components/AppContext/AppContextHOC"
 import * as ROLES from "Utils/Constants/roles"
 import * as ROUTES from "Utils/Constants/routes"
 
@@ -15,7 +16,7 @@ const SignInWithGoogleBase = ({
   firebase,
   history,
   addShowToDatabase,
-  toggleWatchLaterMovie,
+  handleMovieInDatabases,
   closeNavMobile
 }) => {
   const [windowSize, setWindowSize] = useState(window.innerWidth)
@@ -24,7 +25,7 @@ const SignInWithGoogleBase = ({
     setWindowSize(window.innerWidth)
   }, [])
 
-  const context = useContext(UserContentLocalStorageContext)
+  const context = useContext(AppContext)
 
   const onSubmit = provider => {
     // const signInType = windowSize < mobileLayout ? "signInWithGoogleRedirect" : "signInWithGooglePopUp"
@@ -56,17 +57,15 @@ const SignInWithGoogleBase = ({
               addShowToDatabase({
                 id: item.id,
                 show: item,
-                userDatabase: "watchingShows",
-                userUid: authUser.user.uid
+                userDatabase: "watchingShows"
               })
             })
 
             watchLaterMovies.forEach(item => {
-              toggleWatchLaterMovie({
+              handleMovieInDatabases({
                 id: item.id,
                 data: item,
-                userDatabase: "watchLaterMovies",
-                userUid: authUser.user.uid
+                userDatabase: "watchLaterMovies"
               })
             })
           })
@@ -74,7 +73,7 @@ const SignInWithGoogleBase = ({
             localStorage.removeItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)
             localStorage.removeItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)
 
-            context.clearContentState()
+            context.userContentLocalStorage.clearContentState()
 
             if (closeNavMobile) closeNavMobile()
           })

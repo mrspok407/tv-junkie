@@ -188,7 +188,7 @@
     }
 
     @include mediaMaxW(#{$mobileViewPort}) {
-      .full-detailes .buttons__col-warning:after {
+      .detailes-page .buttons__col-warning:after {
         left: 50%;
       }
     }

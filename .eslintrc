@@ -5,7 +5,7 @@
     "no-console": 0,
     "react/no-unused-state": 0,
     "consistent-return": 0,
-    "camelcase": 0,
+    "camelcase": 1,
     "react/prop-types": 0,
     "react/destructuring-assignment": [0, "never"],
     "react/sort-comp": 0,

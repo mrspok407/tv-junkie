@@ -18,14 +18,14 @@ export default function AdvancedSearch({
   searchingAdvancedSearch,
   withActors,
   toggleActor,
-  clearWithActors
+  clearWithActors,
 }) {
   const [advSearchOpen, setAdvSearchOpen] = useState(false)
   const [genres, setGenres] = useState(listOfGenres)
 
   function toggleGenre(e) {
     const newGenres = [...genres]
-    const genre = newGenres.find(item => item.name.toLowerCase() === e.target.value)
+    const genre = newGenres.find((item) => item.name.toLowerCase() === e.target.value)
     const data = e.target.getAttribute("data")
 
     genre.isChecked = !genre.isChecked
@@ -47,15 +47,11 @@ export default function AdvancedSearch({
         name,
         isChecked: false,
         withGenre: false,
-        withoutGenre: false
+        withoutGenre: false,
       }
     })
     setGenres(resetGenres)
   }
-
-  // function changeYear(e) {
-  //   setYear(e)
-  // }
 
   return (
     <Formik
@@ -67,13 +63,12 @@ export default function AdvancedSearch({
         rating: "",
         voteCount: "",
         sortBy: "vote_count.desc",
-        mediaType: "movie"
+        mediaType: "movie",
       }}
       validationSchema={Yup.object({
         // year: Yup.mixed().required("Required")
       })}
       onSubmit={(values, { setSubmitting, setFieldValue }) => {
-        // const averageVote = values.averageVote === "" ? "0" : values.averageVote
         let yearTo
         if (values.yearTo < values.yearFrom && values.yearTo !== "") {
           yearTo = values.yearFrom
@@ -131,7 +126,7 @@ export default function AdvancedSearch({
                   <div className="inputs__buttons--search">
                     <button
                       className={classNames("button", {
-                        "button--loading": searchingAdvancedSearch
+                        "button--loading": searchingAdvancedSearch,
                       })}
                       type="submit"
                     >

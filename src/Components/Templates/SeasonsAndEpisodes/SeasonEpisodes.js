@@ -1,10 +1,12 @@
 /* eslint-disable array-callback-return */
 import React, { Component } from "react"
-import { differenceBtwDatesInDays } from "Utils"
+import { differenceBtwDatesInDays, todayDate } from "Utils"
 import classNames from "classnames"
+import * as _get from "lodash.get"
 import { Link } from "react-router-dom"
 import * as ROUTES from "Utils/Constants/routes"
 import UserRating from "../../UserRating/UserRating"
+import TorrentLinksEpisodes from "./Components/TorrentLinksEpisodes"
 
 const FADE_OUT_SPEED = 300
 
@@ -16,7 +18,8 @@ export default class SeasonEpisodes extends Component {
       showTorrentLinks: [],
       fadeOutEpisodes: [],
       moveUpEpisodes: [],
-      disableCheckboxWarning: null
+      disableCheckboxWarning: null,
+      checkbox: "",
     }
 
     this.episode = React.createRef()
@@ -34,7 +37,7 @@ export default class SeasonEpisodes extends Component {
     document.removeEventListener("mousedown", this.handleClickOutside)
   }
 
-  handleClickOutside = e => {
+  handleClickOutside = (e) => {
     if (this.props.authUser) return
     if (
       this.checkboxRef.current &&
@@ -43,48 +46,48 @@ export default class SeasonEpisodes extends Component {
       !this.registerWarningRef.current.contains(e.target)
     ) {
       this.setState({
-        disableCheckboxWarning: null
+        disableCheckboxWarning: null,
       })
     }
   }
 
-  showDissableCheckboxWarning = checkboxId => {
+  showDissableCheckboxWarning = (checkboxId) => {
     if (this.props.authUser) return
     this.setState({
-      disableCheckboxWarning: checkboxId
+      disableCheckboxWarning: checkboxId,
     })
   }
 
-  toggleTorrentLinks = id => {
+  toggleTorrentLinks = (id) => {
     const allreadyShowed = this.state.showTorrentLinks.includes(id)
 
     if (allreadyShowed) {
       this.setState({
-        showTorrentLinks: this.state.showTorrentLinks.filter(item => item !== id)
+        showTorrentLinks: this.state.showTorrentLinks.filter((item) => item !== id),
       })
     } else {
       this.setState({
-        showTorrentLinks: [...this.state.showTorrentLinks, id]
+        showTorrentLinks: [...this.state.showTorrentLinks, id],
       })
     }
   }
 
   handleFadeOut = (episodeId, episodeIndex) => {
-    if (this.state.fadeOutEpisodes.find(item => item.id === episodeId)) return
+    if (this.state.fadeOutEpisodes.find((item) => item.id === episodeId)) return
 
     clearTimeout(this.episodeFadeOutTimeout)
 
     this.setState({
-      fadeOutEpisodes: [...this.state.fadeOutEpisodes, { id: episodeId, index: episodeIndex }]
+      fadeOutEpisodes: [...this.state.fadeOutEpisodes, { id: episodeId, index: episodeIndex }],
     })
 
     this.episodeFadeOutTimeout = setTimeout(() => {
       const fadeOutEpisodes = this.state.fadeOutEpisodes
       this.setState({
-        fadeOutEpisodes: []
+        fadeOutEpisodes: [],
       })
 
-      fadeOutEpisodes.forEach(item => {
+      fadeOutEpisodes.forEach((item) => {
         this.props.toggleWatchedEpisode(this.props.season.season_number, item.index)
       })
     }, FADE_OUT_SPEED)
@@ -92,21 +95,19 @@ export default class SeasonEpisodes extends Component {
 
   render() {
     const showCheckboxes =
-      this.props.authUser &&
-      this.props.showInDatabase.info &&
-      this.props.showInDatabase.database !== "notWatchingShows" &&
-      this.props.showInDatabase.info.episodes &&
-      this.props.showInDatabase.info.episodes.length > 0 &&
+      this.props.showInfo &&
+      this.props.showDatabaseOnClient !== "notWatchingShows" &&
+      this.props.episodesFromDatabase &&
+      this.props.episodesFromDatabase.length > 0 &&
       true
 
-    const showSeason =
-      showCheckboxes && this.props.showInDatabase.info.episodes[this.props.season.season_number - 1]
+    const showSeason = showCheckboxes && this.props.episodesFromDatabase[this.props.season.season_number - 1]
 
     const seasons = this.props.toWatchPage ? this.props.seasonsArr : this.props.showEpisodes
 
     return (
       <div className="episodes__episode-list">
-        {seasons.map(item => {
+        {seasons.map((item) => {
           const seasonId = this.props.toWatchPage ? item.id : item.seasonId
 
           if (seasonId !== this.props.seasonId) return null
@@ -115,14 +116,13 @@ export default class SeasonEpisodes extends Component {
             if (this.props.toWatchPage && episode.watched) return
             const indexOfEpisode = item.episodes.length - 1 - episodeIndex
 
-            const urlShowTitle = this.props.showTitle.split(" ").join("+")
             // Format Date //
             const airDateISO = episode.air_date && new Date(episode.air_date).toISOString()
 
             const optionss = {
               month: "long",
               day: "numeric",
-              year: "numeric"
+              year: "numeric",
             }
 
             const formatedDate = new Date(airDateISO)
@@ -132,19 +132,9 @@ export default class SeasonEpisodes extends Component {
               : "No date available"
             // Format Date End //
 
-            // Format Seasons And Episode Numbers //
-            const seasonToString = this.props.season.season_number.toString()
-            const episodeToString = episode.episode_number.toString()
-
-            const seasonNumber =
-              seasonToString.length === 1 ? "s0".concat(seasonToString) : "s".concat(seasonToString)
-            const episodeNumber =
-              episodeToString.length === 1 ? "e0".concat(episodeToString) : "e".concat(episodeToString)
-            // Format Seasons And Episode Numbers End //
-
             const episodeAirDateAsDateObj = new Date(episode.air_date)
 
-            const daysToNewEpisode = differenceBtwDatesInDays(episode.air_date, this.props.todayDate)
+            const daysToNewEpisode = differenceBtwDatesInDays(episode.air_date, todayDate)
 
             return (
               <div
@@ -153,25 +143,26 @@ export default class SeasonEpisodes extends Component {
                 className={classNames("episodes__episode", {
                   "episodes__episode--open": this.props.detailEpisodeInfo.includes(episode.id),
                   "fade-out-episode":
-                    this.props.toWatchPage && this.state.fadeOutEpisodes.find(item => item.id === episode.id)
+                    this.props.toWatchPage &&
+                    this.state.fadeOutEpisodes.find((item) => item.id === episode.id),
                 })}
               >
                 <div
                   className="episodes__episode-wrapper"
-                  onClick={() => this.props.fullContentPage && this.props.showEpisodeInfo(episode.id)}
+                  onClick={() => this.props.detailesPage && this.props.showEpisodeInfo(episode.id)}
                   style={
                     daysToNewEpisode > 0 || !episode.air_date
                       ? {
-                          backgroundColor: "rgba(132, 90, 90, 0.3)"
+                          backgroundColor: "rgba(132, 90, 90, 0.3)",
                         }
                       : {
-                          backgroundColor: "#1d1d1d96"
+                          backgroundColor: "#1d1d1d96",
                         }
                   }
                 >
                   {this.props.toWatchPage && (
                     <UserRating
-                      id={this.props.showInDatabase.info.id}
+                      id={this.props.showInfo.id}
                       firebaseRef="userShowSingleEpisode"
                       seasonNum={this.props.season.season_number}
                       episodeNum={indexOfEpisode}
@@ -186,43 +177,19 @@ export default class SeasonEpisodes extends Component {
                     {episode.name}
                   </div>
                   {daysToNewEpisode > 0 ? (
-                    <div className="episodes__episode-days-to-air">{daysToNewEpisode} days</div>
+                    <div className="episodes__episode-days-to-air">
+                      {daysToNewEpisode === 1 ? `${daysToNewEpisode} day` : `${daysToNewEpisode} days`}
+                    </div>
                   ) : (
-                    episodeAirDateAsDateObj < this.props.todayDate.getTime() &&
+                    episodeAirDateAsDateObj < todayDate.getTime() &&
                     episode.air_date &&
                     this.props.toWatchPage && (
-                      <>
-                        <div
-                          className={classNames(
-                            "torrent-links torrent-links--episodes torrent-links--to-watch-page-desktop",
-                            {
-                              "torrent-links--to-watch-page": this.props.toWatchPage
-                            }
-                          )}
-                        >
-                          <a
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}+1080p&cat=41`}
-                          >
-                            1080p
-                          </a>
-                          <a
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}+720p&cat=41`}
-                          >
-                            720p
-                          </a>
-                          <a
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}&cat=5`}
-                          >
-                            480p
-                          </a>
-                        </div>
-                      </>
+                      <TorrentLinksEpisodes
+                        toWatchPage={true}
+                        showTitle={this.props.showTitle}
+                        seasonNumber={this.props.season.season_number}
+                        episodeNumber={episode.episode_number}
+                      />
                     )
                   )}
                 </div>
@@ -236,22 +203,19 @@ export default class SeasonEpisodes extends Component {
                     <label>
                       <input
                         type="checkbox"
-                        checked={showSeason && showSeason.episodes[indexOfEpisode].watched}
+                        checked={_get(showSeason, `episodes.${indexOfEpisode}.watched`, false)}
                         onChange={() => {
                           if (this.props.toWatchPage) {
                             this.handleFadeOut(episode.id, indexOfEpisode)
                           } else {
-                            this.props.toggleWatchedEpisodeDeb(
-                              this.props.season.season_number,
-                              indexOfEpisode
-                            )
+                            this.props.toggleWatchedEpisode(this.props.season.season_number, indexOfEpisode)
                           }
                         }}
                         disabled={!showCheckboxes || !this.props.authUser}
                       />
                       <span
                         className={classNames("custom-checkmark", {
-                          "custom-checkmark--disabled": !showCheckboxes || !this.props.authUser
+                          "custom-checkmark--disabled": !showCheckboxes || !this.props.authUser,
                         })}
                       />
                     </label>
@@ -270,14 +234,14 @@ export default class SeasonEpisodes extends Component {
                 {this.props.detailEpisodeInfo.includes(episode.id) && (
                   <div
                     className={classNames("episodes__episode-detailes", {
-                      "episodes__episode-detailes--no-image": !episode.still_path
+                      "episodes__episode-detailes--no-image": !episode.still_path,
                     })}
                   >
                     {episode.still_path && (
                       <div
                         className="episodes__episode-detailes-image"
                         style={{
-                          backgroundImage: `url(https://image.tmdb.org/t/p/w500${episode.still_path})`
+                          backgroundImage: `url(https://image.tmdb.org/t/p/w500${episode.still_path})`,
                         }}
                       />
                     )}
@@ -285,42 +249,22 @@ export default class SeasonEpisodes extends Component {
                       <div className="episodes__episode-detailes-overview">{episode.overview}</div>
                     )}
 
-                    {episodeAirDateAsDateObj < this.props.todayDate.getTime() && episode.air_date && (
+                    {episodeAirDateAsDateObj < todayDate.getTime() && episode.air_date && (
                       <>
-                        {this.props.showInDatabase.info && (
+                        {this.props.showInfo && (
                           <UserRating
-                            id={this.props.showInDatabase.info.id}
-                            show={this.props.showInDatabase}
+                            id={this.props.showInfo.id}
                             firebaseRef="userShowSingleEpisode"
                             seasonNum={this.props.season.season_number}
                             episodeNum={indexOfEpisode}
                             episodeRating={true}
                           />
                         )}
-
-                        <div className="torrent-links torrent-links--episodes">
-                          <a
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}+1080p&cat=41`}
-                          >
-                            1080p
-                          </a>
-                          <a
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}+720p&cat=41`}
-                          >
-                            720p
-                          </a>
-                          <a
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            href={`https://www.ettvdl.com/torrents-search.php?search=${urlShowTitle}+${seasonNumber}${episodeNumber}&cat=5`}
-                          >
-                            480p
-                          </a>
-                        </div>
+                        <TorrentLinksEpisodes
+                          showTitle={this.props.showTitle}
+                          seasonNumber={this.props.season.season_number}
+                          episodeNumber={episode.episode_number}
+                        />
                       </>
                     )}
                   </div>
