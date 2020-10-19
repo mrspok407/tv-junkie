@@ -15,7 +15,6 @@ import ScrollToTop from "Utils/ScrollToTopBar"
 import ScrollToTopOnUpdate from "Utils/ScrollToTopOnUpdate"
 import Footer from "Components/Footer/Footer"
 import PlaceholderLoadingFullInfo from "Components/Placeholders/PlaceholderLoadingFullInfo/PlaceholderLoadingFullInfo"
-import mergeEpisodes from "./FirebaseHelpers/mergeEpisodes"
 import useHandleListeners from "./FirebaseHelpers/useHandleListeners"
 import "./DetailesPage.scss"
 
@@ -67,14 +66,16 @@ function DetailesPage({
   }, [mediaType, id])
 
   useEffect(() => {
-    if (mediaType === "show") {
-      getShowInDatabase()
+    mediaType === "show" ? getShowInDatabase() : getMovieInDatabase()
+  }, [context, id])
+
+  useEffect(() => {
+    if (!authUser || mediaType !== "show" || context.userContent.loadingShowsMerging || !detailes) {
+      return
     }
 
-    if (mediaType === "movie") {
-      getMovieInDatabase()
-    }
-  }, [context, id])
+    handleListeners({ status: detailes.status, handleLoading })
+  }, [detailes, context.userContent.loadingShowsMerging])
 
   const handleLoading = (isLoading) => {
     setLoadingFromDatabase(isLoading)
@@ -165,17 +166,6 @@ function DetailesPage({
             seasonsArr: seasons ? seasons.reverse() : [],
           })
 
-          if (mediaType === "show" && authUser) {
-            mergeEpisodes({
-              status,
-              handleLoading,
-              id: Number(id),
-              authUser,
-              firebase,
-              context,
-              callback: handleListeners,
-            })
-          }
           if (!authUser) {
             setLoadingFromDatabase(false)
           }

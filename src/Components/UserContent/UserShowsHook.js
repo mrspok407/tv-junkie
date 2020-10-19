@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from "react"
 import { combineMergeObjects, releasedEpisodesToOneArray } from "Utils"
 import { organiseFutureEpisodesByMonth } from "Components/CalendarPage/CalendarHelpers"
 import merge from "deepmerge"
-import mergeEpisodesWithAirDate from "Utils/mergeEpisodesWithAirDate"
+import updateUserEpisodesFromDatabase from "./FirebaseHelpers/updateUserEpisodesFromDatabase"
 
 const SESSION_STORAGE_KEY_SHOWS = "userShows"
 
@@ -14,6 +14,7 @@ const useUserShows = (firebase) => {
   const [userToWatchShows, setUserToWatchShows] = useState([])
   const [loadingShows, setLoadingShows] = useState(true)
   const [loadingNotFinishedShows, setLoadingNotFinishedShows] = useState(true)
+  const [loadingShowsMerging, setLoadingShowsMerging] = useState(true)
   const [loadingMovies, setLoadingMovies] = useState(true)
   const [firebaseListeners, setFirebaseListeners] = useState([])
 
@@ -39,14 +40,14 @@ const useUserShows = (firebase) => {
             Promise.all(
               Object.values(snapshot.val()).map((show) => {
                 return firebase
-                  .showInDatabase(show.status, show.id)
+                  .showInDatabase(show.id)
                   .once("value")
                   .then((snapshot) => {
                     if (snapshot.val() !== null) {
                       return {
                         ...show,
                         ...snapshot.val().info,
-                        episodes: snapshot.val().episodes,
+                        episodes: snapshot.val().episodes || [],
                       }
                     }
                   })
@@ -58,65 +59,9 @@ const useUserShows = (firebase) => {
 
               const watchingShows = mergedShows.filter((show) => show && show.database === "watchingShows")
 
-              firebase.userEpisodes(authUser.uid).once("value", (snapshot) => {
-                const shows = Object.values(snapshot.val()).map((show) => {
-                  return show
-                })
-
-                const mergedShowsEpisodes = merge(mergedShows, shows, {
-                  arrayMerge: combineMergeObjects,
-                })
-
-                mergedShowsEpisodes.forEach((show) => {
-                  const seasons = show.episodes.reduce((acc, season) => {
-                    const episodes = season.episodes.reduce((acc, episode) => {
-                      acc.push({ userRating: episode.userRating || 0, watched: episode.watched || false })
-                      return acc
-                    }, [])
-                    acc.push({
-                      episodes,
-                      season_number: season.season_number,
-                      userRating: season.userRating || 0,
-                    })
-                    return acc
-                  }, [])
-
-                  const statusDatabase =
-                    show.status === "Ended" || show.status === "Canceled" ? "ended" : "ongoing"
-
-                  const releasedEpisodes = releasedEpisodesToOneArray({ data: show.episodes })
-
-                  firebase.userShowAllEpisodes(authUser.uid, show.id).set(seasons)
-
-                  const allEpisodes = seasons.reduce((acc, item) => {
-                    acc.push(...item.episodes)
-                    return acc
-                  }, [])
-
-                  allEpisodes.splice(releasedEpisodes.length)
-
-                  const episodesWithAirDate = mergeEpisodesWithAirDate({
-                    fullData: show.episodes,
-                    userData: seasons,
-                  })
-
-                  const allEpisodesWatched = !allEpisodes.some((episode) => !episode.watched)
-                  const finished = statusDatabase === "ended" && allEpisodesWatched ? true : false
-
-                  firebase.userShowAllEpisodesInfo(authUser.uid, show.id).update({
-                    allEpisodesWatched,
-                    finished,
-                  })
-
-                  firebase
-                    .userShow({ uid: authUser.uid, key: show.id })
-                    .update({ finished, allEpisodesWatched })
-
-                  firebase
-                    .userShowAllEpisodesNotFinished(authUser.uid, show.id)
-                    .set(allEpisodesWatched || show.database !== "watchingShows" ? null : episodesWithAirDate)
-                })
-              })
+              updateUserEpisodesFromDatabase({ firebase, authUser, shows: mergedShows }).then(() =>
+                setLoadingShowsMerging(false)
+              )
 
               const willAirEpisodes = organiseFutureEpisodesByMonth(watchingShows)
 
@@ -128,7 +73,7 @@ const useUserShows = (firebase) => {
             shows.forEach((show, index) => {
               if (userShowsSS.find((item) => item.id === show.id)) return
 
-              firebase.showInDatabase(show.status, show.id).once("value", (snapshot) => {
+              firebase.showInDatabase(show.id).once("value", (snapshot) => {
                 const updatedShows = [...userShowsSS]
                 const mergedShow = { ...show, ...snapshot.val().info, episodes: snapshot.val().episodes }
 
@@ -248,6 +193,7 @@ const useUserShows = (firebase) => {
     userMovies,
     loadingShows,
     loadingNotFinishedShows,
+    loadingShowsMerging,
     loadingMovies,
     handleUserShowsOnClient,
     handleUserMoviesOnClient,

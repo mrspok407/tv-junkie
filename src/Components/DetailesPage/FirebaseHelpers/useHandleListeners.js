@@ -7,11 +7,11 @@ const useHandleListeners = ({ id, authUser, firebase }) => {
   const [releasedEpisodes, setReleasedEpisodes] = useState()
 
   const handleListeners = ({ status, handleLoading = () => {} }) => {
-    if (!authUser) return
+    if (!status) return
 
     const statusDatabase = status === "Ended" || status === "Canceled" ? "ended" : "ongoing"
 
-    firebase.showEpisodes(statusDatabase, id).once("value", (snapshot) => {
+    firebase.showEpisodes(id).once("value", (snapshot) => {
       if (snapshot.val() === null) {
         handleLoading(false)
         console.log("early return showsEpisodes")
@@ -74,8 +74,6 @@ const useHandleListeners = ({ id, authUser, firebase }) => {
       console.log("unmount")
 
       firebase.userShowEpisodes(authUser.uid, id).off()
-      firebase.showEpisodes("ended", id).off()
-      firebase.showEpisodes("ongoing", id).off()
       setEpisodes(null)
       setReleasedEpisodes(null)
     }

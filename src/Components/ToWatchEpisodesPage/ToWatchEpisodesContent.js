@@ -80,7 +80,7 @@ class ToWatchEpisodesContent extends Component {
   render() {
     return (
       <div className="content-results content-results--to-watch-page">
-        {this.state.initialLoading ? (
+        {this.state.initialLoading || this.context.userContent.loadingShowsMerging ? (
           <Loader className="loader--pink" />
         ) : this.state.watchingShows.length === 0 ? (
           <PlaceholderNoToWatchEpisodes />
