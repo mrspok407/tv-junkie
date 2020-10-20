@@ -48,132 +48,6 @@ class HomePage extends Component {
 
   componentDidMount() {
     this.getContentForSliders()
-    console.log(this.props.firebase)
-  }
-
-  abir = () => {
-    this.props.firebase.allShowsList("ongoing").once("value", (snapshot) => {
-      const ongoingShows = snapshot.val()
-
-      this.props.firebase.allShowsList("ended").once("value", (snapshot) => {
-        const endedShows = snapshot.val()
-
-        const mergedShows = { ...ongoingShows, ...endedShows }
-
-        this.props.firebase.allShowsListNew().set(mergedShows)
-      })
-    })
-  }
-
-  databaseModify = () => {
-    axios
-      .get(`https://api.themoviedb.org/3/tv/changes?api_key=${process.env.REACT_APP_TMDB_API}`)
-      .then(({ data }) => {
-        console.log(data)
-
-        data.results.forEach((show) => {
-          this.props.firebase.showInDatabase(show.id).once("value", (snapshot) => {
-            console.log(snapshot.val())
-            if (snapshot.val() !== null) {
-              axios
-                .get(
-                  `https://api.themoviedb.org/3/tv/${show.id}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US`
-                )
-                .then(({ data: { number_of_seasons } }) => {
-                  const maxSeasonsInChunk = 20
-                  const allSeasons = []
-                  const seasonChunks = []
-                  const apiRequests = []
-
-                  for (let i = 1; i <= number_of_seasons; i += 1) {
-                    allSeasons.push(`season/${i}`)
-                  }
-
-                  for (let i = 0; i <= allSeasons.length; i += maxSeasonsInChunk) {
-                    const chunk = allSeasons.slice(i, i + maxSeasonsInChunk)
-                    seasonChunks.push(chunk.join())
-                  }
-
-                  seasonChunks.forEach((item) => {
-                    const request = axios.get(
-                      `https://api.themoviedb.org/3/tv/${show.id}?api_key=${process.env.REACT_APP_TMDB_API}&append_to_response=${item}`
-                    )
-                    apiRequests.push(request)
-                  })
-
-                  return axios.all([...apiRequests])
-                })
-                .then(
-                  axios.spread((...responses) => {
-                    const rowData = []
-                    const seasonsData = []
-
-                    responses.forEach((item) => {
-                      rowData.push(item.data)
-                    })
-
-                    const mergedRowData = Object.assign({}, ...rowData)
-
-                    Object.entries(mergedRowData).forEach(([key, value]) => {
-                      if (!key.indexOf("season/")) {
-                        seasonsData.push({ [key]: { ...value } })
-                      }
-                    })
-
-                    const allEpisodes = []
-
-                    seasonsData.forEach((data, index) => {
-                      const season = data[`season/${index + 1}`]
-                      if (!Array.isArray(season.episodes) || season.episodes.length === 0) return
-
-                      const episodes = []
-
-                      season.episodes.forEach((item) => {
-                        const updatedEpisode = {
-                          air_date: item.air_date,
-                          episode_number: item.episode_number,
-                          name: item.name,
-                          season_number: item.season_number,
-                          id: item.id,
-                        }
-                        episodes.push(updatedEpisode)
-                      })
-
-                      const updatedSeason = {
-                        air_date: season.air_date,
-                        season_number: season.season_number,
-                        id: season._id,
-                        poster_path: season.poster_path,
-                        name: season.name,
-                        episodes,
-                      }
-
-                      allEpisodes.push(updatedSeason)
-                    })
-
-                    const dataToPass = {
-                      episodes: allEpisodes,
-                      status: mergedRowData.status,
-                    }
-
-                    return dataToPass
-                  })
-                )
-                .then((data) => {
-                  this.props.firebase
-                    .showInDatabase(show.id)
-                    .update({ episodes: data.episodes })
-                    .catch((err) => {
-                      console.log(err)
-                    })
-                })
-                .catch((err) => {
-                  console.log(err)
-                })
-            }
-          })
-        })
-      })
   }
 
   getContentForSliders = () => {
@@ -280,7 +154,7 @@ class HomePage extends Component {
         <>
           {this.context.userContent.userWillAirEpisodes.length > 0 ? (
             <div className="home-page__heading">
-              <h1 onClick={() => this.databaseModify()}>Soon to watch</h1>
+              <h1>Soon to watch</h1>
             </div>
           ) : (
             <PlaceholderHomePageNoFutureEpisodes />

@@ -297,9 +297,9 @@ class ShowsEpisodes extends Component {
         )}
         <div className="episodes">
           {this.props.seasonsArr.map((season) => {
-            if (season.season_number === 0 || season.name === "Specials") return null
-
-            const seasonId = season.id
+            if (season.season_number === 0 || season.name === "Specials" || season.episode_count === 0) {
+              return null
+            }
 
             const seasonEpisodesNotWatched =
               this.props.toWatchPage && season.episodes.filter((episode) => !episode.watched)
@@ -316,17 +316,17 @@ class ShowsEpisodes extends Component {
 
             return (
               <div
-                key={seasonId}
+                key={season.id}
                 className={classNames("episodes__episode-group", {
                   "episodes__episode-group--no-poster": !season.poster_path,
                 })}
                 style={
-                  !this.state.loadingEpisodesIds.includes(seasonId) ? { rowGap: "10px" } : { rowGap: "0px" }
+                  !this.state.loadingEpisodesIds.includes(season.id) ? { rowGap: "10px" } : { rowGap: "0px" }
                 }
               >
                 <div
                   className={classNames("episodes__episode-group-info", {
-                    "episodes__episode-group-info--open": this.state.openSeasons.includes(seasonId),
+                    "episodes__episode-group-info--open": this.state.openSeasons.includes(season.id),
                   })}
                   style={
                     daysToNewSeason > 0
@@ -337,7 +337,7 @@ class ShowsEpisodes extends Component {
                           backgroundColor: "#1d1d1d96",
                         }
                   }
-                  onClick={() => this.showSeasonsEpisodes(seasonId, season.season_number)}
+                  onClick={() => this.showSeasonsEpisodes(season.id, season.season_number)}
                 >
                   <div className="episodes__episode-group-name">Season {season.season_number}</div>
                   {daysToNewSeason > 0 && (
@@ -355,8 +355,8 @@ class ShowsEpisodes extends Component {
                   </div>
                 </div>
 
-                {this.state.openSeasons.includes(seasonId) &&
-                  (!this.state.loadingEpisodesIds.includes(seasonId) ? (
+                {this.state.openSeasons.includes(season.id) &&
+                  (!this.state.loadingEpisodesIds.includes(season.id) ? (
                     <>
                       {season.poster_path && this.props.detailesPage && (
                         <div className="episodes__episode-group-poster-wrapper">
@@ -397,7 +397,7 @@ class ShowsEpisodes extends Component {
                         detailEpisodeInfo={this.state.detailEpisodeInfo}
                         showEpisodeInfo={this.showEpisodeInfo}
                         season={season}
-                        seasonId={seasonId}
+                        seasonId={season.id}
                         authUser={this.props.authUser}
                         episodesFromDatabase={this.props.episodesFromDatabase}
                         showInfo={this.props.showInfo}

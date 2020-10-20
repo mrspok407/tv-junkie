@@ -18,8 +18,6 @@ const useHandleListeners = ({ id, authUser, firebase }) => {
         return
       }
 
-      console.log("handleListeners run")
-
       const episodesFullData = snapshot.val()
       const releasedEpisodes = releasedEpisodesToOneArray({ data: snapshot.val() })
 
@@ -40,7 +38,7 @@ const useHandleListeners = ({ id, authUser, firebase }) => {
 
         const episodesWithAirDate = mergeEpisodesWithAirDate({
           fullData: episodesFullData,
-          userData: userEpisodes,
+          userData: userEpisodes
         })
 
         const allEpisodesWatched = !allEpisodes.some((episode) => !episode.watched)
@@ -48,7 +46,7 @@ const useHandleListeners = ({ id, authUser, firebase }) => {
 
         firebase.userShowAllEpisodesInfo(authUser.uid, id).update({
           allEpisodesWatched,
-          finished,
+          finished
         })
 
         firebase.userShow({ uid: authUser.uid, key: id }).update({ finished, allEpisodesWatched })

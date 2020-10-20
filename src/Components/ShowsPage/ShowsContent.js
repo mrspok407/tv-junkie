@@ -47,7 +47,7 @@ class ShowsContent extends Component {
     this._isMounted = false
   }
 
-  toggleSection = section => {
+  toggleSection = (section) => {
     this.setState({
       activeSection: section
     })
@@ -65,7 +65,7 @@ class ShowsContent extends Component {
         ...this.state.disableLoad,
         [this.state.activeSection]:
           this.state.loadedShows[this.state.activeSection] >=
-            this.context.userContent.userShows.filter(show => show.database === this.state.activeSection)
+            this.context.userContent.userShows.filter((show) => show.database === this.state.activeSection)
               .length && true
       }
     })
@@ -90,21 +90,20 @@ class ShowsContent extends Component {
 
   handleScroll = throttle(500, () => {
     if (window.innerHeight + window.scrollY >= document.body.scrollHeight - SCROLL_THRESHOLD) {
-      console.log(this.state.disableLoad)
       this.loadNewContent()
       this.loadNewContentLS()
     }
   })
 
-  sortBy = sortBy => {
+  sortBy = (sortBy) => {
     if (this.state.sortBy === sortBy) return
 
     this.setState({ sortBy })
   }
 
-  renderContent = section => {
+  renderContent = (section) => {
     const content = this.context.userContent.userShows
-      .filter(show => {
+      .filter((show) => {
         if (section === "finishedShows") {
           return show.finished
         } else {
@@ -126,13 +125,11 @@ class ShowsContent extends Component {
       ? content
       : this.context.userContentLocalStorage.watchingShows.slice(0, this.state.loadedShows.watchingShowsLS)
 
-    console.log(shows)
-
     return (
       <>
-        {shows.map(item => {
-          const filteredGenres = item.genre_ids.map(genreId =>
-            listOfGenres.filter(item => item.id === genreId)
+        {shows.map((item) => {
+          const filteredGenres = item.genre_ids.map((genreId) =>
+            listOfGenres.filter((item) => item.id === genreId)
           )
 
           return (
@@ -155,7 +152,7 @@ class ShowsContent extends Component {
                     )}
                   </div>
                   <div className="content-results__item-genres">
-                    {filteredGenres.map(item => (
+                    {filteredGenres.map((item) => (
                       <span key={item[0].id}>{item[0].name}</span>
                     ))}
                   </div>
@@ -165,8 +162,9 @@ class ShowsContent extends Component {
                         style={
                           item.backdrop_path !== null
                             ? {
-                                backgroundImage: `url(https://image.tmdb.org/t/p/w500/${item.backdrop_path ||
-                                  item.poster_path})`
+                                backgroundImage: `url(https://image.tmdb.org/t/p/w500/${
+                                  item.backdrop_path || item.poster_path
+                                })`
                               }
                             : {
                                 backgroundImage: `url(https://homestaymatch.com/images/no-image-available.png)`
@@ -240,7 +238,7 @@ class ShowsContent extends Component {
   }
 
   render() {
-    const content = this.context.userContent.userShows.filter(show => {
+    const content = this.context.userContent.userShows.filter((show) => {
       if (this.state.activeSection === "finishedShows") {
         return show.finished
       } else {

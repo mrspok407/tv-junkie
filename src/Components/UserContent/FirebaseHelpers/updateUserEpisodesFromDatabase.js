@@ -9,9 +9,15 @@ const updateUserEpisodesFromDatabase = ({ firebase, authUser, shows }) => {
     })
 
     console.log("merging on first load")
+    console.log(shows)
+    console.log(showsEpisodes)
+
+    if (shows.length !== showsEpisodes.length) return
+
+    console.log("fffffffff")
 
     const mergedShowsEpisodes = merge(shows, showsEpisodes, {
-      arrayMerge: combineMergeObjects,
+      arrayMerge: combineMergeObjects
     })
 
     mergedShowsEpisodes.forEach((show) => {
@@ -23,7 +29,7 @@ const updateUserEpisodesFromDatabase = ({ firebase, authUser, shows }) => {
         acc.push({
           episodes,
           season_number: season.season_number,
-          userRating: season.userRating || 0,
+          userRating: season.userRating || 0
         })
         return acc
       }, [])
@@ -39,7 +45,7 @@ const updateUserEpisodesFromDatabase = ({ firebase, authUser, shows }) => {
 
       const episodesWithAirDate = mergeEpisodesWithAirDate({
         fullData: show.episodes,
-        userData: seasons,
+        userData: seasons
       })
 
       const allEpisodesWatched = !allEpisodes.some((episode) => !episode.watched)
@@ -49,7 +55,7 @@ const updateUserEpisodesFromDatabase = ({ firebase, authUser, shows }) => {
 
       firebase.userShowAllEpisodesInfo(authUser.uid, show.id).update({
         allEpisodesWatched,
-        finished,
+        finished
       })
 
       firebase.userShow({ uid: authUser.uid, key: show.id }).update({ finished, allEpisodesWatched })

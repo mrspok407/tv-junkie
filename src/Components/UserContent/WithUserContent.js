@@ -17,7 +17,7 @@ const withUserContent = (Component) => {
           watchingShows: [],
           droppedShows: [],
           willWatchShows: [],
-          finishedShows: [],
+          finishedShows: []
         },
         userShows: [],
         loadingShows: false,
@@ -26,8 +26,8 @@ const withUserContent = (Component) => {
         moviesDatabases: ["watchLaterMovies"],
         errorInDatabase: {
           error: false,
-          message: "",
-        },
+          message: ""
+        }
       }
 
       this.firebase = this.props.firebase
@@ -105,7 +105,7 @@ const withUserContent = (Component) => {
                   episode_number: item.episode_number,
                   name: item.name,
                   season_number: item.season_number,
-                  id: item.id,
+                  id: item.id
                 }
                 episodes.push(updatedEpisode)
               })
@@ -116,7 +116,7 @@ const withUserContent = (Component) => {
                 id: season._id,
                 poster_path: season.poster_path,
                 name: season.name,
-                episodes,
+                episodes
               }
 
               allEpisodes.push(updatedSeason)
@@ -124,7 +124,7 @@ const withUserContent = (Component) => {
 
             const dataToPass = {
               episodes: allEpisodes,
-              status: mergedRowData.status,
+              status: mergedRowData.status
             }
 
             return dataToPass
@@ -137,8 +137,11 @@ const withUserContent = (Component) => {
       return promise
     }
 
-    addShowToDatabase = ({ id, show, userDatabase, callback }) => {
+    addShowToDatabase = ({ id, show, userDatabase, callback = () => {} }) => {
       this.getShowEpisodes({ id }).then((data) => {
+        console.log(show)
+        console.log(data)
+
         const showsSubDatabase = data.status === "Ended" || data.status === "Canceled" ? "ended" : "ongoing"
 
         const userEpisodes = data.episodes.reduce((acc, season) => {
@@ -157,25 +160,20 @@ const withUserContent = (Component) => {
           name: show.name,
           timeStamp: this.firebase.timeStamp(),
           finished: false,
-          id,
+          id
         })
 
         this.props.firebase
           .userEpisodes(this.userUid)
           .child(id)
-          .set(
-            {
-              episodes: userEpisodes,
-              info: {
-                database: userDatabase,
-                allEpisodesWatched: false,
-                finished: false,
-              },
-            },
-            () => {
-              this.context.userMergedShows.handleMergedShows(id)
+          .set({
+            episodes: userEpisodes,
+            info: {
+              database: userDatabase,
+              allEpisodesWatched: false,
+              finished: false
             }
-          )
+          })
 
         this.firebase.showInDatabase(id).transaction(
           (snapshot) => {
@@ -192,11 +190,11 @@ const withUserContent = (Component) => {
                   poster_path: show.poster_path,
                   vote_average: show.vote_average,
                   vote_count: show.vote_count,
-                  status: data.status,
+                  status: data.status
                 },
                 episodes: data.episodes,
-                id,
-                usersWatching: 1,
+                id: id.toString(),
+                usersWatching: 1
               }
             } else {
               return
@@ -204,11 +202,11 @@ const withUserContent = (Component) => {
           },
           (error, committed, snapshot) => {
             if (error) {
-              // console.log("Transaction failed abnormally!", error)
+              console.log("Transaction failed abnormally!", error)
             } else if (!committed) {
-              // console.log("We aborted the transaction (because allready exists).")
+              console.log("We aborted the transaction (because allready exists).")
               this.firebase.showInDatabase(id).update({
-                usersWatching: snapshot.val().usersWatching + 1,
+                usersWatching: snapshot.val().usersWatching + 1
               })
 
               callback({ status: data.status })
@@ -227,25 +225,26 @@ const withUserContent = (Component) => {
       database,
       userShows,
       fullContentPage = false,
-      callback = () => {},
+      callback = () => {}
     }) => {
-      const allreadyInDatabase = userShows.find((show) => show.id === id)
+      const userShow = userShows.find((show) => show.id === id)
 
-      if (allreadyInDatabase) {
+      if (userShow) {
         this.firebase.userShow({ uid: this.userUid, key: id }).update({
-          database,
+          database
         })
 
         this.props.firebase
           .userShowAllEpisodesInfo(this.userUid, id)
           .update(
             {
-              database,
+              database
             },
             () => {
               if (fullContentPage) return
               this.props.firebase.userShowEpisodes(this.userUid, id).once("value", (snapshot) => {
-                const show = snapshot.val()
+                const showEpisodes = snapshot.val().episodes
+                const showInfo = snapshot.val().info
 
                 const episodesFullData = _get(
                   this.context.userContent.userShows.find((show) => show.id === id),
@@ -255,13 +254,13 @@ const withUserContent = (Component) => {
 
                 const episodesWithAirDate = mergeEpisodesWithAirDate({
                   fullData: episodesFullData,
-                  userData: show.episodes,
+                  userData: showEpisodes
                 })
 
                 this.props.firebase
                   .userShowAllEpisodesNotFinished(this.userUid, id)
                   .set(
-                    show.info.allEpisodesWatched || show.info.database !== "watchingShows"
+                    showInfo.allEpisodesWatched || showInfo.database !== "watchingShows"
                       ? null
                       : episodesWithAirDate
                   )
@@ -274,8 +273,25 @@ const withUserContent = (Component) => {
             this.setState({
               errorInDatabase: {
                 error: true,
-                message: `Error in database occured. ${error}`,
-              },
+                message: `Error in database occured. ${error}`
+              }
+            })
+          })
+
+        this.firebase
+          .showInDatabase(id)
+          .child("usersWatching")
+          .once("value", (snapshot) => {
+            const currentUsersWatching = snapshot.val()
+            const prevDatabase = userShow.database
+
+            this.firebase.showInDatabase(id).update({
+              usersWatching:
+                database === "watchingShows"
+                  ? currentUsersWatching + 1
+                  : prevDatabase !== "watchingShows"
+                  ? currentUsersWatching
+                  : currentUsersWatching - 1
             })
           })
       } else {
@@ -302,7 +318,7 @@ const withUserContent = (Component) => {
               backdrop_path: movie.backdrop_path,
               overview: movie.overview,
               genre_ids: movie.genre_ids,
-              timeStamp: this.firebase.timeStamp(),
+              timeStamp: this.firebase.timeStamp()
             })
           }
         })
