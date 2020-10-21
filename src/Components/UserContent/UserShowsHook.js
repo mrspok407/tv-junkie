@@ -26,6 +26,7 @@ const useUserShows = (firebase) => {
           if (snapshot.val() === null) {
             console.log("hook in listener NO value")
             setLoadingShows(false)
+            setLoadingShowsMerging(false)
             return
           }
 
@@ -38,6 +39,7 @@ const useUserShows = (firebase) => {
           const userShowsSSLength = userShowsSS.length
 
           if (userShowsSSLength === 0) {
+            console.log("userShows length = 0")
             Promise.all(
               Object.values(snapshot.val()).map((show) => {
                 return firebase
@@ -72,6 +74,7 @@ const useUserShows = (firebase) => {
               return mergedShows
             })
           } else if (userShowsSSLength < shows.length) {
+            console.log("userShows length less")
             shows.forEach((show, index) => {
               if (userShowsSS.find((item) => item.id === show.id)) return
 
@@ -140,7 +143,6 @@ const useUserShows = (firebase) => {
         })
       },
       () => {
-        console.log("test")
         setLoadingShows(false)
         setLoadingMovies(false)
       }

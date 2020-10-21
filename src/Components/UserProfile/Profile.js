@@ -10,6 +10,7 @@ import Header from "Components/Header/Header"
 import "./Profile.scss"
 import Footer from "Components/Footer/Footer"
 import { withUserContent } from "Components/UserContent"
+import { todayDate } from "Utils"
 
 class Profile extends Component {
   constructor(props) {
@@ -42,9 +43,17 @@ class Profile extends Component {
   }
 
   databaseModify = () => {
+    const todayConverted = `${todayDate.getDate()}-${todayDate.getMonth() + 1}-${todayDate.getFullYear()}`
+    const theDayBeforeYesterday = new Date(todayDate.getTime() - 172800000)
+
+    const theDayBeforeYesterdayConverted = `${theDayBeforeYesterday.getDate()}-${
+      theDayBeforeYesterday.getMonth() + 1
+    }-${theDayBeforeYesterday.getFullYear()}`
+    console.log(theDayBeforeYesterday)
+
     axios
       .get(
-        `https://api.themoviedb.org/3/tv/changes?api_key=${process.env.REACT_APP_TMDB_API}&end_date=20-10-2020&start_date=18-10-2020`
+        `https://api.themoviedb.org/3/tv/changes?api_key=${process.env.REACT_APP_TMDB_API}&end_date=${todayConverted}&start_date=${theDayBeforeYesterdayConverted}`
       )
       .then(({ data }) => {
         console.log(data.results)
@@ -182,7 +191,7 @@ class Profile extends Component {
           <div className="user-profile__signout">
             <SignOutButton />
           </div>
-          {_get(this.state.authUser, "uid", "") === "uNEoRMthWif1qWp6zHvOELmHhyw2" && (
+          {_get(this.state.authUser, "email", "") === "test@test.com" && (
             <div className="update-database">
               <button onClick={() => this.databaseModify()} className="button" type="button">
                 Update Database

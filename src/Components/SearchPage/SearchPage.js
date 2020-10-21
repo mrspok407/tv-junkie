@@ -109,7 +109,7 @@ class SearchPage extends Component {
       }, [])
       .join()
 
-    const getActors = withActors.map(item => item.id).join()
+    const getActors = withActors.map((item) => item.id).join()
 
     const voteCountMoreThan = parseInt(voteCount, 10) <= 100 || voteCount === "" ? "25" : voteCount
 
@@ -175,7 +175,7 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
           totalPagesAdvMovies: totalPages
         })
       })
-      .catch(err => {
+      .catch((err) => {
         if (axios.isCancel(err)) return
         this.setState({
           advancedSearchContent: [...advancedSearchContent],
@@ -203,7 +203,7 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
           loadingNewPage: false
         })
       })
-      .catch(err => {
+      .catch((err) => {
         if (axios.isCancel(err)) return
         this.setState({
           advancedSearchContent: [...advancedSearchContent],
@@ -269,7 +269,7 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
 
   toggleActor = (id, name) => {
     const actorsArr = [...this.state.withActors]
-    const indexInActors = actorsArr.findIndex(e => e.id === id)
+    const indexInActors = actorsArr.findIndex((e) => e.id === id)
     if (indexInActors !== -1) {
       actorsArr.splice(indexInActors, 1)
       this.setState({

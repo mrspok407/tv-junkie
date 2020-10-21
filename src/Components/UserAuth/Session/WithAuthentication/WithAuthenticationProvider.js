@@ -2,7 +2,7 @@ import React from "react"
 import { withFirebase } from "Components/Firebase/FirebaseContext"
 import AuthUserContext from "./AuthUserContext"
 
-const withAuthenticationProvider = Component => {
+const withAuthenticationProvider = (Component) => {
   class WithAuthenticationProvider extends React.Component {
     constructor(props) {
       super(props)
@@ -13,16 +13,19 @@ const withAuthenticationProvider = Component => {
     }
 
     componentDidMount() {
+      console.log("auth provider mount")
       this.authUserListener()
     }
 
     componentWillUnmount() {
+      console.log("auth provider unmount")
       this.authUserListener()
     }
 
     authUserListener = () => {
       this.props.firebase.onAuthUserListener(
-        authUser => {
+        (authUser) => {
+          console.log("setting authUser in LS")
           localStorage.setItem("authUser", JSON.stringify(authUser))
           this.setState({ authUser })
         },

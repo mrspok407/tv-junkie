@@ -9,12 +9,8 @@ const updateUserEpisodesFromDatabase = ({ firebase, authUser, shows }) => {
     })
 
     console.log("merging on first load")
-    console.log(shows)
-    console.log(showsEpisodes)
 
     if (shows.length !== showsEpisodes.length) return
-
-    console.log("fffffffff")
 
     const mergedShowsEpisodes = merge(shows, showsEpisodes, {
       arrayMerge: combineMergeObjects
