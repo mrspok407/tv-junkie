@@ -1,4 +1,5 @@
 {
   "semi": false,
-  "printWidth": 110
+  "printWidth": 110,
+  "trailingComma": "none"
 }

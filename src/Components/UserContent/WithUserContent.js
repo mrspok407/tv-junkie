@@ -17,7 +17,7 @@ const withUserContent = (Component) => {
           watchingShows: [],
           droppedShows: [],
           willWatchShows: [],
-          finishedShows: [],
+          finishedShows: []
         },
         userShows: [],
         loadingShows: false,
@@ -26,8 +26,8 @@ const withUserContent = (Component) => {
         moviesDatabases: ["watchLaterMovies"],
         errorInDatabase: {
           error: false,
-          message: "",
-        },
+          message: ""
+        }
       }
 
       this.firebase = this.props.firebase
@@ -105,7 +105,7 @@ const withUserContent = (Component) => {
                   episode_number: item.episode_number,
                   name: item.name,
                   season_number: item.season_number,
-                  id: item.id,
+                  id: item.id
                 }
                 episodes.push(updatedEpisode)
               })
@@ -116,7 +116,7 @@ const withUserContent = (Component) => {
                 id: season._id,
                 poster_path: season.poster_path,
                 name: season.name,
-                episodes,
+                episodes
               }
 
               allEpisodes.push(updatedSeason)
@@ -124,7 +124,7 @@ const withUserContent = (Component) => {
 
             const dataToPass = {
               episodes: allEpisodes,
-              status: mergedRowData.status,
+              status: mergedRowData.status
             }
 
             return dataToPass
@@ -137,8 +137,112 @@ const withUserContent = (Component) => {
       return promise
     }
 
-    addShowToDatabase = ({ id, show, userDatabase, callback }) => {
+    addShowToDatabaseOnRegister = ({ shows }) => {
+      Promise.all(
+        Object.values(shows).map((show) => {
+          return this.getShowEpisodes({ id: show.id }).then((data) => {
+            const showsSubDatabase =
+              data.status === "Ended" || data.status === "Canceled" ? "ended" : "ongoing"
+
+            const userEpisodes = data.episodes.reduce((acc, season) => {
+              const episodes = season.episodes.map(() => {
+                return { watched: false, userRating: 0 }
+              })
+
+              acc.push({ season_number: season.season_number, episodes, userRating: 0 })
+              return acc
+            }, [])
+
+            const showInfo = {
+              allEpisodesWatched: false,
+              finished: false,
+              database: "watchingShows",
+              status: showsSubDatabase,
+              firstAirDate: show.first_air_date,
+              name: show.name,
+              timeStamp: this.firebase.timeStamp(),
+              id: show.id
+            }
+
+            this.firebase.showInDatabase(show.id).transaction(
+              (snapshot) => {
+                if (snapshot === null) {
+                  return {
+                    info: {
+                      backdrop_path: show.backdrop_path,
+                      first_air_date: show.first_air_date,
+                      genre_ids: show.genre_ids,
+                      id: show.id,
+                      name: show.name,
+                      original_name: show.original_name,
+                      overview: show.overview,
+                      poster_path: show.poster_path,
+                      vote_average: show.vote_average,
+                      vote_count: show.vote_count,
+                      status: data.status
+                    },
+                    episodes: data.episodes,
+                    id: show.id.toString(),
+                    usersWatching: 1
+                  }
+                } else {
+                  return
+                }
+              },
+              (error, committed, snapshot) => {
+                if (error) {
+                  console.log("Transaction failed abnormally!", error)
+                } else if (!committed) {
+                  console.log("We aborted the transaction (because allready exists).")
+                  this.firebase.showInDatabase(show.id).update({
+                    usersWatching: snapshot.val().usersWatching + 1
+                  })
+
+                  // callback({ status: data.status })
+                } else {
+                  // callback({ status: data.status })
+                  console.log("added!")
+                }
+              }
+            )
+
+            return [showInfo, userEpisodes]
+          })
+        })
+      ).then((data) => {
+        const userShows = data.reduce((acc, show) => {
+          const showInfo = { ...show[0] }
+          return { ...acc, [show[0].id]: showInfo }
+        }, {})
+
+        const userEpisodes = data.reduce((acc, show) => {
+          const showEpisodes = { ...show[1] }
+          return {
+            ...acc,
+            [show[0].id]: {
+              info: { allEpisodesWatched: false, finished: false, database: "watchingShows" },
+              episodes: showEpisodes
+            }
+          }
+        }, {})
+
+        this.firebase.auth.onAuthStateChanged((auth) => {
+          console.log(auth)
+          if (!auth) return
+
+          this.firebase.userAllShows(auth.uid).set(userShows)
+          this.firebase.userEpisodes(auth.uid).set(userEpisodes)
+        })
+
+        console.log(userShows)
+        console.log(userEpisodes)
+      })
+    }
+
+    addShowToDatabase = ({ id, show, userDatabase, callback = () => {} }) => {
       this.getShowEpisodes({ id }).then((data) => {
+        console.log("addShowInDatabase run in function body")
+
         const showsSubDatabase = data.status === "Ended" || data.status === "Canceled" ? "ended" : "ongoing"
 
         const userEpisodes = data.episodes.reduce((acc, season) => {
@@ -150,80 +254,76 @@ const withUserContent = (Component) => {
           return acc
         }, [])
 
-        this.firebase.userAllShows(this.userUid).child(id).set({
-          database: userDatabase,
-          status: showsSubDatabase,
-          firstAirDate: show.first_air_date,
-          name: show.name,
-          timeStamp: this.firebase.timeStamp(),
-          finished: false,
-          id,
-        })
+        console.log(this.authUser)
 
-        this.props.firebase
-          .userEpisodes(this.userUid)
-          .child(id)
-          .set(
-            {
+        this.firebase.auth.onAuthStateChanged((auth) => {
+          console.log(auth)
+          if (!auth) return
+
+          this.firebase.userAllShows(auth.uid).child(id).set({
+            database: userDatabase,
+            status: showsSubDatabase,
+            firstAirDate: show.first_air_date,
+            name: show.name,
+            timeStamp: this.firebase.timeStamp(),
+            finished: false,
+            id
+          })
+
+          this.props.firebase
+            .userEpisodes(auth.uid)
+            .child(id)
+            .set({
               episodes: userEpisodes,
               info: {
                 database: userDatabase,
                 allEpisodesWatched: false,
-                finished: false,
-              },
-            },
-            () => {
-              this.context.userMergedShows.handleMergedShows(id)
-            }
-          )
-
-        this.firebase
-          .allShowsList(showsSubDatabase)
-          .child(id)
-          .transaction(
-            (snapshot) => {
-              if (snapshot === null) {
-                return {
-                  info: {
-                    backdrop_path: show.backdrop_path,
-                    first_air_date: show.first_air_date,
-                    genre_ids: show.genre_ids,
-                    id: show.id,
-                    name: show.name,
-                    original_name: show.original_name,
-                    overview: show.overview,
-                    poster_path: show.poster_path,
-                    vote_average: show.vote_average,
-                    vote_count: show.vote_count,
-                    status: data.status,
-                  },
-                  episodes: data.episodes,
-                  id,
-                  usersWatching: 1,
-                }
-              } else {
-                return
+                finished: false
               }
-            },
-            (error, committed, snapshot) => {
-              if (error) {
-                // console.log("Transaction failed abnormally!", error)
-              } else if (!committed) {
-                // console.log("We aborted the transaction (because allready exists).")
-                this.firebase
-                  .allShowsList(showsSubDatabase)
-                  .child(id)
-                  .update({
-                    usersWatching: snapshot.val().usersWatching + 1,
-                  })
+            })
+        })
 
-                callback({ status: data.status })
-              } else {
-                callback({ status: data.status })
-                console.log("added!")
+        this.firebase.showInDatabase(id).transaction(
+          (snapshot) => {
+            if (snapshot === null) {
+              return {
+                info: {
+                  backdrop_path: show.backdrop_path,
+                  first_air_date: show.first_air_date,
+                  genre_ids: show.genre_ids,
+                  id: show.id,
+                  name: show.name,
+                  original_name: show.original_name,
+                  overview: show.overview,
+                  poster_path: show.poster_path,
+                  vote_average: show.vote_average,
+                  vote_count: show.vote_count,
+                  status: data.status
+                },
+                episodes: data.episodes,
+                id: id.toString(),
+                usersWatching: 1
               }
+            } else {
+              return
             }
-          )
+          },
+          (error, committed, snapshot) => {
+            if (error) {
+              console.log("Transaction failed abnormally!", error)
+            } else if (!committed) {
+              console.log("We aborted the transaction (because allready exists).")
+              this.firebase.showInDatabase(id).update({
+                usersWatching: snapshot.val().usersWatching + 1
+              })
+
+              callback({ status: data.status })
+            } else {
+              callback({ status: data.status })
+              console.log("added!")
+            }
+          }
+        )
       })
     }
 
@@ -233,25 +333,26 @@ const withUserContent = (Component) => {
       database,
       userShows,
       fullContentPage = false,
-      callback = () => {},
+      callback = () => {}
     }) => {
-      const allreadyInDatabase = userShows.find((show) => show.id === id)
+      const userShow = userShows.find((show) => show.id === id)
 
-      if (allreadyInDatabase) {
+      if (userShow) {
         this.firebase.userShow({ uid: this.userUid, key: id }).update({
-          database,
+          database
         })
 
         this.props.firebase
           .userShowAllEpisodesInfo(this.userUid, id)
           .update(
             {
-              database,
+              database
             },
             () => {
               if (fullContentPage) return
               this.props.firebase.userShowEpisodes(this.userUid, id).once("value", (snapshot) => {
-                const show = snapshot.val()
+                const showEpisodes = snapshot.val().episodes
+                const showInfo = snapshot.val().info
 
                 const episodesFullData = _get(
                   this.context.userContent.userShows.find((show) => show.id === id),
@@ -261,13 +362,13 @@ const withUserContent = (Component) => {
 
                 const episodesWithAirDate = mergeEpisodesWithAirDate({
                   fullData: episodesFullData,
-                  userData: show.episodes,
+                  userData: showEpisodes
                 })
 
                 this.props.firebase
                   .userShowAllEpisodesNotFinished(this.userUid, id)
                   .set(
-                    show.info.allEpisodesWatched || show.info.database !== "watchingShows"
+                    showInfo.allEpisodesWatched || showInfo.database !== "watchingShows"
                       ? null
                       : episodesWithAirDate
                   )
@@ -280,8 +381,25 @@ const withUserContent = (Component) => {
             this.setState({
               errorInDatabase: {
                 error: true,
-                message: `Error in database occured. ${error}`,
-              },
+                message: `Error in database occured. ${error}`
+              }
+            })
+          })
+
+        this.firebase
+          .showInDatabase(id)
+          .child("usersWatching")
+          .once("value", (snapshot) => {
+            const currentUsersWatching = snapshot.val()
+            const prevDatabase = userShow.database
+
+            this.firebase.showInDatabase(id).update({
+              usersWatching:
+                database === "watchingShows"
+                  ? currentUsersWatching + 1
+                  : prevDatabase !== "watchingShows"
+                  ? currentUsersWatching
+                  : currentUsersWatching - 1
             })
           })
       } else {
@@ -308,7 +426,7 @@ const withUserContent = (Component) => {
               backdrop_path: movie.backdrop_path,
               overview: movie.overview,
               genre_ids: movie.genre_ids,
-              timeStamp: this.firebase.timeStamp(),
+              timeStamp: this.firebase.timeStamp()
             })
           }
         })
@@ -322,6 +440,7 @@ const withUserContent = (Component) => {
           handleMovieInDatabases={this.handleMovieInDatabases}
           handleShowInDatabases={this.handleShowInDatabases}
           addShowToDatabase={this.addShowToDatabase}
+          addShowToDatabaseOnRegister={this.addShowToDatabaseOnRegister}
         />
       )
     }

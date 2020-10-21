@@ -10,7 +10,7 @@ class ShowsButtons extends Component {
     super(props)
 
     this.state = {
-      disableBtnWarning: null,
+      disableBtnWarning: null
     }
   }
 
@@ -26,7 +26,7 @@ class ShowsButtons extends Component {
     if (this.props.authUser) return
     if (this._notAuthButtons && !this._notAuthButtons.contains(e.target)) {
       this.setState({
-        disableBtnWarning: null,
+        disableBtnWarning: null
       })
     }
   }
@@ -34,7 +34,7 @@ class ShowsButtons extends Component {
   showDissableBtnWarning = (btn) => {
     if (this.props.authUser) return
     this.setState({
-      disableBtnWarning: btn,
+      disableBtnWarning: btn
     })
   }
 
@@ -49,7 +49,7 @@ class ShowsButtons extends Component {
               "button--pressed":
                 this.props.showDatabaseOnClient === "watchingShows" ||
                 this.props.showDatabaseOnClient === "finishedShows" ||
-                this.context.userContentLocalStorage.watchingShows.find((item) => item.id === Number(id)),
+                this.context.userContentLocalStorage.watchingShows.find((item) => item.id === Number(id))
             })}
             type="button"
             onClick={() => {
@@ -61,16 +61,16 @@ class ShowsButtons extends Component {
                   database: "watchingShows",
                   userShows: this.context.userContent.userShows,
                   fullContentPage: true,
-                  callback: this.props.handleListeners,
+                  callback: this.props.handleListeners
                 })
                 this.context.userContent.handleUserShowsOnClient({
                   database: "watchingShows",
-                  id: Number(id),
+                  id: Number(id)
                 })
               } else {
                 this.context.userContentLocalStorage.addShowLS({
                   id: Number(id),
-                  data: detailes,
+                  data: detailes
                 })
               }
             }}
@@ -85,7 +85,7 @@ class ShowsButtons extends Component {
               "button--pressed":
                 this.props.showDatabaseOnClient === "notWatchingShows" ||
                 (!this.props.authUser &&
-                  !this.context.userContentLocalStorage.watchingShows.find((item) => item.id === Number(id))),
+                  !this.context.userContentLocalStorage.watchingShows.find((item) => item.id === Number(id)))
             })}
             type="button"
             onClick={() => {
@@ -96,15 +96,15 @@ class ShowsButtons extends Component {
                   data: detailes,
                   database: "notWatchingShows",
                   userShows: this.context.userContent.userShows,
-                  fullContentPage: true,
+                  fullContentPage: true
                 })
                 this.context.userContent.handleUserShowsOnClient({
                   database: "notWatchingShows",
-                  id: Number(id),
+                  id: Number(id)
                 })
               } else {
                 this.context.userContentLocalStorage.removeShowLS({
-                  id: Number(id),
+                  id: Number(id)
                 })
               }
             }}
@@ -122,7 +122,7 @@ class ShowsButtons extends Component {
             <button
               className={classNames("button", {
                 "button--pressed": this.props.showDatabaseOnClient === "droppedShows",
-                "button--not-logged-in": !authUser,
+                "button--not-logged-in": !authUser
               })}
               type="button"
               onClick={() => {
@@ -133,11 +133,11 @@ class ShowsButtons extends Component {
                     data: detailes,
                     database: "droppedShows",
                     userShows: this.context.userContent.userShows,
-                    fullContentPage: true,
+                    fullContentPage: true
                   })
                   this.context.userContent.handleUserShowsOnClient({
                     database: "droppedShows",
-                    id: Number(id),
+                    id: Number(id)
                   })
                 } else {
                   this.showDissableBtnWarning("dropBtn")
@@ -161,7 +161,7 @@ class ShowsButtons extends Component {
             <button
               className={classNames("button", {
                 "button--pressed": this.props.showDatabaseOnClient === "willWatchShows",
-                "button--not-logged-in": !authUser,
+                "button--not-logged-in": !authUser
               })}
               type="button"
               onClick={() => {
@@ -172,11 +172,11 @@ class ShowsButtons extends Component {
                     data: detailes,
                     database: "willWatchShows",
                     userShows: this.context.userContent.userShows,
-                    fullContentPage: true,
+                    fullContentPage: true
                   })
                   this.context.userContent.handleUserShowsOnClient({
                     database: "willWatchShows",
-                    id: Number(id),
+                    id: Number(id)
                   })
                 } else {
                   this.showDissableBtnWarning("willWatchBtn")

@@ -7,10 +7,10 @@ import * as ROLES from "Utils/Constants/roles"
 import * as ROUTES from "Utils/Constants/routes"
 import classNames from "classnames"
 import Input from "../Input/Input"
-// import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { withUserContent } from "Components/UserContent"
 import SignInWithGoogleForm from "../SignIn/SignInWithGoogle"
+import { WithAuthenticationConsumer } from "../Session/WithAuthentication"
 
 const LOCAL_STORAGE_KEY_WATCHING_SHOWS = "watchingShowsLocalS"
 const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = "watchLaterMoviesLocalS"
@@ -46,7 +46,7 @@ class RegisterBase extends Component {
     this.state = { ...INITIAL_STATE }
   }
 
-  onSubmit = event => {
+  onSubmit = (event) => {
     event.preventDefault()
 
     const { email, password } = this.state.requiredInputs
@@ -69,8 +69,9 @@ class RegisterBase extends Component {
 
     this.props.firebase
       .createUserWithEmailAndPassword(email, password)
-      .then(authUser => {
+      .then((authUser) => {
         const userRole = email === "mr.spok407@gmail.com" ? ROLES.ADMIN : ROLES.USER
+        console.log("user created")
 
         this.props.firebase
           .user(authUser.user.uid)
@@ -80,19 +81,23 @@ class RegisterBase extends Component {
             role: userRole
           })
           .then(() => {
+            console.log("then, after user set in database")
             const watchingShows = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)) || []
             const watchLaterMovies =
               JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)) || []
 
-            watchingShows.forEach(item => {
-              this.props.addShowToDatabase({
-                id: item.id,
-                show: item,
-                userDatabase: "watchingShows"
-              })
-            })
+            this.props.addShowToDatabaseOnRegister({ shows: watchingShows })
 
-            watchLaterMovies.forEach(item => {
+            // watchingShows.forEach((item) => {
+            //   console.log("addShowtoDatabase run in Register")
+            //   this.props.addShowToDatabase({
+            //     id: item.id,
+            //     show: item,
+            //     userDatabase: "watchingShows"
+            //   })
+            // })
+
+            watchLaterMovies.forEach((item) => {
               this.props.handleMovieInDatabases({
                 id: item.id,
                 data: item,
@@ -101,6 +106,7 @@ class RegisterBase extends Component {
             })
           })
           .then(() => {
+            console.log("then after addShowtoDatabase run")
             localStorage.removeItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)
             localStorage.removeItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)
 
@@ -110,19 +116,21 @@ class RegisterBase extends Component {
           })
       })
       .then(() => {
+        console.log("email verification sent")
         return this.props.firebase.sendEmailVerification()
       })
       .then(() => {
+        console.log("push in register in home page")
         this.setState({ ...INITIAL_STATE })
         this.props.history.push(ROUTES.HOME_PAGE)
       })
-      .catch(error => {
+      .catch((error) => {
         errors.error = error
         this.setState({ errors, submitRequestLoading: false })
       })
   }
 
-  handleOnChange = event => {
+  handleOnChange = (event) => {
     event.preventDefault()
     const { value } = event.target
     const name = event.target.name === "new-password" ? "password" : event.target.name
@@ -161,7 +169,7 @@ class RegisterBase extends Component {
     }
 
     this.setState(
-      prevState => ({
+      (prevState) => ({
         requiredInputs: { ...prevState.requiredInputs, [name]: value },
         inputs: { ...prevState.inputs, [name]: value }
       }),
@@ -169,7 +177,7 @@ class RegisterBase extends Component {
     )
   }
 
-  handleValidationOnblur = event => {
+  handleValidationOnblur = (event) => {
     event.preventDefault()
 
     const { value } = event.target
@@ -205,9 +213,9 @@ class RegisterBase extends Component {
     })
   }
 
-  handleKeyDown = e => e.which === 27 && this.resetInput(e.target.name)
+  handleKeyDown = (e) => e.which === 27 && this.resetInput(e.target.name)
 
-  resetInput = name => {
+  resetInput = (name) => {
     this.setState({
       inputs: { ...this.state.inputs, [`${name}`]: "" },
       requiredInputs: { ...this.state.requiredInputs, [`${name}`]: "" },
@@ -332,7 +340,7 @@ class RegisterBase extends Component {
   }
 }
 
-const Register = compose(withRouter, withUserContent)(RegisterBase)
+const Register = compose(withRouter, withUserContent, WithAuthenticationConsumer)(RegisterBase)
 
 export default Register
 

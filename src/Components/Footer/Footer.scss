@@ -16,6 +16,10 @@
   }
 
   &__admin-info {
+    display: grid;
+    grid-template-columns: repeat(4, max-content);
+    column-gap: 5px;
+    align-items: center;
     color: #fff;
     opacity: 0.05;
     transition: 0.2s;
@@ -40,5 +44,14 @@
     .fa-twitter {
       color: #1da1f2;
     }
+  }
+
+  .tmdb-logo {
+    display: block;
+    width: 45px;
+    height: 100%;
+    background-image: url("../../assets/images/icons/tmdb-logo.svg");
+    background-position: center;
+    background-repeat: no-repeat;
   }
 }

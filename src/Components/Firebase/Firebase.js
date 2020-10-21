@@ -64,10 +64,10 @@ class Firebase {
   timeStamp = () => database.ServerValue.TIMESTAMP
 
   /// Shows In Database ///
-  allShowsList = (subDatabase) => this.db.ref(`allShowsList/${subDatabase}`)
-  showInDatabase = (subDatabase, showKey) => this.db.ref(`allShowsList/${subDatabase}/${showKey}`)
-  showInfo = (subDatabase, showKey) => this.db.ref(`allShowsList/${subDatabase}/${showKey}/info`)
-  showEpisodes = (subDatabase, showKey) => this.db.ref(`allShowsList/${subDatabase}/${showKey}/episodes`)
+  allShowsList = () => this.db.ref(`allShowsList`)
+  showInDatabase = (showKey) => this.db.ref(`allShowsList/${showKey}`)
+  showInfo = (showKey) => this.db.ref(`allShowsList/${showKey}/info`)
+  showEpisodes = (showKey) => this.db.ref(`allShowsList/${showKey}/episodes`)
 
   /// Users API ///
   user = (uid) => this.db.ref(`users/${uid}`)
