@@ -228,6 +228,7 @@ const withUserContent = (Component) => {
 
         this.firebase.auth.onAuthStateChanged((auth) => {
           console.log(auth)
+          if (!auth) return
 
           this.firebase.userAllShows(auth.uid).set(userShows)
           this.firebase.userEpisodes(auth.uid).set(userEpisodes)
@@ -257,6 +258,7 @@ const withUserContent = (Component) => {
 
         this.firebase.auth.onAuthStateChanged((auth) => {
           console.log(auth)
+          if (!auth) return
 
           this.firebase.userAllShows(auth.uid).child(id).set({
             database: userDatabase,

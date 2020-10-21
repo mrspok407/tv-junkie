@@ -248,7 +248,9 @@ class ShowsContent extends Component {
 
     const shows = this.props.authUser
       ? content
-      : this.context.userContentLocalStorage.watchingShows.slice(0, this.state.loadedShows.watchingShowsLS)
+      : this.state.activeSection === "watchingShows"
+      ? this.context.userContentLocalStorage.watchingShows.slice(0, this.state.loadedShows.watchingShowsLS)
+      : []
 
     const maxColumns = 4
     const currentNumOfColumns = shows.length <= maxColumns - 1 ? shows.length : maxColumns
@@ -307,11 +309,7 @@ class ShowsContent extends Component {
         {loadingShows ? (
           <Loader className="loader--pink" />
         ) : shows.length === 0 ? (
-          <PlaceholderNoShows
-            section={this.state.activeSection}
-            authUser={this.props.authUser}
-            activeSection={this.state.activeSection}
-          />
+          <PlaceholderNoShows authUser={this.props.authUser} activeSection={this.state.activeSection} />
         ) : (
           <>
             {this.props.authUser && (
