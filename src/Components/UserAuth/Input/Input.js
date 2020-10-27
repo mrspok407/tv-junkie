@@ -1,39 +1,6 @@
 import React, { Component } from "react"
 
 export default class Input extends Component {
-  // state = {
-  //   value: "",
-  //   isInvalid: false,
-  //   validationText: ""
-  // }
-
-  // handleOnChange = e => {
-  //   const { value, name } = e.target
-
-  //   this.setState(
-  //     prevState => ({
-  //       value: value
-  //     }),
-  //     this.validateInput
-  //   )
-  // }
-
-  // sanitizeInput = () => this.setState({ isInvalid: false, validationText: "" })
-
-  // validateInput = () => {
-  //   if (this.props.withValidation && this.props.validationCases) {
-  //     const filteredCases = this.props.validationCases.filter(c => !!c.condition)
-  //     const inputInvalid = filteredCases.length > 0
-  //     if (inputInvalid) {
-  //       this.setState({ isInvalid: true, validationText: filteredCases[0].text })
-  //     } else {
-  //       this.sanitizeInput()
-  //     }
-  //     return inputInvalid
-  //   }
-  //   return false
-  // }
-
   render() {
     const {
       classNameInput,

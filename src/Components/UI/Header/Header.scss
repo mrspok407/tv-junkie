@@ -1,0 +1,426 @@
+@import "../../../styles/globals";
+
+$navBackground: #352424;
+
+.header {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  &__show-nav {
+    display: none;
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    width: 50px;
+    height: 30px;
+    background-color: transparent;
+    border: none;
+    opacity: 0;
+    z-index: 20;
+    animation: showNavBtn 0.5s forwards;
+    @keyframes showNavBtn {
+      to {
+        opacity: 1;
+      }
+    }
+    &:focus {
+      outline: none;
+    }
+
+    @include mediaMaxW(#{$mobileViewPort}) {
+      display: initial;
+    }
+
+    @for $i from 1 through 3 {
+      span:nth-child(#{$i}) {
+        position: absolute;
+        left: 0;
+        top: 50% * ($i - 1);
+        width: 100%;
+        height: 6px;
+        border-radius: 5px;
+        background-color: #fff;
+        transition: 0.25s;
+        transform-origin: center left;
+      }
+    }
+
+    &--open {
+      span:nth-child(2) {
+        opacity: 0;
+      }
+
+      span:nth-child(1) {
+        transform: rotate(37deg);
+      }
+      span:nth-child(3) {
+        transform: rotate(-37deg);
+      }
+    }
+  }
+}
+
+.nav {
+  position: relative;
+  display: flex;
+  justify-content: center;
+
+  &:after {
+    content: "";
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: rgb(0, 0, 0);
+    background: radial-gradient(circle, $navBackground 60%, rgba(84, 81, 73, 0) 100%);
+    z-index: -10;
+
+    @include mediaMaxW(#{$mobileViewPort}) {
+      display: none;
+    }
+  }
+
+  @include mediaMaxW(#{$mobileViewPort}) {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    padding-top: 5px;
+    padding-bottom: 20px;
+    transform: translate(0, 0);
+    z-index: 10;
+  }
+
+  &--mobile-open {
+    @include mediaMaxW(#{$mobileViewPort}) {
+      transform: translate(100%, 0);
+      transition: transform 0.25s;
+    }
+  }
+
+  &__list {
+    position: relative;
+    display: inline-flex;
+    justify-content: center;
+    width: 100%;
+    list-style-type: none;
+    color: #fff;
+
+    @include mediaMaxW(#{$mobileViewPort}) {
+      align-items: center;
+      flex-direction: column;
+      justify-content: start;
+    }
+
+    &--not-auth {
+      justify-content: center;
+      padding-left: 118px;
+
+      @include mediaMaxW(#{$mobileViewPort}) {
+        padding-left: 0;
+      }
+    }
+  }
+
+  &__link {
+    color: #fff;
+    transition: 0.3s;
+
+    @include mediaMaxW(#{$mobileViewPort}) {
+      display: flex;
+      justify-content: center;
+      width: 60%;
+    }
+
+    &--logo {
+      display: flex;
+      align-items: center;
+    }
+
+    &-move {
+      transform: translateX(-15px);
+    }
+
+    &-move-back {
+      transform: translateX(0);
+    }
+
+    &--non-auth {
+      transform: translateX(0);
+    }
+
+    @include mediaMaxW(#{$mobileViewPort}) {
+      &-move {
+        transform: translateX(0);
+      }
+
+      &-move-back {
+        transform: translateX(0);
+      }
+    }
+  }
+
+  &__item {
+    position: relative;
+    padding: 31px 25px 18px 25px;
+    border: none;
+    text-align: center;
+    cursor: pointer;
+    font-size: 1.3rem;
+    z-index: 1;
+
+    &:before {
+      content: "";
+      position: absolute;
+      bottom: -3px;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      border-radius: 5px;
+      background-color: getColor(blueClr, $mainPalette);
+      transition: 0.2s;
+      opacity: 0;
+    }
+
+    &:hover:before {
+      opacity: 1;
+    }
+
+    @include mediaMaxW(1190px) {
+      padding: 31px 11px 18px 11px;
+    }
+
+    @include mediaMaxW(#{$mobileViewPort}) {
+      width: 100px;
+      padding: 14px 5px 14px 5px;
+      font-size: 0.95rem;
+    }
+
+    &--active li {
+      &:after,
+      &:before {
+        background-color: peru;
+        opacity: 1;
+      }
+    }
+
+    &--logo {
+      width: 150px;
+      background-image: url("../../../assets/images/icons/logo-icon.png");
+      background-size: cover;
+      background-repeat: no-repeat;
+
+      &:after,
+      &:before {
+        display: none;
+      }
+
+      @include mediaMaxW(#{$mobileViewPort}) {
+        height: 55px;
+      }
+    }
+
+    &--nav-search {
+      cursor: initial;
+      z-index: 9999;
+
+      @include mediaMaxW(#{$mobileViewPort}) {
+        width: 60%;
+      }
+
+      @include mediaMaxW(#{$mobileViewPort - 400px}) {
+        width: 90%;
+      }
+
+      &:after,
+      &:before {
+        display: none;
+      }
+
+      .search__input {
+        height: 27px;
+        width: 126px;
+        padding-left: 34px;
+        padding-right: 32px;
+        padding-bottom: 8px;
+        font-size: 1.2rem;
+
+        &--focus {
+          width: 300px;
+
+          @include mediaMaxW(#{$mobileViewPort}) {
+            width: 100%;
+          }
+        }
+        @include mediaMaxW(#{$mobileViewPort}) {
+          width: 100%;
+          padding-top: 5px;
+          height: 35px;
+        }
+      }
+
+      .button--input-clear {
+        top: 10px;
+
+        @include mediaMaxW(#{$mobileViewPort}) {
+          top: 17px;
+        }
+      }
+
+      .search__media-type {
+        background-size: 22px;
+        background-position: 3px 0px;
+
+        @include mediaMaxW(#{$mobileViewPort}) {
+          background-position: 3px 5px;
+        }
+
+        &:after {
+          right: 6px;
+          top: 8px;
+
+          @include mediaMaxW(#{$mobileViewPort}) {
+            top: 13px;
+          }
+        }
+
+        &:before {
+          top: 1px;
+
+          @include mediaMaxW(#{$mobileViewPort}) {
+            top: 4px;
+          }
+        }
+      }
+
+      .media-type__options {
+        top: 30px;
+        width: 115px;
+      }
+
+      .media-type__item {
+        background-size: 19px;
+        background-position: 8px 4px;
+
+        &:first-child {
+          .media-type__button {
+            padding-top: 4px;
+          }
+        }
+
+        &:last-child {
+          .media-type__button {
+            padding-bottom: 4px;
+          }
+        }
+      }
+
+      .media-type__button {
+        padding: 2px 0px 2px 36px;
+        font-size: 1.2rem;
+      }
+
+      .media-type__selected-value {
+        height: 100%;
+        padding-left: 44px;
+        font-size: 1.2rem;
+
+        span {
+          display: none;
+        }
+      }
+
+      .loader--small-pink {
+        top: 4px;
+        right: 33px;
+      }
+
+      .search-list {
+        display: initial;
+        top: calc(100% + 18px);
+        opacity: 0;
+        animation: showSearchList 0s 0.25s forwards;
+        @keyframes showSearchList {
+          to {
+            opacity: 1;
+          }
+        }
+        @include scrollbar(5px, getColor(blueClr, $mainPalette), #c5bbb1);
+        @include mediaMaxW(#{$mobileViewPort}) {
+          top: 100%;
+          opacity: 1;
+          animation: initial;
+        }
+      }
+
+      .placeholder--no-results {
+        top: calc(100% + 18px);
+        opacity: 0;
+        animation: showSearchList 0s 0.25s forwards;
+      }
+
+      &__non-auth {
+        .search__input {
+          width: 100%;
+        }
+      }
+    }
+  }
+}
+
+.login__container {
+  position: absolute;
+  right: 0;
+  top: 0;
+  color: #fff;
+
+  @include mediaMaxW(#{$mobileViewPort}) {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    align-items: center;
+    width: 60%;
+  }
+}
+
+.nav__item--login {
+  user-select: none;
+}
+
+.nav__hover-line {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 152px;
+  transition: 0s;
+  transform-origin: bottom left;
+  opacity: 1;
+  transform: translate(0, 0);
+  z-index: 0;
+  @include mediaMaxW(#{$mobileViewPort}) {
+    display: none;
+    width: 102px;
+  }
+  &:after,
+  &:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    border-radius: 5px;
+    background-color: peru;
+    opacity: 1;
+  }
+  &:before {
+    top: initial;
+    bottom: 0;
+  }
+}

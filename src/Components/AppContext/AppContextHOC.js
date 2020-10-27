@@ -1,6 +1,6 @@
 import React, { createContext } from "react"
-import useUserContentLocalStorage from "Components/UserContent/UserContentLocalStorageHook"
-import useUserShows from "Components/UserContent/UserShowsHook"
+import useUserContentLocalStorage from "Components/UserContent/UseUserContentLocalStorage"
+import useUserShows from "Components/UserContent/UseUserShows"
 
 const AppContext = createContext()
 

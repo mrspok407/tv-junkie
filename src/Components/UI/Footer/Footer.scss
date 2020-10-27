@@ -1,0 +1,57 @@
+@import "../../../styles/globals";
+
+.footer {
+  $parentRef: &;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  background-color: $bodyBackgroundClr;
+  margin-top: auto;
+  min-height: 50px;
+
+  @mixin hovered {
+    #{$parentRef}:hover & {
+      @content;
+    }
+  }
+
+  &__admin-info {
+    display: grid;
+    grid-template-columns: repeat(4, max-content);
+    column-gap: 5px;
+    align-items: center;
+    color: #fff;
+    opacity: 0.05;
+    transition: 0.2s;
+
+    @include hovered {
+      opacity: 1;
+    }
+
+    a {
+      color: initial;
+    }
+
+    .fab {
+      padding-left: 5px;
+      cursor: pointer;
+    }
+
+    .fa-github {
+      color: #fff;
+    }
+
+    .fa-twitter {
+      color: #1da1f2;
+    }
+  }
+
+  .tmdb-logo {
+    display: block;
+    width: 45px;
+    height: 100%;
+    background-image: url("../../../assets/images/icons/tmdb-logo.svg");
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+}

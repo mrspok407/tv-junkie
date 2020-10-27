@@ -1,0 +1,223 @@
+@import "../../../../../styles/globals";
+
+.search-list {
+  display: flex;
+  position: absolute;
+  top: 100%;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+  background-color: getColor(backgroundColor, $searchCardPalette);
+  z-index: 1;
+
+  &--searching {
+    min-height: 100vh;
+  }
+}
+
+.search-card {
+  $parentRef: &;
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  cursor: pointer;
+  background-color: getColor(backgroundColor, $searchCardPalette);
+  transition: 0.2s;
+
+  &__active {
+    background-color: getColor(backgroundColorHover, $searchCardPalette);
+  }
+
+  @mixin cardHovered {
+    #{$parentRef}:hover & {
+      @content;
+    }
+  }
+
+  &:after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0px;
+    width: 100%;
+    height: 1px;
+    background-color: getColor(separatorColor, $searchCardPalette);
+  }
+  &:last-child:after {
+    display: none;
+  }
+
+  &__link {
+    display: block;
+    padding: 10px;
+  }
+
+  &__image {
+    min-width: 100px;
+    height: 132px;
+    background-size: auto 100%;
+    background-repeat: no-repeat;
+    background-position: left top;
+  }
+
+  &__info {
+    display: grid;
+    grid-template-columns: max-content 4fr 1fr;
+    column-gap: 10px;
+    row-gap: 3px;
+
+    @include mediaMaxW(350px) {
+      grid-template-columns: 4fr 1fr;
+    }
+
+    &-image {
+      --height: 62px;
+      min-width: calc(var(--height) / 1.5);
+      height: var(--height);
+      grid-row: 1 / 3;
+      background-size: auto 100%;
+      background-repeat: no-repeat;
+      background-position: left top;
+
+      @include mediaMaxW(350px) {
+        display: none;
+      }
+    }
+
+    &-title {
+      text-align: left;
+      font: {
+        size: 1.3rem;
+        weight: 600;
+      }
+      color: getColor(titleColor, $searchCardPalette);
+      transition: 0.2s;
+
+      @include mediaMinW(1000px) {
+        @include cardHovered {
+          color: getColor(titleColorHover, $searchCardPalette);
+        }
+      }
+    }
+
+    &-year {
+      font-size: 1rem;
+      padding-left: 6px;
+      color: getColor(yearColor, $searchCardPalette);
+    }
+
+    &-wrapper {
+      display: grid;
+      grid-template-rows: repeat(1fr);
+      justify-self: end;
+    }
+
+    &-rating,
+    &-type {
+      font: {
+        size: 1rem;
+        weight: 600;
+      }
+      color: getColor(ratingColor, $searchCardPalette);
+
+      span {
+        padding-left: 2px;
+        font-size: 0.8rem;
+      }
+    }
+
+    &-type {
+      color: getColor(typeColor, $searchCardPalette);
+    }
+
+    &-country {
+      padding-left: 5px;
+      color: getColor(countryColor, $searchCardPalette);
+      font-size: 1rem;
+    }
+
+    &-link {
+      color: getColor(linkColor, $searchCardPalette);
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    .user-rating {
+      $buttonSize: 30px;
+
+      grid-row: 2 / 3;
+      grid-template-columns: repeat(auto-fill, minmax($buttonSize, $buttonSize));
+
+      &__button {
+        width: $buttonSize - 10px;
+        height: $buttonSize - 10px;
+        background-size: $buttonSize - 10px;
+
+        &:after {
+          width: $buttonSize - 4px;
+          height: $buttonSize - 4px;
+          background-size: $buttonSize - 4px;
+        }
+      }
+    }
+  }
+
+  &__loading-db {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 4px solid #fff;
+    border-left-color: transparent;
+    animation: authFormLoading 0.5s linear infinite;
+    @keyframes authFormLoading {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  }
+
+  &--person {
+    cursor: inherit;
+
+    .search-card__info {
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      grid-template-rows: repeat(3, max-content);
+      row-gap: 4px;
+      padding: 10px;
+
+      &-image {
+        grid-row: 1 / 4;
+
+        @include mediaMaxW(350px) {
+          display: initial;
+        }
+      }
+
+      &-name,
+      &-activity,
+      &-known-movies {
+        text-align: left;
+        font: {
+          size: 1rem;
+        }
+        color: #fff;
+      }
+
+      &-name {
+        font: {
+          size: 1.2rem;
+          weight: 600;
+        }
+        color: getColor(orangeClr, $mainPalette);
+      }
+    }
+  }
+}
+
+.search-card__add-movie {
+  padding: 5px;
+  margin-top: auto;
+}

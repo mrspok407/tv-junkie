@@ -8,7 +8,7 @@ import * as ROUTES from "Utils/Constants/routes"
 import classNames from "classnames"
 import Input from "../Input/Input"
 import { AppContext } from "Components/AppContext/AppContextHOC"
-import { withUserContent } from "Components/UserContent"
+import userContentHandler from "Components/UserContent/UserContentHandler"
 import SignInWithGoogleForm from "../SignIn/SignInWithGoogle"
 import { WithAuthenticationConsumer } from "../Session/WithAuthentication"
 
@@ -86,16 +86,7 @@ class RegisterBase extends Component {
             const watchLaterMovies =
               JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)) || []
 
-            this.props.addShowToDatabaseOnRegister({ shows: watchingShows })
-
-            // watchingShows.forEach((item) => {
-            //   console.log("addShowtoDatabase run in Register")
-            //   this.props.addShowToDatabase({
-            //     id: item.id,
-            //     show: item,
-            //     userDatabase: "watchingShows"
-            //   })
-            // })
+            this.props.addShowsToDatabaseOnRegister({ shows: watchingShows })
 
             watchLaterMovies.forEach((item) => {
               this.props.handleMovieInDatabases({
@@ -340,7 +331,7 @@ class RegisterBase extends Component {
   }
 }
 
-const Register = compose(withRouter, withUserContent, WithAuthenticationConsumer)(RegisterBase)
+const Register = compose(withRouter, userContentHandler, WithAuthenticationConsumer)(RegisterBase)
 
 export default Register
 

@@ -1,0 +1,74 @@
+@import "../../../../../styles/globals";
+
+.torrent-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(75px, 1fr));
+  grid-column-gap: 5px;
+  justify-content: space-around;
+  padding-top: 5px;
+
+  * {
+    position: relative;
+    text-align: center;
+    padding: 15px 10px 15px 10px;
+    background-color: getColor(orangeClr, $mainPalette);
+    color: #fff;
+    text-decoration: none;
+    transition: 0.3s;
+    &:after,
+    &:before {
+      content: "";
+      position: absolute;
+      width: 50%;
+      height: 50%;
+      top: 50%;
+      left: 0;
+      transition: 0.3s;
+      background-color: #fff;
+      z-index: -1;
+      @include mediaMaxW(#{$mobileViewPort}) {
+        display: none;
+      }
+    }
+    &:before {
+      left: initial;
+      right: 0;
+      top: 0;
+    }
+    &:hover:after {
+      transform: translate(-3px, 3px);
+    }
+    &:hover:before {
+      transform: translate(3px, -3px);
+    }
+  }
+
+  &--content-results {
+    * {
+      padding: 10px;
+    }
+  }
+
+  &--episodes {
+    grid-template-columns: repeat(auto-fit, minmax(30px, 1fr));
+    padding: 10px 0 10px 0;
+
+    * {
+      padding: 5px 10px 5px 10px;
+      display: flex;
+      height: 33px;
+      justify-content: center;
+      align-items: center;
+      align-self: end;
+      @include mediaMaxW(#{$mobileViewPort}) {
+        padding: 5px 0px 5px 0px;
+      }
+      &:hover:after {
+        transform: translate(-1px, 1px);
+      }
+      &:hover:before {
+        transform: translate(1px, -1px);
+      }
+    }
+  }
+}

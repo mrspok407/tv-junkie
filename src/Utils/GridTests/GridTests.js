@@ -1,5 +1,5 @@
 import React, { Component } from "react"
-import { withUserContent } from "Components/UserContent"
+import userContentHandler from "Components/UserContent/UserContentHandler"
 import "./GridTests.scss"
 
 const POSTER_URL = "https://image.tmdb.org/t/p/w500"
@@ -17,9 +17,9 @@ class GridTests extends Component {
     this.setState({ content: this.props.userContent.watchingShows.slice(0, 10) })
   }
 
-  deleteItem = id => {
-    this.setState(prevState => ({
-      content: [...prevState.content.filter(item => item.id !== id)]
+  deleteItem = (id) => {
+    this.setState((prevState) => ({
+      content: [...prevState.content.filter((item) => item.id !== id)]
     }))
   }
 
@@ -42,4 +42,4 @@ class GridTests extends Component {
   }
 }
 
-export default withUserContent(GridTests)
+export default userContentHandler(GridTests)

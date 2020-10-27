@@ -1,0 +1,83 @@
+@import "../../../styles/globals";
+
+.home-page__wrapper {
+  display: grid;
+  width: 100%;
+  max-width: 1000px;
+  padding-bottom: 100px;
+}
+
+.home-page__heading {
+  padding-bottom: 15px;
+  color: getColor(orangeClr, $mainPalette);
+
+  h1 {
+    text-align: center;
+  }
+
+  &-features {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: 15px;
+    padding-left: 23px;
+
+    @include mediaMaxW(#{$mobileViewPort}) {
+      grid-template-columns: 1fr;
+      row-gap: 5px;
+    }
+  }
+
+  &-list {
+    display: grid;
+    row-gap: 8px;
+    list-style-type: none;
+  }
+
+  &-item {
+    position: relative;
+    font-size: 1.3rem;
+
+    &:after {
+      content: "";
+      position: absolute;
+      top: 6px;
+      left: -17px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: #fff;
+    }
+  }
+
+  &-register {
+    padding: 30px 0 0 5px;
+    font-size: 1.5rem;
+    color: #fff;
+  }
+
+  &-link {
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.home-page__sliders {
+  display: grid;
+  row-gap: 40px;
+  overflow: hidden;
+
+  &--non-auth {
+    padding-top: 50px;
+  }
+}
+
+.home-page__slider {
+  max-width: 1000px;
+  overflow: hidden;
+
+  &-heading {
+    padding: 0 5px 10px;
+    color: getColor(blueClr, $mainPalette);
+  }
+}
