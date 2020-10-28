@@ -10,7 +10,6 @@ import Input from "../Input/Input"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import userContentHandler from "Components/UserContent/UserContentHandler"
 import SignInWithGoogleForm from "../SignIn/SignInWithGoogle"
-import { WithAuthenticationConsumer } from "../Session/WithAuthentication"
 
 const LOCAL_STORAGE_KEY_WATCHING_SHOWS = "watchingShowsLocalS"
 const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = "watchLaterMoviesLocalS"
@@ -331,9 +330,8 @@ class RegisterBase extends Component {
   }
 }
 
-const Register = compose(withRouter, userContentHandler, WithAuthenticationConsumer)(RegisterBase)
+const Register = compose(withRouter, userContentHandler)(RegisterBase)
 
 export default Register
 
-// RegisterBase.contextType = UserContentLocalStorageContext
 RegisterBase.contextType = AppContext

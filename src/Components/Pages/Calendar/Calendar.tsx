@@ -4,7 +4,6 @@ import { Helmet } from "react-helmet"
 import ScrollToTop from "Utils/ScrollToTopBar"
 import HeaderBase from "Components/UI/Header/Header"
 import CalendarContent from "./CalendarContent"
-import { compose } from "recompose"
 import { WithAuthorization } from "Components/UserAuth/Session/WithAuthorization"
 import Footer from "Components/UI/Footer/Footer"
 import "./Calendar.scss"
@@ -27,6 +26,6 @@ class CalendarPage extends Component {
   }
 }
 
-const condition = (authUser) => authUser !== null
+const condition = (authUser: {}) => authUser !== null
 
-export default compose(WithAuthorization(condition))(CalendarPage)
+export default WithAuthorization(condition)(CalendarPage)

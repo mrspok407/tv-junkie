@@ -16,7 +16,7 @@ import ScrollToTopOnUpdate from "Utils/ScrollToTopOnUpdate"
 import Footer from "Components/UI/Footer/Footer"
 import PlaceholderLoadingFullInfo from "Components/UI/Placeholders/PlaceholderLoadingFullInfo/PlaceholderLoadingFullInfo"
 import useHandleListeners from "./FirebaseHelpers/UseHandleListeners"
-import "./DetailesPage.scss"
+import "./Detailes.scss"
 
 let cancelRequest
 

@@ -101,13 +101,6 @@ class HomePage extends Component {
       })
   }
 
-  handleCalendarState = ({ loading = false, willAirEpisodes = [] }) => {
-    this.setState({
-      calendarLoading: loading,
-      willAirEpisodes
-    })
-  }
-
   renderNonAuthUser = () => (
     <>
       <div className="home-page__heading">
@@ -162,7 +155,7 @@ class HomePage extends Component {
         </>
       )}
 
-      <CalendarContent homePage={true} handleCalendarState={this.handleCalendarState} />
+      <CalendarContent homePage={true} />
 
       {!this.context.userContent.loadingShows && !this.state.slidersLoading && (
         <div className="home-page__sliders">

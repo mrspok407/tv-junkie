@@ -8,19 +8,26 @@ import PlaceholderNoFutureEpisodes from "Components/UI/Placeholders/PlaceholderN
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import TorrentLinksEpisodes from "Components/UI/Templates/SeasonsAndEpisodes/Components/TorrentLinksEpisodes"
 
-class CalendarContent extends Component {
-  constructor(props) {
-    super(props)
+type Props = {
+  homePage?: boolean
+}
 
-    this.state = {
-      willAirEpisodes: [],
-      openMonths: [],
-      initialLoading: false
-    }
+type State = {
+  willAirEpisodes: { month: string; episodes: {}[] }[]
+  openMonths: string[]
+  initialLoading: boolean
+}
+
+class CalendarContent extends Component<Props, State> {
+  prevContext = this.context
+
+  state: State = {
+    willAirEpisodes: [],
+    openMonths: [],
+    initialLoading: false
   }
 
   componentDidMount() {
-    this._isMounted = true
     this.prevContext = this.context
 
     this.getContent()
@@ -33,19 +40,14 @@ class CalendarContent extends Component {
     this.prevContext = this.context
   }
 
-  componentWillUnmount() {
-    this._isMounted = false
-  }
-
   getContent = () => {
-    if (this.props.authUser === null) return
     if (this.context.userContent.userShows === 0) return
 
     const willAirEpisodes = this.props.homePage
       ? this.context.userContent.userWillAirEpisodes.slice(0, 2)
       : this.context.userContent.userWillAirEpisodes
 
-    const months = willAirEpisodes.map((item) => {
+    const months = willAirEpisodes.map((item: Object) => {
       return Object.values(item)[0]
     })
 
@@ -55,7 +57,7 @@ class CalendarContent extends Component {
     })
   }
 
-  showMonthEpisodes = (month) => {
+  showMonthEpisodes = (month: string) => {
     if (this.state.openMonths.includes(month)) {
       this.setState({
         openMonths: this.state.openMonths.filter((item) => item !== month)
@@ -108,7 +110,7 @@ class CalendarContent extends Component {
                   <div className="episodes__episode-list">
                     {this.state.openMonths.includes(month.month) && (
                       <>
-                        {monthEpisodes.map((episode, episodeIndex, array) => {
+                        {monthEpisodes.map((episode: any, episodeIndex: number, array: any[]) => {
                           const prevEpisode = array[episodeIndex - 1]
                           const prevEpisodeAirDate = prevEpisode && prevEpisode.air_date
 
