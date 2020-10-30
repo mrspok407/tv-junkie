@@ -193,7 +193,7 @@ class MoviesContent extends Component {
                       <button
                         type="button"
                         className="button"
-                        onClick={() => this.props.getMovieLinks(item.id)}
+                        onClick={() => this.props.getMovieLinks({ id: item.id })}
                       >
                         Show Links
                       </button>

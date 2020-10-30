@@ -40,6 +40,7 @@ class ToWatchEpisodesContent extends Component {
     const watchingShows = this.context.userContent.userShows.filter(
       (show) => show.database === "watchingShows" && !show.allEpisodesWatched
     )
+    console.log(watchingShows)
     const toWatchEpisodes = this.context.userContent.userToWatchShows
 
     const watchingShowsModified = watchingShows.reduce((acc, show) => {
@@ -62,7 +63,7 @@ class ToWatchEpisodesContent extends Component {
       arrayMerge: combineMergeObjects
     })
 
-    this.setState({ watchingShows: mergedShows, initialLoading: false })
+    this.setState({ watchingShows, initialLoading: false })
   }
 
   showEpisodeInfo = (episodeId) => {

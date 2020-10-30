@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect, useContext } from "react"
 import { useHistory } from "react-router-dom"
-import axios, { CancelToken } from "axios"
+import axios from "axios"
 import { Helmet } from "react-helmet"
 import * as ROUTES from "Utils/Constants/routes"
 import { AppContext } from "Components/AppContext/AppContextHOC"
@@ -18,22 +18,81 @@ import PlaceholderLoadingFullInfo from "Components/UI/Placeholders/PlaceholderLo
 import useHandleListeners from "./FirebaseHelpers/UseHandleListeners"
 import "./Detailes.scss"
 
-let cancelRequest
+const { CancelToken } = require("axios")
+let cancelRequest: any
 
-function DetailesPage({
+type Props = {
+  firebase: {}
+  match: { params: { id: number; mediaType: string } }
+  authUser: { uid: string }
+}
+
+interface Detailes {
+  id: number | string
+  poster_path: string
+  backdrop_path: string
+  name: string
+  original_name: string
+  title: string
+  first_air_date: string
+  release_date: string
+  last_air_date: string
+  episode_run_time: string
+  runtime: string
+  status: string
+  genres: {}[]
+  genre_ids: {}[]
+  network: {}[]
+  production_companies: {}[]
+  vote_average: string
+  vote_count: string
+  overview: string
+  tagline: string
+  budget: number | string
+  number_of_seasons: number | string
+  imdb_id: number | string
+  seasonsArr: {}[]
+}
+
+export const DetailesPage: React.FC<Props> = ({
   match: {
     params: { id, mediaType }
   },
   firebase,
   authUser
-}) {
-  const [detailes, setDetailes] = useState()
-  const [similarContent, setSimilarContent] = useState([])
+}) => {
+  const [detailes, setDetailes] = useState<Detailes>({
+    id,
+    poster_path: "-",
+    backdrop_path: "-",
+    name: "-",
+    original_name: "-",
+    title: "-",
+    first_air_date: "-",
+    release_date: "-",
+    last_air_date: "-",
+    episode_run_time: "-",
+    runtime: "-",
+    status: "-",
+    genres: [],
+    genre_ids: [],
+    network: [],
+    production_companies: [],
+    vote_average: "-",
+    vote_count: "-",
+    overview: "-",
+    tagline: "-",
+    budget: "-",
+    number_of_seasons: "-",
+    imdb_id: "",
+    seasonsArr: []
+  })
+  const [similarContent, setSimilarContent] = useState<{}[]>([])
 
   const [loadingAPIrequest, setLoadingAPIrequest] = useState(true)
 
-  const [showInfo, setShowInfo] = useState()
-  const [movieInDatabase, setMovieInDatabase] = useState(null)
+  const [showInfo, setShowInfo] = useState<{} | null>({})
+  const [movieInDatabase, setMovieInDatabase] = useState<{} | null>(null)
 
   const [episodesFromDatabase, releasedEpisodes, handleListeners] = useHandleListeners({
     id: Number(id),
@@ -43,9 +102,9 @@ function DetailesPage({
 
   const [loadingFromDatabase, setLoadingFromDatabase] = useState(true)
 
-  const [showDatabaseOnClient, setShowDatabaseOnClient] = useState(null)
+  const [showDatabaseOnClient, setShowDatabaseOnClient] = useState<{} | null>(null)
 
-  const [error, setError] = useState()
+  const [error, setError] = useState<string>()
 
   const history = useHistory()
 
@@ -77,7 +136,7 @@ function DetailesPage({
     handleListeners({ status: detailes.status, handleLoading })
   }, [detailes, context.userContent.loadingShowsMerging])
 
-  const handleLoading = (isLoading) => {
+  const handleLoading = (isLoading: boolean) => {
     setLoadingFromDatabase(isLoading)
   }
 
@@ -91,7 +150,7 @@ function DetailesPage({
           process.env.REACT_APP_TMDB_API
         }&language=en-US&append_to_response=${mediaType === "show" ? "similar" : "similar_movies"}`,
         {
-          cancelToken: new CancelToken(function executor(c) {
+          cancelToken: new CancelToken(function executor(c: any) {
             cancelRequest = c
           })
         }
@@ -127,16 +186,21 @@ function DetailesPage({
             similar_movies
           }
         }) => {
-          const genreIds = genres && genres.length ? genres.map((item) => item.id) : "-"
-          const genreNames = genres && genres.length ? genres.map((item) => item.name).join(", ") : "-"
+          const genreIds = genres && genres.length ? genres.map((item: { id: number }) => item.id) : "-"
+          const genreNames =
+            genres && genres.length ? genres.map((item: { name: string }) => item.name).join(", ") : "-"
           const networkNames =
-            networks && networks.length ? networks.map((item) => item.name).join(", ") : "-"
+            networks && networks.length ? networks.map((item: { name: string }) => item.name).join(", ") : "-"
           const prodComp =
             production_companies.length === 0 || !production_companies ? "-" : production_companies[0].name
 
           const similarType = similar || similar_movies
-          const similarContent = similarType.results.filter((item) => item.poster_path)
-          const similarContentSortByVotes = similarContent.sort((a, b) => b.vote_count - a.vote_count)
+          const similarContent = similarType.results.filter(
+            (item: { poster_path: string }) => item.poster_path
+          )
+          const similarContentSortByVotes = similarContent.sort(
+            (a: { vote_count: number }, b: { vote_count: number }) => b.vote_count - a.vote_count
+          )
 
           setDetailes({
             ...detailes,
@@ -165,8 +229,6 @@ function DetailesPage({
             imdb_id: imdb_id || "",
             seasonsArr: seasons ? seasons.reverse() : []
           })
-
-          console.log(runtime)
 
           if (!authUser) {
             setLoadingFromDatabase(false)
@@ -197,7 +259,7 @@ function DetailesPage({
     setShowDatabaseOnClient(show.database)
   }
 
-  const changeShowDatabaseOnClient = (database) => {
+  const changeShowDatabaseOnClient = (database: string) => {
     setShowDatabaseOnClient(database)
   }
 

@@ -5,6 +5,7 @@ import Header from "Components/UI/Header/Header"
 import MoviesContent from "./MoviesContent"
 import ScrollToTop from "Utils/ScrollToTopBar"
 import Footer from "Components/UI/Footer/Footer"
+import { withRouter } from "react-router-dom"
 const { CancelToken } = require("axios")
 
 let cancelRequest: any
@@ -14,6 +15,10 @@ type State = {
   error: number[]
   loadingIds: number[]
   moviesIds: number[]
+}
+
+interface getMovieLinksArg {
+  id: number
 }
 
 class Movies extends Component<State> {
@@ -30,7 +35,7 @@ class Movies extends Component<State> {
     }
   }
 
-  getMovieLinks = (id: number): void => {
+  getMovieLinks = ({ id }: getMovieLinksArg) => {
     if (this.state.moviesIds.includes(id)) return
 
     this.setState((prevState: { loadingIds: number[]; moviesIds: number[] }) => ({
@@ -93,4 +98,5 @@ class Movies extends Component<State> {
   }
 }
 
-export default Movies
+// @ts-ignore
+export default withRouter(Movies)

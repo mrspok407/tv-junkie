@@ -4,15 +4,34 @@ import useUserShows from "Components/UserContent/UseUserShows"
 
 interface AppContextInterface {
   userContentLocalStorage: {}
-  userContent: {}
+  userContent: {
+    loadingShowsMerging: boolean
+    loadingShows: boolean
+    loadingNotFinishedShows: boolean
+    loadingMovies: boolean
+    userShows: { id: number; database: string }[]
+    userWillAirEpisodes: {}[]
+    userToWatchShows: {}[]
+    userMovies: { id: number }[]
+  }
 }
 
-const AppContext = createContext<AppContextInterface | null>(null)
+const AppContext = createContext<AppContextInterface>({
+  userContentLocalStorage: {},
+  userContent: {
+    loadingShowsMerging: true,
+    loadingShows: true,
+    loadingNotFinishedShows: true,
+    loadingMovies: true,
+    userShows: [],
+    userWillAirEpisodes: [],
+    userToWatchShows: [],
+    userMovies: []
+  }
+})
 
 const AppContextHOC = (Component: any) =>
   function Comp(props: any) {
-    // const userContentLocalStorage = useUserContentLocalStorage()
-    // const userContent = useUserShows(props.firebase)
     const ContextValue: AppContextInterface = {
       userContentLocalStorage: useUserContentLocalStorage(),
       userContent: useUserShows(props.firebase)
