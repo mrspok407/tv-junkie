@@ -163,23 +163,12 @@ class ShowsEpisodes extends Component {
         seasonNum,
         episodeNum
       })
-      .update({
-        watched: !episodesFromDatabase[seasonNum - 1].episodes[episodeNum].watched
-      })
-
-    if (this.props.toWatchPage) {
-      this.props.firebase
-        .userShowSingleEpisodeNotFinished({
-          uid: this.props.authUser.uid,
-          key: showInfo.id,
-          seasonNum,
-          episodeNum
-        })
-        .update(
-          {
-            watched: !episodesFromDatabase[seasonNum - 1].episodes[episodeNum].watched
-          },
-          () => {
+      .update(
+        {
+          watched: !episodesFromDatabase[seasonNum - 1].episodes[episodeNum].watched
+        },
+        () => {
+          if (this.props.toWatchPage) {
             isAllEpisodesWatched({
               showInfo,
               releasedEpisodes,
@@ -188,8 +177,8 @@ class ShowsEpisodes extends Component {
               singleEpisode: true
             })
           }
-        )
-    }
+        }
+      )
   }
 
   checkEverySeasonEpisode = (seasonNum) => {
@@ -198,7 +187,7 @@ class ShowsEpisodes extends Component {
     const releasedEpisodes = this.props.releasedEpisodes
 
     const seasonEpisodes = episodesFromDatabase[seasonNum - 1].episodes.reduce((acc, episode) => {
-      acc.push({ userRating: episode.userRating, watched: episode.watched })
+      acc.push({ userRating: episode.userRating, watched: episode.watched, air_date: episode.air_date })
       return acc
     }, [])
     const seasonEpisodesAirDate = episodesFromDatabase[seasonNum - 1].episodes.reduce((acc, episode) => {
@@ -234,18 +223,8 @@ class ShowsEpisodes extends Component {
         key: showInfo.id,
         seasonNum
       })
-      .set(seasonEpisodes)
-
-    console.log(seasonEpisodesAirDate)
-
-    if (this.props.toWatchPage) {
-      this.props.firebase
-        .userShowSeasonEpisodesNotFinished({
-          uid: this.props.authUser.uid,
-          key: showInfo.id,
-          seasonNum
-        })
-        .set(seasonEpisodesAirDate, () => {
+      .set(seasonEpisodes, () => {
+        if (this.props.toWatchPage) {
           isAllEpisodesWatched({
             showInfo,
             releasedEpisodes,
@@ -253,8 +232,10 @@ class ShowsEpisodes extends Component {
             firebase: this.props.firebase,
             singleEpisode: false
           })
-        })
-    }
+        }
+      })
+
+    console.log(seasonEpisodesAirDate)
   }
 
   checkEveryShowEpisode = () => {
@@ -289,12 +270,14 @@ class ShowsEpisodes extends Component {
     const showCheckboxes = this.props.showInfo && this.props.showDatabaseOnClient !== "notWatchingShows"
     return (
       <>
-        {showCheckboxes && this.props.detailesPage && _get(this.props.releasedEpisodes, "length", 0) && (
+        {showCheckboxes && this.props.detailesPage && _get(this.props.releasedEpisodes, "length", 0) ? (
           <div className="episodes__check-all-episodes">
             <button type="button" className="button" onClick={() => this.checkEveryShowEpisode()}>
               Check all episodes
             </button>
           </div>
+        ) : (
+          ""
         )}
         <div className="episodes">
           {this.props.seasonsArr.map((season) => {

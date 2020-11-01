@@ -113,37 +113,34 @@ const useUserShows = (firebase) => {
           }
         })
 
-        firebase.userEpisodesNotFinished(authUser.uid).on("value", (snapshot) => {
-          if (snapshot.val() === null) {
-            setUserToWatchShows([])
-            setLoadingNotFinishedShows(false)
-            return
-          }
-
-          console.log("notFinished listener")
-
-          const userEpisodes = Object.entries(snapshot.val()).reduce((acc, [key, value]) => {
-            const releasedEpisodes = releasedEpisodesToOneArray({ data: value.episodes })
-
-            if (releasedEpisodes.find((episode) => !episode.watched)) {
-              acc.push({ id: Number(key), episodes: value.episodes })
-            }
-            return acc
-          }, [])
-
-          console.log(userEpisodes)
-
-          setUserToWatchShows(userEpisodes)
-          setLoadingNotFinishedShows(false)
-        })
-
         firebase
           .userEpisodes(authUser.uid)
-          .orderByChild("info/database")
-          .equalTo("watchingShows")
+          .orderByChild("info/isAllWatched_database")
+          .equalTo("false_watchingShows")
           .on("value", (snapshot) => {
-            console.log("userEpisodes on test")
+            if (snapshot.val() === null) {
+              setUserToWatchShows([])
+              setLoadingNotFinishedShows(false)
+              return
+            }
+
             console.log(snapshot.val())
+
+            const userEpisodes = Object.entries(snapshot.val()).reduce((acc, [key, value]) => {
+              const releasedEpisodes = releasedEpisodesToOneArray({ data: value.episodes })
+
+              console.log(releasedEpisodes)
+
+              if (releasedEpisodes.find((episode) => !episode.watched)) {
+                acc.push({ id: Number(key), episodes: value.episodes })
+              }
+              return acc
+            }, [])
+
+            console.log(userEpisodes)
+
+            setUserToWatchShows(userEpisodes)
+            setLoadingNotFinishedShows(false)
           })
 
         firebase.watchLaterMovies(authUser.uid).on("value", (snapshot) => {
@@ -163,7 +160,11 @@ const useUserShows = (firebase) => {
         setFirebaseListeners([
           firebase.userAllShows(authUser.uid),
           firebase.userEpisodesNotFinished(authUser.uid),
-          firebase.watchLaterMovies(authUser.uid)
+          firebase.watchLaterMovies(authUser.uid),
+          firebase
+            .userEpisodes(authUser.uid)
+            .orderByChild("info/isAllWatched_database")
+            .equalTo("false_watchingShows")
         ])
       },
       () => {

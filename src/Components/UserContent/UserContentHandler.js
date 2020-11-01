@@ -94,7 +94,7 @@ const userContentHandler = (Component) => {
       })
     }
 
-    addShowToDatabase = ({ id, show, userDatabase, callback }) => {
+    addShowToDatabase = ({ id, show, callback }) => {
       getShowEpisodesFromAPI({ id }).then((dataFromAPI) => {
         console.log("addShowInDatabase run in function body")
 
@@ -102,8 +102,8 @@ const userContentHandler = (Component) => {
           dataFromAPI.status === "Ended" || dataFromAPI.status === "Canceled" ? "ended" : "ongoing"
 
         const userEpisodes = dataFromAPI.episodes.reduce((acc, season) => {
-          const episodes = season.episodes.map(() => {
-            return { watched: false, userRating: 0 }
+          const episodes = season.episodes.map((episode) => {
+            return { watched: false, userRating: 0, air_date: episode.air_date || null }
           })
 
           acc.push({ season_number: season.season_number, episodes, userRating: 0 })
@@ -117,7 +117,7 @@ const userContentHandler = (Component) => {
           if (!auth) return
 
           this.firebase.userAllShows(auth.uid).child(id).set({
-            database: userDatabase,
+            database: "watchingShows",
             status: showsSubDatabase,
             firstAirDate: show.first_air_date,
             name: show.name,
@@ -132,8 +132,9 @@ const userContentHandler = (Component) => {
             .set({
               episodes: userEpisodes,
               info: {
-                database: userDatabase,
+                database: "watchingShows",
                 allEpisodesWatched: false,
+                isAllWatched_database: "false_watchingShows",
                 finished: false
               }
             })
@@ -153,37 +154,10 @@ const userContentHandler = (Component) => {
 
         this.props.firebase
           .userShowAllEpisodesInfo(this.userUid, id)
-          .update(
-            {
-              database
-            },
-            () => {
-              if (fullContentPage) return
-              this.props.firebase.userShowEpisodes(this.userUid, id).once("value", (snapshot) => {
-                const showEpisodes = snapshot.val().episodes
-                const showInfo = snapshot.val().info
-
-                const episodesFullData = _get(
-                  this.context.userContent.userShows.find((show) => show.id === id),
-                  "episodes",
-                  []
-                )
-
-                const episodesWithAirDate = mergeEpisodesWithAirDate({
-                  fullData: episodesFullData,
-                  userData: showEpisodes
-                })
-
-                this.props.firebase
-                  .userShowAllEpisodesNotFinished(this.userUid, id)
-                  .set(
-                    showInfo.allEpisodesWatched || showInfo.database !== "watchingShows"
-                      ? null
-                      : episodesWithAirDate
-                  )
-              })
-            }
-          )
+          .update({
+            database,
+            isAllWatched_database: `${userShow.allEpisodesWatched}_${database}`
+          })
           .catch((error) => {
             console.log(`Error in database occured. ${error}`)
 
@@ -213,7 +187,7 @@ const userContentHandler = (Component) => {
           })
       } else {
         const showData = Array.isArray(data) ? data.find((item) => item.id === id) : data
-        this.addShowToDatabase({ id, show: showData, userDatabase: database, callback })
+        this.addShowToDatabase({ id, show: showData, callback })
       }
     }
 

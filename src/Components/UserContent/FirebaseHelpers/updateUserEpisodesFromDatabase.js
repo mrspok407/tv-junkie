@@ -1,5 +1,4 @@
 import { combineMergeObjects, releasedEpisodesToOneArray } from "Utils"
-import mergeEpisodesWithAirDate from "Utils/mergeEpisodesWithAirDate"
 import merge from "deepmerge"
 
 const updateUserEpisodesFromDatabase = ({ firebase, authUser, shows }) => {
@@ -19,7 +18,11 @@ const updateUserEpisodesFromDatabase = ({ firebase, authUser, shows }) => {
     mergedShowsEpisodes.forEach((show) => {
       const seasons = show.episodes.reduce((acc, season) => {
         const episodes = season.episodes.reduce((acc, episode) => {
-          acc.push({ userRating: episode.userRating || 0, watched: episode.watched || false })
+          acc.push({
+            userRating: episode.userRating || 0,
+            watched: episode.watched || false,
+            air_date: episode.air_date || null
+          })
           return acc
         }, [])
         acc.push({
@@ -39,11 +42,6 @@ const updateUserEpisodesFromDatabase = ({ firebase, authUser, shows }) => {
       }, [])
       allEpisodes.splice(releasedEpisodes.length)
 
-      const episodesWithAirDate = mergeEpisodesWithAirDate({
-        fullData: show.episodes,
-        userData: seasons
-      })
-
       const allEpisodesWatched = !allEpisodes.some((episode) => !episode.watched)
       const finished = statusDatabase === "ended" && allEpisodesWatched ? true : false
 
@@ -51,14 +49,11 @@ const updateUserEpisodesFromDatabase = ({ firebase, authUser, shows }) => {
 
       firebase.userShowAllEpisodesInfo(authUser.uid, show.id).update({
         allEpisodesWatched,
-        finished
+        finished,
+        isAllWatched_database: `${allEpisodesWatched}_${show.database}`
       })
 
       firebase.userShow({ uid: authUser.uid, key: show.id }).update({ finished, allEpisodesWatched })
-
-      firebase
-        .userShowAllEpisodesNotFinished(authUser.uid, show.id)
-        .set(allEpisodesWatched || show.database !== "watchingShows" ? null : episodesWithAirDate)
     })
   })
 }

@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useContext } from "react"
 import { releasedEpisodesToOneArray } from "Utils"
+import { AppContext } from "Components/AppContext/AppContextHOC"
 import mergeEpisodesWithAirDate from "Utils/mergeEpisodesWithAirDate"
 
 interface Props {
@@ -23,6 +24,10 @@ interface handleListenersArg {
 const useHandleListeners = ({ id, authUser, firebase }: Props) => {
   const [episodes, setEpisodes] = useState<{}[] | null>()
   const [releasedEpisodes, setReleasedEpisodes] = useState<{}[] | null>()
+
+  const [database, setDatabase] = useState<string>()
+
+  const context = useContext(AppContext)
 
   const handleListeners = ({ status, handleLoading }: handleListenersArg) => {
     if (status === "-") return
@@ -55,10 +60,10 @@ const useHandleListeners = ({ id, authUser, firebase }: Props) => {
 
         allEpisodes.splice(releasedEpisodes.length)
 
-        const episodesWithAirDate = mergeEpisodesWithAirDate({
-          fullData: episodesFullData,
-          userData: userEpisodes
-        })
+        // const episodesWithAirDate = mergeEpisodesWithAirDate({
+        //   fullData: episodesFullData,
+        //   userData: userEpisodes
+        // })
 
         const allEpisodesWatched = !allEpisodes.some((episode: { watched: boolean }) => !episode.watched)
         const finished = statusDatabase === "ended" && allEpisodesWatched ? true : false
@@ -66,25 +71,18 @@ const useHandleListeners = ({ id, authUser, firebase }: Props) => {
         console.log(allEpisodesWatched)
         console.log(statusDatabase)
 
-        firebase.userShowAllEpisodesInfo(authUser.uid, id).update({
-          allEpisodesWatched,
-          finished
-        })
-
-        firebase.userShow({ uid: authUser.uid, key: id }).update({ finished, allEpisodesWatched })
-
         firebase
-          .userShow({ uid: authUser.uid, key: id })
+          .userShowAllEpisodesInfo(authUser.uid, id)
           .child("database")
           .once("value", (snapshot: any) => {
-            console.log(snapshot.val())
-            if (allEpisodesWatched || snapshot.val() !== "watchingShows") {
-              firebase.userShowAllEpisodesNotFinished(authUser.uid, id).set(null)
-            }
-            // firebase
-            //   .userShowAllEpisodesNotFinished(authUser.uid, id)
-            //   .set(allEpisodesWatched || snapshot.val() !== "watchingShows" ? null : episodesWithAirDate)
+            firebase.userShowAllEpisodesInfo(authUser.uid, id).update({
+              allEpisodesWatched,
+              finished,
+              isAllWatched_database: `${allEpisodesWatched}_${snapshot.val()}`
+            })
           })
+
+        firebase.userShow({ uid: authUser.uid, key: id }).update({ finished, allEpisodesWatched })
 
         setEpisodes(userEpisodes)
         setReleasedEpisodes(releasedEpisodes)
@@ -99,6 +97,7 @@ const useHandleListeners = ({ id, authUser, firebase }: Props) => {
       console.log("unmount")
 
       firebase.userShowAllEpisodes(authUser.uid, id).off()
+      firebase.userShowAllEpisodesInfo(authUser.uid, id).child("database").off()
       setEpisodes(null)
       setReleasedEpisodes(null)
     }

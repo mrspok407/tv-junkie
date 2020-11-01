@@ -40,17 +40,16 @@ class ToWatchEpisodesContent extends Component {
     const watchingShows = this.context.userContent.userShows.filter(
       (show) => show.database === "watchingShows" && !show.allEpisodesWatched
     )
-    console.log(watchingShows)
     const toWatchEpisodes = this.context.userContent.userToWatchShows
 
-    const watchingShowsModified = watchingShows.reduce((acc, show) => {
-      if (toWatchEpisodes.find((item) => item.id === show.id)) {
-        acc.push(show)
-      }
-      return acc
-    }, [])
+    // const watchingShowsModified = watchingShows.reduce((acc, show) => {
+    //   if (toWatchEpisodes.find((item) => item.id === show.id)) {
+    //     acc.push(show)
+    //   }
+    //   return acc
+    // }, [])
 
-    if (watchingShowsModified.length === 0) {
+    if (toWatchEpisodes.length === 0) {
       this.setState({ watchingShows: [] })
 
       if (!this.context.userContent.loadingNotFinishedShows && !this.context.userContent.loadingShows) {
@@ -59,11 +58,11 @@ class ToWatchEpisodesContent extends Component {
       return
     }
 
-    const mergedShows = merge(watchingShowsModified, toWatchEpisodes, {
+    const mergedShows = merge(watchingShows, toWatchEpisodes, {
       arrayMerge: combineMergeObjects
     })
 
-    this.setState({ watchingShows, initialLoading: false })
+    this.setState({ watchingShows: mergedShows, initialLoading: false })
   }
 
   showEpisodeInfo = (episodeId) => {
@@ -79,6 +78,7 @@ class ToWatchEpisodesContent extends Component {
   }
 
   render() {
+    console.log(this.state.watchingShows)
     return (
       <div className="content-results content-results--to-watch-page">
         {this.state.initialLoading || this.context.userContent.loadingShowsMerging ? (
@@ -106,7 +106,11 @@ class ToWatchEpisodesContent extends Component {
               }, [])
               toWatchEpisodes.reverse()
 
+              console.log(toWatchEpisodes)
+
               const releasedEpisodes = releasedEpisodesToOneArray({ data: toWatchEpisodes })
+
+              console.log(releasedEpisodes)
 
               return (
                 <div key={show.id} className="towatch__show">
