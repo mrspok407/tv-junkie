@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react"
 import { compose } from "recompose"
 import { withRouter } from "react-router-dom"
-import { withUserContent } from "Components/UserContent"
+import userContentHandler from "Components/UserContent/UserContentHandler"
 // import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import * as ROLES from "Utils/Constants/roles"
@@ -12,13 +12,7 @@ const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = "watchLaterMoviesLocalS"
 
 const mobileLayout = 1000
 
-const SignInWithGoogleBase = ({
-  firebase,
-  history,
-  addShowToDatabase,
-  handleMovieInDatabases,
-  closeNavMobile
-}) => {
+const SignInWithGoogleBase = ({ firebase, history, handleMovieInDatabases, closeNavMobile }) => {
   const [windowSize, setWindowSize] = useState(window.innerWidth)
 
   useEffect(() => {
@@ -27,16 +21,13 @@ const SignInWithGoogleBase = ({
 
   const context = useContext(AppContext)
 
-  const onSubmit = provider => {
-    // const signInType = windowSize < mobileLayout ? "signInWithGoogleRedirect" : "signInWithGooglePopUp"
+  const onSubmit = (provider) => {
     const signInType = windowSize < mobileLayout ? "signInWithRedirect" : "signInWithPopup"
-
-    // const provider = new firebase.app.auth.GoogleAuthProvider()
 
     firebase.app
       .auth()
       [signInType](provider)
-      .then(authUser => {
+      .then((authUser) => {
         const userRole = authUser.user.email === "mr.spok407@gmail.com" ? ROLES.ADMIN : ROLES.USER
 
         firebase
@@ -53,15 +44,9 @@ const SignInWithGoogleBase = ({
             const watchLaterMovies =
               JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)) || []
 
-            watchingShows.forEach(item => {
-              addShowToDatabase({
-                id: item.id,
-                show: item,
-                userDatabase: "watchingShows"
-              })
-            })
+            this.props.addShowsToDatabaseOnRegister({ shows: watchingShows })
 
-            watchLaterMovies.forEach(item => {
+            watchLaterMovies.forEach((item) => {
               handleMovieInDatabases({
                 id: item.id,
                 data: item,
@@ -81,7 +66,7 @@ const SignInWithGoogleBase = ({
       .then(() => {
         history.push(ROUTES.HOME_PAGE)
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error)
         // setError(error.message)
       })
@@ -101,6 +86,6 @@ const SignInWithGoogleBase = ({
   )
 }
 
-const SignInWithGoogleForm = compose(withUserContent, withRouter)(SignInWithGoogleBase)
+const SignInWithGoogleForm = compose(userContentHandler, withRouter)(SignInWithGoogleBase)
 
 export default SignInWithGoogleForm

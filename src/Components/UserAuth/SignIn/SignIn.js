@@ -7,7 +7,6 @@ import { validEmailRegex } from "Utils"
 import * as ROUTES from "Utils/Constants/routes"
 import classNames from "classnames"
 import Input from "../Input/Input"
-import { WithAuthenticationConsumer } from "../Session/WithAuthentication"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import SignInWithGoogleForm from "./SignInWithGoogle"
 
@@ -37,7 +36,7 @@ class SignInFormBase extends Component {
     this.state = { ...INITIAL_STATE }
   }
 
-  onSubmit = event => {
+  onSubmit = (event) => {
     event.preventDefault()
     const { email, password } = this.state.requiredInputs
     const errors = { ...this.state.errors }
@@ -69,13 +68,13 @@ class SignInFormBase extends Component {
         this.setState({ ...INITIAL_STATE })
         this.props.history.push(ROUTES.HOME_PAGE)
       })
-      .catch(error => {
+      .catch((error) => {
         errors.error = error
         this.setState({ errors, submitRequestLoading: false })
       })
   }
 
-  handleOnChange = event => {
+  handleOnChange = (event) => {
     event.preventDefault()
     const { value } = event.target
 
@@ -106,14 +105,14 @@ class SignInFormBase extends Component {
     }
 
     this.setState(
-      prevState => ({
+      (prevState) => ({
         requiredInputs: { ...prevState.requiredInputs, [name]: value }
       }),
       validation
     )
   }
 
-  handleValidationOnblur = event => {
+  handleValidationOnblur = (event) => {
     event.preventDefault()
 
     const { value, name } = event.target
@@ -142,9 +141,9 @@ class SignInFormBase extends Component {
     })
   }
 
-  handleKeyDown = e => e.which === 27 && this.resetInput(e.target.name)
+  handleKeyDown = (e) => e.which === 27 && this.resetInput(e.target.name)
 
-  resetInput = name => {
+  resetInput = (name) => {
     this.setState({
       requiredInputs: { ...this.state.requiredInputs, [`${name}`]: "" },
       errors: { ...this.state.errors, [`${name}Error`]: "" }
@@ -241,9 +240,8 @@ class SignInFormBase extends Component {
   }
 }
 
-const SignInForm = compose(WithAuthenticationConsumer, withRouter, withFirebase)(SignInFormBase)
+const SignInForm = compose(withRouter, withFirebase)(SignInFormBase)
 
 export default SignInForm
 
-// SignInFormBase.contextType = UserContentLocalStorageContext
 SignInFormBase.contextType = AppContext
