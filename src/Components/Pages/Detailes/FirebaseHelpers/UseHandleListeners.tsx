@@ -1,7 +1,5 @@
-import { useState, useEffect, useContext } from "react"
+import { useState, useEffect } from "react"
 import { releasedEpisodesToOneArray } from "Utils"
-import { AppContext } from "Components/AppContext/AppContextHOC"
-import mergeEpisodesWithAirDate from "Utils/mergeEpisodesWithAirDate"
 
 interface Props {
   id: number
@@ -25,10 +23,6 @@ const useHandleListeners = ({ id, authUser, firebase }: Props) => {
   const [episodes, setEpisodes] = useState<{}[] | null>()
   const [releasedEpisodes, setReleasedEpisodes] = useState<{}[] | null>()
 
-  const [database, setDatabase] = useState<string>()
-
-  const context = useContext(AppContext)
-
   const handleListeners = ({ status, handleLoading }: handleListenersArg) => {
     if (status === "-") return
 
@@ -41,7 +35,6 @@ const useHandleListeners = ({ id, authUser, firebase }: Props) => {
         return
       }
 
-      const episodesFullData = snapshot.val()
       const releasedEpisodes = releasedEpisodesToOneArray({ data: snapshot.val() })
 
       firebase.userShowAllEpisodes(authUser.uid, id).on("value", (snapshot: any) => {
@@ -59,11 +52,6 @@ const useHandleListeners = ({ id, authUser, firebase }: Props) => {
         }, [])
 
         allEpisodes.splice(releasedEpisodes.length)
-
-        // const episodesWithAirDate = mergeEpisodesWithAirDate({
-        //   fullData: episodesFullData,
-        //   userData: userEpisodes
-        // })
 
         const allEpisodesWatched = !allEpisodes.some((episode: { watched: boolean }) => !episode.watched)
         const finished = statusDatabase === "ended" && allEpisodesWatched ? true : false
@@ -94,10 +82,7 @@ const useHandleListeners = ({ id, authUser, firebase }: Props) => {
   useEffect(() => {
     return () => {
       if (!authUser) return
-      console.log("unmount")
-
       firebase.userShowAllEpisodes(authUser.uid, id).off()
-      firebase.userShowAllEpisodesInfo(authUser.uid, id).child("database").off()
       setEpisodes(null)
       setReleasedEpisodes(null)
     }

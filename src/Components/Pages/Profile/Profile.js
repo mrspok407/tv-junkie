@@ -42,18 +42,50 @@ class Profile extends Component {
     )
   }
 
+  // test = () => {
+  //   this.props.firebase.users().once("value", (snapshot) => {
+  //     Object.entries(snapshot.val()).forEach(([key, value]) => {
+  //       this.props.firebase
+  //         .userEpisodes(key)
+  //         .child("all")
+  //         .once("value", (snapshot) => {
+  //           if (snapshot.val() === null) return
+  //           this.props.firebase.userEpisodes(key).set(snapshot.val(), () => {
+  //             this.props.firebase.userEpisodes(key).once("value", (snapshot) => {
+  //               if (snapshot.val() === null) return
+  //               const modifiedData = Object.entries(snapshot.val()).reduce((acc, [key, value]) => {
+  //                 const show = {
+  //                   episodes: value.episodes,
+  //                   info: {
+  //                     ...value.info,
+  //                     isAllWatched_database: `${value.info.allEpisodesWatched}_${value.info.database}`
+  //                   }
+  //                 }
+  //                 acc = { ...acc, [key]: show }
+  //                 return acc
+  //               }, {})
+
+  //               this.props.firebase.userEpisodes(key).set(modifiedData)
+  //               console.log(modifiedData)
+  //             })
+  //           })
+  //         })
+  //     })
+  //   })
+  // }
+
   databaseModify = () => {
     const todayConverted = `${todayDate.getDate()}-${todayDate.getMonth() + 1}-${todayDate.getFullYear()}`
-    const theDayBeforeYesterday = new Date(todayDate.getTime() - 172800000)
+    const threeDaysBefore = new Date(todayDate.getTime() - 259200000)
 
-    const theDayBeforeYesterdayConverted = `${theDayBeforeYesterday.getDate()}-${
-      theDayBeforeYesterday.getMonth() + 1
-    }-${theDayBeforeYesterday.getFullYear()}`
-    console.log(theDayBeforeYesterday)
+    const threeDaysBeforeConverted = `${threeDaysBefore.getDate()}-${
+      threeDaysBefore.getMonth() + 1
+    }-${threeDaysBefore.getFullYear()}`
+    console.log(threeDaysBefore)
 
     axios
       .get(
-        `https://api.themoviedb.org/3/tv/changes?api_key=${process.env.REACT_APP_TMDB_API}&end_date=${todayConverted}&start_date=${theDayBeforeYesterdayConverted}`
+        `https://api.themoviedb.org/3/tv/changes?api_key=${process.env.REACT_APP_TMDB_API}&end_date=${todayConverted}&start_date=${threeDaysBeforeConverted}`
       )
       .then(({ data }) => {
         data.results.forEach((show) => {

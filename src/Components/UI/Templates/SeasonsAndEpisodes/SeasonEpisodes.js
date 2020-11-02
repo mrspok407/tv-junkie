@@ -15,9 +15,7 @@ export default class SeasonEpisodes extends Component {
     super(props)
 
     this.state = {
-      showTorrentLinks: [],
       fadeOutEpisodes: [],
-      moveUpEpisodes: [],
       disableCheckboxWarning: null,
       checkbox: ""
     }
@@ -58,20 +56,6 @@ export default class SeasonEpisodes extends Component {
     })
   }
 
-  toggleTorrentLinks = (id) => {
-    const allreadyShowed = this.state.showTorrentLinks.includes(id)
-
-    if (allreadyShowed) {
-      this.setState({
-        showTorrentLinks: this.state.showTorrentLinks.filter((item) => item !== id)
-      })
-    } else {
-      this.setState({
-        showTorrentLinks: [...this.state.showTorrentLinks, id]
-      })
-    }
-  }
-
   handleFadeOut = (episodeId, episodeIndex) => {
     if (this.state.fadeOutEpisodes.find((item) => item.id === episodeId)) return
 
@@ -104,6 +88,8 @@ export default class SeasonEpisodes extends Component {
     const showSeason = showCheckboxes && this.props.episodesFromDatabase[this.props.season.season_number - 1]
 
     const seasons = this.props.toWatchPage ? this.props.seasonsArr : this.props.showEpisodes
+
+    console.log(this.props.episodesFromDatabase)
 
     return (
       <div className="episodes__episode-list">

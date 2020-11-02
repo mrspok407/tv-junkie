@@ -59,7 +59,11 @@ const userContentHandler = (Component) => {
               id: show.id
             }
 
-            addShowToMainDatabase({ firebase: this.firebase, show, dataFromAPI })
+            addShowToMainDatabase({
+              firebase: this.firebase,
+              show,
+              dataFromAPI
+            })
 
             return { showInfo, userEpisodes }
           })
@@ -140,11 +144,16 @@ const userContentHandler = (Component) => {
             })
         })
 
-        addShowToMainDatabase({ firebase: this.firebase, show, dataFromAPI, callback })
+        addShowToMainDatabase({
+          firebase: this.firebase,
+          show,
+          dataFromAPI,
+          callback
+        })
       })
     }
 
-    handleShowInDatabases = ({ id, data = [], database, userShows, fullContentPage = false, callback }) => {
+    handleShowInDatabases = ({ id, data = [], database, userShows, callback }) => {
       const userShow = userShows.find((show) => show.id === id)
 
       if (userShow) {

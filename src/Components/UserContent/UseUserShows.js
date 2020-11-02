@@ -46,23 +46,11 @@ const useUserShows = (firebase) => {
                   .once("value")
                   .then((snapshot) => {
                     if (snapshot.val() !== null) {
-                      const episodesFromDatabase = snapshot.val().episodes
-                      const infoFromDatabase = snapshot.val().info
-                      return firebase
-                        .userShowAllEpisodes(authUser.uid, show.id)
-                        .once("value")
-                        .then((snapshot) => {
-                          const userEpisodes = snapshot.val()
-                          const mergedEpisodes = merge(episodesFromDatabase, userEpisodes, {
-                            arrayMerge: combineMergeObjects
-                          })
-
-                          return {
-                            ...show,
-                            ...infoFromDatabase,
-                            episodes: mergedEpisodes || []
-                          }
-                        })
+                      return {
+                        ...show,
+                        ...snapshot.val().info,
+                        episodes: snapshot.val().episodes || []
+                      }
                     }
                   })
               })
@@ -124,20 +112,14 @@ const useUserShows = (firebase) => {
               return
             }
 
-            console.log(snapshot.val())
-
             const userEpisodes = Object.entries(snapshot.val()).reduce((acc, [key, value]) => {
               const releasedEpisodes = releasedEpisodesToOneArray({ data: value.episodes })
-
-              console.log(releasedEpisodes)
 
               if (releasedEpisodes.find((episode) => !episode.watched)) {
                 acc.push({ id: Number(key), episodes: value.episodes })
               }
               return acc
             }, [])
-
-            console.log(userEpisodes)
 
             setUserToWatchShows(userEpisodes)
             setLoadingNotFinishedShows(false)
@@ -159,7 +141,6 @@ const useUserShows = (firebase) => {
 
         setFirebaseListeners([
           firebase.userAllShows(authUser.uid),
-          firebase.userEpisodesNotFinished(authUser.uid),
           firebase.watchLaterMovies(authUser.uid),
           firebase
             .userEpisodes(authUser.uid)
@@ -170,6 +151,7 @@ const useUserShows = (firebase) => {
       () => {
         setLoadingShows(false)
         setLoadingMovies(false)
+        setLoadingNotFinishedShows(false)
       }
     )
   }, [firebase])

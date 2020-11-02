@@ -20,7 +20,6 @@ class ToWatchEpisodesContent extends Component {
   }
 
   componentDidMount() {
-    this._isMounted = true
     this.prevContext = this.context
     this.getContent()
   }
@@ -32,22 +31,18 @@ class ToWatchEpisodesContent extends Component {
     this.prevContext = this.context
   }
 
-  componentWillUnmount() {
-    this._isMounted = false
-  }
-
   getContent = () => {
     const watchingShows = this.context.userContent.userShows.filter(
       (show) => show.database === "watchingShows" && !show.allEpisodesWatched
     )
     const toWatchEpisodes = this.context.userContent.userToWatchShows
 
-    // const watchingShowsModified = watchingShows.reduce((acc, show) => {
-    //   if (toWatchEpisodes.find((item) => item.id === show.id)) {
-    //     acc.push(show)
-    //   }
-    //   return acc
-    // }, [])
+    const watchingShowsModified = watchingShows.reduce((acc, show) => {
+      if (toWatchEpisodes.find((item) => item.id === show.id)) {
+        acc.push(show)
+      }
+      return acc
+    }, [])
 
     if (toWatchEpisodes.length === 0) {
       this.setState({ watchingShows: [] })
@@ -58,7 +53,7 @@ class ToWatchEpisodesContent extends Component {
       return
     }
 
-    const mergedShows = merge(watchingShows, toWatchEpisodes, {
+    const mergedShows = merge(watchingShowsModified, toWatchEpisodes, {
       arrayMerge: combineMergeObjects
     })
 
@@ -87,7 +82,7 @@ class ToWatchEpisodesContent extends Component {
           <PlaceholderNoToWatchEpisodes />
         ) : (
           <>
-            {this.state.watchingShows.map((show, index) => {
+            {this.state.watchingShows.map((show) => {
               const toWatchEpisodes = show.episodes.reduce((acc, season) => {
                 const seasonEpisodes = season.episodes.reduce((acc, episode) => {
                   if (episode.air_date && new Date(episode.air_date) < todayDate.getTime()) {
@@ -106,12 +101,7 @@ class ToWatchEpisodesContent extends Component {
               }, [])
               toWatchEpisodes.reverse()
 
-              console.log(toWatchEpisodes)
-
               const releasedEpisodes = releasedEpisodesToOneArray({ data: toWatchEpisodes })
-
-              console.log(releasedEpisodes)
-
               return (
                 <div key={show.id} className="towatch__show">
                   <Link className="towatch__show-name" to={`/show/${show.id}`}>
@@ -121,7 +111,6 @@ class ToWatchEpisodesContent extends Component {
                     toWatchPage={true}
                     seasonsArr={toWatchEpisodes}
                     showTitle={show.name || show.original_name}
-                    todayDate={todayDate}
                     id={show.id}
                     showInfo={show}
                     episodesFromDatabase={show.episodes}

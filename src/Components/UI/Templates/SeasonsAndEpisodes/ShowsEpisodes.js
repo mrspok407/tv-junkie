@@ -234,8 +234,6 @@ class ShowsEpisodes extends Component {
           })
         }
       })
-
-    console.log(seasonEpisodesAirDate)
   }
 
   checkEveryShowEpisode = () => {
@@ -379,13 +377,13 @@ class ShowsEpisodes extends Component {
                         toWatchPage={this.props.toWatchPage}
                         showTitle={this.props.showTitle}
                         detailEpisodeInfo={this.state.detailEpisodeInfo}
-                        showEpisodeInfo={this.showEpisodeInfo}
                         season={season}
                         seasonId={season.id}
                         authUser={this.props.authUser}
                         episodesFromDatabase={this.props.episodesFromDatabase}
                         showInfo={this.props.showInfo}
                         showDatabaseOnClient={this.props.showDatabaseOnClient}
+                        showEpisodeInfo={this.showEpisodeInfo}
                         toggleWatchedEpisode={this.toggleWatchedEpisode}
                       />
                       {this.props.toWatchPage && (
