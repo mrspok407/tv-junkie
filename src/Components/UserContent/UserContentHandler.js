@@ -1,8 +1,6 @@
 import React from "react"
 import { withFirebase } from "Components/Firebase"
 import { compose } from "recompose"
-import * as _get from "lodash.get"
-import mergeEpisodesWithAirDate from "Utils/mergeEpisodesWithAirDate"
 import { WithAuthenticationConsumer } from "Components/UserAuth/Session/WithAuthentication"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import addShowToMainDatabase from "./FirebaseHelpers/addShowToMainDatabase"

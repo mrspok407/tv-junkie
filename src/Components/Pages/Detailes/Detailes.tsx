@@ -4,6 +4,7 @@ import { useHistory } from "react-router-dom"
 import axios from "axios"
 import { Helmet } from "react-helmet"
 import * as ROUTES from "Utils/Constants/routes"
+import * as _get from "lodash.get"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import userContentHandler from "Components/UserContent/UserContentHandler"
 import Header from "Components/UI/Header/Header"
@@ -34,24 +35,28 @@ interface Detailes {
   name: string
   original_name: string
   title: string
+  original_title: string
   first_air_date: string
   release_date: string
   last_air_date: string
-  episode_run_time: string
+  episode_run_time: string[] | number[]
   runtime: string
   status: string
-  genres: {}[]
+  genres: any
   genre_ids: {}[]
-  network: {}[]
-  production_companies: {}[]
+  networks: any
+  production_companies: any
   vote_average: string
   vote_count: string
   overview: string
   tagline: string
-  budget: number | string
+  budget?: number | bigint
   number_of_seasons: number | string
   imdb_id: number | string
   seasonsArr: {}[]
+  seasons: {}[]
+  similar?: { results: {}[] }[]
+  similar_movies?: { results: {}[] }[]
 }
 
 export const DetailesPage: React.FC<Props> = ({
@@ -68,25 +73,28 @@ export const DetailesPage: React.FC<Props> = ({
     name: "-",
     original_name: "-",
     title: "-",
+    original_title: "-",
     first_air_date: "-",
     release_date: "-",
     last_air_date: "-",
-    episode_run_time: "-",
+    episode_run_time: ["-"],
     runtime: "-",
     status: "-",
     genres: [],
     genre_ids: [],
-    network: [],
+    networks: [],
     production_companies: [],
     vote_average: "-",
     vote_count: "-",
     overview: "-",
     tagline: "-",
-    budget: "-",
+    budget: 0,
     number_of_seasons: "-",
     imdb_id: "",
-    seasonsArr: []
+    seasonsArr: [],
+    seasons: []
   })
+
   const [similarContent, setSimilarContent] = useState<{}[]>([])
 
   const [loadingAPIrequest, setLoadingAPIrequest] = useState(true)
@@ -145,7 +153,7 @@ export const DetailesPage: React.FC<Props> = ({
     setLoadingFromDatabase(true)
 
     axios
-      .get(
+      .get<Detailes>(
         `https://api.themoviedb.org/3/${mediaType === "show" ? "tv" : "movie"}/${id}?api_key=${
           process.env.REACT_APP_TMDB_API
         }&language=en-US&append_to_response=${mediaType === "show" ? "similar" : "similar_movies"}`,
@@ -155,92 +163,66 @@ export const DetailesPage: React.FC<Props> = ({
           })
         }
       )
-      .then(
-        ({
-          data: {
-            id,
-            name,
-            original_name,
-            title,
-            original_title,
-            first_air_date,
-            last_air_date,
-            release_date,
-            vote_average,
-            genres,
-            overview,
-            backdrop_path,
-            poster_path,
-            vote_count,
-            episode_run_time,
-            runtime,
-            tagline,
-            status,
-            networks,
-            production_companies,
-            budget,
-            number_of_seasons,
-            imdb_id,
-            seasons,
-            similar,
-            similar_movies
-          }
-        }) => {
-          const genreIds = genres && genres.length ? genres.map((item: { id: number }) => item.id) : "-"
-          const genreNames =
-            genres && genres.length ? genres.map((item: { name: string }) => item.name).join(", ") : "-"
-          const networkNames =
-            networks && networks.length ? networks.map((item: { name: string }) => item.name).join(", ") : "-"
-          const prodComp =
-            production_companies.length === 0 || !production_companies ? "-" : production_companies[0].name
+      .then(({ data }) => {
+        const genreIds =
+          data.genres && data.genres.length ? data.genres.map((item: { id: number }) => item.id) : "-"
+        const genreNames =
+          data.genres && data.genres.length
+            ? data.genres.map((item: { name: string }) => item.name).join(", ")
+            : "-"
+        const networkNames =
+          data.networks && data.networks.length
+            ? data.networks.map((item: { name: string }) => item.name).join(", ")
+            : "-"
+        const prodComp =
+          data.production_companies.length === 0 || !data.production_companies
+            ? "-"
+            : data.production_companies[0].name
 
-          const similarType = similar || similar_movies
-          const similarContent = similarType.results.filter(
-            (item: { poster_path: string }) => item.poster_path
-          )
-          const similarContentSortByVotes = similarContent.sort(
-            (a: { vote_count: number }, b: { vote_count: number }) => b.vote_count - a.vote_count
-          )
+        const similarType: any = data.similar || data.similar_movies
+        const similarContent = similarType.results.filter((item: { poster_path: string }) => item.poster_path)
+        const similarContentSortByVotes = similarContent.sort(
+          (a: { vote_count: number }, b: { vote_count: number }) => b.vote_count - a.vote_count
+        )
 
-          setDetailes({
-            ...detailes,
-            id: id,
-            poster_path: poster_path,
-            backdrop_path: backdrop_path,
-            name: name || original_name || "-",
-            original_name: original_name || "-",
-            title: title || original_title || "-",
-            first_air_date: first_air_date || "-",
-            release_date: release_date || "-",
-            last_air_date: last_air_date || "-",
-            episode_run_time: episode_run_time || "-",
-            runtime: runtime || "-",
-            status: status || "-",
-            genres: genreNames || "-",
-            genre_ids: genreIds,
-            network: networkNames || "-",
-            production_companies: prodComp || "-",
-            vote_average: vote_average || "-",
-            vote_count: vote_count || "-",
-            overview: overview || "-",
-            tagline: tagline || "-",
-            budget: budget || "-",
-            number_of_seasons: number_of_seasons || "-",
-            imdb_id: imdb_id || "",
-            seasonsArr: seasons ? seasons.reverse() : []
-          })
+        setDetailes({
+          ...detailes,
+          id: data.id,
+          poster_path: data.poster_path,
+          backdrop_path: data.backdrop_path,
+          name: data.name || data.original_name || "-",
+          original_name: data.original_name || "-",
+          title: data.title || data.original_title || "-",
+          first_air_date: data.first_air_date || "-",
+          release_date: data.release_date || "-",
+          last_air_date: data.last_air_date || "-",
+          episode_run_time: data.episode_run_time || "-",
+          runtime: data.runtime || "-",
+          status: data.status || "-",
+          genres: genreNames || "-",
+          genre_ids: genreIds,
+          networks: networkNames || "-",
+          production_companies: prodComp || "-",
+          vote_average: data.vote_average || "-",
+          vote_count: data.vote_count || "-",
+          overview: data.overview || "-",
+          tagline: data.tagline || "-",
+          budget: data.budget || 0,
+          number_of_seasons: data.number_of_seasons || "-",
+          imdb_id: data.imdb_id || "",
+          seasonsArr: data.seasons ? data.seasons.reverse() : []
+        })
 
-          if (!authUser) {
-            setLoadingFromDatabase(false)
-          }
-
-          setLoadingAPIrequest(false)
-          setSimilarContent(similarContentSortByVotes)
+        if (!authUser) {
+          setLoadingFromDatabase(false)
         }
-      )
+
+        setLoadingAPIrequest(false)
+        setSimilarContent(similarContentSortByVotes)
+      })
       .catch((err) => {
         if (axios.isCancel(err)) return
-        if (err.response.status === 404) {
+        if (_get(err.response, "status", "") === 404) {
           history.push(ROUTES.PAGE_DOESNT_EXISTS)
           return
         }

@@ -89,8 +89,6 @@ export default class SeasonEpisodes extends Component {
 
     const seasons = this.props.toWatchPage ? this.props.seasonsArr : this.props.showEpisodes
 
-    console.log(this.props.episodesFromDatabase)
-
     return (
       <div className="episodes__episode-list">
         {seasons.map((item) => {
@@ -237,13 +235,14 @@ export default class SeasonEpisodes extends Component {
 
                     {episodeAirDateAsDateObj < todayDate.getTime() && episode.air_date && (
                       <>
-                        {this.props.showInfo && (
+                        {this.props.showInfo && !!this.props.episodesFromDatabase && (
                           <UserRating
                             id={this.props.showInfo.id}
                             firebaseRef="userShowSingleEpisode"
                             seasonNum={this.props.season.season_number}
                             episodeNum={indexOfEpisode}
                             episodeRating={true}
+                            disableRating={!!(this.props.showDatabaseOnClient === "notWatchingShows")}
                           />
                         )}
                         <TorrentLinksEpisodes

@@ -77,7 +77,6 @@ class Movies extends Component<State> {
   }
 
   render() {
-    console.log(this.state)
     return (
       <>
         <Helmet>

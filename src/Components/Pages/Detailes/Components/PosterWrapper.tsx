@@ -1,22 +1,45 @@
 import React, { Component } from "react"
-import axios, { CancelToken } from "axios"
+import axios from "axios"
 import { todayDate } from "Utils"
 import Loader from "Components/UI/Placeholders/Loader"
 
-let cancelRequest
+const { CancelToken } = require("axios")
+let cancelRequest: any
 
-export default class PosterWrapper extends Component {
-  constructor(props) {
-    super(props)
+type Props = {
+  poster_path: string
+  backdrop_path: string
+  imdb_id: number | string
+  release_date: string
+  first_air_date: string
+  mediaType: string
+}
 
-    this.state = {
-      movieTitle: "",
-      movieHash1080p: "",
-      movieHash720p: "",
-      movieAvailable: true,
-      loadingTorrentLinks: false,
-      error: ""
-    }
+type State = {
+  movieTitle: string
+  movieHash1080p?: string
+  movieHash720p?: string
+  movieAvailable: boolean
+  loadingTorrentLinks: boolean
+  error: string
+}
+
+interface APIData {
+  data: {
+    movies: { torrents: { hash: string }[]; title: string }[]
+  }
+}
+
+export default class PosterWrapper extends Component<Props, State> {
+  _isMounted = false
+
+  state: State = {
+    movieTitle: "",
+    movieHash1080p: "",
+    movieHash720p: "",
+    movieAvailable: true,
+    loadingTorrentLinks: false,
+    error: ""
   }
 
   componentDidMount() {
@@ -38,23 +61,23 @@ export default class PosterWrapper extends Component {
       loadingTorrentLinks: true
     })
     axios
-      .get(`https://yts.mx/api/v2/list_movies.json?query_term=${this.props.imdb_id}`, {
-        cancelToken: new CancelToken(function executor(c) {
+      .get<APIData>(`https://yts.mx/api/v2/list_movies.json?query_term=${this.props.imdb_id}`, {
+        cancelToken: new CancelToken(function executor(c: any) {
           cancelRequest = c
         })
       })
-      .then((res) => {
-        if (!res.data.data.hasOwnProperty("movies")) {
+      .then(({ data }) => {
+        if (!data.data.hasOwnProperty("movies")) {
           this.setState({
             movieAvailable: false
           })
           return
         }
 
-        const movie = res.data.data.movies[0]
-        const movieHash1080p = movie.torrents.find((item) => item.quality === "1080p")
+        const movie = data.data.movies[0]
+        const movieHash1080p = movie.torrents.find((item: any) => item.quality === "1080p")
 
-        const movieHash720p = movie.torrents.find((item) => item.quality === "720p")
+        const movieHash720p = movie.torrents.find((item: any) => item.quality === "720p")
 
         if (this._isMounted) {
           this.setState({

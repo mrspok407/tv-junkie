@@ -124,6 +124,7 @@ class UserRating extends Component {
   render() {
     const disableRating =
       this.props.authUser === null ||
+      this.props.disableRating ||
       (this.props.showDatabase === null && this.props.showRating && this.props.mediaType !== "movie")
     return (
       <div

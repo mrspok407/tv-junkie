@@ -3,7 +3,10 @@ import useUserContentLocalStorage from "Components/UserContent/UseUserContentLoc
 import useUserShows from "Components/UserContent/UseUserShows"
 
 interface AppContextInterface {
-  userContentLocalStorage: {}
+  userContentLocalStorage: {
+    watchLaterMovies: { id: number }[]
+    toggleMovieLS: () => void
+  }
   userContent: {
     loadingShowsMerging: boolean
     loadingShows: boolean
@@ -17,7 +20,10 @@ interface AppContextInterface {
 }
 
 const AppContext = createContext<AppContextInterface>({
-  userContentLocalStorage: {},
+  userContentLocalStorage: {
+    watchLaterMovies: [],
+    toggleMovieLS: () => {}
+  },
   userContent: {
     loadingShowsMerging: true,
     loadingShows: true,

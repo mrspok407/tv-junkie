@@ -55,7 +55,7 @@ class ToWatchEpisodesContent extends Component {
 
     const mergedShows = merge(watchingShowsModified, toWatchEpisodes, {
       arrayMerge: combineMergeObjects
-    })
+    }).sort((a, b) => (a.first_air_date > b.first_air_date ? -1 : 1))
 
     this.setState({ watchingShows: mergedShows, initialLoading: false })
   }
