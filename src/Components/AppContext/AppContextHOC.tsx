@@ -2,10 +2,15 @@ import React, { createContext } from "react"
 import useUserContentLocalStorage from "Components/UserContent/UseUserContentLocalStorage"
 import useUserShows from "Components/UserContent/UseUserShows"
 
+interface FunctionArguments {
+  id: number | string
+  data: { id: number }[] | { id: number }
+}
+
 interface AppContextInterface {
   userContentLocalStorage: {
     watchLaterMovies: { id: number }[]
-    toggleMovieLS: () => void
+    toggleMovieLS: ({ id, data }: FunctionArguments) => void
   }
   userContent: {
     loadingShowsMerging: boolean

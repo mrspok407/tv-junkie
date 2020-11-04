@@ -6,45 +6,57 @@ import { AppContext } from "Components/AppContext/AppContextHOC"
 import addShowToMainDatabase from "./FirebaseHelpers/addShowToMainDatabase"
 import getShowEpisodesFromAPI from "./TmdbAPIHelpers/getShowEpisodesFromAPI"
 
-const userContentHandler = (Component) => {
-  class UserContentHandler extends React.Component {
-    constructor(props) {
-      super(props)
+type Props = {
+  firebase: { auth: {}; timeStamp: () => void }
+  authUser: { uid: string }
+}
 
-      this.state = {
-        errorInDatabase: {
-          error: false,
-          message: ""
-        }
+type State = {
+  errorInDatabase: { error: boolean; message: string }
+}
+
+interface FunctionArguments {
+  shows: { id: number; first_air_date: string; name: string }[]
+}
+
+const userContentHandler = (Component: any) => {
+  class UserContentHandler extends React.Component<Props, State> {
+    firebase = this.props.firebase
+    authUser = this.props.authUser
+    userUid = this.authUser && this.authUser.uid
+
+    state: State = {
+      errorInDatabase: {
+        error: false,
+        message: ""
       }
-
-      this.firebase = this.props.firebase
-      this.authUser = this.props.authUser
-      this.userUid = this.authUser && this.authUser.uid
     }
 
-    componentDidUpdate(prevProps) {
-      if (this.props.authUser && this.props.authUser !== prevProps.authUser) {
+    componentDidUpdate(prevProps: Props) {
+      if (!!this.props.authUser && this.props.authUser !== prevProps.authUser) {
         this.authUser = this.props.authUser
         this.userUid = this.props.authUser.uid
       }
     }
 
-    addShowsToDatabaseOnRegister = ({ shows }) => {
+    addShowsToDatabaseOnRegister = ({ shows }: FunctionArguments) => {
       Promise.all(
         Object.values(shows).map((show) => {
-          return getShowEpisodesFromAPI({ id: show.id }).then((dataFromAPI) => {
+          return getShowEpisodesFromAPI({ id: show.id }).then((dataFromAPI: any) => {
             const showsSubDatabase =
               dataFromAPI.status === "Ended" || dataFromAPI.status === "Canceled" ? "ended" : "ongoing"
 
-            const userEpisodes = dataFromAPI.episodes.reduce((acc, season) => {
-              const episodes = season.episodes.map(() => {
-                return { watched: false, userRating: 0 }
-              })
+            const userEpisodes = dataFromAPI.episodes.reduce(
+              (acc: {}[], season: { episodes: {}[]; season_number: number }) => {
+                const episodes = season.episodes.map(() => {
+                  return { watched: false, userRating: 0 }
+                })
 
-              acc.push({ season_number: season.season_number, episodes, userRating: 0 })
-              return acc
-            }, [])
+                acc.push({ season_number: season.season_number, episodes, userRating: 0 })
+                return acc
+              },
+              []
+            )
 
             const showInfo = {
               allEpisodesWatched: false,

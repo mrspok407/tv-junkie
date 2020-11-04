@@ -290,8 +290,8 @@ export const DetailesPage: React.FC<Props> = ({
             />
 
             <MainInfo
-              detailes={detailes}
               handleListeners={handleListeners}
+              detailes={detailes}
               mediaType={mediaType}
               id={id}
               showInfo={showInfo}
