@@ -1,8 +1,28 @@
 import * as _isFunction from "lodash.isfunction"
 
-const addShowToMainDatabase = ({ firebase, show, dataFromAPI, callback }) => {
+interface Arguments {
+  firebase: {
+    showInDatabase: any
+  }
+  show: {
+    id: number
+    backdrop_path: string
+    first_air_date: string
+    genre_ids: number[]
+    name: string
+    original_name: string
+    overview: string
+    poster_path: string
+    vote_average: string | number
+    vote_count: string | number
+  }
+  dataFromAPI: { status: string; episodes: {}[] }
+  callback?: any
+}
+
+const addShowToMainDatabase = ({ firebase, show, dataFromAPI, callback }: Arguments) => {
   firebase.showInDatabase(show.id).transaction(
-    (snapshot) => {
+    (snapshot: any) => {
       if (snapshot === null) {
         return {
           info: {
@@ -26,7 +46,7 @@ const addShowToMainDatabase = ({ firebase, show, dataFromAPI, callback }) => {
         return
       }
     },
-    (error, committed, snapshot) => {
+    (error: any, committed: any, snapshot: any) => {
       if (error) {
         console.log("Transaction failed abnormally!", error)
       } else if (!committed) {

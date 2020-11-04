@@ -90,8 +90,7 @@ class RegisterBase extends Component {
             watchLaterMovies.forEach((item) => {
               this.props.handleMovieInDatabases({
                 id: item.id,
-                data: item,
-                userDatabase: "watchLaterMovies"
+                data: item
               })
             })
           })

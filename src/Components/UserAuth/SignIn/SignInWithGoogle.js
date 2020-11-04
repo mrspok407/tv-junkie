@@ -49,8 +49,7 @@ const SignInWithGoogleBase = ({ firebase, history, handleMovieInDatabases, close
             watchLaterMovies.forEach((item) => {
               handleMovieInDatabases({
                 id: item.id,
-                data: item,
-                userDatabase: "watchLaterMovies"
+                data: item
               })
             })
           })

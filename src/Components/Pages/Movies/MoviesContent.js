@@ -238,8 +238,7 @@ class MoviesContent extends Component {
                       if (this.props.authUser) {
                         this.props.handleMovieInDatabases({
                           id: item.id,
-                          data: item,
-                          userDatabase: "watchLaterMovies"
+                          data: item
                         })
                         this.props.context.userContent.handleUserMoviesOnClient({ id: item.id })
                       } else {

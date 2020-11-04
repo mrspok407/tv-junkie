@@ -8,6 +8,7 @@ import UserRating from "Components/UI/UserRating/UserRating"
 
 type Props = {
   detailes: {
+    id: number
     name: string
     title: string
     first_air_date: string
@@ -16,7 +17,7 @@ type Props = {
     status: string
     episode_run_time: string[] | number[]
     runtime: string
-    budget: number | bigint
+    budget: number
     genres: any
     networks: any
     production_companies: any
@@ -31,7 +32,7 @@ type Props = {
   authUser: {}
   changeShowDatabaseOnClient: () => void
   handleListeners: () => void
-  handleMovieInDatabases: () => void
+  handleMovieInDatabases: (data: any) => void
 }
 
 export const MainInfo: React.FC<Props> = ({
@@ -42,7 +43,8 @@ export const MainInfo: React.FC<Props> = ({
   showDatabaseOnClient,
   authUser,
   changeShowDatabaseOnClient,
-  handleMovieInDatabases
+  handleMovieInDatabases,
+  handleListeners
 }) => {
   const context = useContext(AppContext)
 
@@ -140,11 +142,11 @@ export const MainInfo: React.FC<Props> = ({
           <div className="detailes-page__info-option">My rating</div>
           <div className="detailes-page__info-value">
             <UserRating
-              id
+              id={id}
               firebaseRef="userShow"
               showDatabase={showDatabaseOnClient}
               showRating={true}
-              mediaType
+              mediaType={mediaType}
             />
           </div>
         </div>
@@ -183,12 +185,12 @@ export const MainInfo: React.FC<Props> = ({
       <div className="detailes-page__info-row detailes-page__info--button">
         {isMediaTypeTV && (
           <ShowsButtons
-            id
-            authUser
-            detailes
-            changeShowDatabaseOnClient
-            showDatabaseOnClient
-            handleListeners
+            id={id}
+            authUser={authUser}
+            detailes={detailes}
+            changeShowDatabaseOnClient={changeShowDatabaseOnClient}
+            showDatabaseOnClient={showDatabaseOnClient}
+            handleListeners={handleListeners}
           />
         )}
 
@@ -205,8 +207,7 @@ export const MainInfo: React.FC<Props> = ({
               if (authUser) {
                 handleMovieInDatabases({
                   id: Number(id),
-                  data: detailes,
-                  userDatabase: "watchLaterMovies"
+                  data: detailes
                 })
               } else {
                 context.userContentLocalStorage.toggleMovieLS({
