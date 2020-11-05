@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import { Link } from "react-router-dom"
-import userContentHandler from "Components/UserContent/UserContentHandler"
+import userContentHandler from "Components/UserContent/UseContentHandler"
 import { listOfGenres } from "Utils"
 import { throttle } from "throttle-debounce"
 import classNames from "classnames"
@@ -334,4 +334,5 @@ class MoviesContent extends Component {
   }
 }
 
-export default compose(userContentHandler, AppContextConsumer)(MoviesContent)
+// export default compose(userContentHandler, AppContextConsumer)(MoviesContent)
+export default userContentHandler(AppContextConsumer(MoviesContent))

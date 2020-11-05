@@ -7,7 +7,7 @@ import * as ROUTES from "Utils/Constants/routes"
 import SearchList from "./SearchList/SearchList"
 import Input from "./Input/Input"
 import PlaceholderNoResults from "Components/UI/Placeholders/PlaceholderNoResults"
-import userContentHandler from "Components/UserContent/UserContentHandler"
+import userContentHandler from "Components/UserContent/UseContentHandler"
 import "./Search.scss"
 
 let cancelRequest
@@ -212,4 +212,4 @@ class Search extends Component {
   }
 }
 
-export default compose(withRouter, userContentHandler)(Search)
+export default withRouter(Search)

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react"
 import { compose } from "recompose"
 import { withRouter } from "react-router-dom"
-import userContentHandler from "Components/UserContent/UserContentHandler"
+import userContentHandler from "Components/UserContent/UseContentHandler"
 // import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import * as ROLES from "Utils/Constants/roles"

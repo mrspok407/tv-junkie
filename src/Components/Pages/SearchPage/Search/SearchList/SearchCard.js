@@ -1,7 +1,7 @@
 import React, { Component } from "react"
 import { Link } from "react-router-dom"
 import classNames from "classnames"
-import userContentHandler from "Components/UserContent/UserContentHandler"
+import userContentHandler from "Components/UserContent/UseContentHandler"
 
 class SearchCard extends Component {
   constructor(props) {

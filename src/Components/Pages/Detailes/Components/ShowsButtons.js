@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 import classNames from "classnames"
 import * as ROUTES from "Utils/Constants/routes"
 import { AppContext } from "Components/AppContext/AppContextHOC"
-import userContentHandler from "Components/UserContent/UserContentHandler"
+import userContentHandler from "Components/UserContent/UseContentHandler"
 
 class ShowsButtons extends Component {
   constructor(props) {
@@ -55,7 +55,7 @@ class ShowsButtons extends Component {
             onClick={() => {
               if (authUser) {
                 this.props.changeShowDatabaseOnClient("watchingShows")
-                this.props.handleShowInDatabases({
+                this.context.userContentHandler.handleShowInDatabases({
                   id: Number(id),
                   data: detailes,
                   database: "watchingShows",
@@ -128,7 +128,7 @@ class ShowsButtons extends Component {
               onClick={() => {
                 if (authUser) {
                   this.props.changeShowDatabaseOnClient("droppedShows")
-                  this.props.handleShowInDatabases({
+                  this.context.userContentHandler.handleShowInDatabases({
                     id: Number(id),
                     data: detailes,
                     database: "droppedShows",
@@ -167,7 +167,7 @@ class ShowsButtons extends Component {
               onClick={() => {
                 if (authUser) {
                   this.props.changeShowDatabaseOnClient("willWatchShows")
-                  this.props.handleShowInDatabases({
+                  this.context.userContentHandler.handleShowInDatabases({
                     id: Number(id),
                     data: detailes,
                     database: "willWatchShows",
@@ -201,5 +201,5 @@ class ShowsButtons extends Component {
   }
 }
 
-export default userContentHandler(ShowsButtons)
+export default ShowsButtons
 ShowsButtons.contextType = AppContext

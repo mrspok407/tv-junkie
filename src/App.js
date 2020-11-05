@@ -42,4 +42,4 @@ class App extends Component {
   }
 }
 
-export default compose(WithAuthenticationProvider, AppContextHOC)(App)
+export default WithAuthenticationProvider(AppContextHOC(App))

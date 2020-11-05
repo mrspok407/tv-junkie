@@ -7,7 +7,7 @@ import Loader from "Components/UI/Placeholders/Loader"
 import PlaceholderNoToWatchEpisodes from "Components/UI/Placeholders/PlaceholderNoToWatchEpisodes"
 import merge from "deepmerge"
 import { AppContext } from "Components/AppContext/AppContextHOC"
-import userContentHandler from "Components/UserContent/UserContentHandler"
+import userContentHandler from "Components/UserContent/UseContentHandler"
 
 class ToWatchEpisodesContent extends Component {
   constructor(props) {

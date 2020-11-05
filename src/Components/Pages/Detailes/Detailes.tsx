@@ -6,7 +6,7 @@ import { Helmet } from "react-helmet"
 import * as ROUTES from "Utils/Constants/routes"
 import * as _get from "lodash.get"
 import { AppContext } from "Components/AppContext/AppContextHOC"
-import userContentHandler from "Components/UserContent/UserContentHandler"
+import userContentHandler from "Components/UserContent/UseContentHandler"
 import Header from "Components/UI/Header/Header"
 import Slider from "Utils/Slider/Slider"
 import MainInfo from "./Components/MainInfo"
@@ -18,6 +18,8 @@ import Footer from "Components/UI/Footer/Footer"
 import PlaceholderLoadingFullInfo from "Components/UI/Placeholders/PlaceholderLoadingFullInfo/PlaceholderLoadingFullInfo"
 import useHandleListeners from "./FirebaseHelpers/UseHandleListeners"
 import "./Detailes.scss"
+import { FirebaseContext } from "Components/Firebase"
+import { AuthUserContext } from "Components/UserAuth/Session/WithAuthentication"
 
 const { CancelToken } = require("axios")
 let cancelRequest: any
@@ -28,8 +30,8 @@ type Props = {
   authUser: { uid: string }
 }
 
-interface Detailes {
-  id: number | string
+export interface Detailes {
+  id: number
   poster_path: string
   backdrop_path: string
   name: string
@@ -43,14 +45,14 @@ interface Detailes {
   runtime: string
   status: string
   genres: any
-  genre_ids: {}[]
+  genre_ids: number[]
   networks: any
   production_companies: any
   vote_average: string
   vote_count: string
   overview: string
   tagline: string
-  budget?: number | bigint
+  budget: number
   number_of_seasons: number | string
   imdb_id: number | string
   seasonsArr: {}[]
@@ -62,9 +64,7 @@ interface Detailes {
 export const DetailesPage: React.FC<Props> = ({
   match: {
     params: { id, mediaType }
-  },
-  firebase,
-  authUser
+  }
 }) => {
   const [detailes, setDetailes] = useState<Detailes>({
     id,
@@ -95,6 +95,11 @@ export const DetailesPage: React.FC<Props> = ({
     seasons: []
   })
 
+  const history = useHistory()
+  const context = useContext(AppContext)
+  const firebase = useContext(FirebaseContext)
+  const authUser = useContext(AuthUserContext)
+
   const [similarContent, setSimilarContent] = useState<{}[]>([])
 
   const [loadingAPIrequest, setLoadingAPIrequest] = useState(true)
@@ -113,10 +118,6 @@ export const DetailesPage: React.FC<Props> = ({
   const [showDatabaseOnClient, setShowDatabaseOnClient] = useState<{} | null>(null)
 
   const [error, setError] = useState<string>()
-
-  const history = useHistory()
-
-  const context = useContext(AppContext)
 
   useEffect(() => {
     getContent()
@@ -294,7 +295,6 @@ export const DetailesPage: React.FC<Props> = ({
               detailes={detailes}
               mediaType={mediaType}
               id={id}
-              showInfo={showInfo}
               changeShowDatabaseOnClient={changeShowDatabaseOnClient}
               showDatabaseOnClient={showDatabaseOnClient}
               movieInDatabase={movieInDatabase}
@@ -304,6 +304,8 @@ export const DetailesPage: React.FC<Props> = ({
 
             {mediaType === "show" && (
               <ShowsEpisodes
+                authUser={authUser}
+                firebase={firebase}
                 detailesPage={true}
                 seasonsArr={detailes.seasonsArr}
                 showTitle={detailes.name}
@@ -335,4 +337,4 @@ export const DetailesPage: React.FC<Props> = ({
   )
 }
 
-export default userContentHandler(DetailesPage)
+export default DetailesPage

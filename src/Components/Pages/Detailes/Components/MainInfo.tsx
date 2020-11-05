@@ -3,36 +3,22 @@ import React, { useContext } from "react"
 import ShowsButtons from "./ShowsButtons"
 import classNames from "classnames"
 import { AppContext } from "Components/AppContext/AppContextHOC"
-import userContentHandler from "Components/UserContent/UserContentHandler"
+import userContentHandler from "Components/UserContent/UseContentHandler"
 import UserRating from "Components/UI/UserRating/UserRating"
+import { Detailes } from "../Detailes"
+import { HandleListenersArg } from "../FirebaseHelpers/UseHandleListeners"
+import { AuthUserContext } from "Components/UserAuth/Session/WithAuthentication"
+import { FirebaseContext } from "Components/Firebase"
 
 type Props = {
-  detailes: {
-    id: number
-    name: string
-    title: string
-    first_air_date: string
-    last_air_date: string
-    release_date: string
-    status: string
-    episode_run_time: string[] | number[]
-    runtime: string
-    budget: number
-    genres: any
-    networks: any
-    production_companies: any
-    vote_average: string
-    tagline: string
-    imdb_id: number | string
-  }
+  detailes: Detailes
   movieInDatabase: {} | null
   mediaType: string
   id: number | string
-  showDatabaseOnClient: {}
-  authUser: {}
-  changeShowDatabaseOnClient: () => void
-  handleListeners: () => void
-  handleMovieInDatabases: (data: any) => void
+  showDatabaseOnClient: {} | null
+  changeShowDatabaseOnClient: (database: string) => void
+  handleListeners: ({ status, handleLoading }: HandleListenersArg) => void
+  // handleMovieInDatabases: (data: any) => void
 }
 
 export const MainInfo: React.FC<Props> = ({
@@ -41,12 +27,13 @@ export const MainInfo: React.FC<Props> = ({
   mediaType,
   id,
   showDatabaseOnClient,
-  authUser,
   changeShowDatabaseOnClient,
-  handleMovieInDatabases,
+  // handleMovieInDatabases,
   handleListeners
 }) => {
   const context = useContext(AppContext)
+  const firebase = useContext(FirebaseContext)
+  const authUser: { uid: string } = useContext(AuthUserContext)
 
   const isMediaTypeTV = mediaType === "show"
 
@@ -143,6 +130,8 @@ export const MainInfo: React.FC<Props> = ({
           <div className="detailes-page__info-value">
             <UserRating
               id={id}
+              firebase={firebase}
+              authUser={authUser}
               firebaseRef="userShow"
               showDatabase={showDatabaseOnClient}
               showRating={true}
@@ -205,7 +194,7 @@ export const MainInfo: React.FC<Props> = ({
             })}
             onClick={() => {
               if (authUser) {
-                handleMovieInDatabases({
+                context.userContentHandler.handleMovieInDatabases({
                   id: Number(id),
                   data: detailes
                 })
@@ -226,4 +215,4 @@ export const MainInfo: React.FC<Props> = ({
   )
 }
 
-export default userContentHandler(MainInfo)
+export default MainInfo

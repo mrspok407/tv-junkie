@@ -1,12 +1,19 @@
 import React, { createContext } from "react"
 
-interface FirebaseContextInterface {
-  showEpisodes: (id: number | string) => void
+export interface FirebaseInterface {
+  auth?: any
+  showEpisodes?: any
+  showInDatabase?: any
+  timeStamp?: any
+  callback?: any
+  userAllShows?: any
+  userEpisodes?: any
+  userShow?: any
+  userShowAllEpisodesInfo?: any
+  watchLaterMovies?: any
 }
 
-const FirebaseContext = createContext<FirebaseContextInterface>({
-  showEpisodes: () => {}
-})
+export const FirebaseContext = createContext<FirebaseInterface>({})
 
 export const withFirebase = (Component: any) => (props: any) => {
   // const ContextValue: FirebaseContextInterface = {
@@ -19,5 +26,3 @@ export const withFirebase = (Component: any) => (props: any) => {
     </FirebaseContext.Consumer>
   )
 }
-
-export default FirebaseContext

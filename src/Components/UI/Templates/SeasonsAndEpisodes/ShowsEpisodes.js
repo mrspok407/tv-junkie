@@ -1,5 +1,5 @@
 import React, { Component } from "react"
-import userContentHandler from "Components/UserContent/UserContentHandler"
+import userContentHandler from "Components/UserContent/UseContentHandler"
 import axios, { CancelToken } from "axios"
 import { differenceBtwDatesInDays, todayDate } from "Utils"
 import * as _get from "lodash.get"
@@ -412,6 +412,6 @@ class ShowsEpisodes extends Component {
   }
 }
 
-export default userContentHandler(ShowsEpisodes)
+export default ShowsEpisodes
 
 ShowsEpisodes.contextType = AppContext

@@ -27,4 +27,5 @@ const LoginPage = () => {
   )
 }
 
-export default compose(withFirebase, WithAuthenticationConsumer)(LoginPage)
+// export default compose(withFirebase, WithAuthenticationConsumer)(LoginPage)
+export default withFirebase(WithAuthenticationConsumer(LoginPage))

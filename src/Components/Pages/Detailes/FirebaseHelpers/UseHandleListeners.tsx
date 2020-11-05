@@ -14,7 +14,7 @@ interface Props {
   }
 }
 
-interface handleListenersArg {
+export interface HandleListenersArg {
   status: string
   handleLoading?: (isLoading: boolean) => void
 }
@@ -23,7 +23,7 @@ const useHandleListeners = ({ id, authUser, firebase }: Props) => {
   const [episodes, setEpisodes] = useState<{}[] | null>()
   const [releasedEpisodes, setReleasedEpisodes] = useState<{}[] | null>()
 
-  const handleListeners = ({ status, handleLoading }: handleListenersArg) => {
+  const handleListeners = ({ status, handleLoading }: HandleListenersArg) => {
     if (status === "-") return
 
     const statusDatabase = status === "Ended" || status === "Canceled" ? "ended" : "ongoing"

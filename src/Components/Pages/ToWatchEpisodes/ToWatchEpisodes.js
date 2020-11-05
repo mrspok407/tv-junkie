@@ -29,4 +29,4 @@ class ToWatchEpisodesPage extends Component {
 
 const condition = (authUser) => authUser !== null
 
-export default compose(WithAuthorization(condition))(ToWatchEpisodesPage)
+export default WithAuthorization(condition)(ToWatchEpisodesPage)

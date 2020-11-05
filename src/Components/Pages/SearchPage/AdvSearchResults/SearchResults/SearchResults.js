@@ -2,7 +2,7 @@ import React, { Component } from "react"
 import { Link } from "react-router-dom"
 import { compose } from "recompose"
 import { listOfGenres } from "Utils"
-import userContentHandler from "Components/UserContent/UserContentHandler"
+import userContentHandler from "Components/UserContent/UseContentHandler"
 import Loader from "Components/UI/Placeholders/Loader"
 import "./SearchResults.scss"
 
@@ -123,4 +123,4 @@ class AdvSearchResults extends Component {
   }
 }
 
-export default compose(userContentHandler)(AdvSearchResults, "SearchResults")
+export default AdvSearchResults

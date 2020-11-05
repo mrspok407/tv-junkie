@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import { compose } from "recompose"
-import userContentHandler from "Components/UserContent/UserContentHandler"
+import userContentHandler from "Components/UserContent/UseContentHandler"
 import classNames from "classnames"
 import { Link } from "react-router-dom"
 import * as ROUTES from "Utils/Constants/routes"
@@ -160,4 +160,4 @@ class UserRating extends Component {
     )
   }
 }
-export default compose(userContentHandler)(UserRating)
+export default UserRating

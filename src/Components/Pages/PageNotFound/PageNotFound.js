@@ -68,4 +68,5 @@ class PageNotFound extends Component {
   }
 }
 
-export default compose(withRouter)(PageNotFound)
+// export default compose(withRouter)(PageNotFound)
+export default withRouter(PageNotFound)

@@ -8,7 +8,7 @@ import WithAuthorization from "Components/UserAuth/Session/WithAuthorization/Wit
 import { WithAuthenticationConsumer } from "Components/UserAuth/Session/WithAuthentication"
 import Header from "Components/UI/Header/Header"
 import Footer from "Components/UI/Footer/Footer"
-import userContentHandler from "Components/UserContent/UserContentHandler"
+import userContentHandler from "Components/UserContent/UseContentHandler"
 import { todayDate } from "Utils"
 import "./Profile.scss"
 

@@ -1,5 +1,5 @@
 import { createContext } from "react"
 
-const AuthUserContext = createContext(null)
+const AuthUserContext = createContext<{ uid: string }>({ uid: "" })
 
 export default AuthUserContext

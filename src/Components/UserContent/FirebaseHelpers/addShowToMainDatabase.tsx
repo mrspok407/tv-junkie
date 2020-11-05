@@ -1,9 +1,8 @@
+import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
 import * as _isFunction from "lodash.isfunction"
 
 interface Arguments {
-  firebase: {
-    showInDatabase: any
-  }
+  firebase: FirebaseInterface
   show: {
     id: number
     backdrop_path: string
