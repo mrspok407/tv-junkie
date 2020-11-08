@@ -1,13 +1,11 @@
 import React, { Component } from "react"
 import axios, { CancelToken } from "axios"
 import { Link, withRouter } from "react-router-dom"
-import { compose } from "recompose"
 import * as _isFunction from "lodash.isfunction"
 import * as ROUTES from "Utils/Constants/routes"
 import SearchList from "./SearchList/SearchList"
 import Input from "./Input/Input"
 import PlaceholderNoResults from "Components/UI/Placeholders/PlaceholderNoResults"
-import userContentHandler from "Components/UserContent/UseContentHandler"
 import "./Search.scss"
 
 let cancelRequest

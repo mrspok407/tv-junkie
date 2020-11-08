@@ -1,8 +1,6 @@
 /* eslint-disable react/no-access-state-in-setstate */
 import React, { Component } from "react"
 import { withRouter } from "react-router-dom"
-import { compose } from "recompose"
-import { withFirebase } from "Components/Firebase"
 import { validEmailRegex } from "Utils"
 import * as ROUTES from "Utils/Constants/routes"
 import classNames from "classnames"
@@ -56,7 +54,7 @@ class SignInFormBase extends Component {
 
     this.setState({ submitRequestLoading: true })
 
-    this.props.firebase
+    this.context.firebase
       .signInWithEmailAndPassword(email, password)
       .then(() => {
         localStorage.removeItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)
@@ -240,7 +238,7 @@ class SignInFormBase extends Component {
   }
 }
 
-const SignInForm = compose(withRouter, withFirebase)(SignInFormBase)
+const SignInForm = withRouter(SignInFormBase)
 
 export default SignInForm
 

@@ -1,8 +1,5 @@
 import React, { useState, useEffect, useContext } from "react"
-import { compose } from "recompose"
 import { withRouter } from "react-router-dom"
-import userContentHandler from "Components/UserContent/UseContentHandler"
-// import { UserContentLocalStorageContext } from "Components/UserContent/UserContentLocalStorageContext"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import * as ROLES from "Utils/Constants/roles"
 import * as ROUTES from "Utils/Constants/routes"
@@ -12,7 +9,7 @@ const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = "watchLaterMoviesLocalS"
 
 const mobileLayout = 1000
 
-const SignInWithGoogleBase = ({ firebase, history, handleMovieInDatabases, closeNavMobile }) => {
+const SignInWithGoogleBase = ({ history, closeNavMobile }) => {
   const [windowSize, setWindowSize] = useState(window.innerWidth)
 
   useEffect(() => {
@@ -24,13 +21,13 @@ const SignInWithGoogleBase = ({ firebase, history, handleMovieInDatabases, close
   const onSubmit = (provider) => {
     const signInType = windowSize < mobileLayout ? "signInWithRedirect" : "signInWithPopup"
 
-    firebase.app
+    context.firebase.app
       .auth()
       [signInType](provider)
       .then((authUser) => {
         const userRole = authUser.user.email === "mr.spok407@gmail.com" ? ROLES.ADMIN : ROLES.USER
 
-        firebase
+        context.firebase
           .user(authUser.user.uid)
           .update({
             username: authUser.user.displayName,
@@ -44,10 +41,10 @@ const SignInWithGoogleBase = ({ firebase, history, handleMovieInDatabases, close
             const watchLaterMovies =
               JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)) || []
 
-            this.props.addShowsToDatabaseOnRegister({ shows: watchingShows })
+            this.context.userContentHandler.addShowsToDatabaseOnRegister({ shows: watchingShows })
 
             watchLaterMovies.forEach((item) => {
-              handleMovieInDatabases({
+              this.context.userContentHandler.handleMovieInDatabases({
                 id: item.id,
                 data: item
               })
@@ -76,7 +73,7 @@ const SignInWithGoogleBase = ({ firebase, history, handleMovieInDatabases, close
       <button
         className="button button--auth__form"
         type="button"
-        onClick={() => onSubmit(new firebase.app.auth.GoogleAuthProvider())}
+        onClick={() => onSubmit(new context.firebase.app.auth.GoogleAuthProvider())}
       >
         <div className="auth__form--google-icon"></div>
         <div className="auth__form--google-title">Google Sign In</div>
@@ -85,6 +82,6 @@ const SignInWithGoogleBase = ({ firebase, history, handleMovieInDatabases, close
   )
 }
 
-const SignInWithGoogleForm = compose(userContentHandler, withRouter)(SignInWithGoogleBase)
+const SignInWithGoogleForm = withRouter(SignInWithGoogleBase)
 
 export default SignInWithGoogleForm

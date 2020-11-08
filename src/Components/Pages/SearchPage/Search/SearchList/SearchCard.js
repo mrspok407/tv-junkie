@@ -1,15 +1,8 @@
 import React, { Component } from "react"
 import { Link } from "react-router-dom"
 import classNames from "classnames"
-import userContentHandler from "Components/UserContent/UseContentHandler"
 
 class SearchCard extends Component {
-  constructor(props) {
-    super(props)
-
-    this.state = {}
-  }
-
   render() {
     const {
       movieTitle,
@@ -128,4 +121,4 @@ class SearchCard extends Component {
   }
 }
 
-export default userContentHandler(SearchCard)
+export default SearchCard

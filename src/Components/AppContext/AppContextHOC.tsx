@@ -2,6 +2,9 @@ import React, { createContext } from "react"
 import useUserContentLocalStorage from "Components/UserContent/UseUserContentLocalStorage"
 import useUserShows from "Components/UserContent/UseUserShows"
 import useContentHandler from "Components/UserContent/UseContentHandler"
+import useFirebase from "Components/Firebase/UseFirebase"
+import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
+import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
 
 interface ShowInterface {
   id: number
@@ -31,6 +34,7 @@ interface MovieInterface {
 
 export interface AddShowsToDatabaseOnRegisterArg {
   shows: ShowInterface[]
+  uid: string
 }
 
 export interface AddShowToDatabaseArg {
@@ -78,6 +82,8 @@ interface AppContextInterface {
     handleShowInDatabases: ({ id, data, database, userShows, callback }: HandleShowInDatabasesArg) => void
     handleMovieInDatabases: ({ id, data }: HandleMovieInDatabasesArg) => void
   }
+  firebase: FirebaseInterface
+  authUser: { uid: string }
 }
 
 export const AppContext = createContext<AppContextInterface>({
@@ -100,15 +106,19 @@ export const AppContext = createContext<AppContextInterface>({
     addShowToDatabase: () => {},
     handleShowInDatabases: () => {},
     handleMovieInDatabases: () => {}
-  }
+  },
+  firebase: {},
+  authUser: { uid: "" }
 })
 
 const AppContextHOC = (Component: any) =>
   function Comp(props: any) {
     const ContextValue: AppContextInterface = {
       userContentLocalStorage: useUserContentLocalStorage(),
-      userContent: useUserShows(props.firebase),
-      userContentHandler: useContentHandler()
+      userContent: useUserShows(),
+      userContentHandler: useContentHandler(),
+      firebase: useFirebase(),
+      authUser: useAuthUser()
     }
     return (
       <AppContext.Provider value={ContextValue}>

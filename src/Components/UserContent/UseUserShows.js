@@ -1,13 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useContext } from "react"
 import { combineMergeObjects, releasedEpisodesToOneArray } from "Utils"
 import { organiseFutureEpisodesByMonth } from "Components/Pages/Calendar/CalendarHelpers"
 import merge from "deepmerge"
 import updateUserEpisodesFromDatabase from "./FirebaseHelpers/updateUserEpisodesFromDatabase"
+import { FirebaseContext } from "Components/Firebase"
 
 const SESSION_STORAGE_KEY_SHOWS = "userShows"
 
-const useUserShows = (firebase) => {
+const useUserShows = () => {
   const [userShows, setUserShows] = useState([])
   const [userMovies, setUserMovies] = useState([])
   const [userWillAirEpisodes, setUserWillAirEpisodes] = useState([])
@@ -18,10 +19,13 @@ const useUserShows = (firebase) => {
   const [loadingMovies, setLoadingMovies] = useState(true)
   const [firebaseListeners, setFirebaseListeners] = useState([])
 
+  const firebase = useContext(FirebaseContext)
+
   const authUserListener = useCallback(() => {
     console.log("hook run")
     firebase.onAuthUserListener(
       (authUser) => {
+        console.log(authUser)
         firebase.userAllShows(authUser.uid).on("value", (snapshot) => {
           if (snapshot.val() === null) {
             console.log("hook in listener NO value")
@@ -156,6 +160,13 @@ const useUserShows = (firebase) => {
     )
   }, [firebase])
 
+  const resetContentState = () => {
+    setUserShows([])
+    setUserMovies([])
+    setUserWillAirEpisodes([])
+    setUserToWatchShows([])
+  }
+
   useEffect(() => {
     authUserListener()
     return () => {
@@ -168,6 +179,7 @@ const useUserShows = (firebase) => {
 
   useEffect(() => {
     sessionStorage.setItem(SESSION_STORAGE_KEY_SHOWS, JSON.stringify(userShows))
+    console.log(userShows)
   }, [userShows])
 
   const handleUserShowsOnClient = ({ database, id }) => {
@@ -203,7 +215,8 @@ const useUserShows = (firebase) => {
     loadingShowsMerging,
     loadingMovies,
     handleUserShowsOnClient,
-    handleUserMoviesOnClient
+    handleUserMoviesOnClient,
+    resetContentState
   }
 }
 

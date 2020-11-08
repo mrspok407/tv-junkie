@@ -7,6 +7,7 @@ import { Link } from "react-router-dom"
 import * as ROUTES from "Utils/Constants/routes"
 import UserRating from "Components/UI/UserRating/UserRating"
 import TorrentLinksEpisodes from "./Components/TorrentLinksEpisodes"
+import { AppContext } from "Components/AppContext/AppContextHOC"
 
 const FADE_OUT_SPEED = 300
 
@@ -36,7 +37,7 @@ export default class SeasonEpisodes extends Component {
   }
 
   handleClickOutside = (e) => {
-    if (this.props.authUser) return
+    if (this.context.authUser) return
     if (
       this.checkboxRef.current &&
       this.registerWarningRef.current &&
@@ -50,7 +51,7 @@ export default class SeasonEpisodes extends Component {
   }
 
   showDissableCheckboxWarning = (checkboxId) => {
-    if (this.props.authUser) return
+    if (this.context.authUser) return
     this.setState({
       disableCheckboxWarning: checkboxId
     })
@@ -195,11 +196,11 @@ export default class SeasonEpisodes extends Component {
                             this.props.toggleWatchedEpisode(this.props.season.season_number, indexOfEpisode)
                           }
                         }}
-                        disabled={!showCheckboxes || !this.props.authUser}
+                        disabled={!showCheckboxes || !this.context.authUser}
                       />
                       <span
                         className={classNames("custom-checkmark", {
-                          "custom-checkmark--disabled": !showCheckboxes || !this.props.authUser
+                          "custom-checkmark--disabled": !showCheckboxes || !this.context.authUser
                         })}
                       />
                     </label>
@@ -262,3 +263,5 @@ export default class SeasonEpisodes extends Component {
     )
   }
 }
+
+SeasonEpisodes.contextType = AppContext

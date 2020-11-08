@@ -2,9 +2,8 @@ import React, { Component } from "react"
 import { Helmet } from "react-helmet"
 import { Link } from "react-router-dom"
 import { withFirebase } from "Components/Firebase/FirebaseContext"
-import userContentHandler from "Components/UserContent/UseContentHandler"
 import axios from "axios"
-import ScrollToTop from "Utils/ScrollToTopBar"
+import ScrollToTopBar from "Utils/ScrollToTopBar"
 import HeaderBase from "Components/UI/Header/Header"
 import CalendarContent from "Components/Pages/Calendar/CalendarContent"
 import Slider from "Utils/Slider/Slider"
@@ -13,6 +12,7 @@ import * as ROUTES from "Utils/Constants/routes"
 import Footer from "Components/UI/Footer/Footer"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import "./Home.scss"
+import ScrollToTopOnMount from "Utils/ScrollToTopOnMount"
 
 const Header = withFirebase(HeaderBase)
 
@@ -47,6 +47,8 @@ class HomePage extends Component {
   }
 
   componentDidMount() {
+    console.log("mount home")
+    console.log(window.scrollY)
     this.getContentForSliders()
   }
 
@@ -175,21 +177,22 @@ class HomePage extends Component {
   render() {
     return (
       <>
+        <ScrollToTopOnMount />
         <Helmet>
           <meta charSet="utf-8" />
           <title>TV Junkie</title>
         </Helmet>
         <Header />
         <div className="home-page__wrapper">
-          {!this.props.authUser ? this.renderNonAuthUser() : this.renderAuthUser()}
+          {!this.context.authUser ? this.renderNonAuthUser() : this.renderAuthUser()}
         </div>
         <Footer />
-        <ScrollToTop />
+        <ScrollToTopBar />
       </>
     )
   }
 }
 
-export default userContentHandler(HomePage)
+export default HomePage
 
 HomePage.contextType = AppContext

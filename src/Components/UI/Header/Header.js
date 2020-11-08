@@ -4,9 +4,9 @@ import classNames from "classnames"
 import logo from "assets/images/main-page-logo.png"
 import Login from "./Login"
 import * as ROUTES from "Utils/Constants/routes"
-import { AuthUserContext } from "Components/UserAuth/Session/WithAuthentication"
 import "./Header.scss"
 import Search from "Components/Pages/SearchPage/Search/Search"
+import { AppContext } from "Components/AppContext/AppContextHOC"
 
 export default class Header extends Component {
   constructor(props) {
@@ -25,7 +25,7 @@ export default class Header extends Component {
 
   render() {
     const { isLogoVisible = true, hideLogin = false } = this.props
-    const authUser = this.context
+    const { authUser } = this.context
 
     return (
       <header className="header">
@@ -171,4 +171,4 @@ export default class Header extends Component {
   }
 }
 
-Header.contextType = AuthUserContext
+Header.contextType = AppContext

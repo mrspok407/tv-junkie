@@ -1,14 +1,12 @@
 import React, { Component } from "react"
 import { Link } from "react-router-dom"
-import userContentHandler from "Components/UserContent/UseContentHandler"
 import { listOfGenres } from "Utils"
 import { throttle } from "throttle-debounce"
 import classNames from "classnames"
-import AppContextConsumer from "Components/AppContext/AppContextConsumer"
 import Loader from "Components/UI/Placeholders/Loader"
 import PlaceholderNoMovies from "Components/UI/Placeholders/PlaceholderNoMovies"
 import PlaceholderLoadingContentResultsItem from "Components/UI/Placeholders/PlaceholderLoadingSortBy/PlaceholderLoadingContentResultsItem"
-import { compose } from "recompose"
+import { AppContext } from "Components/AppContext/AppContextHOC"
 
 const MOVIES_TO_LOAD_INITIAL = 15
 const SCROLL_THRESHOLD = 800
@@ -50,15 +48,14 @@ class MoviesContent extends Component {
         ...this.state.disableLoad,
         [this.state.activeSection]:
           this.state.loadedMovies[this.state.activeSection] >=
-            this.props.context.userContent.userMovies.filter(
-              (movie) => movie.database === this.state.activeSection
-            ).length && true
+            this.context.userContent.userMovies.filter((movie) => movie.database === this.state.activeSection)
+              .length && true
       }
     })
   }
 
   loadNewContentLS = () => {
-    if (this.state.disableLoad.watchLaterMoviesLS || this.props.firebase.authUser === null) return
+    if (this.state.disableLoad.watchLaterMoviesLS || this.context.authUser === null) return
 
     this.setState({
       loadedMovies: {
@@ -69,7 +66,7 @@ class MoviesContent extends Component {
         ...this.state.disableLoad,
         watchLaterMoviesLS:
           this.state.loadedMovies.watchLaterMoviesLS >=
-            this.props.context.userContentLocalStorage.watchLaterMovies.length && true
+            this.context.userContentLocalStorage.watchLaterMovies.length && true
       }
     })
   }
@@ -88,7 +85,7 @@ class MoviesContent extends Component {
   })
 
   renderContent = (section) => {
-    const content = this.props.context.userContent.userMovies
+    const content = this.context.userContent.userMovies
       .sort((a, b) =>
         a[this.state.sortBy] > b[this.state.sortBy]
           ? this.state.sortBy === "timeStamp"
@@ -100,9 +97,9 @@ class MoviesContent extends Component {
       )
       .slice(0, this.state.loadedMovies[section])
 
-    const movies = this.props.authUser
+    const movies = this.context.authUser
       ? content
-      : this.props.context.userContentLocalStorage.watchLaterMovies.slice(
+      : this.context.userContentLocalStorage.watchLaterMovies.slice(
           0,
           this.state.loadedMovies.watchLaterMoviesLS
         )
@@ -235,14 +232,14 @@ class MoviesContent extends Component {
                   <button
                     className="button--del-item"
                     onClick={() => {
-                      if (this.props.authUser) {
-                        this.props.handleMovieInDatabases({
+                      if (this.context.authUser) {
+                        this.context.userContentHandler.handleMovieInDatabases({
                           id: item.id,
                           data: item
                         })
-                        this.props.context.userContent.handleUserMoviesOnClient({ id: item.id })
+                        this.context.userContent.handleUserMoviesOnClient({ id: item.id })
                       } else {
-                        this.props.context.userContentLocalStorage.toggleMovieLS({
+                        this.context.userContentLocalStorage.toggleMovieLS({
                           id: item.id,
                           data: movies
                         })
@@ -260,27 +257,23 @@ class MoviesContent extends Component {
   }
 
   render() {
-    const movies = this.props.authUser
-      ? this.props.context.userContent.userMovies
-      : this.props.context.userContentLocalStorage.watchLaterMovies
+    const movies = this.context.authUser
+      ? this.context.userContent.userMovies
+      : this.context.userContentLocalStorage.watchLaterMovies
     const maxColumns = 4
     const currentNumOfColumns = movies.length <= maxColumns - 1 ? movies.length : maxColumns
 
-    const loadingMovies = this.props.authUser ? this.props.context.userContent.loadingMovies : false
+    const loadingMovies = this.context.authUser ? this.context.userContent.loadingMovies : false
 
     return (
       <div className="content-results">
         {loadingMovies ? (
           <Loader className="loader--pink" />
         ) : movies.length === 0 ? (
-          <PlaceholderNoMovies
-            section={this.state.activeSection}
-            authUser={this.props.authUser}
-            activeSection={this.state.activeSection}
-          />
+          <PlaceholderNoMovies />
         ) : (
           <>
-            {this.props.authUser && (
+            {this.context.authUser && (
               <div className="content-results__sortby">
                 <div className="content-results__sortby-text">Sort by:</div>
                 <div className="content-results__sortby-buttons">
@@ -335,4 +328,5 @@ class MoviesContent extends Component {
 }
 
 // export default compose(userContentHandler, AppContextConsumer)(MoviesContent)
-export default userContentHandler(AppContextConsumer(MoviesContent))
+export default MoviesContent
+MoviesContent.contextType = AppContext

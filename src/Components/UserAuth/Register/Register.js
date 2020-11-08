@@ -1,14 +1,12 @@
 /* eslint-disable react/no-access-state-in-setstate */
 import React, { Component } from "react"
 import { withRouter } from "react-router-dom"
-import { compose } from "recompose"
 import { validEmailRegex } from "Utils"
 import * as ROLES from "Utils/Constants/roles"
 import * as ROUTES from "Utils/Constants/routes"
 import classNames from "classnames"
 import Input from "../Input/Input"
 import { AppContext } from "Components/AppContext/AppContextHOC"
-import userContentHandler from "Components/UserContent/UseContentHandler"
 import SignInWithGoogleForm from "../SignIn/SignInWithGoogle"
 
 const LOCAL_STORAGE_KEY_WATCHING_SHOWS = "watchingShowsLocalS"
@@ -66,13 +64,13 @@ class RegisterBase extends Component {
 
     this.setState({ submitRequestLoading: true })
 
-    this.props.firebase
+    this.context.firebase
       .createUserWithEmailAndPassword(email, password)
       .then((authUser) => {
         const userRole = email === "mr.spok407@gmail.com" ? ROLES.ADMIN : ROLES.USER
         console.log("user created")
 
-        this.props.firebase
+        this.context.firebase
           .user(authUser.user.uid)
           .set({
             username: this.state.inputs.login,
@@ -85,10 +83,13 @@ class RegisterBase extends Component {
             const watchLaterMovies =
               JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)) || []
 
-            this.props.addShowsToDatabaseOnRegister({ shows: watchingShows })
+            this.context.userContentHandler.addShowsToDatabaseOnRegister({
+              shows: watchingShows,
+              uid: authUser.user.uid
+            })
 
             watchLaterMovies.forEach((item) => {
-              this.props.handleMovieInDatabases({
+              this.context.userContentHandler.handleMovieInDatabases({
                 id: item.id,
                 data: item
               })
@@ -106,7 +107,7 @@ class RegisterBase extends Component {
       })
       .then(() => {
         console.log("email verification sent")
-        return this.props.firebase.sendEmailVerification()
+        return this.context.firebase.sendEmailVerification()
       })
       .then(() => {
         console.log("push in register in home page")
@@ -329,7 +330,7 @@ class RegisterBase extends Component {
   }
 }
 
-const Register = compose(withRouter, userContentHandler)(RegisterBase)
+const Register = withRouter(RegisterBase)
 
 export default Register
 

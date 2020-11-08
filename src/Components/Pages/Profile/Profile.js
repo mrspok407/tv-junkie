@@ -1,16 +1,14 @@
 import React, { Component } from "react"
-import { compose } from "recompose"
 import { Helmet } from "react-helmet"
 import * as _get from "lodash.get"
 import axios from "axios"
 import SignOutButton from "Components/UserAuth/SignOut/SignOutButton"
 import WithAuthorization from "Components/UserAuth/Session/WithAuthorization/WithAuthorization"
-import { WithAuthenticationConsumer } from "Components/UserAuth/Session/WithAuthentication"
 import Header from "Components/UI/Header/Header"
 import Footer from "Components/UI/Footer/Footer"
-import userContentHandler from "Components/UserContent/UseContentHandler"
 import { todayDate } from "Utils"
 import "./Profile.scss"
+import { AppContext } from "Components/AppContext/AppContextHOC"
 
 class Profile extends Component {
   constructor(props) {
@@ -27,12 +25,12 @@ class Profile extends Component {
   }
 
   sendEmailVerification = () => {
-    this.props.firebase.sendEmailVerification()
+    this.context.firebase.sendEmailVerification()
     this.setState({ verificationSent: true })
   }
 
   authUserListener = () => {
-    this.props.firebase.onAuthUserListener(
+    this.context.firebase.onAuthUserListener(
       (authUser) => {
         this.setState({ authUser })
       },
@@ -43,15 +41,15 @@ class Profile extends Component {
   }
 
   // test = () => {
-  //   this.props.firebase.users().once("value", (snapshot) => {
+  //   this.context.firebase.users().once("value", (snapshot) => {
   //     Object.entries(snapshot.val()).forEach(([key, value]) => {
-  //       this.props.firebase
+  //       this.context.firebase
   //         .userEpisodes(key)
   //         .child("all")
   //         .once("value", (snapshot) => {
   //           if (snapshot.val() === null) return
-  //           this.props.firebase.userEpisodes(key).set(snapshot.val(), () => {
-  //             this.props.firebase.userEpisodes(key).once("value", (snapshot) => {
+  //           this.context.firebase.userEpisodes(key).set(snapshot.val(), () => {
+  //             this.context.firebase.userEpisodes(key).once("value", (snapshot) => {
   //               if (snapshot.val() === null) return
   //               const modifiedData = Object.entries(snapshot.val()).reduce((acc, [key, value]) => {
   //                 const show = {
@@ -65,7 +63,7 @@ class Profile extends Component {
   //                 return acc
   //               }, {})
 
-  //               this.props.firebase.userEpisodes(key).set(modifiedData)
+  //               this.context.firebase.userEpisodes(key).set(modifiedData)
   //               console.log(modifiedData)
   //             })
   //           })
@@ -89,7 +87,7 @@ class Profile extends Component {
       )
       .then(({ data }) => {
         data.results.forEach((show) => {
-          this.props.firebase
+          this.context.firebase
             .showInDatabase(show.id)
             .child("id")
             .once("value", (snapshot) => {
@@ -180,7 +178,7 @@ class Profile extends Component {
                     })
                   )
                   .then((data) => {
-                    this.props.firebase
+                    this.context.firebase
                       .showInDatabase(show.id)
                       .update({ episodes: data.episodes, status: data.status })
                       .catch((err) => {
@@ -205,10 +203,10 @@ class Profile extends Component {
         <Header />
         <div className="user-profile">
           <div className="user-profile__email">
-            Sign in with <span>{this.props.authUser.email}</span>
+            Sign in with <span>{this.context.authUser.email}</span>
           </div>
           <div className="user-profile__verified">
-            {this.props.authUser.emailVerified ? (
+            {this.context.authUser.emailVerified ? (
               "Email verified"
             ) : (
               <>
@@ -238,4 +236,5 @@ class Profile extends Component {
 
 const condition = (authUser) => authUser !== null
 
-export default compose(WithAuthenticationConsumer, userContentHandler, WithAuthorization(condition))(Profile)
+export default WithAuthorization(condition)(Profile)
+Profile.contextType = AppContext

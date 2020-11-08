@@ -2,6 +2,7 @@ import React, { Component } from "react"
 import axios, { CancelToken } from "axios"
 import { throttle } from "throttle-debounce"
 import { Helmet } from "react-helmet"
+import ScrollToTopBar from "Utils/ScrollToTopBar"
 import Search from "./Search/Search"
 import AdvancedSearch from "Components/Pages/SearchPage/Search/AdvancedSearch/AdvancedSearch"
 import AdvSearchResults from "./AdvSearchResults/SearchResults/SearchResults"
@@ -321,7 +322,7 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
           />
         </div>
         {this.renderAdvMovies()}
-
+        <ScrollToTopBar />
         <Footer />
       </>
     )

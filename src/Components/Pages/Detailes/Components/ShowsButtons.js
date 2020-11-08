@@ -3,7 +3,6 @@ import { Link } from "react-router-dom"
 import classNames from "classnames"
 import * as ROUTES from "Utils/Constants/routes"
 import { AppContext } from "Components/AppContext/AppContextHOC"
-import userContentHandler from "Components/UserContent/UseContentHandler"
 
 class ShowsButtons extends Component {
   constructor(props) {
@@ -23,7 +22,7 @@ class ShowsButtons extends Component {
   }
 
   handleClickOutside = (e) => {
-    if (this.props.authUser) return
+    if (this.context.authUser) return
     if (this._notAuthButtons && !this._notAuthButtons.contains(e.target)) {
       this.setState({
         disableBtnWarning: null
@@ -32,7 +31,7 @@ class ShowsButtons extends Component {
   }
 
   showDissableBtnWarning = (btn) => {
-    if (this.props.authUser) return
+    if (this.context.authUser) return
     this.setState({
       disableBtnWarning: btn
     })
@@ -84,7 +83,7 @@ class ShowsButtons extends Component {
             className={classNames("button", {
               "button--pressed":
                 this.props.showDatabaseOnClient === "notWatchingShows" ||
-                (!this.props.authUser &&
+                (!this.context.authUser &&
                   !this.context.userContentLocalStorage.watchingShows.find((item) => item.id === Number(id)))
             })}
             type="button"

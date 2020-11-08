@@ -3,6 +3,7 @@ import merge from "deepmerge"
 
 const updateUserEpisodesFromDatabase = ({ firebase, authUser, shows }) => {
   return firebase.userEpisodes(authUser.uid).once("value", (snapshot) => {
+    if (snapshot.val() === null) return
     const showsEpisodes = Object.values(snapshot.val()).map((show) => {
       return show
     })

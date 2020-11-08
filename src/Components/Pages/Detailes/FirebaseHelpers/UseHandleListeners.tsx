@@ -1,17 +1,18 @@
-import { useState, useEffect } from "react"
+import { AppContext } from "Components/AppContext/AppContextHOC"
+import { useState, useEffect, useContext } from "react"
 import { releasedEpisodesToOneArray } from "Utils"
 
 interface Props {
   id: number
-  authUser: { uid: string }
-  firebase: {
-    showEpisodes?: any
-    userShowEpisodes?: any
-    userShowAllEpisodesInfo?: any
-    userShow?: any
-    userShowAllEpisodesNotFinished?: any
-    userShowAllEpisodes?: any
-  }
+  // authUser: { uid: string }
+  // firebase: {
+  //   showEpisodes?: any
+  //   userShowEpisodes?: any
+  //   userShowAllEpisodesInfo?: any
+  //   userShow?: any
+  //   userShowAllEpisodesNotFinished?: any
+  //   userShowAllEpisodes?: any
+  // }
 }
 
 export interface HandleListenersArg {
@@ -19,8 +20,9 @@ export interface HandleListenersArg {
   handleLoading?: (isLoading: boolean) => void
 }
 
-const useHandleListeners = ({ id, authUser, firebase }: Props) => {
-  const [episodes, setEpisodes] = useState<{}[] | null>()
+const useHandleListeners = ({ id }: Props) => {
+  const { firebase, authUser } = useContext(AppContext)
+  const [episodesFromDatabase, setEpisodesFromDatabase] = useState<{}[] | null>()
   const [releasedEpisodes, setReleasedEpisodes] = useState<{}[] | null>()
 
   const handleListeners = ({ status, handleLoading }: HandleListenersArg) => {
@@ -72,7 +74,7 @@ const useHandleListeners = ({ id, authUser, firebase }: Props) => {
 
         firebase.userShow({ uid: authUser.uid, key: id }).update({ finished, allEpisodesWatched })
 
-        setEpisodes(userEpisodes)
+        setEpisodesFromDatabase(userEpisodes)
         setReleasedEpisodes(releasedEpisodes)
         if (handleLoading) handleLoading(false)
       })
@@ -83,13 +85,13 @@ const useHandleListeners = ({ id, authUser, firebase }: Props) => {
     return () => {
       if (!authUser) return
       firebase.userShowAllEpisodes(authUser.uid, id).off()
-      setEpisodes(null)
+      setEpisodesFromDatabase(null)
       setReleasedEpisodes(null)
     }
     // eslint-disable-next-line
   }, [id])
 
-  return [episodes, releasedEpisodes, handleListeners] as const
+  return { episodesFromDatabase, releasedEpisodes, handleListeners } as const
 }
 
 export default useHandleListeners

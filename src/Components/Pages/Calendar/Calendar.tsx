@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet"
 import ScrollToTop from "Utils/ScrollToTopBar"
 import HeaderBase from "Components/UI/Header/Header"
 import CalendarContent from "./CalendarContent"
-import { WithAuthorization } from "Components/UserAuth/Session/WithAuthorization"
+import WithAuthorization from "Components/UserAuth/Session/WithAuthorization/WithAuthorization"
 import Footer from "Components/UI/Footer/Footer"
 import "./Calendar.scss"
 

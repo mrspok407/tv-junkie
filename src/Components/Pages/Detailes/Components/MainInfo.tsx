@@ -3,11 +3,9 @@ import React, { useContext } from "react"
 import ShowsButtons from "./ShowsButtons"
 import classNames from "classnames"
 import { AppContext } from "Components/AppContext/AppContextHOC"
-import userContentHandler from "Components/UserContent/UseContentHandler"
 import UserRating from "Components/UI/UserRating/UserRating"
 import { Detailes } from "../Detailes"
 import { HandleListenersArg } from "../FirebaseHelpers/UseHandleListeners"
-import { AuthUserContext } from "Components/UserAuth/Session/WithAuthentication"
 import { FirebaseContext } from "Components/Firebase"
 
 type Props = {
@@ -18,7 +16,6 @@ type Props = {
   showDatabaseOnClient: {} | null
   changeShowDatabaseOnClient: (database: string) => void
   handleListeners: ({ status, handleLoading }: HandleListenersArg) => void
-  // handleMovieInDatabases: (data: any) => void
 }
 
 export const MainInfo: React.FC<Props> = ({
@@ -28,12 +25,11 @@ export const MainInfo: React.FC<Props> = ({
   id,
   showDatabaseOnClient,
   changeShowDatabaseOnClient,
-  // handleMovieInDatabases,
   handleListeners
 }) => {
   const context = useContext(AppContext)
   const firebase = useContext(FirebaseContext)
-  const authUser: { uid: string } = useContext(AuthUserContext)
+  const { authUser } = useContext(AppContext)
 
   const isMediaTypeTV = mediaType === "show"
 

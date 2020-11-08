@@ -1,6 +1,5 @@
 import React, { Component } from "react"
 import { Link } from "react-router-dom"
-import userContentHandler from "Components/UserContent/UseContentHandler"
 import { listOfGenres } from "Utils"
 import { throttle } from "throttle-debounce"
 import classNames from "classnames"
@@ -90,7 +89,7 @@ class ShowsContent extends Component {
   }
 
   loadNewContentLS = () => {
-    if (this.state.disableLoad.watchingShowsLS || this.props.firebase.authUser === null) return
+    if (this.state.disableLoad.watchingShowsLS || this.context.authUser === null) return
 
     this.setState({
       loadedShows: {
@@ -139,7 +138,7 @@ class ShowsContent extends Component {
       )
       .slice(0, this.state.loadedShows[section])
 
-    const shows = this.props.authUser
+    const shows = this.context.authUser
       ? content
       : this.context.userContentLocalStorage.watchingShows.slice(0, this.state.loadedShows.watchingShowsLS)
 
@@ -201,8 +200,8 @@ class ShowsContent extends Component {
                     <button
                       className="button"
                       onClick={() => {
-                        if (this.props.authUser) {
-                          this.props.handleShowInDatabases({
+                        if (this.context.authUser) {
+                          this.context.userContentHandler.handleShowInDatabases({
                             id: item.id,
                             data: item,
                             database: "notWatchingShows",
@@ -229,7 +228,7 @@ class ShowsContent extends Component {
                       <button
                         className="button"
                         onClick={() => {
-                          this.props.handleShowInDatabases({
+                          this.context.userContentHandler.handleShowInDatabases({
                             id: item.id,
                             data: item,
                             database: "watchingShows",
@@ -264,7 +263,7 @@ class ShowsContent extends Component {
       }
     })
 
-    const shows = this.props.authUser
+    const shows = this.context.authUser
       ? content
       : this.state.activeSection === "watchingShows"
       ? this.context.userContentLocalStorage.watchingShows.slice(0, this.state.loadedShows.watchingShowsLS)
@@ -273,7 +272,7 @@ class ShowsContent extends Component {
     const maxColumns = 4
     const currentNumOfColumns = shows.length <= maxColumns - 1 ? shows.length : maxColumns
 
-    const loadingShows = this.props.authUser ? this.context.userContent.loadingShows : false
+    const loadingShows = this.context.authUser ? this.context.userContent.loadingShows : false
 
     return (
       <div className="content-results">
@@ -327,10 +326,10 @@ class ShowsContent extends Component {
         {loadingShows ? (
           <Loader className="loader--pink" />
         ) : shows.length === 0 ? (
-          <PlaceholderNoShows authUser={this.props.authUser} activeSection={this.state.activeSection} />
+          <PlaceholderNoShows authUser={this.context.authUser} activeSection={this.state.activeSection} />
         ) : (
           <>
-            {this.props.authUser && (
+            {this.context.authUser && (
               <div className="content-results__sortby">
                 <div className="content-results__sortby-text">Sort by:</div>
                 <div className="content-results__sortby-buttons">
@@ -386,5 +385,5 @@ class ShowsContent extends Component {
   }
 }
 
-export default userContentHandler(ShowsContent)
+export default ShowsContent
 ShowsContent.contextType = AppContext

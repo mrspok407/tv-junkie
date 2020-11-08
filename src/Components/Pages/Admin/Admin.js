@@ -1,10 +1,9 @@
 import React, { Component } from "react"
-import { withFirebase } from "Components/Firebase"
-import { compose } from "recompose"
 import { Helmet } from "react-helmet"
 import * as ROLES from "Utils/Constants/roles"
 import WithAuthorization from "Components/UserAuth/Session/WithAuthorization/WithAuthorization"
 import Header from "Components/UI/Header/Header"
+import { AppContext } from "Components/AppContext/AppContextHOC"
 import "./Admin.scss"
 
 class AdminPage extends Component {
@@ -20,7 +19,7 @@ class AdminPage extends Component {
   componentDidMount() {
     this.setState({ loading: true })
 
-    this.props.firebase.users().once("value", (snapshot) => {
+    this.context.firebase.users().once("value", (snapshot) => {
       const usersObject = snapshot.val()
 
       const userList = Object.keys(usersObject).map((key) => ({
@@ -36,7 +35,7 @@ class AdminPage extends Component {
   }
 
   componentWillUnmount() {
-    this.props.firebase.users().off()
+    this.context.firebase.users().off()
   }
 
   render() {
@@ -65,4 +64,5 @@ class AdminPage extends Component {
 
 const condition = (authUser) => authUser && !!authUser.role === ROLES.ADMIN
 
-export default compose(withFirebase, WithAuthorization(condition))(AdminPage)
+export default WithAuthorization(condition)(AdminPage)
+AdminPage.contextType = AppContext

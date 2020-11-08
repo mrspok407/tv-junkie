@@ -1,11 +1,10 @@
 /* eslint-disable react/no-access-state-in-setstate */
 import React, { Component } from "react"
 import { withRouter } from "react-router-dom"
-import { compose } from "recompose"
-import { withFirebase } from "Components/Firebase"
 import { validEmailRegex } from "Utils"
 import classNames from "classnames"
 import Input from "../Input/Input"
+import { AppContext } from "Components/AppContext/AppContextHOC"
 
 const INITIAL_STATE = {
   requiredInputs: {
@@ -26,7 +25,7 @@ class PasswordForgetFormBase extends Component {
     this.state = { ...INITIAL_STATE }
   }
 
-  onSubmit = event => {
+  onSubmit = (event) => {
     event.preventDefault()
     const { email } = this.state.requiredInputs
     const errors = { ...this.state.errors }
@@ -46,18 +45,18 @@ class PasswordForgetFormBase extends Component {
 
     this.setState({ submitRequestLoading: true })
 
-    this.props.firebase
+    this.context.firebase
       .passwordReset(email)
       .then(() => {
         this.setState({ ...INITIAL_STATE, emailSentSuccess: true })
       })
-      .catch(error => {
+      .catch((error) => {
         errors.error = error
         this.setState({ errors, submitRequestLoading: false })
       })
   }
 
-  handleOnChange = event => {
+  handleOnChange = (event) => {
     event.preventDefault()
     const { value, name } = event.target
 
@@ -83,14 +82,14 @@ class PasswordForgetFormBase extends Component {
     }
 
     this.setState(
-      prevState => ({
+      (prevState) => ({
         requiredInputs: { ...prevState.requiredInputs, [name]: value }
       }),
       validation
     )
   }
 
-  handleValidationOnblur = event => {
+  handleValidationOnblur = (event) => {
     event.preventDefault()
 
     const { value, name } = event.target
@@ -115,9 +114,9 @@ class PasswordForgetFormBase extends Component {
     })
   }
 
-  handleKeyDown = e => e.which === 27 && this.resetInput(e.target.name)
+  handleKeyDown = (e) => e.which === 27 && this.resetInput(e.target.name)
 
-  resetInput = name => {
+  resetInput = (name) => {
     this.setState({
       requiredInputs: { ...this.state.requiredInputs, [`${name}`]: "" },
       errors: { ...this.state.errors, [`${name}Error`]: "" }
@@ -175,6 +174,5 @@ class PasswordForgetFormBase extends Component {
   }
 }
 
-const PasswordForget = compose(withRouter, withFirebase)(PasswordForgetFormBase)
-
-export default PasswordForget
+export default withRouter(PasswordForgetFormBase)
+PasswordForgetFormBase.contextType = AppContext

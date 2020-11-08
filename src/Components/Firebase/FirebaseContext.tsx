@@ -9,8 +9,10 @@ export interface FirebaseInterface {
   userAllShows?: any
   userEpisodes?: any
   userShow?: any
+  userShowAllEpisodes?: any
   userShowAllEpisodesInfo?: any
   watchLaterMovies?: any
+  onAuthUserListener?: any
 }
 
 export const FirebaseContext = createContext<FirebaseInterface>({})

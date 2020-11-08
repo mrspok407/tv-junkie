@@ -1,10 +1,9 @@
 import React, { Component } from "react"
-import { compose } from "recompose"
-import userContentHandler from "Components/UserContent/UseContentHandler"
 import classNames from "classnames"
 import { Link } from "react-router-dom"
 import * as ROUTES from "Utils/Constants/routes"
 import "./UserRating.scss"
+import { AppContext } from "Components/AppContext/AppContextHOC"
 
 const STAR_AMOUNT = 5
 
@@ -18,9 +17,6 @@ class UserRating extends Component {
     }
 
     this.userRatingRef = React.createRef()
-
-    this.firebase = this.props.firebase
-    this.uid = this.props.authUser && this.props.authUser.uid
   }
 
   componentDidMount() {
@@ -33,10 +29,10 @@ class UserRating extends Component {
   }
 
   getRating = () => {
-    if (this.props.authUser === null || this.props.toWatchPage) return
+    if (this.context.authUser === null || this.props.toWatchPage) return
 
-    this.firebase[this.props.firebaseRef]({
-      uid: this.uid,
+    this.context.firebase[this.props.firebaseRef]({
+      uid: this.context.authUser.uid,
       key: Number(this.props.id),
       seasonNum: this.props.seasonNum,
       episodeNum: this.props.episodeNum
@@ -50,7 +46,7 @@ class UserRating extends Component {
   }
 
   onMouseMoveHandler = (e) => {
-    if (this.props.authUser === null || this.props.disableHover) return
+    if (this.context.authUser === null || this.props.disableHover) return
 
     const buttonsNodeList = e.target.parentElement.getElementsByClassName("user-rating__button")
     const currentRating = e.target.dataset.rating
@@ -66,7 +62,7 @@ class UserRating extends Component {
   }
 
   onMouseLeaveHandler = (e) => {
-    if (this.props.authUser === null || this.props.disableHover) return
+    if (this.context.authUser === null || this.props.disableHover) return
 
     const buttonsNodeList = e.target.parentElement.getElementsByClassName("user-rating__button")
 
@@ -80,29 +76,28 @@ class UserRating extends Component {
   }
 
   onClickHandler = (e) => {
-    if (this.props.authUser === null || this.props.disableHover) return
+    if (this.context.authUser === null || this.props.disableHover) return
     if (this.props.toWatchPage) {
       this.props.handleFadeOut(this.props.episodeId, this.props.episodeNum)
     }
 
     const rating = e.target.dataset.rating
 
-    this.firebase[this.props.firebaseRef]({
-      uid: this.uid,
+    this.context.firebase[this.props.firebaseRef]({
+      uid: this.context.authUser.uid,
       key: Number(this.props.id),
       seasonNum: this.props.seasonNum,
       episodeNum: this.props.episodeNum
     }).once("value", (snapshot) => {
+      console.log(snapshot.val())
       if (snapshot.val() === null) return
-
-      console.log(rating)
 
       this.setState({
         userRating: rating
       })
 
-      this.firebase[this.props.firebaseRef]({
-        uid: this.uid,
+      this.context.firebase[this.props.firebaseRef]({
+        uid: this.context.authUser.uid,
         key: Number(this.props.id),
         seasonNum: this.props.seasonNum,
         episodeNum: this.props.episodeNum
@@ -123,15 +118,16 @@ class UserRating extends Component {
 
   render() {
     const disableRating =
-      this.props.authUser === null ||
+      this.context.authUser === null ||
       this.props.disableRating ||
       (this.props.showDatabase === null && this.props.showRating && this.props.mediaType !== "movie")
+
     return (
       <div
         ref={this.userRatingRef}
         className="user-rating"
         onClick={() => {
-          if (this.props.authUser !== null) return
+          if (this.context.authUser !== null) return
           this.setState({ nonAuthWarning: !this.state.nonAuthWarning })
         }}
       >
@@ -161,3 +157,4 @@ class UserRating extends Component {
   }
 }
 export default UserRating
+UserRating.contextType = AppContext

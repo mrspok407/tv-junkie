@@ -1,7 +1,5 @@
 import React from "react"
 import { withFirebase } from "Components/Firebase"
-import { compose } from "recompose"
-import { WithAuthenticationConsumer } from "Components/UserAuth/Session/WithAuthentication"
 import { Helmet } from "react-helmet"
 import UserAuthForm from "Components/UI/UserAuthForm/UserAuthForm"
 import HeaderBase from "Components/UI/Header/Header"
@@ -27,5 +25,4 @@ const LoginPage = () => {
   )
 }
 
-// export default compose(withFirebase, WithAuthenticationConsumer)(LoginPage)
-export default withFirebase(WithAuthenticationConsumer(LoginPage))
+export default LoginPage

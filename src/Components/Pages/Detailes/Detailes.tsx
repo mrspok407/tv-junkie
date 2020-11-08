@@ -3,31 +3,27 @@ import React, { useState, useEffect, useContext } from "react"
 import { useHistory } from "react-router-dom"
 import axios from "axios"
 import { Helmet } from "react-helmet"
+import { AppContext } from "Components/AppContext/AppContextHOC"
+import { FirebaseContext } from "Components/Firebase"
 import * as ROUTES from "Utils/Constants/routes"
 import * as _get from "lodash.get"
-import { AppContext } from "Components/AppContext/AppContextHOC"
-import userContentHandler from "Components/UserContent/UseContentHandler"
 import Header from "Components/UI/Header/Header"
 import Slider from "Utils/Slider/Slider"
 import MainInfo from "./Components/MainInfo"
 import ShowsEpisodes from "Components/UI/Templates/SeasonsAndEpisodes/ShowsEpisodes"
 import PosterWrapper from "./Components/PosterWrapper"
-import ScrollToTop from "Utils/ScrollToTopBar"
+import ScrollToTopBar from "Utils/ScrollToTopBar"
 import ScrollToTopOnUpdate from "Utils/ScrollToTopOnUpdate"
 import Footer from "Components/UI/Footer/Footer"
 import PlaceholderLoadingFullInfo from "Components/UI/Placeholders/PlaceholderLoadingFullInfo/PlaceholderLoadingFullInfo"
 import useHandleListeners from "./FirebaseHelpers/UseHandleListeners"
 import "./Detailes.scss"
-import { FirebaseContext } from "Components/Firebase"
-import { AuthUserContext } from "Components/UserAuth/Session/WithAuthentication"
 
 const { CancelToken } = require("axios")
 let cancelRequest: any
 
 type Props = {
-  firebase: {}
   match: { params: { id: number; mediaType: string } }
-  authUser: { uid: string }
 }
 
 export interface Detailes {
@@ -98,26 +94,20 @@ export const DetailesPage: React.FC<Props> = ({
   const history = useHistory()
   const context = useContext(AppContext)
   const firebase = useContext(FirebaseContext)
-  const authUser = useContext(AuthUserContext)
+  const { authUser } = useContext(AppContext)
+
+  const { episodesFromDatabase, releasedEpisodes, handleListeners } = useHandleListeners({ id: Number(id) })
 
   const [similarContent, setSimilarContent] = useState<{}[]>([])
-
-  const [loadingAPIrequest, setLoadingAPIrequest] = useState(true)
-
   const [showInfo, setShowInfo] = useState<{} | null>({})
   const [movieInDatabase, setMovieInDatabase] = useState<{} | null>(null)
-
-  const [episodesFromDatabase, releasedEpisodes, handleListeners] = useHandleListeners({
-    id: Number(id),
-    authUser,
-    firebase
-  })
-
-  const [loadingFromDatabase, setLoadingFromDatabase] = useState(true)
 
   const [showDatabaseOnClient, setShowDatabaseOnClient] = useState<{} | null>(null)
 
   const [error, setError] = useState<string>()
+
+  const [loadingAPIrequest, setLoadingAPIrequest] = useState(true)
+  const [loadingFromDatabase, setLoadingFromDatabase] = useState(true)
 
   useEffect(() => {
     getContent()
@@ -281,14 +271,7 @@ export const DetailesPage: React.FC<Props> = ({
           </div>
         ) : !loadingAPIrequest && !loadingFromDatabase && !context.userContent.loadingShows ? (
           <div className="detailes-page">
-            <PosterWrapper
-              poster_path={detailes.poster_path}
-              backdrop_path={detailes.backdrop_path}
-              imdb_id={detailes.imdb_id}
-              release_date={detailes.release_date}
-              first_air_date={detailes.first_air_date}
-              mediaType={mediaType}
-            />
+            <PosterWrapper detailes={detailes} mediaType={mediaType} />
 
             <MainInfo
               handleListeners={handleListeners}
@@ -331,7 +314,7 @@ export const DetailesPage: React.FC<Props> = ({
         )}
       </div>
       <Footer />
-      <ScrollToTop />
+      <ScrollToTopBar />
       <ScrollToTopOnUpdate />
     </>
   )

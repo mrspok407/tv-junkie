@@ -1,5 +1,4 @@
 import React, { Component } from "react"
-import userContentHandler from "Components/UserContent/UseContentHandler"
 import "./GridTests.scss"
 
 const POSTER_URL = "https://image.tmdb.org/t/p/w500"
@@ -42,4 +41,4 @@ class GridTests extends Component {
   }
 }
 
-export default userContentHandler(GridTests)
+export default GridTests

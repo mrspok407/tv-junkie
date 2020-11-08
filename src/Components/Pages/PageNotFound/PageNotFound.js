@@ -1,7 +1,6 @@
 import React, { Component } from "react"
 import { Link, withRouter } from "react-router-dom"
 import { withFirebase } from "Components/Firebase"
-import { compose } from "recompose"
 import { Helmet } from "react-helmet"
 import * as ROUTES from "Utils/Constants/routes"
 import HeaderBase from "Components/UI/Header/Header"
@@ -68,5 +67,4 @@ class PageNotFound extends Component {
   }
 }
 
-// export default compose(withRouter)(PageNotFound)
 export default withRouter(PageNotFound)

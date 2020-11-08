@@ -2,16 +2,13 @@ import React, { Component } from "react"
 import axios from "axios"
 import { todayDate } from "Utils"
 import Loader from "Components/UI/Placeholders/Loader"
+import { Detailes } from "../Detailes"
 
 const { CancelToken } = require("axios")
 let cancelRequest: any
 
 type Props = {
-  poster_path: string
-  backdrop_path: string
-  imdb_id: number | string
-  release_date: string
-  first_air_date: string
+  detailes: Detailes
   mediaType: string
 }
 
@@ -61,7 +58,7 @@ export default class PosterWrapper extends Component<Props, State> {
       loadingTorrentLinks: true
     })
     axios
-      .get<APIData>(`https://yts.mx/api/v2/list_movies.json?query_term=${this.props.imdb_id}`, {
+      .get<APIData>(`https://yts.mx/api/v2/list_movies.json?query_term=${this.props.detailes.imdb_id}`, {
         cancelToken: new CancelToken(function executor(c: any) {
           cancelRequest = c
         })
@@ -105,26 +102,26 @@ export default class PosterWrapper extends Component<Props, State> {
         <div
           className="detailes-page__poster"
           style={
-            this.props.poster_path
+            this.props.detailes.poster_path
               ? {
-                  backgroundImage: `url(https://image.tmdb.org/t/p/w500/${this.props.poster_path})`
+                  backgroundImage: `url(https://image.tmdb.org/t/p/w500/${this.props.detailes.poster_path})`
                 }
               : {
                   backgroundImage: `url(https://homestaymatch.com/images/no-image-available.png)`
                 }
           }
         />
-        {this.props.backdrop_path && (
+        {this.props.detailes.backdrop_path && (
           <div
             className="detailes-page__poster detailes-page__poster--mobile"
             style={{
-              backgroundImage: `url(https://image.tmdb.org/t/p/w500/${this.props.backdrop_path})`
+              backgroundImage: `url(https://image.tmdb.org/t/p/w500/${this.props.detailes.backdrop_path})`
             }}
           />
         )}
 
         {this.props.mediaType === "movie" &&
-        new Date(this.props.release_date).getTime() < todayDate.getTime() &&
+        new Date(this.props.detailes.release_date).getTime() < todayDate.getTime() &&
         this.state.movieAvailable ? (
           <div className="detailes-page__movie-links">
             {!this.state.loadingTorrentLinks ? (

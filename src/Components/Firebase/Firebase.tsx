@@ -60,7 +60,7 @@ class Firebase {
 
   passwordUpdate = (password: string) => this.auth.currentUser.updatePassword(password)
 
-  onAuthUserListener = (next: (authUser: {}) => void, fallback: () => void) => {
+  onAuthUserListener = (next: (authUser: { uid: string }) => void, fallback: () => void) => {
     this.auth.onAuthStateChanged((authUser: { uid: string; email: string; emailVerified: boolean }) => {
       if (authUser) {
         authUser = {

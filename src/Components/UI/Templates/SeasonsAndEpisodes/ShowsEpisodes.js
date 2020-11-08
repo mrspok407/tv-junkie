@@ -1,5 +1,4 @@
 import React, { Component } from "react"
-import userContentHandler from "Components/UserContent/UseContentHandler"
 import axios, { CancelToken } from "axios"
 import { differenceBtwDatesInDays, todayDate } from "Utils"
 import * as _get from "lodash.get"
@@ -150,15 +149,15 @@ class ShowsEpisodes extends Component {
   }
 
   toggleWatchedEpisode = (seasonNum, episodeNum) => {
-    if (!this.props.authUser) return
+    if (!this.context.authUser) return
 
     const showInfo = this.props.showInfo
     const episodesFromDatabase = this.props.episodesFromDatabase
     const releasedEpisodes = this.props.releasedEpisodes
 
-    this.props.firebase
+    this.context.firebase
       .userShowSingleEpisode({
-        uid: this.props.authUser.uid,
+        uid: this.context.authUser.uid,
         key: showInfo.id,
         seasonNum,
         episodeNum
@@ -172,8 +171,8 @@ class ShowsEpisodes extends Component {
             isAllEpisodesWatched({
               showInfo,
               releasedEpisodes,
-              authUser: this.props.authUser,
-              firebase: this.props.firebase,
+              authUser: this.context.authUser,
+              firebase: this.context.firebase,
               singleEpisode: true
             })
           }
@@ -217,9 +216,9 @@ class ShowsEpisodes extends Component {
       seasonEpisodesAirDate[indexOfEpisode].watched = !isAllEpisodesChecked
     })
 
-    this.props.firebase
+    this.context.firebase
       .userShowSeasonEpisodes({
-        uid: this.props.authUser.uid,
+        uid: this.context.authUser.uid,
         key: showInfo.id,
         seasonNum
       })
@@ -228,8 +227,8 @@ class ShowsEpisodes extends Component {
           isAllEpisodesWatched({
             showInfo,
             releasedEpisodes,
-            authUser: this.props.authUser,
-            firebase: this.props.firebase,
+            authUser: this.context.authUser,
+            firebase: this.context.firebase,
             singleEpisode: false
           })
         }
@@ -261,7 +260,9 @@ class ShowsEpisodes extends Component {
       userEpisodesFormated[episodeIndex].watched = !isAllEpisodesChecked
     })
 
-    this.props.firebase.userShowAllEpisodes(this.props.authUser.uid, showInfo.id).set(episodesFromDatabase)
+    this.context.firebase
+      .userShowAllEpisodes(this.context.authUser.uid, showInfo.id)
+      .set(episodesFromDatabase)
   }
 
   render() {
@@ -379,7 +380,7 @@ class ShowsEpisodes extends Component {
                         detailEpisodeInfo={this.state.detailEpisodeInfo}
                         season={season}
                         seasonId={season.id}
-                        authUser={this.props.authUser}
+                        authUser={this.context.authUser}
                         episodesFromDatabase={this.props.episodesFromDatabase}
                         showInfo={this.props.showInfo}
                         showDatabaseOnClient={this.props.showDatabaseOnClient}
