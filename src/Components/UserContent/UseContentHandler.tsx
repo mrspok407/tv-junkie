@@ -180,7 +180,6 @@ const useContentHandler = () => {
 
   const handleMovieInDatabases = ({ id, data }: HandleMovieInDatabasesArg) => {
     const movie = data
-    console.log(movie)
     firebase
       .watchLaterMovies(authUser.uid)
       .child(id)

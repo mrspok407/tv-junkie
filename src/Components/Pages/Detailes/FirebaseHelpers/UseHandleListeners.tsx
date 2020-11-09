@@ -4,15 +4,6 @@ import { releasedEpisodesToOneArray } from "Utils"
 
 interface Props {
   id: number
-  // authUser: { uid: string }
-  // firebase: {
-  //   showEpisodes?: any
-  //   userShowEpisodes?: any
-  //   userShowAllEpisodesInfo?: any
-  //   userShow?: any
-  //   userShowAllEpisodesNotFinished?: any
-  //   userShowAllEpisodes?: any
-  // }
 }
 
 export interface HandleListenersArg {

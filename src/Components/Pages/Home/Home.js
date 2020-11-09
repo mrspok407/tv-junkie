@@ -47,8 +47,6 @@ class HomePage extends Component {
   }
 
   componentDidMount() {
-    console.log("mount home")
-    console.log(window.scrollY)
     this.getContentForSliders()
   }
 

@@ -80,7 +80,8 @@ $navBackground: #352424;
     z-index: -10;
 
     @include mediaMaxW(#{$mobileViewPort}) {
-      display: none;
+      // display: none;
+      background: #000;
     }
   }
 

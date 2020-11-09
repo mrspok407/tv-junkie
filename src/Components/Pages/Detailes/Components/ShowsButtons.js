@@ -90,7 +90,7 @@ class ShowsButtons extends Component {
             onClick={() => {
               if (authUser) {
                 this.props.changeShowDatabaseOnClient("notWatchingShows")
-                this.props.handleShowInDatabases({
+                this.context.userContentHandler.handleShowInDatabases({
                   id: Number(id),
                   data: detailes,
                   database: "notWatchingShows",
