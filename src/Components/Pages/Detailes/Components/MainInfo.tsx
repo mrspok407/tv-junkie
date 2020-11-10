@@ -4,12 +4,12 @@ import ShowsButtons from "./ShowsButtons"
 import classNames from "classnames"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import UserRating from "Components/UI/UserRating/UserRating"
-import { Detailes } from "../Detailes"
+import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
 import { HandleListenersArg } from "../FirebaseHelpers/UseHandleListeners"
 import { FirebaseContext } from "Components/Firebase"
 
 type Props = {
-  detailes: Detailes
+  detailes: ContentDetailes
   movieInDatabase: {} | null
   mediaType: string
   id: number | string

@@ -2,13 +2,13 @@ import React, { Component } from "react"
 import axios from "axios"
 import { todayDate } from "Utils"
 import Loader from "Components/UI/Placeholders/Loader"
-import { Detailes } from "../Detailes"
+import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
 
 const { CancelToken } = require("axios")
 let cancelRequest: any
 
 type Props = {
-  detailes: Detailes
+  detailes: ContentDetailes
   mediaType: string
 }
 

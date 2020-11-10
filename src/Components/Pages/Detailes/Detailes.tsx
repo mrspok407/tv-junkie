@@ -17,6 +17,7 @@ import ScrollToTopOnUpdate from "Utils/ScrollToTopOnUpdate"
 import Footer from "Components/UI/Footer/Footer"
 import PlaceholderLoadingFullInfo from "Components/UI/Placeholders/PlaceholderLoadingFullInfo/PlaceholderLoadingFullInfo"
 import useHandleListeners from "./FirebaseHelpers/UseHandleListeners"
+import { ContentDetailes, CONTENT_DETAILS_DEFAULT } from "Utils/Interfaces/ContentDetails"
 import "./Detailes.scss"
 
 const { CancelToken } = require("axios")
@@ -26,70 +27,12 @@ type Props = {
   match: { params: { id: number; mediaType: string } }
 }
 
-export interface Detailes {
-  id: number
-  poster_path: string
-  backdrop_path: string
-  name: string
-  original_name: string
-  title: string
-  original_title: string
-  first_air_date: string
-  release_date: string
-  last_air_date: string
-  episode_run_time: string[] | number[]
-  runtime: string
-  status: string
-  genres: any
-  genre_ids: number[]
-  networks: any
-  production_companies: any
-  vote_average: string
-  vote_count: string
-  overview: string
-  tagline: string
-  budget: number
-  number_of_seasons: number | string
-  imdb_id: number | string
-  seasonsArr: {}[]
-  seasons: {}[]
-  similar?: { results: {}[] }[]
-  similar_movies?: { results: {}[] }[]
-}
-
 export const DetailesPage: React.FC<Props> = ({
   match: {
     params: { id, mediaType }
   }
 }) => {
-  const [detailes, setDetailes] = useState<Detailes>({
-    id,
-    poster_path: "-",
-    backdrop_path: "-",
-    name: "-",
-    original_name: "-",
-    title: "-",
-    original_title: "-",
-    first_air_date: "-",
-    release_date: "-",
-    last_air_date: "-",
-    episode_run_time: ["-"],
-    runtime: "-",
-    status: "-",
-    genres: [],
-    genre_ids: [],
-    networks: [],
-    production_companies: [],
-    vote_average: "-",
-    vote_count: "-",
-    overview: "-",
-    tagline: "-",
-    budget: 0,
-    number_of_seasons: "-",
-    imdb_id: "",
-    seasonsArr: [],
-    seasons: []
-  })
+  const [detailes, setDetailes] = useState<ContentDetailes>(CONTENT_DETAILS_DEFAULT)
 
   const history = useHistory()
   const context = useContext(AppContext)
@@ -144,7 +87,7 @@ export const DetailesPage: React.FC<Props> = ({
     setLoadingFromDatabase(true)
 
     axios
-      .get<Detailes>(
+      .get<ContentDetailes>(
         `https://api.themoviedb.org/3/${mediaType === "show" ? "tv" : "movie"}/${id}?api_key=${
           process.env.REACT_APP_TMDB_API
         }&language=en-US&append_to_response=${mediaType === "show" ? "similar" : "similar_movies"}`,

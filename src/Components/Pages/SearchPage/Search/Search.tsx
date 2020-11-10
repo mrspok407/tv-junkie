@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from "react"
 import axios from "axios"
 import { Link, useHistory } from "react-router-dom"
+import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
 import * as _isFunction from "lodash.isfunction"
 import * as ROUTES from "Utils/Constants/routes"
 import SearchList from "./SearchList/SearchList"
 import Input from "./Input/Input"
 import PlaceholderNoResults from "Components/UI/Placeholders/PlaceholderNoResults"
 import "./Search.scss"
-import { Detailes } from "Components/Pages/Detailes/Detailes"
 
 const { CancelToken } = require("axios")
 
@@ -26,7 +26,7 @@ export interface HandleSearchArg {
 
 const Search: React.FC<Props> = ({ navSearch, navRef, closeNavMobile }) => {
   const [query, setQuery] = useState("")
-  const [searchResults, setSearchResults] = useState<Detailes[]>([])
+  const [searchResults, setSearchResults] = useState<ContentDetailes[]>([])
   const [isSearchingList, setIsSearchingList] = useState(false)
   const [listIsOpen, setListIsOpen] = useState(false)
   const [totalPages, setTotalPages] = useState(null)
@@ -34,7 +34,7 @@ const Search: React.FC<Props> = ({ navSearch, navRef, closeNavMobile }) => {
   const [mediaTypeSearching, setMediaTypeSearching] = useState("")
   const [error, setError] = useState("")
 
-  const searchContRef = useRef<any>()
+  const searchContRef = useRef<HTMLDivElement>(null)
 
   const history = useHistory()
 
@@ -101,10 +101,10 @@ const Search: React.FC<Props> = ({ navSearch, navRef, closeNavMobile }) => {
     )
   }
 
-  const handleClickOutside = (e: React.MouseEvent) => {
+  const handleClickOutside = (e: CustomEvent) => {
     if (
-      (searchContRef.current && !searchContRef.current.contains(e.target)) ||
-      (navRef && !navRef.current.contains(e.target))
+      (searchContRef && searchContRef.current && !searchContRef.current.contains(e.target as Node)) ||
+      (navRef && navRef.current && !navRef.current.contains(e.target))
     ) {
       setListIsOpen(false)
       onBlur()
@@ -191,8 +191,6 @@ const Search: React.FC<Props> = ({ navSearch, navRef, closeNavMobile }) => {
               <SearchList
                 searchResults={searchResults}
                 closeList={closeList}
-                isSearchingList={isSearchingList}
-                navSearch={navSearch}
                 currentListItem={currentListItem}
                 mediaTypeSearching={mediaTypeSearching}
                 handleClickOutside={handleClickOutside}

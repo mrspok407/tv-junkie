@@ -39,19 +39,27 @@ const Input: React.FC<Props> = ({
   const [mediaTypesIsOpen, setMediaTypesIsOpen] = useState(false)
   const [searchReset, setSearchReset] = useState(false)
 
-  const mediaTypeRef = useRef<any>(null)
-  const inputRef = useRef<any>(null)
+  const mediaTypeRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   const history = useHistory()
 
   useEffect(() => {
     const windowWidth = window.innerWidth
-    if (history.action === "PUSH" && !navSearch && windowWidth > MOBILE_LAYOUT) inputRef.current.focus()
+    if (
+      history.action === "PUSH" &&
+      !navSearch &&
+      windowWidth > MOBILE_LAYOUT &&
+      inputRef &&
+      inputRef.current
+    ) {
+      inputRef.current.focus()
+    }
 
-    document.addEventListener("mousedown", handleClickOutside)
+    document.addEventListener("mousedown", handleClickOutside as EventListener)
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
+      document.removeEventListener("mousedown", handleClickOutside as EventListener)
     }
   }, [])
 
@@ -63,8 +71,8 @@ const Input: React.FC<Props> = ({
     _runSearch(query, mediaType)
   }, [searchReset])
 
-  const handleClickOutside = (e: any) => {
-    if (mediaTypeRef.current && !mediaTypeRef.current.contains(e.target)) {
+  const handleClickOutside = (e: CustomEvent) => {
+    if (mediaTypeRef && mediaTypeRef.current && !mediaTypeRef.current.contains(e.target as Node)) {
       setMediaTypesIsOpen(false)
     }
   }
@@ -86,7 +94,7 @@ const Input: React.FC<Props> = ({
   }
 
   const linkOnKeyPressDeb = debounce(() => {
-    if (inputRef) inputRef.current.blur()
+    if (inputRef && inputRef.current) inputRef.current.blur()
     linkOnKeyPress()
   }, 300)
 
@@ -137,7 +145,7 @@ const Input: React.FC<Props> = ({
                       className="media-type__button"
                       value={item.type}
                       onClick={(e: any) => {
-                        if (listIsOpen) {
+                        if (listIsOpen && inputRef.current) {
                           inputRef.current.focus()
                         }
                         setMediaType({ type: e.target.value, icon: item.icon })
