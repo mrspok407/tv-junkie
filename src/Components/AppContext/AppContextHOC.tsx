@@ -48,7 +48,6 @@ export interface HandleShowInDatabasesArg {
   data: ShowInterface[]
   database: string
   userShows: ShowInterface[]
-  callback?: () => void
 }
 
 export interface HandleMovieInDatabasesArg {
@@ -65,6 +64,7 @@ interface AppContextInterface {
   userContentLocalStorage: {
     watchLaterMovies: { id: number }[]
     toggleMovieLS: ({ id, data }: toggleMovieLSArg) => void
+    clearContentState: () => void
   }
   userContent: {
     loadingShowsMerging: boolean
@@ -79,17 +79,18 @@ interface AppContextInterface {
   userContentHandler: {
     addShowsToDatabaseOnRegister: ({ shows }: AddShowsToDatabaseOnRegisterArg) => void
     addShowToDatabase: ({ id, show, callback }: AddShowToDatabaseArg) => void
-    handleShowInDatabases: ({ id, data, database, userShows, callback }: HandleShowInDatabasesArg) => void
+    handleShowInDatabases: ({ id, data, database, userShows }: HandleShowInDatabasesArg) => void
     handleMovieInDatabases: ({ id, data }: HandleMovieInDatabasesArg) => void
   }
   firebase: FirebaseInterface
-  authUser: { uid: string }
+  authUser: { uid: string } | null
 }
 
 export const AppContext = createContext<AppContextInterface>({
   userContentLocalStorage: {
     watchLaterMovies: [],
-    toggleMovieLS: () => {}
+    toggleMovieLS: () => {},
+    clearContentState: () => {}
   },
   userContent: {
     loadingShowsMerging: true,

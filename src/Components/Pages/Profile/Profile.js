@@ -16,7 +16,8 @@ class Profile extends Component {
 
     this.state = {
       verificationSent: false,
-      authUser: null
+      authUser: null,
+      passwordUpdate: ""
     }
   }
 
@@ -194,6 +195,20 @@ class Profile extends Component {
       })
   }
 
+  handleOnChange = (e) => {
+    e.preventDefault()
+
+    this.setState({
+      passwordUpdate: e.target.value
+    })
+  }
+
+  updatePassword = (e) => {
+    e.preventDefault()
+
+    this.context.firebase.passwordUpdate(this.state.passwordUpdate)
+  }
+
   render() {
     return (
       <>
@@ -221,11 +236,24 @@ class Profile extends Component {
             <SignOutButton />
           </div>
           {_get(this.state.authUser, "email", "") === "test@test.com" && (
-            <div className="update-database">
-              <button onClick={() => this.databaseModify()} className="button" type="button">
-                Update Database
-              </button>
-            </div>
+            <>
+              <div className="update-database">
+                <button onClick={() => this.databaseModify()} className="button" type="button">
+                  Update Database
+                </button>
+              </div>
+              <form onSubmit={this.updatePassword}>
+                <input
+                  onChange={this.handleOnChange}
+                  value={this.state.passwordUpdate}
+                  type="password"
+                  name="new-password"
+                />
+                <button className="button" type="submit">
+                  Update Password
+                </button>
+              </form>
+            </>
           )}
         </div>
         <Footer />

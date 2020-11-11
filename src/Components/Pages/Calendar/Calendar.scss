@@ -57,6 +57,19 @@
         grid-column: 3 / 4;
         grid-row: 1 /2;
       }
+
+      .torrent-links--episodes {
+        * {
+          height: 25px;
+          border-radius: 5px;
+          font-size: 1rem;
+
+          &:after,
+          &:before {
+            border-radius: 6px;
+          }
+        }
+      }
     }
 
     &-wrapper--calendar {

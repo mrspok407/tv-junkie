@@ -13,6 +13,7 @@ export interface FirebaseInterface {
   userShowAllEpisodesInfo?: any
   watchLaterMovies?: any
   onAuthUserListener?: any
+  signInWithEmailAndPassword?: any
 }
 
 export const FirebaseContext = createContext<FirebaseInterface>({})

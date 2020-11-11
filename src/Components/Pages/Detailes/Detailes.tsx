@@ -39,7 +39,7 @@ export const DetailesPage: React.FC<Props> = ({
   const firebase = useContext(FirebaseContext)
   const { authUser } = useContext(AppContext)
 
-  const { episodesFromDatabase, releasedEpisodes, handleListeners } = useHandleListeners({ id: Number(id) })
+  const { episodesFromDatabase, releasedEpisodes, handleListeners } = useHandleListeners()
 
   const [similarContent, setSimilarContent] = useState<{}[]>([])
   const [showInfo, setShowInfo] = useState<{} | null>({})
@@ -57,12 +57,12 @@ export const DetailesPage: React.FC<Props> = ({
 
     return () => {
       if (cancelRequest !== undefined) cancelRequest()
-      if (!authUser) return
 
       setShowInfo(null)
-
       setMovieInDatabase(null)
       setShowDatabaseOnClient(null)
+
+      firebase.userShowAllEpisodes(authUser && authUser.uid, id).off()
     }
   }, [mediaType, id])
 
@@ -75,7 +75,7 @@ export const DetailesPage: React.FC<Props> = ({
       return
     }
 
-    handleListeners({ status: detailes.status, handleLoading })
+    handleListeners({ id: detailes.id, status: detailes.status, handleLoading, firebase, authUser })
   }, [detailes, context.userContent.loadingShowsMerging])
 
   const handleLoading = (isLoading: boolean) => {
@@ -217,7 +217,6 @@ export const DetailesPage: React.FC<Props> = ({
             <PosterWrapper detailes={detailes} mediaType={mediaType} />
 
             <MainInfo
-              handleListeners={handleListeners}
               detailes={detailes}
               mediaType={mediaType}
               id={id}

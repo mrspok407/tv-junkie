@@ -59,8 +59,7 @@ class ShowsButtons extends Component {
                   data: detailes,
                   database: "watchingShows",
                   userShows: this.context.userContent.userShows,
-                  fullContentPage: true,
-                  callback: this.props.handleListeners
+                  fullContentPage: true
                 })
                 this.context.userContent.handleUserShowsOnClient({
                   database: "watchingShows",

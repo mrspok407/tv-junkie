@@ -1,8 +1,9 @@
 import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
-import * as _isFunction from "lodash.isfunction"
+import { HandleListenersArg } from "Components/Pages/Detailes/FirebaseHelpers/UseHandleListeners"
 
 interface Arguments {
   firebase: FirebaseInterface
+  authUser: { uid: string }
   show: {
     id: number
     backdrop_path: string
@@ -17,9 +18,10 @@ interface Arguments {
   }
   dataFromAPI: { status: string; episodes: {}[] }
   callback?: any
+  handleListeners?: ({ id, status }: HandleListenersArg) => void
 }
 
-const addShowToMainDatabase = ({ firebase, show, dataFromAPI, callback }: Arguments) => {
+const addShowToMainDatabase = ({ firebase, authUser, show, dataFromAPI, handleListeners }: Arguments) => {
   firebase.showInDatabase(show.id).transaction(
     (snapshot: any) => {
       if (snapshot === null) {
@@ -54,9 +56,13 @@ const addShowToMainDatabase = ({ firebase, show, dataFromAPI, callback }: Argume
           usersWatching: snapshot.val().usersWatching + 1
         })
 
-        if (_isFunction(callback)) callback({ status: dataFromAPI.status })
+        if (handleListeners !== undefined) {
+          handleListeners({ id: show.id, status: dataFromAPI.status, firebase, authUser })
+        }
       } else {
-        if (_isFunction(callback)) callback({ status: dataFromAPI.status })
+        if (handleListeners !== undefined) {
+          handleListeners({ id: show.id, status: dataFromAPI.status, firebase, authUser })
+        }
         console.log("added!")
       }
     }

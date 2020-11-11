@@ -1,26 +1,23 @@
-import { AppContext } from "Components/AppContext/AppContextHOC"
-import { useState, useEffect, useContext } from "react"
+import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
+import { useState, useEffect } from "react"
 import { releasedEpisodesToOneArray } from "Utils"
 
-interface Props {
-  id: number
-}
-
 export interface HandleListenersArg {
+  id: number
   status: string
   handleLoading?: (isLoading: boolean) => void
+  firebase: FirebaseInterface
+  authUser: { uid: string }
 }
 
-const useHandleListeners = ({ id }: Props) => {
-  const { firebase, authUser } = useContext(AppContext)
+const useHandleListeners = () => {
   const [episodesFromDatabase, setEpisodesFromDatabase] = useState<{}[] | null>()
   const [releasedEpisodes, setReleasedEpisodes] = useState<{}[] | null>()
 
-  const handleListeners = ({ status, handleLoading }: HandleListenersArg) => {
+  const handleListeners = ({ id, status, handleLoading, firebase, authUser }: HandleListenersArg) => {
     if (status === "-") return
 
     const statusDatabase = status === "Ended" || status === "Canceled" ? "ended" : "ongoing"
-
     firebase.showEpisodes(id).once("value", (snapshot: any) => {
       if (snapshot.val() === null) {
         if (handleLoading) handleLoading(false)
@@ -74,13 +71,10 @@ const useHandleListeners = ({ id }: Props) => {
 
   useEffect(() => {
     return () => {
-      if (!authUser) return
-      firebase.userShowAllEpisodes(authUser.uid, id).off()
       setEpisodesFromDatabase(null)
       setReleasedEpisodes(null)
     }
-    // eslint-disable-next-line
-  }, [id])
+  }, [])
 
   return { episodesFromDatabase, releasedEpisodes, handleListeners } as const
 }

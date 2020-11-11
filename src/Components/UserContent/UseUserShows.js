@@ -26,6 +26,10 @@ const useUserShows = () => {
     firebase.onAuthUserListener(
       (authUser) => {
         console.log(authUser)
+        setLoadingShows(true)
+        setLoadingNotFinishedShows(true)
+        setLoadingShowsMerging(true)
+        setLoadingMovies(true)
         firebase.userAllShows(authUser.uid).on("value", (snapshot) => {
           if (snapshot.val() === null) {
             console.log("hook in listener NO value")

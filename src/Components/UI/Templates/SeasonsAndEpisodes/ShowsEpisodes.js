@@ -359,7 +359,7 @@ class ShowsEpisodes extends Component {
                               backgroundImage: `url(https://image.tmdb.org/t/p/w500/${season.poster_path})`
                             }}
                           />
-                          {showCheckboxes && daysToNewSeason < 0 && (
+                          {showCheckboxes && daysToNewSeason <= 0 && (
                             <div className="episodes__episode-group-check-all-episodes">
                               <button
                                 type="button"

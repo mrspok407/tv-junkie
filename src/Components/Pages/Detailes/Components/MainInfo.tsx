@@ -5,7 +5,6 @@ import classNames from "classnames"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import UserRating from "Components/UI/UserRating/UserRating"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
-import { HandleListenersArg } from "../FirebaseHelpers/UseHandleListeners"
 import { FirebaseContext } from "Components/Firebase"
 
 type Props = {
@@ -15,7 +14,6 @@ type Props = {
   id: number | string
   showDatabaseOnClient: {} | null
   changeShowDatabaseOnClient: (database: string) => void
-  handleListeners: ({ status, handleLoading }: HandleListenersArg) => void
 }
 
 export const MainInfo: React.FC<Props> = ({
@@ -24,8 +22,7 @@ export const MainInfo: React.FC<Props> = ({
   mediaType,
   id,
   showDatabaseOnClient,
-  changeShowDatabaseOnClient,
-  handleListeners
+  changeShowDatabaseOnClient
 }) => {
   const context = useContext(AppContext)
   const firebase = useContext(FirebaseContext)
@@ -175,7 +172,6 @@ export const MainInfo: React.FC<Props> = ({
             detailes={detailes}
             changeShowDatabaseOnClient={changeShowDatabaseOnClient}
             showDatabaseOnClient={showDatabaseOnClient}
-            handleListeners={handleListeners}
           />
         )}
 

@@ -10,10 +10,12 @@ import {
 import addShowToMainDatabase from "./FirebaseHelpers/addShowToMainDatabase"
 import getShowEpisodesFromAPI from "./TmdbAPIHelpers/getShowEpisodesFromAPI"
 import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
+import useHandleListeners from "Components/Pages/Detailes/FirebaseHelpers/UseHandleListeners"
 
 const useContentHandler = () => {
   const authUser: { uid: string } = useAuthUser()
   const firebase: FirebaseInterface = useContext(FirebaseContext)
+  const { handleListeners } = useHandleListeners()
 
   const addShowsToDatabaseOnRegister = ({ shows, uid }: AddShowsToDatabaseOnRegisterArg) => {
     Promise.all(
@@ -45,11 +47,7 @@ const useContentHandler = () => {
             id: show.id
           }
 
-          addShowToMainDatabase({
-            firebase,
-            show,
-            dataFromAPI
-          })
+          addShowToMainDatabase({ firebase, authUser, show, dataFromAPI })
 
           return { showInfo, userEpisodes }
         })
@@ -123,22 +121,11 @@ const useContentHandler = () => {
           }
         })
 
-      addShowToMainDatabase({
-        firebase,
-        show,
-        dataFromAPI,
-        callback
-      })
+      addShowToMainDatabase({ firebase, authUser, show, dataFromAPI, handleListeners })
     })
   }
 
-  const handleShowInDatabases = ({
-    id,
-    data = [],
-    database,
-    userShows,
-    callback
-  }: HandleShowInDatabasesArg) => {
+  const handleShowInDatabases = ({ id, data = [], database, userShows }: HandleShowInDatabasesArg) => {
     const userShow = userShows.find((show) => show.id === id)
 
     if (userShow) {
@@ -174,7 +161,7 @@ const useContentHandler = () => {
         })
     } else {
       const showData: any = Array.isArray(data) ? data.find((item) => item.id === id) : data
-      addShowToDatabase({ id, show: showData, callback })
+      addShowToDatabase({ id, show: showData })
     }
   }
 
