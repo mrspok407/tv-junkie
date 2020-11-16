@@ -7,8 +7,8 @@ import WithAuthorization from "Components/UserAuth/Session/WithAuthorization/Wit
 import Header from "Components/UI/Header/Header"
 import Footer from "Components/UI/Footer/Footer"
 import { todayDate } from "Utils"
-import "./Profile.scss"
 import { AppContext } from "Components/AppContext/AppContextHOC"
+import "./Profile.scss"
 
 class Profile extends Component {
   constructor(props) {

@@ -2,25 +2,29 @@
 import React, { useContext, useState } from "react"
 import { useHistory } from "react-router-dom"
 import { validEmailRegex } from "Utils"
-import SignInWithGoogleForm from "./SignInWithGoogle"
+import * as ROLES from "Utils/Constants/roles"
 import * as ROUTES from "Utils/Constants/routes"
 import classNames from "classnames"
 import Input from "../Input/Input"
-import { AppContext } from "Components/AppContext/AppContextHOC"
+import { AppContext, MovieInterface } from "Components/AppContext/AppContextHOC"
+import SignInWithGoogleForm from "../SignIn/SignInWithGoogle"
 import { FirebaseContext } from "Components/Firebase"
+import { AuthUserFirebaseInterface } from "Utils/Interfaces/UserAuth"
 
 const LOCAL_STORAGE_KEY_WATCHING_SHOWS = "watchingShowsLocalS"
 const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = "watchLaterMoviesLocalS"
 
 type Props = {
   closeNavMobile: () => void
-  togglePasswordForget: () => void
 }
 
 interface ErrorsInterface {
   emailError: string
   emailOnBlur: boolean
   passwordError: string
+  passwordOnBlur: boolean
+  passwordConfirmError: string
+  passwordConfirmOnblur: boolean
   error: { message: string }
   [key: string]: string | boolean | {}
 }
@@ -28,17 +32,30 @@ interface ErrorsInterface {
 interface RequiredInputsInterface {
   email: string
   password: string
+  passwordConfirm: string
+}
+
+interface InputsInterface {
+  login: string
 }
 
 const ERROR_DEFAULT_VALUES = {
   emailError: "",
   emailOnBlur: false,
   passwordError: "",
+  passwordOnBlur: false,
+  passwordConfirmError: "",
+  passwordConfirmOnblur: false,
   error: { message: "" }
 }
 
-const SignInFormBase: React.FC<Props> = ({ closeNavMobile, togglePasswordForget }) => {
-  const [requiredInputs, setRequiredInputs] = useState<RequiredInputsInterface>({ email: "", password: "" })
+const Register: React.FC<Props> = ({ closeNavMobile }) => {
+  const [requiredInputs, setRequiredInputs] = useState<RequiredInputsInterface>({
+    email: "",
+    password: "",
+    passwordConfirm: ""
+  })
+  const [inputs, setInputs] = useState<InputsInterface>({ login: "" })
   const [errors, setErrors] = useState<ErrorsInterface>(ERROR_DEFAULT_VALUES)
   const [submitClicked, setSubmitClicked] = useState(false)
   const [submitRequestLoading, setSubmitRequestLoading] = useState(false)
@@ -68,15 +85,52 @@ const SignInFormBase: React.FC<Props> = ({ closeNavMobile, togglePasswordForget 
     }
 
     firebase
-      .signInWithEmailAndPassword(email, password)
+      .createUserWithEmailAndPassword(email, password)
+      .then((authUser: AuthUserFirebaseInterface) => {
+        const userRole = email === "mr.spok407@gmail.com" ? ROLES.ADMIN : ROLES.USER
+        console.log("user created")
+
+        firebase
+          .user(authUser.user.uid)
+          .set({
+            username: inputs.login,
+            email,
+            role: userRole
+          })
+          .then(() => {
+            console.log("then, after user set in database")
+            const watchingShows = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)!) || []
+            const watchLaterMovies =
+              JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)!) || []
+
+            context.userContentHandler.addShowsToDatabaseOnRegister({
+              shows: watchingShows,
+              uid: authUser.user.uid
+            })
+
+            watchLaterMovies.forEach((item: MovieInterface) => {
+              context.userContentHandler.handleMovieInDatabases({
+                id: item.id,
+                data: item
+              })
+            })
+          })
+          .then(() => {
+            console.log("then after addShowtoDatabase run")
+            localStorage.removeItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)
+            localStorage.removeItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)
+
+            context.userContentLocalStorage.clearContentState()
+
+            if (closeNavMobile) closeNavMobile()
+          })
+      })
       .then(() => {
-        localStorage.removeItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)
-        localStorage.removeItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)
-
-        context.userContentLocalStorage.clearContentState()
-        if (closeNavMobile) closeNavMobile()
-
-        setSubmitRequestLoading(false)
+        console.log("email verification sent")
+        return firebase.sendEmailVerification()
+      })
+      .then(() => {
+        console.log("push in register in home page")
         history.push(ROUTES.HOME_PAGE)
       })
       .catch((error: any) => {
@@ -89,40 +143,64 @@ const SignInFormBase: React.FC<Props> = ({ closeNavMobile, togglePasswordForget 
   const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault()
     const value = event.target.value
-    const name = event.target.name === "current-password" ? "password" : event.target.name
+    const name = event.target.name === "new-password" ? "password" : event.target.name
     let errorsOnChange = { ...errors }
 
     if (errorsOnChange[`${name}OnBlur`] || submitClicked) {
+      console.log({ value })
       if (name === "email") {
         errorsOnChange[`${name}Error`] = validEmailRegex.test(value) ? "" : "Invalid email"
       }
+
       if (name === "password") {
-        errorsOnChange.passwordError = ""
+        errorsOnChange[`${name}Error`] = value.length >= 6 ? "" : "Password should be at least 6 characters"
+
+        errorsOnChange.passwordConfirmError =
+          value !== requiredInputs.passwordConfirm && value.length >= 6 ? "Passwords are not the same" : ""
+      }
+
+      if (name === "passwordConfirm") {
+        if (requiredInputs.password.length >= 6)
+          errorsOnChange[`${name}Error`] =
+            requiredInputs.password !== value ? "Passwords are not the same" : ""
       }
     }
+
     if (name === "email") setIsEmailValid(validEmailRegex.test(value))
-    if (value === "") errorsOnChange = ERROR_DEFAULT_VALUES
+    if (value === "") {
+      errorsOnChange[`${name}Error`] = ""
+      errorsOnChange[`${name}OnBlur`] = false
+      errorsOnChange.error.message = ""
+    }
 
     setErrors(errorsOnChange)
     setRequiredInputs({ ...requiredInputs, [name]: value })
+    setInputs({ ...inputs, [name]: value })
   }
 
   const handleValidationOnblur = (event: React.FocusEvent<HTMLInputElement>) => {
     event.preventDefault()
+    const { value } = event.target
+    const name = event.target.name === "new-password" ? "password" : event.target.name
 
-    const { value, name } = event.target
-    const { email } = requiredInputs
+    const { email, password, passwordConfirm } = requiredInputs
     const errorsOnBlur = { ...errors }
 
     errorsOnBlur[`${name}OnBlur`] = true
 
     if (!submitClicked) {
+      console.log({ email })
       if (name === "email") {
         errorsOnBlur[`${name}Error`] = validEmailRegex.test(email) ? "" : "Invalid email"
       }
 
       if (name === "password") {
-        errorsOnBlur.passwordError = ""
+        errorsOnBlur[`${name}Error`] = password.length >= 6 ? "" : "Password should be at least 6 characters"
+      }
+
+      if (name === "passwordConfirm") {
+        if (password.length >= 6)
+          errorsOnBlur[`${name}Error`] = password !== passwordConfirm ? "Passwords are not the same" : ""
       }
 
       if (value === "") {
@@ -130,16 +208,14 @@ const SignInFormBase: React.FC<Props> = ({ closeNavMobile, togglePasswordForget 
         errorsOnBlur[`${name}OnBlur`] = false
       }
     }
-
     setErrors(errorsOnBlur)
   }
 
-  const handleKeyDown = (e: any) => {
-    e.which === 27 && resetInput(e.target.name)
-  }
+  const handleKeyDown = (e: any) => e.which === 27 && resetInput(e.target.name)
 
   const resetInput = (name: string) => {
     setRequiredInputs({ ...requiredInputs, [`${name}`]: "" })
+    setInputs({ ...inputs, [`${name}`]: "" })
     setErrors({ ...errors, [`${name}Error`]: "" })
   }
 
@@ -169,6 +245,19 @@ const SignInFormBase: React.FC<Props> = ({ closeNavMobile, togglePasswordForget 
   return (
     <form className="auth__form" onSubmit={onSubmit}>
       <Input
+        classNameInput="auth__form-input"
+        classNameLabel="auth__form-label"
+        name="login"
+        value={inputs.login}
+        handleOnChange={handleOnChange}
+        handleKeyDown={handleKeyDown}
+        type="text"
+        placeholder="Login"
+        labelText="Login"
+        withLabel
+      />
+
+      <Input
         classNameInput={classNames("auth__form-input", {
           "auth__form-input--error": errors.emailError
         })}
@@ -186,14 +275,15 @@ const SignInFormBase: React.FC<Props> = ({ closeNavMobile, togglePasswordForget 
       <div className="auth__form-error">{errors.emailError}</div>
 
       <Input
-        classNameInput={classNames("auth__form-input auth__form-input--password", {
+        classNameInput={classNames("auth__form-input  auth__form-input--password", {
           "auth__form-input--error": errors.passwordError
         })}
         classNameLabel="auth__form-label"
-        name="current-password"
-        autocomplete="current-password"
+        name="new-password"
+        autocomplete="new-password"
         value={requiredInputs.password}
         handleOnChange={handleOnChange}
+        handleValidation={handleValidationOnblur}
         handleKeyDown={handleKeyDown}
         type={!showPassword ? "password" : "text"}
         placeholder="Password"
@@ -202,14 +292,26 @@ const SignInFormBase: React.FC<Props> = ({ closeNavMobile, togglePasswordForget 
         toggleShowPassword={toggleShowPassword}
         withLabel
       />
-
       <div className="auth__form-error">{errors.passwordError}</div>
 
-      {errors.error && <div className="auth__form-error">{errors.error.message}</div>}
+      <Input
+        classNameInput={classNames("auth__form-input auth__form-input--password", {
+          "auth__form-input--error": errors.passwordConfirmError
+        })}
+        classNameLabel="auth__form-label"
+        name="passwordConfirm"
+        value={requiredInputs.passwordConfirm}
+        handleOnChange={handleOnChange}
+        handleValidation={handleValidationOnblur}
+        handleKeyDown={handleKeyDown}
+        type={!showPassword ? "password" : "text"}
+        placeholder="Password"
+        labelText="Confirm Password"
+        withLabel
+      />
+      <div className="auth__form-error">{errors.passwordConfirmError}</div>
 
-      <span onClick={togglePasswordForget} className="auth__form-password-link">
-        Forget password?
-      </span>
+      {errors.error && <div className="auth__form-error">{errors.error.message}</div>}
 
       <button
         className={classNames("button button--auth__form", {
@@ -217,11 +319,11 @@ const SignInFormBase: React.FC<Props> = ({ closeNavMobile, togglePasswordForget 
         })}
         type="submit"
       >
-        {submitRequestLoading ? <span className="auth__form-loading"></span> : "Sign In"}
+        {submitRequestLoading ? <span className="auth__form-loading"></span> : "Register"}
       </button>
       <SignInWithGoogleForm />
     </form>
   )
 }
 
-export default SignInFormBase
+export default Register

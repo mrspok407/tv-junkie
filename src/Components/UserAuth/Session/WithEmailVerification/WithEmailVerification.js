@@ -1,7 +1,4 @@
 import React from "react"
-import { compose } from "recompose"
-import { withFirebase } from "Components/Firebase"
-import { WithAuthenticationConsumer } from "../WithAuthentication"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 
 export const withEmailVerification = (Component) => {
@@ -10,8 +7,8 @@ export const withEmailVerification = (Component) => {
       return <>{this.context.authUser.emailVerified ? <Component {...this.props} /> : "Email not verified"}</>
     }
   }
+  WithEmailVerification.contextType = AppContext
   return WithEmailVerification
 }
 
 export default withEmailVerification
-withEmailVerification.contextType = AppContext

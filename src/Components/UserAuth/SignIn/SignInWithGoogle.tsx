@@ -1,30 +1,31 @@
 import React, { useState, useEffect, useContext } from "react"
-import { withRouter } from "react-router-dom"
-import { AppContext } from "Components/AppContext/AppContextHOC"
+import { useHistory } from "react-router-dom"
+import { AppContext, MovieInterface } from "Components/AppContext/AppContextHOC"
 import * as ROLES from "Utils/Constants/roles"
 import * as ROUTES from "Utils/Constants/routes"
+import { AuthUserFirebaseInterface } from "Utils/Interfaces/UserAuth"
 
 const LOCAL_STORAGE_KEY_WATCHING_SHOWS = "watchingShowsLocalS"
 const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = "watchLaterMoviesLocalS"
 
 const mobileLayout = 1000
 
-const SignInWithGoogleBase = ({ history, closeNavMobile }) => {
+const SignInWithGoogleForm = () => {
   const [windowSize, setWindowSize] = useState(window.innerWidth)
+  const context = useContext(AppContext)
+  const history = useHistory()
 
   useEffect(() => {
     setWindowSize(window.innerWidth)
   }, [])
 
-  const context = useContext(AppContext)
-
-  const onSubmit = (provider) => {
+  const onSubmit = (provider: any) => {
     const signInType = windowSize < mobileLayout ? "signInWithRedirect" : "signInWithPopup"
 
     context.firebase.app
       .auth()
       [signInType](provider)
-      .then((authUser) => {
+      .then((authUser: AuthUserFirebaseInterface) => {
         const userRole = authUser.user.email === "mr.spok407@gmail.com" ? ROLES.ADMIN : ROLES.USER
 
         context.firebase
@@ -37,14 +38,17 @@ const SignInWithGoogleBase = ({ history, closeNavMobile }) => {
           .then(() => {
             if (!authUser.additionalUserInfo.isNewUser) return
 
-            const watchingShows = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)) || []
+            const watchingShows = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)!) || []
             const watchLaterMovies =
-              JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)) || []
+              JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)!) || []
 
-            this.context.userContentHandler.addShowsToDatabaseOnRegister({ shows: watchingShows })
+            context.userContentHandler.addShowsToDatabaseOnRegister({
+              shows: watchingShows,
+              uid: authUser.user.uid
+            })
 
-            watchLaterMovies.forEach((item) => {
-              this.context.userContentHandler.handleMovieInDatabases({
+            watchLaterMovies.forEach((item: MovieInterface) => {
+              context.userContentHandler.handleMovieInDatabases({
                 id: item.id,
                 data: item
               })
@@ -55,14 +59,12 @@ const SignInWithGoogleBase = ({ history, closeNavMobile }) => {
             localStorage.removeItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)
 
             context.userContentLocalStorage.clearContentState()
-
-            if (closeNavMobile) closeNavMobile()
           })
       })
       .then(() => {
         history.push(ROUTES.HOME_PAGE)
       })
-      .catch((error) => {
+      .catch((error: any) => {
         console.log(error)
         // setError(error.message)
       })
@@ -81,7 +83,5 @@ const SignInWithGoogleBase = ({ history, closeNavMobile }) => {
     </div>
   )
 }
-
-const SignInWithGoogleForm = withRouter(SignInWithGoogleBase)
 
 export default SignInWithGoogleForm

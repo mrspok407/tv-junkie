@@ -7,13 +7,14 @@ import Loader from "Components/UI/Placeholders/Loader"
 import PlaceholderNoFutureEpisodes from "Components/UI/Placeholders/PlaceholderNoFutureEpisodes"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import TorrentLinksEpisodes from "Components/UI/Templates/SeasonsAndEpisodes/Components/TorrentLinksEpisodes"
+import { UserWillAirEpisodesInterface } from "Components/UserContent/UseUserShows"
 
 type Props = {
   homePage?: boolean
 }
 
 type State = {
-  willAirEpisodes: { month: string; episodes: {}[] }[]
+  willAirEpisodes: UserWillAirEpisodesInterface[]
   openMonths: string[]
   initialLoading: boolean
 }

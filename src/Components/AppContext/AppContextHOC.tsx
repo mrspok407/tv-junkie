@@ -6,7 +6,7 @@ import useFirebase from "Components/Firebase/UseFirebase"
 import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
 import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
 
-interface ShowInterface {
+export interface ShowInterface {
   id: number
   backdrop_path: string
   first_air_date: string
@@ -21,7 +21,7 @@ interface ShowInterface {
   database: string
 }
 
-interface MovieInterface {
+export interface MovieInterface {
   id: number
   title: string
   release_date: string
@@ -55,6 +55,10 @@ export interface HandleMovieInDatabasesArg {
   data: MovieInterface
 }
 
+export interface AuthUserInterface {
+  uid: string
+}
+
 interface toggleMovieLSArg {
   id: number | string
   data: { id: number }[] | { id: number }
@@ -75,6 +79,7 @@ interface AppContextInterface {
     userWillAirEpisodes: {}[]
     userToWatchShows: {}[]
     userMovies: { id: number }[]
+    resetContentState: () => void
   }
   userContentHandler: {
     addShowsToDatabaseOnRegister: ({ shows }: AddShowsToDatabaseOnRegisterArg) => void
@@ -83,7 +88,7 @@ interface AppContextInterface {
     handleMovieInDatabases: ({ id, data }: HandleMovieInDatabasesArg) => void
   }
   firebase: FirebaseInterface
-  authUser: { uid: string } | null
+  authUser: AuthUserInterface | null
 }
 
 export const AppContext = createContext<AppContextInterface>({
@@ -100,7 +105,8 @@ export const AppContext = createContext<AppContextInterface>({
     userShows: [],
     userWillAirEpisodes: [],
     userToWatchShows: [],
-    userMovies: []
+    userMovies: [],
+    resetContentState: () => {}
   },
   userContentHandler: {
     addShowsToDatabaseOnRegister: () => {},

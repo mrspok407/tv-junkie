@@ -4,9 +4,9 @@ import classNames from "classnames"
 import logo from "assets/images/main-page-logo.png"
 import Login from "./Login"
 import * as ROUTES from "Utils/Constants/routes"
-import "./Header.scss"
 import Search from "Components/Pages/SearchPage/Search/Search"
 import { AppContext } from "Components/AppContext/AppContextHOC"
+import "./Header.scss"
 
 export default class Header extends Component {
   constructor(props) {
