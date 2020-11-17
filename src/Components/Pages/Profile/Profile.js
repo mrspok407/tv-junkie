@@ -82,9 +82,10 @@ class Profile extends Component {
     }-${threeDaysBefore.getFullYear()}`
     console.log(threeDaysBefore)
 
+    console.log(threeDaysBeforeConverted)
     axios
       .get(
-        `https://api.themoviedb.org/3/tv/changes?api_key=${process.env.REACT_APP_TMDB_API}&end_date=${todayConverted}&start_date=${threeDaysBeforeConverted}`
+        `https://api.themoviedb.org/3/tv/changes?api_key=${process.env.REACT_APP_TMDB_API}&end_date=${todayConverted}&start_date=05-11-2020`
       )
       .then(({ data }) => {
         data.results.forEach((show) => {
@@ -149,21 +150,21 @@ class Profile extends Component {
 
                         season.episodes.forEach((item) => {
                           const updatedEpisode = {
-                            air_date: item.air_date,
-                            episode_number: item.episode_number,
-                            name: item.name,
-                            season_number: item.season_number,
+                            air_date: item.air_date || null,
+                            episode_number: item.episode_number || null,
+                            name: item.name || null,
+                            season_number: item.season_number || null,
                             id: item.id
                           }
                           episodes.push(updatedEpisode)
                         })
 
                         const updatedSeason = {
-                          air_date: season.air_date,
-                          season_number: season.season_number,
+                          air_date: season.air_date || null,
+                          season_number: season.season_number || null,
                           id: season._id,
-                          poster_path: season.poster_path,
-                          name: season.name,
+                          poster_path: season.poster_path || null,
+                          name: season.name || null,
                           episodes
                         }
 
