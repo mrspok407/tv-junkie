@@ -166,6 +166,8 @@ const useContentHandler = () => {
   }
 
   const handleMovieInDatabases = ({ id, data }: HandleMovieInDatabasesArg) => {
+    console.log("handleMovieINDatabases")
+
     const movie = data
     firebase
       .watchLaterMovies(authUser.uid)

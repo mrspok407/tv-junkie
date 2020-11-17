@@ -2,25 +2,37 @@
 import { useState, useEffect, useCallback, useContext } from "react"
 import { combineMergeObjects, releasedEpisodesToOneArray } from "Utils"
 import { organiseFutureEpisodesByMonth } from "Components/Pages/Calendar/CalendarHelpers"
-import merge from "deepmerge"
-import updateUserEpisodesFromDatabase from "./FirebaseHelpers/updateUserEpisodesFromDatabase"
 import { FirebaseContext } from "Components/Firebase"
 import { AuthUserFirebaseInterface } from "Utils/Interfaces/UserAuth"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
+import merge from "deepmerge"
+import updateUserEpisodesFromDatabase from "./FirebaseHelpers/updateUserEpisodesFromDatabase"
 
 const SESSION_STORAGE_KEY_SHOWS = "userShows"
 
-interface UserShowsInterface extends ContentDetailes {
+export interface UserShowsInterface extends ContentDetailes {
   allEpisodesWatched: boolean
   database: string
   finished: boolean
   timeStamp: number
-  userRating: string
-  episodes: {}[]
+  userRating: string | string
+  episodes: EpisodesFromDatabaseInterface[]
+  info: {}
+}
+
+export interface SingleEpisodeInterface {
+  userRating: number | string
+  watched: boolean
+  air_date: string | null
+}
+export interface EpisodesFromDatabaseInterface {
+  episodes: SingleEpisodeInterface[]
+  season_number: number
+  userRating: number | string
 }
 
 export interface UserMoviesInterface extends ContentDetailes {
-  timeStamp: number
+  timeStamp?: number
 }
 
 export interface UserWillAirEpisodesInterface {
@@ -58,7 +70,9 @@ const useUserShows = () => {
           if (snapshot.val() === null) {
             console.log("hook in listener NO value")
             setLoadingShows(false)
+            setLoadingNotFinishedShows(false)
             setLoadingShowsMerging(false)
+            setLoadingMovies(false)
             return
           }
 
@@ -78,7 +92,7 @@ const useUserShows = () => {
                 return firebase
                   .showInDatabase(show.id)
                   .once("value")
-                  .then((snapshot: any) => {
+                  .then((snapshot: { val: () => { info: {}; episodes: EpisodesFromDatabaseInterface } }) => {
                     if (snapshot.val() !== null) {
                       return {
                         ...show,
@@ -89,6 +103,7 @@ const useUserShows = () => {
                   })
               })
             ).then((showsDatabase) => {
+              console.log({ showsDatabase })
               const mergedShows: UserShowsInterface[] = merge(shows, showsDatabase, {
                 arrayMerge: combineMergeObjects
               })
@@ -117,25 +132,28 @@ const useUserShows = () => {
 
               firebase
                 .showInDatabase(show.id)
-                .once("value", (snapshot: { val: () => { info: {}; episodes: {}[] } }) => {
-                  const updatedShows = [...userShowsSS]
-                  const mergedShow: UserShowsInterface = {
-                    ...show,
-                    ...snapshot.val().info,
-                    episodes: snapshot.val().episodes
+                .once(
+                  "value",
+                  (snapshot: { val: () => { info: {}; episodes: EpisodesFromDatabaseInterface[] } }) => {
+                    const updatedShows = [...userShowsSS]
+                    const mergedShow = {
+                      ...show,
+                      ...snapshot.val().info,
+                      episodes: snapshot.val().episodes
+                    }
+
+                    updatedShows.splice(index, 0, mergedShow)
+
+                    const watchingShows = updatedShows.filter((show) => show.database === "watchingShows")
+                    const willAirEpisodes: UserWillAirEpisodesInterface[] = organiseFutureEpisodesByMonth(
+                      watchingShows
+                    )
+
+                    setUserShows(updatedShows)
+                    setUserWillAirEpisodes(willAirEpisodes)
+                    setLoadingShows(false)
                   }
-
-                  updatedShows.splice(index, 0, mergedShow)
-
-                  const watchingShows = updatedShows.filter((show) => show.database === "watchingShows")
-                  const willAirEpisodes: UserWillAirEpisodesInterface[] = organiseFutureEpisodesByMonth(
-                    watchingShows
-                  )
-
-                  setUserShows(updatedShows)
-                  setUserWillAirEpisodes(willAirEpisodes)
-                  setLoadingShows(false)
-                })
+                )
             })
           } else if (userShowsSS.length === shows.length) {
             console.log("userShows length same")
@@ -151,7 +169,7 @@ const useUserShows = () => {
           .userEpisodes(authUser.uid)
           .orderByChild("info/isAllWatched_database")
           .equalTo("false_watchingShows")
-          .on("value", (snapshot: any) => {
+          .on("value", (snapshot: { val: () => { id: number; episodes: {}[] } }) => {
             if (snapshot.val() === null) {
               setUserToWatchShows([])
               setLoadingNotFinishedShows(false)
@@ -249,12 +267,14 @@ const useUserShows = () => {
     console.log("upd on client")
   }
 
-  const handleUserMoviesOnClient = ({ id }: UserMoviesInterface) => {
-    const updatedMovies = userMovies.filter((movie) => movie.id !== id)
+  const handleUserMoviesOnClient = ({ id, data }: { id: number; data: UserMoviesInterface }) => {
+    const movie = userMovies.find((movie) => movie.id === id)
 
-    console.log("upd on client movies")
-
-    setUserMovies(updatedMovies)
+    if (movie) {
+      setUserMovies(userMovies.filter((movie) => movie.id !== id))
+    } else {
+      setUserMovies([...userMovies, { ...data }])
+    }
   }
 
   return {

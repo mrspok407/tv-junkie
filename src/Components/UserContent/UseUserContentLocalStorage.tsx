@@ -3,7 +3,7 @@ import { useState, useEffect } from "react"
 const LOCAL_STORAGE_KEY_WATCHING_SHOWS = "watchingShowsLocalS"
 const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = "watchLaterMoviesLocalS"
 
-interface FunctionArguments {
+interface ToggleMovieLSArg {
   id: number | string
   data: { id: number }[] | { id: number }
 }
@@ -19,24 +19,24 @@ const useUserContentLocalStorage = () => {
     watchLaterMovies: JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)!) || []
   })
 
-  const toggleMovieLS = ({ id, data = [] }: FunctionArguments) => {
+  const toggleMovieLS = ({ id, data }: ToggleMovieLSArg) => {
     const movieExists = userContent.watchLaterMovies.find((item: { id: number }) => item.id === id)
-    const movie: any = Array.isArray(data) ? data.find((item: { id: number }) => item.id === id) : data
+    const movie = Array.isArray(data) ? data.find((item: { id: number }) => item.id === id)! : data
 
     if (movieExists) {
-      setUserContent((prevState) => ({
-        ...prevState,
-        watchLaterMovies: [...prevState.watchLaterMovies.filter((item: { id: number }) => item.id !== id)]
-      }))
+      setUserContent({
+        ...userContent,
+        watchLaterMovies: [...userContent.watchLaterMovies.filter((item: { id: number }) => item.id !== id)]
+      })
     } else {
-      setUserContent((prevState) => ({
-        ...prevState,
-        watchLaterMovies: [...prevState.watchLaterMovies, { ...movie, userWatching: movie && true }]
-      }))
+      setUserContent({
+        ...userContent,
+        watchLaterMovies: [...userContent.watchLaterMovies, { ...movie, userWatching: !!movie }]
+      })
     }
   }
 
-  const addShowLS = ({ id, data = [] }: FunctionArguments) => {
+  const addShowLS = ({ id, data = [] }: ToggleMovieLSArg) => {
     if (userContent.watchingShows.find((item) => item.id === id)) return
     const show: any = Array.isArray(data) ? data.find((item) => item.id === id) : data
 
@@ -46,7 +46,7 @@ const useUserContentLocalStorage = () => {
     }))
   }
 
-  const removeShowLS = ({ id }: FunctionArguments) => {
+  const removeShowLS = ({ id }: ToggleMovieLSArg) => {
     setUserContent((prevState) => ({
       ...prevState,
       watchingShows: [...prevState.watchingShows.filter((item) => item.id !== id)]

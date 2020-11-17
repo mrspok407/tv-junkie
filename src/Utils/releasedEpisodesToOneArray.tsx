@@ -1,7 +1,7 @@
 /* eslint-disable array-callback-return */
 import { differenceBtwDatesInDays, todayDate } from "Utils"
 
-export const releasedEpisodes = ({ data }) => {
+export const releasedEpisodes = ({ data }: any) => {
   if (!Array.isArray(data)) {
     throw new Error("Provided data should be an array")
   }
@@ -11,7 +11,7 @@ export const releasedEpisodes = ({ data }) => {
       acc.push(...season.episodes)
       return acc
     }, [])
-    .filter((episode) => {
+    .filter((episode: any) => {
       const daysToNewEpisode = differenceBtwDatesInDays(episode.air_date, todayDate)
       return daysToNewEpisode <= 0 && episode
     })

@@ -28,6 +28,10 @@ export const MainInfo: React.FC<Props> = ({
   const firebase = useContext(FirebaseContext)
   const { authUser } = useContext(AppContext)
 
+  const movieInLS = context.userContentLocalStorage.watchLaterMovies.find(
+    (item: { id: number }) => item.id === Number(id)
+  )
+
   const isMediaTypeTV = mediaType === "show"
 
   const title = isMediaTypeTV ? detailes.name : detailes.title
@@ -178,11 +182,7 @@ export const MainInfo: React.FC<Props> = ({
         {!isMediaTypeTV && (
           <button
             className={classNames("button", {
-              "button--pressed":
-                movieInDatabase ||
-                context.userContentLocalStorage.watchLaterMovies.find(
-                  (item: { id: number }) => item.id === Number(id)
-                )
+              "button--pressed": movieInDatabase || movieInLS
             })}
             onClick={() => {
               if (authUser) {
@@ -190,6 +190,7 @@ export const MainInfo: React.FC<Props> = ({
                   id: Number(id),
                   data: detailes
                 })
+                context.userContent.handleUserMoviesOnClient({ id: Number(id), data: detailes })
               } else {
                 context.userContentLocalStorage.toggleMovieLS({
                   id: Number(id),
@@ -199,7 +200,7 @@ export const MainInfo: React.FC<Props> = ({
             }}
             type="button"
           >
-            {movieInDatabase === "watchLaterMovies" ? "Remove" : "Watch later"}
+            {movieInDatabase || movieInLS ? "Remove" : "Watch later"}
           </button>
         )}
       </div>

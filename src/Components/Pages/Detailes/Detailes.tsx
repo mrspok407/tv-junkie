@@ -180,6 +180,7 @@ export const DetailesPage: React.FC<Props> = ({
   }
 
   const getMovieInDatabase = () => {
+    console.log("getMovieInDatabase")
     const movie = context.userContent.userMovies.find((movie) => movie.id === Number(id))
 
     setMovieInDatabase(!authUser || !movie ? null : movie)

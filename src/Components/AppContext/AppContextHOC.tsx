@@ -1,6 +1,6 @@
 import React, { createContext } from "react"
 import useUserContentLocalStorage from "Components/UserContent/UseUserContentLocalStorage"
-import useUserShows from "Components/UserContent/UseUserShows"
+import useUserShows, { UserMoviesInterface } from "Components/UserContent/UseUserShows"
 import useContentHandler from "Components/UserContent/UseContentHandler"
 import useFirebase from "Components/Firebase/UseFirebase"
 import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
@@ -80,6 +80,7 @@ interface AppContextInterface {
     userToWatchShows: {}[]
     userMovies: { id: number }[]
     resetContentState: () => void
+    handleUserMoviesOnClient: ({ id, data }: { id: number; data: UserMoviesInterface }) => void
   }
   userContentHandler: {
     addShowsToDatabaseOnRegister: ({ shows }: AddShowsToDatabaseOnRegisterArg) => void
@@ -106,7 +107,8 @@ export const AppContext = createContext<AppContextInterface>({
     userWillAirEpisodes: [],
     userToWatchShows: [],
     userMovies: [],
-    resetContentState: () => {}
+    resetContentState: () => {},
+    handleUserMoviesOnClient: () => {}
   },
   userContentHandler: {
     addShowsToDatabaseOnRegister: () => {},
