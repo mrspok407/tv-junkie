@@ -7,7 +7,7 @@ import "./Slider.scss"
 
 const POSTER_PATH = "https://image.tmdb.org/t/p/w500/"
 
-export default function Slider({ listOfContent }) {
+export default function Slider({ sliderData }) {
   const [slider, setSlider] = useState()
   const [sliderWidth, setSliderWidth] = useState()
 
@@ -18,7 +18,7 @@ export default function Slider({ listOfContent }) {
   const itemsInRow = slider && Number(getComputedStyle(slider).getPropertyValue("--itemsInRow"))
   const itemWidth = sliderWidth / itemsInRow
 
-  const itemsInSlider = listOfContent.length
+  const itemsInSlider = sliderData.length
   const nonVisibleItems = itemsInSlider - itemsInRow
   const dragСoefficient = 1.25
   const thresholdToSlide = itemWidth / 2
@@ -38,7 +38,7 @@ export default function Slider({ listOfContent }) {
 
   let startDragPoint = 0
 
-  const sliderRef = useCallback(node => {
+  const sliderRef = useCallback((node) => {
     if (node !== null) {
       setSlider(node)
     }
@@ -112,7 +112,7 @@ export default function Slider({ listOfContent }) {
     toggleArrows()
   }, [itemsInRow])
 
-  const pagination = direction => {
+  const pagination = (direction) => {
     if (currentItem === 0 && direction === "left") return
     if (nonVisibleItems === currentItem && direction === "right") return
 
@@ -131,7 +131,7 @@ export default function Slider({ listOfContent }) {
     }
   }
 
-  const onMouseDown = e => {
+  const onMouseDown = (e) => {
     if (!sliderAvailable || window.innerWidth <= mobileLayout || e.button !== 0) return
     e.preventDefault()
 
@@ -143,7 +143,7 @@ export default function Slider({ listOfContent }) {
     document.addEventListener("mouseup", onMouseUp)
   }
 
-  const onMouseMove = e => {
+  const onMouseMove = (e) => {
     if (!sliderAvailable || window.innerWidth <= mobileLayout) return
     e.preventDefault()
 
@@ -167,7 +167,7 @@ export default function Slider({ listOfContent }) {
     slider.style.transition = "0ms"
   }
 
-  const onMouseUp = e => {
+  const onMouseUp = (e) => {
     if (!sliderAvailable || window.innerWidth <= mobileLayout) return
     e.preventDefault()
 
@@ -199,19 +199,19 @@ export default function Slider({ listOfContent }) {
   return (
     <div className="slider-container">
       <div
-        onMouseDown={e => onMouseDown(e)}
-        onMouseUp={e => onMouseUp(e)}
+        onMouseDown={(e) => onMouseDown(e)}
+        onMouseUp={(e) => onMouseUp(e)}
         className={classNames("slider", {
           "s--dragging": dragging
         })}
         ref={sliderRef}
       >
-        {listOfContent.map(({ poster_path, original_title, id }) => {
+        {sliderData.map(({ poster_path, original_title, id }) => {
           const mediaType = original_title ? "movie" : "show"
           return (
             <div key={id} className="slider__item-wrapper">
               <Link
-                onClick={e => {
+                onClick={(e) => {
                   if (blockLinks) e.preventDefault()
                 }}
                 to={{

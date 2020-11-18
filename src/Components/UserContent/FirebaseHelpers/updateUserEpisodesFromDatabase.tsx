@@ -19,8 +19,6 @@ const updateUserEpisodesFromDatabase = ({ firebase, authUser, shows }: Arguments
         return show
       })
 
-      console.log("merging on first load")
-
       if (shows.length !== showsEpisodes.length) return
 
       const mergedShowsEpisodes: UserShowsInterface[] = merge(shows, showsEpisodes, {
@@ -33,7 +31,7 @@ const updateUserEpisodesFromDatabase = ({ firebase, authUser, shows }: Arguments
             acc.push({
               userRating: episode.userRating || 0,
               watched: episode.watched || false,
-              air_date: episode.air_date || null
+              air_date: episode.air_date || ""
             })
             return acc
           }, [])

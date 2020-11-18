@@ -8,6 +8,7 @@ import Footer from "Components/UI/Footer/Footer"
 import { FirebaseContext } from "Components/Firebase"
 import { useHistory } from "react-router-dom"
 import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
+import { AuthUserFirebaseInterface } from "Utils/Interfaces/UserAuth"
 import "./Login.scss"
 
 const LoginPage = () => {
@@ -17,7 +18,7 @@ const LoginPage = () => {
 
   const authorizationListener = useCallback(() => {
     firebase.onAuthUserListener(
-      (authUser) => {
+      (authUser: AuthUserFirebaseInterface) => {
         if (authUser !== null) {
           history.push(ROUTES.HOME_PAGE)
         }
@@ -41,7 +42,7 @@ const LoginPage = () => {
         </Helmet>
         <Header isLogoVisible={false} hideLogin={true} />
         <div className="login-page">
-          <UserAuthForm loginPage={true} activeSection="register" />
+          <UserAuthForm loginPage={true} />
         </div>
         <Footer />
         <ScrollToTopOnMount />

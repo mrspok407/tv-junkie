@@ -6,12 +6,12 @@ import PasswordForget from "Components/UserAuth/PasswordForget/PasswordForget"
 import "./UserAuthForm.scss"
 
 type Props = {
-  closeNavMobile: () => void
+  closeNavMobile?: () => void
+  authContRef?: string | ((instance: HTMLDivElement | null) => void)
   loginPage: boolean
-  authContRef: string | ((instance: HTMLDivElement | null) => void)
 }
 
-const UserAuthForm: React.FC<Props> = ({ closeNavMobile, loginPage, authContRef }) => {
+const UserAuthForm: React.FC<Props> = ({ closeNavMobile = () => {}, loginPage, authContRef }) => {
   const [activeSection, setActiveSection] = useState(loginPage ? "register" : "signIn")
   const [passwordForgetFormOpen, setPasswordforgetFormOpen] = useState(false)
 

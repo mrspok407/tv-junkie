@@ -248,7 +248,7 @@ export const DetailesPage: React.FC<Props> = ({
                   {mediaType === "movie" ? "Similar movies" : "Similar shows"}
                 </div>
 
-                <Slider listOfContent={similarContent} />
+                <Slider sliderData={similarContent} />
               </div>
             )}
           </div>

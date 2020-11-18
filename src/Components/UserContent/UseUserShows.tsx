@@ -23,7 +23,7 @@ export interface UserShowsInterface extends ContentDetailes {
 export interface SingleEpisodeInterface {
   userRating: number | string
   watched: boolean
-  air_date: string | null
+  air_date: string
 }
 export interface EpisodesFromDatabaseInterface {
   episodes: SingleEpisodeInterface[]
@@ -103,7 +103,7 @@ const useUserShows = () => {
                   })
               })
             ).then((showsDatabase) => {
-              console.log({ showsDatabase })
+              // console.log({ showsDatabase })
               const mergedShows: UserShowsInterface[] = merge(shows, showsDatabase, {
                 arrayMerge: combineMergeObjects
               })
@@ -116,8 +116,6 @@ const useUserShows = () => {
               updateUserEpisodesFromDatabase({ firebase, authUser, shows: mergedShows }).then(() =>
                 setLoadingShowsMerging(false)
               )
-              console.log({ mergedShows })
-              console.log({ willAirEpisodes })
 
               setUserShows(mergedShows)
               setUserWillAirEpisodes(willAirEpisodes)
@@ -145,9 +143,7 @@ const useUserShows = () => {
                     updatedShows.splice(index, 0, mergedShow)
 
                     const watchingShows = updatedShows.filter((show) => show.database === "watchingShows")
-                    const willAirEpisodes: UserWillAirEpisodesInterface[] = organiseFutureEpisodesByMonth(
-                      watchingShows
-                    )
+                    const willAirEpisodes = organiseFutureEpisodesByMonth(watchingShows)
 
                     setUserShows(updatedShows)
                     setUserWillAirEpisodes(willAirEpisodes)
@@ -190,8 +186,6 @@ const useUserShows = () => {
               []
             )
 
-            console.log({ userEpisodes })
-
             setUserToWatchShows(userEpisodes)
             setLoadingNotFinishedShows(false)
           })
@@ -207,9 +201,6 @@ const useUserShows = () => {
             const movies: UserMoviesInterface[] = Object.values(snapshot.val()).map((movie) => {
               return movie
             })
-
-            console.log({ movies })
-
             setUserMovies(movies)
             setLoadingMovies(false)
           })

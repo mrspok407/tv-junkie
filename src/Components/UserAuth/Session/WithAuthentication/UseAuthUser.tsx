@@ -8,7 +8,7 @@ const useAuthUser = () => {
   const authUserListener = () => {
     firebase.onAuthUserListener(
       (authUser: { uid: string }) => {
-        console.log("setting authUser in LS")
+        // console.log("setting authUser in LS")
         localStorage.setItem("authUser", JSON.stringify(authUser))
         setAuthUser(authUser)
       },

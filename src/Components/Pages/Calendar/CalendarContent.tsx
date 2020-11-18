@@ -7,7 +7,7 @@ import Loader from "Components/UI/Placeholders/Loader"
 import PlaceholderNoFutureEpisodes from "Components/UI/Placeholders/PlaceholderNoFutureEpisodes"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import TorrentLinksEpisodes from "Components/UI/Templates/SeasonsAndEpisodes/Components/TorrentLinksEpisodes"
-import { UserWillAirEpisodesInterface } from "Components/UserContent/UseUserShows"
+import { SingleEpisodeInterface, UserWillAirEpisodesInterface } from "Components/UserContent/UseUserShows"
 
 type Props = {
   homePage?: boolean
@@ -83,7 +83,9 @@ class CalendarContent extends Component<Props, State> {
               const date = new Date(month.month)
               const monthLongName = date.toLocaleString("en", { month: "long" })
 
-              const monthEpisodes = organizeMonthEpisodesByEpisodeNumber(month.episodes)
+              const monthEpisodes: SingleEpisodeInterface[] = organizeMonthEpisodesByEpisodeNumber(
+                month.episodes
+              )
 
               return (
                 <div key={month.month} className="episodes__episode-group">
