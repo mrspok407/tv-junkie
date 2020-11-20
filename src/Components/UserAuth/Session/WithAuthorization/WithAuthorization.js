@@ -13,7 +13,7 @@ const withAuthorization = (condition) => (Component) => {
       this.authorizationListener()
     }
 
-    authorizationListener = () => {
+    authorizationListener = () =>
       this.context.firebase.onAuthUserListener(
         (authUser) => {
           if (!condition(authUser)) {
@@ -22,7 +22,6 @@ const withAuthorization = (condition) => (Component) => {
         },
         () => this.props.history.push(ROUTES.HOME_PAGE)
       )
-    }
 
     render() {
       return condition(this.context.authUser) ? <Component {...this.props} /> : null

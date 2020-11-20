@@ -1,9 +1,10 @@
+import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
 import { HandleListenersArg } from "Components/Pages/Detailes/FirebaseHelpers/UseHandleListeners"
 
 interface Arguments {
   firebase: FirebaseInterface
-  authUser: { uid: string }
+  authUser: AuthUserInterface | null
   show: {
     id: number
     backdrop_path: string

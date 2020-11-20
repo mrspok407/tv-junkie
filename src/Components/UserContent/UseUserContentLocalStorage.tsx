@@ -1,12 +1,13 @@
+import { ToggleMovieLSArg } from "Components/AppContext/AppContextHOC"
 import { useState, useEffect } from "react"
 
 const LOCAL_STORAGE_KEY_WATCHING_SHOWS = "watchingShowsLocalS"
 const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = "watchLaterMoviesLocalS"
 
-interface ToggleMovieLSArg {
-  id: number | string
-  data: { id: number }[] | { id: number }
-}
+// interface ToggleMovieLSArg {
+//   id: number
+//   data: { id: number }[] | { id: number }
+// }
 
 interface UserContent {
   watchingShows: { id: number }[]
@@ -46,7 +47,7 @@ const useUserContentLocalStorage = () => {
     }))
   }
 
-  const removeShowLS = ({ id }: ToggleMovieLSArg) => {
+  const removeShowLS = ({ id }: { id: number }) => {
     setUserContent((prevState) => ({
       ...prevState,
       watchingShows: [...prevState.watchingShows.filter((item) => item.id !== id)]

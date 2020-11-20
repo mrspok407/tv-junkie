@@ -40,6 +40,8 @@ interface ContentDetailes {
   seasons: {}[]
   similar?: { results: {}[] }[]
   similar_movies?: { results: {}[] }[]
+  allEpisodesWatched: boolean
+  database: string
 }
 
 const CONTENT_DETAILS_DEFAULT: ContentDetailes = {
@@ -74,7 +76,9 @@ const CONTENT_DETAILS_DEFAULT: ContentDetailes = {
   number_of_seasons: "-",
   imdb_id: "",
   seasonsArr: [],
-  seasons: []
+  seasons: [],
+  allEpisodesWatched: false,
+  database: ""
 }
 
 export type { ContentDetailes }

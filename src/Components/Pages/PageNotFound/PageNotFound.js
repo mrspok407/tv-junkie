@@ -1,14 +1,11 @@
 import React, { Component } from "react"
 import { Link, withRouter } from "react-router-dom"
-import { withFirebase } from "Components/Firebase"
 import { Helmet } from "react-helmet"
 import * as ROUTES from "Utils/Constants/routes"
-import HeaderBase from "Components/UI/Header/Header"
+import Header from "Components/UI/Header/Header"
 import logo404 from "assets/images/doge-404.png"
 import Footer from "Components/UI/Footer/Footer"
 import "./PageNotFound.scss"
-
-const Header = withFirebase(HeaderBase)
 
 const TIME_TO_REDIRECT = 5
 const COUNTDOWN_INTERVAL = 1000

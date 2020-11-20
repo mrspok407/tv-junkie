@@ -45,7 +45,7 @@ export const DetailesPage: React.FC<Props> = ({
   const [showInfo, setShowInfo] = useState<{} | null>({})
   const [movieInDatabase, setMovieInDatabase] = useState<{} | null>(null)
 
-  const [showDatabaseOnClient, setShowDatabaseOnClient] = useState<{} | null>(null)
+  const [showDatabaseOnClient, setShowDatabaseOnClient] = useState<string | null>(null)
 
   const [error, setError] = useState<string>()
 
@@ -180,7 +180,6 @@ export const DetailesPage: React.FC<Props> = ({
   }
 
   const getMovieInDatabase = () => {
-    console.log("getMovieInDatabase")
     const movie = context.userContent.userMovies.find((movie) => movie.id === Number(id))
 
     setMovieInDatabase(!authUser || !movie ? null : movie)

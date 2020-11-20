@@ -1,20 +1,22 @@
-import { UserShowsInterface, UserWillAirEpisodesInterface } from "Components/UserContent/UseUserShows"
+import {
+  UserShowsInterface,
+  UserWillAirEpisodesInterface,
+  SingleEpisodeByMonthInterface
+} from "Components/UserContent/UseUserShows"
 import { differenceBtwDatesInDays, todayDate } from "Utils"
 
-interface SingleEpisodeByMonthInterface {
-  show: string
-  air_date: string
-  showId: number
-}
-
 export const organiseFutureEpisodesByMonth = (data: UserShowsInterface[]) => {
-  console.log({ organiseFutureEpisodesByMonth_INPUT_DATA: data })
   const sortedAndFiltered = data
     .flatMap((show) => {
       return show.episodes.flatMap((season) =>
         season.episodes.reduce((acc: SingleEpisodeByMonthInterface[], episode) => {
           if (differenceBtwDatesInDays(episode.air_date, todayDate) >= 0) {
-            acc.push({ ...episode, show: show.name || show.original_name, showId: show.id })
+            acc.push({
+              ...episode,
+              show: show.name || show.original_name,
+              showId: show.id,
+              episode_number: episode && episode.episode_number
+            })
           }
 
           return acc
@@ -44,28 +46,31 @@ export const organiseFutureEpisodesByMonth = (data: UserShowsInterface[]) => {
     []
   )
 
-  console.log({ organiseFutureEpisodesByMonth_OUTPUT_DATA: episodesByMonths })
-
   return episodesByMonths
 }
 
-export const organizeMonthEpisodesByEpisodeNumber = (data: any) => {
-  console.log(data)
+export const organizeMonthEpisodesByEpisodeNumber = (data: SingleEpisodeByMonthInterface[]) => {
   const uniqueDates = data
-    .map((episode: any) => episode.air_date)
-    .filter((episode: any, index: any, array: any) => array.indexOf(episode) === index)
+    .map((episode) => episode.air_date)
+    .filter((episode, index, array) => array.indexOf(episode) === index)
 
-  const monthEpisodes = uniqueDates.reduce((acc: any, uniqueDate: any) => {
-    const episodesInDate = data.filter((episode: any) => episode.air_date === uniqueDate)
+  const monthEpisodes = uniqueDates.reduce((acc: SingleEpisodeByMonthInterface[], uniqueDate) => {
+    const episodesInDate = data.filter((episode) => episode.air_date === uniqueDate)
 
     const uniqueShows = episodesInDate
-      .map((episode: any) => episode.show)
-      .filter((show: any, index: any, array: any) => array.indexOf(show) === index)
+      .map((episode) => episode.show)
+      .filter((show, index, array) => array.indexOf(show) === index)
 
-    const sortedEpisodes = uniqueShows.reduce((acc: any, show: any) => {
+    const sortedEpisodes = uniqueShows.reduce((acc: SingleEpisodeByMonthInterface[], show) => {
       const filteredByShows = episodesInDate
-        .filter((episode: any) => episode.show === show)
-        .sort((a: any, b: any) => (a.episode_number > b.episode_number ? 1 : -1))
+        .filter((episode) => episode.show === show)
+        .sort((a, b) => {
+          if (a.episode_number && b.episode_number) {
+            return a.episode_number > b.episode_number ? 1 : -1
+          } else {
+            return 1
+          }
+        })
 
       acc.push(...filteredByShows)
 

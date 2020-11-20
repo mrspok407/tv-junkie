@@ -1,7 +1,7 @@
 import { combineMergeObjects, releasedEpisodesToOneArray } from "Utils"
 import merge from "deepmerge"
 import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
-import { AuthUserInterface } from "Components/AppContext/AppContextHOC"
+import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 import { EpisodesFromDatabaseInterface, SingleEpisodeInterface, UserShowsInterface } from "../UseUserShows"
 
 interface Arguments {
@@ -52,7 +52,7 @@ const updateUserEpisodesFromDatabase = ({ firebase, authUser, shows }: Arguments
         }, [])
         allEpisodes.splice(releasedEpisodes.length)
 
-        const allEpisodesWatched = !allEpisodes.some((episode: any) => !episode.watched)
+        const allEpisodesWatched = !allEpisodes.some((episode) => !episode.watched)
         const finished = statusDatabase === "ended" && allEpisodesWatched ? true : false
 
         firebase.userShowAllEpisodes(authUser.uid, show.id).set(seasons)

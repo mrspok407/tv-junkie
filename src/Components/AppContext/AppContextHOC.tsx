@@ -1,10 +1,15 @@
 import React, { createContext } from "react"
 import useUserContentLocalStorage from "Components/UserContent/UseUserContentLocalStorage"
-import useUserShows, { UserMoviesInterface } from "Components/UserContent/UseUserShows"
+import useUserShows, {
+  UserMoviesInterface,
+  UserWillAirEpisodesInterface
+} from "Components/UserContent/UseUserShows"
 import useContentHandler from "Components/UserContent/UseContentHandler"
 import useFirebase from "Components/Firebase/UseFirebase"
 import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
 import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
+import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
+import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
 
 export interface ShowInterface {
   id: number
@@ -45,7 +50,7 @@ export interface AddShowToDatabaseArg {
 
 export interface HandleShowInDatabasesArg {
   id: number
-  data: ShowInterface[]
+  data: ShowInterface
   database: string
   userShows: ShowInterface[]
 }
@@ -55,32 +60,32 @@ export interface HandleMovieInDatabasesArg {
   data: MovieInterface
 }
 
-export interface AuthUserInterface {
-  uid: string
-}
-
-interface toggleMovieLSArg {
-  id: number | string
+export interface ToggleMovieLSArg {
+  id: number
   data: { id: number }[] | { id: number }
 }
 
 interface AppContextInterface {
   userContentLocalStorage: {
     watchLaterMovies: { id: number }[]
-    toggleMovieLS: ({ id, data }: toggleMovieLSArg) => void
+    watchingShows: { id: number }[]
+    toggleMovieLS: ({ id, data }: ToggleMovieLSArg) => void
     clearContentState: () => void
+    addShowLS: ({ id, data }: { id: number; data: ContentDetailes }) => void
+    removeShowLS: ({ id }: { id: number }) => void
   }
   userContent: {
     loadingShowsMerging: boolean
     loadingShows: boolean
     loadingNotFinishedShows: boolean
     loadingMovies: boolean
-    userShows: { id: number; database: string }[]
-    userWillAirEpisodes: {}[]
+    userShows: ShowInterface[]
+    userWillAirEpisodes: UserWillAirEpisodesInterface[]
     userToWatchShows: {}[]
     userMovies: { id: number }[]
     resetContentState: () => void
     handleUserMoviesOnClient: ({ id, data }: { id: number; data: UserMoviesInterface }) => void
+    handleUserShowsOnClient: ({ id, database }: { id: number; database: string }) => void
   }
   userContentHandler: {
     addShowsToDatabaseOnRegister: ({ shows }: AddShowsToDatabaseOnRegisterArg) => void
@@ -95,8 +100,11 @@ interface AppContextInterface {
 export const AppContext = createContext<AppContextInterface>({
   userContentLocalStorage: {
     watchLaterMovies: [],
+    watchingShows: [],
     toggleMovieLS: () => {},
-    clearContentState: () => {}
+    clearContentState: () => {},
+    addShowLS: () => {},
+    removeShowLS: () => {}
   },
   userContent: {
     loadingShowsMerging: true,
@@ -108,7 +116,8 @@ export const AppContext = createContext<AppContextInterface>({
     userToWatchShows: [],
     userMovies: [],
     resetContentState: () => {},
-    handleUserMoviesOnClient: () => {}
+    handleUserMoviesOnClient: () => {},
+    handleUserShowsOnClient: () => {}
   },
   userContentHandler: {
     addShowsToDatabaseOnRegister: () => {},
@@ -117,7 +126,7 @@ export const AppContext = createContext<AppContextInterface>({
     handleMovieInDatabases: () => {}
   },
   firebase: {},
-  authUser: { uid: "" }
+  authUser: { uid: "", email: "", emailVerified: false }
 })
 
 const AppContextHOC = (Component: any) =>

@@ -7,8 +7,8 @@ import "./UserAuthForm.scss"
 
 type Props = {
   closeNavMobile?: () => void
-  authContRef?: string | ((instance: HTMLDivElement | null) => void)
-  loginPage: boolean
+  authContRef?: React.RefObject<HTMLDivElement>
+  loginPage?: boolean
 }
 
 const UserAuthForm: React.FC<Props> = ({ closeNavMobile = () => {}, loginPage, authContRef }) => {

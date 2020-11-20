@@ -6,13 +6,14 @@ import { AppContext } from "Components/AppContext/AppContextHOC"
 import UserRating from "Components/UI/UserRating/UserRating"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
 import { FirebaseContext } from "Components/Firebase"
+import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
 
 type Props = {
   detailes: ContentDetailes
   movieInDatabase: {} | null
   mediaType: string
-  id: number | string
-  showDatabaseOnClient: {} | null
+  id: number
+  showDatabaseOnClient: string | null
   changeShowDatabaseOnClient: (database: string) => void
 }
 
@@ -26,7 +27,7 @@ export const MainInfo: React.FC<Props> = ({
 }) => {
   const context = useContext(AppContext)
   const firebase = useContext(FirebaseContext)
-  const { authUser } = useContext(AppContext)
+  const authUser = useAuthUser()
 
   const movieInLS = context.userContentLocalStorage.watchLaterMovies.find(
     (item: { id: number }) => item.id === Number(id)
@@ -172,7 +173,6 @@ export const MainInfo: React.FC<Props> = ({
         {isMediaTypeTV && (
           <ShowsButtons
             id={id}
-            authUser={authUser}
             detailes={detailes}
             changeShowDatabaseOnClient={changeShowDatabaseOnClient}
             showDatabaseOnClient={showDatabaseOnClient}

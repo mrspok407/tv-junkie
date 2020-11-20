@@ -1,13 +1,14 @@
 import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
 import { useState, useEffect } from "react"
 import { releasedEpisodesToOneArray } from "Utils"
+import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 
 export interface HandleListenersArg {
   id: number
   status: string
   handleLoading?: (isLoading: boolean) => void
   firebase: FirebaseInterface
-  authUser: { uid: string }
+  authUser: AuthUserInterface | null
 }
 
 const useHandleListeners = () => {
@@ -15,7 +16,7 @@ const useHandleListeners = () => {
   const [releasedEpisodes, setReleasedEpisodes] = useState<{}[] | null>()
 
   const handleListeners = ({ id, status, handleLoading, firebase, authUser }: HandleListenersArg) => {
-    if (status === "-") return
+    if (status === "-" || !authUser) return
 
     const statusDatabase = status === "Ended" || status === "Canceled" ? "ended" : "ongoing"
     firebase.showEpisodes(id).once("value", (snapshot: any) => {

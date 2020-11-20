@@ -1,12 +1,9 @@
 import React, { Component } from "react"
 import { Helmet } from "react-helmet"
 import ScrollToTop from "Utils/ScrollToTopBar"
-import HeaderBase from "Components/UI/Header/Header"
-import { withFirebase } from "Components/Firebase/FirebaseContext"
+import Header from "Components/UI/Header/Header"
 import ShowsContent from "./ShowsContent"
 import Footer from "Components/UI/Footer/Footer"
-
-const Header = withFirebase(HeaderBase)
 
 class Shows extends Component {
   render() {

@@ -1,16 +1,16 @@
 import React, { Component } from "react"
-import { withFirebase } from "Components/Firebase/FirebaseContext"
 import { Helmet } from "react-helmet"
 import ScrollToTop from "Utils/ScrollToTopBar"
-import HeaderBase from "Components/UI/Header/Header"
+import Header from "Components/UI/Header/Header"
 import CalendarContent from "./CalendarContent"
 import WithAuthorization from "Components/UserAuth/Session/WithAuthorization/WithAuthorization"
 import Footer from "Components/UI/Footer/Footer"
 import "./Calendar.scss"
 
-const Header = withFirebase(HeaderBase)
-
 class CalendarPage extends Component {
+  componentWillUnmount() {
+    console.log("Calendar unmount")
+  }
   render() {
     return (
       <>

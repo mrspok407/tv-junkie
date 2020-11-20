@@ -120,7 +120,7 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false }) =>
               )} */}
             </>
           ) : (
-            <>{!hideLogin && <Login />}</>
+            <>{!hideLogin && <Login closeNavMobile={closeNavMobile} />}</>
           )}
 
           <li

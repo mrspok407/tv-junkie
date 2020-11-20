@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback, useContext } from "react"
 import { combineMergeObjects, releasedEpisodesToOneArray } from "Utils"
 import { organiseFutureEpisodesByMonth } from "Components/Pages/Calendar/CalendarHelpers"
 import { FirebaseContext } from "Components/Firebase"
-import { AuthUserFirebaseInterface } from "Utils/Interfaces/UserAuth"
+import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
 import merge from "deepmerge"
 import updateUserEpisodesFromDatabase from "./FirebaseHelpers/updateUserEpisodesFromDatabase"
@@ -24,6 +24,7 @@ export interface SingleEpisodeInterface {
   userRating: number | string
   watched: boolean
   air_date: string
+  episode_number?: number
 }
 export interface EpisodesFromDatabaseInterface {
   episodes: SingleEpisodeInterface[]
@@ -35,9 +36,15 @@ export interface UserMoviesInterface extends ContentDetailes {
   timeStamp?: number
 }
 
+export interface SingleEpisodeByMonthInterface {
+  episode_number?: number
+  show: string
+  air_date: string
+  showId: number
+}
 export interface UserWillAirEpisodesInterface {
   month: string
-  episodes: {}[]
+  episodes: SingleEpisodeByMonthInterface[]
 }
 
 export interface UserToWatchShowsInterface {
@@ -61,7 +68,7 @@ const useUserShows = () => {
   const authUserListener = useCallback(() => {
     console.log("hook run")
     firebase.onAuthUserListener(
-      (authUser: AuthUserFirebaseInterface) => {
+      (authUser: AuthUserInterface) => {
         setLoadingShows(true)
         setLoadingNotFinishedShows(true)
         setLoadingShowsMerging(true)
@@ -108,7 +115,9 @@ const useUserShows = () => {
                 arrayMerge: combineMergeObjects
               })
 
-              const watchingShows = mergedShows.filter((show) => show && show.database === "watchingShows")
+              const watchingShows: any = mergedShows.filter(
+                (show) => show && show.database === "watchingShows"
+              )
               const willAirEpisodes: UserWillAirEpisodesInterface[] = organiseFutureEpisodesByMonth(
                 watchingShows
               )
@@ -243,7 +252,7 @@ const useUserShows = () => {
     sessionStorage.setItem(SESSION_STORAGE_KEY_SHOWS, JSON.stringify(userShows))
   }, [userShows])
 
-  const handleUserShowsOnClient = ({ database, id }: UserShowsInterface) => {
+  const handleUserShowsOnClient = ({ database, id }: { id: number; database: string }) => {
     const userShowsSS: UserShowsInterface[] = JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY_SHOWS)!)
     if (userShowsSS.find((show) => show.id === id) === undefined) return
 

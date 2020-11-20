@@ -8,7 +8,7 @@ import Footer from "Components/UI/Footer/Footer"
 import { FirebaseContext } from "Components/Firebase"
 import { useHistory } from "react-router-dom"
 import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
-import { AuthUserFirebaseInterface } from "Utils/Interfaces/UserAuth"
+import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 import "./Login.scss"
 
 const LoginPage = () => {
@@ -18,7 +18,7 @@ const LoginPage = () => {
 
   const authorizationListener = useCallback(() => {
     firebase.onAuthUserListener(
-      (authUser: AuthUserFirebaseInterface) => {
+      (authUser: AuthUserInterface) => {
         if (authUser !== null) {
           history.push(ROUTES.HOME_PAGE)
         }

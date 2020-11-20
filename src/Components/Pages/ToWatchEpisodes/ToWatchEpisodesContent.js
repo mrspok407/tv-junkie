@@ -72,7 +72,6 @@ class ToWatchEpisodesContent extends Component {
   }
 
   render() {
-    console.log(this.state.watchingShows)
     return (
       <div className="content-results content-results--to-watch-page">
         {this.state.initialLoading || this.context.userContent.loadingShowsMerging ? (

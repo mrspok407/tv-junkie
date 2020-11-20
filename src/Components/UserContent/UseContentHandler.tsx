@@ -13,7 +13,7 @@ import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthU
 import useHandleListeners from "Components/Pages/Detailes/FirebaseHelpers/UseHandleListeners"
 
 const useContentHandler = () => {
-  const authUser: { uid: string } = useAuthUser()
+  const authUser = useAuthUser()
   const firebase: FirebaseInterface = useContext(FirebaseContext)
   const { handleListeners } = useHandleListeners()
 
@@ -77,7 +77,8 @@ const useContentHandler = () => {
     })
   }
 
-  const addShowToDatabase = ({ id, show, callback }: AddShowToDatabaseArg) => {
+  const addShowToDatabase = ({ id, show }: AddShowToDatabaseArg) => {
+    if (!authUser) return
     getShowEpisodesFromAPI({ id }).then((dataFromAPI: any) => {
       console.log("addShowInDatabase run in function body")
 
@@ -125,7 +126,8 @@ const useContentHandler = () => {
     })
   }
 
-  const handleShowInDatabases = ({ id, data = [], database, userShows }: HandleShowInDatabasesArg) => {
+  const handleShowInDatabases = ({ id, data, database, userShows }: HandleShowInDatabasesArg) => {
+    if (!authUser) return
     const userShow = userShows.find((show) => show.id === id)
 
     if (userShow) {
@@ -166,6 +168,7 @@ const useContentHandler = () => {
   }
 
   const handleMovieInDatabases = ({ id, data }: HandleMovieInDatabasesArg) => {
+    if (!authUser) return
     console.log("handleMovieINDatabases")
 
     const movie = data

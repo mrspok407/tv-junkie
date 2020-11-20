@@ -3,7 +3,7 @@ import { useHistory } from "react-router-dom"
 import { AppContext, MovieInterface } from "Components/AppContext/AppContextHOC"
 import * as ROLES from "Utils/Constants/roles"
 import * as ROUTES from "Utils/Constants/routes"
-import { AuthUserFirebaseInterface } from "Utils/Interfaces/UserAuth"
+import { AuthUserGoogleSignInInterface } from "Utils/Interfaces/UserAuth"
 
 const LOCAL_STORAGE_KEY_WATCHING_SHOWS = "watchingShowsLocalS"
 const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = "watchLaterMoviesLocalS"
@@ -25,7 +25,7 @@ const SignInWithGoogleForm = () => {
     context.firebase.app
       .auth()
       [signInType](provider)
-      .then((authUser: AuthUserFirebaseInterface) => {
+      .then((authUser: AuthUserGoogleSignInInterface) => {
         const userRole = authUser.user.email === "mr.spok407@gmail.com" ? ROLES.ADMIN : ROLES.USER
 
         context.firebase

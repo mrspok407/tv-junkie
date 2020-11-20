@@ -32,6 +32,10 @@ export default class SeasonEpisodes extends Component {
     document.addEventListener("mousedown", this.handleClickOutside)
   }
 
+  componentDidUpdate() {
+    console.log("updated")
+  }
+
   componentWillUnmount() {
     document.removeEventListener("mousedown", this.handleClickOutside)
   }
