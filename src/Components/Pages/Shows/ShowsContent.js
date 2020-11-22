@@ -55,21 +55,6 @@ class ShowsContent extends Component {
   loadNewContent = () => {
     if (this.state.disableLoad[this.state.activeSection]) return
 
-    console.log(
-      `WatchingShows: ${
-        this.context.userContent.userShows.filter(
-          (show) => show.database === this.state.activeSection && !show.finished
-        ).length
-      }`
-    )
-    console.log(
-      `FinishedShows: ${this.context.userContent.userShows.filter((show) => !!show.finished).length}`
-    )
-    console.log(this.state.loadedShows[this.state.activeSection])
-    console.log(
-      this.context.userContent.userShows.filter((show) => show.database === this.state.activeSection)
-    )
-
     this.setState({
       loadedShows: {
         ...this.state.loadedShows,

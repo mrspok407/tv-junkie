@@ -1,4 +1,5 @@
 interface ContentDetailes {
+  [key: string]: string | string[] | number | number[] | {} | undefined
   id: number
   poster_path: string
   backdrop_path: string
@@ -42,6 +43,8 @@ interface ContentDetailes {
   similar_movies?: { results: {}[] }[]
   allEpisodesWatched: boolean
   database: string
+  userWatching?: boolean
+  torrents: { hash: string; quality: string }[]
 }
 
 const CONTENT_DETAILS_DEFAULT: ContentDetailes = {
@@ -78,7 +81,8 @@ const CONTENT_DETAILS_DEFAULT: ContentDetailes = {
   seasonsArr: [],
   seasons: [],
   allEpisodesWatched: false,
-  database: ""
+  database: "",
+  torrents: [{ hash: "", quality: "" }]
 }
 
 export type { ContentDetailes }

@@ -62,12 +62,12 @@ export interface HandleMovieInDatabasesArg {
 
 export interface ToggleMovieLSArg {
   id: number
-  data: { id: number }[] | { id: number }
+  data: ContentDetailes[] | ContentDetailes
 }
 
 interface AppContextInterface {
   userContentLocalStorage: {
-    watchLaterMovies: { id: number }[]
+    watchLaterMovies: ContentDetailes[]
     watchingShows: { id: number }[]
     toggleMovieLS: ({ id, data }: ToggleMovieLSArg) => void
     clearContentState: () => void
@@ -82,9 +82,9 @@ interface AppContextInterface {
     userShows: ShowInterface[]
     userWillAirEpisodes: UserWillAirEpisodesInterface[]
     userToWatchShows: {}[]
-    userMovies: { id: number }[]
+    userMovies: ContentDetailes[]
     resetContentState: () => void
-    handleUserMoviesOnClient: ({ id, data }: { id: number; data: UserMoviesInterface }) => void
+    handleUserMoviesOnClient: ({ id, data }: { id: number; data?: UserMoviesInterface }) => void
     handleUserShowsOnClient: ({ id, database }: { id: number; database: string }) => void
   }
   userContentHandler: {

@@ -267,12 +267,13 @@ const useUserShows = () => {
     console.log("upd on client")
   }
 
-  const handleUserMoviesOnClient = ({ id, data }: { id: number; data: UserMoviesInterface }) => {
+  const handleUserMoviesOnClient = ({ id, data }: { id: number; data?: UserMoviesInterface }) => {
     const movie = userMovies.find((movie) => movie.id === id)
 
     if (movie) {
       setUserMovies(userMovies.filter((movie) => movie.id !== id))
     } else {
+      if (data === undefined) return
       setUserMovies([...userMovies, { ...data }])
     }
   }

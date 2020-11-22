@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect } from "react"
+import React, { useContext, useEffect } from "react"
 import { Helmet } from "react-helmet"
 import * as ROUTES from "Utils/Constants/routes"
 import UserAuthForm from "Components/UI/UserAuthForm/UserAuthForm"
@@ -11,43 +11,47 @@ import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthU
 import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 import "./Login.scss"
 
-const LoginPage = () => {
+const LoginPage: React.FC = () => {
   const authUser = useAuthUser()
   const firebase = useContext(FirebaseContext)
   const history = useHistory()
 
-  const authorizationListener = useCallback(() => {
-    firebase.onAuthUserListener(
-      (authUser: AuthUserInterface) => {
-        if (authUser !== null) {
-          history.push(ROUTES.HOME_PAGE)
-        }
-      },
-      () => {}
-    )
-  }, [firebase, history])
-
   useEffect(() => {
+    let authSubscriber: any
+
+    const authorizationListener = () => {
+      authSubscriber = firebase.onAuthUserListener(
+        (authUser: AuthUserInterface) => {
+          if (authUser !== null) {
+            history.push(ROUTES.HOME_PAGE)
+          }
+        },
+        () => {}
+      )
+    }
+
     authorizationListener()
     return () => {
-      authorizationListener()
+      authSubscriber()
     }
-  }, [authorizationListener])
+  }, [firebase, history])
+
+  if (authUser !== null) {
+    return null
+  }
 
   return (
-    authUser === null && (
-      <>
-        <Helmet>
-          <title>Login | TV Junkie</title>
-        </Helmet>
-        <Header isLogoVisible={false} hideLogin={true} />
-        <div className="login-page">
-          <UserAuthForm loginPage={true} />
-        </div>
-        <Footer />
-        <ScrollToTopOnMount />
-      </>
-    )
+    <>
+      <Helmet>
+        <title>Login | TV Junkie</title>
+      </Helmet>
+      <Header isLogoVisible={false} hideLogin={true} />
+      <div className="login-page">
+        <UserAuthForm loginPage={true} />
+      </div>
+      <Footer />
+      <ScrollToTopOnMount />
+    </>
   )
 }
 

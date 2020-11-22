@@ -1,47 +1,32 @@
-import React, { Component } from "react"
+import React, { useEffect, useState } from "react"
 import axios from "axios"
 import { Helmet } from "react-helmet"
 import Header from "Components/UI/Header/Header"
 import MoviesContent from "./MoviesContent"
 import ScrollToTop from "Utils/ScrollToTopBar"
 import Footer from "Components/UI/Footer/Footer"
-import { withRouter } from "react-router-dom"
+import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
 const { CancelToken } = require("axios")
 
 let cancelRequest: any
 
-type State = {
-  moviesArr: { torrents: {}[]; title: string }[]
-  error: number[]
-  loadingIds: number[]
-  moviesIds: number[]
-}
+const Movies: React.FC = () => {
+  const [moviesData, setMoviesData] = useState<ContentDetailes[]>([])
+  const [loadingIds, setLoadingIds] = useState<number[]>([])
+  const [openLinksMoviesId, setOpenLinksMoviesId] = useState<number[]>([])
+  const [error, setError] = useState<number[]>([])
 
-interface getMovieLinksArg {
-  id: number
-}
-
-class Movies extends Component<State> {
-  state: State = {
-    moviesArr: [],
-    error: [],
-    loadingIds: [],
-    moviesIds: []
-  }
-
-  componentWillUnmount() {
-    if (cancelRequest !== undefined) {
-      cancelRequest()
+  useEffect(() => {
+    return () => {
+      if (cancelRequest !== undefined) cancelRequest()
     }
-  }
+  }, [])
 
-  getMovieLinks = ({ id }: getMovieLinksArg) => {
-    if (this.state.moviesIds.includes(id)) return
+  const getMovieLinks = ({ id }: { id: number }) => {
+    if (openLinksMoviesId.includes(id)) return
 
-    this.setState((prevState: { loadingIds: number[]; moviesIds: number[] }) => ({
-      loadingIds: [...prevState.loadingIds, id],
-      moviesIds: [...prevState.moviesIds, id]
-    }))
+    setLoadingIds((prevState) => [...prevState, id])
+    setOpenLinksMoviesId((prevState) => [...prevState, id])
 
     axios
       .get(
@@ -63,39 +48,33 @@ class Movies extends Component<State> {
       .then((res) => {
         const movie = res.data.data.movies[0]
         movie.id = id
-        this.setState((prevState: { loadingIds: number[]; moviesArr: {}[] }) => ({
-          moviesArr: [...prevState.moviesArr, movie],
-          loadingIds: [...prevState.loadingIds.filter((item: number) => item !== id)]
-        }))
+
+        setMoviesData((prevState) => [...prevState, movie])
+        setLoadingIds((prevState) => [...prevState.filter((item: number) => item !== id)])
       })
       .catch((error) => {
         if (axios.isCancel(error)) return
-        this.setState((prevState: { error: number[] }) => ({
-          error: [...prevState.error, id]
-        }))
+        setError((prevState) => [...prevState, id])
       })
   }
 
-  render() {
-    return (
-      <>
-        <Helmet>
-          <title>All your movies | TV Junkie</title>
-        </Helmet>
-        <Header />
-        <MoviesContent
-          moviesArr={this.state.moviesArr}
-          getMovieLinks={this.getMovieLinks}
-          loadingIds={this.state.loadingIds}
-          moviesIds={this.state.moviesIds}
-          error={this.state.error}
-        />
-        <Footer />
-        <ScrollToTop />
-      </>
-    )
-  }
+  return (
+    <>
+      <Helmet>
+        <title>All your movies | TV Junkie</title>
+      </Helmet>
+      <Header />
+      <MoviesContent
+        moviesData={moviesData}
+        getMovieLinks={getMovieLinks}
+        loadingIds={loadingIds}
+        openLinksMoviesId={openLinksMoviesId}
+        error={error}
+      />
+      <Footer />
+      <ScrollToTop />
+    </>
+  )
 }
 
-// @ts-ignore
-export default withRouter(Movies)
+export default Movies

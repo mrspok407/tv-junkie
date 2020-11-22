@@ -1,5 +1,6 @@
 import { ToggleMovieLSArg } from "Components/AppContext/AppContextHOC"
 import { useState, useEffect } from "react"
+import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
 
 const LOCAL_STORAGE_KEY_WATCHING_SHOWS = "watchingShowsLocalS"
 const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = "watchLaterMoviesLocalS"
@@ -11,7 +12,7 @@ const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = "watchLaterMoviesLocalS"
 
 interface UserContent {
   watchingShows: { id: number }[]
-  watchLaterMovies: { id: number; userWatching: boolean }[]
+  watchLaterMovies: ContentDetailes[]
 }
 
 const useUserContentLocalStorage = () => {
