@@ -4,8 +4,6 @@ import * as ROUTES from "Utils/Constants/routes"
 
 export default function PlaceholderNoShows({ authUser, activeSection }) {
   let message
-  console.log(authUser)
-  console.log(activeSection)
   const messageForNonAuth = !authUser && activeSection !== "watchingShows" && (
     <h1>
       To use full features please{" "}

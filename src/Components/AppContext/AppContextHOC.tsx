@@ -24,6 +24,7 @@ export interface ShowInterface {
   vote_count: string | number
   allEpisodesWatched: boolean
   database: string
+  finished: boolean
 }
 
 export interface MovieInterface {
@@ -38,21 +39,21 @@ export interface MovieInterface {
 }
 
 export interface AddShowsToDatabaseOnRegisterArg {
-  shows: ShowInterface[]
+  shows: ContentDetailes[]
   uid: string
 }
 
 export interface AddShowToDatabaseArg {
   id: number
-  show: ShowInterface
+  show: ContentDetailes
   callback?: () => void
 }
 
 export interface HandleShowInDatabasesArg {
   id: number
-  data: ShowInterface
+  data: ContentDetailes
   database: string
-  userShows: ShowInterface[]
+  userShows: ContentDetailes[]
 }
 
 export interface HandleMovieInDatabasesArg {
@@ -65,10 +66,10 @@ export interface ToggleMovieLSArg {
   data: ContentDetailes[] | ContentDetailes
 }
 
-interface AppContextInterface {
+export interface AppContextInterface {
   userContentLocalStorage: {
     watchLaterMovies: ContentDetailes[]
-    watchingShows: { id: number }[]
+    watchingShows: ContentDetailes[]
     toggleMovieLS: ({ id, data }: ToggleMovieLSArg) => void
     clearContentState: () => void
     addShowLS: ({ id, data }: { id: number; data: ContentDetailes }) => void
@@ -79,7 +80,7 @@ interface AppContextInterface {
     loadingShows: boolean
     loadingNotFinishedShows: boolean
     loadingMovies: boolean
-    userShows: ShowInterface[]
+    userShows: ContentDetailes[]
     userWillAirEpisodes: UserWillAirEpisodesInterface[]
     userToWatchShows: {}[]
     userMovies: ContentDetailes[]

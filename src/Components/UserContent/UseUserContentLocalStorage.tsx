@@ -5,13 +5,8 @@ import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
 const LOCAL_STORAGE_KEY_WATCHING_SHOWS = "watchingShowsLocalS"
 const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = "watchLaterMoviesLocalS"
 
-// interface ToggleMovieLSArg {
-//   id: number
-//   data: { id: number }[] | { id: number }
-// }
-
 interface UserContent {
-  watchingShows: { id: number }[]
+  watchingShows: ContentDetailes[]
   watchLaterMovies: ContentDetailes[]
 }
 
