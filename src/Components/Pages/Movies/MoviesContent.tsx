@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react"
+import React, { useCallback, useContext, useEffect, useReducer, useState } from "react"
 import { Link } from "react-router-dom"
 import { listOfGenres } from "Utils"
 import { throttle } from "throttle-debounce"
@@ -8,8 +8,8 @@ import PlaceholderNoMovies from "Components/UI/Placeholders/PlaceholderNoMovies"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
+import reducer, { INITIAL_STATE, MoviesContentState, ActionInterface, ActionTypes } from "./_reducerConfig"
 
-const MOVIES_TO_LOAD_INITIAL = 5
 const SCROLL_THRESHOLD = 800
 
 type Props = {
@@ -20,18 +20,6 @@ type Props = {
   getMovieLinks: ({ id }: { id: number }) => void
 }
 
-interface DisableLoadInterface {
-  [key: string]: boolean
-  watchLaterMovies: boolean
-  watchLaterMoviesLS: boolean
-}
-
-interface LoadedMoviesInterface {
-  [key: string]: number
-  watchLaterMovies: number
-  watchLaterMoviesLS: number
-}
-
 const MoviesContent: React.FC<Props> = ({
   moviesData,
   loadingIds,
@@ -39,98 +27,121 @@ const MoviesContent: React.FC<Props> = ({
   error,
   getMovieLinks
 }) => {
-  // eslint-disable-next-line
-  const [activeSection, setActiveSection] = useState<string>("watchLaterMovies")
+  // const [activeSection, setActiveSection] = useState<string>("watchLaterMovies")
   const [sortByState, setSortByState] = useState("title")
-  const [disableLoad, setDisableLoad] = useState<DisableLoadInterface>({
-    watchLaterMovies: false,
-    watchLaterMoviesLS: false
-  })
-  const [loadedMovies, setLoadedMovies] = useState<LoadedMoviesInterface>({
-    watchLaterMovies: MOVIES_TO_LOAD_INITIAL,
-    watchLaterMoviesLS: MOVIES_TO_LOAD_INITIAL
-  })
+  // const [disableLoad, setDisableLoad] = useState<DisableLoadInterface>({
+  //   watchLaterMovies: false,
+  //   watchLaterMoviesLS: false
+  // })
+  // const [loadedMovies, setLoadedMovies] = useState<LoadedMoviesInterface>({
+  //   watchLaterMovies: MOVIES_TO_LOAD_INITIAL,
+  //   watchLaterMoviesLS: MOVIES_TO_LOAD_INITIAL
+  // })
 
   const context = useContext(AppContext)
   const authUser = useAuthUser()
 
-  const loadedMoviesRef = useRef<LoadedMoviesInterface>({
-    watchLaterMovies: MOVIES_TO_LOAD_INITIAL,
-    watchLaterMoviesLS: MOVIES_TO_LOAD_INITIAL
-  })
-  const disableLoadRef = useRef<DisableLoadInterface>({
-    watchLaterMovies: false,
-    watchLaterMoviesLS: false
-  })
+  const [state, dispatch] = useReducer<React.Reducer<MoviesContentState, ActionInterface>>(
+    reducer,
+    INITIAL_STATE
+  )
 
+  useEffect(() => {
+    dispatch({ type: ActionTypes.UpdateContext, payload: context })
+  }, [context])
+
+  // const loadedMoviesRef = useRef<LoadedMoviesInterface>({
+  //   watchLaterMovies: MOVIES_TO_LOAD_INITIAL,
+  //   watchLaterMoviesLS: MOVIES_TO_LOAD_INITIAL
+  // })
+  // const disableLoadRef = useRef<DisableLoadInterface>({
+  //   watchLaterMovies: false,
+  //   watchLaterMoviesLS: false
+  // })
+
+  // useEffect(() => {
+  //   loadedMoviesRef.current = {
+  //     watchLaterMovies: loadedMovies.watchLaterMovies,
+  //     watchLaterMoviesLS: loadedMovies.watchLaterMoviesLS
+  //   }
+  // }, [loadedMovies])
+
+  // useEffect(() => {
+  //   if (authUser === null) return
+
+  //   disableLoadRef.current = {
+  //     ...disableLoadRef.current,
+  //     [activeSection]: !!(loadedMoviesRef.current[activeSection] >= context.userContent.userMovies.length)
+  //   }
+  // }, [disableLoad, activeSection, context.userContent.userMovies.length, authUser])
+
+  // useEffect(() => {
+  //   if (authUser !== null) return
+
+  //   disableLoadRef.current = {
+  //     ...disableLoadRef.current,
+  //     watchLaterMoviesLS: !!(
+  //       loadedMoviesRef.current.watchLaterMoviesLS >= context.userContentLocalStorage.watchLaterMovies.length
+  //     )
+  //   }
+  // }, [disableLoad, context.userContentLocalStorage.watchLaterMovies.length, authUser])
+
+  const loadNewContent = () => {
+    if (state.disableLoad[state.activeSection] || authUser === null) return
+    dispatch({ type: ActionTypes.IncrementLoadedMovies })
+    dispatch({ type: ActionTypes.DisableLoad })
+  }
+
+  const loadNewContentLS = () => {
+    if (state.disableLoad.watchLaterMoviesLS || authUser !== null) return
+    console.log("loadNewContentLS")
+    dispatch({ type: ActionTypes.IncrementLoadedMoviesLS })
+    dispatch({ type: ActionTypes.DisableLoadLS })
+  }
+
+  // const loadNewContent = () => {
+  //   if (disableLoadRef.current[activeSection] || authUser === null) return
+  //   console.log(context)
+  //   setLoadedMovies({
+  //     ...loadedMovies,
+  //     [activeSection]: loadedMovies[activeSection] + MOVIES_TO_LOAD_INITIAL
+  //   })
+  //   setDisableLoad({
+  //     ...disableLoad,
+  //     [activeSection]: !!(loadedMoviesRef.current[activeSection] >= context.userContent.userMovies.length)
+  //   })
+  // }
+
+  // const loadNewContentLS = () => {
+  //   if (disableLoadRef.current.watchLaterMoviesLS || authUser !== null) return
+
+  //   setLoadedMovies({
+  //     ...loadedMovies,
+  //     watchLaterMoviesLS: loadedMovies.watchLaterMoviesLS + MOVIES_TO_LOAD_INITIAL
+  //   })
+  //   setDisableLoad({
+  //     ...disableLoad,
+  //     watchLaterMoviesLS: !!(
+  //       loadedMoviesRef.current.watchLaterMoviesLS >= context.userContentLocalStorage.watchLaterMovies.length
+  //     )
+  //   })
+  // }
+
+  const handleScroll = useCallback(
+    throttle(500, () => {
+      if (window.innerHeight + window.scrollY >= document.body.scrollHeight - SCROLL_THRESHOLD) {
+        loadNewContent()
+        loadNewContentLS()
+      }
+    }),
+    [state.disableLoad, state.activeSection]
+  )
   useEffect(() => {
     window.addEventListener("scroll", handleScroll)
     return () => {
       window.removeEventListener("scroll", handleScroll)
     }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    loadedMoviesRef.current = {
-      watchLaterMovies: loadedMovies.watchLaterMovies,
-      watchLaterMoviesLS: loadedMovies.watchLaterMoviesLS
-    }
-  }, [loadedMovies])
-
-  useEffect(() => {
-    if (authUser === null) return
-
-    disableLoadRef.current = {
-      ...disableLoadRef.current,
-      [activeSection]: !!(loadedMoviesRef.current[activeSection] >= context.userContent.userMovies.length)
-    }
-  }, [disableLoad, activeSection, context.userContent.userMovies.length, authUser])
-
-  useEffect(() => {
-    if (authUser !== null) return
-
-    disableLoadRef.current = {
-      ...disableLoadRef.current,
-      watchLaterMoviesLS: !!(
-        loadedMoviesRef.current.watchLaterMoviesLS >= context.userContentLocalStorage.watchLaterMovies.length
-      )
-    }
-  }, [disableLoad, context.userContentLocalStorage.watchLaterMovies.length, authUser])
-
-  const loadNewContent = () => {
-    if (disableLoadRef.current[activeSection] || authUser === null) return
-    console.log(context)
-    setLoadedMovies({
-      ...loadedMovies,
-      [activeSection]: loadedMovies[activeSection] + MOVIES_TO_LOAD_INITIAL
-    })
-    setDisableLoad({
-      ...disableLoad,
-      [activeSection]: !!(loadedMoviesRef.current[activeSection] >= context.userContent.userMovies.length)
-    })
-  }
-
-  const loadNewContentLS = () => {
-    if (disableLoadRef.current.watchLaterMoviesLS || authUser !== null) return
-
-    setLoadedMovies({
-      ...loadedMovies,
-      watchLaterMoviesLS: loadedMovies.watchLaterMoviesLS + MOVIES_TO_LOAD_INITIAL
-    })
-    setDisableLoad({
-      ...disableLoad,
-      watchLaterMoviesLS: !!(
-        loadedMoviesRef.current.watchLaterMoviesLS >= context.userContentLocalStorage.watchLaterMovies.length
-      )
-    })
-  }
-
-  const handleScroll = throttle(500, () => {
-    if (window.innerHeight + window.scrollY >= document.body.scrollHeight - SCROLL_THRESHOLD) {
-      loadNewContent()
-      loadNewContentLS()
-    }
-  })
+  }, [handleScroll])
 
   const sortByHandler = (sortBy: string) => {
     if (sortBy === sortByState) return
@@ -149,11 +160,11 @@ const MoviesContent: React.FC<Props> = ({
           ? -1
           : 1
       )
-      .slice(0, loadedMovies[section])
+      .slice(0, state.loadedMovies[section])
 
     const movies = authUser
       ? content
-      : context.userContentLocalStorage.watchLaterMovies.slice(0, loadedMovies.watchLaterMoviesLS)
+      : context.userContentLocalStorage.watchLaterMovies.slice(0, state.loadedMovies.watchLaterMoviesLS)
 
     return (
       <>
@@ -358,7 +369,7 @@ const MoviesContent: React.FC<Props> = ({
                   }
             }
           >
-            {renderContent(activeSection)}
+            {renderContent(state.activeSection)}
           </div>
         </>
       )}

@@ -58,10 +58,6 @@ const PosterWrapper = React.memo<Props>(({ detailes, mediaType }) => {
   }, [detailes])
 
   useEffect(() => {
-    console.log("Poster Wrapper updated")
-  })
-
-  useEffect(() => {
     if (mediaType === "movie") {
       getMovieTorrents()
     }

@@ -98,7 +98,7 @@ export interface AppContextInterface {
   authUser: AuthUserInterface | null
 }
 
-export const AppContext = createContext<AppContextInterface>({
+export const CONTEXT_INITIAL_STATE = {
   userContentLocalStorage: {
     watchLaterMovies: [],
     watchingShows: [],
@@ -128,7 +128,9 @@ export const AppContext = createContext<AppContextInterface>({
   },
   firebase: {},
   authUser: { uid: "", email: "", emailVerified: false }
-})
+}
+
+export const AppContext = createContext<AppContextInterface>(CONTEXT_INITIAL_STATE)
 
 const AppContextHOC = (Component: any) =>
   function Comp(props: any) {

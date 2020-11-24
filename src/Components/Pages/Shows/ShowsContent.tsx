@@ -7,7 +7,7 @@ import PlaceholderNoShows from "Components/UI/Placeholders/PlaceholderNoShows"
 import Loader from "Components/UI/Placeholders/Loader"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
-import reducer, { INITIAL_STATE } from "./_reducerConfig"
+import reducer, { INITIAL_STATE, ShowsContentState, ActionInterface, ActionTypes } from "./_reducerConfig"
 
 const SCROLL_THRESHOLD = 800
 
@@ -17,22 +17,25 @@ const ShowsContent: React.FC = () => {
   const context = useContext(AppContext)
   const authUser = useAuthUser()
 
-  const [state, dispatch]: any = useReducer<any>(reducer, INITIAL_STATE)
+  const [state, dispatch] = useReducer<React.Reducer<ShowsContentState, ActionInterface>>(
+    reducer,
+    INITIAL_STATE
+  )
 
   useEffect(() => {
-    dispatch({ type: "updateContext", payload: context })
+    dispatch({ type: ActionTypes.UpdateContext, payload: context })
   }, [context])
 
   const loadNewContent = () => {
     if (state.disableLoad[state.activeSection] || authUser === null) return
-    dispatch({ type: "incrementLoadedShows" })
-    dispatch({ type: "disableLoad" })
+    dispatch({ type: ActionTypes.IncrementLoadedShows })
+    dispatch({ type: ActionTypes.DisableLoad })
   }
 
   const loadNewContentLS = () => {
     if (state.disableLoad.watchingShowsLS || authUser !== null) return
-    dispatch({ type: "incrementLoadedShowsLS" })
-    dispatch({ type: "disableLoadLS" })
+    dispatch({ type: ActionTypes.IncrementLoadedShowsLS })
+    dispatch({ type: ActionTypes.DisableLoadLS })
   }
 
   const handleScroll = useCallback(
@@ -57,7 +60,7 @@ const ShowsContent: React.FC = () => {
   }
 
   const toggleSection = (section: string) => {
-    dispatch({ type: "changeActiveSection", payload: section })
+    dispatch({ type: ActionTypes.ChangeActiveSection, payload: section })
   }
 
   const renderContent = (section: string) => {

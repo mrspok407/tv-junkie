@@ -1,4 +1,5 @@
 import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
+import { EpisodesFromDatabaseInterface } from "Components/UserContent/UseUserShows"
 import { useState, useEffect } from "react"
 import { releasedEpisodesToOneArray } from "Utils"
 import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
@@ -19,7 +20,7 @@ const useHandleListeners = () => {
     if (status === "-" || !authUser) return
 
     const statusDatabase = status === "Ended" || status === "Canceled" ? "ended" : "ongoing"
-    firebase.showEpisodes(id).once("value", (snapshot: any) => {
+    firebase.showEpisodes(id).once("value", (snapshot: { val: () => EpisodesFromDatabaseInterface[] }) => {
       if (snapshot.val() === null) {
         if (handleLoading) handleLoading(false)
         console.log("early return showsEpisodes")
