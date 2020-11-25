@@ -41,7 +41,7 @@ export const DetailesPage: React.FC<Props> = ({
 
   const { episodesFromDatabase, releasedEpisodes, handleListeners } = useHandleListeners()
 
-  const [similarContent, setSimilarContent] = useState<{}[]>([])
+  const [similarContent, setSimilarContent] = useState<ContentDetailes[]>([])
   const [showInfo, setShowInfo] = useState<{} | null>({})
   const [movieInDatabase, setMovieInDatabase] = useState<{} | null>(null)
 

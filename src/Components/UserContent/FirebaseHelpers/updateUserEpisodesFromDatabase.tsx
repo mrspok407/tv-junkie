@@ -2,7 +2,11 @@ import { combineMergeObjects, releasedEpisodesToOneArray } from "Utils"
 import merge from "deepmerge"
 import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
 import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
-import { EpisodesFromDatabaseInterface, SingleEpisodeInterface, UserShowsInterface } from "../UseUserShows"
+import {
+  SeasonEpisodesFromDatabaseInterface,
+  SingleEpisodeInterface,
+  UserShowsInterface
+} from "../UseUserShows"
 
 interface Arguments {
   firebase: FirebaseInterface
@@ -26,7 +30,7 @@ const updateUserEpisodesFromDatabase = ({ firebase, authUser, shows }: Arguments
       })
 
       mergedShowsEpisodes.forEach((show) => {
-        const seasons = show.episodes.reduce((acc: EpisodesFromDatabaseInterface[], season) => {
+        const seasons = show.episodes.reduce((acc: SeasonEpisodesFromDatabaseInterface[], season) => {
           const episodes = season.episodes.reduce((acc: SingleEpisodeInterface[], episode) => {
             acc.push({
               userRating: episode.userRating || 0,

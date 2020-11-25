@@ -348,7 +348,6 @@ class ShowsEpisodes extends Component {
                               id={this.props.showInfo.id}
                               firebaseRef="userShowSeason"
                               seasonNum={season.season_number}
-                              seasonRating={true}
                               disableRating={!!(this.props.showDatabaseOnClient === "notWatchingShows")}
                             />
                           )}

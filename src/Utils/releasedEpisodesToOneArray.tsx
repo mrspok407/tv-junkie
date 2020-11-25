@@ -1,8 +1,8 @@
 /* eslint-disable array-callback-return */
-import { EpisodesFromDatabaseInterface } from "Components/UserContent/UseUserShows"
+import { SeasonEpisodesFromDatabaseInterface } from "Components/UserContent/UseUserShows"
 import { differenceBtwDatesInDays, todayDate } from "Utils"
 
-export const releasedEpisodes = ({ data }: { data: EpisodesFromDatabaseInterface[] }) => {
+export const releasedEpisodes = ({ data }: { data: SeasonEpisodesFromDatabaseInterface[] }) => {
   // if (!Array.isArray(data)) {
   //   throw new Error("Provided data should be an array")
   // }

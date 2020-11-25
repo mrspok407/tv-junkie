@@ -3,13 +3,14 @@ import React, { useEffect, useState, useCallback, useLayoutEffect } from "react"
 import { Link } from "react-router-dom"
 import debounce from "debounce"
 import classNames from "classnames"
+import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
 import "./Slider.scss"
 
 const POSTER_PATH = "https://image.tmdb.org/t/p/w500/"
 
-export default function Slider({ sliderData }) {
-  const [slider, setSlider] = useState()
-  const [sliderWidth, setSliderWidth] = useState()
+export default function Slider({ sliderData }: { sliderData: ContentDetailes[] }) {
+  const [slider, setSlider] = useState<HTMLDivElement>(null!)
+  const [sliderWidth, setSliderWidth] = useState<number>(null!)
 
   if (slider) slider.style.setProperty("--sliderWidth", `${sliderWidth}px`)
 
@@ -26,7 +27,7 @@ export default function Slider({ sliderData }) {
   const sliderAvailable = itemsInSlider > itemsInRow
 
   const [currentItem, setCurrentItem] = useState(0)
-  const [mouseUp, setMouseUp] = useState()
+  const [mouseUp, setMouseUp] = useState<number>()
 
   const [dragging, setDragging] = useState(false)
   const [blockLinks, setBlockLinks] = useState(false)
@@ -78,7 +79,7 @@ export default function Slider({ sliderData }) {
         if (!resizeObserver) return
 
         resizeObserver.disconnect()
-        resizeObserver = null
+        // resizeObserver = null
         removeDragListeners()
       }
     } else {
@@ -91,7 +92,7 @@ export default function Slider({ sliderData }) {
   }, [slider])
 
   useEffect(() => {
-    if (slider === undefined) return
+    if (!slider) return
 
     slider.style.transform = `translate3d(-${currentItem * itemWidth}px, 0, 0)`
     slider.style.transition = "500ms"
@@ -100,7 +101,7 @@ export default function Slider({ sliderData }) {
   }, [currentItem, mouseUp])
 
   useEffect(() => {
-    if (slider === undefined) return
+    if (!slider) return
 
     slider.style.transform = `translate3d(-${currentItem * itemWidth}px, 0, 0)`
   }, [itemWidth])
@@ -112,7 +113,7 @@ export default function Slider({ sliderData }) {
     toggleArrows()
   }, [itemsInRow])
 
-  const pagination = (direction) => {
+  const pagination = (direction: string) => {
     if (currentItem === 0 && direction === "left") return
     if (nonVisibleItems === currentItem && direction === "right") return
 
@@ -131,7 +132,7 @@ export default function Slider({ sliderData }) {
     }
   }
 
-  const onMouseDown = (e) => {
+  const onMouseDown = (e: React.MouseEvent) => {
     if (!sliderAvailable || window.innerWidth <= mobileLayout || e.button !== 0) return
     e.preventDefault()
 
@@ -139,14 +140,13 @@ export default function Slider({ sliderData }) {
 
     startDragPoint = e.pageX
 
-    document.addEventListener("mousemove", onMouseMove)
-    document.addEventListener("mouseup", onMouseUp)
+    document.addEventListener<any>("mousemove", onMouseMove)
+    document.addEventListener<any>("mouseup", onMouseUp)
   }
 
-  const onMouseMove = (e) => {
+  const onMouseMove = (e: React.MouseEvent) => {
     if (!sliderAvailable || window.innerWidth <= mobileLayout) return
     e.preventDefault()
-
     setBlockLinks(true)
 
     const diffFromStartPoint = (startDragPoint - e.pageX) * -1
@@ -167,7 +167,7 @@ export default function Slider({ sliderData }) {
     slider.style.transition = "0ms"
   }
 
-  const onMouseUp = (e) => {
+  const onMouseUp = (e: React.MouseEvent) => {
     if (!sliderAvailable || window.innerWidth <= mobileLayout) return
     e.preventDefault()
 
@@ -185,8 +185,8 @@ export default function Slider({ sliderData }) {
   }
 
   const removeDragListeners = () => {
-    document.removeEventListener("mousemove", onMouseMove)
-    document.removeEventListener("mouseup", onMouseUp)
+    document.removeEventListener<any>("mousemove", onMouseMove)
+    document.removeEventListener<any>("mouseup", onMouseUp)
   }
 
   const toggleArrows = () => {

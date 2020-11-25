@@ -16,30 +16,31 @@ class Profile extends Component {
 
     this.state = {
       verificationSent: false,
-      authUser: null,
+      // authUser: null,
       passwordUpdate: ""
     }
   }
 
   componentDidMount() {
-    this.authUserListener()
+    // this.authUserListener()
   }
 
   sendEmailVerification = () => {
-    this.context.firebase.sendEmailVerification()
-    this.setState({ verificationSent: true })
+    this.context.firebase.sendEmailVerification().then(() => {
+      this.setState({ verificationSent: true })
+    })
   }
 
-  authUserListener = () => {
-    this.context.firebase.onAuthUserListener(
-      (authUser) => {
-        this.setState({ authUser })
-      },
-      () => {
-        this.setState({ authUser: null })
-      }
-    )
-  }
+  // authUserListener = () => {
+  //   this.context.firebase.onAuthUserListener(
+  //     (authUser) => {
+  //       this.setState({ authUser })
+  //     },
+  //     () => {
+  //       this.setState({ authUser: null })
+  //     }
+  //   )
+  // }
 
   // test = () => {
   //   this.context.firebase.users().once("value", (snapshot) => {
@@ -236,7 +237,7 @@ class Profile extends Component {
           <div className="user-profile__signout">
             <SignOutButton />
           </div>
-          {_get(this.state.authUser, "email", "") === "test@test.com" && (
+          {_get(this.context.authUser, "email", "") === "test@test.com" && (
             <>
               <div className="update-database">
                 <button onClick={() => this.databaseModify()} className="button" type="button">

@@ -16,6 +16,7 @@
     "@types/react-helmet": "^6.1.0",
     "@types/react-router-dom": "^5.1.6",
     "@types/recompose": "^0.30.7",
+    "@types/resize-observer-browser": "^0.1.4",
     "@welldone-software/why-did-you-render": "^4.2.7",
     "axios": "^0.19.2",
     "classnames": "^2.2.6",

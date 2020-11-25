@@ -16,7 +16,7 @@ export interface UserShowsInterface extends ContentDetailes {
   finished: boolean
   timeStamp: number
   userRating: string | string
-  episodes: EpisodesFromDatabaseInterface[]
+  episodes: SeasonEpisodesFromDatabaseInterface[]
   info: {}
 }
 
@@ -26,7 +26,7 @@ export interface SingleEpisodeInterface {
   air_date: string
   episode_number?: number
 }
-export interface EpisodesFromDatabaseInterface {
+export interface SeasonEpisodesFromDatabaseInterface {
   episodes: SingleEpisodeInterface[]
   season_number: number
   userRating: number | string
@@ -49,7 +49,9 @@ export interface UserWillAirEpisodesInterface {
 
 export interface UserToWatchShowsInterface {
   id: number
-  episodes: {}[]
+  name?: string
+  original_name?: string
+  episodes: SeasonEpisodesFromDatabaseInterface[]
 }
 
 const useUserShows = () => {
@@ -99,18 +101,21 @@ const useUserShows = () => {
                 return firebase
                   .showInDatabase(show.id)
                   .once("value")
-                  .then((snapshot: { val: () => { info: {}; episodes: EpisodesFromDatabaseInterface } }) => {
-                    if (snapshot.val() !== null) {
-                      return {
-                        ...show,
-                        ...snapshot.val().info,
-                        episodes: snapshot.val().episodes || []
+                  .then(
+                    (snapshot: {
+                      val: () => { info: {}; episodes: SeasonEpisodesFromDatabaseInterface }
+                    }) => {
+                      if (snapshot.val() !== null) {
+                        return {
+                          ...show,
+                          ...snapshot.val().info,
+                          episodes: snapshot.val().episodes || []
+                        }
                       }
                     }
-                  })
+                  )
               })
             ).then((showsDatabase) => {
-              // console.log({ showsDatabase })
               const mergedShows: UserShowsInterface[] = merge(shows, showsDatabase, {
                 arrayMerge: combineMergeObjects
               })
@@ -141,7 +146,9 @@ const useUserShows = () => {
                 .showInDatabase(show.id)
                 .once(
                   "value",
-                  (snapshot: { val: () => { info: {}; episodes: EpisodesFromDatabaseInterface[] } }) => {
+                  (snapshot: {
+                    val: () => { info: {}; episodes: SeasonEpisodesFromDatabaseInterface[] }
+                  }) => {
                     const updatedShows = [...userShowsSS]
                     const mergedShow = {
                       ...show,

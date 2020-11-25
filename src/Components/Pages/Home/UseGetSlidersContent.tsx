@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import axios from "axios"
+import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
 
 const API_LINK_BASE = `https://api.themoviedb.org/3/discover/tv?api_key=${process.env.REACT_APP_TMDB_API}&\
 language=en-US&page=1&sort_by=vote_count.desc&first_air_date.gte=&first_air_date.lte=&first_air_date_year=&vote_average.gte=&\
@@ -8,14 +9,8 @@ vote_count.gte=25&include_null_first_air_dates=false`
 interface ObjectKeysInterface {
   [key: string]: {
     name: string
-    data: DataInterface[]
+    data: ContentDetailes[]
   }
-}
-
-interface DataInterface {
-  poster_path: string
-  original_title: string
-  id: number
 }
 
 const useGetSlidersContent = () => {

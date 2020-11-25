@@ -1,6 +1,7 @@
 import React, { createContext } from "react"
 
 export interface FirebaseInterface {
+  [key: string]: any
   auth?: any
   app?: any
   user?: any

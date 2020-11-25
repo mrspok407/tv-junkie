@@ -5,7 +5,6 @@ import classNames from "classnames"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import UserRating from "Components/UI/UserRating/UserRating"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
-import { FirebaseContext } from "Components/Firebase"
 import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
 
 type Props = {
@@ -26,7 +25,6 @@ export const MainInfo: React.FC<Props> = ({
   changeShowDatabaseOnClient
 }) => {
   const context = useContext(AppContext)
-  const firebase = useContext(FirebaseContext)
   const authUser = useAuthUser()
 
   const movieInLS = context.userContentLocalStorage.watchLaterMovies.find(
@@ -128,8 +126,6 @@ export const MainInfo: React.FC<Props> = ({
           <div className="detailes-page__info-value">
             <UserRating
               id={id}
-              firebase={firebase}
-              authUser={authUser}
               firebaseRef="userShow"
               showDatabase={showDatabaseOnClient}
               showRating={true}
