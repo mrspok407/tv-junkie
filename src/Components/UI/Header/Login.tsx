@@ -11,17 +11,17 @@ const Login: React.FC<Props> = ({ closeNavMobile }) => {
   const loginButtonRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside)
+    document.addEventListener("mousedown", handleClickOutside as EventListener)
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
+      document.removeEventListener("mousedown", handleClickOutside as EventListener)
     }
   }, [])
 
-  const handleClickOutside = (e: any) => {
+  const handleClickOutside = (e: CustomEvent) => {
     if (
       loginButtonRef.current === e.target ||
       !authContRef.current ||
-      authContRef.current.contains(e.target)
+      authContRef.current.contains(e.target as Node)
     ) {
       return
     }

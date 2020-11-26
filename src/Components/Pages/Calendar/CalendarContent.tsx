@@ -10,7 +10,7 @@ import TorrentLinksEpisodes from "Components/UI/Templates/SeasonsAndEpisodes/Com
 import {
   SingleEpisodeByMonthInterface,
   UserWillAirEpisodesInterface
-} from "Components/UserContent/UseUserShows"
+} from "Components/UserContent/UseUserShows/UseUserShows"
 
 type Props = {
   homePage?: boolean

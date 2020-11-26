@@ -4,7 +4,7 @@ import { Link } from "react-router-dom"
 import * as ROUTES from "Utils/Constants/routes"
 import { FirebaseContext } from "Components/Firebase"
 import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
-import { SingleEpisodeInterface } from "Components/UserContent/UseUserShows"
+import { SingleEpisodeInterface } from "Components/UserContent/UseUserShows/UseUserShows"
 import "./UserRating.scss"
 
 const STAR_AMOUNT = 5
@@ -52,6 +52,12 @@ const UserRating: React.FC<Props> = ({
     }
   }, [])
 
+  const handleClickOutside = (e: CustomEvent) => {
+    if (userRatingRef.current && !userRatingRef.current.contains(e.target as Node)) {
+      setNonAuthWarning(false)
+    }
+  }
+
   const getRating = useCallback(() => {
     if (firebase.auth.currentUser === null || toWatchPage) return
 
@@ -73,7 +79,6 @@ const UserRating: React.FC<Props> = ({
   const onMouseMoveHandler = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (authUser === null) return
     const target = e.target as HTMLButtonElement
-
     const buttonsNodeList = (target.parentElement as HTMLElement).getElementsByClassName(
       "user-rating__button"
     )
@@ -132,12 +137,6 @@ const UserRating: React.FC<Props> = ({
         watched: toWatchPage ? snapshot.val().watched : episodeRating ? true : null
       })
     })
-  }
-
-  const handleClickOutside = (e: CustomEvent) => {
-    if (userRatingRef.current && !userRatingRef.current.contains(e.target as Node)) {
-      setNonAuthWarning(false)
-    }
   }
 
   const ratingDisabled =

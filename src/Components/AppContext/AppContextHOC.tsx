@@ -2,15 +2,15 @@ import React, { createContext } from "react"
 import useUserContentLocalStorage from "Components/UserContent/UseUserContentLocalStorage"
 import useUserShows, {
   UserMoviesInterface,
-  UserToWatchShowsInterface,
   UserWillAirEpisodesInterface
-} from "Components/UserContent/UseUserShows"
+} from "Components/UserContent/UseUserShows/UseUserShows"
 import useContentHandler from "Components/UserContent/UseContentHandler"
 import useFirebase from "Components/Firebase/UseFirebase"
 import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
 import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
 import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
+import { UserToWatchShowsInterface } from "Components/UserContent/UseUserShows/UseGetUserToWatchShows"
 
 export interface ShowInterface {
   id: number

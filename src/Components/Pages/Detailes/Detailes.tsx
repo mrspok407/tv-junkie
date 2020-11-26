@@ -19,6 +19,7 @@ import PlaceholderLoadingFullInfo from "Components/UI/Placeholders/PlaceholderLo
 import useHandleListeners from "./FirebaseHelpers/UseHandleListeners"
 import { ContentDetailes, CONTENT_DETAILS_DEFAULT } from "Utils/Interfaces/ContentDetails"
 import "./Detailes.scss"
+import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
 
 const { CancelToken } = require("axios")
 let cancelRequest: any
@@ -37,13 +38,13 @@ export const DetailesPage: React.FC<Props> = ({
   const history = useHistory()
   const context = useContext(AppContext)
   const firebase = useContext(FirebaseContext)
-  const { authUser } = useContext(AppContext)
+  const authUser = useAuthUser()
 
   const { episodesFromDatabase, releasedEpisodes, handleListeners } = useHandleListeners()
 
   const [similarContent, setSimilarContent] = useState<ContentDetailes[]>([])
-  const [showInfo, setShowInfo] = useState<{} | null>({})
-  const [movieInDatabase, setMovieInDatabase] = useState<{} | null>(null)
+  const [showInfo, setShowInfo] = useState<ContentDetailes | null>()
+  const [movieInDatabase, setMovieInDatabase] = useState<ContentDetailes | null>(null)
 
   const [showDatabaseOnClient, setShowDatabaseOnClient] = useState<string | null>(null)
 

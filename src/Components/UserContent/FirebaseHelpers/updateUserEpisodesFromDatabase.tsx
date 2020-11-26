@@ -6,7 +6,7 @@ import {
   SeasonEpisodesFromDatabaseInterface,
   SingleEpisodeInterface,
   UserShowsInterface
-} from "../UseUserShows"
+} from "../UseUserShows/UseUserShows"
 
 interface Arguments {
   firebase: FirebaseInterface

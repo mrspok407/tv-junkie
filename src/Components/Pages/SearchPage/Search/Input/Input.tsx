@@ -5,8 +5,8 @@ import debounce from "debounce"
 import classNames from "classnames"
 import Loader from "Components/UI/Placeholders/Loader"
 import { mediaTypesArr } from "Utils"
-import "./Input.scss"
 import { HandleSearchArg } from "../Search"
+import "./Input.scss"
 
 const MOBILE_LAYOUT = 1000
 

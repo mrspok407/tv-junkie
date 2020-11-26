@@ -73,6 +73,20 @@ export default class WithActorsInput extends Component {
     this.setState({ query: e.target.value }, this.runSearchDeb)
   }
 
+  handleClickOutside = (e) => {
+    if (this.searchContRef.current && !this.searchContRef.current.contains(e.target)) {
+      this.setState({
+        listIsOpen: false
+      })
+    }
+  }
+
+  onFocus = () => {
+    this.setState({
+      listIsOpen: true
+    })
+  }
+
   renderActors = () => {
     const { actors, error } = this.state
     const { toggleActor, withActors } = this.props
@@ -145,20 +159,6 @@ export default class WithActorsInput extends Component {
         </div>
       ))
     )
-  }
-
-  handleClickOutside = (e) => {
-    if (this.searchContRef.current && !this.searchContRef.current.contains(e.target)) {
-      this.setState({
-        listIsOpen: false
-      })
-    }
-  }
-
-  onFocus = () => {
-    this.setState({
-      listIsOpen: true
-    })
   }
 
   render() {

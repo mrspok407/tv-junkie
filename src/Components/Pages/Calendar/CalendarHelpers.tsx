@@ -2,7 +2,7 @@ import {
   UserShowsInterface,
   UserWillAirEpisodesInterface,
   SingleEpisodeByMonthInterface
-} from "Components/UserContent/UseUserShows"
+} from "Components/UserContent/UseUserShows/UseUserShows"
 import { differenceBtwDatesInDays, todayDate } from "Utils"
 
 export const organiseFutureEpisodesByMonth = (data: UserShowsInterface[]) => {
