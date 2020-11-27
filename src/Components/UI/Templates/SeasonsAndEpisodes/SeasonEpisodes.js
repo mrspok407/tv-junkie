@@ -79,6 +79,12 @@ export default class SeasonEpisodes extends Component {
   }
 
   render() {
+    console.log({
+      showInfo: this.props.showInfo,
+      showDatabaseOnClient: this.props.showDatabaseOnClient,
+      episodesFromDatabase: this.props.episodesFromDatabase
+    })
+
     const showCheckboxes =
       this.props.showInfo &&
       this.props.showDatabaseOnClient !== "notWatchingShows" &&

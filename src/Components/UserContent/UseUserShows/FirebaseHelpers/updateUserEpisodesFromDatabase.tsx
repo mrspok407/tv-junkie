@@ -6,26 +6,26 @@ import {
   SeasonEpisodesFromDatabaseInterface,
   SingleEpisodeInterface,
   UserShowsInterface
-} from "../UseUserShows/UseUserShows"
+} from "../UseUserShows"
 
 interface Arguments {
   firebase: FirebaseInterface
   authUser: AuthUserInterface
-  shows: UserShowsInterface[]
+  showsFullInfo: UserShowsInterface[]
 }
 
-const updateUserEpisodesFromDatabase = ({ firebase, authUser, shows }: Arguments) => {
+const updateUserEpisodesFromDatabase = ({ firebase, authUser, showsFullInfo }: Arguments) => {
   return firebase
     .userEpisodes(authUser.uid)
     .once("value", (snapshot: { val: () => { key: UserShowsInterface } }) => {
       if (snapshot.val() === null) return
-      const showsEpisodes = Object.values(snapshot.val()).map((show) => {
+      const userShowsEpisodes = Object.values(snapshot.val()).map((show) => {
         return show
       })
 
-      if (shows.length !== showsEpisodes.length) return
+      if (showsFullInfo.length !== userShowsEpisodes.length) return
 
-      const mergedShowsEpisodes: UserShowsInterface[] = merge(shows, showsEpisodes, {
+      const mergedShowsEpisodes: UserShowsInterface[] = merge(showsFullInfo, userShowsEpisodes, {
         arrayMerge: combineMergeObjects
       })
 

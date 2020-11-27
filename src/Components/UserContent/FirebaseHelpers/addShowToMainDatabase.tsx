@@ -19,7 +19,7 @@ interface Arguments {
   }
   dataFromAPI: { status: string; episodes: {}[] }
   callback?: any
-  handleListeners?: ({ id, status }: HandleListenersArg) => void
+  handleListeners?: ({ status }: HandleListenersArg) => void
 }
 
 const addShowToMainDatabase = ({ firebase, authUser, show, dataFromAPI, handleListeners }: Arguments) => {
@@ -58,11 +58,11 @@ const addShowToMainDatabase = ({ firebase, authUser, show, dataFromAPI, handleLi
         })
 
         if (handleListeners !== undefined) {
-          handleListeners({ id: show.id, status: dataFromAPI.status, firebase, authUser })
+          //  handleListeners({ id: show.id, status: dataFromAPI.status })
         }
       } else {
         if (handleListeners !== undefined) {
-          handleListeners({ id: show.id, status: dataFromAPI.status, firebase, authUser })
+          //  handleListeners({ id: show.id, status: dataFromAPI.status })
         }
         console.log("added!")
       }

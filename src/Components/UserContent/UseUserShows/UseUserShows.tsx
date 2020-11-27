@@ -1,12 +1,15 @@
-import { useState, useEffect, useCallback, useContext } from "react"
-import { combineMergeObjects, releasedEpisodesToOneArray } from "Utils"
+import { useState, useEffect, useContext } from "react"
+import { combineMergeObjects } from "Utils"
 import { organiseFutureEpisodesByMonth } from "Components/Pages/Calendar/CalendarHelpers"
 import { FirebaseContext } from "Components/Firebase"
 import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
 import merge from "deepmerge"
-import updateUserEpisodesFromDatabase from "../FirebaseHelpers/updateUserEpisodesFromDatabase"
-import useGetUserToWatchShows from "./UseGetUserToWatchShows"
+// import updateUserEpisodesFromDatabase from "./FirebaseHelpers/updateUserEpisodesFromDatabase"
+import useGetUserToWatchShows from "./Hooks/UseGetUserToWatchShows"
+// import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
+import getShowsFullInfo from "./FirebaseHelpers/getShowsFullInfo"
+import spliceNewShowFromDatabase from "./FirebaseHelpers/spliceNewShowFromDatabase"
 
 const SESSION_STORAGE_KEY_SHOWS = "userShows"
 
@@ -47,224 +50,133 @@ export interface UserWillAirEpisodesInterface {
   episodes: SingleEpisodeByMonthInterface[]
 }
 
-// export interface UserToWatchShowsInterface {
-//   id: number
-//   name?: string
-//   original_name?: string
-//   episodes: SeasonEpisodesFromDatabaseInterface[]
-// }
-
 const useUserShows = () => {
   const [userShows, setUserShows] = useState<UserShowsInterface[]>([])
   const [userMovies, setUserMovies] = useState<UserMoviesInterface[]>([])
   const [userWillAirEpisodes, setUserWillAirEpisodes] = useState<UserWillAirEpisodesInterface[]>([])
-  // const [userToWatchShows, setUserToWatchShows] = useState<UserToWatchShowsInterface[]>([])
-  const { userToWatchShows, loadingNotFinishedShows, listenerUserToWatchShow } = useGetUserToWatchShows()
+  const {
+    userToWatchShows,
+    loadingNotFinishedShows,
+    listenerUserToWatchShow,
+    resetStateToWatchShows
+  } = useGetUserToWatchShows()
   const [loadingShows, setLoadingShows] = useState(true)
-  // const [loadingNotFinishedShows, setLoadingNotFinishedShows] = useState(true)
   const [loadingShowsMerging, setLoadingShowsMerging] = useState(true)
   const [loadingMovies, setLoadingMovies] = useState(true)
   const [firebaseListeners, setFirebaseListeners] = useState<any>([])
 
   const firebase = useContext(FirebaseContext)
 
-  const authUserListener = useCallback(() => {
-    console.log("hook run")
-    firebase.onAuthUserListener(
-      (authUser: AuthUserInterface) => {
-        setLoadingShows(true)
-        // setLoadingNotFinishedShows(true)
-        setLoadingShowsMerging(true)
-        setLoadingMovies(true)
-        firebase
-          .userAllShows(authUser.uid)
-          .on("value", async (snapshot: { val: () => UserShowsInterface[] }) => {
-            if (snapshot.val() === null) {
-              console.log("hook in listener NO value")
-              setLoadingShows(false)
-              // setLoadingNotFinishedShows(false)
-              setLoadingShowsMerging(false)
-              setLoadingMovies(false)
-              return
-            }
+  useEffect(() => {
+    let authSubscriber: any
+    const authUserListener = () => {
+      console.log("hook run")
+      authSubscriber = firebase.onAuthUserListener(
+        (authUser: AuthUserInterface) => {
+          if (!authUser) return
+          setLoadingShows(true)
+          setLoadingMovies(true)
+          firebase
+            .userAllShows(authUser.uid)
+            .on("value", async (snapshot: { val: () => UserShowsInterface[] }) => {
+              if (snapshot.val() === null) {
+                console.log("hook in listener NO value")
+                setLoadingShows(false)
+                setLoadingShowsMerging(false)
+                return
+              }
+              console.log("hook in listener")
 
-            console.log("hook in listener")
+              const shows = Object.values(snapshot.val()).map((show) => {
+                return show
+              })
+              const userShowsSS: UserShowsInterface[] = JSON.parse(
+                sessionStorage.getItem(SESSION_STORAGE_KEY_SHOWS)!
+              )
 
-            const shows = Object.values(snapshot.val()).map((show) => {
-              return show
-            })
-            const userShowsSS: UserShowsInterface[] = JSON.parse(
-              sessionStorage.getItem(SESSION_STORAGE_KEY_SHOWS)!
-            )
-
-            if (userShowsSS.length === 0) {
-              console.log("userShows length = 0")
-              Promise.all(
-                Object.values(snapshot.val()).map((show) => {
-                  return firebase
-                    .showInDatabase(show.id)
-                    .once("value")
-                    .then(
-                      (snapshot: {
-                        val: () => { info: {}; episodes: SeasonEpisodesFromDatabaseInterface }
-                      }) => {
-                        if (snapshot.val() !== null) {
-                          return {
-                            ...show,
-                            ...snapshot.val().info,
-                            episodes: snapshot.val().episodes || []
-                          }
-                        }
-                      }
-                    )
+              if (userShowsSS.length === 0) {
+                console.log("userShows length = 0")
+                const { showsFullInfo, willAirEpisodes } = await getShowsFullInfo({
+                  userShows: shows,
+                  firebase,
+                  authUser
                 })
-              ).then((showsDatabase) => {
-                const mergedShows: UserShowsInterface[] = merge(shows, showsDatabase, {
+                setUserShows(showsFullInfo)
+                setUserWillAirEpisodes(willAirEpisodes)
+                setLoadingShows(false)
+                setLoadingShowsMerging(false)
+              } else if (userShowsSS.length < shows.length) {
+                console.log("userShows length less")
+                console.log(shows)
+                console.log(userShowsSS)
+                shows.forEach(async (show, index) => {
+                  if (userShowsSS.find((item) => item.id === show.id)) return
+
+                  const { showsFullInfo, willAirEpisodes } = await spliceNewShowFromDatabase({
+                    userShow: show,
+                    index,
+                    userShowsSS,
+                    firebase
+                  })
+                  setUserShows(showsFullInfo)
+                  setUserWillAirEpisodes(willAirEpisodes)
+                  setLoadingShows(false)
+                })
+              } else if (userShowsSS.length === shows.length) {
+                console.log("userShows length same")
+                const mergedShows = merge(userShowsSS, shows, {
                   arrayMerge: combineMergeObjects
                 })
 
-                const watchingShows: any = mergedShows.filter(
-                  (show) => show && show.database === "watchingShows"
-                )
-                const willAirEpisodes: UserWillAirEpisodesInterface[] = organiseFutureEpisodesByMonth(
-                  watchingShows
-                )
-
-                updateUserEpisodesFromDatabase({ firebase, authUser, shows: mergedShows }).then(() =>
-                  setLoadingShowsMerging(false)
-                )
-
                 setUserShows(mergedShows)
-                setUserWillAirEpisodes(willAirEpisodes)
-                setLoadingShows(false)
-
-                return mergedShows
-              })
-            } else if (userShowsSS.length < shows.length) {
-              console.log("userShows length less")
-              shows.forEach((show, index) => {
-                if (userShowsSS.find((item) => item.id === show.id)) return
-
-                firebase
-                  .showInDatabase(show.id)
-                  .once(
-                    "value",
-                    (snapshot: {
-                      val: () => { info: {}; episodes: SeasonEpisodesFromDatabaseInterface[] }
-                    }) => {
-                      const updatedShows = [...userShowsSS]
-                      const mergedShow = {
-                        ...show,
-                        ...snapshot.val().info,
-                        episodes: snapshot.val().episodes
-                      }
-
-                      updatedShows.splice(index, 0, mergedShow)
-
-                      const watchingShows = updatedShows.filter((show) => show.database === "watchingShows")
-                      const willAirEpisodes = organiseFutureEpisodesByMonth(watchingShows)
-
-                      setUserShows(updatedShows)
-                      setUserWillAirEpisodes(willAirEpisodes)
-                      setLoadingShows(false)
-                    }
-                  )
-              })
-            } else if (userShowsSS.length === shows.length) {
-              console.log("userShows length same")
-              const mergedShows = merge(userShowsSS, shows, {
-                arrayMerge: combineMergeObjects
-              })
-
-              setUserShows(mergedShows)
-            }
-          })
-
-        listenerUserToWatchShow(authUser)
-
-        // firebase
-        //   .userEpisodes(authUser.uid)
-        //   .orderByChild("info/isAllWatched_database")
-        //   .equalTo("false_watchingShows")
-        //   .on("value", (snapshot: { val: () => { id: number; episodes: {}[] } }) => {
-        //     if (snapshot.val() === null) {
-        //       setUserToWatchShows([])
-        //       setLoadingNotFinishedShows(false)
-        //       return
-        //     }
-
-        //     const userEpisodes: UserToWatchShowsInterface[] = Object.entries(snapshot.val()).reduce(
-        //       (acc: UserToWatchShowsInterface[], [key, value]: any) => {
-        //         const releasedEpisodes: { watched: boolean }[] = releasedEpisodesToOneArray({
-        //           data: value.episodes
-        //         })
-
-        //         if (releasedEpisodes.find((episode) => !episode.watched)) {
-        //           acc.push({ id: Number(key), episodes: value.episodes })
-        //         }
-        //         return acc
-        //       },
-        //       []
-        //     )
-
-        //     setUserToWatchShows(userEpisodes)
-        //     setLoadingNotFinishedShows(false)
-        //   })
-
-        firebase
-          .watchLaterMovies(authUser.uid)
-          .on("value", (snapshot: { val: () => UserMoviesInterface[] }) => {
-            if (snapshot.val() === null) {
-              setLoadingMovies(false)
-              return
-            }
-
-            const movies: UserMoviesInterface[] = Object.values(snapshot.val()).map((movie) => {
-              return movie
+              }
             })
-            setUserMovies(movies)
-            setLoadingMovies(false)
-          })
 
-        setFirebaseListeners([
-          firebase.userAllShows(authUser.uid),
-          firebase.watchLaterMovies(authUser.uid),
+          listenerUserToWatchShow()
+
           firebase
-            .userEpisodes(authUser.uid)
-            .orderByChild("info/isAllWatched_database")
-            .equalTo("false_watchingShows")
-        ])
-      },
-      () => {
-        setLoadingShows(false)
-        setLoadingMovies(false)
-        // setLoadingNotFinishedShows(false)
-      }
-    )
-  }, [firebase, listenerUserToWatchShow])
+            .watchLaterMovies(authUser.uid)
+            .on("value", (snapshot: { val: () => UserMoviesInterface[] }) => {
+              if (snapshot.val() === null) {
+                setLoadingMovies(false)
+                return
+              }
 
-  const resetContentState = () => {
-    setUserShows([])
-    setUserMovies([])
-    setUserWillAirEpisodes([])
-    // setUserToWatchShows([])
-  }
+              const movies: UserMoviesInterface[] = Object.values(snapshot.val()).map((movie) => {
+                return movie
+              })
+              setUserMovies(movies)
+              setLoadingMovies(false)
+            })
 
-  useEffect(() => {
+          setFirebaseListeners([firebase.userAllShows(authUser.uid), firebase.watchLaterMovies(authUser.uid)])
+        },
+        () => {
+          setLoadingShows(false)
+          setLoadingMovies(false)
+        }
+      )
+    }
+
+    console.log("updated")
+
     authUserListener()
     return () => {
       console.log("userShowsHook unmounted")
+      authSubscriber()
       firebaseListeners.forEach((listener: any) => {
         listener.off()
       })
     }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line
+  }, [])
 
   useEffect(() => {
     sessionStorage.setItem(SESSION_STORAGE_KEY_SHOWS, JSON.stringify(userShows))
   }, [userShows])
 
   const handleUserShowsOnClient = ({ database, id }: { id: number; database: string }) => {
+    console.log("updateOnClientTOP")
     const userShowsSS: UserShowsInterface[] = JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY_SHOWS)!)
     if (userShowsSS.find((show) => show.id === id) === undefined) return
 
@@ -288,6 +200,13 @@ const useUserShows = () => {
       if (data === undefined) return
       setUserMovies([...userMovies, { ...data }])
     }
+  }
+
+  const resetContentState = () => {
+    setUserShows([])
+    setUserMovies([])
+    setUserWillAirEpisodes([])
+    resetStateToWatchShows()
   }
 
   return {

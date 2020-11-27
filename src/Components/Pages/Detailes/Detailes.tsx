@@ -18,8 +18,9 @@ import Footer from "Components/UI/Footer/Footer"
 import PlaceholderLoadingFullInfo from "Components/UI/Placeholders/PlaceholderLoadingFullInfo/PlaceholderLoadingFullInfo"
 import useHandleListeners from "./FirebaseHelpers/UseHandleListeners"
 import { ContentDetailes, CONTENT_DETAILS_DEFAULT } from "Utils/Interfaces/ContentDetails"
-import "./Detailes.scss"
 import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
+import { SeasonEpisodesFromDatabaseInterface } from "Components/UserContent/UseUserShows/UseUserShows"
+import "./Detailes.scss"
 
 const { CancelToken } = require("axios")
 let cancelRequest: any
@@ -40,7 +41,11 @@ export const DetailesPage: React.FC<Props> = ({
   const firebase = useContext(FirebaseContext)
   const authUser = useAuthUser()
 
-  const { episodesFromDatabase, releasedEpisodes, handleListeners } = useHandleListeners()
+  const { episodesFromDatabase, releasedEpisodes, handleListeners } = useHandleListeners({ id })
+
+  const [epFromDBTest, setEpFromDBTest] = useState<SeasonEpisodesFromDatabaseInterface[] | null | undefined>(
+    []
+  )
 
   const [similarContent, setSimilarContent] = useState<ContentDetailes[]>([])
   const [showInfo, setShowInfo] = useState<ContentDetailes | null>()
@@ -52,6 +57,12 @@ export const DetailesPage: React.FC<Props> = ({
 
   const [loadingAPIrequest, setLoadingAPIrequest] = useState(true)
   const [loadingFromDatabase, setLoadingFromDatabase] = useState(true)
+
+  useEffect(() => {
+    console.log("SHIT JUST UPDATED")
+    console.log({ episodesFromDatabase })
+    setEpFromDBTest(episodesFromDatabase)
+  }, [episodesFromDatabase])
 
   useEffect(() => {
     getContent()
@@ -76,8 +87,10 @@ export const DetailesPage: React.FC<Props> = ({
       return
     }
 
-    handleListeners({ id: detailes.id, status: detailes.status, handleLoading, firebase, authUser })
-  }, [detailes, context.userContent.loadingShowsMerging])
+    console.log("fffffffffffffffffffff")
+
+    handleListeners({ id, status: detailes.status, handleLoading })
+  }, [id, detailes, context.userContent.userShows, context.userContent.loadingShowsMerging])
 
   const handleLoading = (isLoading: boolean) => {
     setLoadingFromDatabase(isLoading)
@@ -172,6 +185,8 @@ export const DetailesPage: React.FC<Props> = ({
 
     if (!authUser || !show) return
 
+    console.log("show in details:")
+    console.log(show)
     setShowInfo(show)
     setShowDatabaseOnClient(show.database)
   }
@@ -186,6 +201,8 @@ export const DetailesPage: React.FC<Props> = ({
     setMovieInDatabase(!authUser || !movie ? null : movie)
     setLoadingFromDatabase(false)
   }
+
+  console.log({ epFromDBTest })
 
   return (
     <>

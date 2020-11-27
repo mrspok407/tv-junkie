@@ -1,28 +1,35 @@
-import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
+import { FirebaseContext, FirebaseInterface } from "Components/Firebase/FirebaseContext"
+import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
 import {
   SeasonEpisodesFromDatabaseInterface,
   SingleEpisodeInterface
 } from "Components/UserContent/UseUserShows/UseUserShows"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef, useContext } from "react"
 import { releasedEpisodesToOneArray } from "Utils"
 import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 
 export interface HandleListenersArg {
   id: number
   status: string
-  firebase: FirebaseInterface
-  authUser: AuthUserInterface | null
+  // firebase: FirebaseInterface
+  // authUser: AuthUserInterface | null
   handleLoading?: (isLoading: boolean) => void
 }
 
-const useHandleListeners = () => {
-  const [episodesFromDatabase, setEpisodesFromDatabase] = useState<
-    SeasonEpisodesFromDatabaseInterface[] | null
-  >()
+const useHandleListeners = ({ id }: { id?: number }) => {
+  const [episodesFromDatabase, setEpisodesFromDatabase] = useState<SeasonEpisodesFromDatabaseInterface[]>([])
   const [releasedEpisodes, setReleasedEpisodes] = useState<SingleEpisodeInterface[] | null>()
 
-  const handleListeners = ({ id, status, handleLoading, firebase, authUser }: HandleListenersArg) => {
+  const firebase = useContext(FirebaseContext)
+  const authUser = useAuthUser()
+
+  const firebaseListenerRef = useRef()
+
+  // console.log(id)
+
+  const handleListeners = ({ id, status, handleLoading }: HandleListenersArg) => {
     if (status === "-" || !authUser) return
+    console.log(id)
 
     const statusDatabase = status === "Ended" || status === "Canceled" ? "ended" : "ongoing"
     firebase
@@ -37,6 +44,12 @@ const useHandleListeners = () => {
         const releasedEpisodes: SingleEpisodeInterface[] = releasedEpisodesToOneArray({
           data: snapshot.val()
         })
+
+        // console.log({ id })
+
+        firebaseListenerRef.current = firebase.userShowAllEpisodes(authUser.uid, id)
+
+        console.log("useHandleListeners before .on")
 
         firebase
           .userShowAllEpisodes(authUser.uid, id)
@@ -59,10 +72,13 @@ const useHandleListeners = () => {
             const allEpisodesWatched = !allEpisodes.some((episode) => !episode.watched)
             const finished = statusDatabase === "ended" && allEpisodesWatched ? true : false
 
+            console.log("handleListener just before firebase")
+            console.log(id)
             firebase
               .userShowAllEpisodesInfo(authUser.uid, id)
               .child("database")
               .once("value", (snapshot: { val: () => string }) => {
+                console.log("handleListeners in firebase")
                 firebase.userShowAllEpisodesInfo(authUser.uid, id).update({
                   allEpisodesWatched,
                   finished,
@@ -72,6 +88,9 @@ const useHandleListeners = () => {
 
             firebase.userShow({ uid: authUser.uid, key: id }).update({ finished, allEpisodesWatched })
 
+            console.log("userEpisodes in detailesListener:")
+            console.log(userEpisodes)
+
             setEpisodesFromDatabase(userEpisodes)
             setReleasedEpisodes(releasedEpisodes)
             if (handleLoading) handleLoading(false)
@@ -80,13 +99,24 @@ const useHandleListeners = () => {
   }
 
   useEffect(() => {
-    return () => {
-      setEpisodesFromDatabase(null)
-      setReleasedEpisodes(null)
-    }
-  }, [])
+    console.log("useEffect in handleListeners")
+    console.log({ episodesFromDatabase })
+    console.log("AAAAAAAAAAAAAAAAAAAAAAAAAA")
+  }, [episodesFromDatabase])
 
-  return { episodesFromDatabase, releasedEpisodes, handleListeners } as const
+  useEffect(() => {
+    console.log("updated")
+    return () => {
+      console.log("unmounted")
+      setEpisodesFromDatabase([])
+      setReleasedEpisodes([])
+
+      if (!authUser) return
+      firebase.userShowAllEpisodes(authUser.uid, id).off()
+    }
+  }, [id])
+
+  return { episodesFromDatabase, releasedEpisodes, handleListeners }
 }
 
 export default useHandleListeners

@@ -10,7 +10,7 @@ import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthU
 import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
 import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
-import { UserToWatchShowsInterface } from "Components/UserContent/UseUserShows/UseGetUserToWatchShows"
+import { UserToWatchShowsInterface } from "Components/UserContent/UseUserShows/Hooks/UseGetUserToWatchShows"
 
 export interface ShowInterface {
   id: number

@@ -1,13 +1,14 @@
-import { useContext, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { FirebaseContext } from "Components/Firebase"
-import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
-import { SeasonEpisodesFromDatabaseInterface } from "./UseUserShows"
+import { SeasonEpisodesFromDatabaseInterface } from "../UseUserShows"
 import { releasedEpisodesToOneArray } from "Utils"
+import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
 
 type Hook = () => {
   userToWatchShows: UserToWatchShowsInterface[]
   loadingNotFinishedShows: boolean
-  listenerUserToWatchShow: (authUser: AuthUserInterface) => void
+  listenerUserToWatchShow: () => void
+  resetStateToWatchShows: () => void
 }
 
 export interface UserToWatchShowsInterface {
@@ -21,8 +22,24 @@ const useGetUserToWatchShows: Hook = () => {
   const [userToWatchShows, setUserToWatchShows] = useState<UserToWatchShowsInterface[]>([])
   const [loadingNotFinishedShows, setLoadingNotFinishedShows] = useState(true)
   const firebase = useContext(FirebaseContext)
+  const authUser = useAuthUser()
 
-  const listenerUserToWatchShow = (authUser: AuthUserInterface) => {
+  useEffect(() => {
+    return () => {
+      if (!authUser) return
+
+      firebase
+        .userEpisodes(authUser.uid)
+        .orderByChild("info/isAllWatched_database")
+        .equalTo("false_watchingShows")
+        .off()
+    }
+  }, [firebase, authUser])
+
+  const listenerUserToWatchShow = () => {
+    console.log(authUser)
+    if (!authUser) return
+
     firebase
       .userEpisodes(authUser.uid)
       .orderByChild("info/isAllWatched_database")
@@ -55,10 +72,15 @@ const useGetUserToWatchShows: Hook = () => {
       })
   }
 
+  const resetStateToWatchShows = () => {
+    setUserToWatchShows([])
+  }
+
   return {
     userToWatchShows,
     loadingNotFinishedShows,
-    listenerUserToWatchShow
+    listenerUserToWatchShow,
+    resetStateToWatchShows
   }
 }
 

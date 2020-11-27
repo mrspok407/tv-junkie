@@ -15,6 +15,8 @@ const isAllEpisodesWatched = ({ showInfo, releasedEpisodes, authUser, firebase, 
       isAllWatched_database: `${allEpisodesWatched}_${showInfo.database}`
     })
 
+    console.log("isAllEpisodesWatched")
+
     firebase.userShow({ uid: authUser.uid, key: showInfo.id }).update({ finished, allEpisodesWatched })
   }
 }

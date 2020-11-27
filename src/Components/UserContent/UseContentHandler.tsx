@@ -15,7 +15,7 @@ import useHandleListeners from "Components/Pages/Detailes/FirebaseHelpers/UseHan
 const useContentHandler = () => {
   const authUser = useAuthUser()
   const firebase: FirebaseInterface = useContext(FirebaseContext)
-  const { handleListeners } = useHandleListeners()
+  const { handleListeners } = useHandleListeners({})
 
   const addShowsToDatabaseOnRegister = ({ shows, uid }: AddShowsToDatabaseOnRegisterArg) => {
     Promise.all(
@@ -100,11 +100,12 @@ const useContentHandler = () => {
       console.log(authUser)
 
       firebase.userAllShows(authUser.uid).child(id).set({
+        allEpisodesWatched: false,
         database: "watchingShows",
         status: showsSubDatabase,
         firstAirDate: show.first_air_date,
         name: show.name,
-        timeStamp: firebase.timeStamp(),
+        //timeStamp: firebase.timeStamp(),
         finished: false,
         id
       })

@@ -11,7 +11,7 @@ import {
   SingleEpisodeInterface
 } from "Components/UserContent/UseUserShows/UseUserShows"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
-import { UserToWatchShowsInterface } from "Components/UserContent/UseUserShows/UseGetUserToWatchShows"
+import { UserToWatchShowsInterface } from "Components/UserContent/UseUserShows/Hooks/UseGetUserToWatchShows"
 
 const ToWatchEpisodesContent: React.FC = () => {
   const [watchingShows, setWatchingShows] = useState<UserToWatchShowsInterface[]>([])
