@@ -1,4 +1,4 @@
-import { FirebaseContext, FirebaseInterface } from "Components/Firebase/FirebaseContext"
+import { FirebaseContext } from "Components/Firebase/FirebaseContext"
 import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
 import {
   SeasonEpisodesFromDatabaseInterface,
@@ -6,7 +6,6 @@ import {
 } from "Components/UserContent/UseUserShows/UseUserShows"
 import { useState, useEffect, useRef, useContext } from "react"
 import { releasedEpisodesToOneArray } from "Utils"
-import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 
 export interface HandleListenersArg {
   id: number
@@ -18,7 +17,7 @@ export interface HandleListenersArg {
 
 const useHandleListeners = ({ id }: { id?: number }) => {
   const [episodesFromDatabase, setEpisodesFromDatabase] = useState<SeasonEpisodesFromDatabaseInterface[]>([])
-  const [releasedEpisodes, setReleasedEpisodes] = useState<SingleEpisodeInterface[] | null>()
+  const [releasedEpisodes, setReleasedEpisodes] = useState<SingleEpisodeInterface[]>([])
 
   const firebase = useContext(FirebaseContext)
   const authUser = useAuthUser()
@@ -114,7 +113,7 @@ const useHandleListeners = ({ id }: { id?: number }) => {
       if (!authUser) return
       firebase.userShowAllEpisodes(authUser.uid, id).off()
     }
-  }, [id])
+  }, [id, authUser, firebase])
 
   return { episodesFromDatabase, releasedEpisodes, handleListeners }
 }

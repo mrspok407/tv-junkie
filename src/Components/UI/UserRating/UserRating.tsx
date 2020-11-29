@@ -18,7 +18,7 @@ type Props = {
   episodeRating?: number
   handleFadeOut?: (episodeId: number, episodeIndex: number) => void
   toWatchPage?: boolean
-  showDatabase?: string | null
+  showDatabase?: string
   disableRating?: boolean
   showRating?: boolean
   mediaType?: string
@@ -140,7 +140,7 @@ const UserRating: React.FC<Props> = ({
   }
 
   const ratingDisabled =
-    authUser === null || disableRating || (showDatabase === null && showRating && mediaType !== "movie")
+    authUser === null || disableRating || (!showDatabase && showRating && mediaType !== "movie")
 
   return (
     <div

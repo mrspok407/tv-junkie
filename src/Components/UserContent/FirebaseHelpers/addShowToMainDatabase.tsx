@@ -1,10 +1,8 @@
-import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
 import { HandleListenersArg } from "Components/Pages/Detailes/FirebaseHelpers/UseHandleListeners"
 
 interface Arguments {
   firebase: FirebaseInterface
-  authUser: AuthUserInterface | null
   show: {
     id: number
     backdrop_path: string
@@ -22,7 +20,7 @@ interface Arguments {
   handleListeners?: ({ status }: HandleListenersArg) => void
 }
 
-const addShowToMainDatabase = ({ firebase, authUser, show, dataFromAPI, handleListeners }: Arguments) => {
+const addShowToMainDatabase = ({ firebase, show, dataFromAPI }: Arguments) => {
   firebase.showInDatabase(show.id).transaction(
     (snapshot: any) => {
       if (snapshot === null) {
@@ -56,14 +54,7 @@ const addShowToMainDatabase = ({ firebase, authUser, show, dataFromAPI, handleLi
         firebase.showInDatabase(show.id).update({
           usersWatching: snapshot.val().usersWatching + 1
         })
-
-        if (handleListeners !== undefined) {
-          //  handleListeners({ id: show.id, status: dataFromAPI.status })
-        }
       } else {
-        if (handleListeners !== undefined) {
-          //  handleListeners({ id: show.id, status: dataFromAPI.status })
-        }
         console.log("added!")
       }
     }

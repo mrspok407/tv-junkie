@@ -1,3 +1,5 @@
+import { SeasonEpisodesFromDatabaseInterface } from "Components/UserContent/UseUserShows/UseUserShows"
+
 interface ContentDetailes {
   [key: string]: string | string[] | number | number[] | {} | undefined
   id: number
@@ -37,8 +39,8 @@ interface ContentDetailes {
   media_type?: string
   number_of_seasons: number | string
   imdb_id: number | string
-  seasonsArr: {}[]
-  seasons: {}[]
+  seasonsArr: SeasonEpisodesFromDatabaseInterface[]
+  seasons: SeasonEpisodesFromDatabaseInterface[]
   similar?: { results: {}[] }[]
   similar_movies?: { results: {}[] }[]
   allEpisodesWatched: boolean

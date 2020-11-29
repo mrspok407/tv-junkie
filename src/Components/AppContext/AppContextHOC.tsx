@@ -2,6 +2,7 @@ import React, { createContext } from "react"
 import useUserContentLocalStorage from "Components/UserContent/UseUserContentLocalStorage"
 import useUserShows, {
   UserMoviesInterface,
+  UserShowsInterface,
   UserWillAirEpisodesInterface
 } from "Components/UserContent/UseUserShows/UseUserShows"
 import useContentHandler from "Components/UserContent/UseContentHandler"
@@ -81,7 +82,7 @@ export interface AppContextInterface {
     loadingShows: boolean
     loadingNotFinishedShows: boolean
     loadingMovies: boolean
-    userShows: ContentDetailes[]
+    userShows: UserShowsInterface[]
     userWillAirEpisodes: UserWillAirEpisodesInterface[]
     userToWatchShows: UserToWatchShowsInterface[]
     userMovies: ContentDetailes[]

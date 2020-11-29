@@ -10,12 +10,10 @@ import {
 import addShowToMainDatabase from "./FirebaseHelpers/addShowToMainDatabase"
 import getShowEpisodesFromAPI from "./TmdbAPIHelpers/getShowEpisodesFromAPI"
 import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
-import useHandleListeners from "Components/Pages/Detailes/FirebaseHelpers/UseHandleListeners"
 
 const useContentHandler = () => {
   const authUser = useAuthUser()
   const firebase: FirebaseInterface = useContext(FirebaseContext)
-  const { handleListeners } = useHandleListeners({})
 
   const addShowsToDatabaseOnRegister = ({ shows, uid }: AddShowsToDatabaseOnRegisterArg) => {
     Promise.all(
@@ -47,7 +45,7 @@ const useContentHandler = () => {
             id: show.id
           }
 
-          addShowToMainDatabase({ firebase, authUser, show, dataFromAPI })
+          addShowToMainDatabase({ firebase, show, dataFromAPI })
 
           return { showInfo, userEpisodes }
         })
@@ -105,7 +103,7 @@ const useContentHandler = () => {
         status: showsSubDatabase,
         firstAirDate: show.first_air_date,
         name: show.name,
-        //timeStamp: firebase.timeStamp(),
+        timeStamp: firebase.timeStamp(),
         finished: false,
         id
       })
@@ -123,7 +121,7 @@ const useContentHandler = () => {
           }
         })
 
-      addShowToMainDatabase({ firebase, authUser, show, dataFromAPI, handleListeners })
+      addShowToMainDatabase({ firebase, show, dataFromAPI })
     })
   }
 

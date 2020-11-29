@@ -8,13 +8,12 @@ import merge from "deepmerge"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import {
   SeasonEpisodesFromDatabaseInterface,
-  SingleEpisodeInterface
+  SingleEpisodeInterface,
+  UserShowsInterface
 } from "Components/UserContent/UseUserShows/UseUserShows"
-import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
-import { UserToWatchShowsInterface } from "Components/UserContent/UseUserShows/Hooks/UseGetUserToWatchShows"
 
 const ToWatchEpisodesContent: React.FC = () => {
-  const [watchingShows, setWatchingShows] = useState<UserToWatchShowsInterface[]>([])
+  const [watchingShows, setWatchingShows] = useState<UserShowsInterface[]>([])
   const [initialLoading, setInitialLoading] = useState(true)
 
   const context = useContext(AppContext)
@@ -23,10 +22,10 @@ const ToWatchEpisodesContent: React.FC = () => {
     const watchingShows = context.userContent.userShows.filter(
       (show) => show.database === "watchingShows" && !show.allEpisodesWatched
     )
-    const toWatchEpisodes = context.userContent.userToWatchShows
+    const toWatchEpisodes: any = context.userContent.userToWatchShows
 
-    const watchingShowsModified = watchingShows.reduce((acc: ContentDetailes[], show) => {
-      if (toWatchEpisodes.find((item) => item.id === show.id)) {
+    const watchingShowsModified = watchingShows.reduce((acc: UserShowsInterface[], show) => {
+      if (toWatchEpisodes.find((item: any) => item.id === show.id)) {
         acc.push(show)
       }
       return acc
@@ -82,7 +81,9 @@ const ToWatchEpisodesContent: React.FC = () => {
             )
             toWatchEpisodes.reverse()
 
-            const releasedEpisodes = releasedEpisodesToOneArray({ data: toWatchEpisodes })
+            const releasedEpisodes: SingleEpisodeInterface[] = releasedEpisodesToOneArray({
+              data: toWatchEpisodes
+            })
             return (
               <div key={show.id} className="towatch__show">
                 <Link className="towatch__show-name" to={`/show/${show.id}`}>

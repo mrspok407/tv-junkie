@@ -12,7 +12,7 @@ type Props = {
   movieInDatabase: {} | null
   mediaType: string
   id: number
-  showDatabaseOnClient: string | null
+  showDatabaseOnClient: string
   changeShowDatabaseOnClient: (database: string) => void
 }
 

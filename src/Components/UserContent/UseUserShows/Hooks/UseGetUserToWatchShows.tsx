@@ -13,10 +13,10 @@ type Hook = () => {
 
 export interface UserToWatchShowsInterface {
   id: number
-  name?: string
-  original_name?: string
   episodes: SeasonEpisodesFromDatabaseInterface[]
 }
+
+export interface UserToWatchTest {}
 
 const useGetUserToWatchShows: Hook = () => {
   const [userToWatchShows, setUserToWatchShows] = useState<UserToWatchShowsInterface[]>([])

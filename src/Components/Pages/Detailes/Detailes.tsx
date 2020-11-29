@@ -48,10 +48,10 @@ export const DetailesPage: React.FC<Props> = ({
   )
 
   const [similarContent, setSimilarContent] = useState<ContentDetailes[]>([])
-  const [showInfo, setShowInfo] = useState<ContentDetailes | null>()
+  const [showInfo, setShowInfo] = useState<{ status?: string; id?: number; database?: string } | null>(null)
   const [movieInDatabase, setMovieInDatabase] = useState<ContentDetailes | null>(null)
 
-  const [showDatabaseOnClient, setShowDatabaseOnClient] = useState<string | null>(null)
+  const [showDatabaseOnClient, setShowDatabaseOnClient] = useState<string>("")
 
   const [error, setError] = useState<string>()
 
@@ -72,7 +72,7 @@ export const DetailesPage: React.FC<Props> = ({
 
       setShowInfo(null)
       setMovieInDatabase(null)
-      setShowDatabaseOnClient(null)
+      setShowDatabaseOnClient("")
 
       firebase.userShowAllEpisodes(authUser && authUser.uid, id).off()
     }
@@ -247,8 +247,6 @@ export const DetailesPage: React.FC<Props> = ({
 
             {mediaType === "show" && (
               <ShowsEpisodes
-                authUser={authUser}
-                firebase={firebase}
                 detailesPage={true}
                 seasonsArr={detailes.seasonsArr}
                 showTitle={detailes.name}

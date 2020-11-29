@@ -24,15 +24,22 @@ export interface UserShowsInterface extends ContentDetailes {
 }
 
 export interface SingleEpisodeInterface {
+  [key: string]: number | string | boolean | null | undefined
   userRating: number | string
   watched: boolean
-  air_date: string
+  air_date: string | null
   episode_number?: number
+  season_number?: number
 }
 export interface SeasonEpisodesFromDatabaseInterface {
   episodes: SingleEpisodeInterface[]
+  air_date?: string
+  poster_path?: string
+  episode_count?: number
   season_number: number
   userRating: number | string
+  name?: string
+  id: number
 }
 
 export interface UserMoviesInterface extends ContentDetailes {
@@ -42,7 +49,7 @@ export interface UserMoviesInterface extends ContentDetailes {
 export interface SingleEpisodeByMonthInterface {
   episode_number?: number
   show: string
-  air_date: string
+  air_date: any
   showId: number
 }
 export interface UserWillAirEpisodesInterface {
