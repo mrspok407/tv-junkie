@@ -7,12 +7,12 @@ import ScrollToTopOnMount from "Utils/ScrollToTopOnMount"
 import Footer from "Components/UI/Footer/Footer"
 import { FirebaseContext } from "Components/Firebase"
 import { useHistory } from "react-router-dom"
-import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
 import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 import "./Login.scss"
+import { AppContext } from "Components/AppContext/AppContextHOC"
 
 const LoginPage: React.FC = () => {
-  const authUser = useAuthUser()
+  const { authUser } = useContext(AppContext)
   const firebase = useContext(FirebaseContext)
   const history = useHistory()
 

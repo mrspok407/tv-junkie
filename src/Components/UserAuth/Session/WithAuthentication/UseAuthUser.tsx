@@ -9,6 +9,7 @@ const useAuthUser = () => {
   const firebase = useContext(FirebaseContext)
 
   useEffect(() => {
+    console.log("authUser set in LC")
     let authSubscriber: any
     const authUserListener = () => {
       authSubscriber = firebase.onAuthUserListener(
@@ -25,6 +26,7 @@ const useAuthUser = () => {
 
     authUserListener()
     return () => {
+      console.log("unmount authUser LS")
       authSubscriber()
     }
   }, [firebase])

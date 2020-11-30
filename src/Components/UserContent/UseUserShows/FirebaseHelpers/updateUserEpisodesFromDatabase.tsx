@@ -41,6 +41,7 @@ const updateUserEpisodesFromDatabase = ({ firebase, authUser, showsFullInfo }: A
           }, [])
           acc.push({
             episodes,
+            name: season.name,
             season_number: season.season_number,
             userRating: season.userRating || 0,
             id: season.id

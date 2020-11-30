@@ -5,7 +5,6 @@ import classNames from "classnames"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import UserRating from "Components/UI/UserRating/UserRating"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
-import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
 
 type Props = {
   detailes: ContentDetailes
@@ -25,7 +24,7 @@ export const MainInfo: React.FC<Props> = ({
   changeShowDatabaseOnClient
 }) => {
   const context = useContext(AppContext)
-  const authUser = useAuthUser()
+  const { authUser } = context
 
   const movieInLS = context.userContentLocalStorage.watchLaterMovies.find(
     (item: { id: number }) => item.id === Number(id)

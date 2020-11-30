@@ -11,13 +11,12 @@ import Footer from "Components/UI/Footer/Footer"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import ScrollToTopOnMount from "Utils/ScrollToTopOnMount"
 import useGetSlidersContent from "./UseGetSlidersContent"
-import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
 import "./Home.scss"
 
 const HomePage: React.FC = () => {
   const { sliders, slidersLoading } = useGetSlidersContent()
   const context = useContext(AppContext)
-  const authUser = useAuthUser()
+  const { authUser } = context
 
   const renderNonAuthUser = () => (
     <>

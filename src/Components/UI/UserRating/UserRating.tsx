@@ -3,9 +3,9 @@ import classNames from "classnames"
 import { Link } from "react-router-dom"
 import * as ROUTES from "Utils/Constants/routes"
 import { FirebaseContext } from "Components/Firebase"
-import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
 import { SingleEpisodeInterface } from "Components/UserContent/UseUserShows/UseUserShows"
 import "./UserRating.scss"
+import { AppContext } from "Components/AppContext/AppContextHOC"
 
 const STAR_AMOUNT = 5
 
@@ -43,7 +43,7 @@ const UserRating: React.FC<Props> = ({
   const userRatingRef = useRef<HTMLDivElement>(null!)
 
   const firebase = useContext(FirebaseContext)
-  const authUser = useAuthUser()
+  const { authUser } = useContext(AppContext)
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside as EventListener)

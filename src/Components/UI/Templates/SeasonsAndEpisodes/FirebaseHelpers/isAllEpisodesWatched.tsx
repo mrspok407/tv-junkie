@@ -1,6 +1,25 @@
-const isAllEpisodesWatched = ({ showInfo, releasedEpisodes, authUser, firebase, singleEpisode }) => {
+import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
+import { ShowInfoInterface } from "Components/Pages/Detailes/Detailes"
+import { SingleEpisodeInterface } from "Components/UserContent/UseUserShows/UseUserShows"
+import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
+
+interface Arguments {
+  showInfo: ShowInfoInterface
+  releasedEpisodes: SingleEpisodeInterface[]
+  authUser: AuthUserInterface
+  firebase: FirebaseInterface
+  isSingleEpisode: boolean
+}
+
+const isAllEpisodesWatched = ({
+  showInfo,
+  releasedEpisodes,
+  authUser,
+  firebase,
+  isSingleEpisode
+}: Arguments) => {
   const status = showInfo.status === "Ended" || showInfo.status === "Canceled" ? "ended" : "ongoing"
-  const allEpisodesWatched = singleEpisode
+  const allEpisodesWatched = isSingleEpisode
     ? releasedEpisodes.filter((episode) => !episode.watched).length === 1
     : releasedEpisodes
         .map((episode) => episode.season_number)

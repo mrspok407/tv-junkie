@@ -1,6 +1,5 @@
 import { useContext } from "react"
 import { FirebaseContext } from "Components/Firebase"
-import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
 import {
   AddShowsToDatabaseOnRegisterArg,
   AddShowToDatabaseArg,
@@ -12,8 +11,8 @@ import getShowEpisodesFromAPI from "./TmdbAPIHelpers/getShowEpisodesFromAPI"
 import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
 
 const useContentHandler = () => {
+  const firebase = useContext(FirebaseContext)
   const authUser = useAuthUser()
-  const firebase: FirebaseInterface = useContext(FirebaseContext)
 
   const addShowsToDatabaseOnRegister = ({ shows, uid }: AddShowsToDatabaseOnRegisterArg) => {
     Promise.all(

@@ -6,7 +6,6 @@ import classNames from "classnames"
 import PlaceholderNoShows from "Components/UI/Placeholders/PlaceholderNoShows"
 import Loader from "Components/UI/Placeholders/Loader"
 import { AppContext } from "Components/AppContext/AppContextHOC"
-import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
 import reducer, { INITIAL_STATE, ShowsContentState, ActionInterface, ActionTypes } from "./_reducerConfig"
 
 const SCROLL_THRESHOLD = 800
@@ -15,7 +14,7 @@ const ShowsContent: React.FC = () => {
   const [sortByState, setSortByState] = useState("name")
 
   const context = useContext(AppContext)
-  const authUser = useAuthUser()
+  const { authUser } = context
 
   const [state, dispatch] = useReducer<React.Reducer<ShowsContentState, ActionInterface>>(
     reducer,

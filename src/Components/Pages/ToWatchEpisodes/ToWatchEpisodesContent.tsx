@@ -90,8 +90,8 @@ const ToWatchEpisodesContent: React.FC = () => {
                   {show.name}
                 </Link>
                 <ShowsEpisodes
-                  toWatchPage={true}
-                  seasonsArr={toWatchEpisodes}
+                  parentComponent="toWatchPage"
+                  episodesData={toWatchEpisodes}
                   showTitle={show.name || show.original_name}
                   id={show.id}
                   showInfo={show}

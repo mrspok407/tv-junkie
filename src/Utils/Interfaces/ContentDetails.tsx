@@ -1,4 +1,18 @@
-import { SeasonEpisodesFromDatabaseInterface } from "Components/UserContent/UseUserShows/UseUserShows"
+import {
+  SeasonEpisodesFromDatabaseInterface,
+  SingleEpisodeInterface
+} from "Components/UserContent/UseUserShows/UseUserShows"
+
+export interface SeasonsFromAPI {
+  air_date?: string
+  episode_count?: number
+  id: number
+  name: string
+  overview?: string
+  poster_path?: string
+  season_number: number
+  episodes: SingleEpisodeInterface[]
+}
 
 interface ContentDetailes {
   [key: string]: string | string[] | number | number[] | {} | undefined
@@ -39,7 +53,7 @@ interface ContentDetailes {
   media_type?: string
   number_of_seasons: number | string
   imdb_id: number | string
-  seasonsArr: SeasonEpisodesFromDatabaseInterface[]
+  seasonsFromAPI: SeasonsFromAPI[]
   seasons: SeasonEpisodesFromDatabaseInterface[]
   similar?: { results: {}[] }[]
   similar_movies?: { results: {}[] }[]
@@ -80,7 +94,7 @@ const CONTENT_DETAILS_DEFAULT: ContentDetailes = {
   budget: 0,
   number_of_seasons: "-",
   imdb_id: "",
-  seasonsArr: [],
+  seasonsFromAPI: [],
   seasons: [],
   allEpisodesWatched: false,
   database: "",

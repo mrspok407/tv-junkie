@@ -1,5 +1,5 @@
+import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase/FirebaseContext"
-import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
 import {
   SeasonEpisodesFromDatabaseInterface,
   SingleEpisodeInterface
@@ -10,8 +10,6 @@ import { releasedEpisodesToOneArray } from "Utils"
 export interface HandleListenersArg {
   id: number
   status: string
-  // firebase: FirebaseInterface
-  // authUser: AuthUserInterface | null
   handleLoading?: (isLoading: boolean) => void
 }
 
@@ -20,11 +18,9 @@ const useHandleListeners = ({ id }: { id?: number }) => {
   const [releasedEpisodes, setReleasedEpisodes] = useState<SingleEpisodeInterface[]>([])
 
   const firebase = useContext(FirebaseContext)
-  const authUser = useAuthUser()
+  const { authUser } = useContext(AppContext)
 
   const firebaseListenerRef = useRef()
-
-  // console.log(id)
 
   const handleListeners = ({ id, status, handleLoading }: HandleListenersArg) => {
     if (status === "-" || !authUser) return
@@ -43,8 +39,6 @@ const useHandleListeners = ({ id }: { id?: number }) => {
         const releasedEpisodes: SingleEpisodeInterface[] = releasedEpisodesToOneArray({
           data: snapshot.val()
         })
-
-        // console.log({ id })
 
         firebaseListenerRef.current = firebase.userShowAllEpisodes(authUser.uid, id)
 
@@ -87,21 +81,12 @@ const useHandleListeners = ({ id }: { id?: number }) => {
 
             firebase.userShow({ uid: authUser.uid, key: id }).update({ finished, allEpisodesWatched })
 
-            console.log("userEpisodes in detailesListener:")
-            console.log(userEpisodes)
-
             setEpisodesFromDatabase(userEpisodes)
             setReleasedEpisodes(releasedEpisodes)
             if (handleLoading) handleLoading(false)
           })
       })
   }
-
-  useEffect(() => {
-    console.log("useEffect in handleListeners")
-    console.log({ episodesFromDatabase })
-    console.log("AAAAAAAAAAAAAAAAAAAAAAAAAA")
-  }, [episodesFromDatabase])
 
   useEffect(() => {
     console.log("updated")

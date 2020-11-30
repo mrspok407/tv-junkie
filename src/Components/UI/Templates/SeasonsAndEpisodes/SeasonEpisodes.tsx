@@ -1,4 +1,5 @@
 /* eslint-disable array-callback-return */
+// @ts-nocheck
 import React, { Component } from "react"
 import { differenceBtwDatesInDays, todayDate } from "Utils"
 import classNames from "classnames"
@@ -8,8 +9,18 @@ import * as ROUTES from "Utils/Constants/routes"
 import UserRating from "Components/UI/UserRating/UserRating"
 import TorrentLinksEpisodes from "./Components/TorrentLinksEpisodes"
 import { AppContext } from "Components/AppContext/AppContextHOC"
+import { SeasonEpisodesFromDatabaseInterface } from "Components/UserContent/UseUserShows/UseUserShows"
 
 const FADE_OUT_SPEED = 300
+
+type Props = {
+  detailesPage?: boolean
+  seasonsArr: SeasonEpisodesFromDatabaseInterface[]
+}
+
+const SeasonEpisodes: React.FC<Props> = ({}) => {}
+
+export default SeasonEpisodes
 
 export default class SeasonEpisodes extends Component {
   constructor(props) {
@@ -79,12 +90,6 @@ export default class SeasonEpisodes extends Component {
   }
 
   render() {
-    console.log({
-      showInfo: this.props.showInfo,
-      showDatabaseOnClient: this.props.showDatabaseOnClient,
-      episodesFromDatabase: this.props.episodesFromDatabase
-    })
-
     const showCheckboxes =
       this.props.showInfo &&
       this.props.showDatabaseOnClient !== "notWatchingShows" &&
@@ -242,7 +247,7 @@ export default class SeasonEpisodes extends Component {
 
                     {episodeAirDateAsDateObj < todayDate.getTime() && episode.air_date && (
                       <>
-                        {this.props.showInfo && !!this.props.episodesFromDatabase && (
+                        {this.props.showInfo.showInUserDatabase && !!this.props.episodesFromDatabase && (
                           <UserRating
                             id={this.props.showInfo.id}
                             firebaseRef="userShowSingleEpisode"

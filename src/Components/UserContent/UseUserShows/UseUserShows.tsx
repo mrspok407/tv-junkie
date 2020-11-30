@@ -5,9 +5,7 @@ import { FirebaseContext } from "Components/Firebase"
 import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
 import merge from "deepmerge"
-// import updateUserEpisodesFromDatabase from "./FirebaseHelpers/updateUserEpisodesFromDatabase"
 import useGetUserToWatchShows from "./Hooks/UseGetUserToWatchShows"
-// import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
 import getShowsFullInfo from "./FirebaseHelpers/getShowsFullInfo"
 import spliceNewShowFromDatabase from "./FirebaseHelpers/spliceNewShowFromDatabase"
 
@@ -38,7 +36,7 @@ export interface SeasonEpisodesFromDatabaseInterface {
   episode_count?: number
   season_number: number
   userRating: number | string
-  name?: string
+  name: string
   id: number
 }
 
@@ -113,9 +111,6 @@ const useUserShows = () => {
                 setLoadingShows(false)
                 setLoadingShowsMerging(false)
               } else if (userShowsSS.length < shows.length) {
-                console.log("userShows length less")
-                console.log(shows)
-                console.log(userShowsSS)
                 shows.forEach(async (show, index) => {
                   if (userShowsSS.find((item) => item.id === show.id)) return
 

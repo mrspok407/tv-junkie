@@ -4,7 +4,6 @@ import classNames from "classnames"
 import * as ROUTES from "Utils/Constants/routes"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
-import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
 
 type Props = {
   id: number
@@ -22,7 +21,7 @@ const ShowsButtons: React.FC<Props> = ({
   const [disableBtnWarning, setDisableBtnWarning] = useState<string | null>(null)
   const _notAuthButtons = useRef<HTMLDivElement>(null)
   const context = useContext(AppContext)
-  const authUser = useAuthUser()
+  const { authUser } = context
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside as EventListener)

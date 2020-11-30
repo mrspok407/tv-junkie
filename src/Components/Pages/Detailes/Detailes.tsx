@@ -18,8 +18,6 @@ import Footer from "Components/UI/Footer/Footer"
 import PlaceholderLoadingFullInfo from "Components/UI/Placeholders/PlaceholderLoadingFullInfo/PlaceholderLoadingFullInfo"
 import useHandleListeners from "./FirebaseHelpers/UseHandleListeners"
 import { ContentDetailes, CONTENT_DETAILS_DEFAULT } from "Utils/Interfaces/ContentDetails"
-import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
-import { SeasonEpisodesFromDatabaseInterface } from "Components/UserContent/UseUserShows/UseUserShows"
 import "./Detailes.scss"
 
 const { CancelToken } = require("axios")
@@ -27,6 +25,19 @@ let cancelRequest: any
 
 type Props = {
   match: { params: { id: number; mediaType: string } }
+}
+
+export interface ShowInfoInterface {
+  status: string
+  id: number
+  database: string
+  showInUserDatabase?: boolean
+}
+const SHOW_INFO_INITIAL_STATE = {
+  status: "",
+  id: 0,
+  database: "",
+  showInUserDatabase: false
 }
 
 export const DetailesPage: React.FC<Props> = ({
@@ -39,16 +50,14 @@ export const DetailesPage: React.FC<Props> = ({
   const history = useHistory()
   const context = useContext(AppContext)
   const firebase = useContext(FirebaseContext)
-  const authUser = useAuthUser()
+  const { authUser } = context
 
   const { episodesFromDatabase, releasedEpisodes, handleListeners } = useHandleListeners({ id })
 
-  const [epFromDBTest, setEpFromDBTest] = useState<SeasonEpisodesFromDatabaseInterface[] | null | undefined>(
-    []
-  )
-
   const [similarContent, setSimilarContent] = useState<ContentDetailes[]>([])
-  const [showInfo, setShowInfo] = useState<{ status?: string; id?: number; database?: string } | null>(null)
+
+  const [showInfo, setShowInfo] = useState<ShowInfoInterface>(SHOW_INFO_INITIAL_STATE)
+  // const [showInUserDatabase, setShowInUserDatabase] = useState(false);
   const [movieInDatabase, setMovieInDatabase] = useState<ContentDetailes | null>(null)
 
   const [showDatabaseOnClient, setShowDatabaseOnClient] = useState<string>("")
@@ -59,18 +68,12 @@ export const DetailesPage: React.FC<Props> = ({
   const [loadingFromDatabase, setLoadingFromDatabase] = useState(true)
 
   useEffect(() => {
-    console.log("SHIT JUST UPDATED")
-    console.log({ episodesFromDatabase })
-    setEpFromDBTest(episodesFromDatabase)
-  }, [episodesFromDatabase])
-
-  useEffect(() => {
     getContent()
 
     return () => {
       if (cancelRequest !== undefined) cancelRequest()
 
-      setShowInfo(null)
+      setShowInfo(SHOW_INFO_INITIAL_STATE)
       setMovieInDatabase(null)
       setShowDatabaseOnClient("")
 
@@ -158,7 +161,7 @@ export const DetailesPage: React.FC<Props> = ({
           budget: data.budget || 0,
           number_of_seasons: data.number_of_seasons || "-",
           imdb_id: data.imdb_id || "",
-          seasonsArr: data.seasons ? data.seasons.reverse() : []
+          seasonsFromAPI: data.seasons ? data.seasons.reverse() : []
         })
 
         if (!authUser) {
@@ -185,9 +188,8 @@ export const DetailesPage: React.FC<Props> = ({
 
     if (!authUser || !show) return
 
-    console.log("show in details:")
-    console.log(show)
-    setShowInfo(show)
+    setShowInfo({ ...show, showInUserDatabase: true })
+    // setShowInUserDatabase(true)
     setShowDatabaseOnClient(show.database)
   }
 
@@ -201,8 +203,6 @@ export const DetailesPage: React.FC<Props> = ({
     setMovieInDatabase(!authUser || !movie ? null : movie)
     setLoadingFromDatabase(false)
   }
-
-  console.log({ epFromDBTest })
 
   return (
     <>
@@ -247,8 +247,8 @@ export const DetailesPage: React.FC<Props> = ({
 
             {mediaType === "show" && (
               <ShowsEpisodes
-                detailesPage={true}
-                seasonsArr={detailes.seasonsArr}
+                parentComponent="detailesPage"
+                episodesData={detailes.seasonsFromAPI}
                 showTitle={detailes.name}
                 id={id}
                 showInfo={showInfo}

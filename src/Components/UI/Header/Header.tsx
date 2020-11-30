@@ -1,11 +1,11 @@
-import React, { useRef, useState } from "react"
+import React, { useContext, useRef, useState } from "react"
 import { NavLink } from "react-router-dom"
 import classNames from "classnames"
 import logo from "assets/images/main-page-logo.png"
 import Login from "./Login"
 import * as ROUTES from "Utils/Constants/routes"
 import Search from "Components/Pages/SearchPage/Search/Search"
-import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
+import { AppContext } from "Components/AppContext/AppContextHOC"
 import "./Header.scss"
 
 type Props = {
@@ -16,7 +16,7 @@ type Props = {
 const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false }) => {
   const [navMobileOpen, setNavMobileOpen] = useState(false)
   const navRef = useRef<HTMLElement>(null)
-  const authUser = useAuthUser()
+  const { authUser } = useContext(AppContext)
 
   const closeNavMobile = () => {
     setNavMobileOpen(false)
