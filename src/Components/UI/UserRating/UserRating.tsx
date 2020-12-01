@@ -4,8 +4,8 @@ import { Link } from "react-router-dom"
 import * as ROUTES from "Utils/Constants/routes"
 import { FirebaseContext } from "Components/Firebase"
 import { SingleEpisodeInterface } from "Components/UserContent/UseUserShows/UseUserShows"
-import "./UserRating.scss"
 import { AppContext } from "Components/AppContext/AppContextHOC"
+import "./UserRating.scss"
 
 const STAR_AMOUNT = 5
 
@@ -15,9 +15,9 @@ type Props = {
   seasonNum?: number
   episodeNum?: number
   episodeId?: number
-  episodeRating?: number
-  handleFadeOut?: (episodeId: number, episodeIndex: number) => void
-  toWatchPage?: boolean
+  episodeRating?: boolean
+  handleFadeOut?: (episodeId: number, episodeIndex: number, seasonNum: any, rating?: any) => void
+  parentComponent?: string
   showDatabase?: string
   disableRating?: boolean
   showRating?: boolean
@@ -32,7 +32,7 @@ const UserRating: React.FC<Props> = ({
   episodeId = 0,
   episodeRating,
   showDatabase,
-  toWatchPage,
+  parentComponent,
   disableRating,
   showRating,
   mediaType,
@@ -59,7 +59,7 @@ const UserRating: React.FC<Props> = ({
   }
 
   const getRating = useCallback(() => {
-    if (firebase.auth.currentUser === null || toWatchPage) return
+    if (firebase.auth.currentUser === null || parentComponent === "toWatchPage") return
 
     firebase[firebaseRef]({
       uid: firebase.auth.currentUser.uid,
@@ -70,7 +70,7 @@ const UserRating: React.FC<Props> = ({
       if (snapshot.val() === null) return
       setUserRating(snapshot.val().userRating)
     })
-  }, [firebase, firebaseRef, episodeNum, id, seasonNum, toWatchPage])
+  }, [firebase, firebaseRef, episodeNum, id, seasonNum, parentComponent])
 
   useEffect(() => {
     getRating()
@@ -112,31 +112,34 @@ const UserRating: React.FC<Props> = ({
 
   const onClickHandler = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (authUser === null) return
-    if (toWatchPage) {
-      handleFadeOut(episodeId, episodeNum)
-    }
     const rating = Number((e.target as HTMLButtonElement).dataset.rating)
 
-    firebase[firebaseRef]({
-      uid: authUser.uid,
-      key: Number(id),
-      seasonNum: seasonNum,
-      episodeNum: episodeNum
-    }).once("value", (snapshot: { val: () => SingleEpisodeInterface }) => {
-      if (snapshot.val() === null) return
-
-      setUserRating(rating)
-
+    if (parentComponent === "toWatchPage") {
+      console.log(rating)
+      handleFadeOut(episodeId, episodeNum, seasonNum, rating)
+      // setUserRating(rating)
+    } else {
       firebase[firebaseRef]({
         uid: authUser.uid,
         key: Number(id),
         seasonNum: seasonNum,
         episodeNum: episodeNum
-      }).update({
-        userRating: rating,
-        watched: toWatchPage ? snapshot.val().watched : episodeRating ? true : null
+      }).once("value", (snapshot: { val: () => SingleEpisodeInterface }) => {
+        if (snapshot.val() === null) return
+
+        setUserRating(rating)
+
+        firebase[firebaseRef]({
+          uid: authUser.uid,
+          key: Number(id),
+          seasonNum: seasonNum,
+          episodeNum: episodeNum
+        }).update({
+          userRating: rating,
+          watched: parentComponent === "toWatchPage" ? snapshot.val().watched : episodeRating ? true : null
+        })
       })
-    })
+    }
   }
 
   const ratingDisabled =

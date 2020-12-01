@@ -14,6 +14,7 @@ import { ShowInfoInterface } from "Components/Pages/Detailes/Detailes"
 import { FirebaseContext } from "Components/Firebase"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import "./ShowsEpisodes.scss"
+import SeasonEpisodes from "./SeasonEpisodes"
 
 const { CancelToken } = require("axios")
 
@@ -30,9 +31,10 @@ type Props = {
   parentComponent: string
 }
 
-interface EpisodesDataInterface {
+export interface EpisodesDataInterface {
   name: string
   id: number
+  seasonId?: number
   air_date?: string
   season_number: number
   episode_count?: number
@@ -40,8 +42,9 @@ interface EpisodesDataInterface {
   episodes: SingleEpisodeInterface[]
 }
 
-interface ShowEpisodesFromAPIInterface {
+export interface ShowEpisodesFromAPIInterface {
   seasonId: number
+  id?: number
   episodes: SingleEpisodeInterface[]
 }
 
@@ -57,7 +60,7 @@ const ShowsEpisodes: React.FC<Props> = ({
 }) => {
   const [loadingEpisodesIds, setLoadingEpisodesIds] = useState<number[]>([])
   const [currentlyOpenSeasons, setCurrentlyOpenSeasons] = useState<number[]>([])
-  const [showEpisodesFromAPI, setShowEpisodesFromAPI] = useState<ShowEpisodesFromAPIInterface[]>([])
+  const [episodesDataFromAPI, setEpisodesDataFromAPI] = useState<ShowEpisodesFromAPIInterface[]>([])
   const [detailEpisodeInfo, setDetailEpisodeInfo] = useState<number[]>([])
   const [errorShowEpisodes, setErrorShowEpisodes] = useState("")
 
@@ -74,7 +77,7 @@ const ShowsEpisodes: React.FC<Props> = ({
       if (firstSeason.id) setCurrentlyOpenSeasons([firstSeason.id])
 
       if (parentComponent === "toWatchPage") {
-        setShowEpisodesFromAPI([{ seasonId: firstSeason.id, episodes: firstSeason.episodes }])
+        setEpisodesDataFromAPI([{ seasonId: firstSeason.id, episodes: firstSeason.episodes }])
       } else {
         axios
           .get(
@@ -88,7 +91,7 @@ const ShowsEpisodes: React.FC<Props> = ({
           .then(({ data: { episodes } }) => {
             const episodesReverse = episodes.reverse()
 
-            setShowEpisodesFromAPI([{ seasonId: firstSeason.id, episodes: episodesReverse }])
+            setEpisodesDataFromAPI([{ seasonId: firstSeason.id, episodes: episodesReverse }])
             setLoadingEpisodesIds(loadingEpisodesIds.filter((item) => item !== firstSeason.id))
           })
           .catch((err) => {
@@ -114,7 +117,7 @@ const ShowsEpisodes: React.FC<Props> = ({
     }
 
     if (parentComponent === "toWatchPage") return
-    if (showEpisodesFromAPI.some((item) => item.seasonId === seasonId)) return
+    if (episodesDataFromAPI.some((item) => item.seasonId === seasonId)) return
 
     setLoadingEpisodesIds([...loadingEpisodesIds, seasonId])
 
@@ -129,7 +132,7 @@ const ShowsEpisodes: React.FC<Props> = ({
       )
       .then(({ data: { episodes } }) => {
         const episodesReverse = episodes.reverse()
-        setShowEpisodesFromAPI((prevState) => [...prevState, { seasonId, episodes: episodesReverse }])
+        setEpisodesDataFromAPI((prevState) => [...prevState, { seasonId, episodes: episodesReverse }])
         setLoadingEpisodesIds((prevState) => [...prevState.filter((item) => item !== seasonId)])
       })
       .catch((err) => {
@@ -175,12 +178,52 @@ const ShowsEpisodes: React.FC<Props> = ({
       )
   }
 
+  const checkBunchOfEpisodes = (episodesData: any, reset: any) => {
+    if (!authUser) return
+    console.log(episodesData)
+
+    Promise.all(
+      episodesData.map((episode: any) => {
+        console.log(episode)
+        return firebase
+          .userShowSingleEpisode({
+            uid: authUser.uid,
+            key: id,
+            seasonNum: episode.seasonNum,
+            episodeNum: episode.index
+          })
+          .update(
+            {
+              watched: !episodesFromDatabase[episode.seasonNum - 1].episodes[episode.index].watched,
+              userRating: episode.rating ? episode.rating : 0
+            },
+            () => {
+              isAllEpisodesWatched({
+                showInfo: showInfo,
+                releasedEpisodes,
+                authUser: authUser,
+                firebase: firebase,
+                isSingleEpisode: true
+              })
+            }
+          )
+      })
+    ).then(() => {
+      console.log("finished")
+      reset()
+    })
+  }
+
   const checkEverySeasonEpisode = (seasonNum: number) => {
     if (!authUser) return
 
     const seasonEpisodes = episodesFromDatabase[seasonNum - 1].episodes.reduce(
       (acc: SingleEpisodeInterface[], episode) => {
-        acc.push({ userRating: episode.userRating, watched: episode.watched, air_date: episode.air_date })
+        acc.push({
+          userRating: episode.userRating,
+          watched: episode.watched,
+          air_date: episode.air_date
+        })
         return acc
       },
       []
@@ -363,22 +406,21 @@ const ShowsEpisodes: React.FC<Props> = ({
                         )}
                       </div>
                     )}
-                    {/* <SeasonEpisodes
-                      detailesPage={detailesPage}
-                      seasonsArr={seasonsArr}
-                      showEpisodes={showEpisodesFromAPI}
-                      toWatchPage={toWatchPage}
+                    <SeasonEpisodes
+                      parentComponent={parentComponent}
+                      episodesData={episodesData}
+                      episodesDataFromAPI={episodesDataFromAPI}
                       showTitle={showTitle}
                       detailEpisodeInfo={detailEpisodeInfo}
                       season={season}
                       seasonId={season.id}
-                      authUser={authUser}
                       episodesFromDatabase={episodesFromDatabase}
                       showInfo={showInfo}
                       showDatabaseOnClient={showDatabaseOnClient}
                       showEpisodeInfo={showEpisodeInfo}
                       toggleWatchedEpisode={toggleWatchedEpisode}
-                    /> */}
+                      checkBunchOfEpisodes={checkBunchOfEpisodes}
+                    />
                     {parentComponent === "toWatchPage" && (
                       <div className="episodes__episode-group-check-all-episodes">
                         <button

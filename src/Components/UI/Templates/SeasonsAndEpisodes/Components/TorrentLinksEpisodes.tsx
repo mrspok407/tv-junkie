@@ -3,14 +3,14 @@ import classNames from "classnames"
 import "./TorrentLinksEpisodes.scss"
 
 type Props = {
-  toWatchPage?: boolean
+  parentComponent?: string
   showTitle: string
   seasonNumber: number
   episodeNumber: number
 }
 
 const TorrentLinksEpisodes = React.memo<Props>(
-  ({ toWatchPage = false, showTitle, seasonNumber, episodeNumber }) => {
+  ({ parentComponent = "", showTitle, seasonNumber, episodeNumber }) => {
     const urlShowTitle = showTitle.split(" ").join("+")
 
     const seasonToString = seasonNumber.toString()
@@ -22,7 +22,7 @@ const TorrentLinksEpisodes = React.memo<Props>(
     return (
       <div
         className={classNames("torrent-links torrent-links--episodes", {
-          "torrent-links--to-watch-page": toWatchPage
+          "torrent-links--to-watch-page": parentComponent === "toWatchPage"
         })}
       >
         <a

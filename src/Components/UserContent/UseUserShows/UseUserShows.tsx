@@ -23,6 +23,7 @@ export interface UserShowsInterface extends ContentDetailes {
 
 export interface SingleEpisodeInterface {
   [key: string]: number | string | boolean | null | undefined
+  id?: number
   userRating: number | string
   watched: boolean
   air_date: string | null
