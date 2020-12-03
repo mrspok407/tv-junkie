@@ -178,7 +178,10 @@ const ShowsEpisodes: React.FC<Props> = ({
       )
   }
 
-  const checkBunchOfEpisodes = (episodesData: any, reset: any) => {
+  const checkMultipleEpisodes = (
+    episodesData: { id: number; index: number }[],
+    resetFadeOutEpisodes: () => void
+  ) => {
     if (!authUser) return
     console.log(episodesData)
 
@@ -197,20 +200,21 @@ const ShowsEpisodes: React.FC<Props> = ({
               watched: !episodesFromDatabase[episode.seasonNum - 1].episodes[episode.index].watched,
               userRating: episode.rating ? episode.rating : 0
             },
-            () => {
-              isAllEpisodesWatched({
-                showInfo: showInfo,
-                releasedEpisodes,
-                authUser: authUser,
-                firebase: firebase,
-                isSingleEpisode: true
-              })
-            }
+            () => {}
           )
       })
     ).then(() => {
       console.log("finished")
-      reset()
+
+      isAllEpisodesWatched({
+        showInfo: showInfo,
+        releasedEpisodes,
+        authUser: authUser,
+        firebase: firebase,
+        multipleEpisodes: episodesData.length
+      })
+
+      resetFadeOutEpisodes()
     })
   }
 
@@ -270,8 +274,7 @@ const ShowsEpisodes: React.FC<Props> = ({
             showInfo,
             releasedEpisodes,
             authUser: authUser,
-            firebase: firebase,
-            isSingleEpisode: false
+            firebase: firebase
           })
         }
       })
@@ -419,7 +422,7 @@ const ShowsEpisodes: React.FC<Props> = ({
                       showDatabaseOnClient={showDatabaseOnClient}
                       showEpisodeInfo={showEpisodeInfo}
                       toggleWatchedEpisode={toggleWatchedEpisode}
-                      checkBunchOfEpisodes={checkBunchOfEpisodes}
+                      checkMultipleEpisodes={checkMultipleEpisodes}
                     />
                     {parentComponent === "toWatchPage" && (
                       <div className="episodes__episode-group-check-all-episodes">

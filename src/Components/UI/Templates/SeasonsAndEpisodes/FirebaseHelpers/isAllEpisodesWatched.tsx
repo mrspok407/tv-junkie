@@ -8,7 +8,8 @@ interface Arguments {
   releasedEpisodes: SingleEpisodeInterface[]
   authUser: AuthUserInterface
   firebase: FirebaseInterface
-  isSingleEpisode: boolean
+  isSingleEpisode?: boolean
+  multipleEpisodes?: number
 }
 
 const isAllEpisodesWatched = ({
@@ -16,16 +17,23 @@ const isAllEpisodesWatched = ({
   releasedEpisodes,
   authUser,
   firebase,
-  isSingleEpisode
+  isSingleEpisode,
+  multipleEpisodes
 }: Arguments) => {
   const status = showInfo.status === "Ended" || showInfo.status === "Canceled" ? "ended" : "ongoing"
+  console.log({ multipleEpisodes })
+  console.log(releasedEpisodes.filter((episode) => !episode.watched).length)
   const allEpisodesWatched = isSingleEpisode
     ? releasedEpisodes.filter((episode) => !episode.watched).length === 1
+    : multipleEpisodes
+    ? releasedEpisodes.filter((episode) => !episode.watched).length === multipleEpisodes
     : releasedEpisodes
         .map((episode) => episode.season_number)
         .filter((episode, index, array) => array.indexOf(episode) === index).length === 1
 
   const finished = (status === "ended" || showInfo.status === "ended") && allEpisodesWatched ? true : false
+
+  console.log("all episodes check")
 
   if (allEpisodesWatched) {
     firebase.userShowAllEpisodesInfo(authUser.uid, showInfo.id).update({

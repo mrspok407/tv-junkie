@@ -1,9 +1,9 @@
 /* eslint-disable array-callback-return */
-import React, { useContext, useEffect, useReducer, useRef, useState } from "react"
+import React, { useContext, useEffect, useRef, useState } from "react"
 import { differenceBtwDatesInDays, todayDate } from "Utils"
+import { Link } from "react-router-dom"
 import classNames from "classnames"
 import * as _get from "lodash.get"
-import { Link } from "react-router-dom"
 import * as ROUTES from "Utils/Constants/routes"
 import UserRating from "Components/UI/UserRating/UserRating"
 import TorrentLinksEpisodes from "./Components/TorrentLinksEpisodes"
@@ -33,27 +33,17 @@ type Props = {
     arrLength?: number,
     callback?: any
   ) => any
-  checkBunchOfEpisodes: any
+  checkMultipleEpisodes: (
+    episodesData: { id: number; index: number }[],
+    resetFadeOutEpisodes: () => void
+  ) => void
 }
 
-const reducer: any = (state: any, action: any) => {
-  const { fadeOutEpisodes } = state
-  if (action.type === "fadeOut") {
-    return {
-      ...state,
-      fadeOutEpisodes: [...fadeOutEpisodes, action.payload]
-    }
-  } else if (action.type === "reset") {
-    return {
-      ...state,
-      fadeOutEpisodes: []
-    }
-  } else if (action.type === "function") {
-    state.fadeOutEpisodes.forEach((item: any) => {
-      action.fun(action.season_number, item.index)
-    })
-    return state
-  }
+export interface HandleFadeOutInterface {
+  episodeId: number
+  episodeIndex: number
+  seasonNum: number
+  rating?: number
 }
 
 const SeasonEpisodes: React.FC<Props> = ({
@@ -69,7 +59,7 @@ const SeasonEpisodes: React.FC<Props> = ({
   showDatabaseOnClient,
   showEpisodeInfo,
   toggleWatchedEpisode,
-  checkBunchOfEpisodes
+  checkMultipleEpisodes
 }) => {
   const [fadeOutEpisodes, setFadeOutEpisodes] = useState<{ id: number; index: number }[]>([])
   const [disableCheckboxWarning, setDisableCheckboxWarning] = useState<number | null>(null)
@@ -80,8 +70,7 @@ const SeasonEpisodes: React.FC<Props> = ({
   const checkboxRef = useRef<HTMLDivElement>(null)
   const registerWarningRef = useRef<HTMLDivElement>(null)
   const episodeFadeOutTimeout = useRef<number | null>()
-
-  // const [state, dispatch]: [any, any] = useReducer(reducer, { fadeOutEpisodes: [] })
+  const [timedOut, setTimedOut] = useState(false)
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside as EventListener)
@@ -109,10 +98,7 @@ const SeasonEpisodes: React.FC<Props> = ({
     setDisableCheckboxWarning(checkboxId)
   }
 
-  // const fadeOutRef: any = useRef([])
-  const [timedOut, setTimedOut] = useState(false)
-
-  const reset = () => {
+  const resetFadeOutEpisodes = () => {
     console.log("reset")
     setFadeOutEpisodes([])
   }
@@ -121,37 +107,22 @@ const SeasonEpisodes: React.FC<Props> = ({
     console.log("useEffect run Before")
     if (!timedOut || fadeOutEpisodes.length === 0) return
     console.log("useEffect run")
-    checkBunchOfEpisodes(fadeOutEpisodes, reset)
-    // fadeOutEpisodes.forEach((item: any, index, array) => {
-    //   toggleWatchedEpisode(season.season_number, item.index, index, array.length, reset)
-    // })
-    // setFadeOutEpisodes([])
+    checkMultipleEpisodes(fadeOutEpisodes, resetFadeOutEpisodes)
+    // eslint-disable-next-line
   }, [timedOut, fadeOutEpisodes])
 
-  const handleFadeOut = (episodeId: number, episodeIndex: number, seasonNum: any, rating?: any) => {
-    // if (fadeOutRef.current.find((item: any) => item.id === episodeId)) return
+  const handleFadeOut = ({ episodeId, episodeIndex, seasonNum, rating }: HandleFadeOutInterface) => {
     if (fadeOutEpisodes.find((item: any) => item.id === episodeId)) return
     window.clearTimeout(episodeFadeOutTimeout.current || 0)
     setTimedOut(false)
-
-    // dispatch({ type: "fadeOut", payload: { id: episodeId, index: episodeIndex } })
-    // fadeOutRef.current = [...fadeOutRef.current, { id: episodeId, index: episodeIndex }]
 
     setFadeOutEpisodes((prevState) => [
       ...prevState,
       { id: episodeId, index: episodeIndex, seasonNum, rating }
     ])
-    // season.season_number, item.index
+
     episodeFadeOutTimeout.current = window.setTimeout(() => {
       setTimedOut(true)
-      // console.log({ fadeOutEpisodes: state.fadeOutEpisodes })
-      // console.log({ fadeOutRef_Inside: fadeOutRef.current })
-      // dispatch({ type: "function", fun: toggleWatchedEpisode, season_number: season.season_number })
-      // dispatch({ type: "reset" })
-      // fadeOutRef.current.forEach((item: any) => {
-      //   toggleWatchedEpisode(season.season_number, item.index)
-      // })
-      // fadeOutRef.current = []
     }, FADE_OUT_SPEED)
   }
 
@@ -267,12 +238,12 @@ const SeasonEpisodes: React.FC<Props> = ({
                       checked={_get(showSeason, `episodes.${indexOfEpisode}.watched`, false)}
                       onChange={() => {
                         if (parentComponent === "toWatchPage") {
-                          handleFadeOut(
-                            episode.id as number,
-                            indexOfEpisode,
-                            season.season_number,
-                            episode.userRating
-                          )
+                          handleFadeOut({
+                            episodeId: episode.id as number,
+                            episodeIndex: indexOfEpisode,
+                            seasonNum: season.season_number,
+                            rating: episode.userRating
+                          })
                         } else {
                           toggleWatchedEpisode(season.season_number, indexOfEpisode)
                         }

@@ -6,6 +6,7 @@ import { FirebaseContext } from "Components/Firebase"
 import { SingleEpisodeInterface } from "Components/UserContent/UseUserShows/UseUserShows"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import "./UserRating.scss"
+import { HandleFadeOutInterface } from "../Templates/SeasonsAndEpisodes/SeasonEpisodes"
 
 const STAR_AMOUNT = 5
 
@@ -16,7 +17,7 @@ type Props = {
   episodeNum?: number
   episodeId?: number
   episodeRating?: boolean
-  handleFadeOut?: (episodeId: number, episodeIndex: number, seasonNum: any, rating?: any) => void
+  handleFadeOut?: ({ episodeId, episodeIndex, seasonNum, rating }: HandleFadeOutInterface) => void
   parentComponent?: string
   showDatabase?: string
   disableRating?: boolean
@@ -115,9 +116,8 @@ const UserRating: React.FC<Props> = ({
     const rating = Number((e.target as HTMLButtonElement).dataset.rating)
 
     if (parentComponent === "toWatchPage") {
-      console.log(rating)
-      handleFadeOut(episodeId, episodeNum, seasonNum, rating)
-      // setUserRating(rating)
+      if (!seasonNum) return
+      handleFadeOut({ episodeId, episodeIndex: episodeNum, seasonNum, rating })
     } else {
       firebase[firebaseRef]({
         uid: authUser.uid,
