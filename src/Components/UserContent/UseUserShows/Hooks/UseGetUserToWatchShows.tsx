@@ -3,11 +3,12 @@ import { FirebaseContext } from "Components/Firebase"
 import { SeasonEpisodesFromDatabaseInterface } from "../UseUserShows"
 import { releasedEpisodesToOneArray } from "Utils"
 import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
+import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 
 type Hook = () => {
   userToWatchShows: UserToWatchShowsInterface[]
   loadingNotFinishedShows: boolean
-  listenerUserToWatchShow: () => void
+  listenerUserToWatchShow: ({ uid }: AuthUserInterface) => void
   resetStateToWatchShows: () => void
 }
 
@@ -36,12 +37,9 @@ const useGetUserToWatchShows: Hook = () => {
     }
   }, [firebase, authUser])
 
-  const listenerUserToWatchShow = () => {
-    console.log(authUser)
-    if (!authUser) return
-
+  const listenerUserToWatchShow = ({ uid }: AuthUserInterface) => {
     firebase
-      .userEpisodes(authUser.uid)
+      .userEpisodes(uid)
       .orderByChild("info/isAllWatched_database")
       .equalTo("false_watchingShows")
       .on("value", (snapshot: { val: () => { id: number; episodes: {}[] } }) => {
@@ -51,7 +49,7 @@ const useGetUserToWatchShows: Hook = () => {
           return
         }
 
-        console.log("userToWatchShows")
+        console.log("hook userToWatchShows")
 
         const userEpisodes: UserToWatchShowsInterface[] = Object.entries(snapshot.val()).reduce(
           (acc: UserToWatchShowsInterface[], [key, value]: any) => {

@@ -245,7 +245,7 @@ const MoviesContent: React.FC<Props> = ({
 
   return (
     <div className="content-results">
-      {loadingMovies ? (
+      {loadingMovies || context.userContentHandler.loadingShowsOnRegister ? (
         <Loader className="loader--pink" />
       ) : movies.length === 0 ? (
         <PlaceholderNoMovies />

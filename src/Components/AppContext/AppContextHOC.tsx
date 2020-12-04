@@ -61,6 +61,8 @@ export interface HandleShowInDatabasesArg {
 export interface HandleMovieInDatabasesArg {
   id: number
   data: MovieInterface
+  onRegister?: boolean
+  userOnRegister?: { email: string; uid: string; displayName: string }
 }
 
 export interface ToggleMovieLSArg {
@@ -95,6 +97,9 @@ export interface AppContextInterface {
     addShowToDatabase: ({ id, show, callback }: AddShowToDatabaseArg) => void
     handleShowInDatabases: ({ id, data, database, userShows }: HandleShowInDatabasesArg) => void
     handleMovieInDatabases: ({ id, data }: HandleMovieInDatabasesArg) => void
+    handleLoadingShowsOnRegister: (isLoading: boolean) => void
+    loadingAddShowToDatabase: boolean
+    loadingShowsOnRegister: boolean
   }
   firebase: FirebaseInterface
   authUser: AuthUserInterface | null
@@ -126,7 +131,10 @@ export const CONTEXT_INITIAL_STATE = {
     addShowsToDatabaseOnRegister: () => {},
     addShowToDatabase: () => {},
     handleShowInDatabases: () => {},
-    handleMovieInDatabases: () => {}
+    handleMovieInDatabases: () => {},
+    handleLoadingShowsOnRegister: () => {},
+    loadingAddShowToDatabase: false,
+    loadingShowsOnRegister: false
   },
   firebase: {},
   authUser: { uid: "", email: "", emailVerified: false }

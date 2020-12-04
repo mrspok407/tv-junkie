@@ -24,7 +24,7 @@ const { CancelToken } = require("axios")
 let cancelRequest: any
 
 type Props = {
-  match: { params: { id: number; mediaType: string } }
+  match: { params: { id: string; mediaType: string } }
 }
 
 export interface ShowInfoInterface {
@@ -52,7 +52,7 @@ export const DetailesPage: React.FC<Props> = ({
   const firebase = useContext(FirebaseContext)
   const { authUser } = context
 
-  const { episodesFromDatabase, releasedEpisodes, handleListeners } = useHandleListeners({ id })
+  const { episodesFromDatabase, releasedEpisodes, handleListeners } = useHandleListeners({ id: Number(id) })
 
   const [similarContent, setSimilarContent] = useState<ContentDetailes[]>([])
 
@@ -92,7 +92,12 @@ export const DetailesPage: React.FC<Props> = ({
 
     console.log("fffffffffffffffffffff")
 
-    handleListeners({ id, status: detailes.status, handleLoading })
+    handleListeners({
+      id: Number(id),
+      status: detailes.status,
+      userShows: context.userContent.userShows,
+      handleLoading
+    })
   }, [id, detailes, context.userContent.userShows, context.userContent.loadingShowsMerging])
 
   const handleLoading = (isLoading: boolean) => {
@@ -237,10 +242,11 @@ export const DetailesPage: React.FC<Props> = ({
             <MainInfo
               detailes={detailes}
               mediaType={mediaType}
-              id={id}
+              id={Number(id)}
               changeShowDatabaseOnClient={changeShowDatabaseOnClient}
               showDatabaseOnClient={showDatabaseOnClient}
               movieInDatabase={movieInDatabase}
+              handleListeners={handleListeners}
             />
 
             <div className="detailes-page__description">{detailes.overview}</div>
@@ -250,7 +256,7 @@ export const DetailesPage: React.FC<Props> = ({
                 parentComponent="detailesPage"
                 episodesData={detailes.seasonsFromAPI}
                 showTitle={detailes.name}
-                id={id}
+                id={Number(id)}
                 showInfo={showInfo}
                 episodesFromDatabase={episodesFromDatabase}
                 releasedEpisodes={releasedEpisodes}

@@ -48,9 +48,12 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
     }
   }
 
+  console.log({ loadingShows: context.userContent.loadingShows })
+  console.log({ loadingShowsRegister: context.userContentHandler.loadingShowsOnRegister })
+
   return (
     <div className="content-results content-results--calendar">
-      {context.userContent.loadingShows ? (
+      {context.userContent.loadingShows || context.userContentHandler.loadingShowsOnRegister ? (
         <Loader className="loader--pink" />
       ) : willAirEpisodes.length === 0 && !homePage ? (
         <PlaceholderNoFutureEpisodes />

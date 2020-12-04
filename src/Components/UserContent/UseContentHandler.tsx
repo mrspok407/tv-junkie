@@ -1,4 +1,4 @@
-import { useContext } from "react"
+import { useContext, useState } from "react"
 import { FirebaseContext } from "Components/Firebase"
 import {
   AddShowsToDatabaseOnRegisterArg,
@@ -11,10 +11,14 @@ import getShowEpisodesFromAPI from "./TmdbAPIHelpers/getShowEpisodesFromAPI"
 import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
 
 const useContentHandler = () => {
+  const [loadingAddShowToDatabase, setLoadingAddShowToDatabase] = useState(false)
+  const [loadingShowsOnRegister, setLoadingShowsOnRegister] = useState(false)
+
   const firebase = useContext(FirebaseContext)
   const authUser = useAuthUser()
 
   const addShowsToDatabaseOnRegister = ({ shows, uid }: AddShowsToDatabaseOnRegisterArg) => {
+    // setLoadingShowsOnRegister(true)
     Promise.all(
       Object.values(shows).map((show) => {
         return getShowEpisodesFromAPI({ id: show.id }).then((dataFromAPI: any) => {
@@ -49,33 +53,46 @@ const useContentHandler = () => {
           return { showInfo, userEpisodes }
         })
       })
-    ).then((data) => {
-      const userShows = data.reduce((acc, show) => {
-        const showInfo = { ...show.showInfo }
-        return { ...acc, [show.showInfo.id]: showInfo }
-      }, {})
+    )
+      .then((data) => {
+        const userShows = data.reduce((acc, show) => {
+          const showInfo = { ...show.showInfo }
+          return { ...acc, [show.showInfo.id]: showInfo }
+        }, {})
 
-      const userEpisodes = data.reduce((acc, show) => {
-        const showEpisodes = { ...show.userEpisodes }
-        return {
-          ...acc,
-          [show.showInfo.id]: {
-            info: { allEpisodesWatched: false, finished: false, database: "watchingShows" },
-            episodes: showEpisodes
+        const userEpisodes = data.reduce((acc, show) => {
+          const showEpisodes = { ...show.userEpisodes }
+          return {
+            ...acc,
+            [show.showInfo.id]: {
+              info: { allEpisodesWatched: false, finished: false, database: "watchingShows" },
+              episodes: showEpisodes
+            }
           }
-        }
-      }, {})
+        }, {})
 
-      firebase.userAllShows(uid).set(userShows)
-      firebase.userEpisodes(uid).set(userEpisodes)
+        firebase.userAllShows(uid).set(userShows)
+        firebase.userEpisodes(uid).set(userEpisodes, () => {
+          setLoadingShowsOnRegister(false)
+        })
 
-      console.log(userShows)
-      console.log(userEpisodes)
-    })
+        console.log(userShows)
+        console.log(userEpisodes)
+      })
+      .catch(() => {
+        setLoadingShowsOnRegister(false)
+      })
+  }
+
+  const handleLoadingShowsOnRegister = (isLoading: boolean) => {
+    setLoadingShowsOnRegister(isLoading)
   }
 
   const addShowToDatabase = ({ id, show }: AddShowToDatabaseArg) => {
-    if (!authUser) return
+    if (!authUser) {
+      setLoadingAddShowToDatabase(false)
+      return
+    }
     getShowEpisodesFromAPI({ id }).then((dataFromAPI: any) => {
       console.log("addShowInDatabase run in function body")
 
@@ -102,7 +119,7 @@ const useContentHandler = () => {
         status: showsSubDatabase,
         firstAirDate: show.first_air_date,
         name: show.name,
-        timeStamp: firebase.timeStamp(),
+        // timeStamp: firebase.timeStamp(),
         finished: false,
         id
       })
@@ -110,15 +127,20 @@ const useContentHandler = () => {
       firebase
         .userEpisodes(authUser.uid)
         .child(id)
-        .set({
-          episodes: userEpisodes,
-          info: {
-            database: "watchingShows",
-            allEpisodesWatched: false,
-            isAllWatched_database: "false_watchingShows",
-            finished: false
+        .set(
+          {
+            episodes: userEpisodes,
+            info: {
+              database: "watchingShows",
+              allEpisodesWatched: false,
+              isAllWatched_database: "false_watchingShows",
+              finished: false
+            }
+          },
+          () => {
+            setLoadingAddShowToDatabase(false)
           }
-        })
+        )
 
       addShowToMainDatabase({ firebase, show, dataFromAPI })
     })
@@ -160,24 +182,28 @@ const useContentHandler = () => {
           })
         })
     } else {
+      setLoadingAddShowToDatabase(true)
+
       const showData: any = Array.isArray(data) ? data.find((item) => item.id === id) : data
       addShowToDatabase({ id, show: showData })
     }
   }
 
-  const handleMovieInDatabases = ({ id, data }: HandleMovieInDatabasesArg) => {
-    if (!authUser) return
+  const handleMovieInDatabases = ({ id, data, onRegister, userOnRegister }: HandleMovieInDatabasesArg) => {
+    const user = onRegister ? userOnRegister : authUser
+
+    if (!user) return
     console.log("handleMovieINDatabases")
 
     const movie = data
     firebase
-      .watchLaterMovies(authUser.uid)
+      .watchLaterMovies(user.uid)
       .child(id)
       .once("value", (snapshot: any) => {
         if (snapshot.val() !== null) {
-          firebase.watchLaterMovies(authUser.uid).child(id).set(null)
+          firebase.watchLaterMovies(user.uid).child(id).set(null)
         } else {
-          firebase.watchLaterMovies(authUser.uid).child(id).set({
+          firebase.watchLaterMovies(user.uid).child(id).set({
             id: movie.id,
             title: movie.title,
             release_date: movie.release_date,
@@ -196,7 +222,10 @@ const useContentHandler = () => {
     addShowsToDatabaseOnRegister,
     addShowToDatabase,
     handleShowInDatabases,
-    handleMovieInDatabases
+    handleMovieInDatabases,
+    handleLoadingShowsOnRegister,
+    loadingAddShowToDatabase,
+    loadingShowsOnRegister
   }
 }
 

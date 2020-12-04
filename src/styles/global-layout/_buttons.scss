@@ -2,6 +2,9 @@
 
 .button {
   position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   background-color: getColor(bgColor, $btnPalette);
   line-height: 40px;
   height: 40px;
@@ -47,9 +50,6 @@
 }
 
 .button--auth__form {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   height: 40px;
   margin: 10px 0 10px 0;
   border-radius: 5px;
@@ -199,4 +199,8 @@
       text-decoration: underline;
     }
   }
+}
+
+.button--profile {
+  padding: 5px;
 }

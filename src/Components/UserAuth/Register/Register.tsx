@@ -84,6 +84,8 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
       return
     }
 
+    context.userContentHandler.handleLoadingShowsOnRegister(true)
+
     firebase
       .createUserWithEmailAndPassword(email, password)
       .then((authUser: AuthUserFirebaseInterface) => {
@@ -111,7 +113,9 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
             watchLaterMovies.forEach((item: MovieInterface) => {
               context.userContentHandler.handleMovieInDatabases({
                 id: item.id,
-                data: item
+                data: item,
+                onRegister: true,
+                userOnRegister: authUser.user
               })
             })
           })
@@ -137,6 +141,7 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
         errorsOnSubmit.error = error
         setErrors(errorsOnSubmit)
         setSubmitRequestLoading(false)
+        context.userContentHandler.handleLoadingShowsOnRegister(false)
       })
   }
 

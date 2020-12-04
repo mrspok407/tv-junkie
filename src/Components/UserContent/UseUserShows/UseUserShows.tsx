@@ -8,6 +8,7 @@ import merge from "deepmerge"
 import useGetUserToWatchShows from "./Hooks/UseGetUserToWatchShows"
 import getShowsFullInfo from "./FirebaseHelpers/getShowsFullInfo"
 import spliceNewShowFromDatabase from "./FirebaseHelpers/spliceNewShowFromDatabase"
+import useGetUserMovies from "./Hooks/UseGetUserMovies"
 
 const SESSION_STORAGE_KEY_SHOWS = "userShows"
 
@@ -58,7 +59,7 @@ export interface UserWillAirEpisodesInterface {
 
 const useUserShows = () => {
   const [userShows, setUserShows] = useState<UserShowsInterface[]>([])
-  const [userMovies, setUserMovies] = useState<UserMoviesInterface[]>([])
+  // const [userMovies, setUserMovies] = useState<UserMoviesInterface[]>([])
   const [userWillAirEpisodes, setUserWillAirEpisodes] = useState<UserWillAirEpisodesInterface[]>([])
   const {
     userToWatchShows,
@@ -66,9 +67,16 @@ const useUserShows = () => {
     listenerUserToWatchShow,
     resetStateToWatchShows
   } = useGetUserToWatchShows()
+
+  const {
+    userMovies,
+    loadingMovies,
+    listenerUserMovies,
+    handleUserMoviesOnClient,
+    resetStateUserMovies
+  } = useGetUserMovies()
   const [loadingShows, setLoadingShows] = useState(true)
   const [loadingShowsMerging, setLoadingShowsMerging] = useState(true)
-  const [loadingMovies, setLoadingMovies] = useState(true)
   const [firebaseListeners, setFirebaseListeners] = useState<any>([])
 
   const firebase = useContext(FirebaseContext)
@@ -81,7 +89,6 @@ const useUserShows = () => {
         (authUser: AuthUserInterface) => {
           if (!authUser) return
           setLoadingShows(true)
-          setLoadingMovies(true)
           firebase
             .userAllShows(authUser.uid)
             .on("value", async (snapshot: { val: () => UserShowsInterface[] }) => {
@@ -135,28 +142,13 @@ const useUserShows = () => {
               }
             })
 
-          listenerUserToWatchShow()
-
-          firebase
-            .watchLaterMovies(authUser.uid)
-            .on("value", (snapshot: { val: () => UserMoviesInterface[] }) => {
-              if (snapshot.val() === null) {
-                setLoadingMovies(false)
-                return
-              }
-
-              const movies: UserMoviesInterface[] = Object.values(snapshot.val()).map((movie) => {
-                return movie
-              })
-              setUserMovies(movies)
-              setLoadingMovies(false)
-            })
+          listenerUserToWatchShow({ uid: authUser.uid })
+          listenerUserMovies({ uid: authUser.uid })
 
           setFirebaseListeners([firebase.userAllShows(authUser.uid), firebase.watchLaterMovies(authUser.uid)])
         },
         () => {
           setLoadingShows(false)
-          setLoadingMovies(false)
         }
       )
     }
@@ -194,21 +186,10 @@ const useUserShows = () => {
     console.log("upd on client")
   }
 
-  const handleUserMoviesOnClient = ({ id, data }: { id: number; data?: UserMoviesInterface }) => {
-    const movie = userMovies.find((movie) => movie.id === id)
-
-    if (movie) {
-      setUserMovies(userMovies.filter((movie) => movie.id !== id))
-    } else {
-      if (data === undefined) return
-      setUserMovies([...userMovies, { ...data }])
-    }
-  }
-
   const resetContentState = () => {
     setUserShows([])
-    setUserMovies([])
     setUserWillAirEpisodes([])
+    resetStateUserMovies()
     resetStateToWatchShows()
   }
 

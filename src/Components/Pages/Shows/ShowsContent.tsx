@@ -267,7 +267,7 @@ const ShowsContent: React.FC = () => {
         </div>
       </div>
 
-      {loadingShows ? (
+      {loadingShows || context.userContentHandler.loadingShowsOnRegister ? (
         <Loader className="loader--pink" />
       ) : shows.length === 0 ? (
         <PlaceholderNoShows authUser={authUser} activeSection={state.activeSection} />

@@ -22,6 +22,8 @@ const SignInWithGoogleForm = () => {
   const onSubmit = (provider: any) => {
     const signInType = windowSize < mobileLayout ? "signInWithRedirect" : "signInWithPopup"
 
+    context.userContentHandler.handleLoadingShowsOnRegister(true)
+
     context.firebase.app
       .auth()
       [signInType](provider)
@@ -50,7 +52,9 @@ const SignInWithGoogleForm = () => {
             watchLaterMovies.forEach((item: MovieInterface) => {
               context.userContentHandler.handleMovieInDatabases({
                 id: item.id,
-                data: item
+                data: item,
+                onRegister: true,
+                userOnRegister: authUser.user
               })
             })
           })
@@ -65,6 +69,7 @@ const SignInWithGoogleForm = () => {
         history.push(ROUTES.HOME_PAGE)
       })
       .catch((error: any) => {
+        context.userContentHandler.handleLoadingShowsOnRegister(false)
         console.log(error)
         // setError(error.message)
       })

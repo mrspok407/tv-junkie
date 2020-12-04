@@ -2,7 +2,8 @@ import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase/FirebaseContext"
 import {
   SeasonEpisodesFromDatabaseInterface,
-  SingleEpisodeInterface
+  SingleEpisodeInterface,
+  UserShowsInterface
 } from "Components/UserContent/UseUserShows/UseUserShows"
 import { useState, useEffect, useRef, useContext } from "react"
 import { releasedEpisodesToOneArray } from "Utils"
@@ -10,6 +11,7 @@ import { releasedEpisodesToOneArray } from "Utils"
 export interface HandleListenersArg {
   id: number
   status: string
+  userShows: UserShowsInterface[]
   handleLoading?: (isLoading: boolean) => void
 }
 
@@ -22,8 +24,12 @@ const useHandleListeners = ({ id }: { id?: number }) => {
 
   const firebaseListenerRef = useRef()
 
-  const handleListeners = ({ id, status, handleLoading }: HandleListenersArg) => {
+  const handleListeners = ({ id, status, userShows, handleLoading }: HandleListenersArg) => {
     if (status === "-" || !authUser) return
+    if (!userShows.find((item: any) => item.id === id)) {
+      if (handleLoading) handleLoading(false)
+      return
+    }
     console.log(id)
 
     const statusDatabase = status === "Ended" || status === "Canceled" ? "ended" : "ongoing"

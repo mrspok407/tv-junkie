@@ -34,7 +34,7 @@ export interface MoviesContentState {
   context: AppContextInterface
 }
 
-const MOVIES_TO_LOAD_INITIAL = 5
+const MOVIES_TO_LOAD_INITIAL = 16
 const INITIAL_STATE: MoviesContentState = {
   disableLoad: {
     watchLaterMovies: false,

@@ -13,8 +13,8 @@ import {
 import { ShowInfoInterface } from "Components/Pages/Detailes/Detailes"
 import { FirebaseContext } from "Components/Firebase"
 import { AppContext } from "Components/AppContext/AppContextHOC"
-import "./ShowsEpisodes.scss"
 import SeasonEpisodes from "./SeasonEpisodes"
+import "./ShowsEpisodes.scss"
 
 const { CancelToken } = require("axios")
 
@@ -81,15 +81,15 @@ const ShowsEpisodes: React.FC<Props> = ({
       } else {
         axios
           .get(
-            `https://api.themoviedb.org/3/tv/${id}/season/${firstSeason.season_number}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US`,
+            `https://api.themoviedb.org/3/tv/${id}?api_key=${process.env.REACT_APP_TMDB_API}&append_to_response=season/${firstSeason.season_number}`,
             {
               cancelToken: new CancelToken(function executor(c: any) {
                 cancelRequest = c
               })
             }
           )
-          .then(({ data: { episodes } }) => {
-            const episodesReverse = episodes.reverse()
+          .then(({ data }) => {
+            const episodesReverse = data[`season/${firstSeason.season_number}`].episodes.reverse()
 
             setEpisodesDataFromAPI([{ seasonId: firstSeason.id, episodes: episodesReverse }])
             setLoadingEpisodesIds(loadingEpisodesIds.filter((item) => item !== firstSeason.id))
@@ -123,15 +123,15 @@ const ShowsEpisodes: React.FC<Props> = ({
 
     axios
       .get(
-        `https://api.themoviedb.org/3/tv/${id}/season/${seasonNum}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US`,
+        `https://api.themoviedb.org/3/tv/${id}?api_key=${process.env.REACT_APP_TMDB_API}&append_to_response=season/${seasonNum}`,
         {
           cancelToken: new CancelToken(function executor(c: any) {
             cancelRequest = c
           })
         }
       )
-      .then(({ data: { episodes } }) => {
-        const episodesReverse = episodes.reverse()
+      .then(({ data }) => {
+        const episodesReverse = data[`season/${seasonNum}`].episodes.reverse()
         setEpisodesDataFromAPI((prevState) => [...prevState, { seasonId, episodes: episodesReverse }])
         setLoadingEpisodesIds((prevState) => [...prevState.filter((item) => item !== seasonId)])
       })
@@ -273,8 +273,8 @@ const ShowsEpisodes: React.FC<Props> = ({
           isAllEpisodesWatched({
             showInfo,
             releasedEpisodes,
-            authUser: authUser,
-            firebase: firebase
+            authUser,
+            firebase
           })
         }
       })

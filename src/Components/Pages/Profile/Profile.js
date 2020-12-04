@@ -9,6 +9,7 @@ import Footer from "Components/UI/Footer/Footer"
 import { todayDate } from "Utils"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import "./Profile.scss"
+import PasswordUpdate from "Components/UserAuth/PasswordUpdate/PasswordUpdate"
 
 class Profile extends Component {
   constructor(props) {
@@ -16,19 +17,22 @@ class Profile extends Component {
 
     this.state = {
       verificationSent: false,
-      // authUser: null,
+      loadingVerificationSent: false,
+      errorMessage: null,
       passwordUpdate: ""
     }
   }
 
-  componentDidMount() {
-    // this.authUserListener()
-  }
-
   sendEmailVerification = () => {
-    this.context.firebase.sendEmailVerification().then(() => {
-      this.setState({ verificationSent: true })
-    })
+    this.setState({ loadingVerificationSent: true })
+    this.context.firebase
+      .sendEmailVerification()
+      .then(() => {
+        this.setState({ verificationSent: true, loadingVerificationSent: false, error: null })
+      })
+      .catch((err) => {
+        this.setState({ loadingVerificationSent: false, error: err })
+      })
   }
 
   // authUserListener = () => {
@@ -205,12 +209,6 @@ class Profile extends Component {
     })
   }
 
-  updatePassword = (e) => {
-    e.preventDefault()
-
-    this.context.firebase.passwordUpdate(this.state.passwordUpdate)
-  }
-
   render() {
     return (
       <>
@@ -228,35 +226,44 @@ class Profile extends Component {
             ) : (
               <>
                 Email not verified{" "}
-                <button onClick={this.sendEmailVerification} className="button" type="button">
-                  {this.state.verificationSent ? "Verification sent" : "Send email verification"}
-                </button>
+                {this.state.verificationSent ? (
+                  <div className="user-profile__sent-message">Verification sent</div>
+                ) : (
+                  <button
+                    onClick={this.sendEmailVerification}
+                    className="button button--profile"
+                    type="button"
+                  >
+                    {this.state.loadingVerificationSent ? (
+                      <span className="auth__form-loading"></span>
+                    ) : (
+                      "Send email verification"
+                    )}
+                  </button>
+                )}
               </>
             )}
+            {this.state.error && (
+              <div className="user-profile__error-email-verification">{this.state.error.message}</div>
+            )}
           </div>
-          <div className="user-profile__signout">
-            <SignOutButton />
-          </div>
+          <PasswordUpdate />
           {_get(this.context.authUser, "email", "") === "test@test.com" && (
             <>
               <div className="update-database">
-                <button onClick={() => this.databaseModify()} className="button" type="button">
+                <button
+                  onClick={() => this.databaseModify()}
+                  className="button button--profile"
+                  type="button"
+                >
                   Update Database
                 </button>
               </div>
-              <form onSubmit={this.updatePassword}>
-                <input
-                  onChange={this.handleOnChange}
-                  value={this.state.passwordUpdate}
-                  type="password"
-                  name="new-password"
-                />
-                <button className="button" type="submit">
-                  Update Password
-                </button>
-              </form>
             </>
           )}
+          <div className="user-profile__signout">
+            <SignOutButton />
+          </div>
         </div>
         <Footer />
       </>

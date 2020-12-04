@@ -40,7 +40,7 @@ export interface ShowsContentState {
   context: AppContextInterface
 }
 
-const SHOWS_TO_LOAD_INITIAL = 5
+const SHOWS_TO_LOAD_INITIAL = 16
 const INITIAL_STATE: ShowsContentState = {
   disableLoad: {
     watchingShows: false,

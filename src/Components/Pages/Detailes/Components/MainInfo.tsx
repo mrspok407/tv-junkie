@@ -5,6 +5,7 @@ import classNames from "classnames"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import UserRating from "Components/UI/UserRating/UserRating"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
+import { HandleListenersArg } from "../FirebaseHelpers/UseHandleListeners"
 
 type Props = {
   detailes: ContentDetailes
@@ -13,6 +14,7 @@ type Props = {
   id: number
   showDatabaseOnClient: string
   changeShowDatabaseOnClient: (database: string) => void
+  handleListeners: ({ id, status, userShows, handleLoading }: HandleListenersArg) => void
 }
 
 export const MainInfo: React.FC<Props> = ({

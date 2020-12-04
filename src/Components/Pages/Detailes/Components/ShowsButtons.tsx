@@ -48,9 +48,10 @@ const ShowsButtons: React.FC<Props> = ({
         <button
           className={classNames("button", {
             "button--pressed":
-              showDatabaseOnClient === "watchingShows" ||
-              showDatabaseOnClient === "finishedShows" ||
-              context.userContentLocalStorage.watchingShows.find((item) => item.id === Number(id))
+              (showDatabaseOnClient === "watchingShows" ||
+                showDatabaseOnClient === "finishedShows" ||
+                context.userContentLocalStorage.watchingShows.find((item) => item.id === Number(id))) &&
+              !context.userContentHandler.loadingAddShowToDatabase
           })}
           type="button"
           onClick={() => {
@@ -74,7 +75,11 @@ const ShowsButtons: React.FC<Props> = ({
             }
           }}
         >
-          Watching
+          {context.userContentHandler.loadingAddShowToDatabase ? (
+            <span className="auth__form-loading"></span>
+          ) : (
+            "Watching"
+          )}
         </button>
       </div>
 

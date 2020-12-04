@@ -21,8 +21,6 @@ const isAllEpisodesWatched = ({
   multipleEpisodes
 }: Arguments) => {
   const status = showInfo.status === "Ended" || showInfo.status === "Canceled" ? "ended" : "ongoing"
-  console.log({ multipleEpisodes })
-  console.log(releasedEpisodes.filter((episode) => !episode.watched).length)
   const allEpisodesWatched = isSingleEpisode
     ? releasedEpisodes.filter((episode) => !episode.watched).length === 1
     : multipleEpisodes

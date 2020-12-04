@@ -105,6 +105,7 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false }) =>
                 className={classNames("nav__link", {
                   "nav__link--non-auth": !authUser
                 })}
+                activeClassName="nav__item--active"
               >
                 <li className="nav__item" onClick={() => closeNavMobile()}>
                   Profile
