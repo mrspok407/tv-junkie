@@ -15,6 +15,7 @@ interface Arguments {
 }
 
 const updateUserEpisodesFromDatabase = ({ firebase, authUser, showsFullInfo }: Arguments) => {
+  console.log("updateUserEp")
   return firebase
     .userEpisodes(authUser.uid)
     .once("value", (snapshot: { val: () => { key: UserShowsInterface } }) => {
@@ -25,13 +26,20 @@ const updateUserEpisodesFromDatabase = ({ firebase, authUser, showsFullInfo }: A
 
       if (showsFullInfo.length !== userShowsEpisodes.length) return
 
-      const mergedShowsEpisodes: UserShowsInterface[] = merge(showsFullInfo, userShowsEpisodes, {
+      console.log({ userShowsEpisodes })
+      console.log({ showsFullInfo })
+
+      const mergedShowsEpisodes: UserShowsInterface[] = merge(userShowsEpisodes, showsFullInfo, {
         arrayMerge: combineMergeObjects
       })
 
+      console.log({ mergedShowsEpisodes })
+
       mergedShowsEpisodes.forEach((show) => {
-        const seasons = show.episodes.reduce((acc: SeasonEpisodesFromDatabaseInterface[], season) => {
+        const seasons = show.episodes.reduce((acc: any, season) => {
+          if (!season.id) return acc
           const episodes = season.episodes.reduce((acc: SingleEpisodeInterface[], episode) => {
+            if (!episode.id) return acc
             acc.push({
               userRating: episode.userRating || 0,
               watched: episode.watched || false,
@@ -41,10 +49,8 @@ const updateUserEpisodesFromDatabase = ({ firebase, authUser, showsFullInfo }: A
           }, [])
           acc.push({
             episodes,
-            name: season.name,
             season_number: season.season_number,
-            userRating: season.userRating || 0,
-            id: season.id
+            userRating: season.userRating || 0
           })
           return acc
         }, [])
@@ -52,13 +58,13 @@ const updateUserEpisodesFromDatabase = ({ firebase, authUser, showsFullInfo }: A
         const statusDatabase = show.status === "Ended" || show.status === "Canceled" ? "ended" : "ongoing"
 
         const releasedEpisodes: SingleEpisodeInterface[] = releasedEpisodesToOneArray({ data: show.episodes })
-        const allEpisodes = seasons.reduce((acc: SingleEpisodeInterface[], item) => {
+        const allEpisodes = seasons.reduce((acc: SingleEpisodeInterface[], item: any) => {
           acc.push(...item.episodes)
           return acc
         }, [])
         allEpisodes.splice(releasedEpisodes.length)
 
-        const allEpisodesWatched = !allEpisodes.some((episode) => !episode.watched)
+        const allEpisodesWatched = !allEpisodes.some((episode: any) => !episode.watched)
         const finished = statusDatabase === "ended" && allEpisodesWatched ? true : false
 
         firebase.userShowAllEpisodes(authUser.uid, show.id).set(seasons)

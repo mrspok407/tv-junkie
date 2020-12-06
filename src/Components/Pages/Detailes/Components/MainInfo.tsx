@@ -14,7 +14,7 @@ type Props = {
   id: number
   showDatabaseOnClient: string
   changeShowDatabaseOnClient: (database: string) => void
-  handleListeners: ({ id, status, userShows, handleLoading }: HandleListenersArg) => void
+  handleListeners: ({ id, status, handleLoading }: HandleListenersArg) => void
 }
 
 export const MainInfo: React.FC<Props> = ({
@@ -23,7 +23,8 @@ export const MainInfo: React.FC<Props> = ({
   mediaType,
   id,
   showDatabaseOnClient,
-  changeShowDatabaseOnClient
+  changeShowDatabaseOnClient,
+  handleListeners
 }) => {
   const context = useContext(AppContext)
   const { authUser } = context
@@ -173,6 +174,7 @@ export const MainInfo: React.FC<Props> = ({
             detailes={detailes}
             changeShowDatabaseOnClient={changeShowDatabaseOnClient}
             showDatabaseOnClient={showDatabaseOnClient}
+            handleListeners={handleListeners}
           />
         )}
 

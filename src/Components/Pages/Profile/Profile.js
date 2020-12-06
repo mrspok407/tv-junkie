@@ -187,7 +187,10 @@ class Profile extends Component {
                   .then((data) => {
                     this.context.firebase
                       .showInDatabase(show.id)
-                      .update({ episodes: data.episodes, status: data.status })
+                      .update({
+                        episodes: data.episodes,
+                        status: data.status
+                      })
                       .catch((err) => {
                         console.log(err)
                       })

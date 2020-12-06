@@ -20,8 +20,9 @@ interface Arguments {
   handleListeners?: ({ status }: HandleListenersArg) => void
 }
 
-const addShowToMainDatabase = ({ firebase, show, dataFromAPI }: Arguments) => {
-  firebase.showInDatabase(show.id).transaction(
+const addShowToMainDatabase = ({ firebase, show, dataFromAPI }: Arguments): Promise<any> => {
+  console.log("transaction")
+  return firebase.showInDatabase(show.id).transaction(
     (snapshot: any) => {
       if (snapshot === null) {
         return {

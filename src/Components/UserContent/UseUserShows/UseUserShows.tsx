@@ -38,7 +38,7 @@ export interface SeasonEpisodesFromDatabaseInterface {
   episode_count?: number
   season_number: number
   userRating: number | string
-  name: string
+  name?: string
   id: number
 }
 
@@ -119,6 +119,7 @@ const useUserShows = () => {
                 setLoadingShows(false)
                 setLoadingShowsMerging(false)
               } else if (userShowsSS.length < shows.length) {
+                console.log("userShows length < 0")
                 shows.forEach(async (show, index) => {
                   if (userShowsSS.find((item) => item.id === show.id)) return
 
@@ -153,8 +154,6 @@ const useUserShows = () => {
       )
     }
 
-    console.log("updated")
-
     authUserListener()
     return () => {
       console.log("userShowsHook unmounted")
@@ -167,6 +166,7 @@ const useUserShows = () => {
   }, [])
 
   useEffect(() => {
+    console.log("userShows updated")
     sessionStorage.setItem(SESSION_STORAGE_KEY_SHOWS, JSON.stringify(userShows))
   }, [userShows])
 

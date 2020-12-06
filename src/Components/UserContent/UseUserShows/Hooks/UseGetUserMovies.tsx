@@ -33,8 +33,6 @@ const useGetUserMovies: Hook = () => {
         return
       }
 
-      console.log("hook watch later")
-
       const movies: UserMoviesInterface[] = Object.values(snapshot.val()).map((movie) => {
         return movie
       })

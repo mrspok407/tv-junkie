@@ -95,10 +95,9 @@ export const DetailesPage: React.FC<Props> = ({
     handleListeners({
       id: Number(id),
       status: detailes.status,
-      userShows: context.userContent.userShows,
       handleLoading
     })
-  }, [id, detailes, context.userContent.userShows, context.userContent.loadingShowsMerging])
+  }, [id, detailes, context.userContent.loadingShowsMerging])
 
   const handleLoading = (isLoading: boolean) => {
     setLoadingFromDatabase(isLoading)

@@ -2,8 +2,7 @@ import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase/FirebaseContext"
 import {
   SeasonEpisodesFromDatabaseInterface,
-  SingleEpisodeInterface,
-  UserShowsInterface
+  SingleEpisodeInterface
 } from "Components/UserContent/UseUserShows/UseUserShows"
 import { useState, useEffect, useRef, useContext } from "react"
 import { releasedEpisodesToOneArray } from "Utils"
@@ -11,7 +10,6 @@ import { releasedEpisodesToOneArray } from "Utils"
 export interface HandleListenersArg {
   id: number
   status: string
-  userShows: UserShowsInterface[]
   handleLoading?: (isLoading: boolean) => void
 }
 
@@ -22,14 +20,10 @@ const useHandleListeners = ({ id }: { id?: number }) => {
   const firebase = useContext(FirebaseContext)
   const { authUser } = useContext(AppContext)
 
-  const firebaseListenerRef = useRef()
+  // const firebaseListenerRef = useRef()
 
-  const handleListeners = ({ id, status, userShows, handleLoading }: HandleListenersArg) => {
+  const handleListeners = ({ id, status, handleLoading }: HandleListenersArg) => {
     if (status === "-" || !authUser) return
-    if (!userShows.find((item: any) => item.id === id)) {
-      if (handleLoading) handleLoading(false)
-      return
-    }
     console.log(id)
 
     const statusDatabase = status === "Ended" || status === "Canceled" ? "ended" : "ongoing"
@@ -46,7 +40,7 @@ const useHandleListeners = ({ id }: { id?: number }) => {
           data: snapshot.val()
         })
 
-        firebaseListenerRef.current = firebase.userShowAllEpisodes(authUser.uid, id)
+        // firebaseListenerRef.current = firebase.userShowAllEpisodes(authUser.uid, id)
 
         console.log("useHandleListeners before .on")
 
@@ -54,6 +48,7 @@ const useHandleListeners = ({ id }: { id?: number }) => {
           .userShowAllEpisodes(authUser.uid, id)
           .on("value", (snapshot: { val: () => SeasonEpisodesFromDatabaseInterface[] }) => {
             if (snapshot.val() === null) {
+              firebase.userShowAllEpisodes(authUser.uid, id).off()
               if (handleLoading) handleLoading(false)
               return
             }

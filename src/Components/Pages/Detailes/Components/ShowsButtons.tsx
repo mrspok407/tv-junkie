@@ -4,19 +4,22 @@ import classNames from "classnames"
 import * as ROUTES from "Utils/Constants/routes"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
+import { HandleListenersArg } from "../FirebaseHelpers/UseHandleListeners"
 
 type Props = {
   id: number
   detailes: ContentDetailes
   changeShowDatabaseOnClient: (database: string) => void
   showDatabaseOnClient: string | null
+  handleListeners: ({ id, status, handleLoading }: HandleListenersArg) => void
 }
 
 const ShowsButtons: React.FC<Props> = ({
   id,
   detailes,
   changeShowDatabaseOnClient,
-  showDatabaseOnClient
+  showDatabaseOnClient,
+  handleListeners
 }) => {
   const [disableBtnWarning, setDisableBtnWarning] = useState<string | null>(null)
   const _notAuthButtons = useRef<HTMLDivElement>(null)
@@ -61,7 +64,8 @@ const ShowsButtons: React.FC<Props> = ({
                 id: Number(id),
                 data: detailes,
                 database: "watchingShows",
-                userShows: context.userContent.userShows
+                userShows: context.userContent.userShows,
+                handleListeners
               })
               context.userContent.handleUserShowsOnClient({
                 database: "watchingShows",
@@ -99,7 +103,8 @@ const ShowsButtons: React.FC<Props> = ({
                 id: Number(id),
                 data: detailes,
                 database: "notWatchingShows",
-                userShows: context.userContent.userShows
+                userShows: context.userContent.userShows,
+                handleListeners
               })
               context.userContent.handleUserShowsOnClient({
                 database: "notWatchingShows",
@@ -130,7 +135,8 @@ const ShowsButtons: React.FC<Props> = ({
                   id: Number(id),
                   data: detailes,
                   database: "droppedShows",
-                  userShows: context.userContent.userShows
+                  userShows: context.userContent.userShows,
+                  handleListeners
                 })
                 context.userContent.handleUserShowsOnClient({
                   database: "droppedShows",
@@ -168,7 +174,8 @@ const ShowsButtons: React.FC<Props> = ({
                   id: Number(id),
                   data: detailes,
                   database: "willWatchShows",
-                  userShows: context.userContent.userShows
+                  userShows: context.userContent.userShows,
+                  handleListeners
                 })
                 context.userContent.handleUserShowsOnClient({
                   database: "willWatchShows",

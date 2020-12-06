@@ -32,7 +32,7 @@ type Props = {
 }
 
 export interface EpisodesDataInterface {
-  name: string
+  name?: string
   id: number
   seasonId?: number
   air_date?: string

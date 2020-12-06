@@ -26,6 +26,13 @@ const spliceNewShowFromDatabase = ({
     .showInDatabase(userShow.id)
     .once("value")
     .then((snapshot: { val: () => { info: {}; episodes: SeasonEpisodesFromDatabaseInterface[] } }) => {
+      if (snapshot.val() === null) {
+        throw new Error(
+          "There's no data in database, by this path. And if this function is called the data should be here.\n" +
+            "Find out the reason why the data is missing at the point of calling this function."
+        )
+      }
+
       const updatedShows = [...userShowsSS]
       const mergedShow = {
         ...userShow,

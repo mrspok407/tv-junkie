@@ -38,7 +38,10 @@ const SignInWithGoogleForm = () => {
             role: userRole
           })
           .then(() => {
-            if (!authUser.additionalUserInfo.isNewUser) return
+            if (!authUser.additionalUserInfo.isNewUser) {
+              context.userContentHandler.handleLoadingShowsOnRegister(false)
+              return
+            }
 
             const watchingShows = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)!) || []
             const watchLaterMovies =

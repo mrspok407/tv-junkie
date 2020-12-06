@@ -17,6 +17,7 @@ interface GetUserShowsFullInfoArg {
 }
 
 const getShowsFullInfo = ({ userShows, firebase, authUser }: GetUserShowsFullInfoArg) => {
+  console.log("getShowsFullInfo")
   return Promise.all(
     userShows.map((show) => {
       return firebase
@@ -38,6 +39,8 @@ const getShowsFullInfo = ({ userShows, firebase, authUser }: GetUserShowsFullInf
     })
     const watchingShows: any = mergedShows.filter((show) => show && show.database === "watchingShows")
     const willAirEpisodes: UserWillAirEpisodesInterface[] = organiseFutureEpisodesByMonth(watchingShows)
+
+    console.log({ mergedShows })
 
     await updateUserEpisodesFromDatabase({
       firebase,

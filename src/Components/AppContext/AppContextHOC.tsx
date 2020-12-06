@@ -12,6 +12,7 @@ import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
 import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
 import { UserToWatchShowsInterface } from "Components/UserContent/UseUserShows/Hooks/UseGetUserToWatchShows"
+import { HandleListenersArg } from "Components/Pages/Detailes/FirebaseHelpers/UseHandleListeners"
 
 export interface ShowInterface {
   id: number
@@ -48,7 +49,7 @@ export interface AddShowsToDatabaseOnRegisterArg {
 export interface AddShowToDatabaseArg {
   id: number
   show: ContentDetailes
-  callback?: () => void
+  handleListeners?: ({ id, status, handleLoading }: HandleListenersArg) => void
 }
 
 export interface HandleShowInDatabasesArg {
@@ -56,6 +57,7 @@ export interface HandleShowInDatabasesArg {
   data: ContentDetailes
   database: string
   userShows: ContentDetailes[]
+  handleListeners?: ({ id, status, handleLoading }: HandleListenersArg) => void
 }
 
 export interface HandleMovieInDatabasesArg {
@@ -94,7 +96,7 @@ export interface AppContextInterface {
   }
   userContentHandler: {
     addShowsToDatabaseOnRegister: ({ shows }: AddShowsToDatabaseOnRegisterArg) => void
-    addShowToDatabase: ({ id, show, callback }: AddShowToDatabaseArg) => void
+    addShowToDatabase: ({ id, show, handleListeners }: AddShowToDatabaseArg) => void
     handleShowInDatabases: ({ id, data, database, userShows }: HandleShowInDatabasesArg) => void
     handleMovieInDatabases: ({ id, data }: HandleMovieInDatabasesArg) => void
     handleLoadingShowsOnRegister: (isLoading: boolean) => void

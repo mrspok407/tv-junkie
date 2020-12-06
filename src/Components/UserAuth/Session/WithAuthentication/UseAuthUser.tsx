@@ -9,7 +9,6 @@ const useAuthUser = () => {
   const firebase = useContext(FirebaseContext)
 
   useEffect(() => {
-    console.log("authUser set in LC")
     let authSubscriber: any
     const authUserListener = () => {
       authSubscriber = firebase.onAuthUserListener(

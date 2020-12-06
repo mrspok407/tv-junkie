@@ -48,8 +48,8 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
     }
   }
 
-  console.log({ loadingShows: context.userContent.loadingShows })
-  console.log({ loadingShowsRegister: context.userContentHandler.loadingShowsOnRegister })
+  console.log(context.userContent.loadingShows)
+  console.log(context.userContentHandler.loadingShowsOnRegister)
 
   return (
     <div className="content-results content-results--calendar">

@@ -88,12 +88,12 @@ const useContentHandler = () => {
     setLoadingShowsOnRegister(isLoading)
   }
 
-  const addShowToDatabase = ({ id, show }: AddShowToDatabaseArg) => {
+  const addShowToDatabase = ({ id, show, handleListeners }: AddShowToDatabaseArg) => {
     if (!authUser) {
       setLoadingAddShowToDatabase(false)
       return
     }
-    getShowEpisodesFromAPI({ id }).then((dataFromAPI: any) => {
+    getShowEpisodesFromAPI({ id }).then(async (dataFromAPI: any) => {
       console.log("addShowInDatabase run in function body")
 
       const showsSubDatabase =
@@ -113,40 +113,49 @@ const useContentHandler = () => {
 
       console.log(authUser)
 
-      firebase.userAllShows(authUser.uid).child(id).set({
-        allEpisodesWatched: false,
-        database: "watchingShows",
-        status: showsSubDatabase,
-        firstAirDate: show.first_air_date,
-        name: show.name,
-        // timeStamp: firebase.timeStamp(),
-        finished: false,
-        id
-      })
-
-      firebase
-        .userEpisodes(authUser.uid)
-        .child(id)
-        .set(
-          {
-            episodes: userEpisodes,
-            info: {
-              database: "watchingShows",
-              allEpisodesWatched: false,
-              isAllWatched_database: "false_watchingShows",
-              finished: false
+      await addShowToMainDatabase({ firebase, show, dataFromAPI })
+      await Promise.all([
+        firebase.userAllShows(authUser.uid).child(id).set({
+          allEpisodesWatched: false,
+          database: "watchingShows",
+          status: showsSubDatabase,
+          firstAirDate: show.first_air_date,
+          name: show.name,
+          timeStamp: firebase.timeStamp(),
+          finished: false,
+          id
+        }),
+        firebase
+          .userEpisodes(authUser.uid)
+          .child(id)
+          .set(
+            {
+              episodes: userEpisodes,
+              info: {
+                database: "watchingShows",
+                allEpisodesWatched: false,
+                isAllWatched_database: "false_watchingShows",
+                finished: false
+              }
+            },
+            () => {
+              setLoadingAddShowToDatabase(false)
             }
-          },
-          () => {
-            setLoadingAddShowToDatabase(false)
-          }
-        )
+          )
+      ])
 
-      addShowToMainDatabase({ firebase, show, dataFromAPI })
+      console.log("right after promise all")
+      if (handleListeners) handleListeners({ id, status: dataFromAPI.status })
     })
   }
 
-  const handleShowInDatabases = ({ id, data, database, userShows }: HandleShowInDatabasesArg) => {
+  const handleShowInDatabases = ({
+    id,
+    data,
+    database,
+    userShows,
+    handleListeners
+  }: HandleShowInDatabasesArg) => {
     if (!authUser) return
     const userShow = userShows.find((show) => show.id === id)
 
@@ -185,7 +194,7 @@ const useContentHandler = () => {
       setLoadingAddShowToDatabase(true)
 
       const showData: any = Array.isArray(data) ? data.find((item) => item.id === id) : data
-      addShowToDatabase({ id, show: showData })
+      addShowToDatabase({ id, show: showData, handleListeners })
     }
   }
 
