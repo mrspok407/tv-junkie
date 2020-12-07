@@ -22,7 +22,13 @@ const ToWatchEpisodesContent: React.FC = () => {
     const watchingShows = context.userContent.userShows.filter(
       (show) => show.database === "watchingShows" && !show.allEpisodesWatched
     )
-    const toWatchEpisodes: any = context.userContent.userToWatchShows
+    let toWatchEpisodes: any =
+      watchingShows.length !== 0 ? context.userContent.userToWatchShows.splice(0, watchingShows.length) : []
+
+    // watchingShows.length === 0 ? (toWatchEpisodes = []) : toWatchEpisodes.splice(0, watchingShows.length)
+
+    console.log({ watchingShows })
+    console.log({ toWatchEpisodes })
 
     const watchingShowsModified = watchingShows.reduce((acc: UserShowsInterface[], show) => {
       if (toWatchEpisodes.find((item: any) => item.id === show.id)) {
@@ -31,7 +37,11 @@ const ToWatchEpisodesContent: React.FC = () => {
       return acc
     }, [])
 
-    if (toWatchEpisodes.length !== watchingShows.length || toWatchEpisodes.length === 0) {
+    // if (toWatchEpisodes.length !== watchingShows.length) {
+    //   setWatchingShows((prevState) => [...prevState])
+    //   return
+    // }
+    if (toWatchEpisodes.length === 0) {
       setWatchingShows([])
       if (!context.userContent.loadingNotFinishedShows && !context.userContent.loadingShows) {
         setInitialLoading(false)
