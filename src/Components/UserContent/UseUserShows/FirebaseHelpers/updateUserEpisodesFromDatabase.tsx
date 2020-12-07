@@ -2,11 +2,7 @@ import { combineMergeObjects, releasedEpisodesToOneArray } from "Utils"
 import merge from "deepmerge"
 import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
 import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
-import {
-  SeasonEpisodesFromDatabaseInterface,
-  SingleEpisodeInterface,
-  UserShowsInterface
-} from "../UseUserShows"
+import { SingleEpisodeInterface, UserShowsInterface } from "../UseUserShows"
 
 interface Arguments {
   firebase: FirebaseInterface
@@ -20,9 +16,7 @@ const updateUserEpisodesFromDatabase = ({ firebase, authUser, showsFullInfo }: A
     .userEpisodes(authUser.uid)
     .once("value", (snapshot: { val: () => { key: UserShowsInterface } }) => {
       if (snapshot.val() === null) return
-      const userShowsEpisodes = Object.values(snapshot.val()).map((show) => {
-        return show
-      })
+      const userShowsEpisodes = Object.values(snapshot.val()).map((show) => show)
 
       if (showsFullInfo.length !== userShowsEpisodes.length) return
 

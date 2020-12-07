@@ -42,11 +42,7 @@ const getShowsFullInfo = ({ userShows, firebase, authUser }: GetUserShowsFullInf
 
     console.log({ mergedShows })
 
-    await updateUserEpisodesFromDatabase({
-      firebase,
-      authUser,
-      showsFullInfo: mergedShows
-    })
+    await updateUserEpisodesFromDatabase({ firebase, authUser, showsFullInfo: mergedShows })
 
     return { showsFullInfo: mergedShows, willAirEpisodes }
   })

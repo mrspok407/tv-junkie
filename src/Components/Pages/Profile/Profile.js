@@ -8,8 +8,8 @@ import Header from "Components/UI/Header/Header"
 import Footer from "Components/UI/Footer/Footer"
 import { todayDate } from "Utils"
 import { AppContext } from "Components/AppContext/AppContextHOC"
-import "./Profile.scss"
 import PasswordUpdate from "Components/UserAuth/PasswordUpdate/PasswordUpdate"
+import "./Profile.scss"
 
 class Profile extends Component {
   constructor(props) {
@@ -78,6 +78,21 @@ class Profile extends Component {
   //   })
   // }
 
+  // database()     // import should be like this: import { database } from "firebase/app"
+  // .ref(".info/connected")
+  // .on("value", (snap: any) => {
+  //   if (snap.val() === true) {
+  //     console.log("user online")
+  //     firebase
+  //       .userOnlineStatus(authUser.uid)
+  //       .onDisconnect()
+  //       .set("offline")
+  //       .then(() => {
+  //         firebase.userOnlineStatus(authUser.uid).set("online")
+  //       })
+  //   }
+  // })
+
   databaseModify = () => {
     const todayConverted = `${todayDate.getDate()}-${todayDate.getMonth() + 1}-${todayDate.getFullYear()}`
     const threeDaysBefore = new Date(todayDate.getTime() - 259200000)
@@ -92,7 +107,13 @@ class Profile extends Component {
       .get(
         `https://api.themoviedb.org/3/tv/changes?api_key=${process.env.REACT_APP_TMDB_API}&end_date=${todayConverted}&start_date=${threeDaysBefore}`
       )
-      .then(({ data }) => {
+      .then(async ({ data }) => {
+        // const tempData = [{ id: 34307 }]
+        // const allShowsIds = await this.context.firebase // change show.id below to just show
+        //   .allShowsList()
+        //   .once("value")
+        //   .then((snapshot) => Object.keys(snapshot.val()).map((id) => id))
+
         data.results.forEach((show) => {
           this.context.firebase
             .showInDatabase(show.id)
@@ -251,7 +272,8 @@ class Profile extends Component {
             )}
           </div>
           <PasswordUpdate />
-          {_get(this.context.authUser, "email", "") === "test@test.com" && (
+          {(_get(this.context.authUser, "email", "") === "test@test.com" ||
+            _get(this.context.authUser, "email", "") === "mr.spok407@gmail.com") && (
             <>
               <div className="update-database">
                 <button

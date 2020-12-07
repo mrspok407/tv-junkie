@@ -59,7 +59,6 @@ export interface UserWillAirEpisodesInterface {
 
 const useUserShows = () => {
   const [userShows, setUserShows] = useState<UserShowsInterface[]>([])
-  // const [userMovies, setUserMovies] = useState<UserMoviesInterface[]>([])
   const [userWillAirEpisodes, setUserWillAirEpisodes] = useState<UserWillAirEpisodesInterface[]>([])
   const {
     userToWatchShows,
@@ -89,6 +88,7 @@ const useUserShows = () => {
         (authUser: AuthUserInterface) => {
           if (!authUser) return
           setLoadingShows(true)
+
           firebase
             .userAllShows(authUser.uid)
             .on("value", async (snapshot: { val: () => UserShowsInterface[] }) => {
@@ -114,6 +114,8 @@ const useUserShows = () => {
                   firebase,
                   authUser
                 })
+                listenerUserToWatchShow({ uid: authUser.uid })
+
                 setUserShows(showsFullInfo)
                 setUserWillAirEpisodes(willAirEpisodes)
                 setLoadingShows(false)
@@ -143,7 +145,7 @@ const useUserShows = () => {
               }
             })
 
-          listenerUserToWatchShow({ uid: authUser.uid })
+          // listenerUserToWatchShow({ uid: authUser.uid })
           listenerUserMovies({ uid: authUser.uid })
 
           setFirebaseListeners([firebase.userAllShows(authUser.uid), firebase.watchLaterMovies(authUser.uid)])

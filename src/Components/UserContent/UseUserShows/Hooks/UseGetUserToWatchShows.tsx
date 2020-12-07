@@ -44,19 +44,17 @@ const useGetUserToWatchShows: Hook = () => {
       .equalTo("false_watchingShows")
       .on("value", (snapshot: { val: () => { id: number; episodes: {}[] } }) => {
         if (snapshot.val() === null) {
+          console.log("hook userToWatchShosws No Value")
           setUserToWatchShows([])
           setLoadingNotFinishedShows(false)
           return
         }
-
         console.log("hook userToWatchShows")
-
         const userEpisodes: UserToWatchShowsInterface[] = Object.entries(snapshot.val()).reduce(
           (acc: UserToWatchShowsInterface[], [key, value]: any) => {
             const releasedEpisodes: { watched: boolean }[] = releasedEpisodesToOneArray({
               data: value.episodes
             })
-
             if (releasedEpisodes.find((episode) => !episode.watched)) {
               acc.push({ id: Number(key), episodes: value.episodes })
             }
@@ -64,7 +62,7 @@ const useGetUserToWatchShows: Hook = () => {
           },
           []
         )
-
+        console.log({ userEpisodes })
         setUserToWatchShows(userEpisodes)
         setLoadingNotFinishedShows(false)
       })

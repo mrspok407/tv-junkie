@@ -152,7 +152,11 @@ const ShowsEpisodes: React.FC<Props> = ({
 
   const toggleWatchedEpisode = (seasonNum: number, episodeNum: number) => {
     if (!authUser) return
-
+    const toggledEpisode = _get(
+      episodesFromDatabase[seasonNum - 1],
+      ["episodes", episodeNum, "watched"],
+      null
+    )
     firebase
       .userShowSingleEpisode({
         uid: authUser.uid,
@@ -162,7 +166,7 @@ const ShowsEpisodes: React.FC<Props> = ({
       })
       .update(
         {
-          watched: !episodesFromDatabase[seasonNum - 1].episodes[episodeNum].watched
+          watched: toggledEpisode !== null ? !toggledEpisode : null
         },
         () => {
           if (parentComponent === "toWatchPage") {
@@ -220,29 +224,28 @@ const ShowsEpisodes: React.FC<Props> = ({
 
   const checkEverySeasonEpisode = (seasonNum: number) => {
     if (!authUser) return
+    const safeGetSeasonEpisodes: SingleEpisodeInterface[] = _get(
+      episodesFromDatabase[seasonNum - 1],
+      "episodes",
+      []
+    )
 
-    const seasonEpisodes = episodesFromDatabase[seasonNum - 1].episodes.reduce(
-      (acc: SingleEpisodeInterface[], episode) => {
-        acc.push({
-          userRating: episode.userRating,
-          watched: episode.watched,
-          air_date: episode.air_date
-        })
-        return acc
-      },
-      []
-    )
-    const seasonEpisodesAirDate = episodesFromDatabase[seasonNum - 1].episodes.reduce(
-      (acc: SingleEpisodeInterface[], episode) => {
-        acc.push({
-          userRating: episode.userRating,
-          watched: episode.watched,
-          air_date: episode.air_date || null
-        })
-        return acc
-      },
-      []
-    )
+    const seasonEpisodes = safeGetSeasonEpisodes.reduce((acc: SingleEpisodeInterface[], episode) => {
+      acc.push({
+        userRating: episode.userRating,
+        watched: episode.watched,
+        air_date: episode.air_date
+      })
+      return acc
+    }, [])
+    const seasonEpisodesAirDate = safeGetSeasonEpisodes.reduce((acc: SingleEpisodeInterface[], episode) => {
+      acc.push({
+        userRating: episode.userRating,
+        watched: episode.watched,
+        air_date: episode.air_date || null
+      })
+      return acc
+    }, [])
 
     const seasonEpisodesFromDatabase = releasedEpisodes.filter((item) => item.season_number === seasonNum)
     const seasonLength = seasonEpisodesFromDatabase.length
@@ -324,11 +327,13 @@ const ShowsEpisodes: React.FC<Props> = ({
             return null
           }
 
+          // console.log({ episodesData })
+
           const seasonEpisodesNotWatched: any =
             parentComponent === "toWatchPage" && season.episodes.filter((episode) => !episode.watched)
 
           const daysToNewSeason = differenceBtwDatesInDays(season.air_date, todayDate)
-
+          //console.log(seasonEpisodesNotWatched[seasonEpisodesNotWatched.length - 1])
           const episodeToString =
             parentComponent === "toWatchPage" &&
             seasonEpisodesNotWatched[seasonEpisodesNotWatched.length - 1].episode_number.toString()

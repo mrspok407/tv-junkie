@@ -31,7 +31,7 @@ const ToWatchEpisodesContent: React.FC = () => {
       return acc
     }, [])
 
-    if (toWatchEpisodes.length === 0) {
+    if (toWatchEpisodes.length !== watchingShows.length || toWatchEpisodes.length === 0) {
       setWatchingShows([])
       if (!context.userContent.loadingNotFinishedShows && !context.userContent.loadingShows) {
         setInitialLoading(false)
@@ -79,6 +79,7 @@ const ToWatchEpisodesContent: React.FC = () => {
               },
               []
             )
+            console.log({ toWatchEpisodes })
             toWatchEpisodes.reverse()
 
             const releasedEpisodes: SingleEpisodeInterface[] = releasedEpisodesToOneArray({

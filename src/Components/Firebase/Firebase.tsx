@@ -86,6 +86,7 @@ class Firebase {
   /// Users API ///
   user = (uid: string) => this.db.ref(`users/${uid}`)
   users = () => this.db.ref("users")
+  userOnlineStatus = (uid: string) => this.db.ref(`users/${uid}/status`)
 
   /// User Content API ///
   userAllShows = (uid: string) => this.db.ref(`users/${uid}/content/shows`)

@@ -4,7 +4,7 @@ import {
   SeasonEpisodesFromDatabaseInterface,
   SingleEpisodeInterface
 } from "Components/UserContent/UseUserShows/UseUserShows"
-import { useState, useEffect, useRef, useContext } from "react"
+import { useState, useEffect, useContext } from "react"
 import { releasedEpisodesToOneArray } from "Utils"
 
 export interface HandleListenersArg {
@@ -19,8 +19,6 @@ const useHandleListeners = ({ id }: { id?: number }) => {
 
   const firebase = useContext(FirebaseContext)
   const { authUser } = useContext(AppContext)
-
-  // const firebaseListenerRef = useRef()
 
   const handleListeners = ({ id, status, handleLoading }: HandleListenersArg) => {
     if (status === "-" || !authUser) return
@@ -40,8 +38,6 @@ const useHandleListeners = ({ id }: { id?: number }) => {
           data: snapshot.val()
         })
 
-        // firebaseListenerRef.current = firebase.userShowAllEpisodes(authUser.uid, id)
-
         console.log("useHandleListeners before .on")
 
         firebase
@@ -57,6 +53,7 @@ const useHandleListeners = ({ id }: { id?: number }) => {
 
             const userEpisodes = snapshot.val()
             const allEpisodes = userEpisodes.reduce((acc: SingleEpisodeInterface[], item) => {
+              console.log({ item })
               acc.push(...item.episodes)
               return acc
             }, [])
