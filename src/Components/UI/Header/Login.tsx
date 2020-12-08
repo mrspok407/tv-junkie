@@ -18,11 +18,7 @@ const Login: React.FC<Props> = ({ closeNavMobile }) => {
   }, [])
 
   const handleClickOutside = (e: CustomEvent) => {
-    if (
-      loginButtonRef.current === e.target ||
-      !authContRef.current ||
-      authContRef.current.contains(e.target as Node)
-    ) {
+    if (loginButtonRef.current === e.target || !authContRef.current || authContRef.current.contains(e.target as Node)) {
       return
     }
 

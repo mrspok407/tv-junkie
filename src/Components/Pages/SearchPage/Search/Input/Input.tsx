@@ -46,13 +46,7 @@ const Input: React.FC<Props> = ({
 
   useEffect(() => {
     const windowWidth = window.innerWidth
-    if (
-      history.action === "PUSH" &&
-      !navSearch &&
-      windowWidth > MOBILE_LAYOUT &&
-      inputRef &&
-      inputRef.current
-    ) {
+    if (history.action === "PUSH" && !navSearch && windowWidth > MOBILE_LAYOUT && inputRef && inputRef.current) {
       inputRef.current.focus()
     }
 

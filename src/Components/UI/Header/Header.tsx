@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from "react"
+import React, { useContext, useEffect, useRef, useState } from "react"
 import { NavLink } from "react-router-dom"
 import classNames from "classnames"
 import logo from "assets/images/main-page-logo.png"
@@ -16,10 +16,28 @@ type Props = {
 const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false }) => {
   const [navMobileOpen, setNavMobileOpen] = useState(false)
   const navRef = useRef<HTMLElement>(null)
+  const toggleNavButtonRef = useRef<HTMLButtonElement>(null)
   const { authUser } = useContext(AppContext)
 
   const closeNavMobile = () => {
     setNavMobileOpen(false)
+  }
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside as EventListener)
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside as EventListener)
+    }
+  }, [])
+
+  const handleClickOutside = (e: CustomEvent) => {
+    if (toggleNavButtonRef && toggleNavButtonRef.current && toggleNavButtonRef.current.contains(e.target as Node)) {
+      return
+    }
+    if (navRef && navRef.current && !navRef.current.contains(e.target as Node)) {
+      setNavMobileOpen(false)
+    }
   }
 
   return (
@@ -135,6 +153,7 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false }) =>
       </nav>
       <button
         type="button"
+        ref={toggleNavButtonRef}
         className={classNames("header__show-nav", {
           "header__show-nav--open": navMobileOpen
         })}
