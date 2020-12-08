@@ -22,25 +22,8 @@ const ToWatchEpisodesContent: React.FC = () => {
     const watchingShows = context.userContent.userShows.filter(
       (show) => show.database === "watchingShows" && !show.allEpisodesWatched
     )
-    let toWatchEpisodes: any =
-      watchingShows.length !== 0 ? context.userContent.userToWatchShows.splice(0, watchingShows.length) : []
+    const toWatchEpisodes: any = context.userContent.userToWatchShows
 
-    // watchingShows.length === 0 ? (toWatchEpisodes = []) : toWatchEpisodes.splice(0, watchingShows.length)
-
-    console.log({ watchingShows })
-    console.log({ toWatchEpisodes })
-
-    const watchingShowsModified = watchingShows.reduce((acc: UserShowsInterface[], show) => {
-      if (toWatchEpisodes.find((item: any) => item.id === show.id)) {
-        acc.push(show)
-      }
-      return acc
-    }, [])
-
-    // if (toWatchEpisodes.length !== watchingShows.length) {
-    //   setWatchingShows((prevState) => [...prevState])
-    //   return
-    // }
     if (toWatchEpisodes.length === 0) {
       setWatchingShows([])
       if (!context.userContent.loadingNotFinishedShows && !context.userContent.loadingShows) {
@@ -49,11 +32,30 @@ const ToWatchEpisodesContent: React.FC = () => {
       return
     }
 
-    const mergedShows = merge(watchingShowsModified, toWatchEpisodes, {
-      arrayMerge: combineMergeObjects
-    }).sort((a, b) => (a.first_air_date > b.first_air_date ? -1 : 1))
+    console.log({ watchingShows })
+    console.log({ toWatchEpisodes })
 
-    setWatchingShows(mergedShows)
+    const watchingShowsModified = watchingShows
+      .reduce((acc: UserShowsInterface[], show) => {
+        const showToWatch = toWatchEpisodes.find((item: any) => item.id === show.id)
+        if (showToWatch) {
+          const showMerged = merge(showToWatch, show, {
+            arrayMerge: combineMergeObjects
+          })
+          console.log({ showToWatch })
+          acc.push(showMerged)
+        }
+        return acc
+      }, [])
+      .sort((a, b) => (a.first_air_date > b.first_air_date ? -1 : 1))
+
+    console.log({ watchingShowsModified })
+
+    // const mergedShows = merge(watchingShowsModified, toWatchEpisodes, {
+    //   arrayMerge: combineMergeObjects
+    // }).sort((a, b) => (a.first_air_date > b.first_air_date ? -1 : 1))
+
+    setWatchingShows(watchingShowsModified)
     setInitialLoading(false)
   }, [context.userContent])
 
@@ -89,7 +91,6 @@ const ToWatchEpisodesContent: React.FC = () => {
               },
               []
             )
-            console.log({ toWatchEpisodes })
             toWatchEpisodes.reverse()
 
             const releasedEpisodes: SingleEpisodeInterface[] = releasedEpisodesToOneArray({

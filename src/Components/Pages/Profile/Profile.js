@@ -108,13 +108,13 @@ class Profile extends Component {
         `https://api.themoviedb.org/3/tv/changes?api_key=${process.env.REACT_APP_TMDB_API}&end_date=${todayConverted}&start_date=${threeDaysBefore}`
       )
       .then(async ({ data }) => {
-        // const tempData = [{ id: 34307 }]
+        const tempData = [{ id: 82856 }]
         // const allShowsIds = await this.context.firebase // change show.id below to just show
         //   .allShowsList()
         //   .once("value")
         //   .then((snapshot) => Object.keys(snapshot.val()).map((id) => id))
 
-        data.results.forEach((show) => {
+        tempData.forEach((show) => {
           this.context.firebase
             .showInDatabase(show.id)
             .child("id")
@@ -253,11 +253,7 @@ class Profile extends Component {
                 {this.state.verificationSent ? (
                   <div className="user-profile__sent-message">Verification sent</div>
                 ) : (
-                  <button
-                    onClick={this.sendEmailVerification}
-                    className="button button--profile"
-                    type="button"
-                  >
+                  <button onClick={this.sendEmailVerification} className="button button--profile" type="button">
                     {this.state.loadingVerificationSent ? (
                       <span className="auth__form-loading"></span>
                     ) : (
@@ -276,11 +272,7 @@ class Profile extends Component {
             _get(this.context.authUser, "email", "") === "mr.spok407@gmail.com") && (
             <>
               <div className="update-database">
-                <button
-                  onClick={() => this.databaseModify()}
-                  className="button button--profile"
-                  type="button"
-                >
+                <button onClick={() => this.databaseModify()} className="button button--profile" type="button">
                   Update Database
                 </button>
               </div>

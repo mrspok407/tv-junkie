@@ -89,61 +89,57 @@ const useUserShows = () => {
           if (!authUser) return
           setLoadingShows(true)
 
-          firebase
-            .userAllShows(authUser.uid)
-            .on("value", async (snapshot: { val: () => UserShowsInterface[] }) => {
-              if (snapshot.val() === null) {
-                console.log("hook in listener NO value")
-                setLoadingShows(false)
-                setLoadingShowsMerging(false)
-                return
-              }
-              console.log("hook in listener")
+          firebase.userAllShows(authUser.uid).on("value", async (snapshot: { val: () => UserShowsInterface[] }) => {
+            if (snapshot.val() === null) {
+              console.log("hook in listener NO value")
+              setLoadingShows(false)
+              setLoadingShowsMerging(false)
+              return
+            }
+            console.log("hook in listener")
 
-              const shows = Object.values(snapshot.val()).map((show) => {
-                return show
+            const shows = Object.values(snapshot.val()).map((show) => {
+              return show
+            })
+            const userShowsSS: UserShowsInterface[] = JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY_SHOWS)!)
+
+            if (userShowsSS.length === 0) {
+              console.log("userShows length = 0")
+              const { showsFullInfo, willAirEpisodes } = await getShowsFullInfo({
+                userShows: shows,
+                firebase,
+                authUser
               })
-              const userShowsSS: UserShowsInterface[] = JSON.parse(
-                sessionStorage.getItem(SESSION_STORAGE_KEY_SHOWS)!
-              )
+              listenerUserToWatchShow({ uid: authUser.uid })
 
-              if (userShowsSS.length === 0) {
-                console.log("userShows length = 0")
-                const { showsFullInfo, willAirEpisodes } = await getShowsFullInfo({
-                  userShows: shows,
-                  firebase,
-                  authUser
+              setUserShows(showsFullInfo)
+              setUserWillAirEpisodes(willAirEpisodes)
+              setLoadingShows(false)
+              setLoadingShowsMerging(false)
+            } else if (userShowsSS.length < shows.length) {
+              console.log("userShows length < 0")
+              shows.forEach(async (show, index) => {
+                if (userShowsSS.find((item) => item.id === show.id)) return
+
+                const { showsFullInfo, willAirEpisodes } = await spliceNewShowFromDatabase({
+                  userShow: show,
+                  index,
+                  userShowsSS,
+                  firebase
                 })
-                listenerUserToWatchShow({ uid: authUser.uid })
-
                 setUserShows(showsFullInfo)
                 setUserWillAirEpisodes(willAirEpisodes)
                 setLoadingShows(false)
-                setLoadingShowsMerging(false)
-              } else if (userShowsSS.length < shows.length) {
-                console.log("userShows length < 0")
-                shows.forEach(async (show, index) => {
-                  if (userShowsSS.find((item) => item.id === show.id)) return
+              })
+            } else if (userShowsSS.length === shows.length) {
+              console.log("userShows length same")
+              const mergedShows = merge(userShowsSS, shows, {
+                arrayMerge: combineMergeObjects
+              })
 
-                  const { showsFullInfo, willAirEpisodes } = await spliceNewShowFromDatabase({
-                    userShow: show,
-                    index,
-                    userShowsSS,
-                    firebase
-                  })
-                  setUserShows(showsFullInfo)
-                  setUserWillAirEpisodes(willAirEpisodes)
-                  setLoadingShows(false)
-                })
-              } else if (userShowsSS.length === shows.length) {
-                console.log("userShows length same")
-                const mergedShows = merge(userShowsSS, shows, {
-                  arrayMerge: combineMergeObjects
-                })
-
-                setUserShows(mergedShows)
-              }
-            })
+              setUserShows(mergedShows)
+            }
+          })
 
           // listenerUserToWatchShow({ uid: authUser.uid })
           listenerUserMovies({ uid: authUser.uid })

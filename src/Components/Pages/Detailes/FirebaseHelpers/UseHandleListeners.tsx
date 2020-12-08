@@ -25,65 +25,65 @@ const useHandleListeners = ({ id }: { id?: number }) => {
     console.log(id)
 
     const statusDatabase = status === "Ended" || status === "Canceled" ? "ended" : "ongoing"
-    firebase
-      .showEpisodes(id)
-      .once("value", (snapshot: { val: () => SeasonEpisodesFromDatabaseInterface[] }) => {
-        if (snapshot.val() === null) {
-          if (handleLoading) handleLoading(false)
-          console.log("early return showsEpisodes")
-          return
-        }
+    firebase.showEpisodes(id).once("value", (snapshot: { val: () => SeasonEpisodesFromDatabaseInterface[] }) => {
+      if (snapshot.val() === null) {
+        if (handleLoading) handleLoading(false)
+        console.log("early return showsEpisodes")
+        return
+      }
 
-        const releasedEpisodes: SingleEpisodeInterface[] = releasedEpisodesToOneArray({
-          data: snapshot.val()
-        })
+      console.log({ snapshot: snapshot.val() })
 
-        console.log("useHandleListeners before .on")
-
-        firebase
-          .userShowAllEpisodes(authUser.uid, id)
-          .on("value", (snapshot: { val: () => SeasonEpisodesFromDatabaseInterface[] }) => {
-            if (snapshot.val() === null) {
-              firebase.userShowAllEpisodes(authUser.uid, id).off()
-              if (handleLoading) handleLoading(false)
-              return
-            }
-
-            console.log("detailes Listener")
-
-            const userEpisodes = snapshot.val()
-            const allEpisodes = userEpisodes.reduce((acc: SingleEpisodeInterface[], item) => {
-              console.log({ item })
-              acc.push(...item.episodes)
-              return acc
-            }, [])
-
-            allEpisodes.splice(releasedEpisodes.length)
-
-            const allEpisodesWatched = !allEpisodes.some((episode) => !episode.watched)
-            const finished = statusDatabase === "ended" && allEpisodesWatched ? true : false
-
-            console.log("handleListener just before firebase")
-            console.log(id)
-            firebase
-              .userShowAllEpisodesInfo(authUser.uid, id)
-              .child("database")
-              .once("value", (snapshot: { val: () => string }) => {
-                console.log("handleListeners in firebase")
-                firebase.userShowAllEpisodesInfo(authUser.uid, id).update({
-                  allEpisodesWatched,
-                  finished,
-                  isAllWatched_database: `${allEpisodesWatched}_${snapshot.val()}`
-                })
-              })
-
-            firebase.userShow({ uid: authUser.uid, key: id }).update({ finished, allEpisodesWatched })
-
-            setEpisodesFromDatabase(userEpisodes)
-            setReleasedEpisodes(releasedEpisodes)
-            if (handleLoading) handleLoading(false)
-          })
+      const releasedEpisodes: SingleEpisodeInterface[] = releasedEpisodesToOneArray({
+        data: snapshot.val()
       })
+
+      console.log("useHandleListeners before .on")
+
+      firebase
+        .userShowAllEpisodes(authUser.uid, id)
+        .on("value", (snapshot: { val: () => SeasonEpisodesFromDatabaseInterface[] }) => {
+          if (snapshot.val() === null) {
+            firebase.userShowAllEpisodes(authUser.uid, id).off()
+            if (handleLoading) handleLoading(false)
+            return
+          }
+
+          console.log("detailes Listener")
+
+          const userEpisodes = snapshot.val()
+          const allEpisodes = userEpisodes.reduce((acc: SingleEpisodeInterface[], item) => {
+            console.log({ item })
+            acc.push(...item.episodes)
+            return acc
+          }, [])
+
+          allEpisodes.splice(releasedEpisodes.length)
+
+          const allEpisodesWatched = !allEpisodes.some((episode) => !episode.watched)
+          const finished = statusDatabase === "ended" && allEpisodesWatched ? true : false
+
+          console.log("handleListener just before firebase")
+          console.log(id)
+          firebase
+            .userShowAllEpisodesInfo(authUser.uid, id)
+            .child("database")
+            .once("value", (snapshot: { val: () => string }) => {
+              console.log("handleListeners in firebase")
+              firebase.userShowAllEpisodesInfo(authUser.uid, id).update({
+                allEpisodesWatched,
+                finished,
+                isAllWatched_database: `${allEpisodesWatched}_${snapshot.val()}`
+              })
+            })
+
+          firebase.userShow({ uid: authUser.uid, key: id }).update({ finished, allEpisodesWatched })
+
+          setEpisodesFromDatabase(userEpisodes)
+          setReleasedEpisodes(releasedEpisodes)
+          if (handleLoading) handleLoading(false)
+        })
+    })
   }
 
   useEffect(() => {

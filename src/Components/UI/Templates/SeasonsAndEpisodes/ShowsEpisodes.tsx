@@ -152,11 +152,7 @@ const ShowsEpisodes: React.FC<Props> = ({
 
   const toggleWatchedEpisode = (seasonNum: number, episodeNum: number) => {
     if (!authUser) return
-    const toggledEpisode = _get(
-      episodesFromDatabase[seasonNum - 1],
-      ["episodes", episodeNum, "watched"],
-      null
-    )
+    const toggledEpisode = _get(episodesFromDatabase[seasonNum - 1], ["episodes", episodeNum, "watched"], null)
     firebase
       .userShowSingleEpisode({
         uid: authUser.uid,
@@ -182,10 +178,7 @@ const ShowsEpisodes: React.FC<Props> = ({
       )
   }
 
-  const checkMultipleEpisodes = (
-    episodesData: { id: number; index: number }[],
-    resetFadeOutEpisodes: () => void
-  ) => {
+  const checkMultipleEpisodes = (episodesData: { id: number; index: number }[], resetFadeOutEpisodes: () => void) => {
     if (!authUser) return
     console.log(episodesData)
 
@@ -224,11 +217,7 @@ const ShowsEpisodes: React.FC<Props> = ({
 
   const checkEverySeasonEpisode = (seasonNum: number) => {
     if (!authUser) return
-    const safeGetSeasonEpisodes: SingleEpisodeInterface[] = _get(
-      episodesFromDatabase[seasonNum - 1],
-      "episodes",
-      []
-    )
+    const safeGetSeasonEpisodes: SingleEpisodeInterface[] = _get(episodesFromDatabase[seasonNum - 1], "episodes", [])
 
     const seasonEpisodes = safeGetSeasonEpisodes.reduce((acc: SingleEpisodeInterface[], episode) => {
       acc.push({
@@ -323,7 +312,7 @@ const ShowsEpisodes: React.FC<Props> = ({
       )}
       <div className="episodes">
         {episodesData.map((season) => {
-          if (season.season_number === 0 || season.name === "Specials" || season.episode_count === 0) {
+          if (season.season_number === 0 || season.name === "Specials" || season.episode_count === 0 || !season.id) {
             return null
           }
 
@@ -333,14 +322,13 @@ const ShowsEpisodes: React.FC<Props> = ({
             parentComponent === "toWatchPage" && season.episodes.filter((episode) => !episode.watched)
 
           const daysToNewSeason = differenceBtwDatesInDays(season.air_date, todayDate)
-          //console.log(seasonEpisodesNotWatched[seasonEpisodesNotWatched.length - 1])
-          const episodeToString =
+          const episodeToString: string =
             parentComponent === "toWatchPage" &&
-            seasonEpisodesNotWatched[seasonEpisodesNotWatched.length - 1].episode_number.toString()
+            _get(seasonEpisodesNotWatched[seasonEpisodesNotWatched.length - 1], "episode_number", 1).toString()
           const episodeNumber =
-            episodeToString && episodeToString.length === 1
-              ? "e0".concat(episodeToString)
-              : "e".concat(episodeToString)
+            episodeToString.length === 1 ? "e0".concat(episodeToString) : "e".concat(episodeToString)
+
+          console.log(season.id)
 
           return (
             <div
@@ -376,9 +364,7 @@ const ShowsEpisodes: React.FC<Props> = ({
                   </div>
                 )}
 
-                <div className="episodes__episode-group-date">
-                  {season.air_date && season.air_date.slice(0, 4)}
-                </div>
+                <div className="episodes__episode-group-date">{season.air_date && season.air_date.slice(0, 4)}</div>
               </div>
 
               {currentlyOpenSeasons.includes(season.id) &&

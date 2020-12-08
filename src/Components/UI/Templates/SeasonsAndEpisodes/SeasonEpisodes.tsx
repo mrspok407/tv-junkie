@@ -33,10 +33,7 @@ type Props = {
     arrLength?: number,
     callback?: any
   ) => any
-  checkMultipleEpisodes: (
-    episodesData: { id: number; index: number }[],
-    resetFadeOutEpisodes: () => void
-  ) => void
+  checkMultipleEpisodes: (episodesData: { id: number; index: number }[], resetFadeOutEpisodes: () => void) => void
 }
 
 export interface HandleFadeOutInterface {
@@ -116,10 +113,7 @@ const SeasonEpisodes: React.FC<Props> = ({
     window.clearTimeout(episodeFadeOutTimeout.current || 0)
     setTimedOut(false)
 
-    setFadeOutEpisodes((prevState) => [
-      ...prevState,
-      { id: episodeId, index: episodeIndex, seasonNum, rating }
-    ])
+    setFadeOutEpisodes((prevState) => [...prevState, { id: episodeId, index: episodeIndex, seasonNum, rating }])
 
     episodeFadeOutTimeout.current = window.setTimeout(() => {
       setTimedOut(true)
@@ -174,8 +168,7 @@ const SeasonEpisodes: React.FC<Props> = ({
               className={classNames("episodes__episode", {
                 "episodes__episode--open": detailEpisodeInfo.includes(episode.id as number),
                 "fade-out-episode":
-                  parentComponent === "toWatchPage" &&
-                  fadeOutEpisodes.find((item: any) => item.id === episode.id)
+                  parentComponent === "toWatchPage" && fadeOutEpisodes.find((item: any) => item.id === episode.id)
               })}
             >
               <div
@@ -205,7 +198,7 @@ const SeasonEpisodes: React.FC<Props> = ({
                 <div className="episodes__episode-date">{episodeAirDate}</div>
                 <div className="episodes__episode-name">
                   <span className="episodes__episode-number">{episode.episode_number}.</span>
-                  {episode.name}
+                  {_get(episode, "name", "-")}
                 </div>
                 {daysToNewEpisode > 0 ? (
                   <div className="episodes__episode-days-to-air">
@@ -239,7 +232,7 @@ const SeasonEpisodes: React.FC<Props> = ({
                       onChange={() => {
                         if (parentComponent === "toWatchPage") {
                           handleFadeOut({
-                            episodeId: episode.id as number,
+                            episodeId: _get(episode, "id") as number,
                             episodeIndex: indexOfEpisode,
                             seasonNum: season.season_number,
                             rating: episode.userRating
@@ -282,9 +275,7 @@ const SeasonEpisodes: React.FC<Props> = ({
                       }}
                     />
                   )}
-                  {episode.overview && (
-                    <div className="episodes__episode-detailes-overview">{episode.overview}</div>
-                  )}
+                  {episode.overview && <div className="episodes__episode-detailes-overview">{episode.overview}</div>}
 
                   {episodeAirDateAsDateObj &&
                     episodeAirDateAsDateObj.getTime() < todayDate.getTime() &&
