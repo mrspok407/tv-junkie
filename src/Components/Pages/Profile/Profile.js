@@ -108,13 +108,13 @@ class Profile extends Component {
         `https://api.themoviedb.org/3/tv/changes?api_key=${process.env.REACT_APP_TMDB_API}&end_date=${todayConverted}&start_date=${threeDaysBefore}`
       )
       .then(async ({ data }) => {
-        const tempData = [{ id: 82856 }]
+        // const tempData = [{ id: 82856 }]
         // const allShowsIds = await this.context.firebase // change show.id below to just show
         //   .allShowsList()
         //   .once("value")
         //   .then((snapshot) => Object.keys(snapshot.val()).map((id) => id))
 
-        tempData.forEach((show) => {
+        data.results.forEach((show) => {
           this.context.firebase
             .showInDatabase(show.id)
             .child("id")
@@ -176,7 +176,7 @@ class Profile extends Component {
 
                         season.episodes.forEach((item) => {
                           const updatedEpisode = {
-                            air_date: item.air_date || null,
+                            air_date: item.air_date || "",
                             episode_number: item.episode_number || null,
                             name: item.name || null,
                             season_number: item.season_number || null,
@@ -186,7 +186,7 @@ class Profile extends Component {
                         })
 
                         const updatedSeason = {
-                          air_date: season.air_date || null,
+                          air_date: season.air_date || "",
                           season_number: season.season_number || null,
                           id: season._id,
                           poster_path: season.poster_path || null,

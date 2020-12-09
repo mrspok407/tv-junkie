@@ -231,7 +231,7 @@ const ShowsEpisodes: React.FC<Props> = ({
       acc.push({
         userRating: episode.userRating,
         watched: episode.watched,
-        air_date: episode.air_date || null
+        air_date: episode.air_date || ""
       })
       return acc
     }, [])
@@ -327,8 +327,6 @@ const ShowsEpisodes: React.FC<Props> = ({
             _get(seasonEpisodesNotWatched[seasonEpisodesNotWatched.length - 1], "episode_number", 1).toString()
           const episodeNumber =
             episodeToString.length === 1 ? "e0".concat(episodeToString) : "e".concat(episodeToString)
-
-          console.log(season.id)
 
           return (
             <div

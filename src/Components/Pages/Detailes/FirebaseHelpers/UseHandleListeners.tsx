@@ -53,7 +53,6 @@ const useHandleListeners = ({ id }: { id?: number }) => {
 
           const userEpisodes = snapshot.val()
           const allEpisodes = userEpisodes.reduce((acc: SingleEpisodeInterface[], item) => {
-            console.log({ item })
             acc.push(...item.episodes)
             return acc
           }, [])
@@ -65,11 +64,12 @@ const useHandleListeners = ({ id }: { id?: number }) => {
 
           console.log("handleListener just before firebase")
           console.log(id)
+
           firebase
-            .userShowAllEpisodesInfo(authUser.uid, id)
+            .userShow({ uid: authUser.uid, key: id })
             .child("database")
             .once("value", (snapshot: { val: () => string }) => {
-              console.log("handleListeners in firebase")
+              console.log({ database: snapshot.val() })
               firebase.userShowAllEpisodesInfo(authUser.uid, id).update({
                 allEpisodesWatched,
                 finished,

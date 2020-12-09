@@ -16,6 +16,10 @@ export const releasedEpisodes = ({ data }: { data: SeasonEpisodesFromDatabaseInt
         }, [])
         .filter((episode: any) => {
           const daysToNewEpisode = differenceBtwDatesInDays(episode.air_date, todayDate)
+          if (episode.air_date === null) {
+            console.log(differenceBtwDatesInDays(episode.air_date, todayDate))
+            console.log(differenceBtwDatesInDays(episode.air_date, todayDate) <= 0)
+          }
           return daysToNewEpisode <= 0 && episode
         })
     : []

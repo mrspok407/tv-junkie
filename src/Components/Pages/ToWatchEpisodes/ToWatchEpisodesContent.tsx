@@ -39,9 +39,10 @@ const ToWatchEpisodesContent: React.FC = () => {
       .reduce((acc: UserShowsInterface[], show) => {
         const showToWatch = toWatchEpisodes.find((item: any) => item.id === show.id)
         if (showToWatch) {
-          const showMerged = merge(showToWatch, show, {
+          const showMerged = merge(show, showToWatch, {
             arrayMerge: combineMergeObjects
           })
+          console.log({ show })
           console.log({ showToWatch })
           acc.push(showMerged)
         }
@@ -72,25 +73,23 @@ const ToWatchEpisodesContent: React.FC = () => {
       ) : (
         <>
           {watchingShows.map((show) => {
-            const toWatchEpisodes = show.episodes.reduce(
-              (acc: SeasonEpisodesFromDatabaseInterface[], season) => {
-                const seasonEpisodes = season.episodes.reduce((acc: SingleEpisodeInterface[], episode) => {
-                  if (episode.air_date && new Date(episode.air_date).getTime() < todayDate.getTime()) {
-                    acc.push(episode)
-                  }
-                  return acc
-                }, [])
-
-                seasonEpisodes.reverse()
-
-                if (seasonEpisodes.length !== 0 && seasonEpisodes.some((item) => !item.watched)) {
-                  acc.push({ ...season, episodes: seasonEpisodes })
+            const toWatchEpisodes = show.episodes.reduce((acc: SeasonEpisodesFromDatabaseInterface[], season) => {
+              const seasonEpisodes = season.episodes.reduce((acc: SingleEpisodeInterface[], episode) => {
+                if (episode.air_date && new Date(episode.air_date).getTime() < todayDate.getTime()) {
+                  acc.push(episode)
                 }
-
                 return acc
-              },
-              []
-            )
+              }, [])
+
+              seasonEpisodes.reverse()
+
+              if (seasonEpisodes.length !== 0 && seasonEpisodes.some((item) => !item.watched)) {
+                acc.push({ ...season, episodes: seasonEpisodes })
+              }
+
+              return acc
+            }, [])
+            console.log({ toWatchEpisodes })
             toWatchEpisodes.reverse()
 
             const releasedEpisodes: SingleEpisodeInterface[] = releasedEpisodesToOneArray({

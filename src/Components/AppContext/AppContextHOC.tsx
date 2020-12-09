@@ -5,7 +5,7 @@ import useUserShows, {
   UserShowsInterface,
   UserWillAirEpisodesInterface
 } from "Components/UserContent/UseUserShows/UseUserShows"
-import useContentHandler from "Components/UserContent/UseContentHandler"
+import useContentHandler, { LOADING_ADDING_TO_DATABASE_INITIAL } from "Components/UserContent/UseContentHandler"
 import useFirebase from "Components/Firebase/UseFirebase"
 import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
 import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
@@ -49,6 +49,7 @@ export interface AddShowsToDatabaseOnRegisterArg {
 export interface AddShowToDatabaseArg {
   id: number
   show: ContentDetailes
+  database: string
   handleListeners?: ({ id, status, handleLoading }: HandleListenersArg) => void
 }
 
@@ -100,7 +101,12 @@ export interface AppContextInterface {
     handleShowInDatabases: ({ id, data, database, userShows }: HandleShowInDatabasesArg) => void
     handleMovieInDatabases: ({ id, data }: HandleMovieInDatabasesArg) => void
     handleLoadingShowsOnRegister: (isLoading: boolean) => void
-    loadingAddShowToDatabase: boolean
+    loadingAddShowToDatabase: {
+      watchingShows: boolean
+      droppedShows: boolean
+      willWatchShows: boolean
+      notWatchingShows: boolean
+    }
     loadingShowsOnRegister: boolean
   }
   firebase: FirebaseInterface
@@ -135,7 +141,7 @@ export const CONTEXT_INITIAL_STATE = {
     handleShowInDatabases: () => {},
     handleMovieInDatabases: () => {},
     handleLoadingShowsOnRegister: () => {},
-    loadingAddShowToDatabase: false,
+    loadingAddShowToDatabase: LOADING_ADDING_TO_DATABASE_INITIAL,
     loadingShowsOnRegister: false
   },
   firebase: {},

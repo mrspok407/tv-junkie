@@ -10,8 +10,15 @@ import addShowToMainDatabase from "./FirebaseHelpers/addShowToMainDatabase"
 import getShowEpisodesFromAPI from "./TmdbAPIHelpers/getShowEpisodesFromAPI"
 import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
 
+export const LOADING_ADDING_TO_DATABASE_INITIAL = {
+  watchingShows: false,
+  droppedShows: false,
+  willWatchShows: false,
+  notWatchingShows: false
+}
+
 const useContentHandler = () => {
-  const [loadingAddShowToDatabase, setLoadingAddShowToDatabase] = useState(false)
+  const [loadingAddShowToDatabase, setLoadingAddShowToDatabase] = useState(LOADING_ADDING_TO_DATABASE_INITIAL)
   const [loadingShowsOnRegister, setLoadingShowsOnRegister] = useState(false)
 
   const firebase = useContext(FirebaseContext)
@@ -88,21 +95,20 @@ const useContentHandler = () => {
     setLoadingShowsOnRegister(isLoading)
   }
 
-  const addShowToDatabase = ({ id, show, handleListeners }: AddShowToDatabaseArg) => {
+  const addShowToDatabase = ({ id, show, database, handleListeners }: AddShowToDatabaseArg) => {
     if (!authUser) {
-      setLoadingAddShowToDatabase(false)
+      setLoadingAddShowToDatabase(LOADING_ADDING_TO_DATABASE_INITIAL)
       return
     }
     getShowEpisodesFromAPI({ id }).then(async (dataFromAPI: any) => {
       console.log("addShowInDatabase run in function body")
 
-      const showsSubDatabase =
-        dataFromAPI.status === "Ended" || dataFromAPI.status === "Canceled" ? "ended" : "ongoing"
+      const showsSubDatabase = dataFromAPI.status === "Ended" || dataFromAPI.status === "Canceled" ? "ended" : "ongoing"
 
       const userEpisodes = dataFromAPI.episodes.reduce(
         (acc: {}[], season: { episodes: { air_date: string }[]; season_number: number }) => {
           const episodes = season.episodes.map((episode) => {
-            return { watched: false, userRating: 0, air_date: episode.air_date || null }
+            return { watched: false, userRating: 0, air_date: episode.air_date || "" }
           })
 
           acc.push({ season_number: season.season_number, episodes, userRating: 0 })
@@ -117,7 +123,7 @@ const useContentHandler = () => {
       await Promise.all([
         firebase.userAllShows(authUser.uid).child(id).set({
           allEpisodesWatched: false,
-          database: "watchingShows",
+          database: database,
           status: showsSubDatabase,
           firstAirDate: show.first_air_date,
           name: show.name,
@@ -132,14 +138,14 @@ const useContentHandler = () => {
             {
               episodes: userEpisodes,
               info: {
-                database: "watchingShows",
+                database: database,
                 allEpisodesWatched: false,
-                isAllWatched_database: "false_watchingShows",
+                isAllWatched_database: `false_${database}`,
                 finished: false
               }
             },
             () => {
-              setLoadingAddShowToDatabase(false)
+              setLoadingAddShowToDatabase(LOADING_ADDING_TO_DATABASE_INITIAL)
             }
           )
       ])
@@ -149,13 +155,7 @@ const useContentHandler = () => {
     })
   }
 
-  const handleShowInDatabases = ({
-    id,
-    data,
-    database,
-    userShows,
-    handleListeners
-  }: HandleShowInDatabasesArg) => {
+  const handleShowInDatabases = ({ id, data, database, userShows, handleListeners }: HandleShowInDatabasesArg) => {
     if (!authUser) return
     const userShow = userShows.find((show) => show.id === id)
 
@@ -191,10 +191,10 @@ const useContentHandler = () => {
           })
         })
     } else {
-      setLoadingAddShowToDatabase(true)
+      setLoadingAddShowToDatabase({ ...loadingAddShowToDatabase, [database]: true })
 
       const showData: any = Array.isArray(data) ? data.find((item) => item.id === id) : data
-      addShowToDatabase({ id, show: showData, handleListeners })
+      addShowToDatabase({ id, show: showData, database, handleListeners })
     }
   }
 

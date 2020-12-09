@@ -54,7 +54,7 @@ const ShowsButtons: React.FC<Props> = ({
               (showDatabaseOnClient === "watchingShows" ||
                 showDatabaseOnClient === "finishedShows" ||
                 context.userContentLocalStorage.watchingShows.find((item) => item.id === Number(id))) &&
-              !context.userContentHandler.loadingAddShowToDatabase
+              !context.userContentHandler.loadingAddShowToDatabase.watchingShows
           })}
           type="button"
           onClick={() => {
@@ -79,7 +79,7 @@ const ShowsButtons: React.FC<Props> = ({
             }
           }}
         >
-          {context.userContentHandler.loadingAddShowToDatabase ? (
+          {context.userContentHandler.loadingAddShowToDatabase.watchingShows ? (
             <span className="auth__form-loading"></span>
           ) : (
             "Watching"
@@ -93,7 +93,8 @@ const ShowsButtons: React.FC<Props> = ({
             "button--pressed":
               showDatabaseOnClient === "notWatchingShows" ||
               (!authUser &&
-                !context.userContentLocalStorage.watchingShows.find((item) => item.id === Number(id)))
+                !context.userContentLocalStorage.watchingShows.find((item) => item.id === Number(id)) &&
+                !context.userContentHandler.loadingAddShowToDatabase.notWatchingShows)
           })}
           type="button"
           onClick={() => {
@@ -117,14 +118,20 @@ const ShowsButtons: React.FC<Props> = ({
             }
           }}
         >
-          Not watching
+          {context.userContentHandler.loadingAddShowToDatabase.notWatchingShows ? (
+            <span className="auth__form-loading"></span>
+          ) : (
+            "Not watching"
+          )}
         </button>
       </div>
       <div className="buttons__col-wrapper" ref={_notAuthButtons}>
         <div className="buttons__col">
           <button
             className={classNames("button", {
-              "button--pressed": showDatabaseOnClient === "droppedShows",
+              "button--pressed":
+                showDatabaseOnClient === "droppedShows" &&
+                !context.userContentHandler.loadingAddShowToDatabase.droppedShows,
               "button--not-logged-in": !authUser
             })}
             type="button"
@@ -147,7 +154,11 @@ const ShowsButtons: React.FC<Props> = ({
               }
             }}
           >
-            Drop
+            {context.userContentHandler.loadingAddShowToDatabase.droppedShows ? (
+              <span className="auth__form-loading"></span>
+            ) : (
+              "Drop"
+            )}
           </button>
 
           {disableBtnWarning === "dropBtn" && (
@@ -163,7 +174,9 @@ const ShowsButtons: React.FC<Props> = ({
         <div className="buttons__col">
           <button
             className={classNames("button", {
-              "button--pressed": showDatabaseOnClient === "willWatchShows",
+              "button--pressed":
+                showDatabaseOnClient === "willWatchShows" &&
+                !context.userContentHandler.loadingAddShowToDatabase.willWatchShows,
               "button--not-logged-in": !authUser
             })}
             type="button"
@@ -186,7 +199,11 @@ const ShowsButtons: React.FC<Props> = ({
               }
             }}
           >
-            Will Watch
+            {context.userContentHandler.loadingAddShowToDatabase.willWatchShows ? (
+              <span className="auth__form-loading"></span>
+            ) : (
+              "Will watch"
+            )}
           </button>
           {disableBtnWarning === "willWatchBtn" && (
             <div className="buttons__col-warning">
