@@ -121,11 +121,7 @@ const SeasonEpisodes: React.FC<Props> = ({
   }
 
   const showCheckboxes =
-    showInfo.database &&
-    showDatabaseOnClient !== "notWatchingShows" &&
-    episodesFromDatabase &&
-    episodesFromDatabase.length > 0 &&
-    true
+    showInfo.database && showDatabaseOnClient !== "notWatchingShows" && episodesFromDatabase?.length > 0 && true
 
   const showSeason = showCheckboxes && episodesFromDatabase[season.season_number - 1]
   const seasons = parentComponent === "toWatchPage" ? episodesData : episodesDataFromAPI

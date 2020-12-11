@@ -57,9 +57,7 @@ const SearchCard: React.FC<Props> = ({
                 style={
                   poster_path !== null
                     ? {
-                        backgroundImage: `url(https://image.tmdb.org/t/p/w500/${
-                          poster_path || backdrop_path
-                        })`
+                        backgroundImage: `url(https://image.tmdb.org/t/p/w500/${poster_path || backdrop_path})`
                       }
                     : {
                         backgroundImage: `url(https://d32qys9a6wm9no.cloudfront.net/images/movies/poster/500x735.png)`
@@ -68,9 +66,7 @@ const SearchCard: React.FC<Props> = ({
               />
               <div className="search-card__info-title">
                 {movieTitle || showTitle}
-                <span className="search-card__info-year">
-                  {releaseDate && `(${releaseDate.slice(0, 4)})`}
-                </span>
+                <span className="search-card__info-year">{releaseDate && `(${releaseDate.slice(0, 4)})`}</span>
                 <span className="search-card__info-country">
                   {`${origin_country.length > 0 ? origin_country.join(", ") : ""}`}
                 </span>
@@ -113,11 +109,9 @@ const SearchCard: React.FC<Props> = ({
               {known_for.map((item, i) => {
                 const mediaType = item.media_type === "movie" ? "movie" : "show"
 
-                const title =
-                  item.media_type === "movie" ? item.original_title || "No title" : item.name || "No title"
+                const title = item.media_type === "movie" ? item.original_title || "No title" : item.name || "No title"
 
-                const releaseDate =
-                  item.media_type === "movie" ? item.release_date || "" : item.first_air_date || ""
+                const releaseDate = item.media_type === "movie" ? item.release_date || "" : item.first_air_date || ""
 
                 return (
                   <span key={item.id}>
@@ -125,9 +119,7 @@ const SearchCard: React.FC<Props> = ({
                       {title}
                     </Link>
 
-                    {known_for.length - 1 !== i
-                      ? ` (${releaseDate.slice(0, 4)}), `
-                      : ` (${releaseDate.slice(0, 4)})`}
+                    {known_for.length - 1 !== i ? ` (${releaseDate.slice(0, 4)}), ` : ` (${releaseDate.slice(0, 4)})`}
                   </span>
                 )
               })}

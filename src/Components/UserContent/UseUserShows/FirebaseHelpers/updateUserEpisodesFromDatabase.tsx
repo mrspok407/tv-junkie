@@ -1,5 +1,4 @@
 import { releasedEpisodesToOneArray } from "Utils"
-// import merge from "deepmerge"
 import mergeWith from "lodash.mergewith"
 import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
 import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
@@ -19,14 +18,13 @@ const updateUserEpisodesFromDatabase = ({ firebase, authUser, showsFullInfo }: A
 
     if (showsFullInfo.length !== userShowsEpisodes.length) return
 
-    const customizer = (objValue: any, srcValue: any, key: any) => {
+    const mergeCustomizer = (objValue: any, srcValue: any, key: any) => {
       if (key === "air_date") {
         return objValue === undefined ? "" : objValue
       }
       return undefined
     }
-
-    const mergedShowsEpisodes: UserShowsInterface[] = mergeWith(showsFullInfo, userShowsEpisodes, customizer)
+    const mergedShowsEpisodes: UserShowsInterface[] = mergeWith(showsFullInfo, userShowsEpisodes, mergeCustomizer)
 
     mergedShowsEpisodes.forEach((show) => {
       const seasons = show.episodes.reduce((acc: any, season) => {

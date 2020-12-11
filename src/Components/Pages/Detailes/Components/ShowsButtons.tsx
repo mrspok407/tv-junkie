@@ -35,7 +35,7 @@ const ShowsButtons: React.FC<Props> = ({
 
   const handleClickOutside = (e: CustomEvent) => {
     if (authUser) return
-    if (_notAuthButtons.current && !_notAuthButtons.current.contains(e.target as Node)) {
+    if (!_notAuthButtons?.current?.contains(e.target as Node)) {
       setDisableBtnWarning(null)
     }
   }

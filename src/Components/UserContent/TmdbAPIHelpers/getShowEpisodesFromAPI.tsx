@@ -53,8 +53,9 @@ const getShowEpisodesFromAPI = ({ id }: { id: number }) => {
 
         seasonsData.forEach((item: any, index) => {
           const season = item[`season/${index + 1}`]
-          if (!Array.isArray(season.episodes) || season.episodes.length === 0 || season.air_date.length === 0)
+          if (!Array.isArray(season.episodes) || season.episodes.length === 0) {
             return
+          }
 
           let episodes: {}[] = []
 

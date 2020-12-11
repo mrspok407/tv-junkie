@@ -74,9 +74,7 @@ const Search: React.FC<Props> = ({ navSearch, navRef, closeNavMobile }) => {
       )
       .then(({ data: { results, total_pages: totalPages } }) => {
         const content = [...results]
-        const contentSortByPopularity = content
-          .sort((a, b) => (a.popularity > b.popularity ? -1 : 1))
-          .slice(0, 5)
+        const contentSortByPopularity = content.sort((a, b) => (a.popularity > b.popularity ? -1 : 1)).slice(0, 5)
 
         setSearchResults(contentSortByPopularity)
         setIsSearchingList(false)
@@ -102,10 +100,7 @@ const Search: React.FC<Props> = ({ navSearch, navRef, closeNavMobile }) => {
   }
 
   const handleClickOutside = (e: CustomEvent) => {
-    if (
-      (searchContRef && searchContRef.current && !searchContRef.current.contains(e.target as Node)) ||
-      (navRef && navRef.current && !navRef.current.contains(e.target))
-    ) {
+    if (!searchContRef?.current?.contains(e.target as Node) || (navRef && !navRef.current?.contains(e.target))) {
       setListIsOpen(false)
       onBlur()
     }

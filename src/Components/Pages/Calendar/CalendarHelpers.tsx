@@ -16,7 +16,7 @@ export const organiseFutureEpisodesByMonth = (data: UserShowsInterface[]) => {
                 ...episode,
                 show: show.name || show.original_name,
                 showId: show.id,
-                episode_number: episode && episode.episode_number
+                episode_number: episode?.episode_number
               })
             }
 

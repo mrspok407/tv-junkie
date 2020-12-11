@@ -41,7 +41,7 @@ const UserRating: React.FC<Props> = ({
 }) => {
   const [userRating, setUserRating] = useState(0)
   const [nonAuthWarning, setNonAuthWarning] = useState(false)
-  const userRatingRef = useRef<HTMLDivElement>(null!)
+  const userRatingRef = useRef<HTMLDivElement>(null)
 
   const firebase = useContext(FirebaseContext)
   const { authUser } = useContext(AppContext)
@@ -54,7 +54,7 @@ const UserRating: React.FC<Props> = ({
   }, [])
 
   const handleClickOutside = (e: CustomEvent) => {
-    if (userRatingRef.current && !userRatingRef.current.contains(e.target as Node)) {
+    if (!userRatingRef?.current?.contains(e.target as Node)) {
       setNonAuthWarning(false)
     }
   }
@@ -80,9 +80,7 @@ const UserRating: React.FC<Props> = ({
   const onMouseMoveHandler = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (authUser === null) return
     const target = e.target as HTMLButtonElement
-    const buttonsNodeList = (target.parentElement as HTMLElement).getElementsByClassName(
-      "user-rating__button"
-    )
+    const buttonsNodeList = (target.parentElement as HTMLElement).getElementsByClassName("user-rating__button")
     const currentRating = Number((e.target as HTMLButtonElement).dataset.rating)
 
     Array.from(buttonsNodeList).forEach((star, index) => {
@@ -98,9 +96,7 @@ const UserRating: React.FC<Props> = ({
   const onMouseLeaveHandler = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (authUser === null) return
     const target = e.target as HTMLButtonElement
-    const buttonsNodeList = (target.parentElement as HTMLElement).getElementsByClassName(
-      "user-rating__button"
-    )
+    const buttonsNodeList = (target.parentElement as HTMLElement).getElementsByClassName("user-rating__button")
 
     Array.from(buttonsNodeList).forEach((star, index) => {
       star.classList.remove("user-rating__button-hovered")
@@ -142,8 +138,7 @@ const UserRating: React.FC<Props> = ({
     }
   }
 
-  const ratingDisabled =
-    authUser === null || disableRating || (!showDatabase && showRating && mediaType !== "movie")
+  const ratingDisabled = authUser === null || disableRating || (!showDatabase && showRating && mediaType !== "movie")
 
   return (
     <div
@@ -171,8 +166,8 @@ const UserRating: React.FC<Props> = ({
 
       {nonAuthWarning && (
         <div className="user-rating__warning">
-          To use full features please <Link to={ROUTES.LOGIN_PAGE}>register</Link>. Your allready selected
-          shows will be saved.
+          To use full features please <Link to={ROUTES.LOGIN_PAGE}>register</Link>. Your allready selected shows will be
+          saved.
         </div>
       )}
     </div>

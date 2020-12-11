@@ -15,9 +15,9 @@ type Props = {
 
 const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false }) => {
   const [navMobileOpen, setNavMobileOpen] = useState(false)
+  const { authUser } = useContext(AppContext)
   const navRef = useRef<HTMLElement>(null)
   const toggleNavButtonRef = useRef<HTMLButtonElement>(null)
-  const { authUser } = useContext(AppContext)
 
   const closeNavMobile = () => {
     setNavMobileOpen(false)
@@ -32,10 +32,10 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false }) =>
   }, [])
 
   const handleClickOutside = (e: CustomEvent) => {
-    if (toggleNavButtonRef && toggleNavButtonRef.current && toggleNavButtonRef.current.contains(e.target as Node)) {
+    if (toggleNavButtonRef?.current?.contains(e.target as Node)) {
       return
     }
-    if (navRef && navRef.current && !navRef.current.contains(e.target as Node)) {
+    if (!navRef?.current?.contains(e.target as Node)) {
       setNavMobileOpen(false)
     }
   }
