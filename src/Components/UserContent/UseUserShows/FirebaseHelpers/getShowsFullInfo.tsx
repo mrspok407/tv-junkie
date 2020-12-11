@@ -1,10 +1,6 @@
 import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
 import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
-import {
-  SeasonEpisodesFromDatabaseInterface,
-  UserShowsInterface,
-  UserWillAirEpisodesInterface
-} from "../UseUserShows"
+import { SeasonEpisodesFromDatabaseInterface, UserShowsInterface, UserWillAirEpisodesInterface } from "../UseUserShows"
 import { organiseFutureEpisodesByMonth } from "Components/Pages/Calendar/CalendarHelpers"
 import { combineMergeObjects } from "Utils"
 import updateUserEpisodesFromDatabase from "Components/UserContent/UseUserShows/FirebaseHelpers/updateUserEpisodesFromDatabase"
@@ -43,6 +39,7 @@ const getShowsFullInfo = ({ userShows, firebase, authUser }: GetUserShowsFullInf
     console.log({ mergedShows })
 
     await updateUserEpisodesFromDatabase({ firebase, authUser, showsFullInfo: mergedShows })
+    console.log("after updateUserEpisodes")
 
     return { showsFullInfo: mergedShows, willAirEpisodes }
   })

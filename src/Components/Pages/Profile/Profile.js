@@ -108,7 +108,7 @@ class Profile extends Component {
         `https://api.themoviedb.org/3/tv/changes?api_key=${process.env.REACT_APP_TMDB_API}&end_date=${todayConverted}&start_date=${threeDaysBefore}`
       )
       .then(async ({ data }) => {
-        const tempData = [{ id: 82856 }]
+        const tempData = [{ id: 44006 }]
         // const allShowsIds = await this.context.firebase // change show.id below to just show
         //   .allShowsList()
         //   .once("value")

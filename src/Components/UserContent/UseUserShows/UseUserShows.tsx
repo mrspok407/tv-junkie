@@ -112,6 +112,8 @@ const useUserShows = () => {
               })
               listenerUserToWatchShow({ uid: authUser.uid })
 
+              console.log("showsMerging false")
+
               setUserShows(showsFullInfo)
               setUserWillAirEpisodes(willAirEpisodes)
               setLoadingShows(false)
