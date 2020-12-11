@@ -32,9 +32,6 @@ const ToWatchEpisodesContent: React.FC = () => {
       return
     }
 
-    console.log({ watchingShows })
-    console.log({ toWatchEpisodes })
-
     const watchingShowsModified = watchingShows
       .reduce((acc: UserShowsInterface[], show) => {
         const showToWatch = toWatchEpisodes.find((item: any) => item.id === show.id)
@@ -42,19 +39,11 @@ const ToWatchEpisodesContent: React.FC = () => {
           const showMerged = merge(show, showToWatch, {
             arrayMerge: combineMergeObjects
           })
-          console.log({ show })
-          console.log({ showToWatch })
           acc.push(showMerged)
         }
         return acc
       }, [])
       .sort((a, b) => (a.first_air_date > b.first_air_date ? -1 : 1))
-
-    console.log({ watchingShowsModified })
-
-    // const mergedShows = merge(watchingShowsModified, toWatchEpisodes, {
-    //   arrayMerge: combineMergeObjects
-    // }).sort((a, b) => (a.first_air_date > b.first_air_date ? -1 : 1))
 
     setWatchingShows(watchingShowsModified)
     setInitialLoading(false)
@@ -89,7 +78,6 @@ const ToWatchEpisodesContent: React.FC = () => {
 
               return acc
             }, [])
-            console.log({ toWatchEpisodes })
             toWatchEpisodes.reverse()
 
             const releasedEpisodes: SingleEpisodeInterface[] = releasedEpisodesToOneArray({

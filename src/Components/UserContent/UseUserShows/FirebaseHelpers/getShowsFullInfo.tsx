@@ -1,10 +1,12 @@
-import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
+import { FirebaseContext, FirebaseInterface } from "Components/Firebase/FirebaseContext"
 import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 import { SeasonEpisodesFromDatabaseInterface, UserShowsInterface, UserWillAirEpisodesInterface } from "../UseUserShows"
 import { organiseFutureEpisodesByMonth } from "Components/Pages/Calendar/CalendarHelpers"
 import { combineMergeObjects } from "Utils"
 import updateUserEpisodesFromDatabase from "Components/UserContent/UseUserShows/FirebaseHelpers/updateUserEpisodesFromDatabase"
 import merge from "deepmerge"
+
+const SESSION_STORAGE_KEY_SHOWS = "userShows"
 
 interface GetUserShowsFullInfoArg {
   userShows: UserShowsInterface[]
@@ -13,18 +15,25 @@ interface GetUserShowsFullInfoArg {
 }
 
 const getShowsFullInfo = ({ userShows, firebase, authUser }: GetUserShowsFullInfoArg) => {
+  console.log({ userShows })
   console.log("getShowsFullInfo")
   return Promise.all(
     userShows.map((show) => {
       return firebase
-        .showInDatabase(show.id)
+        .showInfo(show.id)
         .once("value")
-        .then((snapshot: { val: () => { info: {}; episodes: SeasonEpisodesFromDatabaseInterface } }) => {
+        .then((snapshot: { val: () => { info: {}; episodes: SeasonEpisodesFromDatabaseInterface[] } }) => {
           if (snapshot.val() !== null) {
-            return {
-              ...show,
-              ...snapshot.val().info,
-              episodes: snapshot.val().episodes || []
+            const info = snapshot.val()
+            if (show.database === "watchingShows" && !show.finished) {
+              return firebase
+                .showEpisodes(show.id)
+                .once("value")
+                .then((snapshot: { val: () => SeasonEpisodesFromDatabaseInterface[] }) => {
+                  return { ...info, episodes: snapshot.val() }
+                })
+            } else {
+              return { ...info, episodes: [] }
             }
           }
         })
@@ -36,9 +45,12 @@ const getShowsFullInfo = ({ userShows, firebase, authUser }: GetUserShowsFullInf
     const watchingShows: any = mergedShows.filter((show) => show && show.database === "watchingShows")
     const willAirEpisodes: UserWillAirEpisodesInterface[] = organiseFutureEpisodesByMonth(watchingShows)
 
+    sessionStorage.setItem(SESSION_STORAGE_KEY_SHOWS, JSON.stringify(userShows))
+
     console.log({ mergedShows })
 
-    await updateUserEpisodesFromDatabase({ firebase, authUser, showsFullInfo: mergedShows })
+    updateUserEpisodesFromDatabase({ firebase, authUser, showsFullInfo: mergedShows })
+
     console.log("after updateUserEpisodes")
 
     return { showsFullInfo: mergedShows, willAirEpisodes }

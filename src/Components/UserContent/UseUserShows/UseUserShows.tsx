@@ -80,6 +80,8 @@ const useUserShows = () => {
 
   const firebase = useContext(FirebaseContext)
 
+  let count: any = 0
+
   useEffect(() => {
     let authSubscriber: any
     const authUserListener = () => {
@@ -89,6 +91,8 @@ const useUserShows = () => {
           if (!authUser) return
           setLoadingShows(true)
 
+          console.time("test")
+
           firebase.userAllShows(authUser.uid).on("value", async (snapshot: { val: () => UserShowsInterface[] }) => {
             if (snapshot.val() === null) {
               console.log("hook in listener NO value")
@@ -97,6 +101,9 @@ const useUserShows = () => {
               return
             }
             console.log("hook in listener")
+
+            count++
+            if (count > 20) debugger
 
             const shows = Object.values(snapshot.val()).map((show) => {
               return show
@@ -111,6 +118,8 @@ const useUserShows = () => {
                 authUser
               })
               listenerUserToWatchShow({ uid: authUser.uid })
+
+              console.timeEnd("test")
 
               console.log("showsMerging false")
 
@@ -134,6 +143,7 @@ const useUserShows = () => {
                 setLoadingShows(false)
               })
             } else if (userShowsSS.length === shows.length) {
+              if (!loadingShowsMerging) return
               console.log("userShows length same")
               const mergedShows = merge(userShowsSS, shows, {
                 arrayMerge: combineMergeObjects
