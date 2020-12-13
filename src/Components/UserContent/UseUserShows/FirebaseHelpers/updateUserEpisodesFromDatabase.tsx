@@ -12,22 +12,13 @@ interface Arguments {
 
 const updateUserEpisodesFromDatabase = ({ firebase, authUser, showsFullInfo }: Arguments) => {
   console.log("updateUserEp")
-  const watchingShowsFromDB = showsFullInfo.filter((item: any) => item.database === "watchingShows" && !item.finished)
-
-  // return firebase
-  //   .userEpisodes(authUser.uid)
-  //   .orderByChild("info/isAllWatched_database")
-  //   .equalTo("false_watchingShows")
-  //   .once("value")
-
-  // firebase
-  // .userEpisodes(authUser.uid)
-  // .orderByChild("info/isAllWatched_database")
-  // .equalTo("false_watchingShows")
-  // .once("value")
-  // .then(() => {
-  //   return
-  // })
+  const watchingShowsFromDB = showsFullInfo.filter((item: any) => {
+    return (
+      item.database === "watchingShows" &&
+      !item.finished &&
+      (item.lastUpdatedInDatabase > item.lastUpdatedInUser || item.lastUpdatedInUser === undefined)
+    )
+  })
   return (
     Promise.all(
       watchingShowsFromDB.map((show: any) => {
@@ -111,7 +102,9 @@ const updateUserEpisodesFromDatabase = ({ firebase, authUser, showsFullInfo }: A
               finished,
               isAllWatched_database: `${allEpisodesWatched}_${show.database}`
             }),
-            firebase.userShow({ uid: authUser.uid, key: show.id }).update({ finished, allEpisodesWatched })
+            firebase
+              .userShow({ uid: authUser.uid, key: show.id })
+              .update({ finished, allEpisodesWatched, lastUpdatedInUser: firebase.timeStamp() })
           ]
         })
 

@@ -50,6 +50,7 @@ const useGetUserToWatchShows: Hook = () => {
           return
         }
         console.log("hook userToWatchShows")
+        console.log({ toWatch: snapshot.val() })
         const userEpisodes: UserToWatchShowsInterface[] = Object.entries(snapshot.val()).reduce(
           (acc: UserToWatchShowsInterface[], [key, value]: any) => {
             const releasedEpisodes: { watched: boolean }[] = releasedEpisodesToOneArray({

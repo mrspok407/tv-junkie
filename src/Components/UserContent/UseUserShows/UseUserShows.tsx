@@ -9,6 +9,7 @@ import useGetUserToWatchShows from "./Hooks/UseGetUserToWatchShows"
 import getShowsFullInfo from "./FirebaseHelpers/getShowsFullInfo"
 import spliceNewShowFromDatabase from "./FirebaseHelpers/spliceNewShowFromDatabase"
 import useGetUserMovies from "./Hooks/UseGetUserMovies"
+import updateUserEpisodesFromDatabaseNew from "Components/UserContent/UseUserShows/FirebaseHelpers/updateUserEpisodesFromDatabaseNew"
 
 const SESSION_STORAGE_KEY_SHOWS = "userShows"
 
@@ -19,7 +20,9 @@ export interface UserShowsInterface extends ContentDetailes {
   timeStamp: number
   userRating: string | string
   episodes: SeasonEpisodesFromDatabaseInterface[]
-  info: {}
+  lastUpdatedInDatabase: number
+  lastUpdatedInUser: number
+  info: { database: string }
 }
 
 export interface SingleEpisodeInterface {
@@ -59,6 +62,7 @@ export interface UserWillAirEpisodesInterface {
 
 const useUserShows = () => {
   const [userShows, setUserShows] = useState<UserShowsInterface[]>([])
+  const [userShowsKeys, setUserShowsKeys] = useState<{ id: number; lastUpdatedInUser: number }[]>([])
   const [userWillAirEpisodes, setUserWillAirEpisodes] = useState<UserWillAirEpisodesInterface[]>([])
   const {
     userToWatchShows,
@@ -87,11 +91,13 @@ const useUserShows = () => {
     const authUserListener = () => {
       console.log("hook run")
       authSubscriber = firebase.onAuthUserListener(
-        (authUser: AuthUserInterface) => {
+        async (authUser: AuthUserInterface) => {
           if (!authUser) return
           setLoadingShows(true)
 
           console.time("test")
+
+          await updateUserEpisodesFromDatabaseNew({ firebase })
 
           firebase.userAllShows(authUser.uid).on("value", async (snapshot: { val: () => UserShowsInterface[] }) => {
             if (snapshot.val() === null) {
@@ -117,6 +123,7 @@ const useUserShows = () => {
                 firebase,
                 authUser
               })
+
               listenerUserToWatchShow({ uid: authUser.uid })
 
               console.timeEnd("test")
@@ -174,6 +181,10 @@ const useUserShows = () => {
     }
     // eslint-disable-next-line
   }, [])
+
+  // useEffect(() => {
+  //   updateUserEpisodesFromDatabaseNew({ firebase })
+  // }, [firebase])
 
   useEffect(() => {
     console.log("userShows updated")

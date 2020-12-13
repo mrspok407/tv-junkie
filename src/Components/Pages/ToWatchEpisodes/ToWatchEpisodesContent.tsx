@@ -22,6 +22,7 @@ const ToWatchEpisodesContent: React.FC = () => {
     const watchingShows = context.userContent.userShows.filter(
       (show) => show.database === "watchingShows" && !show.allEpisodesWatched
     )
+    console.log({ watchingShows })
     const toWatchEpisodes: any = context.userContent.userToWatchShows
 
     if (toWatchEpisodes.length === 0) {
@@ -83,6 +84,7 @@ const ToWatchEpisodesContent: React.FC = () => {
             const releasedEpisodes: SingleEpisodeInterface[] = releasedEpisodesToOneArray({
               data: toWatchEpisodes
             })
+            console.log({ releasedEpisodes })
             return (
               <div key={show.id} className="towatch__show">
                 <Link className="towatch__show-name" to={`/show/${show.id}`}>

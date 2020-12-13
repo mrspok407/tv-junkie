@@ -78,10 +78,15 @@ const useContentHandler = () => {
           }
         }, {})
 
+        const userShowsLastUpdateList = data.reduce((acc, show) => {
+          return { ...acc, [show.showInfo.id]: { lastUpdatedInUser: show.showInfo.timeStamp } }
+        }, {})
+
         firebase.userAllShows(uid).set(userShows)
         firebase.userEpisodes(uid).set(userEpisodes, () => {
           setLoadingShowsOnRegister(false)
         })
+        firebase.userShowsLastUpdateList(uid).set(userShowsLastUpdateList)
 
         console.log(userShows)
         console.log(userEpisodes)
@@ -149,6 +154,10 @@ const useContentHandler = () => {
             }
           )
       ])
+
+      firebase.userShowsLastUpdateList(authUser.uid).child(id).set({
+        lastUpdatedInUser: firebase.timeStamp()
+      })
 
       console.log("right after promise all")
       if (handleListeners) handleListeners({ id, status: dataFromAPI.status })

@@ -12,6 +12,7 @@ export const organiseFutureEpisodesByMonth = (data: UserShowsInterface[]) => {
         season.episodes.reduce(
           (acc: { show: string; showId: number; episode_number?: number; air_date: any }[], episode) => {
             if (differenceBtwDatesInDays(episode.air_date, todayDate) >= 0) {
+              console.log({ episode })
               acc.push({
                 ...episode,
                 show: show.name || show.original_name,
