@@ -1,7 +1,6 @@
 import { releasedEpisodesToOneArray } from "Utils"
 import mergeWith from "lodash.mergewith"
 import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
-import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 import { SeasonEpisodesFromDatabaseInterface, SingleEpisodeInterface, UserShowsInterface } from "../UseUserShows"
 
 interface Arguments {
@@ -11,39 +10,40 @@ interface Arguments {
 const updateUserEpisodesFromDatabase = async ({ firebase }: Arguments) => {
   const authUser = firebase.auth.currentUser
 
-  console.time("getKeys")
-
   const showsLastUpdateList = await firebase
     .userShowsLastUpdateList(authUser.uid)
     .once("value")
     .then((snapshot: any) => snapshot.val())
 
   const showsToUpdate = await Promise.all(
-    Object.entries(showsLastUpdateList).map(async (show: any) => {
+    Object.entries(showsLastUpdateList).map(async ([key, value]: any) => {
       const lastUpdatedInDatabase = await firebase
-        .showInfo(show[0])
+        .showInfo(key)
         .child("lastUpdatedInDatabase")
         .once("value")
         .then((snapshot: any) => snapshot.val())
-      // return (lastUpdatedInDatabase > show.lastUpdatedInUser || !show.lastUpdatedInUser) && show.id
-      if (lastUpdatedInDatabase > show[1].lastUpdatedInUser) {
-        return show[0]
+      if (lastUpdatedInDatabase > value.lastUpdatedInUser) {
+        return key
       }
     })
   )
 
   console.log({ showsToUpdate })
 
+  if (!showsToUpdate.find((item) => !!item)) return
+
+  console.log({ showsToUpdate: !!showsToUpdate.find((item) => !!item) })
+
   Promise.all([
     Promise.all(
-      showsToUpdate.reduce((acc: any, show: any) => {
+      showsToUpdate.reduce((acc: SeasonEpisodesFromDatabaseInterface[], show) => {
         if (show !== undefined) {
           return [
             ...acc,
             firebase
               .userShowEpisodes(authUser.uid, show)
               .once("value")
-              .then((snapshot: any) => {
+              .then((snapshot: { val: () => SeasonEpisodesFromDatabaseInterface[] }) => {
                 return snapshot.val()
               })
           ]
@@ -52,14 +52,14 @@ const updateUserEpisodesFromDatabase = async ({ firebase }: Arguments) => {
       }, [])
     ),
     Promise.all(
-      showsToUpdate.reduce((acc: any, show: any) => {
+      showsToUpdate.reduce((acc: UserShowsInterface[], show) => {
         if (show !== undefined) {
           return [
             ...acc,
             firebase
               .showInDatabase(show)
               .once("value")
-              .then((snapshot: any) => {
+              .then((snapshot: { val: () => { info: {}; episodes: SeasonEpisodesFromDatabaseInterface[] } }) => {
                 return { ...snapshot.val().info, episodes: snapshot.val().episodes }
               })
           ]
@@ -67,36 +67,31 @@ const updateUserEpisodesFromDatabase = async ({ firebase }: Arguments) => {
         return acc
       }, [])
     )
-  ]).then((data: any) => {
+  ]).then((data) => {
     const userShows = data[0]
     const showsFromDatabase = data[1]
 
     const mergeCustomizer = (objValue: any, srcValue: any, key: any) => {
       if (key === "air_date") {
-        // console.log({ objValue })
-        // console.log({ srcValue })
         return objValue === undefined ? "" : objValue
-        // return undefined
       } else if (key === "season_number") {
         return objValue
       }
       return undefined
     }
     const mergedShowsEpisodes: UserShowsInterface[] = mergeWith(showsFromDatabase, userShows, mergeCustomizer)
-    console.log({ mergedShowsEpisodes })
 
     let promises: any = []
 
     mergedShowsEpisodes.forEach((show) => {
+      console.log(show)
       const seasons = show.episodes.reduce((acc: any, season) => {
-        // if (!season.season_number) return acc
         const episodes = season.episodes.reduce((acc: SingleEpisodeInterface[], episode) => {
-          // if (!episode.id) return acc
           acc.push({
             userRating: episode.userRating || 0,
             watched: episode.air_date ? episode.watched || false : false,
-            // watched: episode.watched || false,
-            air_date: episode.air_date || ""
+            air_date: episode.air_date || "",
+            id: episode.id
           })
           return acc
         }, [])
@@ -120,8 +115,6 @@ const updateUserEpisodesFromDatabase = async ({ firebase }: Arguments) => {
       const allEpisodesWatched = !allEpisodes.some((episode: any) => !episode.watched)
       const finished = statusDatabase === "ended" && allEpisodesWatched ? true : false
 
-      console.log({ show })
-
       promises = [
         ...promises,
         firebase.userShow({ uid: authUser.uid, key: show.id }).update({ finished, allEpisodesWatched })
@@ -138,8 +131,6 @@ const updateUserEpisodesFromDatabase = async ({ firebase }: Arguments) => {
 
     return Promise.all(promises)
   })
-
-  console.timeEnd("getKeys")
 
   // firebase
   //   .showInfo(key)

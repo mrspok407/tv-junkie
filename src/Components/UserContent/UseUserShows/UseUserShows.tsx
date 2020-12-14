@@ -10,6 +10,9 @@ import getShowsFullInfo from "./FirebaseHelpers/getShowsFullInfo"
 import spliceNewShowFromDatabase from "./FirebaseHelpers/spliceNewShowFromDatabase"
 import useGetUserMovies from "./Hooks/UseGetUserMovies"
 import updateUserEpisodesFromDatabaseNew from "Components/UserContent/UseUserShows/FirebaseHelpers/updateUserEpisodesFromDatabaseNew"
+import * as _transform from "lodash.transform"
+import * as _isEqual from "lodash.isequal"
+import * as _isObject from "lodash.isobject"
 
 const SESSION_STORAGE_KEY_SHOWS = "userShows"
 
@@ -62,7 +65,6 @@ export interface UserWillAirEpisodesInterface {
 
 const useUserShows = () => {
   const [userShows, setUserShows] = useState<UserShowsInterface[]>([])
-  const [userShowsKeys, setUserShowsKeys] = useState<{ id: number; lastUpdatedInUser: number }[]>([])
   const [userWillAirEpisodes, setUserWillAirEpisodes] = useState<UserWillAirEpisodesInterface[]>([])
   const {
     userToWatchShows,
@@ -79,7 +81,6 @@ const useUserShows = () => {
     resetStateUserMovies
   } = useGetUserMovies()
   const [loadingShows, setLoadingShows] = useState(true)
-  const [loadingShowsMerging, setLoadingShowsMerging] = useState(true)
   const [firebaseListeners, setFirebaseListeners] = useState<any>([])
 
   const firebase = useContext(FirebaseContext)
@@ -95,15 +96,12 @@ const useUserShows = () => {
           if (!authUser) return
           setLoadingShows(true)
 
-          console.time("test")
-
-          await updateUserEpisodesFromDatabaseNew({ firebase })
+          updateUserEpisodesFromDatabaseNew({ firebase })
 
           firebase.userAllShows(authUser.uid).on("value", async (snapshot: { val: () => UserShowsInterface[] }) => {
             if (snapshot.val() === null) {
               console.log("hook in listener NO value")
               setLoadingShows(false)
-              setLoadingShowsMerging(false)
               return
             }
             console.log("hook in listener")
@@ -118,22 +116,16 @@ const useUserShows = () => {
 
             if (userShowsSS.length === 0) {
               console.log("userShows length = 0")
+              listenerUserToWatchShow({ uid: authUser.uid })
               const { showsFullInfo, willAirEpisodes } = await getShowsFullInfo({
                 userShows: shows,
                 firebase,
                 authUser
               })
 
-              listenerUserToWatchShow({ uid: authUser.uid })
-
-              console.timeEnd("test")
-
-              console.log("showsMerging false")
-
               setUserShows(showsFullInfo)
               setUserWillAirEpisodes(willAirEpisodes)
               setLoadingShows(false)
-              setLoadingShowsMerging(false)
             } else if (userShowsSS.length < shows.length) {
               console.log("userShows length < 0")
               shows.forEach(async (show, index) => {
@@ -150,12 +142,58 @@ const useUserShows = () => {
                 setLoadingShows(false)
               })
             } else if (userShowsSS.length === shows.length) {
-              if (!loadingShowsMerging) return
               console.log("userShows length same")
+
+              const difference = (object: any, base: any) => {
+                function changes(object: any, base: any) {
+                  return _transform(object, function (result: any, value: any, key: any) {
+                    if (!_isEqual(value, base[key])) {
+                      result[key] = _isObject(value) && _isObject(base[key]) ? changes(value, base[key]) : value
+                    }
+                  })
+                }
+                return changes(object, base)
+              }
+
+              const changedShow: any = shows.find((show: any, index: any) => {
+                console.log(difference(show, userShowsSS[index]).allEpisodesWatched)
+                if (
+                  (difference(show, userShowsSS[index]).database ||
+                    difference(show, userShowsSS[index]).allEpisodesWatched !== undefined) &&
+                  userShowsSS[index].episodes.length === 0
+                ) {
+                  return show
+                }
+              })
+
+              console.log({ changedShow })
+
+              if (changedShow) {
+                await firebase
+                  .showInDatabase(changedShow.id)
+                  .once("value")
+                  .then((snapshot: { val: () => { info: {}; episodes: SeasonEpisodesFromDatabaseInterface[] } }) => {
+                    console.log("call to fire")
+                    const index = shows.findIndex((item) => item.id === changedShow.id)
+                    const mergedShow = {
+                      ...changedShow,
+                      ...snapshot.val().info,
+                      episodes: snapshot.val().episodes
+                    }
+                    shows[index] = mergedShow
+                  })
+              }
+
+              console.log(shows)
+
               const mergedShows = merge(userShowsSS, shows, {
                 arrayMerge: combineMergeObjects
               })
 
+              const watchingShows = mergedShows.filter((show) => show.database === "watchingShows")
+              const willAirEpisodes = organiseFutureEpisodesByMonth(watchingShows)
+
+              setUserWillAirEpisodes(willAirEpisodes)
               setUserShows(mergedShows)
             }
           })
@@ -181,10 +219,6 @@ const useUserShows = () => {
     }
     // eslint-disable-next-line
   }, [])
-
-  // useEffect(() => {
-  //   updateUserEpisodesFromDatabaseNew({ firebase })
-  // }, [firebase])
 
   useEffect(() => {
     console.log("userShows updated")
@@ -221,7 +255,6 @@ const useUserShows = () => {
     userMovies,
     loadingShows,
     loadingNotFinishedShows,
-    loadingShowsMerging,
     loadingMovies,
     handleUserShowsOnClient,
     handleUserMoviesOnClient,

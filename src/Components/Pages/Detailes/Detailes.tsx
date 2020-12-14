@@ -86,7 +86,7 @@ export const DetailesPage: React.FC<Props> = ({
   }, [context, id])
 
   useEffect(() => {
-    if (!authUser || mediaType !== "show" || context.userContent.loadingShowsMerging || !detailes) {
+    if (!authUser || mediaType !== "show" || context.userContent.loadingShows || !detailes) {
       return
     }
 
@@ -97,7 +97,7 @@ export const DetailesPage: React.FC<Props> = ({
       status: detailes.status,
       handleLoading
     })
-  }, [id, detailes, context.userContent.loadingShowsMerging])
+  }, [id, detailes, context.userContent.loadingShows])
 
   const handleLoading = (isLoading: boolean) => {
     setLoadingFromDatabase(isLoading)
@@ -119,20 +119,15 @@ export const DetailesPage: React.FC<Props> = ({
         }
       )
       .then(({ data }) => {
-        const genreIds =
-          data.genres && data.genres.length ? data.genres.map((item: { id: number }) => item.id) : "-"
+        const genreIds = data.genres && data.genres.length ? data.genres.map((item: { id: number }) => item.id) : "-"
         const genreNames =
-          data.genres && data.genres.length
-            ? data.genres.map((item: { name: string }) => item.name).join(", ")
-            : "-"
+          data.genres && data.genres.length ? data.genres.map((item: { name: string }) => item.name).join(", ") : "-"
         const networkNames =
           data.networks && data.networks.length
             ? data.networks.map((item: { name: string }) => item.name).join(", ")
             : "-"
         const prodComp =
-          data.production_companies.length === 0 || !data.production_companies
-            ? "-"
-            : data.production_companies[0].name
+          data.production_companies.length === 0 || !data.production_companies ? "-" : data.production_companies[0].name
 
         const similarType: any = data.similar || data.similar_movies
         const similarContent = similarType.results.filter((item: { poster_path: string }) => item.poster_path)
@@ -216,9 +211,7 @@ export const DetailesPage: React.FC<Props> = ({
             {mediaType === "show"
               ? `
                 ${detailes.name}
-                ${
-                  detailes.first_air_date !== "-" ? `(${detailes.first_air_date.slice(0, 4)})` : ""
-                } | TV Junkie
+                ${detailes.first_air_date !== "-" ? `(${detailes.first_air_date.slice(0, 4)})` : ""} | TV Junkie
               `
               : `
               ${detailes.title}

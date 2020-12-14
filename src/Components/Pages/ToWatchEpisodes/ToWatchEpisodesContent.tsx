@@ -22,8 +22,10 @@ const ToWatchEpisodesContent: React.FC = () => {
     const watchingShows = context.userContent.userShows.filter(
       (show) => show.database === "watchingShows" && !show.allEpisodesWatched
     )
-    console.log({ watchingShows })
     const toWatchEpisodes: any = context.userContent.userToWatchShows
+
+    console.log({ watchingShows })
+    console.log({ toWatchEpisodes })
 
     if (toWatchEpisodes.length === 0) {
       setWatchingShows([])
@@ -56,7 +58,7 @@ const ToWatchEpisodesContent: React.FC = () => {
 
   return (
     <div className="content-results content-results--to-watch-page">
-      {initialLoading || context.userContent.loadingShowsMerging ? (
+      {initialLoading || context.userContent.loadingShows ? (
         <Loader className="loader--pink" />
       ) : watchingShows.length === 0 ? (
         <PlaceholderNoToWatchEpisodes />
@@ -84,7 +86,6 @@ const ToWatchEpisodesContent: React.FC = () => {
             const releasedEpisodes: SingleEpisodeInterface[] = releasedEpisodesToOneArray({
               data: toWatchEpisodes
             })
-            console.log({ releasedEpisodes })
             return (
               <div key={show.id} className="towatch__show">
                 <Link className="towatch__show-name" to={`/show/${show.id}`}>

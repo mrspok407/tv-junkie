@@ -83,7 +83,6 @@ export interface AppContextInterface {
     removeShowLS: ({ id }: { id: number }) => void
   }
   userContent: {
-    loadingShowsMerging: boolean
     loadingShows: boolean
     loadingNotFinishedShows: boolean
     loadingMovies: boolean
@@ -123,7 +122,6 @@ export const CONTEXT_INITIAL_STATE = {
     removeShowLS: () => {}
   },
   userContent: {
-    loadingShowsMerging: true,
     loadingShows: true,
     loadingNotFinishedShows: true,
     loadingMovies: true,

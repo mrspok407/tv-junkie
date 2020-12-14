@@ -60,9 +60,7 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
             const date = new Date(month.month)
             const monthLongName = date.toLocaleString("en", { month: "long" })
 
-            const monthEpisodes: SingleEpisodeByMonthInterface[] = organizeMonthEpisodesByEpisodeNumber(
-              month.episodes
-            )
+            const monthEpisodes: SingleEpisodeByMonthInterface[] = organizeMonthEpisodesByEpisodeNumber(month.episodes)
 
             return (
               <div key={month.month} className="episodes__episode-group">
@@ -92,7 +90,7 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
                     <>
                       {monthEpisodes.map((episode: any, episodeIndex: number, array: any[]) => {
                         const prevEpisode = array[episodeIndex - 1]
-                        const prevEpisodeAirDate = prevEpisode && prevEpisode.air_date
+                        const prevEpisodeAirDate = prevEpisode?.air_date
 
                         // Format Date //
                         const airDateISO = episode.air_date && new Date(episode.air_date).toISOString()
@@ -105,10 +103,7 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
                         const formatedDate = new Date(airDateISO)
 
                         const episodeAirDate = episode.air_date
-                          ? new Intl.DateTimeFormat("en-US", options)
-                              .format(formatedDate)
-                              .split(" ")
-                              .join(", ")
+                          ? new Intl.DateTimeFormat("en-US", options).format(formatedDate).split(" ").join(", ")
                           : "No date available"
                         // Format Date End //
 
@@ -117,13 +112,9 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
                         const episodeToString = episode.episode_number.toString()
 
                         const seasonNumber =
-                          seasonToString.length === 1
-                            ? "s".concat(seasonToString)
-                            : "s".concat(seasonToString)
+                          seasonToString.length === 1 ? "s".concat(seasonToString) : "s".concat(seasonToString)
                         const episodeNumber =
-                          episodeToString.length === 1
-                            ? "e0".concat(episodeToString)
-                            : "e".concat(episodeToString)
+                          episodeToString.length === 1 ? "e0".concat(episodeToString) : "e".concat(episodeToString)
                         // Format Seasons And Episode Numbers End //
 
                         const daysToNewEpisode = differenceBtwDatesInDays(episode.air_date, todayDate)

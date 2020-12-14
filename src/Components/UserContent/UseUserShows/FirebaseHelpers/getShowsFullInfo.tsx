@@ -1,9 +1,8 @@
-import { FirebaseContext, FirebaseInterface } from "Components/Firebase/FirebaseContext"
+import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
 import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 import { SeasonEpisodesFromDatabaseInterface, UserShowsInterface, UserWillAirEpisodesInterface } from "../UseUserShows"
 import { organiseFutureEpisodesByMonth } from "Components/Pages/Calendar/CalendarHelpers"
 import { combineMergeObjects } from "Utils"
-import updateUserEpisodesFromDatabase from "Components/UserContent/UseUserShows/FirebaseHelpers/updateUserEpisodesFromDatabase"
 import merge from "deepmerge"
 
 const SESSION_STORAGE_KEY_SHOWS = "userShows"
@@ -15,7 +14,6 @@ interface GetUserShowsFullInfoArg {
 }
 
 const getShowsFullInfo = ({ userShows, firebase, authUser }: GetUserShowsFullInfoArg) => {
-  console.log({ userShows })
   console.log("getShowsFullInfo")
   return Promise.all(
     userShows.map((show) => {
@@ -25,12 +23,7 @@ const getShowsFullInfo = ({ userShows, firebase, authUser }: GetUserShowsFullInf
         .then((snapshot: { val: () => { lastUpdatedInDatabase: number } }) => {
           if (snapshot.val() !== null) {
             const info = snapshot.val()
-            if (
-              true
-              // show.database === "watchingShows" &&
-              // !show.allEpisodesWatched
-              // (info.lastUpdatedInDatabase > show.lastUpdatedInUser || show.lastUpdatedInUser === undefined)
-            ) {
+            if (show.database === "watchingShows" && !show.finished) {
               console.log("roflan")
               return firebase
                 .showEpisodes(show.id)
@@ -49,6 +42,7 @@ const getShowsFullInfo = ({ userShows, firebase, authUser }: GetUserShowsFullInf
       arrayMerge: combineMergeObjects
     })
     const watchingShows: any = mergedShows.filter((show) => show && show.database === "watchingShows")
+    console.log({ watchingShows })
     const willAirEpisodes: UserWillAirEpisodesInterface[] = organiseFutureEpisodesByMonth(watchingShows)
 
     sessionStorage.setItem(SESSION_STORAGE_KEY_SHOWS, JSON.stringify(mergedShows))

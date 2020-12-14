@@ -10,7 +10,6 @@ import { todayDate } from "Utils"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import PasswordUpdate from "Components/UserAuth/PasswordUpdate/PasswordUpdate"
 import "./Profile.scss"
-import { isThisTypeNode } from "typescript"
 
 class Profile extends Component {
   constructor(props) {
@@ -96,10 +95,14 @@ class Profile extends Component {
 
   databaseModify = () => {
     // this.context.firebase.userAllShows(this.context.authUser.uid).once("value", (snapshot) => {
-    //   const modified = Object.entries(snapshot.val()).reduce((acc, [key, value]) => {
-    //     return { ...acc, [key]: { lastUpdatedInUser: value.lastUpdatedInUser } }
-    //   }, {})
-    //   this.context.firebase.userShowsLastUpdateList(this.context.authUser.uid).set(modified)
+    //   // const modified = Object.entries(snapshot.val()).reduce((acc, [key, value]) => {
+    //   //   return { ...acc, [key]: { lastUpdatedInUser: value.lastUpdatedInUser } }
+    //   // }, {})
+    //   // this.context.firebase.userShowsLastUpdateList(this.context.authUser.uid).set(modified)
+
+    //   // Object.keys(snapshot.val()).forEach((key) => {
+    //   //   this.context.firebase.userShow({ uid: this.context.authUser.uid, key }).update({ lastUpdatedInUser: null })
+    //   // })
     // })
 
     const todayConverted = `${todayDate.getDate()}-${todayDate.getMonth() + 1}-${todayDate.getFullYear()}`
