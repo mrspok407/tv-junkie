@@ -2,6 +2,13 @@
 
 .episodes--calendar {
   row-gap: 0px;
+  opacity: 0;
+  animation: showCalendar 200ms forwards;
+  @keyframes showCalendar {
+    to {
+      opacity: 1;
+    }
+  }
 
   .episodes__episode-group {
     row-gap: 0px;

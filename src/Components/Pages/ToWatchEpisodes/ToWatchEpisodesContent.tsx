@@ -14,7 +14,6 @@ import {
 
 const ToWatchEpisodesContent: React.FC = () => {
   const [watchingShows, setWatchingShows] = useState<UserShowsInterface[]>([])
-  const [initialLoading, setInitialLoading] = useState(true)
 
   const context = useContext(AppContext)
 
@@ -29,9 +28,6 @@ const ToWatchEpisodesContent: React.FC = () => {
 
     if (toWatchEpisodes.length === 0) {
       setWatchingShows([])
-      if (!context.userContent.loadingNotFinishedShows && !context.userContent.loadingShows) {
-        setInitialLoading(false)
-      }
       return
     }
 
@@ -49,7 +45,6 @@ const ToWatchEpisodesContent: React.FC = () => {
       .sort((a, b) => (a.first_air_date > b.first_air_date ? -1 : 1))
 
     setWatchingShows(watchingShowsModified)
-    setInitialLoading(false)
   }, [context.userContent])
 
   useEffect(() => {
@@ -58,7 +53,7 @@ const ToWatchEpisodesContent: React.FC = () => {
 
   return (
     <div className="content-results content-results--to-watch-page">
-      {initialLoading || context.userContent.loadingShows ? (
+      {context.userContent.loadingShows || context.userContent.loadingNotFinishedShows ? (
         <Loader className="loader--pink" />
       ) : watchingShows.length === 0 ? (
         <PlaceholderNoToWatchEpisodes />

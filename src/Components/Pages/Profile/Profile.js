@@ -94,11 +94,11 @@ class Profile extends Component {
   // })
 
   databaseModify = () => {
-    // this.context.firebase.userAllShows(this.context.authUser.uid).once("value", (snapshot) => {
-    //   // const modified = Object.entries(snapshot.val()).reduce((acc, [key, value]) => {
-    //   //   return { ...acc, [key]: { lastUpdatedInUser: value.lastUpdatedInUser } }
-    //   // }, {})
-    //   // this.context.firebase.userShowsLastUpdateList(this.context.authUser.uid).set(modified)
+    // this.context.firebase.userAllShows("I9OcmC25eKfieOWppn6Pqr1sVj02").once("value", (snapshot) => {
+    //   const modified = Object.entries(snapshot.val()).reduce((acc, [key, value]) => {
+    //     return { ...acc, [key]: { lastUpdatedInUser: value.timeStamp } }
+    //   }, {})
+    //   this.context.firebase.userShowsLastUpdateList("I9OcmC25eKfieOWppn6Pqr1sVj02").set(modified)
 
     //   // Object.keys(snapshot.val()).forEach((key) => {
     //   //   this.context.firebase.userShow({ uid: this.context.authUser.uid, key }).update({ lastUpdatedInUser: null })
@@ -119,7 +119,7 @@ class Profile extends Component {
         `https://api.themoviedb.org/3/tv/changes?api_key=${process.env.REACT_APP_TMDB_API}&end_date=${todayConverted}&start_date=${threeDaysBefore}`
       )
       .then(async ({ data }) => {
-        const tempData = [{ id: 1399 }]
+        // const tempData = [{ id: 1399 }]
         // const allShowsIds = await this.context.firebase // change show.id below to just show
         //   .allShowsList()
         //   .once("value")

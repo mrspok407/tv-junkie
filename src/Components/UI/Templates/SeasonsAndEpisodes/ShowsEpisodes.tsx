@@ -58,8 +58,10 @@ const ShowsEpisodes: React.FC<Props> = ({
   releasedEpisodes,
   parentComponent
 }) => {
+  const seasons = episodesData.filter((item) => item.name !== "Specials")
+
   const [loadingEpisodesIds, setLoadingEpisodesIds] = useState<number[]>([])
-  const [currentlyOpenSeasons, setCurrentlyOpenSeasons] = useState<number[]>([])
+  const [currentlyOpenSeasons, setCurrentlyOpenSeasons] = useState<number[]>([seasons[seasons?.length - 1]?.id])
   const [episodesDataFromAPI, setEpisodesDataFromAPI] = useState<ShowEpisodesFromAPIInterface[]>([])
   const [detailEpisodeInfo, setDetailEpisodeInfo] = useState<number[]>([])
   const [errorShowEpisodes, setErrorShowEpisodes] = useState("")
@@ -69,12 +71,9 @@ const ShowsEpisodes: React.FC<Props> = ({
 
   useEffect(() => {
     const initialFirstSeasonLoad = () => {
-      const seasons = episodesData.filter((item) => item.name !== "Specials")
       if (seasons.length === 0) return
 
       const firstSeason = seasons[seasons.length - 1]
-
-      if (firstSeason.id) setCurrentlyOpenSeasons([firstSeason.id])
 
       if (parentComponent === "toWatchPage") {
         setEpisodesDataFromAPI([{ seasonId: firstSeason.id, episodes: firstSeason.episodes }])
@@ -299,6 +298,8 @@ const ShowsEpisodes: React.FC<Props> = ({
   }
 
   const showCheckboxes = showInfo.showInUserDatabase && showDatabaseOnClient !== "notWatchingShows"
+
+  console.log({ currentlyOpenSeasons })
   return (
     <>
       {showCheckboxes && parentComponent === "detailesPage" && _get(releasedEpisodes, "length", 0) ? (

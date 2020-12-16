@@ -8,12 +8,17 @@ interface Arguments {
 }
 
 const updateUserEpisodesFromDatabase = async ({ firebase }: Arguments) => {
+  console.log({ firebase })
   const authUser = firebase.auth.currentUser
 
   const showsLastUpdateList = await firebase
     .userShowsLastUpdateList(authUser.uid)
     .once("value")
     .then((snapshot: any) => snapshot.val())
+
+  if (!showsLastUpdateList) return
+
+  console.log({ showsLastUpdateList })
 
   const showsToUpdate = await Promise.all(
     Object.entries(showsLastUpdateList).map(async ([key, value]: any) => {
@@ -84,14 +89,12 @@ const updateUserEpisodesFromDatabase = async ({ firebase }: Arguments) => {
     let promises: any = []
 
     mergedShowsEpisodes.forEach((show) => {
-      console.log(show)
       const seasons = show.episodes.reduce((acc: any, season) => {
         const episodes = season.episodes.reduce((acc: SingleEpisodeInterface[], episode) => {
           acc.push({
             userRating: episode.userRating || 0,
             watched: episode.air_date ? episode.watched || false : false,
-            air_date: episode.air_date || "",
-            id: episode.id
+            air_date: episode.air_date || ""
           })
           return acc
         }, [])

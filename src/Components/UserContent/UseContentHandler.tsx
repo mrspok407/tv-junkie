@@ -33,9 +33,9 @@ const useContentHandler = () => {
             dataFromAPI.status === "Ended" || dataFromAPI.status === "Canceled" ? "ended" : "ongoing"
 
           const userEpisodes = dataFromAPI.episodes.reduce(
-            (acc: {}[], season: { episodes: {}[]; season_number: number }) => {
-              const episodes = season.episodes.map(() => {
-                return { watched: false, userRating: 0 }
+            (acc: {}[], season: { episodes: { air_date: string }[]; season_number: number }) => {
+              const episodes = season.episodes.map((episode) => {
+                return { watched: false, userRating: 0, air_date: episode.air_date || "" }
               })
 
               acc.push({ season_number: season.season_number, episodes, userRating: 0 })
@@ -61,7 +61,7 @@ const useContentHandler = () => {
         })
       })
     )
-      .then((data) => {
+      .then(async (data) => {
         const userShows = data.reduce((acc, show) => {
           const showInfo = { ...show.showInfo }
           return { ...acc, [show.showInfo.id]: showInfo }
@@ -72,7 +72,12 @@ const useContentHandler = () => {
           return {
             ...acc,
             [show.showInfo.id]: {
-              info: { allEpisodesWatched: false, finished: false, database: "watchingShows" },
+              info: {
+                allEpisodesWatched: false,
+                finished: false,
+                database: "watchingShows",
+                isAllWatched_database: `false_watchingShows`
+              },
               episodes: showEpisodes
             }
           }
@@ -82,10 +87,12 @@ const useContentHandler = () => {
           return { ...acc, [show.showInfo.id]: { lastUpdatedInUser: show.showInfo.timeStamp } }
         }, {})
 
-        firebase.userAllShows(uid).set(userShows)
-        firebase.userEpisodes(uid).set(userEpisodes, () => {
-          setLoadingShowsOnRegister(false)
-        })
+        await Promise.all([
+          firebase.userAllShows(uid).set(userShows),
+          firebase.userEpisodes(uid).set(userEpisodes, () => {
+            setLoadingShowsOnRegister(false)
+          })
+        ])
         firebase.userShowsLastUpdateList(uid).set(userShowsLastUpdateList)
 
         console.log(userShows)

@@ -74,7 +74,7 @@ const HomePage: React.FC = () => {
 
       <CalendarContent homePage={true} />
 
-      {!context.userContent.loadingShows && !slidersLoading && (
+      {!slidersLoading && (
         <div className="home-page__sliders">
           {Object.values(sliders).map((value) => {
             return (

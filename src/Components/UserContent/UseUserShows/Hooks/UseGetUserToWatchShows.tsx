@@ -21,7 +21,7 @@ export interface UserToWatchTest {}
 
 const useGetUserToWatchShows: Hook = () => {
   const [userToWatchShows, setUserToWatchShows] = useState<UserToWatchShowsInterface[]>([])
-  const [loadingNotFinishedShows, setLoadingNotFinishedShows] = useState(true)
+  const [loadingNotFinishedShows, setLoadingNotFinishedShows] = useState(false)
   const firebase = useContext(FirebaseContext)
   const authUser = useAuthUser()
 
@@ -38,6 +38,7 @@ const useGetUserToWatchShows: Hook = () => {
   }, [firebase, authUser])
 
   const listenerUserToWatchShow = ({ uid }: AuthUserInterface) => {
+    setLoadingNotFinishedShows(true)
     firebase
       .userEpisodes(uid)
       .orderByChild("info/isAllWatched_database")

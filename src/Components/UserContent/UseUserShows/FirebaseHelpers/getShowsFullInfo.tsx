@@ -5,15 +5,13 @@ import { organiseFutureEpisodesByMonth } from "Components/Pages/Calendar/Calenda
 import { combineMergeObjects } from "Utils"
 import merge from "deepmerge"
 
-const SESSION_STORAGE_KEY_SHOWS = "userShows"
-
 interface GetUserShowsFullInfoArg {
   userShows: UserShowsInterface[]
   firebase: FirebaseInterface
   authUser: AuthUserInterface
 }
 
-const getShowsFullInfo = ({ userShows, firebase, authUser }: GetUserShowsFullInfoArg) => {
+const getShowsFullInfo = ({ userShows, firebase }: GetUserShowsFullInfoArg) => {
   console.log("getShowsFullInfo")
   return Promise.all(
     userShows.map((show) => {
@@ -24,7 +22,7 @@ const getShowsFullInfo = ({ userShows, firebase, authUser }: GetUserShowsFullInf
           if (snapshot.val() !== null) {
             const info = snapshot.val()
             if (show.database === "watchingShows" && !show.finished) {
-              console.log("roflan")
+              console.log(`roflan: ${show.id}`)
               return firebase
                 .showEpisodes(show.id)
                 .once("value")
@@ -45,11 +43,7 @@ const getShowsFullInfo = ({ userShows, firebase, authUser }: GetUserShowsFullInf
     console.log({ watchingShows })
     const willAirEpisodes: UserWillAirEpisodesInterface[] = organiseFutureEpisodesByMonth(watchingShows)
 
-    sessionStorage.setItem(SESSION_STORAGE_KEY_SHOWS, JSON.stringify(mergedShows))
-
     console.log({ mergedShows })
-
-    // updateUserEpisodesFromDatabase({ firebase, authUser, showsFullInfo: mergedShows })
 
     console.log("after updateUserEpisodes")
 

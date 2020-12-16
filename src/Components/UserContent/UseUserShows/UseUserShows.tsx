@@ -8,11 +8,9 @@ import merge from "deepmerge"
 import useGetUserToWatchShows from "./Hooks/UseGetUserToWatchShows"
 import getShowsFullInfo from "./FirebaseHelpers/getShowsFullInfo"
 import spliceNewShowFromDatabase from "./FirebaseHelpers/spliceNewShowFromDatabase"
+import getFullInfoForUpdatedShow from "./FirebaseHelpers/getFullInfoForUpdatedShow"
 import useGetUserMovies from "./Hooks/UseGetUserMovies"
 import updateUserEpisodesFromDatabaseNew from "Components/UserContent/UseUserShows/FirebaseHelpers/updateUserEpisodesFromDatabaseNew"
-import * as _transform from "lodash.transform"
-import * as _isEqual from "lodash.isequal"
-import * as _isObject from "lodash.isobject"
 
 const SESSION_STORAGE_KEY_SHOWS = "userShows"
 
@@ -96,7 +94,8 @@ const useUserShows = () => {
           if (!authUser) return
           setLoadingShows(true)
 
-          updateUserEpisodesFromDatabaseNew({ firebase })
+          console.log("updateUserEpisodesFromDatabaseNew")
+          await updateUserEpisodesFromDatabaseNew({ firebase })
 
           firebase.userAllShows(authUser.uid).on("value", async (snapshot: { val: () => UserShowsInterface[] }) => {
             if (snapshot.val() === null) {
@@ -144,49 +143,11 @@ const useUserShows = () => {
             } else if (userShowsSS.length === shows.length) {
               console.log("userShows length same")
 
-              const difference = (object: any, base: any) => {
-                function changes(object: any, base: any) {
-                  return _transform(object, function (result: any, value: any, key: any) {
-                    if (!_isEqual(value, base[key])) {
-                      result[key] = _isObject(value) && _isObject(base[key]) ? changes(value, base[key]) : value
-                    }
-                  })
-                }
-                return changes(object, base)
-              }
+              const { userShowsCopy } = await getFullInfoForUpdatedShow({ userShows: shows, userShowsSS, firebase })
 
-              const changedShow: any = shows.find((show: any, index: any) => {
-                console.log(difference(show, userShowsSS[index]).allEpisodesWatched)
-                if (
-                  (difference(show, userShowsSS[index]).database ||
-                    difference(show, userShowsSS[index]).allEpisodesWatched !== undefined) &&
-                  userShowsSS[index].episodes.length === 0
-                ) {
-                  return show
-                }
-              })
+              console.log({ userShowsCopy })
 
-              console.log({ changedShow })
-
-              if (changedShow) {
-                await firebase
-                  .showInDatabase(changedShow.id)
-                  .once("value")
-                  .then((snapshot: { val: () => { info: {}; episodes: SeasonEpisodesFromDatabaseInterface[] } }) => {
-                    console.log("call to fire")
-                    const index = shows.findIndex((item) => item.id === changedShow.id)
-                    const mergedShow = {
-                      ...changedShow,
-                      ...snapshot.val().info,
-                      episodes: snapshot.val().episodes
-                    }
-                    shows[index] = mergedShow
-                  })
-              }
-
-              console.log(shows)
-
-              const mergedShows = merge(userShowsSS, shows, {
+              const mergedShows = merge(userShowsSS, userShowsCopy, {
                 arrayMerge: combineMergeObjects
               })
 
@@ -198,7 +159,6 @@ const useUserShows = () => {
             }
           })
 
-          // listenerUserToWatchShow({ uid: authUser.uid })
           listenerUserMovies({ uid: authUser.uid })
 
           setFirebaseListeners([firebase.userAllShows(authUser.uid), firebase.watchLaterMovies(authUser.uid)])

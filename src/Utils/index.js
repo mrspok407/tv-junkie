@@ -5,6 +5,9 @@ import iconMediaTypePerson from "assets/images/icons/media-type-person.png"
 import iconMediaTypeTv from "assets/images/icons/media-type-tv.png"
 import releasedEpisodesToOneArray from "./releasedEpisodesToOneArray"
 import merge from "deepmerge"
+import * as _transform from "lodash.transform"
+import * as _isEqual from "lodash.isequal"
+import * as _isObject from "lodash.isobject"
 
 export const todayDate = new Date()
 
@@ -186,6 +189,17 @@ export const combineMergeObjects = (target, source, options) => {
     }
   })
   return destination
+}
+
+export const differenceInObjects = (object, base) => {
+  function changes(object, base) {
+    return _transform(object, function (result, value, key) {
+      if (!_isEqual(value, base[key])) {
+        result[key] = _isObject(value) && _isObject(base[key]) ? changes(value, base[key]) : value
+      }
+    })
+  }
+  return changes(object, base)
 }
 
 export { releasedEpisodesToOneArray }
