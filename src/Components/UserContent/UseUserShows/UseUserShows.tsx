@@ -10,7 +10,7 @@ import getShowsFullInfo from "./FirebaseHelpers/getShowsFullInfo"
 import spliceNewShowFromDatabase from "./FirebaseHelpers/spliceNewShowFromDatabase"
 import getFullInfoForUpdatedShow from "./FirebaseHelpers/getFullInfoForUpdatedShow"
 import useGetUserMovies from "./Hooks/UseGetUserMovies"
-import updateUserEpisodesFromDatabaseNew from "Components/UserContent/UseUserShows/FirebaseHelpers/updateUserEpisodesFromDatabaseNew"
+import updateUserEpisodesFromDatabase from "Components/UserContent/UseUserShows/FirebaseHelpers/updateUserEpisodesFromDatabase"
 
 const SESSION_STORAGE_KEY_SHOWS = "userShows"
 
@@ -95,7 +95,7 @@ const useUserShows = () => {
           setLoadingShows(true)
 
           console.log("updateUserEpisodesFromDatabaseNew")
-          await updateUserEpisodesFromDatabaseNew({ firebase })
+          await updateUserEpisodesFromDatabase({ firebase })
 
           firebase.userAllShows(authUser.uid).on("value", async (snapshot: { val: () => UserShowsInterface[] }) => {
             if (snapshot.val() === null) {
@@ -182,6 +182,7 @@ const useUserShows = () => {
 
   useEffect(() => {
     console.log("userShows updated")
+    console.log({ userShows })
     sessionStorage.setItem(SESSION_STORAGE_KEY_SHOWS, JSON.stringify(userShows))
   }, [userShows])
 
