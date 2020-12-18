@@ -19,10 +19,14 @@ type Props = {
 const CalendarContent: React.FC<Props> = ({ homePage }) => {
   const [willAirEpisodes, setWillAirEpisodes] = useState<UserWillAirEpisodesInterface[]>([])
   const [openMonths, setOpenMonths] = useState<string[]>([])
+  const [loading, setLoading] = useState(true)
   const context = useContext(AppContext)
 
   const getContent = useCallback(() => {
-    if (context.userContent.userShows.length === 0) return
+    if (context.userContent.userShows.length === 0) {
+      setLoading(false)
+      return
+    }
 
     const willAirEpisodes = homePage
       ? context.userContent.userWillAirEpisodes.slice(0, 2)
@@ -34,6 +38,7 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
 
     setWillAirEpisodes(willAirEpisodes)
     setOpenMonths(homePage ? [months[0]] : months)
+    setLoading(false)
   }, [context.userContent, homePage])
 
   useEffect(() => {
@@ -52,7 +57,7 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
     <div className="content-results content-results--calendar">
       {context.userContent.loadingShows || context.userContentHandler.loadingShowsOnRegister ? (
         <Loader className="loader--pink" />
-      ) : willAirEpisodes.length === 0 && !homePage ? (
+      ) : willAirEpisodes.length === 0 && !homePage && !loading ? (
         <PlaceholderNoFutureEpisodes />
       ) : (
         <div className="episodes episodes--calendar">

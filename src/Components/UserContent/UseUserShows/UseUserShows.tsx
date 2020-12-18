@@ -147,6 +147,11 @@ const useUserShows = () => {
           setFirebaseListeners([firebase.userAllShows(authUser.uid), firebase.watchLaterMovies(authUser.uid)])
         },
         () => {
+          authSubscriber()
+          firebaseListeners.forEach((listener: any) => {
+            console.log(listener)
+            listener.off()
+          })
           setLoadingShows(false)
         }
       )
@@ -160,7 +165,7 @@ const useUserShows = () => {
       })
     }
     // eslint-disable-next-line
-  }, [])
+  }, [firebase.auth.currentUser])
 
   useEffect(() => {
     sessionStorage.setItem(SESSION_STORAGE_KEY_SHOWS, JSON.stringify(userShows))
