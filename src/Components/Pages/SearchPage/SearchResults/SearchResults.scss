@@ -1,0 +1,11 @@
+@import "../../../../styles/globals";
+
+.advanced-search-results-cont {
+  position: relative;
+  min-height: 400px;
+  max-width: 1350px;
+  z-index: 0;
+  @include mediaMaxW(#{$mobileViewPort}) {
+    padding: 0 15px 0 15px;
+  }
+}

@@ -2,9 +2,10 @@ import React, { Component } from "react"
 import axios, { CancelToken } from "axios"
 import { throttle } from "throttle-debounce"
 import { Helmet } from "react-helmet"
+import ScrollToTopBar from "Utils/ScrollToTopBar"
 import Search from "./Search/Search"
 import AdvancedSearch from "Components/Pages/SearchPage/Search/AdvancedSearch/AdvancedSearch"
-import AdvSearchResults from "./AdvSearchResults/SearchResults/SearchResults"
+import SearchResults from "./SearchResults/SearchResults"
 import PlaceholderNoResults from "Components/UI/Placeholders/PlaceholderNoResults"
 import Header from "Components/UI/Header/Header"
 import Footer from "Components/UI/Footer/Footer"
@@ -295,8 +296,8 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
         <PlaceholderNoResults message="No content found" />
       </div>
     ) : (
-      <AdvSearchResults
-        advancedSearchContent={this.state.advancedSearchContent}
+      <SearchResults
+        advancedSearchContent={advancedSearchContent}
         loadingNewPage={this.state.loadingNewPage}
         clearAdvSearchMovies={this.clearAdvSearchMovies}
       />
@@ -321,7 +322,7 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
           />
         </div>
         {this.renderAdvMovies()}
-
+        <ScrollToTopBar />
         <Footer />
       </>
     )

@@ -2,7 +2,7 @@
 
 .user-profile {
   display: grid;
-  grid-template-columns: max-content;
+  grid-template-columns: 300px;
   row-gap: 10px;
   justify-content: center;
   color: #fff;
@@ -22,5 +22,16 @@
     grid-template-columns: 1fr;
     row-gap: 5px;
     text-align: center;
+  }
+
+  &__sent-message {
+    font-size: 1.4rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: getColor(orangeClr, $mainPalette);
+  }
+
+  &__update-pass-input {
+    background-color: #48484826;
   }
 }

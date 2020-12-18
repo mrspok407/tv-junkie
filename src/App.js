@@ -1,6 +1,5 @@
 import React, { Component } from "react"
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
-import { compose } from "recompose"
 import Profile from "Components/Pages/Profile/Profile"
 import Admin from "Components/Pages/Admin/Admin"
 import LoginPage from "Components/Pages/Login/Login"
@@ -13,7 +12,6 @@ import MoviesPage from "Components/Pages/Movies/Movies"
 import DetailesPage from "Components/Pages/Detailes/Detailes"
 import GridTests from "Utils/GridTests/GridTests"
 import * as ROUTES from "Utils/Constants/routes"
-import { WithAuthenticationProvider } from "Components/UserAuth/Session/WithAuthentication"
 import PageNotFound from "Components/Pages/PageNotFound/PageNotFound"
 import AppContextHOC from "Components/AppContext/AppContextHOC"
 
@@ -42,4 +40,4 @@ class App extends Component {
   }
 }
 
-export default compose(WithAuthenticationProvider, AppContextHOC)(App)
+export default AppContextHOC(App)

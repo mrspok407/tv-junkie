@@ -8,22 +8,22 @@ export const episodesWithAirDate = ({ fullData, userData }) => {
   }
 
   const episodesWithAirDate = merge(fullData, userData, {
-    arrayMerge: combineMergeObjects,
+    arrayMerge: combineMergeObjects
   }).reduce((acc, season) => {
     if (!Array.isArray(season.episodes) || season.episodes.length === 0) return
 
     const episodes = season.episodes.reduce((acc, episode) => {
       acc.push({
-        air_date: episode.air_date || null,
+        air_date: episode.air_date || "",
         userRating: episode.userRating,
-        watched: episode.watched,
+        watched: episode.watched
       })
       return acc
     }, [])
     acc.push({
       season_number: season.season_number,
       userRating: season.userRating,
-      episodes,
+      episodes
     })
     return acc
   }, [])

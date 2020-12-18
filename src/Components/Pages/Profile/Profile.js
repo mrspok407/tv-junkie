@@ -1,15 +1,14 @@
 import React, { Component } from "react"
-import { compose } from "recompose"
 import { Helmet } from "react-helmet"
 import * as _get from "lodash.get"
 import axios from "axios"
 import SignOutButton from "Components/UserAuth/SignOut/SignOutButton"
 import WithAuthorization from "Components/UserAuth/Session/WithAuthorization/WithAuthorization"
-import { WithAuthenticationConsumer } from "Components/UserAuth/Session/WithAuthentication"
 import Header from "Components/UI/Header/Header"
 import Footer from "Components/UI/Footer/Footer"
-import userContentHandler from "Components/UserContent/UserContentHandler"
 import { todayDate } from "Utils"
+import { AppContext } from "Components/AppContext/AppContextHOC"
+import PasswordUpdate from "Components/UserAuth/PasswordUpdate/PasswordUpdate"
 import "./Profile.scss"
 
 class Profile extends Component {
@@ -18,21 +17,37 @@ class Profile extends Component {
 
     this.state = {
       verificationSent: false,
+      loadingVerificationSent: false,
+      errorMessage: null,
+      passwordUpdate: "",
       authUser: null
     }
+
+    this.authSubscriber = null
   }
 
   componentDidMount() {
     this.authUserListener()
   }
 
+  componentWillUnmount() {
+    this.authSubscriber()
+  }
+
   sendEmailVerification = () => {
-    this.props.firebase.sendEmailVerification()
-    this.setState({ verificationSent: true })
+    this.setState({ loadingVerificationSent: true })
+    this.context.firebase
+      .sendEmailVerification()
+      .then(() => {
+        this.setState({ verificationSent: true, loadingVerificationSent: false, error: null })
+      })
+      .catch((err) => {
+        this.setState({ loadingVerificationSent: false, error: err })
+      })
   }
 
   authUserListener = () => {
-    this.props.firebase.onAuthUserListener(
+    this.authSubscriber = this.context.firebase.onAuthUserListener(
       (authUser) => {
         this.setState({ authUser })
       },
@@ -42,59 +57,47 @@ class Profile extends Component {
     )
   }
 
-  // test = () => {
-  //   this.props.firebase.users().once("value", (snapshot) => {
-  //     Object.entries(snapshot.val()).forEach(([key, value]) => {
-  //       this.props.firebase
-  //         .userEpisodes(key)
-  //         .child("all")
-  //         .once("value", (snapshot) => {
-  //           if (snapshot.val() === null) return
-  //           this.props.firebase.userEpisodes(key).set(snapshot.val(), () => {
-  //             this.props.firebase.userEpisodes(key).once("value", (snapshot) => {
-  //               if (snapshot.val() === null) return
-  //               const modifiedData = Object.entries(snapshot.val()).reduce((acc, [key, value]) => {
-  //                 const show = {
-  //                   episodes: value.episodes,
-  //                   info: {
-  //                     ...value.info,
-  //                     isAllWatched_database: `${value.info.allEpisodesWatched}_${value.info.database}`
-  //                   }
-  //                 }
-  //                 acc = { ...acc, [key]: show }
-  //                 return acc
-  //               }, {})
-
-  //               this.props.firebase.userEpisodes(key).set(modifiedData)
-  //               console.log(modifiedData)
-  //             })
-  //           })
-  //         })
-  //     })
-  //   })
-  // }
-
   databaseModify = () => {
+    // this.context.firebase.userAllShows("I9OcmC25eKfieOWppn6Pqr1sVj02").once("value", (snapshot) => {
+    //   const modified = Object.entries(snapshot.val()).reduce((acc, [key, value]) => {
+    //     return { ...acc, [key]: { lastUpdatedInUser: value.timeStamp } }
+    //   }, {})
+    //   this.context.firebase.userShowsLastUpdateList("I9OcmC25eKfieOWppn6Pqr1sVj02").set(modified)
+
+    //   // Object.keys(snapshot.val()).forEach((key) => {
+    //   //   this.context.firebase.userShow({ uid: this.context.authUser.uid, key }).update({ lastUpdatedInUser: null })
+    //   // })
+    // })
+
     const todayConverted = `${todayDate.getDate()}-${todayDate.getMonth() + 1}-${todayDate.getFullYear()}`
     const threeDaysBefore = new Date(todayDate.getTime() - 259200000)
 
-    const threeDaysBeforeConverted = `${threeDaysBefore.getDate()}-${
-      threeDaysBefore.getMonth() + 1
-    }-${threeDaysBefore.getFullYear()}`
-    console.log(threeDaysBefore)
+    // const threeDaysBeforeConverted = `${threeDaysBefore.getDate()}-${
+    //   threeDaysBefore.getMonth() + 1
+    // }-${threeDaysBefore.getFullYear()}`
 
     axios
       .get(
-        `https://api.themoviedb.org/3/tv/changes?api_key=${process.env.REACT_APP_TMDB_API}&end_date=${todayConverted}&start_date=${threeDaysBeforeConverted}`
+        `https://api.themoviedb.org/3/tv/changes?api_key=${process.env.REACT_APP_TMDB_API}&end_date=${todayConverted}&start_date=${threeDaysBefore}`
       )
-      .then(({ data }) => {
+      .then(async ({ data }) => {
+        // const tempData = [{ id: 1399 }]
+        // const allShowsIds = await this.context.firebase // change show.id below to just show
+        //   .allShowsList()
+        //   .once("value")
+        //   .then((snapshot) =>
+        //     Object.keys(snapshot.val()).map((id) => {
+        //       return { id }
+        //     })
+        //   )
+        // this.context.firebase.showInDatabase("1399").child("episodes").set(null)
+
         data.results.forEach((show) => {
-          this.props.firebase
+          this.context.firebase
             .showInDatabase(show.id)
             .child("id")
             .once("value", (snapshot) => {
               if (snapshot.val() !== null) {
-                console.log(snapshot.val())
                 axios
                   .get(
                     `https://api.themoviedb.org/3/tv/${show.id}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US`
@@ -150,21 +153,21 @@ class Profile extends Component {
 
                         season.episodes.forEach((item) => {
                           const updatedEpisode = {
-                            air_date: item.air_date,
-                            episode_number: item.episode_number,
-                            name: item.name,
-                            season_number: item.season_number,
+                            air_date: item.air_date || "",
+                            episode_number: item.episode_number || null,
+                            name: item.name || null,
+                            season_number: item.season_number || null,
                             id: item.id
                           }
                           episodes.push(updatedEpisode)
                         })
 
                         const updatedSeason = {
-                          air_date: season.air_date,
-                          season_number: season.season_number,
+                          air_date: season.air_date || "",
+                          season_number: season.season_number || null,
                           id: season._id,
-                          poster_path: season.poster_path,
-                          name: season.name,
+                          poster_path: season.poster_path || null,
+                          name: season.name || null,
                           episodes
                         }
 
@@ -173,19 +176,33 @@ class Profile extends Component {
 
                       const dataToPass = {
                         episodes: allEpisodes,
-                        status: mergedRowData.status
+                        status: mergedRowData.status,
+                        name: mergedRowData.name
                       }
 
                       return dataToPass
                     })
                   )
                   .then((data) => {
-                    this.props.firebase
+                    this.context.firebase
                       .showInDatabase(show.id)
-                      .update({ episodes: data.episodes, status: data.status })
+                      .update({
+                        episodes: data.episodes,
+                        status: data.status
+                      })
                       .catch((err) => {
                         console.log(err)
                       })
+
+                    this.context.firebase.showInfo(show.id).update({
+                      status: data.status,
+                      name: data.name
+                    })
+
+                    this.context.firebase
+                      .showInfo(show.id)
+                      .child("lastUpdatedInDatabase")
+                      .set(this.context.firebase.timeStamp())
                   })
                   .catch((err) => {
                     console.log(err)
@@ -194,6 +211,14 @@ class Profile extends Component {
             })
         })
       })
+  }
+
+  handleOnChange = (e) => {
+    e.preventDefault()
+
+    this.setState({
+      passwordUpdate: e.target.value
+    })
   }
 
   render() {
@@ -205,30 +230,45 @@ class Profile extends Component {
         <Header />
         <div className="user-profile">
           <div className="user-profile__email">
-            Sign in with <span>{this.props.authUser.email}</span>
+            Sign in with <span>{this.context.authUser.email}</span>
           </div>
           <div className="user-profile__verified">
-            {this.props.authUser.emailVerified ? (
+            {this.context.authUser.emailVerified ? (
               "Email verified"
             ) : (
               <>
                 Email not verified{" "}
-                <button onClick={this.sendEmailVerification} className="button" type="button">
-                  {this.state.verificationSent ? "Verification sent" : "Send email verification"}
-                </button>
+                {this.state.verificationSent ? (
+                  <div className="user-profile__sent-message">Verification sent</div>
+                ) : (
+                  <button onClick={this.sendEmailVerification} className="button button--profile" type="button">
+                    {this.state.loadingVerificationSent ? (
+                      <span className="auth__form-loading"></span>
+                    ) : (
+                      "Send email verification"
+                    )}
+                  </button>
+                )}
               </>
             )}
+            {this.state.error && (
+              <div className="user-profile__error-email-verification">{this.state.error.message}</div>
+            )}
           </div>
+          <PasswordUpdate />
+          {(_get(this.state.authUser, "email", "") === process.env.REACT_APP_TEST_EMAIL ||
+            _get(this.state.authUser, "email", "") === process.env.REACT_APP_ADMIN_EMAIL) && (
+            <>
+              <div className="update-database">
+                <button onClick={() => this.databaseModify()} className="button button--profile" type="button">
+                  Update Database
+                </button>
+              </div>
+            </>
+          )}
           <div className="user-profile__signout">
             <SignOutButton />
           </div>
-          {_get(this.state.authUser, "email", "") === "test@test.com" && (
-            <div className="update-database">
-              <button onClick={() => this.databaseModify()} className="button" type="button">
-                Update Database
-              </button>
-            </div>
-          )}
         </div>
         <Footer />
       </>
@@ -238,4 +278,5 @@ class Profile extends Component {
 
 const condition = (authUser) => authUser !== null
 
-export default compose(WithAuthenticationConsumer, userContentHandler, WithAuthorization(condition))(Profile)
+export default WithAuthorization(condition)(Profile)
+Profile.contextType = AppContext

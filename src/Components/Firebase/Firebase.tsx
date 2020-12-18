@@ -3,6 +3,7 @@ import { database } from "firebase/app"
 import "firebase/auth"
 import "firebase/database"
 import "firebase/analytics"
+import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 
 const config = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -60,8 +61,8 @@ class Firebase {
 
   passwordUpdate = (password: string) => this.auth.currentUser.updatePassword(password)
 
-  onAuthUserListener = (next: (authUser: {}) => void, fallback: () => void) => {
-    this.auth.onAuthStateChanged((authUser: { uid: string; email: string; emailVerified: boolean }) => {
+  onAuthUserListener = (next: (authUser: AuthUserInterface) => void, fallback: () => void) =>
+    this.auth.onAuthStateChanged((authUser: AuthUserInterface) => {
       if (authUser) {
         authUser = {
           uid: authUser.uid,
@@ -73,7 +74,6 @@ class Firebase {
         fallback()
       }
     })
-  }
 
   timeStamp = () => database.ServerValue.TIMESTAMP
 
@@ -86,9 +86,11 @@ class Firebase {
   /// Users API ///
   user = (uid: string) => this.db.ref(`users/${uid}`)
   users = () => this.db.ref("users")
+  userOnlineStatus = (uid: string) => this.db.ref(`users/${uid}/status`)
 
   /// User Content API ///
   userAllShows = (uid: string) => this.db.ref(`users/${uid}/content/shows`)
+  userShowsLastUpdateList = (uid: string) => this.db.ref(`users/${uid}/content/showsLastUpdateList`)
   userShow = ({ uid, key }: { uid: string; key: string }) => this.db.ref(`users/${uid}/content/shows/${key}`)
 
   userEpisodes = (uid: string) => this.db.ref(`users/${uid}/content/episodes`)
@@ -105,9 +107,7 @@ class Firebase {
   userShowSingleEpisode = ({ uid, key, seasonNum, episodeNum }: ReferenceInterface) =>
     this.db.ref(`users/${uid}/content/episodes/${key}/episodes/${seasonNum - 1}/episodes/${episodeNum}`)
   userShowSingleEpisodeNotFinished = ({ uid, key, seasonNum, episodeNum }: ReferenceInterface) =>
-    this.db.ref(
-      `users/${uid}/content/episodes/notFinished/${key}/episodes/${seasonNum - 1}/episodes/${episodeNum}`
-    )
+    this.db.ref(`users/${uid}/content/episodes/notFinished/${key}/episodes/${seasonNum - 1}/episodes/${episodeNum}`)
 
   userShowSeasonEpisodes = ({ uid, key, seasonNum }: ReferenceInterface) =>
     this.db.ref(`users/${uid}/content/episodes/${key}/episodes/${seasonNum - 1}/episodes`)

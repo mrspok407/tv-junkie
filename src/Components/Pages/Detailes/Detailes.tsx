@@ -3,124 +3,81 @@ import React, { useState, useEffect, useContext } from "react"
 import { useHistory } from "react-router-dom"
 import axios from "axios"
 import { Helmet } from "react-helmet"
-import * as ROUTES from "Utils/Constants/routes"
 import { AppContext } from "Components/AppContext/AppContextHOC"
-import userContentHandler from "Components/UserContent/UserContentHandler"
+import { FirebaseContext } from "Components/Firebase"
+import * as ROUTES from "Utils/Constants/routes"
+import * as _get from "lodash.get"
 import Header from "Components/UI/Header/Header"
 import Slider from "Utils/Slider/Slider"
 import MainInfo from "./Components/MainInfo"
 import ShowsEpisodes from "Components/UI/Templates/SeasonsAndEpisodes/ShowsEpisodes"
 import PosterWrapper from "./Components/PosterWrapper"
-import ScrollToTop from "Utils/ScrollToTopBar"
+import ScrollToTopBar from "Utils/ScrollToTopBar"
 import ScrollToTopOnUpdate from "Utils/ScrollToTopOnUpdate"
 import Footer from "Components/UI/Footer/Footer"
 import PlaceholderLoadingFullInfo from "Components/UI/Placeholders/PlaceholderLoadingFullInfo/PlaceholderLoadingFullInfo"
 import useHandleListeners from "./FirebaseHelpers/UseHandleListeners"
+import { ContentDetailes, CONTENT_DETAILS_DEFAULT } from "Utils/Interfaces/ContentDetails"
 import "./Detailes.scss"
 
 const { CancelToken } = require("axios")
 let cancelRequest: any
 
 type Props = {
-  firebase: {}
-  match: { params: { id: number; mediaType: string } }
-  authUser: { uid: string }
+  match: { params: { id: string; mediaType: string } }
 }
 
-interface Detailes {
-  id: number | string
-  poster_path: string
-  backdrop_path: string
-  name: string
-  original_name: string
-  title: string
-  first_air_date: string
-  release_date: string
-  last_air_date: string
-  episode_run_time: string
-  runtime: string
+export interface ShowInfoInterface {
   status: string
-  genres: {}[]
-  genre_ids: {}[]
-  network: {}[]
-  production_companies: {}[]
-  vote_average: string
-  vote_count: string
-  overview: string
-  tagline: string
-  budget: number | string
-  number_of_seasons: number | string
-  imdb_id: number | string
-  seasonsArr: {}[]
+  id: number
+  database: string
+  showInUserDatabase?: boolean
+}
+const SHOW_INFO_INITIAL_STATE = {
+  status: "",
+  id: 0,
+  database: "",
+  showInUserDatabase: false
 }
 
 export const DetailesPage: React.FC<Props> = ({
   match: {
     params: { id, mediaType }
-  },
-  firebase,
-  authUser
+  }
 }) => {
-  const [detailes, setDetailes] = useState<Detailes>({
-    id,
-    poster_path: "-",
-    backdrop_path: "-",
-    name: "-",
-    original_name: "-",
-    title: "-",
-    first_air_date: "-",
-    release_date: "-",
-    last_air_date: "-",
-    episode_run_time: "-",
-    runtime: "-",
-    status: "-",
-    genres: [],
-    genre_ids: [],
-    network: [],
-    production_companies: [],
-    vote_average: "-",
-    vote_count: "-",
-    overview: "-",
-    tagline: "-",
-    budget: "-",
-    number_of_seasons: "-",
-    imdb_id: "",
-    seasonsArr: []
-  })
-  const [similarContent, setSimilarContent] = useState<{}[]>([])
+  const [detailes, setDetailes] = useState<ContentDetailes>(CONTENT_DETAILS_DEFAULT)
 
-  const [loadingAPIrequest, setLoadingAPIrequest] = useState(true)
+  const history = useHistory()
+  const context = useContext(AppContext)
+  const firebase = useContext(FirebaseContext)
+  const { authUser } = context
 
-  const [showInfo, setShowInfo] = useState<{} | null>({})
-  const [movieInDatabase, setMovieInDatabase] = useState<{} | null>(null)
+  const { episodesFromDatabase, releasedEpisodes, handleListeners } = useHandleListeners({ id: Number(id) })
 
-  const [episodesFromDatabase, releasedEpisodes, handleListeners] = useHandleListeners({
-    id: Number(id),
-    authUser,
-    firebase
-  })
+  const [similarContent, setSimilarContent] = useState<ContentDetailes[]>([])
 
-  const [loadingFromDatabase, setLoadingFromDatabase] = useState(true)
+  const [showInfo, setShowInfo] = useState<ShowInfoInterface>(SHOW_INFO_INITIAL_STATE)
+  // const [showInUserDatabase, setShowInUserDatabase] = useState(false);
+  const [movieInDatabase, setMovieInDatabase] = useState<ContentDetailes | null>(null)
 
-  const [showDatabaseOnClient, setShowDatabaseOnClient] = useState<{} | null>(null)
+  const [showDatabaseOnClient, setShowDatabaseOnClient] = useState<string>("")
 
   const [error, setError] = useState<string>()
 
-  const history = useHistory()
-
-  const context = useContext(AppContext)
+  const [loadingAPIrequest, setLoadingAPIrequest] = useState(true)
+  const [loadingFromDatabase, setLoadingFromDatabase] = useState(true)
 
   useEffect(() => {
     getContent()
 
     return () => {
       if (cancelRequest !== undefined) cancelRequest()
-      if (!authUser) return
 
-      setShowInfo(null)
-
+      setShowInfo(SHOW_INFO_INITIAL_STATE)
       setMovieInDatabase(null)
-      setShowDatabaseOnClient(null)
+      setShowDatabaseOnClient("")
+
+      firebase.userShowAllEpisodes(authUser && authUser.uid, id).off()
     }
   }, [mediaType, id])
 
@@ -129,12 +86,16 @@ export const DetailesPage: React.FC<Props> = ({
   }, [context, id])
 
   useEffect(() => {
-    if (!authUser || mediaType !== "show" || context.userContent.loadingShowsMerging || !detailes) {
+    if (!authUser || mediaType !== "show" || context.userContent.loadingShows || !detailes) {
       return
     }
 
-    handleListeners({ status: detailes.status, handleLoading })
-  }, [detailes, context.userContent.loadingShowsMerging])
+    handleListeners({
+      id: Number(id),
+      status: detailes.status,
+      handleLoading
+    })
+  }, [id, detailes, context.userContent.loadingShows])
 
   const handleLoading = (isLoading: boolean) => {
     setLoadingFromDatabase(isLoading)
@@ -145,7 +106,7 @@ export const DetailesPage: React.FC<Props> = ({
     setLoadingFromDatabase(true)
 
     axios
-      .get(
+      .get<ContentDetailes>(
         `https://api.themoviedb.org/3/${mediaType === "show" ? "tv" : "movie"}/${id}?api_key=${
           process.env.REACT_APP_TMDB_API
         }&language=en-US&append_to_response=${mediaType === "show" ? "similar" : "similar_movies"}`,
@@ -155,92 +116,61 @@ export const DetailesPage: React.FC<Props> = ({
           })
         }
       )
-      .then(
-        ({
-          data: {
-            id,
-            name,
-            original_name,
-            title,
-            original_title,
-            first_air_date,
-            last_air_date,
-            release_date,
-            vote_average,
-            genres,
-            overview,
-            backdrop_path,
-            poster_path,
-            vote_count,
-            episode_run_time,
-            runtime,
-            tagline,
-            status,
-            networks,
-            production_companies,
-            budget,
-            number_of_seasons,
-            imdb_id,
-            seasons,
-            similar,
-            similar_movies
-          }
-        }) => {
-          const genreIds = genres && genres.length ? genres.map((item: { id: number }) => item.id) : "-"
-          const genreNames =
-            genres && genres.length ? genres.map((item: { name: string }) => item.name).join(", ") : "-"
-          const networkNames =
-            networks && networks.length ? networks.map((item: { name: string }) => item.name).join(", ") : "-"
-          const prodComp =
-            production_companies.length === 0 || !production_companies ? "-" : production_companies[0].name
+      .then(({ data }) => {
+        const genreIds = data.genres && data.genres.length ? data.genres.map((item: { id: number }) => item.id) : "-"
+        const genreNames =
+          data.genres && data.genres.length ? data.genres.map((item: { name: string }) => item.name).join(", ") : "-"
+        const networkNames =
+          data.networks && data.networks.length
+            ? data.networks.map((item: { name: string }) => item.name).join(", ")
+            : "-"
+        const prodComp =
+          data.production_companies.length === 0 || !data.production_companies ? "-" : data.production_companies[0].name
 
-          const similarType = similar || similar_movies
-          const similarContent = similarType.results.filter(
-            (item: { poster_path: string }) => item.poster_path
-          )
-          const similarContentSortByVotes = similarContent.sort(
-            (a: { vote_count: number }, b: { vote_count: number }) => b.vote_count - a.vote_count
-          )
+        const similarType: any = data.similar || data.similar_movies
+        const similarContent = similarType.results.filter((item: { poster_path: string }) => item.poster_path)
+        const similarContentSortByVotes = similarContent.sort(
+          (a: { vote_count: number }, b: { vote_count: number }) => b.vote_count - a.vote_count
+        )
 
-          setDetailes({
-            ...detailes,
-            id: id,
-            poster_path: poster_path,
-            backdrop_path: backdrop_path,
-            name: name || original_name || "-",
-            original_name: original_name || "-",
-            title: title || original_title || "-",
-            first_air_date: first_air_date || "-",
-            release_date: release_date || "-",
-            last_air_date: last_air_date || "-",
-            episode_run_time: episode_run_time || "-",
-            runtime: runtime || "-",
-            status: status || "-",
-            genres: genreNames || "-",
-            genre_ids: genreIds,
-            network: networkNames || "-",
-            production_companies: prodComp || "-",
-            vote_average: vote_average || "-",
-            vote_count: vote_count || "-",
-            overview: overview || "-",
-            tagline: tagline || "-",
-            budget: budget || "-",
-            number_of_seasons: number_of_seasons || "-",
-            imdb_id: imdb_id || "",
-            seasonsArr: seasons ? seasons.reverse() : []
-          })
+        setDetailes({
+          ...detailes,
+          id: data.id,
+          poster_path: data.poster_path,
+          backdrop_path: data.backdrop_path,
+          name: data.name || data.original_name || "-",
+          original_name: data.original_name || "-",
+          title: data.title || data.original_title || "-",
+          first_air_date: data.first_air_date || "-",
+          release_date: data.release_date || "-",
+          last_air_date: data.last_air_date || "-",
+          episode_run_time: data.episode_run_time || "-",
+          runtime: data.runtime || "-",
+          status: data.status || "-",
+          genres: genreNames || "-",
+          genre_ids: genreIds,
+          networks: networkNames || "-",
+          production_companies: prodComp || "-",
+          vote_average: data.vote_average || "-",
+          vote_count: data.vote_count || "-",
+          overview: data.overview || "-",
+          tagline: data.tagline || "-",
+          budget: data.budget || 0,
+          number_of_seasons: data.number_of_seasons || "-",
+          imdb_id: data.imdb_id || "",
+          seasonsFromAPI: data.seasons ? data.seasons.reverse() : []
+        })
 
-          if (!authUser) {
-            setLoadingFromDatabase(false)
-          }
-
-          setLoadingAPIrequest(false)
-          setSimilarContent(similarContentSortByVotes)
+        if (!authUser) {
+          setLoadingFromDatabase(false)
         }
-      )
+
+        setLoadingAPIrequest(false)
+        setSimilarContent(similarContentSortByVotes)
+      })
       .catch((err) => {
         if (axios.isCancel(err)) return
-        if (err.response.status === 404) {
+        if (_get(err.response, "status", "") === 404) {
           history.push(ROUTES.PAGE_DOESNT_EXISTS)
           return
         }
@@ -255,7 +185,8 @@ export const DetailesPage: React.FC<Props> = ({
 
     if (!authUser || !show) return
 
-    setShowInfo(show)
+    setShowInfo({ ...show, showInUserDatabase: true })
+    // setShowInUserDatabase(true)
     setShowDatabaseOnClient(show.database)
   }
 
@@ -278,9 +209,7 @@ export const DetailesPage: React.FC<Props> = ({
             {mediaType === "show"
               ? `
                 ${detailes.name}
-                ${
-                  detailes.first_air_date !== "-" ? `(${detailes.first_air_date.slice(0, 4)})` : ""
-                } | TV Junkie
+                ${detailes.first_air_date !== "-" ? `(${detailes.first_air_date.slice(0, 4)})` : ""} | TV Junkie
               `
               : `
               ${detailes.title}
@@ -298,34 +227,26 @@ export const DetailesPage: React.FC<Props> = ({
           </div>
         ) : !loadingAPIrequest && !loadingFromDatabase && !context.userContent.loadingShows ? (
           <div className="detailes-page">
-            <PosterWrapper
-              poster_path={detailes.poster_path}
-              backdrop_path={detailes.backdrop_path}
-              imdb_id={detailes.imdb_id}
-              release_date={detailes.release_date}
-              first_air_date={detailes.first_air_date}
-              mediaType={mediaType}
-            />
+            <PosterWrapper detailes={detailes} mediaType={mediaType} />
 
             <MainInfo
               detailes={detailes}
-              handleListeners={handleListeners}
               mediaType={mediaType}
-              id={id}
-              showInfo={showInfo}
+              id={Number(id)}
               changeShowDatabaseOnClient={changeShowDatabaseOnClient}
               showDatabaseOnClient={showDatabaseOnClient}
               movieInDatabase={movieInDatabase}
+              handleListeners={handleListeners}
             />
 
             <div className="detailes-page__description">{detailes.overview}</div>
 
             {mediaType === "show" && (
               <ShowsEpisodes
-                detailesPage={true}
-                seasonsArr={detailes.seasonsArr}
+                parentComponent="detailesPage"
+                episodesData={detailes.seasonsFromAPI}
                 showTitle={detailes.name}
-                id={id}
+                id={Number(id)}
                 showInfo={showInfo}
                 episodesFromDatabase={episodesFromDatabase}
                 releasedEpisodes={releasedEpisodes}
@@ -338,7 +259,7 @@ export const DetailesPage: React.FC<Props> = ({
                   {mediaType === "movie" ? "Similar movies" : "Similar shows"}
                 </div>
 
-                <Slider listOfContent={similarContent} />
+                <Slider sliderData={similarContent} />
               </div>
             )}
           </div>
@@ -347,10 +268,10 @@ export const DetailesPage: React.FC<Props> = ({
         )}
       </div>
       <Footer />
-      <ScrollToTop />
+      <ScrollToTopBar />
       <ScrollToTopOnUpdate />
     </>
   )
 }
 
-export default userContentHandler(DetailesPage)
+export default DetailesPage
