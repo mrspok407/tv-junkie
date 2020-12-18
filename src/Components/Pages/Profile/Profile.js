@@ -103,6 +103,8 @@ class Profile extends Component {
                     `https://api.themoviedb.org/3/tv/${show.id}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US`
                   )
                   .then(({ data: { number_of_seasons } }) => {
+                    console.log(show.id)
+
                     const maxSeasonsInChunk = 20
                     const allSeasons = []
                     const seasonChunks = []
