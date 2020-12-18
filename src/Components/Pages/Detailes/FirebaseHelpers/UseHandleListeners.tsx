@@ -22,23 +22,17 @@ const useHandleListeners = ({ id }: { id?: number }) => {
 
   const handleListeners = ({ id, status, handleLoading }: HandleListenersArg) => {
     if (status === "-" || !authUser) return
-    console.log(id)
 
     const statusDatabase = status === "Ended" || status === "Canceled" ? "ended" : "ongoing"
     firebase.showEpisodes(id).once("value", (snapshot: { val: () => SeasonEpisodesFromDatabaseInterface[] }) => {
       if (snapshot.val() === null) {
         if (handleLoading) handleLoading(false)
-        console.log("early return showsEpisodes")
         return
       }
-
-      console.log({ snapshot: snapshot.val() })
 
       const releasedEpisodes: SingleEpisodeInterface[] = releasedEpisodesToOneArray({
         data: snapshot.val()
       })
-
-      console.log("useHandleListeners before .on")
 
       firebase
         .userShowAllEpisodes(authUser.uid, id)
@@ -48,8 +42,6 @@ const useHandleListeners = ({ id }: { id?: number }) => {
             if (handleLoading) handleLoading(false)
             return
           }
-
-          console.log("detailes Listener")
 
           const userEpisodes = snapshot.val()
           const allEpisodes = userEpisodes.reduce((acc: SingleEpisodeInterface[], item) => {
@@ -62,14 +54,10 @@ const useHandleListeners = ({ id }: { id?: number }) => {
           const allEpisodesWatched = !allEpisodes.some((episode) => !episode.watched)
           const finished = statusDatabase === "ended" && allEpisodesWatched ? true : false
 
-          console.log("handleListener just before firebase")
-          console.log(id)
-
           firebase
             .userShow({ uid: authUser.uid, key: id })
             .child("database")
             .once("value", (snapshot: { val: () => string }) => {
-              console.log({ database: snapshot.val() })
               firebase.userShowAllEpisodesInfo(authUser.uid, id).update({
                 allEpisodesWatched,
                 finished,
@@ -87,9 +75,7 @@ const useHandleListeners = ({ id }: { id?: number }) => {
   }
 
   useEffect(() => {
-    console.log("updated")
     return () => {
-      console.log("unmounted")
       setEpisodesFromDatabase([])
       setReleasedEpisodes([])
 

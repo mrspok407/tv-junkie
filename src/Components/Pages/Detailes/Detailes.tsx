@@ -90,8 +90,6 @@ export const DetailesPage: React.FC<Props> = ({
       return
     }
 
-    console.log("fffffffffffffffffffff")
-
     handleListeners({
       id: Number(id),
       status: detailes.status,

@@ -96,14 +96,11 @@ const SeasonEpisodes: React.FC<Props> = ({
   }
 
   const resetFadeOutEpisodes = () => {
-    console.log("reset")
     setFadeOutEpisodes([])
   }
 
   useEffect(() => {
-    console.log("useEffect run Before")
     if (!timedOut || fadeOutEpisodes.length === 0) return
-    console.log("useEffect run")
     checkMultipleEpisodes(fadeOutEpisodes, resetFadeOutEpisodes)
     // eslint-disable-next-line
   }, [timedOut, fadeOutEpisodes])

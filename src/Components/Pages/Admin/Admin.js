@@ -1,6 +1,5 @@
 import React, { Component } from "react"
 import { Helmet } from "react-helmet"
-import * as ROLES from "Utils/Constants/roles"
 import WithAuthorization from "Components/UserAuth/Session/WithAuthorization/WithAuthorization"
 import Header from "Components/UI/Header/Header"
 import { AppContext } from "Components/AppContext/AppContextHOC"
@@ -10,32 +9,7 @@ class AdminPage extends Component {
   constructor(props) {
     super(props)
 
-    this.state = {
-      loading: false,
-      users: []
-    }
-  }
-
-  componentDidMount() {
-    this.setState({ loading: true })
-
-    this.context.firebase.users().once("value", (snapshot) => {
-      const usersObject = snapshot.val()
-
-      const userList = Object.keys(usersObject).map((key) => ({
-        ...usersObject[key],
-        uid: key
-      }))
-
-      this.setState({
-        users: userList,
-        loading: false
-      })
-    })
-  }
-
-  componentWillUnmount() {
-    this.context.firebase.users().off()
+    this.state = {}
   }
 
   render() {
@@ -45,24 +19,12 @@ class AdminPage extends Component {
           <title>Admin page | TV Junkie</title>
         </Helmet>
         <Header />
-        <div className="admin">
-          <h1>Admin</h1>
-
-          {this.state.loading && <div>Loading...</div>}
-
-          {this.state.users.map((item) => (
-            <ul key={item.uid}>
-              <li>{item.uid}</li>
-              <li>{item.email}</li>
-            </ul>
-          ))}
-        </div>
       </>
     )
   }
 }
 
-const condition = (authUser) => authUser && !!authUser.role === ROLES.ADMIN
+const condition = (authUser) => authUser && authUser.email === process.env.REACT_APP_ADMIN_EMAIL
 
 export default WithAuthorization(condition)(AdminPage)
 AdminPage.contextType = AppContext

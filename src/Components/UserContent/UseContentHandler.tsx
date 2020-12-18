@@ -94,9 +94,6 @@ const useContentHandler = () => {
           })
         ])
         firebase.userShowsLastUpdateList(uid).set(userShowsLastUpdateList)
-
-        console.log(userShows)
-        console.log(userEpisodes)
       })
       .catch(() => {
         setLoadingShowsOnRegister(false)
@@ -113,8 +110,6 @@ const useContentHandler = () => {
       return
     }
     getShowEpisodesFromAPI({ id }).then(async (dataFromAPI: any) => {
-      console.log("addShowInDatabase run in function body")
-
       const showsSubDatabase = dataFromAPI.status === "Ended" || dataFromAPI.status === "Canceled" ? "ended" : "ongoing"
 
       const userEpisodes = dataFromAPI.episodes.reduce(
@@ -128,8 +123,6 @@ const useContentHandler = () => {
         },
         []
       )
-
-      console.log(authUser)
 
       await addShowToMainDatabase({ firebase, show, dataFromAPI })
       await Promise.all([
@@ -166,7 +159,6 @@ const useContentHandler = () => {
         lastUpdatedInUser: firebase.timeStamp()
       })
 
-      console.log("right after promise all")
       if (handleListeners) handleListeners({ id, status: dataFromAPI.status })
     })
   }
@@ -218,8 +210,6 @@ const useContentHandler = () => {
     const user = onRegister ? userOnRegister : authUser
 
     if (!user) return
-    console.log("handleMovieINDatabases")
-
     const movie = data
     firebase
       .watchLaterMovies(user.uid)

@@ -28,14 +28,12 @@ const SignInWithGoogleForm = () => {
       .auth()
       [signInType](provider)
       .then((authUser: AuthUserGoogleSignInInterface) => {
-        const userRole = authUser.user.email === "mr.spok407@gmail.com" ? ROLES.ADMIN : ROLES.USER
-
         context.firebase
           .user(authUser.user.uid)
           .update({
             username: authUser.user.displayName,
             email: authUser.user.email,
-            role: userRole
+            role: ROLES.USER
           })
           .then(() => {
             if (!authUser.additionalUserInfo.isNewUser) {
@@ -44,8 +42,7 @@ const SignInWithGoogleForm = () => {
             }
 
             const watchingShows = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)!) || []
-            const watchLaterMovies =
-              JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)!) || []
+            const watchLaterMovies = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)!) || []
 
             context.userContentHandler.addShowsToDatabaseOnRegister({
               shows: watchingShows,
@@ -74,7 +71,6 @@ const SignInWithGoogleForm = () => {
       .catch((error: any) => {
         context.userContentHandler.handleLoadingShowsOnRegister(false)
         console.log(error)
-        // setError(error.message)
       })
   }
 

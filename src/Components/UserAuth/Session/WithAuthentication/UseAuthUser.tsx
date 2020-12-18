@@ -3,9 +3,7 @@ import { FirebaseContext } from "Components/Firebase"
 import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 
 const useAuthUser = () => {
-  const [authUser, setAuthUser] = useState<AuthUserInterface | null>(
-    JSON.parse(localStorage.getItem("authUser")!)
-  )
+  const [authUser, setAuthUser] = useState<AuthUserInterface | null>(JSON.parse(localStorage.getItem("authUser")!))
   const firebase = useContext(FirebaseContext)
 
   useEffect(() => {
@@ -25,7 +23,6 @@ const useAuthUser = () => {
 
     authUserListener()
     return () => {
-      console.log("unmount authUser LS")
       authSubscriber()
     }
   }, [firebase])

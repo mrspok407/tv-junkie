@@ -36,7 +36,6 @@ const useGetUserMovies: Hook = () => {
       const movies: UserMoviesInterface[] = Object.values(snapshot.val()).map((movie) => {
         return movie
       })
-      console.log({ movies })
       setUserMovies(movies)
       setLoadingMovies(false)
     })

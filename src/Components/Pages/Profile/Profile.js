@@ -19,8 +19,19 @@ class Profile extends Component {
       verificationSent: false,
       loadingVerificationSent: false,
       errorMessage: null,
-      passwordUpdate: ""
+      passwordUpdate: "",
+      authUser: null
     }
+
+    this.authSubscriber = null
+  }
+
+  componentDidMount() {
+    this.authUserListener()
+  }
+
+  componentWillUnmount() {
+    this.authSubscriber()
   }
 
   sendEmailVerification = () => {
@@ -35,63 +46,16 @@ class Profile extends Component {
       })
   }
 
-  // authUserListener = () => {
-  //   this.context.firebase.onAuthUserListener(
-  //     (authUser) => {
-  //       this.setState({ authUser })
-  //     },
-  //     () => {
-  //       this.setState({ authUser: null })
-  //     }
-  //   )
-  // }
-
-  // test = () => {
-  //   this.context.firebase.users().once("value", (snapshot) => {
-  //     Object.entries(snapshot.val()).forEach(([key, value]) => {
-  //       this.context.firebase
-  //         .userEpisodes(key)
-  //         .child("all")
-  //         .once("value", (snapshot) => {
-  //           if (snapshot.val() === null) return
-  //           this.context.firebase.userEpisodes(key).set(snapshot.val(), () => {
-  //             this.context.firebase.userEpisodes(key).once("value", (snapshot) => {
-  //               if (snapshot.val() === null) return
-  //               const modifiedData = Object.entries(snapshot.val()).reduce((acc, [key, value]) => {
-  //                 const show = {
-  //                   episodes: value.episodes,
-  //                   info: {
-  //                     ...value.info,
-  //                     isAllWatched_database: `${value.info.allEpisodesWatched}_${value.info.database}`
-  //                   }
-  //                 }
-  //                 acc = { ...acc, [key]: show }
-  //                 return acc
-  //               }, {})
-
-  //               this.context.firebase.userEpisodes(key).set(modifiedData)
-  //               console.log(modifiedData)
-  //             })
-  //           })
-  //         })
-  //     })
-  //   })
-  // }
-
-  // database()     // import should be like this: import { database } from "firebase/app"
-  // .ref(".info/connected")
-  // .on("value", (snap: any) => {
-  //   if (snap.val() === true) {
-  //     console.log("user online")
-  //     firebase
-  //       .userOnlineStatus(authUser.uid)
-  //       .onDisconnect()
-  //       .set("offline")
-  //       .then(() => {
-  //         firebase.userOnlineStatus(authUser.uid).set("online")
-  //       })
-  //   }
-  // })
+  authUserListener = () => {
+    this.authSubscriber = this.context.firebase.onAuthUserListener(
+      (authUser) => {
+        this.setState({ authUser })
+      },
+      () => {
+        this.setState({ authUser: null })
+      }
+    )
+  }
 
   databaseModify = () => {
     // this.context.firebase.userAllShows("I9OcmC25eKfieOWppn6Pqr1sVj02").once("value", (snapshot) => {
@@ -108,12 +72,10 @@ class Profile extends Component {
     const todayConverted = `${todayDate.getDate()}-${todayDate.getMonth() + 1}-${todayDate.getFullYear()}`
     const threeDaysBefore = new Date(todayDate.getTime() - 259200000)
 
-    const threeDaysBeforeConverted = `${threeDaysBefore.getDate()}-${
-      threeDaysBefore.getMonth() + 1
-    }-${threeDaysBefore.getFullYear()}`
-    console.log(threeDaysBefore)
+    // const threeDaysBeforeConverted = `${threeDaysBefore.getDate()}-${
+    //   threeDaysBefore.getMonth() + 1
+    // }-${threeDaysBefore.getFullYear()}`
 
-    console.log(threeDaysBeforeConverted)
     axios
       .get(
         `https://api.themoviedb.org/3/tv/changes?api_key=${process.env.REACT_APP_TMDB_API}&end_date=${todayConverted}&start_date=${threeDaysBefore}`
@@ -123,7 +85,12 @@ class Profile extends Component {
         // const allShowsIds = await this.context.firebase // change show.id below to just show
         //   .allShowsList()
         //   .once("value")
-        //   .then((snapshot) => Object.keys(snapshot.val()).map((id) => id))
+        //   .then((snapshot) =>
+        //     Object.keys(snapshot.val()).map((id) => {
+        //       return { id }
+        //     })
+        //   )
+        // this.context.firebase.showInDatabase("1399").child("episodes").set(null)
 
         data.results.forEach((show) => {
           this.context.firebase
@@ -131,7 +98,6 @@ class Profile extends Component {
             .child("id")
             .once("value", (snapshot) => {
               if (snapshot.val() !== null) {
-                console.log(snapshot.val())
                 axios
                   .get(
                     `https://api.themoviedb.org/3/tv/${show.id}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US`
@@ -210,7 +176,8 @@ class Profile extends Component {
 
                       const dataToPass = {
                         episodes: allEpisodes,
-                        status: mergedRowData.status
+                        status: mergedRowData.status,
+                        name: mergedRowData.name
                       }
 
                       return dataToPass
@@ -226,6 +193,11 @@ class Profile extends Component {
                       .catch((err) => {
                         console.log(err)
                       })
+
+                    this.context.firebase.showInfo(show.id).update({
+                      status: data.status,
+                      name: data.name
+                    })
 
                     this.context.firebase
                       .showInfo(show.id)
@@ -284,8 +256,8 @@ class Profile extends Component {
             )}
           </div>
           <PasswordUpdate />
-          {(_get(this.context.authUser, "email", "") === "test@test.com" ||
-            _get(this.context.authUser, "email", "") === "mr.spok407@gmail.com") && (
+          {(_get(this.state.authUser, "email", "") === process.env.REACT_APP_TEST_EMAIL ||
+            _get(this.state.authUser, "email", "") === process.env.REACT_APP_ADMIN_EMAIL) && (
             <>
               <div className="update-database">
                 <button onClick={() => this.databaseModify()} className="button button--profile" type="button">

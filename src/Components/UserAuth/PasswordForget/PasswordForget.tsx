@@ -71,7 +71,6 @@ const PasswordForget: React.FC = () => {
 
     if (errorsOnChange[`${name}OnBlur`] || submitClicked) {
       if (name === "email") {
-        console.log(value)
         errorsOnChange[`${name}Error`] = validEmailRegex.test(value) ? "" : "Invalid email"
       }
     }
@@ -139,9 +138,7 @@ const PasswordForget: React.FC = () => {
         labelText="Email"
         withLabel
       />
-      {emailSentSuccess && (
-        <div className="auth__form-password-message">Password reset link sent to your email</div>
-      )}
+      {emailSentSuccess && <div className="auth__form-password-message">Password reset link sent to your email</div>}
       {errors.emailError && <div className="auth__form-error">{errors.emailError}</div>}
       {errors.error && <div className="auth__form-error">{errors.error.message}</div>}
 

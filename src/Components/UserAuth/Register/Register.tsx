@@ -89,21 +89,16 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
     firebase
       .createUserWithEmailAndPassword(email, password)
       .then((authUser: AuthUserFirebaseInterface) => {
-        const userRole = email === "mr.spok407@gmail.com" ? ROLES.ADMIN : ROLES.USER
-        console.log("user created")
-
         firebase
           .user(authUser.user.uid)
           .set({
             username: inputs.login,
             email,
-            role: userRole
+            role: ROLES.USER
           })
           .then(() => {
-            console.log("then, after user set in database")
             const watchingShows = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)!) || []
-            const watchLaterMovies =
-              JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)!) || []
+            const watchLaterMovies = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)!) || []
 
             context.userContentHandler.addShowsToDatabaseOnRegister({
               shows: watchingShows,
@@ -120,7 +115,6 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
             })
           })
           .then(() => {
-            console.log("then after addShowtoDatabase run")
             localStorage.removeItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)
             localStorage.removeItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)
 
@@ -130,11 +124,9 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
           })
       })
       .then(() => {
-        console.log("email verification sent")
         return firebase.sendEmailVerification()
       })
       .then(() => {
-        console.log("push in register in home page")
         history.push(ROUTES.HOME_PAGE)
       })
       .catch((error: any) => {
@@ -152,7 +144,6 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
     let errorsOnChange = { ...errors }
 
     if (errorsOnChange[`${name}OnBlur`] || submitClicked) {
-      console.log({ value })
       if (name === "email") {
         errorsOnChange[`${name}Error`] = validEmailRegex.test(value) ? "" : "Invalid email"
       }
@@ -166,8 +157,7 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
 
       if (name === "passwordConfirm") {
         if (requiredInputs.password.length >= 6)
-          errorsOnChange[`${name}Error`] =
-            requiredInputs.password !== value ? "Passwords are not the same" : ""
+          errorsOnChange[`${name}Error`] = requiredInputs.password !== value ? "Passwords are not the same" : ""
       }
     }
 
@@ -194,7 +184,6 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
     errorsOnBlur[`${name}OnBlur`] = true
 
     if (!submitClicked) {
-      console.log({ email })
       if (name === "email") {
         errorsOnBlur[`${name}Error`] = validEmailRegex.test(email) ? "" : "Invalid email"
       }

@@ -19,7 +19,6 @@ const getFullInfoForUpdatedShow = async ({
   const userShowsCopy = [...userShows]
 
   const changedShow: any = userShowsCopy.find((show: any, index: any) => {
-    console.log(differenceInObjects(show, userShowsSS[index]).allEpisodesWatched)
     if (
       (differenceInObjects(show, userShowsSS[index]).database ||
         differenceInObjects(show, userShowsSS[index]).allEpisodesWatched !== undefined) &&
@@ -29,14 +28,11 @@ const getFullInfoForUpdatedShow = async ({
     }
   })
 
-  console.log({ changedShow })
-
   if (changedShow) {
     await firebase
       .showInDatabase(changedShow.id)
       .once("value")
       .then((snapshot: { val: () => { info: {}; episodes: SeasonEpisodesFromDatabaseInterface[] } }) => {
-        console.log("call to fire")
         const index = userShowsCopy.findIndex((item) => item.id === changedShow.id)
         const mergedShow = {
           ...changedShow,

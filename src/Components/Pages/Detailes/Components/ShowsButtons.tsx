@@ -92,9 +92,7 @@ const ShowsButtons: React.FC<Props> = ({
           className={classNames("button", {
             "button--pressed":
               showDatabaseOnClient === "notWatchingShows" ||
-              (!authUser &&
-                !context.userContentLocalStorage.watchingShows.find((item) => item.id === Number(id)) &&
-                !context.userContentHandler.loadingAddShowToDatabase.notWatchingShows)
+              (!authUser && !context.userContentLocalStorage.watchingShows.find((item) => item.id === Number(id)))
           })}
           type="button"
           onClick={() => {
@@ -118,11 +116,12 @@ const ShowsButtons: React.FC<Props> = ({
             }
           }}
         >
-          {context.userContentHandler.loadingAddShowToDatabase.notWatchingShows ? (
+          {/* {context.userContentHandler.loadingAddShowToDatabase.notWatchingShows ? (
             <span className="auth__form-loading"></span>
           ) : (
             "Not watching"
-          )}
+          )} */}
+          Not watching
         </button>
       </div>
       <div className="buttons__col-wrapper" ref={_notAuthButtons}>

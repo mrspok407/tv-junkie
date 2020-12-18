@@ -87,8 +87,6 @@ const getShowEpisodesFromAPI = ({ id }: { id: number }) => {
           status: mergedRowData.status
         }
 
-        console.log(dataToPass)
-
         return dataToPass
       })
     )

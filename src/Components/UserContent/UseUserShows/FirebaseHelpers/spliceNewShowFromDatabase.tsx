@@ -1,8 +1,4 @@
-import {
-  SeasonEpisodesFromDatabaseInterface,
-  UserShowsInterface,
-  UserWillAirEpisodesInterface
-} from "../UseUserShows"
+import { SeasonEpisodesFromDatabaseInterface, UserShowsInterface, UserWillAirEpisodesInterface } from "../UseUserShows"
 import { organiseFutureEpisodesByMonth } from "Components/Pages/Calendar/CalendarHelpers"
 import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
 
@@ -39,8 +35,6 @@ const spliceNewShowFromDatabase = ({
         ...snapshot.val().info,
         episodes: snapshot.val().episodes
       }
-
-      console.log("splice")
 
       updatedShows.splice(index, 0, mergedShow)
 

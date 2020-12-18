@@ -12,7 +12,6 @@ interface GetUserShowsFullInfoArg {
 }
 
 const getShowsFullInfo = ({ userShows, firebase }: GetUserShowsFullInfoArg) => {
-  console.log("getShowsFullInfo")
   return Promise.all(
     userShows.map((show) => {
       return firebase
@@ -22,7 +21,6 @@ const getShowsFullInfo = ({ userShows, firebase }: GetUserShowsFullInfoArg) => {
           if (snapshot.val() !== null) {
             const info = snapshot.val()
             if (show.database === "watchingShows" && !show.finished) {
-              console.log(`roflan: ${show.id}`)
               return firebase
                 .showEpisodes(show.id)
                 .once("value")
@@ -40,12 +38,7 @@ const getShowsFullInfo = ({ userShows, firebase }: GetUserShowsFullInfoArg) => {
       arrayMerge: combineMergeObjects
     })
     const watchingShows: any = mergedShows.filter((show) => show && show.database === "watchingShows")
-    console.log({ watchingShows })
     const willAirEpisodes: UserWillAirEpisodesInterface[] = organiseFutureEpisodesByMonth(watchingShows)
-
-    console.log({ mergedShows })
-
-    console.log("after updateUserEpisodes")
 
     return { showsFullInfo: mergedShows, willAirEpisodes }
   })

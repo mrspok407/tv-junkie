@@ -83,38 +83,26 @@ const useUserShows = () => {
 
   const firebase = useContext(FirebaseContext)
 
-  let count: any = 0
-
   useEffect(() => {
     let authSubscriber: any
     const authUserListener = () => {
-      console.log("hook run")
       authSubscriber = firebase.onAuthUserListener(
         async (authUser: AuthUserInterface) => {
           if (!authUser) return
           setLoadingShows(true)
-
-          console.log("updateUserEpisodesFromDatabaseNew")
           await updateUserEpisodesFromDatabase({ firebase })
 
           firebase.userAllShows(authUser.uid).on("value", async (snapshot: { val: () => UserShowsInterface[] }) => {
             if (snapshot.val() === null) {
-              console.log("hook in listener NO value")
               setLoadingShows(false)
               return
             }
-            console.log("hook in listener")
-
-            count++
-            if (count > 20) debugger
-
             const shows = Object.values(snapshot.val()).map((show) => {
               return show
             })
             const userShowsSS: UserShowsInterface[] = JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY_SHOWS)!)
 
             if (userShowsSS.length === 0) {
-              console.log("userShows length = 0")
               listenerUserToWatchShow({ uid: authUser.uid })
               const { showsFullInfo, willAirEpisodes } = await getShowsFullInfo({
                 userShows: shows,
@@ -126,7 +114,6 @@ const useUserShows = () => {
               setUserWillAirEpisodes(willAirEpisodes)
               setLoadingShows(false)
             } else if (userShowsSS.length < shows.length) {
-              console.log("userShows length < 0")
               shows.forEach(async (show, index) => {
                 if (userShowsSS.find((item) => item.id === show.id)) return
 
@@ -141,11 +128,7 @@ const useUserShows = () => {
                 setLoadingShows(false)
               })
             } else if (userShowsSS.length === shows.length) {
-              console.log("userShows length same")
-
               const { userShowsCopy } = await getFullInfoForUpdatedShow({ userShows: shows, userShowsSS, firebase })
-
-              console.log({ userShowsCopy })
 
               const mergedShows = merge(userShowsSS, userShowsCopy, {
                 arrayMerge: combineMergeObjects
@@ -171,7 +154,6 @@ const useUserShows = () => {
 
     authUserListener()
     return () => {
-      console.log("userShowsHook unmounted")
       authSubscriber()
       firebaseListeners.forEach((listener: any) => {
         listener.off()
@@ -181,13 +163,10 @@ const useUserShows = () => {
   }, [])
 
   useEffect(() => {
-    console.log("userShows updated")
-    console.log({ userShows })
     sessionStorage.setItem(SESSION_STORAGE_KEY_SHOWS, JSON.stringify(userShows))
   }, [userShows])
 
   const handleUserShowsOnClient = ({ database, id }: { id: number; database: string }) => {
-    console.log("updateOnClientTOP")
     const userShowsSS: UserShowsInterface[] = JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY_SHOWS)!)
     if (userShowsSS.find((show) => show.id === id) === undefined) return
 
@@ -198,8 +177,6 @@ const useUserShows = () => {
 
     setUserShows(updatedShows)
     setUserWillAirEpisodes(willAirEpisodes)
-
-    console.log("upd on client")
   }
 
   const resetContentState = () => {

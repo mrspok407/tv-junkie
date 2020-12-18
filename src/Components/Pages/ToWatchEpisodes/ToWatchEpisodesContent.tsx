@@ -23,9 +23,6 @@ const ToWatchEpisodesContent: React.FC = () => {
     )
     const toWatchEpisodes: any = context.userContent.userToWatchShows
 
-    console.log({ watchingShows })
-    console.log({ toWatchEpisodes })
-
     if (toWatchEpisodes.length === 0) {
       setWatchingShows([])
       return

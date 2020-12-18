@@ -19,22 +19,13 @@ type Props = {
   getMovieLinks: ({ id }: { id: number }) => void
 }
 
-const MoviesContent: React.FC<Props> = ({
-  moviesData,
-  loadingIds,
-  openLinksMoviesId,
-  error,
-  getMovieLinks
-}) => {
+const MoviesContent: React.FC<Props> = ({ moviesData, loadingIds, openLinksMoviesId, error, getMovieLinks }) => {
   const [sortByState, setSortByState] = useState("title")
 
   const context = useContext(AppContext)
   const { authUser } = context
 
-  const [state, dispatch] = useReducer<React.Reducer<MoviesContentState, ActionInterface>>(
-    reducer,
-    INITIAL_STATE
-  )
+  const [state, dispatch] = useReducer<React.Reducer<MoviesContentState, ActionInterface>>(reducer, INITIAL_STATE)
 
   useEffect(() => {
     dispatch({ type: ActionTypes.UpdateContext, payload: context })
@@ -42,14 +33,12 @@ const MoviesContent: React.FC<Props> = ({
 
   const loadNewContent = () => {
     if (state.disableLoad[state.activeSection] || authUser === null) return
-    console.log("loadNewContent")
     dispatch({ type: ActionTypes.IncrementLoadedMovies })
     dispatch({ type: ActionTypes.DisableLoad })
   }
 
   const loadNewContentLS = () => {
     if (state.disableLoad.watchLaterMoviesLS || authUser !== null) return
-    console.log("loadNewContentLS")
     dispatch({ type: ActionTypes.IncrementLoadedMoviesLS })
     dispatch({ type: ActionTypes.DisableLoadLS })
   }
@@ -79,13 +68,7 @@ const MoviesContent: React.FC<Props> = ({
     const content = context.userContent.userMovies
       .sort((a, b) =>
         // @ts-ignore
-        a[sortByState] > b[sortByState]
-          ? sortByState === "timeStamp"
-            ? -1
-            : 1
-          : sortByState !== "timeStamp"
-          ? -1
-          : 1
+        a[sortByState] > b[sortByState] ? (sortByState === "timeStamp" ? -1 : 1) : sortByState !== "timeStamp" ? -1 : 1
       )
       .slice(0, state.loadedMovies[section])
 
@@ -96,9 +79,7 @@ const MoviesContent: React.FC<Props> = ({
     return (
       <>
         {movies.map((item) => {
-          const filteredGenres = item.genre_ids.map((genreId) =>
-            listOfGenres.filter((item) => item.id === genreId)
-          )
+          const filteredGenres = item.genre_ids.map((genreId) => listOfGenres.filter((item) => item.id === genreId))
 
           // Movies //
           let movie
@@ -130,9 +111,7 @@ const MoviesContent: React.FC<Props> = ({
                   }}
                 >
                   <div className="content-results__item-main-info">
-                    <div className="content-results__item-title">
-                      {!item.title ? "No title available" : item.title}
-                    </div>
+                    <div className="content-results__item-title">{!item.title ? "No title available" : item.title}</div>
                     <div className="content-results__item-year">
                       {!item.release_date ? "" : `(${item.release_date.slice(0, 4)})`}
                     </div>
@@ -260,11 +239,7 @@ const MoviesContent: React.FC<Props> = ({
                     "content-results__sortby-button--active": sortByState === "title"
                   })}
                 >
-                  <button
-                    type="button"
-                    className="button button--sortby-shows"
-                    onClick={() => sortByHandler("title")}
-                  >
+                  <button type="button" className="button button--sortby-shows" onClick={() => sortByHandler("title")}>
                     Alphabetically
                   </button>
                 </div>

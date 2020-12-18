@@ -179,11 +179,9 @@ const ShowsEpisodes: React.FC<Props> = ({
 
   const checkMultipleEpisodes = (episodesData: { id: number; index: number }[], resetFadeOutEpisodes: () => void) => {
     if (!authUser) return
-    console.log(episodesData)
 
     Promise.all(
       episodesData.map((episode: any) => {
-        console.log(episode)
         return firebase
           .userShowSingleEpisode({
             uid: authUser.uid,
@@ -200,8 +198,6 @@ const ShowsEpisodes: React.FC<Props> = ({
           )
       })
     ).then(() => {
-      console.log("finished")
-
       isAllEpisodesWatched({
         showInfo: showInfo,
         releasedEpisodes,
@@ -298,8 +294,6 @@ const ShowsEpisodes: React.FC<Props> = ({
   }
 
   const showCheckboxes = showInfo.showInUserDatabase && showDatabaseOnClient !== "notWatchingShows"
-
-  console.log({ currentlyOpenSeasons })
   return (
     <>
       {showCheckboxes && parentComponent === "detailesPage" && _get(releasedEpisodes, "length", 0) ? (
@@ -316,8 +310,6 @@ const ShowsEpisodes: React.FC<Props> = ({
           if (season.season_number === 0 || season.name === "Specials" || season.episode_count === 0 || !season.id) {
             return null
           }
-
-          // console.log({ episodesData })
 
           const seasonEpisodesNotWatched: any =
             parentComponent === "toWatchPage" && season.episodes.filter((episode) => !episode.watched)

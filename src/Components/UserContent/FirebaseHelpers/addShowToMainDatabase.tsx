@@ -21,7 +21,6 @@ interface Arguments {
 }
 
 const addShowToMainDatabase = ({ firebase, show, dataFromAPI }: Arguments): Promise<any> => {
-  console.log("transaction")
   return firebase.showInDatabase(show.id).transaction(
     (snapshot: any) => {
       if (snapshot === null) {
@@ -49,14 +48,11 @@ const addShowToMainDatabase = ({ firebase, show, dataFromAPI }: Arguments): Prom
     },
     (error: any, committed: any, snapshot: any) => {
       if (error) {
-        console.log("Transaction failed abnormally!", error)
       } else if (!committed) {
-        console.log("We aborted the transaction (because allready exists).")
         firebase.showInDatabase(show.id).update({
           usersWatching: snapshot.val().usersWatching + 1
         })
       } else {
-        console.log("added!")
       }
     }
   )

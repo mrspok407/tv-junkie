@@ -87,7 +87,8 @@ const updateUserEpisodesFromDatabase = async ({ firebase }: Arguments) => {
         return acc
       }, [])
 
-      const statusDatabase = show.status === "Ended" || show.status === "Canceled" ? "ended" : "ongoing"
+      const statusDatabase =
+        show.status === "Ended" || show.status === "ended" || show.status === "Canceled" ? "ended" : "ongoing"
 
       const releasedEpisodes: SingleEpisodeInterface[] = releasedEpisodesToOneArray({ data: show.episodes })
       const allEpisodes = seasons.reduce((acc: SingleEpisodeInterface[], item: any) => {

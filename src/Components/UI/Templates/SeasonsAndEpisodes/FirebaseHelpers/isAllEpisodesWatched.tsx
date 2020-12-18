@@ -31,16 +31,12 @@ const isAllEpisodesWatched = ({
 
   const finished = (status === "ended" || showInfo.status === "ended") && allEpisodesWatched ? true : false
 
-  console.log("all episodes check")
-
   if (allEpisodesWatched) {
     firebase.userShowAllEpisodesInfo(authUser.uid, showInfo.id).update({
       allEpisodesWatched,
       finished,
       isAllWatched_database: `${allEpisodesWatched}_${showInfo.database}`
     })
-
-    console.log("isAllEpisodesWatched")
 
     firebase.userShow({ uid: authUser.uid, key: showInfo.id }).update({ finished, allEpisodesWatched })
   }
