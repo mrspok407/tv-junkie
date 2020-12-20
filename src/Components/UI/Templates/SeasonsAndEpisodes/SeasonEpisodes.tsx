@@ -123,6 +123,8 @@ const SeasonEpisodes: React.FC<Props> = ({
   const showSeason = showCheckboxes && episodesFromDatabase[season.season_number - 1]
   const seasons = parentComponent === "toWatchPage" ? episodesData : episodesDataFromAPI
 
+  console.log({ seasons })
+
   return (
     <div className="episodes__episode-list">
       {(seasons as Array<EpisodesDataInterface | ShowEpisodesFromAPIInterface>).map((item) => {
@@ -132,7 +134,8 @@ const SeasonEpisodes: React.FC<Props> = ({
 
         return item.episodes.map((episode, episodeIndex) => {
           if (parentComponent === "toWatchPage" && episode.watched) return
-          const indexOfEpisode = item.episodes.length - 1 - episodeIndex
+          const indexOfEpisode: any =
+            parentComponent === "toWatchPage" ? episode.index : item.episodes.length - 1 - episodeIndex
 
           // Format Date //
           const airDateISO = episode.air_date && new Date(episode.air_date).toISOString()

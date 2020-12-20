@@ -149,7 +149,6 @@ const useUserShows = () => {
         () => {
           authSubscriber()
           firebaseListeners.forEach((listener: any) => {
-            console.log(listener)
             listener.off()
           })
           setLoadingShows(false)

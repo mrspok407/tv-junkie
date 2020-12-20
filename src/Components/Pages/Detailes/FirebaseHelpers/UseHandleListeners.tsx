@@ -45,7 +45,7 @@ const useHandleListeners = ({ id }: { id?: number }) => {
 
           const userEpisodes = snapshot.val()
           const allEpisodes = userEpisodes.reduce((acc: SingleEpisodeInterface[], item) => {
-            acc.push(...item.episodes)
+            acc.push(...item.episodes.filter((item) => item.air_date !== ""))
             return acc
           }, [])
 

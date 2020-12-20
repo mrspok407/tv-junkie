@@ -222,31 +222,19 @@ const ShowsEpisodes: React.FC<Props> = ({
       })
       return acc
     }, [])
-    const seasonEpisodesAirDate = safeGetSeasonEpisodes.reduce((acc: SingleEpisodeInterface[], episode) => {
-      acc.push({
-        userRating: episode.userRating,
-        watched: episode.watched,
-        air_date: episode.air_date || ""
-      })
-      return acc
-    }, [])
 
     const seasonEpisodesFromDatabase = releasedEpisodes.filter((item) => item.season_number === seasonNum)
-    const seasonLength = seasonEpisodesFromDatabase.length
 
     let isAllEpisodesChecked = true
 
-    seasonEpisodesFromDatabase.forEach((episode, episodeIndex) => {
-      const indexOfEpisode = seasonLength - 1 - episodeIndex
-      if (!seasonEpisodes[indexOfEpisode].watched) {
+    seasonEpisodesFromDatabase.forEach((episode: any) => {
+      if (!seasonEpisodes[episode.index].watched) {
         isAllEpisodesChecked = false
       }
     })
 
-    seasonEpisodesFromDatabase.forEach((episode, episodeIndex) => {
-      const indexOfEpisode = seasonLength - 1 - episodeIndex
-      seasonEpisodes[indexOfEpisode].watched = !isAllEpisodesChecked
-      seasonEpisodesAirDate[indexOfEpisode].watched = !isAllEpisodesChecked
+    seasonEpisodesFromDatabase.forEach((episode: any) => {
+      seasonEpisodes[episode.index].watched = !isAllEpisodesChecked
     })
 
     firebase
@@ -270,14 +258,19 @@ const ShowsEpisodes: React.FC<Props> = ({
   const checkEveryShowEpisode = () => {
     if (!authUser) return
 
+    console.log({ releasedEpisodes })
+    console.log({ episodesFromDatabase })
+
     let isAllEpisodesChecked = true
     let userEpisodesFormated: SingleEpisodeInterface[] = []
 
     episodesFromDatabase.forEach((season) => {
-      const episodes = season.episodes
+      const episodes = season.episodes.filter((item) => item.air_date !== "")
 
       userEpisodesFormated = [...userEpisodesFormated, ...episodes]
     })
+
+    console.log({ userEpisodesFormated })
 
     releasedEpisodes.forEach((episode, episodeIndex) => {
       const indexOfEpisode = releasedEpisodes.length - 1 - episodeIndex
