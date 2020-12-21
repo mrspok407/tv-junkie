@@ -2,6 +2,7 @@ import { releasedEpisodesToOneArray } from "Utils"
 import mergeWith from "lodash.mergewith"
 import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
 import { SeasonEpisodesFromDatabaseInterface, SingleEpisodeInterface, UserShowsInterface } from "../UseUserShows"
+import updateAllEpisodesWatched from "./updateAllEpisodesWatched"
 
 interface Arguments {
   firebase: FirebaseInterface
@@ -16,53 +17,15 @@ const updateUserEpisodesFromDatabase = async ({ firebase }: Arguments) => {
     .then((snapshot: any) => snapshot.val())
 
   if (!showsLastUpdateList) return
-  console.time("test")
+
+  await Promise.all(
+    Object.keys(showsLastUpdateList).map((key: any) => {
+      return updateAllEpisodesWatched({ firebase, authUser, key })
+    })
+  )
+
   const showsToUpdate: string[] = await Promise.all(
     Object.entries(showsLastUpdateList).map(async ([key, value]: any) => {
-      await firebase
-        .userShowAllEpisodesInfo(authUser.uid, key)
-        .child("finished")
-        .once("value", async (snapshot: any) => {
-          if (snapshot.val()) return
-          await firebase
-            .userShowAllEpisodesInfo(authUser.uid, key)
-            .child("isAllWatched_database")
-            .once("value", (snapshot: any) => {
-              if (snapshot.val() === "true_watchingShows") {
-                if (key !== "34307") return
-                firebase
-                  .userShowAllEpisodes(authUser.uid, key)
-                  .orderByValue()
-                  .limitToLast(1)
-                  .once("value", (snapshot: any) => {
-                    if (key !== "34307") return
-
-                    const userEpisodes = Object.entries(snapshot.val()).reduce((acc: any, [key, value]: any) => {
-                      acc.push(value)
-                      return acc
-                    }, [])
-
-                    const releasedEpisodes: SingleEpisodeInterface[] = releasedEpisodesToOneArray({
-                      data: userEpisodes
-                    })
-                    // const allEpisodes = userEpisodes.reduce((acc: SingleEpisodeInterface[], item: any) => {
-                    //   acc.push(...item.episodes)
-                    //   return acc
-                    // }, [])
-
-                    // allEpisodes.splice(releasedEpisodes.length)
-
-                    // console.log({ allEpisodes })
-
-                    const allEpisodesWatched = !releasedEpisodes.some((episode: any) => !episode.watched)
-                    // const finished = statusDatabase === "ended" && allEpisodesWatched ? true : false
-                  })
-              }
-            })
-        })
-
-      // debugger
-
       const lastUpdatedInDatabase = await firebase
         .showInfo(key)
         .child("lastUpdatedInDatabase")
@@ -73,8 +36,6 @@ const updateUserEpisodesFromDatabase = async ({ firebase }: Arguments) => {
       }
     })
   ).then((data) => data.filter((item) => item !== undefined))
-
-  console.timeEnd("test")
 
   if (showsToUpdate.length === 0) return
 

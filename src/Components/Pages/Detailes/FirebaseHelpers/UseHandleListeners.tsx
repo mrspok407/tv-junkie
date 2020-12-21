@@ -66,7 +66,6 @@ const useHandleListeners = ({ id }: { id?: number }) => {
             })
 
           firebase.userShow({ uid: authUser.uid, key: id }).update({ finished, allEpisodesWatched })
-
           setEpisodesFromDatabase(userEpisodes)
           setReleasedEpisodes(releasedEpisodes)
           if (handleLoading) handleLoading(false)

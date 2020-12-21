@@ -79,8 +79,9 @@ const ToWatchEpisodesContent: React.FC = () => {
             toWatchEpisodes.reverse()
 
             const releasedEpisodes: SingleEpisodeInterface[] = releasedEpisodesToOneArray({
-              data: toWatchEpisodes
+              data: show.episodes
             })
+
             return (
               <div key={show.id} className="towatch__show">
                 <Link className="towatch__show-name" to={`/show/${show.id}`}>

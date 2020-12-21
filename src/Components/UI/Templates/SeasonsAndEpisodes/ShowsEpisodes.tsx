@@ -247,7 +247,7 @@ const ShowsEpisodes: React.FC<Props> = ({
         if (parentComponent === "toWatchPage") {
           isAllEpisodesWatched({
             showInfo,
-            releasedEpisodes,
+            releasedEpisodes: releasedEpisodes.filter((item) => !item.watched),
             authUser,
             firebase
           })

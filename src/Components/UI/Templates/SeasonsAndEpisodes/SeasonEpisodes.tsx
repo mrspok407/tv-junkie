@@ -123,8 +123,6 @@ const SeasonEpisodes: React.FC<Props> = ({
   const showSeason = showCheckboxes && episodesFromDatabase[season.season_number - 1]
   const seasons = parentComponent === "toWatchPage" ? episodesData : episodesDataFromAPI
 
-  console.log({ seasons })
-
   return (
     <div className="episodes__episode-list">
       {(seasons as Array<EpisodesDataInterface | ShowEpisodesFromAPIInterface>).map((item) => {

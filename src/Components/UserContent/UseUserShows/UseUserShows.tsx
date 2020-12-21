@@ -90,6 +90,7 @@ const useUserShows = () => {
         async (authUser: AuthUserInterface) => {
           if (!authUser) return
           setLoadingShows(true)
+
           await updateUserEpisodesFromDatabase({ firebase })
 
           firebase.userAllShows(authUser.uid).on("value", async (snapshot: { val: () => UserShowsInterface[] }) => {
@@ -97,6 +98,7 @@ const useUserShows = () => {
               setLoadingShows(false)
               return
             }
+            console.log("userAllShowsListener")
             const shows = Object.values(snapshot.val()).map((show) => {
               return show
             })

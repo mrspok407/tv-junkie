@@ -9,7 +9,7 @@ export const releasedEpisodes = ({ data }: { data: SeasonEpisodesFromDatabaseInt
   const modifiedData = Array.isArray(data)
     ? data
         .reduce((acc: any, season) => {
-          const seasonEpisodes = season.episodes.filter(() => true)
+          const seasonEpisodes = season?.episodes?.filter(() => true)
           if (!Array.isArray(seasonEpisodes) || seasonEpisodes.length === 0) return
           const episodesWithIndex = seasonEpisodes.reduce((acc: any, episode: any, index: any) => {
             acc.push({ ...episode, index })
