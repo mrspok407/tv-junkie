@@ -9,6 +9,7 @@ import {
 import addShowToMainDatabase from "./FirebaseHelpers/addShowToMainDatabase"
 import getShowEpisodesFromAPI from "./TmdbAPIHelpers/getShowEpisodesFromAPI"
 import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
+import updateAllEpisodesWatched from "./UseUserShows/FirebaseHelpers/updateAllEpisodesWatched"
 
 export const LOADING_ADDING_TO_DATABASE_INITIAL = {
   watchingShows: false,
@@ -174,10 +175,15 @@ const useContentHandler = () => {
 
       firebase
         .userShowAllEpisodesInfo(authUser.uid, id)
-        .update({
-          database,
-          isAllWatched_database: `${userShow.allEpisodesWatched}_${database}`
-        })
+        .update(
+          {
+            database,
+            isAllWatched_database: `${userShow.allEpisodesWatched}_${database}`
+          },
+          () => {
+            if (database === "watchingShows") updateAllEpisodesWatched({ firebase, authUser, key: id })
+          }
+        )
         .catch((error: any) => {
           console.log(`Error in database occured. ${error}`)
         })

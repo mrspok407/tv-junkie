@@ -17,13 +17,13 @@ const updateUserEpisodesFromDatabase = async ({ firebase }: Arguments) => {
     .then((snapshot: any) => snapshot.val())
 
   if (!showsLastUpdateList) return
-
+  console.time("test")
   await Promise.all(
     Object.keys(showsLastUpdateList).map((key: any) => {
       return updateAllEpisodesWatched({ firebase, authUser, key })
     })
   )
-
+  console.timeEnd("test")
   const showsToUpdate: string[] = await Promise.all(
     Object.entries(showsLastUpdateList).map(async ([key, value]: any) => {
       const lastUpdatedInDatabase = await firebase

@@ -81,6 +81,27 @@ class Profile extends Component {
     //   .child("1111111111111")
     //   .child("keyForDatabaseWrite")
     //   .once("value", (snapshot) => console.log(snapshot.val()))
+    console.time("test")
+    let promises = []
+
+    for (let i = 0; i <= 50; i++) {
+      promises.push(
+        this.context.firebase
+          .userShowAllEpisodes(this.state.authUser.uid, "46260")
+          .child("0")
+          .child("episodes")
+          .child(i)
+          .child("watched")
+          .once("value")
+          .then((snapshot) => snapshot.val())
+      )
+    }
+
+    Promise.all(promises).then((res) => {
+      console.log({ res })
+      console.timeEnd("test")
+    })
+
     axios
       .get(
         `https://api.themoviedb.org/3/tv/changes?api_key=${process.env.REACT_APP_TMDB_API}&end_date=${todayConverted}&start_date=${threeDaysBefore}`
@@ -96,108 +117,108 @@ class Profile extends Component {
         //     })
         //   )
         // this.context.firebase.showInDatabase("1399").child("episodes").set(null)
-        data.results.forEach((show) => {
-          this.context.firebase
-            .showInDatabase(show.id)
-            .child("id")
-            .once("value", (snapshot) => {
-              if (snapshot.val() !== null) {
-                axios
-                  .get(
-                    `https://api.themoviedb.org/3/tv/${show.id}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US`
-                  )
-                  .then(({ data: { number_of_seasons } }) => {
-                    console.log(show.id)
-                    const maxSeasonsInChunk = 20
-                    const allSeasons = []
-                    const seasonChunks = []
-                    const apiRequests = []
-                    for (let i = 1; i <= number_of_seasons; i += 1) {
-                      allSeasons.push(`season/${i}`)
-                    }
-                    for (let i = 0; i <= allSeasons.length; i += maxSeasonsInChunk) {
-                      const chunk = allSeasons.slice(i, i + maxSeasonsInChunk)
-                      seasonChunks.push(chunk.join())
-                    }
-                    seasonChunks.forEach((item) => {
-                      const request = axios.get(
-                        `https://api.themoviedb.org/3/tv/${show.id}?api_key=${process.env.REACT_APP_TMDB_API}&append_to_response=${item}`
-                      )
-                      apiRequests.push(request)
-                    })
-                    return axios.all([...apiRequests])
-                  })
-                  .then(
-                    axios.spread((...responses) => {
-                      const rowData = []
-                      const seasonsData = []
-                      responses.forEach((item) => {
-                        rowData.push(item.data)
-                      })
-                      const mergedRowData = Object.assign({}, ...rowData)
-                      Object.entries(mergedRowData).forEach(([key, value]) => {
-                        if (!key.indexOf("season/")) {
-                          seasonsData.push({ [key]: { ...value } })
-                        }
-                      })
-                      const allEpisodes = []
-                      seasonsData.forEach((data, index) => {
-                        const season = data[`season/${index + 1}`]
-                        if (!Array.isArray(season.episodes) || season.episodes.length === 0) return
-                        const episodes = []
-                        season.episodes.forEach((item) => {
-                          const updatedEpisode = {
-                            air_date: item.air_date || "",
-                            episode_number: item.episode_number || null,
-                            name: item.name || null,
-                            season_number: item.season_number || null,
-                            id: item.id
-                          }
-                          episodes.push(updatedEpisode)
-                        })
-                        const updatedSeason = {
-                          air_date: season.air_date || "",
-                          season_number: season.season_number || null,
-                          id: season._id,
-                          poster_path: season.poster_path || null,
-                          name: season.name || null,
-                          episodes
-                        }
-                        allEpisodes.push(updatedSeason)
-                      })
-                      const dataToPass = {
-                        episodes: allEpisodes,
-                        status: mergedRowData.status,
-                        name: mergedRowData.name
-                      }
-                      return dataToPass
-                    })
-                  )
-                  .then((data) => {
-                    this.context.firebase
-                      .showInDatabase(show.id)
-                      .update({
-                        episodes: data.episodes,
-                        status: data.status
-                      })
-                      .catch((err) => {
-                        console.log(err)
-                      })
-                    this.context.firebase.showInfo(show.id).update({
-                      status: data.status,
-                      name: data.name
-                    })
-                    this.context.firebase
-                      .showInfo(show.id)
-                      .child("lastUpdatedInDatabase")
-                      .set(this.context.firebase.timeStamp())
-                  })
-                  .catch((err) => {
-                    console.log(err)
-                  })
-              }
-            })
-        })
+        // data.results.forEach((show) => {
+        //   this.context.firebase
+        //     .showInDatabase(show.id)
+        //     .child("id")
+        //     .once("value", (snapshot) => {
+        //       if (snapshot.val() !== null) {
+        //         axios
+        //           .get(
+        //             `https://api.themoviedb.org/3/tv/${show.id}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US`
+        //           )
+        //           .then(({ data: { number_of_seasons } }) => {
+        //             console.log(show.id)
+        //             const maxSeasonsInChunk = 20
+        //             const allSeasons = []
+        //             const seasonChunks = []
+        //             const apiRequests = []
+        //             for (let i = 1; i <= number_of_seasons; i += 1) {
+        //               allSeasons.push(`season/${i}`)
+        //             }
+        //             for (let i = 0; i <= allSeasons.length; i += maxSeasonsInChunk) {
+        //               const chunk = allSeasons.slice(i, i + maxSeasonsInChunk)
+        //               seasonChunks.push(chunk.join())
+        //             }
+        //             seasonChunks.forEach((item) => {
+        //               const request = axios.get(
+        //                 `https://api.themoviedb.org/3/tv/${show.id}?api_key=${process.env.REACT_APP_TMDB_API}&append_to_response=${item}`
+        //               )
+        //               apiRequests.push(request)
+        //             })
+        //             return axios.all([...apiRequests])
+        //           })
+        //           .then(
+        //             axios.spread((...responses) => {
+        //               const rowData = []
+        //               const seasonsData = []
+        //               responses.forEach((item) => {
+        //                 rowData.push(item.data)
+        //               })
+        //               const mergedRowData = Object.assign({}, ...rowData)
+        //               Object.entries(mergedRowData).forEach(([key, value]) => {
+        //                 if (!key.indexOf("season/")) {
+        //                   seasonsData.push({ [key]: { ...value } })
+        //                 }
+        //               })
+        //               const allEpisodes = []
+        //               seasonsData.forEach((data, index) => {
+        //                 const season = data[`season/${index + 1}`]
+        //                 if (!Array.isArray(season.episodes) || season.episodes.length === 0) return
+        //                 const episodes = []
+        //                 season.episodes.forEach((item) => {
+        //                   const updatedEpisode = {
+        //                     air_date: item.air_date || "",
+        //                     episode_number: item.episode_number || null,
+        //                     name: item.name || null,
+        //                     season_number: item.season_number || null,
+        //                     id: item.id
+        //                   }
+        //                   episodes.push(updatedEpisode)
+        //                 })
+        //                 const updatedSeason = {
+        //                   air_date: season.air_date || "",
+        //                   season_number: season.season_number || null,
+        //                   id: season._id,
+        //                   poster_path: season.poster_path || null,
+        //                   name: season.name || null,
+        //                   episodes
+        //                 }
+        //                 allEpisodes.push(updatedSeason)
+        //               })
+        //               const dataToPass = {
+        //                 episodes: allEpisodes,
+        //                 status: mergedRowData.status,
+        //                 name: mergedRowData.name
+        //               }
+        //               return dataToPass
+        //             })
+        //           )
+        //           .then((data) => {
+        //             this.context.firebase
+        //               .showInDatabase(show.id)
+        //               .update({
+        //                 episodes: data.episodes,
+        //                 status: data.status
+        //               })
+        //               .catch((err) => {
+        //                 console.log(err)
+        //               })
+        //             this.context.firebase.showInfo(show.id).update({
+        //               status: data.status,
+        //               name: data.name
+        //             })
+        //             this.context.firebase
+        //               .showInfo(show.id)
+        //               .child("lastUpdatedInDatabase")
+        //               .set(this.context.firebase.timeStamp())
+        //           })
+        //           .catch((err) => {
+        //             console.log(err)
+        //           })
+        //       }
+        //     })
+        // })
       })
   }
 
