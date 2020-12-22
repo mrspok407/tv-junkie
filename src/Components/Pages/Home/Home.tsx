@@ -74,18 +74,20 @@ const HomePage: React.FC = () => {
 
       <CalendarContent homePage={true} />
 
-      {!slidersLoading && (
-        <div className="home-page__sliders">
-          {Object.values(sliders).map((value) => {
-            return (
-              <div key={value.name} className="home-page__slider">
-                <h2 className="home-page__slider-heading">{value.name}</h2>
-                <Slider sliderData={value.data} />
-              </div>
-            )
-          })}
-        </div>
-      )}
+      <div className="home-page__sliders-wrapper">
+        {!slidersLoading && (
+          <div className="home-page__sliders">
+            {Object.values(sliders).map((value) => {
+              return (
+                <div key={value.name} className="home-page__slider">
+                  <h2 className="home-page__slider-heading">{value.name}</h2>
+                  <Slider sliderData={value.data} />
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
     </>
   )
 

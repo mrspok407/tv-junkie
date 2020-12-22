@@ -14,7 +14,8 @@ export const LOADING_ADDING_TO_DATABASE_INITIAL = {
   watchingShows: false,
   droppedShows: false,
   willWatchShows: false,
-  notWatchingShows: false
+  notWatchingShows: false,
+  loading: false
 }
 
 const useContentHandler = () => {
@@ -25,7 +26,6 @@ const useContentHandler = () => {
   const authUser = useAuthUser()
 
   const addShowsToDatabaseOnRegister = ({ shows, uid }: AddShowsToDatabaseOnRegisterArg) => {
-    // setLoadingShowsOnRegister(true)
     Promise.all(
       Object.values(shows).map((show) => {
         return getShowEpisodesFromAPI({ id: show.id }).then((dataFromAPI: any) => {
@@ -199,7 +199,9 @@ const useContentHandler = () => {
           })
         })
     } else {
-      setLoadingAddShowToDatabase({ ...loadingAddShowToDatabase, [database]: true })
+      if (loadingAddShowToDatabase.loading) return
+      console.log("tt")
+      setLoadingAddShowToDatabase({ ...loadingAddShowToDatabase, loading: true, [database]: true })
 
       const showData: any = Array.isArray(data) ? data.find((item) => item.id === id) : data
       addShowToDatabase({ id, show: showData, database, handleListeners })

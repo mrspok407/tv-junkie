@@ -1,4 +1,5 @@
 /* eslint-disable jsx-a11y/mouse-events-have-key-events */
+import PlaceholderNoResults from "Components/UI/Placeholders/PlaceholderNoResults"
 import React, { useEffect } from "react"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
 import SearchCard from "./SearchCard"
@@ -10,6 +11,8 @@ type Props = {
   closeList: () => void
   currentListItem: number
   mediaTypeSearching: string
+  listIsOpen: boolean
+  query: string
 }
 
 const SearchList: React.FC<Props> = ({
@@ -17,7 +20,9 @@ const SearchList: React.FC<Props> = ({
   handleClickOutside,
   closeList,
   currentListItem,
-  mediaTypeSearching
+  mediaTypeSearching,
+  listIsOpen,
+  query
 }) => {
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside as EventListener)
@@ -30,18 +35,22 @@ const SearchList: React.FC<Props> = ({
 
   return (
     <div className="search-list">
-      {searchResults.map((item, index) => {
-        return (
-          <SearchCard
-            key={item.id}
-            detailes={item}
-            closeList={closeList}
-            currentListItem={currentListItem}
-            index={index}
-            mediaTypeSearching={mediaTypeSearching}
-          />
-        )
-      })}
+      {searchResults.length === 0 && query !== "" && listIsOpen ? (
+        <PlaceholderNoResults message="No results found" />
+      ) : (
+        searchResults.map((item, index) => {
+          return (
+            <SearchCard
+              key={item.id}
+              detailes={item}
+              closeList={closeList}
+              currentListItem={currentListItem}
+              index={index}
+              mediaTypeSearching={mediaTypeSearching}
+            />
+          )
+        })
+      )}
     </div>
   )
 }

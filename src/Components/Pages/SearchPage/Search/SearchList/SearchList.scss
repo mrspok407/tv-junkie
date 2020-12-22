@@ -13,6 +13,10 @@
   &--searching {
     min-height: 100vh;
   }
+
+  .placeholder--no-results {
+    top: 0;
+  }
 }
 
 .search-card {

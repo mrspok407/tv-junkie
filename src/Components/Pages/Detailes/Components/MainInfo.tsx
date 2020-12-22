@@ -71,11 +71,7 @@ export const MainInfo: React.FC<Props> = ({
       <div className="detailes-page__info-row">
         <div className="detailes-page__info-option">Year</div>
         <div className="detailes-page__info-value">
-          {yearRelease !== "-" ? (
-            `${yearRelease}`
-          ) : (
-            <span className="detailes-page__info-no-info">{yearRelease}</span>
-          )}
+          {yearRelease !== "-" ? `${yearRelease}` : <span className="detailes-page__info-no-info">{yearRelease}</span>}
         </div>
       </div>
       {detailes.status !== "Released" && (
@@ -102,7 +98,7 @@ export const MainInfo: React.FC<Props> = ({
         </div>
       </div>
       <div className="detailes-page__info-row">
-        <div className="detailes-page__info-option">User rating</div>
+        <div className="detailes-page__info-option">Users rating</div>
         <div className="detailes-page__info-value">
           {detailes.vote_average !== "-" ? (
             detailes.vote_average
@@ -114,11 +110,7 @@ export const MainInfo: React.FC<Props> = ({
       <div className="detailes-page__info-row">
         <div className="detailes-page__info-option">Runtime</div>
         <div className="detailes-page__info-value">
-          {runtime !== "-" && runtime ? (
-            `${runtime} min`
-          ) : (
-            <span className="detailes-page__info-no-info">-</span>
-          )}
+          {runtime !== "-" && runtime ? `${runtime} min` : <span className="detailes-page__info-no-info">-</span>}
         </div>
       </div>
 

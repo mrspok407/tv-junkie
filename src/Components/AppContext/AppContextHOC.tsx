@@ -105,6 +105,7 @@ export interface AppContextInterface {
       droppedShows: boolean
       willWatchShows: boolean
       notWatchingShows: boolean
+      loading: boolean
     }
     loadingShowsOnRegister: boolean
   }

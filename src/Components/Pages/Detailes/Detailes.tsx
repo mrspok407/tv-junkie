@@ -186,11 +186,11 @@ export const DetailesPage: React.FC<Props> = ({
     if (!authUser || !show) return
 
     setShowInfo({ ...show, showInUserDatabase: true })
-    // setShowInUserDatabase(true)
     setShowDatabaseOnClient(show.database)
   }
 
   const changeShowDatabaseOnClient = (database: string) => {
+    if (context.userContentHandler.loadingAddShowToDatabase.loading) return
     setShowDatabaseOnClient(database)
   }
 

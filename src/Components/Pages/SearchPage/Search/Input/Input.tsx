@@ -98,6 +98,10 @@ const Input: React.FC<Props> = ({
   }
 
   const handleKeyDown = (e: any) => {
+    if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+      e.preventDefault()
+    }
+
     if (e.which === 27) resetSearch()
     if (e.which === 13) linkOnKeyPressDeb()
     if (e.which === 38 || e.which === 40) navigateSearchListByArrows(e.which)
