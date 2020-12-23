@@ -83,6 +83,8 @@ const useUserShows = () => {
 
   const firebase = useContext(FirebaseContext)
 
+  console.log("test")
+
   useEffect(() => {
     let authSubscriber: any
     const authUserListener = () => {
