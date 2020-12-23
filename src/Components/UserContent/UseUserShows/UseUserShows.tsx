@@ -105,6 +105,7 @@ const useUserShows = () => {
             const userShowsSS: UserShowsInterface[] = JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY_SHOWS)!)
 
             if (userShowsSS.length === 0) {
+              console.log("length 0")
               listenerUserToWatchShow({ uid: authUser.uid })
               const { showsFullInfo, willAirEpisodes } = await getShowsFullInfo({
                 userShows: shows,
@@ -116,6 +117,7 @@ const useUserShows = () => {
               setUserWillAirEpisodes(willAirEpisodes)
               setLoadingShows(false)
             } else if (userShowsSS.length < shows.length) {
+              console.log("length less")
               shows.forEach(async (show, index) => {
                 if (userShowsSS.find((item) => item.id === show.id)) return
 
@@ -130,6 +132,7 @@ const useUserShows = () => {
                 setLoadingShows(false)
               })
             } else if (userShowsSS.length === shows.length) {
+              console.log("length equal")
               const { userShowsCopy } = await getFullInfoForUpdatedShow({ userShows: shows, userShowsSS, firebase })
 
               const mergedShows = merge(userShowsSS, userShowsCopy, {

@@ -36,10 +36,12 @@ const addShowToMainDatabase = ({ firebase, show, dataFromAPI }: Arguments): Prom
             poster_path: show.poster_path,
             vote_average: show.vote_average,
             vote_count: show.vote_count,
-            status: dataFromAPI.status
+            status: dataFromAPI.status,
+            lastUpdatedInDatabase: firebase.timeStamp()
           },
           episodes: dataFromAPI.episodes,
           id: show.id.toString(),
+          status: dataFromAPI.status,
           usersWatching: 1
         }
       } else {

@@ -17,13 +17,13 @@ const updateUserEpisodesFromDatabase = async ({ firebase }: Arguments) => {
     .then((snapshot: any) => snapshot.val())
 
   if (!showsLastUpdateList) return
-  console.time("test")
+
   await Promise.all(
     Object.keys(showsLastUpdateList).map((key: any) => {
       return updateAllEpisodesWatched({ firebase, authUser, key })
     })
   )
-  console.timeEnd("test")
+
   const showsToUpdate: string[] = await Promise.all(
     Object.entries(showsLastUpdateList).map(async ([key, value]: any) => {
       const lastUpdatedInDatabase = await firebase
@@ -31,7 +31,7 @@ const updateUserEpisodesFromDatabase = async ({ firebase }: Arguments) => {
         .child("lastUpdatedInDatabase")
         .once("value")
         .then((snapshot: any) => snapshot.val())
-      if (lastUpdatedInDatabase > value.lastUpdatedInUser) {
+      if (lastUpdatedInDatabase > value.lastUpdatedInUser || lastUpdatedInDatabase === null) {
         return key
       }
     })
@@ -39,7 +39,7 @@ const updateUserEpisodesFromDatabase = async ({ firebase }: Arguments) => {
 
   if (showsToUpdate.length === 0) return
 
-  Promise.all([
+  const data = await Promise.all([
     Promise.all(
       showsToUpdate.map((show) =>
         firebase
@@ -60,69 +60,73 @@ const updateUserEpisodesFromDatabase = async ({ firebase }: Arguments) => {
           })
       )
     )
-  ]).then((data) => {
-    const userShows = data[0]
-    const showsFromDatabase = data[1]
+  ])
 
-    const mergeCustomizer = (objValue: any, srcValue: any, key: any) => {
-      if (key === "air_date") {
-        return objValue === undefined ? "" : objValue
-      } else if (key === "season_number") {
-        return objValue
-      }
-      return undefined
+  console.log({ data })
+  const [userShows, showsFromDatabase] = data
+
+  const mergeCustomizer = (objValue: any, srcValue: any, key: any) => {
+    if (key === "air_date") {
+      return objValue === undefined ? "" : objValue
+    } else if (key === "season_number") {
+      return objValue
     }
-    const mergedShowsEpisodes: UserShowsInterface[] = mergeWith(showsFromDatabase, userShows, mergeCustomizer)
+    return undefined
+  }
+  const mergedShowsEpisodes: UserShowsInterface[] = mergeWith(showsFromDatabase, userShows, mergeCustomizer)
 
-    let userShowsPromises: any = []
+  let userShowsPromises: any = []
 
-    mergedShowsEpisodes.forEach((show) => {
-      const seasons = show.episodes.reduce((acc: any, season) => {
-        const episodes = season.episodes.reduce((acc: SingleEpisodeInterface[], episode) => {
-          acc.push({
-            userRating: episode.userRating || 0,
-            watched: episode.air_date ? episode.watched || false : false,
-            air_date: episode.air_date || ""
-          })
-          return acc
-        }, [])
+  mergedShowsEpisodes.forEach((show) => {
+    const seasons = show.episodes.reduce((acc: any, season) => {
+      const episodes = season.episodes.reduce((acc: SingleEpisodeInterface[], episode) => {
         acc.push({
-          episodes,
-          season_number: season.season_number,
-          userRating: season.userRating || 0
+          userRating: episode.userRating || 0,
+          watched: episode.air_date ? episode.watched || false : false,
+          air_date: episode.air_date || ""
         })
         return acc
       }, [])
-
-      const statusDatabase =
-        show.status === "Ended" || show.status === "ended" || show.status === "Canceled" ? "ended" : "ongoing"
-
-      const releasedEpisodes: SingleEpisodeInterface[] = releasedEpisodesToOneArray({ data: show.episodes })
-      const allEpisodes = seasons.reduce((acc: SingleEpisodeInterface[], item: any) => {
-        acc.push(...item.episodes.filter((item: any) => item.air_date !== ""))
-        return acc
-      }, [])
-      allEpisodes.splice(releasedEpisodes.length)
-
-      const allEpisodesWatched = !allEpisodes.some((episode: any) => !episode.watched)
-      const finished = statusDatabase === "ended" && allEpisodesWatched ? true : false
-
-      userShowsPromises = [
-        ...userShowsPromises,
-        firebase.userShow({ uid: authUser.uid, key: show.id }).update({ finished, allEpisodesWatched })
-      ]
-
-      firebase.userShowAllEpisodes(authUser.uid, show.id).set(seasons)
-      firebase.userShowAllEpisodesInfo(authUser.uid, show.id).update({
-        allEpisodesWatched,
-        finished,
-        isAllWatched_database: `${allEpisodesWatched}_${show.info.database}`
+      acc.push({
+        episodes,
+        season_number: season.season_number,
+        userRating: season.userRating || 0
       })
-      firebase.userShowsLastUpdateList(authUser.uid).child(show.id).update({ lastUpdatedInUser: firebase.timeStamp() })
-    })
+      return acc
+    }, [])
 
-    return Promise.all(userShowsPromises)
+    const statusDatabase =
+      show.status === "Ended" || show.status === "ended" || show.status === "Canceled" ? "ended" : "ongoing"
+
+    const releasedEpisodes: SingleEpisodeInterface[] = releasedEpisodesToOneArray({ data: show.episodes })
+    const allEpisodes = seasons.reduce((acc: SingleEpisodeInterface[], item: any) => {
+      acc.push(...item.episodes.filter((item: any) => item.air_date !== ""))
+      return acc
+    }, [])
+    allEpisodes.splice(releasedEpisodes.length)
+
+    const allEpisodesWatched = !allEpisodes.some((episode: any) => !episode.watched)
+    const finished = statusDatabase === "ended" && allEpisodesWatched ? true : false
+
+    userShowsPromises = [
+      ...userShowsPromises,
+      firebase
+        .userShow({ uid: authUser.uid, key: show.id })
+        .update({ finished, allEpisodesWatched }, () => console.log("updated userShow"))
+    ]
+
+    firebase.userShowAllEpisodes(authUser.uid, show.id).set(seasons)
+    firebase.userShowAllEpisodesInfo(authUser.uid, show.id).update({
+      allEpisodesWatched,
+      finished,
+      isAllWatched_database: `${allEpisodesWatched}_${show.info.database}`
+    })
+    firebase.userShowsLastUpdateList(authUser.uid).child(show.id).update({ lastUpdatedInUser: firebase.timeStamp() })
   })
+
+  console.log({ userShowsPromises })
+
+  return Promise.all(userShowsPromises)
 }
 
 export default updateUserEpisodesFromDatabase

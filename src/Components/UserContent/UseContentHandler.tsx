@@ -133,7 +133,7 @@ const useContentHandler = () => {
           status: showsSubDatabase,
           firstAirDate: show.first_air_date,
           name: show.name,
-          timeStamp: firebase.timeStamp(),
+          timeStamp: new Date().getTime(),
           finished: false,
           id
         }),
@@ -206,7 +206,6 @@ const useContentHandler = () => {
         })
     } else {
       if (loadingAddShowToDatabase.loading) return
-      console.log("tt")
       setLoadingAddShowToDatabase({ ...loadingAddShowToDatabase, loading: true, [database]: true })
 
       const showData: any = Array.isArray(data) ? data.find((item) => item.id === id) : data

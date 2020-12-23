@@ -186,6 +186,7 @@ const Search: React.FC<Props> = ({ navSearch, navRef, closeNavMobile }) => {
                 listIsOpen={listIsOpen}
                 query={query}
                 handleClickOutside={handleClickOutside}
+                isSearchingList={isSearchingList}
               />
             )}
 

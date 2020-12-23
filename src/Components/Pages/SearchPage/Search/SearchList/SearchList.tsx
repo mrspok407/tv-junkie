@@ -13,6 +13,7 @@ type Props = {
   mediaTypeSearching: string
   listIsOpen: boolean
   query: string
+  isSearchingList: boolean
 }
 
 const SearchList: React.FC<Props> = ({
@@ -22,7 +23,8 @@ const SearchList: React.FC<Props> = ({
   currentListItem,
   mediaTypeSearching,
   listIsOpen,
-  query
+  query,
+  isSearchingList
 }) => {
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside as EventListener)
@@ -35,7 +37,7 @@ const SearchList: React.FC<Props> = ({
 
   return (
     <div className="search-list">
-      {searchResults.length === 0 && query !== "" && listIsOpen ? (
+      {searchResults.length === 0 && query !== "" && listIsOpen && !isSearchingList ? (
         <PlaceholderNoResults message="No results found" />
       ) : (
         searchResults.map((item, index) => {
