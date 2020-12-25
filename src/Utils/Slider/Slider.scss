@@ -96,6 +96,7 @@ $mobileLayout: 850px;
   opacity: 0.75;
   transition: 0.2s;
   cursor: pointer;
+  user-select: none;
 
   @include mediaMaxW($mobileLayout) {
     display: none !important;
