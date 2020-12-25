@@ -39,7 +39,7 @@ const updateUserEpisodesFromDatabase = async ({ firebase }: Arguments) => {
 
   if (showsToUpdate.length === 0) return
 
-  const data = await Promise.all([
+  const [userShows, showsFromDatabase] = await Promise.all([
     Promise.all(
       showsToUpdate.map((show) =>
         firebase
@@ -62,8 +62,10 @@ const updateUserEpisodesFromDatabase = async ({ firebase }: Arguments) => {
     )
   ])
 
-  console.log({ data })
-  const [userShows, showsFromDatabase] = data
+  console.log({ userShows })
+  console.log({ showsFromDatabase })
+  // console.log({ data })
+  // const [userShows, showsFromDatabase] = data
 
   const mergeCustomizer = (objValue: any, srcValue: any, key: any) => {
     if (key === "air_date") {

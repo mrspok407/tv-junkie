@@ -107,7 +107,7 @@ class Profile extends Component {
       )
       .then(async ({ data }) => {
         // const tempData = [{ id: 1396 }]
-        // const allShowsIds = await this.context.firebase // change show.id below to just show
+        // const allShowsIds = await this.context.firebase
         //   .allShowsList()
         //   .once("value")
         //   .then((snapshot) =>

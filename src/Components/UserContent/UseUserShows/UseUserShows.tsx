@@ -83,8 +83,6 @@ const useUserShows = () => {
 
   const firebase = useContext(FirebaseContext)
 
-  console.log("test")
-
   useEffect(() => {
     let authSubscriber: any
     const authUserListener = () => {
@@ -94,6 +92,8 @@ const useUserShows = () => {
           setLoadingShows(true)
 
           await updateUserEpisodesFromDatabase({ firebase })
+
+          console.log("useUserShows")
 
           firebase.userAllShows(authUser.uid).on("value", async (snapshot: { val: () => UserShowsInterface[] }) => {
             if (snapshot.val() === null) {
