@@ -114,7 +114,7 @@ const updateUserEpisodesFromDatabase = async ({ firebase }: Arguments) => {
       ...userShowsPromises,
       firebase
         .userShow({ uid: authUser.uid, key: show.id })
-        .update({ finished, allEpisodesWatched }, () => console.log("updated userShow"))
+        .update({ finished, allEpisodesWatched, status: statusDatabase }, () => console.log("updated userShow"))
     ]
 
     firebase.userShowAllEpisodes(authUser.uid, show.id).set(seasons)

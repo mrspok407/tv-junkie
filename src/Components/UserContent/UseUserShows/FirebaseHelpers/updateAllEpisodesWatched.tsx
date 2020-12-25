@@ -34,6 +34,10 @@ const updateAllEpisodesWatched = async ({ firebase, authUser, key }: UpdateAllEp
     .once("value")
     .then((snapshot: any) => snapshot.val())
 
+  if (lastTwoSeasonsData === null) return
+
+  console.log({ lastTwoSeasonsData })
+
   const userEpisodes = Object.values(lastTwoSeasonsData).map((item: any) => item)
   const releasedEpisodes: SingleEpisodeInterface[] = releasedEpisodesToOneArray({
     data: userEpisodes

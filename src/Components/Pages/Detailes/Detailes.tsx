@@ -175,7 +175,7 @@ export const DetailesPage: React.FC<Props> = ({
           return
         }
 
-        setError("Something went wrong, sorry")
+        setError("Something went wrong, sorry. Try to reload the page.")
         setLoadingAPIrequest(false)
       })
   }

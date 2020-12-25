@@ -86,16 +86,6 @@ const Search: React.FC<Props> = ({ navSearch, navRef, closeNavMobile }) => {
       })
   }
 
-  const renderSearch = (list: any) => {
-    return error || !Array.isArray(searchResults) ? (
-      <div className="error">
-        <p>{error || "Something gone terrible wrong"}</p>
-      </div>
-    ) : (
-      list
-    )
-  }
-
   const handleClickOutside = (e: CustomEvent) => {
     if (!searchContRef?.current?.contains(e.target as Node)) {
       setListIsOpen(false)
@@ -176,25 +166,20 @@ const Search: React.FC<Props> = ({ navSearch, navRef, closeNavMobile }) => {
             navigateSearchListByArrows={navigateSearchListByArrows}
           />
 
-          {listIsOpen &&
-            renderSearch(
-              <SearchList
-                searchResults={searchResults}
-                closeList={closeList}
-                currentListItem={currentListItem}
-                mediaTypeSearching={mediaTypeSearching}
-                listIsOpen={listIsOpen}
-                query={query}
-                handleClickOutside={handleClickOutside}
-                isSearchingList={isSearchingList}
-              />
-            )}
+          {listIsOpen && (
+            <SearchList
+              searchResults={searchResults}
+              closeList={closeList}
+              currentListItem={currentListItem}
+              mediaTypeSearching={mediaTypeSearching}
+              listIsOpen={listIsOpen}
+              query={query}
+              handleClickOutside={handleClickOutside}
+              isSearchingList={isSearchingList}
+              error={error}
+            />
+          )}
 
-          {/* {totalPages === 0 && query !== "" && listIsOpen ? (
-            <PlaceholderNoResults message="No results found" handleClickOutside={handleClickOutside} />
-          ) : (
-
-          )} */}
           {navSearch && (
             <div className="search__link-to-adv-container">
               <Link className="search__link-to-adv" to={ROUTES.SEARCH_PAGE}></Link>
