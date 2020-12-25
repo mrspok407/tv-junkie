@@ -97,7 +97,7 @@ const ShowsEpisodes: React.FC<Props> = ({
           })
           .catch((err) => {
             if (axios.isCancel(err)) return
-            setLoadingEpisodesIds([])
+            setLoadingEpisodesIds(loadingEpisodesIds.filter((item) => item !== firstSeason.id))
             setErrorShowEpisodes("Something went wrong, sorry")
           })
       }
@@ -139,7 +139,7 @@ const ShowsEpisodes: React.FC<Props> = ({
       })
       .catch((err) => {
         if (axios.isCancel(err)) return
-        setLoadingEpisodesIds([])
+        setLoadingEpisodesIds((prevState) => [...prevState.filter((item) => item !== seasonId)])
         setErrorShowEpisodes("Something went wrong, sorry")
       })
   }
