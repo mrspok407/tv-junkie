@@ -57,7 +57,6 @@ export const DetailesPage: React.FC<Props> = ({
   const [similarContent, setSimilarContent] = useState<ContentDetailes[]>([])
 
   const [showInfo, setShowInfo] = useState<ShowInfoInterface>(SHOW_INFO_INITIAL_STATE)
-  // const [showInUserDatabase, setShowInUserDatabase] = useState(false);
   const [movieInDatabase, setMovieInDatabase] = useState<ContentDetailes | null>(null)
 
   const [showDatabaseOnClient, setShowDatabaseOnClient] = useState<string>("")

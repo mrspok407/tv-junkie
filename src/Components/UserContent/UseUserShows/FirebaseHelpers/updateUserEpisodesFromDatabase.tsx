@@ -62,11 +62,6 @@ const updateUserEpisodesFromDatabase = async ({ firebase }: Arguments) => {
     )
   ])
 
-  console.log({ userShows })
-  console.log({ showsFromDatabase })
-  // console.log({ data })
-  // const [userShows, showsFromDatabase] = data
-
   const mergeCustomizer = (objValue: any, srcValue: any, key: any) => {
     if (key === "air_date") {
       return objValue === undefined ? "" : objValue
@@ -114,7 +109,7 @@ const updateUserEpisodesFromDatabase = async ({ firebase }: Arguments) => {
       ...userShowsPromises,
       firebase
         .userShow({ uid: authUser.uid, key: show.id })
-        .update({ finished, allEpisodesWatched, status: statusDatabase }, () => console.log("updated userShow"))
+        .update({ finished, allEpisodesWatched, status: statusDatabase })
     ]
 
     firebase.userShowAllEpisodes(authUser.uid, show.id).set(seasons)
@@ -125,8 +120,6 @@ const updateUserEpisodesFromDatabase = async ({ firebase }: Arguments) => {
     })
     firebase.userShowsLastUpdateList(authUser.uid).child(show.id).update({ lastUpdatedInUser: firebase.timeStamp() })
   })
-
-  console.log({ userShowsPromises })
 
   return Promise.all(userShowsPromises)
 }

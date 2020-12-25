@@ -3,7 +3,6 @@
 .inputs__other {
   display: grid;
   grid-template-columns: 0.8fr 1fr 1.8fr 1fr;
-  // grid-template-columns: repeat(4, 1fr);
   margin-top: 8px;
   @include mediaMaxW(#{$mobileViewPort}) {
     grid-template-columns: 1fr 1fr;

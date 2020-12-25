@@ -76,31 +76,6 @@ class Profile extends Component {
     //   threeDaysBefore.getMonth() + 1
     // }-${threeDaysBefore.getFullYear()}`
 
-    // this.context.firebase
-    //   .allShowsList()
-    //   .child("1111111111111")
-    //   .child("keyForDatabaseWrite")
-    //   .once("value", (snapshot) => console.log(snapshot.val()))
-    // console.time("test")
-    // let promises = []
-
-    // for (let i = 0; i <= 50; i++) {
-    //   promises.push(
-    //     this.context.firebase
-    //       .userShowAllEpisodes(this.state.authUser.uid, "46260")
-    //       .child("0")
-    //       .child("episodes")
-    //       .child(i)
-    //       .child("watched")
-    //       .once("value")
-    //       .then((snapshot) => snapshot.val())
-    //   )
-    // }
-
-    // Promise.all(promises).then((res) => {
-    //   console.log({ res })
-    // })
-
     axios
       .get(
         `https://api.themoviedb.org/3/tv/changes?api_key=${process.env.REACT_APP_TMDB_API}&end_date=${todayConverted}&start_date=${threeDaysBefore}`

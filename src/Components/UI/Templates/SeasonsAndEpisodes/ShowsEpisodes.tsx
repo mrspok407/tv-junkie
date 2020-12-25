@@ -78,6 +78,8 @@ const ShowsEpisodes: React.FC<Props> = ({
       if (parentComponent === "toWatchPage") {
         setEpisodesDataFromAPI([{ seasonId: firstSeason.id, episodes: firstSeason.episodes }])
       } else {
+        if (loadingEpisodesIds.includes(firstSeason.id)) return
+        setLoadingEpisodesIds([...loadingEpisodesIds, firstSeason.id])
         axios
           .get(
             `https://api.themoviedb.org/3/tv/${id}?api_key=${process.env.REACT_APP_TMDB_API}&append_to_response=season/${firstSeason.season_number}`,
@@ -117,6 +119,7 @@ const ShowsEpisodes: React.FC<Props> = ({
 
     if (parentComponent === "toWatchPage") return
     if (episodesDataFromAPI.some((item) => item.seasonId === seasonId)) return
+    if (loadingEpisodesIds.includes(seasonId)) return
 
     setLoadingEpisodesIds([...loadingEpisodesIds, seasonId])
 
@@ -258,9 +261,6 @@ const ShowsEpisodes: React.FC<Props> = ({
   const checkEveryShowEpisode = () => {
     if (!authUser) return
 
-    console.log({ releasedEpisodes })
-    console.log({ episodesFromDatabase })
-
     let isAllEpisodesChecked = true
     let userEpisodesFormated: SingleEpisodeInterface[] = []
 
@@ -269,8 +269,6 @@ const ShowsEpisodes: React.FC<Props> = ({
 
       userEpisodesFormated = [...userEpisodesFormated, ...episodes]
     })
-
-    console.log({ userEpisodesFormated })
 
     releasedEpisodes.forEach((episode, episodeIndex) => {
       const indexOfEpisode = releasedEpisodes.length - 1 - episodeIndex
