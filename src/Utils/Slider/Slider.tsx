@@ -79,7 +79,6 @@ export default function Slider({ sliderData }: { sliderData: ContentDetailes[] }
         if (!resizeObserver) return
 
         resizeObserver.disconnect()
-        // resizeObserver = null
         removeDragListeners()
       }
     } else {

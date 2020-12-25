@@ -116,11 +116,9 @@ export default class WithActorsInput extends Component {
               {known_for.map((item, i) => {
                 const mediaType = item.media_type === "movie" ? "movie" : "show"
 
-                const title =
-                  item.media_type === "movie" ? item.original_title || "No title" : item.name || "No title"
+                const title = item.media_type === "movie" ? item.original_title || "No title" : item.name || "No title"
 
-                const releaseDate =
-                  item.media_type === "movie" ? item.release_date || "" : item.first_air_date || ""
+                const releaseDate = item.media_type === "movie" ? item.release_date || "" : item.first_air_date || ""
 
                 return (
                   <span key={item.id}>
@@ -128,9 +126,7 @@ export default class WithActorsInput extends Component {
                       {title}
                     </Link>
 
-                    {known_for.length - 1 !== i
-                      ? ` (${releaseDate.slice(0, 4)}), `
-                      : ` (${releaseDate.slice(0, 4)})`}
+                    {known_for.length - 1 !== i ? ` (${releaseDate.slice(0, 4)}), ` : ` (${releaseDate.slice(0, 4)})`}
                   </span>
                 )
               })}
@@ -149,7 +145,10 @@ export default class WithActorsInput extends Component {
             ) : (
               <button
                 className="button button--searchlist"
-                onClick={() => toggleActor(id, name)}
+                onClick={() => {
+                  toggleActor(id, name)
+                  this.setState({ listIsOpen: false })
+                }}
                 type="button"
               >
                 Add
@@ -191,16 +190,12 @@ export default class WithActorsInput extends Component {
             onFocus={this.onFocus}
           />
           {this.state.isSearchingActors && <Loader className="loader--small-pink" />}
-          {this.state.query && (
-            <button type="button" className="button--input-clear" onClick={this.resetSearch} />
-          )}
+          {this.state.query && <button type="button" className="button--input-clear" onClick={this.resetSearch} />}
         </div>
         {this.state.totalPages === 0 && this.state.query !== "" && this.state.listIsOpen ? (
           <PlaceholderNoResults message="No results found" handleClickOutside={this.handleClickOutside} />
         ) : (
-          this.state.listIsOpen && (
-            <div className="search-list search-list--with-actors">{this.renderActors()}</div>
-          )
+          this.state.listIsOpen && <div className="search-list search-list--with-actors">{this.renderActors()}</div>
         )}
         <div className="actors-added">
           {this.props.withActors.map((item) => (

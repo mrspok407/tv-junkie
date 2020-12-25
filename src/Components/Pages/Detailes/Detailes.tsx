@@ -57,7 +57,6 @@ export const DetailesPage: React.FC<Props> = ({
   const [similarContent, setSimilarContent] = useState<ContentDetailes[]>([])
 
   const [showInfo, setShowInfo] = useState<ShowInfoInterface>(SHOW_INFO_INITIAL_STATE)
-  // const [showInUserDatabase, setShowInUserDatabase] = useState(false);
   const [movieInDatabase, setMovieInDatabase] = useState<ContentDetailes | null>(null)
 
   const [showDatabaseOnClient, setShowDatabaseOnClient] = useState<string>("")
@@ -175,7 +174,7 @@ export const DetailesPage: React.FC<Props> = ({
           return
         }
 
-        setError("Something went wrong, sorry")
+        setError("Something went wrong, sorry. Try to reload the page.")
         setLoadingAPIrequest(false)
       })
   }
@@ -186,11 +185,11 @@ export const DetailesPage: React.FC<Props> = ({
     if (!authUser || !show) return
 
     setShowInfo({ ...show, showInUserDatabase: true })
-    // setShowInUserDatabase(true)
     setShowDatabaseOnClient(show.database)
   }
 
   const changeShowDatabaseOnClient = (database: string) => {
+    if (context.userContentHandler.loadingAddShowToDatabase.loading) return
     setShowDatabaseOnClient(database)
   }
 

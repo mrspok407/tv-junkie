@@ -45,7 +45,7 @@ const useHandleListeners = ({ id }: { id?: number }) => {
 
           const userEpisodes = snapshot.val()
           const allEpisodes = userEpisodes.reduce((acc: SingleEpisodeInterface[], item) => {
-            acc.push(...item.episodes)
+            acc.push(...item.episodes.filter((item) => item.air_date !== ""))
             return acc
           }, [])
 
@@ -66,7 +66,6 @@ const useHandleListeners = ({ id }: { id?: number }) => {
             })
 
           firebase.userShow({ uid: authUser.uid, key: id }).update({ finished, allEpisodesWatched })
-
           setEpisodesFromDatabase(userEpisodes)
           setReleasedEpisodes(releasedEpisodes)
           if (handleLoading) handleLoading(false)

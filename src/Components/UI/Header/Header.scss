@@ -80,7 +80,6 @@ $navBackground: #352424;
     z-index: -10;
 
     @include mediaMaxW(#{$mobileViewPort}) {
-      // display: none;
       background: #000;
     }
   }
@@ -359,7 +358,7 @@ $navBackground: #352424;
       }
 
       .placeholder--no-results {
-        top: calc(100% + 18px);
+        top: 0;
         opacity: 0;
         animation: showSearchList 0s 0.25s forwards;
       }

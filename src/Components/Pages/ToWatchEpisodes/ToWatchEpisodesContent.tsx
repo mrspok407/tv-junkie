@@ -61,9 +61,9 @@ const ToWatchEpisodesContent: React.FC = () => {
         <>
           {watchingShows.map((show) => {
             const toWatchEpisodes = show.episodes.reduce((acc: SeasonEpisodesFromDatabaseInterface[], season) => {
-              const seasonEpisodes = season.episodes.reduce((acc: SingleEpisodeInterface[], episode) => {
+              const seasonEpisodes = season.episodes.reduce((acc: SingleEpisodeInterface[], episode, index) => {
                 if (episode.air_date && new Date(episode.air_date).getTime() < todayDate.getTime()) {
-                  acc.push(episode)
+                  acc.push({ ...episode, index })
                 }
                 return acc
               }, [])
@@ -79,8 +79,9 @@ const ToWatchEpisodesContent: React.FC = () => {
             toWatchEpisodes.reverse()
 
             const releasedEpisodes: SingleEpisodeInterface[] = releasedEpisodesToOneArray({
-              data: toWatchEpisodes
+              data: show.episodes
             })
+
             return (
               <div key={show.id} className="towatch__show">
                 <Link className="towatch__show-name" to={`/show/${show.id}`}>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
-import axios from "axios"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
+import axios from "axios"
 
 const API_LINK_BASE = `https://api.themoviedb.org/3/discover/tv?api_key=${process.env.REACT_APP_TMDB_API}&\
 language=en-US&page=1&sort_by=vote_count.desc&first_air_date.gte=&first_air_date.lte=&first_air_date_year=&vote_average.gte=&\
@@ -44,9 +44,7 @@ const useGetSlidersContent = () => {
       )
       const popularDramasPromise = axios.get(`${API_LINK_BASE}&with_genres=18&without_genres=16,35,9648`)
       const popularComediesPromise = axios.get(`${API_LINK_BASE}&with_genres=35&without_genres=16,18`)
-      const popularCrimePromise = axios.get(
-        `${API_LINK_BASE}&with_genres=80&without_genres=16,35,9648,10759,10765`
-      )
+      const popularCrimePromise = axios.get(`${API_LINK_BASE}&with_genres=80&without_genres=16,35,9648,10759,10765`)
       const promises = [weekTvTrending, popularDramasPromise, popularComediesPromise, popularCrimePromise]
 
       axios

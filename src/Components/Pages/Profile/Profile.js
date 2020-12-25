@@ -81,8 +81,8 @@ class Profile extends Component {
         `https://api.themoviedb.org/3/tv/changes?api_key=${process.env.REACT_APP_TMDB_API}&end_date=${todayConverted}&start_date=${threeDaysBefore}`
       )
       .then(async ({ data }) => {
-        // const tempData = [{ id: 1399 }]
-        // const allShowsIds = await this.context.firebase // change show.id below to just show
+        // const tempData = [{ id: 1396 }]
+        // const allShowsIds = await this.context.firebase
         //   .allShowsList()
         //   .once("value")
         //   .then((snapshot) =>
@@ -90,7 +90,6 @@ class Profile extends Component {
         //       return { id }
         //     })
         //   )
-        // this.context.firebase.showInDatabase("1399").child("episodes").set(null)
 
         data.results.forEach((show) => {
           this.context.firebase
@@ -104,55 +103,43 @@ class Profile extends Component {
                   )
                   .then(({ data: { number_of_seasons } }) => {
                     console.log(show.id)
-
                     const maxSeasonsInChunk = 20
                     const allSeasons = []
                     const seasonChunks = []
                     const apiRequests = []
-
                     for (let i = 1; i <= number_of_seasons; i += 1) {
                       allSeasons.push(`season/${i}`)
                     }
-
                     for (let i = 0; i <= allSeasons.length; i += maxSeasonsInChunk) {
                       const chunk = allSeasons.slice(i, i + maxSeasonsInChunk)
                       seasonChunks.push(chunk.join())
                     }
-
                     seasonChunks.forEach((item) => {
                       const request = axios.get(
                         `https://api.themoviedb.org/3/tv/${show.id}?api_key=${process.env.REACT_APP_TMDB_API}&append_to_response=${item}`
                       )
                       apiRequests.push(request)
                     })
-
                     return axios.all([...apiRequests])
                   })
                   .then(
                     axios.spread((...responses) => {
                       const rowData = []
                       const seasonsData = []
-
                       responses.forEach((item) => {
                         rowData.push(item.data)
                       })
-
                       const mergedRowData = Object.assign({}, ...rowData)
-
                       Object.entries(mergedRowData).forEach(([key, value]) => {
                         if (!key.indexOf("season/")) {
                           seasonsData.push({ [key]: { ...value } })
                         }
                       })
-
                       const allEpisodes = []
-
                       seasonsData.forEach((data, index) => {
                         const season = data[`season/${index + 1}`]
                         if (!Array.isArray(season.episodes) || season.episodes.length === 0) return
-
                         const episodes = []
-
                         season.episodes.forEach((item) => {
                           const updatedEpisode = {
                             air_date: item.air_date || "",
@@ -163,7 +150,6 @@ class Profile extends Component {
                           }
                           episodes.push(updatedEpisode)
                         })
-
                         const updatedSeason = {
                           air_date: season.air_date || "",
                           season_number: season.season_number || null,
@@ -172,16 +158,13 @@ class Profile extends Component {
                           name: season.name || null,
                           episodes
                         }
-
                         allEpisodes.push(updatedSeason)
                       })
-
                       const dataToPass = {
                         episodes: allEpisodes,
                         status: mergedRowData.status,
                         name: mergedRowData.name
                       }
-
                       return dataToPass
                     })
                   )
@@ -195,12 +178,10 @@ class Profile extends Component {
                       .catch((err) => {
                         console.log(err)
                       })
-
                     this.context.firebase.showInfo(show.id).update({
                       status: data.status,
                       name: data.name
                     })
-
                     this.context.firebase
                       .showInfo(show.id)
                       .child("lastUpdatedInDatabase")

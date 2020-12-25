@@ -6,7 +6,6 @@ import * as _isFunction from "lodash.isfunction"
 import * as ROUTES from "Utils/Constants/routes"
 import SearchList from "./SearchList/SearchList"
 import Input from "./Input/Input"
-import PlaceholderNoResults from "Components/UI/Placeholders/PlaceholderNoResults"
 import "./Search.scss"
 
 const { CancelToken } = require("axios")
@@ -29,7 +28,6 @@ const Search: React.FC<Props> = ({ navSearch, navRef, closeNavMobile }) => {
   const [searchResults, setSearchResults] = useState<ContentDetailes[]>([])
   const [isSearchingList, setIsSearchingList] = useState(false)
   const [listIsOpen, setListIsOpen] = useState(false)
-  const [totalPages, setTotalPages] = useState(null)
   const [currentListItem, setCurrentListItem] = useState(0)
   const [mediaTypeSearching, setMediaTypeSearching] = useState("")
   const [error, setError] = useState("")
@@ -78,7 +76,6 @@ const Search: React.FC<Props> = ({ navSearch, navRef, closeNavMobile }) => {
 
         setSearchResults(contentSortByPopularity)
         setIsSearchingList(false)
-        setTotalPages(totalPages)
         setMediaTypeSearching(mediatype.type.toLowerCase())
       })
       .catch((err) => {
@@ -89,18 +86,8 @@ const Search: React.FC<Props> = ({ navSearch, navRef, closeNavMobile }) => {
       })
   }
 
-  const renderSearch = (list: any) => {
-    return error || !Array.isArray(searchResults) ? (
-      <div className="error">
-        <p>{error || "Something gone terrible wrong"}</p>
-      </div>
-    ) : (
-      list
-    )
-  }
-
   const handleClickOutside = (e: CustomEvent) => {
-    if (!searchContRef?.current?.contains(e.target as Node) || (navRef && !navRef.current?.contains(e.target))) {
+    if (!searchContRef?.current?.contains(e.target as Node)) {
       setListIsOpen(false)
       onBlur()
     }
@@ -140,7 +127,7 @@ const Search: React.FC<Props> = ({ navSearch, navRef, closeNavMobile }) => {
   }
 
   const linkOnKeyPress = () => {
-    if (!listIsOpen || isSearchingList) return
+    if (!listIsOpen || isSearchingList || searchResults.length === 0) return
 
     const content = searchResults[currentListItem]
     const mediaType = content.original_title ? "movie" : content.original_name ? "show" : null
@@ -178,20 +165,21 @@ const Search: React.FC<Props> = ({ navSearch, navRef, closeNavMobile }) => {
             linkOnKeyPress={linkOnKeyPress}
             navigateSearchListByArrows={navigateSearchListByArrows}
           />
-          {totalPages === 0 && query !== "" && listIsOpen ? (
-            <PlaceholderNoResults message="No results found" handleClickOutside={handleClickOutside} />
-          ) : (
-            listIsOpen &&
-            renderSearch(
-              <SearchList
-                searchResults={searchResults}
-                closeList={closeList}
-                currentListItem={currentListItem}
-                mediaTypeSearching={mediaTypeSearching}
-                handleClickOutside={handleClickOutside}
-              />
-            )
+
+          {listIsOpen && (
+            <SearchList
+              searchResults={searchResults}
+              closeList={closeList}
+              currentListItem={currentListItem}
+              mediaTypeSearching={mediaTypeSearching}
+              listIsOpen={listIsOpen}
+              query={query}
+              handleClickOutside={handleClickOutside}
+              isSearchingList={isSearchingList}
+              error={error}
+            />
           )}
+
           {navSearch && (
             <div className="search__link-to-adv-container">
               <Link className="search__link-to-adv" to={ROUTES.SEARCH_PAGE}></Link>

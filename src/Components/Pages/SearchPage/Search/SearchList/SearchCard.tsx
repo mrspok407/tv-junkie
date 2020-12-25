@@ -115,7 +115,11 @@ const SearchCard: React.FC<Props> = ({
 
                 return (
                   <span key={item.id}>
-                    <Link className="search-card__info-link" to={`/${mediaType}/${item.id}`}>
+                    <Link
+                      className="search-card__info-link"
+                      to={`/${mediaType}/${item.id}`}
+                      onClick={() => closeList()}
+                    >
                       {title}
                     </Link>
 

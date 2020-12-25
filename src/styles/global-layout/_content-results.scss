@@ -67,6 +67,7 @@ $font-sizes: (
     &-button--active {
       .button--sortby-shows {
         &:after {
+          display: initial;
           opacity: 1;
         }
       }

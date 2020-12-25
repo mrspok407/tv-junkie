@@ -78,6 +78,8 @@ const ShowsEpisodes: React.FC<Props> = ({
       if (parentComponent === "toWatchPage") {
         setEpisodesDataFromAPI([{ seasonId: firstSeason.id, episodes: firstSeason.episodes }])
       } else {
+        if (loadingEpisodesIds.includes(firstSeason.id)) return
+        setLoadingEpisodesIds([...loadingEpisodesIds, firstSeason.id])
         axios
           .get(
             `https://api.themoviedb.org/3/tv/${id}?api_key=${process.env.REACT_APP_TMDB_API}&append_to_response=season/${firstSeason.season_number}`,
@@ -117,6 +119,7 @@ const ShowsEpisodes: React.FC<Props> = ({
 
     if (parentComponent === "toWatchPage") return
     if (episodesDataFromAPI.some((item) => item.seasonId === seasonId)) return
+    if (loadingEpisodesIds.includes(seasonId)) return
 
     setLoadingEpisodesIds([...loadingEpisodesIds, seasonId])
 
@@ -222,31 +225,19 @@ const ShowsEpisodes: React.FC<Props> = ({
       })
       return acc
     }, [])
-    const seasonEpisodesAirDate = safeGetSeasonEpisodes.reduce((acc: SingleEpisodeInterface[], episode) => {
-      acc.push({
-        userRating: episode.userRating,
-        watched: episode.watched,
-        air_date: episode.air_date || ""
-      })
-      return acc
-    }, [])
 
     const seasonEpisodesFromDatabase = releasedEpisodes.filter((item) => item.season_number === seasonNum)
-    const seasonLength = seasonEpisodesFromDatabase.length
 
     let isAllEpisodesChecked = true
 
-    seasonEpisodesFromDatabase.forEach((episode, episodeIndex) => {
-      const indexOfEpisode = seasonLength - 1 - episodeIndex
-      if (!seasonEpisodes[indexOfEpisode].watched) {
+    seasonEpisodesFromDatabase.forEach((episode: any) => {
+      if (!seasonEpisodes[episode.index].watched) {
         isAllEpisodesChecked = false
       }
     })
 
-    seasonEpisodesFromDatabase.forEach((episode, episodeIndex) => {
-      const indexOfEpisode = seasonLength - 1 - episodeIndex
-      seasonEpisodes[indexOfEpisode].watched = !isAllEpisodesChecked
-      seasonEpisodesAirDate[indexOfEpisode].watched = !isAllEpisodesChecked
+    seasonEpisodesFromDatabase.forEach((episode: any) => {
+      seasonEpisodes[episode.index].watched = !isAllEpisodesChecked
     })
 
     firebase
@@ -259,7 +250,7 @@ const ShowsEpisodes: React.FC<Props> = ({
         if (parentComponent === "toWatchPage") {
           isAllEpisodesWatched({
             showInfo,
-            releasedEpisodes,
+            releasedEpisodes: releasedEpisodes.filter((item) => !item.watched),
             authUser,
             firebase
           })
@@ -274,7 +265,7 @@ const ShowsEpisodes: React.FC<Props> = ({
     let userEpisodesFormated: SingleEpisodeInterface[] = []
 
     episodesFromDatabase.forEach((season) => {
-      const episodes = season.episodes
+      const episodes = season.episodes.filter((item) => item.air_date !== "")
 
       userEpisodesFormated = [...userEpisodesFormated, ...episodes]
     })

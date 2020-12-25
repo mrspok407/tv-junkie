@@ -9,12 +9,14 @@ import {
 import addShowToMainDatabase from "./FirebaseHelpers/addShowToMainDatabase"
 import getShowEpisodesFromAPI from "./TmdbAPIHelpers/getShowEpisodesFromAPI"
 import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
+import updateAllEpisodesWatched from "./UseUserShows/FirebaseHelpers/updateAllEpisodesWatched"
 
 export const LOADING_ADDING_TO_DATABASE_INITIAL = {
   watchingShows: false,
   droppedShows: false,
   willWatchShows: false,
-  notWatchingShows: false
+  notWatchingShows: false,
+  loading: false
 }
 
 const useContentHandler = () => {
@@ -25,7 +27,6 @@ const useContentHandler = () => {
   const authUser = useAuthUser()
 
   const addShowsToDatabaseOnRegister = ({ shows, uid }: AddShowsToDatabaseOnRegisterArg) => {
-    // setLoadingShowsOnRegister(true)
     Promise.all(
       Object.values(shows).map((show) => {
         return getShowEpisodesFromAPI({ id: show.id }).then((dataFromAPI: any) => {
@@ -132,7 +133,7 @@ const useContentHandler = () => {
           status: showsSubDatabase,
           firstAirDate: show.first_air_date,
           name: show.name,
-          timeStamp: firebase.timeStamp(),
+          timeStamp: new Date().getTime(),
           finished: false,
           id
         }),
@@ -174,10 +175,15 @@ const useContentHandler = () => {
 
       firebase
         .userShowAllEpisodesInfo(authUser.uid, id)
-        .update({
-          database,
-          isAllWatched_database: `${userShow.allEpisodesWatched}_${database}`
-        })
+        .update(
+          {
+            database,
+            isAllWatched_database: `${userShow.allEpisodesWatched}_${database}`
+          },
+          () => {
+            if (database === "watchingShows") updateAllEpisodesWatched({ firebase, authUser, key: id })
+          }
+        )
         .catch((error: any) => {
           console.log(`Error in database occured. ${error}`)
         })
@@ -199,7 +205,8 @@ const useContentHandler = () => {
           })
         })
     } else {
-      setLoadingAddShowToDatabase({ ...loadingAddShowToDatabase, [database]: true })
+      if (loadingAddShowToDatabase.loading) return
+      setLoadingAddShowToDatabase({ ...loadingAddShowToDatabase, loading: true, [database]: true })
 
       const showData: any = Array.isArray(data) ? data.find((item) => item.id === id) : data
       addShowToDatabase({ id, show: showData, database, handleListeners })

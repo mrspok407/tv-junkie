@@ -3,15 +3,16 @@ import { SeasonEpisodesFromDatabaseInterface } from "Components/UserContent/UseU
 import { differenceBtwDatesInDays, todayDate } from "Utils"
 
 export const releasedEpisodes = ({ data }: { data: SeasonEpisodesFromDatabaseInterface[] }) => {
-  // if (!Array.isArray(data)) {
-  //   throw new Error("Provided data should be an array")
-  // }
   const modifiedData = Array.isArray(data)
     ? data
         .reduce((acc: any, season) => {
-          const seasonEpisodes = season.episodes.filter(() => true)
+          const seasonEpisodes = season?.episodes?.filter(() => true)
           if (!Array.isArray(seasonEpisodes) || seasonEpisodes.length === 0) return
-          acc.push(...seasonEpisodes)
+          const episodesWithIndex = seasonEpisodes.reduce((acc: any, episode: any, index: any) => {
+            acc.push({ ...episode, index })
+            return acc
+          }, [])
+          acc.push(...episodesWithIndex)
           return acc
         }, [])
         .filter((episode: any) => {

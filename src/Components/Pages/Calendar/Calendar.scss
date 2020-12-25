@@ -108,6 +108,9 @@
     .episodes__episode-wrapper {
       grid-template-columns: minmax(75px, 1.05fr) 3fr 1.5fr;
       cursor: initial;
+      @include mediaMaxW(#{$mobileViewPort}) {
+        grid-template-columns: minmax(60px, 0.5fr) 3fr 1.5fr;
+      }
     }
 
     .episodes__episode-wrapper {

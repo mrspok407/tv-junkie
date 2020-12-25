@@ -16,10 +16,7 @@ const ShowsContent: React.FC = () => {
   const context = useContext(AppContext)
   const { authUser } = context
 
-  const [state, dispatch] = useReducer<React.Reducer<ShowsContentState, ActionInterface>>(
-    reducer,
-    INITIAL_STATE
-  )
+  const [state, dispatch] = useReducer<React.Reducer<ShowsContentState, ActionInterface>>(reducer, INITIAL_STATE)
 
   useEffect(() => {
     dispatch({ type: ActionTypes.UpdateContext, payload: context })
@@ -73,13 +70,7 @@ const ShowsContent: React.FC = () => {
       })
       .sort((a, b) =>
         // @ts-ignore
-        a[sortByState] > b[sortByState]
-          ? sortByState === "timeStamp"
-            ? -1
-            : 1
-          : sortByState !== "timeStamp"
-          ? -1
-          : 1
+        a[sortByState] > b[sortByState] ? (sortByState === "timeStamp" ? -1 : 1) : sortByState !== "timeStamp" ? -1 : 1
       )
       .slice(0, state.loadedShows[section])
 
@@ -90,18 +81,14 @@ const ShowsContent: React.FC = () => {
     return (
       <>
         {shows.map((item) => {
-          const filteredGenres = item.genre_ids.map((genreId) =>
-            listOfGenres.filter((item) => item.id === genreId)
-          )
+          const filteredGenres = item.genre_ids.map((genreId) => listOfGenres.filter((item) => item.id === genreId))
 
           return (
             <div key={item.id} className="content-results__item content-results__item--shows">
               <div className="content-results__item--shows-wrapper">
                 <Link to={`/show/${item.id}`}>
                   <div className="content-results__item-main-info">
-                    <div className="content-results__item-title">
-                      {!item.name ? "No title available" : item.name}
-                    </div>
+                    <div className="content-results__item-title">{!item.name ? "No title available" : item.name}</div>
                     <div className="content-results__item-year">
                       {!item.first_air_date ? "" : `(${item.first_air_date.slice(0, 4)})`}
                     </div>
@@ -282,11 +269,7 @@ const ShowsContent: React.FC = () => {
                     "content-results__sortby-button--active": sortByState === "name"
                   })}
                 >
-                  <button
-                    type="button"
-                    className="button button--sortby-shows"
-                    onClick={() => sortByHandler("name")}
-                  >
+                  <button type="button" className="button button--sortby-shows" onClick={() => sortByHandler("name")}>
                     Alphabetically
                   </button>
                 </div>
