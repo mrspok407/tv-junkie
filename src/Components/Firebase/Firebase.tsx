@@ -5,7 +5,7 @@ import "firebase/database"
 import "firebase/analytics"
 import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 
-const config = {
+const configProduction = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
   authDomain: process.env.REACT_APP_AUTH_DOMAIN,
   databaseURL: process.env.REACT_APP_DATABASE_URL,
@@ -27,14 +27,7 @@ const configDevelopment = {
   appId: process.env.REACT_APP_DEV_APP_ID
 }
 
-const test =
-  process.env.NODE_ENV === "production"
-    ? "App is running in production mode"
-    : process.env.NODE_ENV === "development"
-    ? "App is running in development mode"
-    : "lol"
-
-console.log(test)
+const config = process.env.NODE_ENV === "production" ? configProduction : configDevelopment
 
 interface ReferenceInterface {
   uid: string
