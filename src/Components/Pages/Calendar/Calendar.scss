@@ -142,21 +142,39 @@
       column-gap: 10px;
       grid-template-columns: 1fr max-content;
       color: getColor(orangeClr, $mainPalette);
-      justify-self: initial;
+      justify-self: end;
       font: {
         size: 1.2rem;
         weight: 600;
       }
 
-      @include mediaMaxW(#{$mobileViewPort}) {
-        grid-row: 2 / 2;
-        grid-column: 1 / 4;
-      }
+      // @include mediaMaxW(#{$mobileViewPort}) {
+      //   grid-row: 2 / 2;
+      //   grid-column: 1 / 4;
+      // }
 
       span {
         align-self: center;
       }
     }
+    // .episodes__episode-wrapper--calendar {
+    //   @include mediaMaxW(#{$mobileViewPort}) {
+    //     grid-column: 2 / 4;
+    //     grid-template-columns: minmax(50px, 100px) max-content 1fr;
+    //   }
+    // }
+  }
+
+  .episodes__episode--today-admin {
+    .episodes__episode-days-to-air {
+      justify-self: initial;
+
+      @include mediaMaxW(#{$mobileViewPort}) {
+        grid-row: 2 / 2;
+        grid-column: 1 / 4;
+      }
+    }
+
     .episodes__episode-wrapper--calendar {
       @include mediaMaxW(#{$mobileViewPort}) {
         grid-column: 2 / 4;

@@ -202,7 +202,8 @@ const SeasonEpisodes: React.FC<Props> = ({
                   episodeAirDateAsDateObj &&
                   episodeAirDateAsDateObj.getTime() < todayDate.getTime() &&
                   episode.air_date &&
-                  parentComponent === "toWatchPage" && (
+                  parentComponent === "toWatchPage" &&
+                  authUser?.email === process.env.REACT_APP_ADMIN_EMAIL && (
                     <TorrentLinksEpisodes
                       parentComponent={parentComponent}
                       showTitle={showTitle}
@@ -285,11 +286,13 @@ const SeasonEpisodes: React.FC<Props> = ({
                             disableRating={!!(showDatabaseOnClient === "notWatchingShows")}
                           />
                         )}
-                        <TorrentLinksEpisodes
-                          showTitle={showTitle}
-                          seasonNumber={season.season_number}
-                          episodeNumber={episode.episode_number as number}
-                        />
+                        {authUser?.email === process.env.REACT_APP_ADMIN_EMAIL && (
+                          <TorrentLinksEpisodes
+                            showTitle={showTitle}
+                            seasonNumber={season.season_number}
+                            episodeNumber={episode.episode_number as number}
+                          />
+                        )}
                       </>
                     )}
                 </div>
