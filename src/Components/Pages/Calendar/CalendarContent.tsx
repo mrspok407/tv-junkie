@@ -129,7 +129,9 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
                           <div
                             key={episode.id}
                             className={classNames("episodes__episode", {
-                              "episodes__episode--today": willAirToday
+                              "episodes__episode--today": willAirToday,
+                              "episodes__episode--today-admin":
+                                context.authUser?.email === process.env.REACT_APP_ADMIN_EMAIL && willAirToday
                             })}
                           >
                             <div className="episodes__episode-wrapper">
@@ -148,12 +150,8 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
                               </div>
 
                               {daysToNewEpisode >= 0 && (
-                                <div
-                                  className={classNames("episodes__episode-days-to-air", {
-                                    "episodes__episode-days-to-air": willAirToday
-                                  })}
-                                >
-                                  {willAirToday && (
+                                <div className="episodes__episode-days-to-air">
+                                  {willAirToday && context.authUser?.email === process.env.REACT_APP_ADMIN_EMAIL && (
                                     <TorrentLinksEpisodes
                                       showTitle={episode.show}
                                       seasonNumber={episode.season_number}

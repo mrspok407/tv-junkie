@@ -33,7 +33,7 @@ const SignInWithGoogleForm = () => {
           .update({
             username: authUser.user.displayName,
             email: authUser.user.email,
-            role: ROLES.USER
+            role: authUser.user.email === process.env.REACT_APP_ADMIN_EMAIL ? ROLES.ADMIN : ROLES.USER
           })
           .then(() => {
             if (!authUser.additionalUserInfo.isNewUser) {

@@ -76,6 +76,8 @@ const MoviesContent: React.FC<Props> = ({ moviesData, loadingIds, openLinksMovie
       ? content
       : context.userContentLocalStorage.watchLaterMovies.slice(0, state.loadedMovies.watchLaterMoviesLS)
 
+    const overviewCharacterLimit = context.authUser?.email === process.env.REACT_APP_ADMIN_EMAIL ? 150 : 300
+
     return (
       <>
         {movies.map((item) => {
@@ -145,51 +147,56 @@ const MoviesContent: React.FC<Props> = ({ moviesData, loadingIds, openLinksMovie
                       />
                     </div>
                     <div className="content-results__item-description">
-                      {item.overview.length > 150 ? `${item.overview.substring(0, 150)}...` : item.overview}
+                      {item.overview.length > overviewCharacterLimit
+                        ? `${item.overview.substring(0, overviewCharacterLimit)}...`
+                        : item.overview}
                     </div>
                   </div>
                 </Link>
 
-                <div className="content-results__item-links">
-                  {!openLinksMoviesId.includes(item.id) ? (
-                    <button type="button" className="button" onClick={() => getMovieLinks({ id: item.id })}>
-                      Show Links
-                    </button>
-                  ) : loadingIds.includes(item.id) && !error.includes(item.id) ? (
-                    <div>
-                      <Loader className="loader--small-pink" />
-                    </div>
-                  ) : (
-                    loadingIds.includes(item.id) && (
-                      <div className="content-results__item-links--error">No links available</div>
-                    )
-                  )}
-
-                  {movie && (
-                    <div className="content-results__item-links-wrapper">
-                      <div className="torrent-links">
-                        {movieHash1080p && (
-                          <a
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            href={`magnet:?xt=urn:btih:${movieHash1080p}&dn=${urlMovieTitle}&xl=310660222&tr=udp%3A%2F%2Ftracker.coppersurfer.tk:6969/announce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org:6969/announce&tr=udp%3A%2F%2Ftracker.pirateparty.gr:6969/announce&tr=udp%3A%2F%2Fexodus.desync.com:6969/announce&tr=udp%3A%2F%2Ftracker.opentrackr.org:1337/announce&tr=udp%3A%2F%2Ftracker.internetwarriors.net:1337/announce&tr=udp%3A%2F%2Ftracker.torrent.eu.org:451&tr=udp%3A%2F%2Ftracker.cyberia.is:6969/announce&tr=udp%3A%2F%2Fopen.demonii.si:1337/announce&tr=udp%3A%2F%2Fopen.stealth.si:80/announce&tr=udp%3A%2F%2Ftracker.tiny-vps.com:6969/announce&tr=udp%3A%2F%2Ftracker.iamhansen.xyz:2000/announce&tr=udp%3A%2F%2Fexplodie.org:6969/announce&tr=udp%3A%2F%2Fdenis.stalker.upeer.me:6969/announce&tr=udp%3A%2F%2Fipv4.tracker.harry.lu:80/announce`}
-                          >
-                            1080p
-                          </a>
-                        )}
-                        {movieHash720p && (
-                          <a
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            href={`magnet:?xt=urn:btih:${movieHash720p}&dn=${urlMovieTitle}&xl=310660222&tr=udp%3A%2F%2Ftracker.coppersurfer.tk:6969/announce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org:6969/announce&tr=udp%3A%2F%2Ftracker.pirateparty.gr:6969/announce&tr=udp%3A%2F%2Fexodus.desync.com:6969/announce&tr=udp%3A%2F%2Ftracker.opentrackr.org:1337/announce&tr=udp%3A%2F%2Ftracker.internetwarriors.net:1337/announce&tr=udp%3A%2F%2Ftracker.torrent.eu.org:451&tr=udp%3A%2F%2Ftracker.cyberia.is:6969/announce&tr=udp%3A%2F%2Fopen.demonii.si:1337/announce&tr=udp%3A%2F%2Fopen.stealth.si:80/announce&tr=udp%3A%2F%2Ftracker.tiny-vps.com:6969/announce&tr=udp%3A%2F%2Ftracker.iamhansen.xyz:2000/announce&tr=udp%3A%2F%2Fexplodie.org:6969/announce&tr=udp%3A%2F%2Fdenis.stalker.upeer.me:6969/announce&tr=udp%3A%2F%2Fipv4.tracker.harry.lu:80/announce`}
-                          >
-                            720p
-                          </a>
-                        )}
+                {context.authUser?.email === process.env.REACT_APP_ADMIN_EMAIL && (
+                  <div className="content-results__item-links">
+                    {!openLinksMoviesId.includes(item.id) ? (
+                      <button type="button" className="button" onClick={() => getMovieLinks({ id: item.id })}>
+                        Show Links
+                      </button>
+                    ) : loadingIds.includes(item.id) && !error.includes(item.id) ? (
+                      <div>
+                        <Loader className="loader--small-pink" />
                       </div>
-                    </div>
-                  )}
-                </div>
+                    ) : (
+                      loadingIds.includes(item.id) && (
+                        <div className="content-results__item-links--error">No links available</div>
+                      )
+                    )}
+
+                    {movie && (
+                      <div className="content-results__item-links-wrapper">
+                        <div className="torrent-links">
+                          {movieHash1080p && (
+                            <a
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              href={`magnet:?xt=urn:btih:${movieHash1080p}&dn=${urlMovieTitle}&xl=310660222&tr=udp%3A%2F%2Ftracker.coppersurfer.tk:6969/announce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org:6969/announce&tr=udp%3A%2F%2Ftracker.pirateparty.gr:6969/announce&tr=udp%3A%2F%2Fexodus.desync.com:6969/announce&tr=udp%3A%2F%2Ftracker.opentrackr.org:1337/announce&tr=udp%3A%2F%2Ftracker.internetwarriors.net:1337/announce&tr=udp%3A%2F%2Ftracker.torrent.eu.org:451&tr=udp%3A%2F%2Ftracker.cyberia.is:6969/announce&tr=udp%3A%2F%2Fopen.demonii.si:1337/announce&tr=udp%3A%2F%2Fopen.stealth.si:80/announce&tr=udp%3A%2F%2Ftracker.tiny-vps.com:6969/announce&tr=udp%3A%2F%2Ftracker.iamhansen.xyz:2000/announce&tr=udp%3A%2F%2Fexplodie.org:6969/announce&tr=udp%3A%2F%2Fdenis.stalker.upeer.me:6969/announce&tr=udp%3A%2F%2Fipv4.tracker.harry.lu:80/announce`}
+                            >
+                              1080p
+                            </a>
+                          )}
+                          {movieHash720p && (
+                            <a
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              href={`magnet:?xt=urn:btih:${movieHash720p}&dn=${urlMovieTitle}&xl=310660222&tr=udp%3A%2F%2Ftracker.coppersurfer.tk:6969/announce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org:6969/announce&tr=udp%3A%2F%2Ftracker.pirateparty.gr:6969/announce&tr=udp%3A%2F%2Fexodus.desync.com:6969/announce&tr=udp%3A%2F%2Ftracker.opentrackr.org:1337/announce&tr=udp%3A%2F%2Ftracker.internetwarriors.net:1337/announce&tr=udp%3A%2F%2Ftracker.torrent.eu.org:451&tr=udp%3A%2F%2Ftracker.cyberia.is:6969/announce&tr=udp%3A%2F%2Fopen.demonii.si:1337/announce&tr=udp%3A%2F%2Fopen.stealth.si:80/announce&tr=udp%3A%2F%2Ftracker.tiny-vps.com:6969/announce&tr=udp%3A%2F%2Ftracker.iamhansen.xyz:2000/announce&tr=udp%3A%2F%2Fexplodie.org:6969/announce&tr=udp%3A%2F%2Fdenis.stalker.upeer.me:6969/announce&tr=udp%3A%2F%2Fipv4.tracker.harry.lu:80/announce`}
+                            >
+                              720p
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 <button
                   className="button--del-item"
                   onClick={() => {
