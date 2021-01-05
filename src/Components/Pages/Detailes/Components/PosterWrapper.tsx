@@ -1,8 +1,9 @@
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useContext, useEffect, useState } from "react"
 import axios from "axios"
 import { todayDate } from "Utils"
 import Loader from "Components/UI/Placeholders/Loader"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
+import { AppContext } from "Components/AppContext/AppContextHOC"
 
 const { CancelToken } = require("axios")
 let cancelRequest: any
@@ -25,6 +26,8 @@ const PosterWrapper = React.memo<Props>(({ detailes, mediaType }) => {
   const [movieAvailable, setMovieAvailable] = useState(true)
   const [loadingTorrentLinks, setLoadingTorrentLinks] = useState(false)
   const [error, setError] = useState("")
+
+  const { authUser } = useContext(AppContext)
 
   const getMovieTorrents = useCallback(() => {
     setLoadingTorrentLinks(true)
@@ -91,11 +94,9 @@ const PosterWrapper = React.memo<Props>(({ detailes, mediaType }) => {
         />
       )}
 
-      {mediaType === "movie" &&
-      new Date(detailes.release_date).getTime() < todayDate.getTime() &&
-      movieAvailable ? (
+      {mediaType === "movie" && new Date(detailes.release_date).getTime() < todayDate.getTime() && movieAvailable ? (
         <div className="detailes-page__movie-links">
-          {!loadingTorrentLinks ? (
+          {!loadingTorrentLinks && authUser?.email === process.env.REACT_APP_ADMIN_EMAIL ? (
             <div className="torrent-links">
               {movieHash1080p && (
                 <a
