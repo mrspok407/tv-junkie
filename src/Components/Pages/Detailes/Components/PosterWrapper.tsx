@@ -94,9 +94,12 @@ const PosterWrapper = React.memo<Props>(({ detailes, mediaType }) => {
         />
       )}
 
-      {mediaType === "movie" && new Date(detailes.release_date).getTime() < todayDate.getTime() && movieAvailable ? (
+      {mediaType === "movie" &&
+      new Date(detailes.release_date).getTime() < todayDate.getTime() &&
+      movieAvailable &&
+      authUser?.email === process.env.REACT_APP_ADMIN_EMAIL ? (
         <div className="detailes-page__movie-links">
-          {!loadingTorrentLinks && authUser?.email === process.env.REACT_APP_ADMIN_EMAIL ? (
+          {!loadingTorrentLinks ? (
             <div className="torrent-links">
               {movieHash1080p && (
                 <a
