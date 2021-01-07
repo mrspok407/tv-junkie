@@ -9,6 +9,7 @@ import SearchResults from "./SearchResults/SearchResults"
 import PlaceholderNoResults from "Components/UI/Placeholders/PlaceholderNoResults"
 import Header from "Components/UI/Header/Header"
 import Footer from "Components/UI/Footer/Footer"
+import googleRedirectHOC from "Components/UserAuth/SignIn/GoogleRedirectHOC"
 import "./SearchPage.scss"
 
 const SESSION_STORAGE_KEY_ADV = "advancedSearchContent"
@@ -55,18 +56,7 @@ class SearchPage extends Component {
     sessionStorage.setItem(SESSION_STORAGE_KEY_TOTALPAGES, JSON.stringify(this.state.totalPagesAdvMovies))
   }
 
-  advancedSearch = (
-    year,
-    decade,
-    yearFrom,
-    yearTo,
-    rating,
-    voteCount,
-    sortBy,
-    mediaType,
-    withActors,
-    genres
-  ) => {
+  advancedSearch = (year, decade, yearFrom, yearTo, rating, voteCount, sortBy, mediaType, withActors, genres) => {
     if (cancelRequestAdvSearch !== undefined) {
       cancelRequestAdvSearch()
     }
@@ -216,10 +206,7 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
   handleScroll = throttle(500, () => {
     if (this.state.loadingNewPage) return
 
-    if (
-      this.state.advancedSearchContent.length < 20 ||
-      this.state.totalPagesAdvMovies <= this.state.numOfPagesLoaded
-    )
+    if (this.state.advancedSearchContent.length < 20 || this.state.totalPagesAdvMovies <= this.state.numOfPagesLoaded)
       return
 
     if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 850) {
@@ -329,4 +316,4 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
   }
 }
 
-export default SearchPage
+export default googleRedirectHOC(SearchPage)

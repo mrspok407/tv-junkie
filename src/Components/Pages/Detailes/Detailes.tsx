@@ -19,6 +19,7 @@ import PlaceholderLoadingFullInfo from "Components/UI/Placeholders/PlaceholderLo
 import useHandleListeners from "./FirebaseHelpers/UseHandleListeners"
 import { ContentDetailes, CONTENT_DETAILS_DEFAULT } from "Utils/Interfaces/ContentDetails"
 import "./Detailes.scss"
+import useGoogleRedirect from "Components/UserAuth/SignIn/UseGoogleRedirect"
 
 const { CancelToken } = require("axios")
 let cancelRequest: any
@@ -65,6 +66,8 @@ export const DetailesPage: React.FC<Props> = ({
 
   const [loadingAPIrequest, setLoadingAPIrequest] = useState(true)
   const [loadingFromDatabase, setLoadingFromDatabase] = useState(true)
+
+  useGoogleRedirect()
 
   useEffect(() => {
     getContent()

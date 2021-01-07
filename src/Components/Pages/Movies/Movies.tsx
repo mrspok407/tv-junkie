@@ -6,6 +6,7 @@ import MoviesContent from "./MoviesContent"
 import ScrollToTop from "Utils/ScrollToTopBar"
 import Footer from "Components/UI/Footer/Footer"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
+import useGoogleRedirect from "Components/UserAuth/SignIn/UseGoogleRedirect"
 const { CancelToken } = require("axios")
 
 let cancelRequest: any
@@ -15,6 +16,8 @@ const Movies: React.FC = () => {
   const [loadingIds, setLoadingIds] = useState<number[]>([])
   const [openLinksMoviesId, setOpenLinksMoviesId] = useState<number[]>([])
   const [error, setError] = useState<number[]>([])
+
+  useGoogleRedirect()
 
   useEffect(() => {
     return () => {

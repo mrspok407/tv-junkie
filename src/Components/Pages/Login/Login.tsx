@@ -8,13 +8,16 @@ import Footer from "Components/UI/Footer/Footer"
 import { FirebaseContext } from "Components/Firebase"
 import { useHistory } from "react-router-dom"
 import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
-import "./Login.scss"
 import { AppContext } from "Components/AppContext/AppContextHOC"
+import useGoogleRedirect from "Components/UserAuth/SignIn/UseGoogleRedirect"
+import "./Login.scss"
 
 const LoginPage: React.FC = () => {
   const { authUser } = useContext(AppContext)
   const firebase = useContext(FirebaseContext)
   const history = useHistory()
+
+  useGoogleRedirect()
 
   useEffect(() => {
     let authSubscriber: any
