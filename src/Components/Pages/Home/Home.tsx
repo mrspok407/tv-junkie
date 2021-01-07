@@ -11,12 +11,15 @@ import Footer from "Components/UI/Footer/Footer"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import ScrollToTopOnMount from "Utils/ScrollToTopOnMount"
 import useGetSlidersContent from "./UseGetSlidersContent"
+import useGoogleRedirect from "Components/UserAuth/SignIn/UseGoogleRedirect"
 import "./Home.scss"
 
 const HomePage: React.FC = () => {
   const { sliders, slidersLoading } = useGetSlidersContent()
   const context = useContext(AppContext)
   const { authUser } = context
+
+  useGoogleRedirect()
 
   const renderNonAuthUser = () => (
     <>
