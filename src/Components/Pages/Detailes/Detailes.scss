@@ -182,6 +182,10 @@ $font-sizes: (
   &__admin-message--german {
     margin-top: -30px;
 
+    @include mediaMaxW(#{$mobileViewPort}) {
+      margin-top: initial;
+    }
+
     .toggle-german {
       position: relative;
       background-color: rgba(29, 29, 29, 0.59);
