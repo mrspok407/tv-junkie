@@ -171,6 +171,7 @@ const ShowsEpisodes: React.FC<Props> = ({
             isAllEpisodesWatched({
               showInfo: showInfo,
               releasedEpisodes,
+              episodesFromDatabase,
               authUser: authUser,
               firebase: firebase,
               isSingleEpisode: true
@@ -204,6 +205,7 @@ const ShowsEpisodes: React.FC<Props> = ({
       isAllEpisodesWatched({
         showInfo: showInfo,
         releasedEpisodes,
+        episodesFromDatabase,
         authUser: authUser,
         firebase: firebase,
         multipleEpisodes: episodesData.length
@@ -251,6 +253,7 @@ const ShowsEpisodes: React.FC<Props> = ({
           isAllEpisodesWatched({
             showInfo,
             releasedEpisodes: releasedEpisodes.filter((item) => !item.watched),
+            episodesFromDatabase,
             authUser,
             firebase
           })
