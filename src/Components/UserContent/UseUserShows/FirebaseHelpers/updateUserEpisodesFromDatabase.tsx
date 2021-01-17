@@ -100,23 +100,24 @@ const updateUserEpisodesFromDatabase = async ({ firebase }: Arguments) => {
       acc.push(...item.episodes.filter((item: any) => item.air_date !== ""))
       return acc
     }, [])
-    allEpisodes.splice(releasedEpisodes.length)
+    const releasedUserEpisodes = allEpisodes.slice(0, releasedEpisodes.length)
 
     const allEpisodesWatched = !allEpisodes.some((episode: any) => !episode.watched)
+    const releasedEpisodesWatched = !releasedUserEpisodes.some((episode: any) => !episode.watched)
     const finished = statusDatabase === "ended" && allEpisodesWatched ? true : false
 
     userShowsPromises = [
       ...userShowsPromises,
       firebase
         .userShow({ uid: authUser.uid, key: show.id })
-        .update({ finished, allEpisodesWatched, status: statusDatabase })
+        .update({ finished, allEpisodesWatched: releasedEpisodesWatched, status: statusDatabase })
     ]
 
     firebase.userShowAllEpisodes(authUser.uid, show.id).set(seasons)
     firebase.userShowAllEpisodesInfo(authUser.uid, show.id).update({
-      allEpisodesWatched,
+      allEpisodesWatched: releasedEpisodesWatched,
       finished,
-      isAllWatched_database: `${allEpisodesWatched}_${show.info.database}`
+      isAllWatched_database: `${releasedEpisodesWatched}_${show.info.database}`
     })
     firebase.userShowsLastUpdateList(authUser.uid).child(show.id).update({ lastUpdatedInUser: firebase.timeStamp() })
   })
