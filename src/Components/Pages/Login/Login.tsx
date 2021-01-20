@@ -17,8 +17,6 @@ const LoginPage: React.FC = () => {
   const firebase = useContext(FirebaseContext)
   const history = useHistory()
 
-  const authUserLS = authUser
-
   useGoogleRedirect()
 
   useEffect(() => {
@@ -27,7 +25,7 @@ const LoginPage: React.FC = () => {
     const authorizationListener = () => {
       authSubscriber = firebase.onAuthUserListener(
         (authUser: AuthUserInterface) => {
-          if (authUser !== null && authUserLS) {
+          if (authUser !== null) {
             history.push(ROUTES.HOME_PAGE)
           }
         },
@@ -39,9 +37,9 @@ const LoginPage: React.FC = () => {
     return () => {
       authSubscriber()
     }
-  }, [firebase, history]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [firebase, history])
 
-  if (authUserLS !== null) {
+  if (authUser !== null) {
     return null
   }
 
