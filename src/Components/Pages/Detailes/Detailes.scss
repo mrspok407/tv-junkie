@@ -162,65 +162,13 @@ $font-sizes: (
     }
   }
 
-  &__description,
-  &__admin-message,
-  &__admin-message--german {
+  &__description {
     grid-column: 1 / 3;
     line-height: 26px;
     font-size: map-get($font-sizes, description);
     color: map-get($colors, description);
     @include mediaMaxW(#{$mobileViewPort}) {
       grid-column: inherit;
-    }
-  }
-  &__admin-message,
-  &__admin-message--german {
-    font-size: 0.9rem;
-    color: #de9c9c;
-  }
-
-  &__admin-message--german {
-    margin-top: -30px;
-
-    @include mediaMaxW(#{$mobileViewPort}) {
-      margin-top: initial;
-    }
-
-    .toggle-german {
-      position: relative;
-      background-color: rgba(29, 29, 29, 0.59);
-      height: 40px;
-      padding: 5px;
-      cursor: pointer;
-
-      &:before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: #252525;
-        opacity: 0;
-        transition: 0.2s;
-        z-index: -1;
-      }
-      &:after {
-        content: "";
-        position: absolute;
-        right: 10px;
-        top: 18px;
-        width: 0;
-        height: 0;
-        border-style: solid;
-        border-width: 8px 6px 0 6px;
-        border-color: #ffffff transparent transparent transparent;
-        z-index: -1;
-      }
-
-      &:hover:before {
-        opacity: 1;
-      }
     }
   }
 
