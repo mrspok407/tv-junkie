@@ -5,7 +5,7 @@
 A personal pet project/portfolio.
 
 - https://www.tv-junkie.com - live website.
-- https://youtu.be/ib9TA_zVWjk - a short video presentation with audio commentary of the functionality of the app.
+- https://youtu.be/eVpnWltTYf0 - a short video presentation with audio commentary of the functionality of the app.
 
 Technical information below.
 
