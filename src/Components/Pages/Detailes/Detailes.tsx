@@ -18,7 +18,6 @@ import Footer from "Components/UI/Footer/Footer"
 import PlaceholderLoadingFullInfo from "Components/UI/Placeholders/PlaceholderLoadingFullInfo/PlaceholderLoadingFullInfo"
 import useHandleListeners from "./FirebaseHelpers/UseHandleListeners"
 import { ContentDetailes, CONTENT_DETAILS_DEFAULT } from "Utils/Interfaces/ContentDetails"
-import { anime } from "Utils"
 import useGoogleRedirect from "Components/UserAuth/SignIn/UseGoogleRedirect"
 import "./Detailes.scss"
 
@@ -67,8 +66,6 @@ export const DetailesPage: React.FC<Props> = ({
 
   const [loadingAPIrequest, setLoadingAPIrequest] = useState(true)
   const [loadingFromDatabase, setLoadingFromDatabase] = useState(true)
-
-  const [toggleAdminMsgGerman, setToggleAdminMsgGerman] = useState(false)
 
   useGoogleRedirect()
 
@@ -245,47 +242,6 @@ export const DetailesPage: React.FC<Props> = ({
             />
 
             <div className="detailes-page__description">{detailes.overview}</div>
-            {anime.includes(Number(id)) && (
-              <>
-                <div className="detailes-page__admin-message">
-                  Hi. I'm a developer of this website, it's my personal pet project. I notice that people finding this
-                  app through google, although I didn't advertise it. Particulary people from Germany that looking for
-                  anime. I would be glad that someone uses my app for tracking shows and/or anime and like it. I could
-                  add some features that you would like to see on a website like this, for example links (like anime
-                  torrent) to new episodes of your anime, so you would just click in a list of episodes that aired today
-                  and it transfer you to the torrent (or any other legal way to watch :) ), so you wouldn't need to copy
-                  paste title and particular number of the episode. Or could sugest some other features that would
-                  consider you to use this app. You can contact me via direct message in{" "}
-                  <a href="https://twitter.com/mrspok407" target="_blank" rel="noopener noreferrer">
-                    Twitter
-                  </a>
-                  . Thanks for reading.
-                </div>
-                <div className="detailes-page__admin-message--german">
-                  <div onClick={() => setToggleAdminMsgGerman(!toggleAdminMsgGerman)} className="toggle-german">
-                    Das gleiche auf Deutsch.
-                  </div>
-                  {toggleAdminMsgGerman && (
-                    <div className="german-message">
-                      Hallo. Ich bin Entwickler dieser Website, es ist mein persönliches Lieblingsprojekt. Ich stelle
-                      fest, dass Leute diese App finden über Google, obwohl ich es nicht beworben habe. Besondere Leute
-                      aus Deutschland, die nach Anime suchen. Ich würde mich freuen, wenn jemand meine App zum Verfolgen
-                      von Shows und / oder Anime verwendet und sie mag. Ich könnte einige hinzufügen Funktionen, die Sie
-                      auf einer Website wie dieser sehen möchten, z. B. Links (wie Anime Torrent) zu neue Episoden Ihres
-                      Anime, also klicken Sie einfach in eine Liste der Episoden, die heute ausgestrahlt wurden
-                      Übertragen Sie auf den Torrent (oder eine andere legale Methode zum Ansehen :)), sodass Sie das
-                      Kopieren und Einfügen nicht kopieren müssen Titel und bestimmte Nummer der Episode. Oder könnte
-                      einige andere Funktionen vorschlagen, die Sie in Betracht ziehen würden um diese App zu nutzen.
-                      Sie können mich per Direktnachricht in kontaktieren{" "}
-                      <a href="https://twitter.com/mrspok407" target="_blank" rel="noopener noreferrer">
-                        Twitter
-                      </a>
-                      . Danke fürs Lesen. Es ist Google übersetzt, sorry.
-                    </div>
-                  )}
-                </div>
-              </>
-            )}
 
             {mediaType === "show" && (
               <ShowsEpisodes
