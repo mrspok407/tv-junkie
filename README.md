@@ -12,13 +12,13 @@ A personal pet project/portfolio created with React and Firebase.
 ## Table of Contents
 
 - [Features](#Features)
-- [Main technologies](#Main technologies)
+- [Main technologies](#main-technologies)
 - [Frontend](#Frontend)
 - [Backend](#Backend)
 - [Hosting](#Hosting)
-- [Some caveats](#Some caveats)
-- [Easy features to implement](#Easy features to implement)
-- [Challenging features](#Challenging features)
+- [Some caveats](#some-caveats)
+- [Easy features to implement](#easy-features-to-implement)
+- [Challenging features](#challenging-features)
 
 ## Features
 
