@@ -38,7 +38,7 @@ A personal pet project/portfolio created with React and Firebase.
 
 ## Frontend
 
-- React with React Router
+- React with React Router.
 - Almost every component is functional with heavy usage of reusable custom hooks. Most of the components were refactored from class components.
 - React Context used for state management. UseReducer hook helps with the components where the state is too complex and/or where one state may be dependent on another. For example on the Shows page.
 - Almost every component is in TypeScript. It helps to keep track of the data structure received from an external API and in what formats should it be transformed for the backend. A whole app was refactored to TS from regular JavaScript.
@@ -54,7 +54,7 @@ A personal pet project/portfolio created with React and Firebase.
 
 ## Hosting
 
-- AWS amplify
+- AWS amplify.
 - Continuous deployment from the Github repository is configured. Development branch set up to deploy to the password-protected development domain and the master branch to the main domain.
 
 ## Some caveats
