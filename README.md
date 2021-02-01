@@ -57,9 +57,7 @@ A personal pet project/portfolio created with React and Firebase.
 - AWS amplify
 - Continuous deployment from the Github repository is configured. Development branch set up to deploy to the password-protected development domain and the master branch to the main domain.
 
-### Some caveats
-
----
+## Some caveats
 
 If a user has a considerable amount of shows in their database the first data load could be slow. This is a consequence of conscious decision. Some backend work is done on the frontend because to do it the right way a substantial amount of download traffic needs to be used which is not free.
 
@@ -67,9 +65,7 @@ This is not how it is supposed to be. Backend work should be on the backend. But
 
 For a detailed explanation of what exactly and why I'm doing on front and not backend we can have a conversation.
 
-### Easy features to implement
-
----
+## Easy features to implement
 
 Some features that would be easy and straightforward to implement which I won't be doing at the pet project. I would learn very little from developing them or is mainly backend work.
 
@@ -80,9 +76,7 @@ Some features that would be easy and straightforward to implement which I won't 
 - A lot of settings on the profile page could be implemented like language, light/dark mode, and a lot of personal preferences on what and how to show in the UI.
 - Favourite shows, notes to episodes/shows, and similar features are easily implemented.
 
-### Challenging features
-
----
+## Challenging features
 
 Things I want to do, that would be interesting and challenging
 
