@@ -41,7 +41,7 @@ A personal pet project/portfolio created with React and Firebase.
 - React with React Router.
 - Almost every component is functional with heavy usage of reusable custom hooks. Most of the components were refactored from class components.
 - React Context used for state management. UseReducer hook helps with the components where the state is too complex and/or where one state may be dependent on another. For example on the Shows page.
-- Almost every component is in TypeScript. It helps to keep track of the data structure received from an external API and in what formats should it be transformed for the backend. A whole app was refactored to TS from regular JavaScript.
+- Almost every component is in TypeScript. It helps to keep track of the data structure received from an external API and to what formats should it be transformed for the backend. A whole app was refactored to TS from regular JavaScript.
 - For optimization of frequent API calls, like in search bar or infinite scrolling, the wrapper debounce function is used. It prevents a lot of unnecessary API calls on every keystroke or scrolling. Important to keep in mind when using debounce and similar methods in functional components, that on every render there will be a completely new debounce function. One of the approaches to deal with it is to wrap it in the useCallback hook to preserve it between renders.
 - SCSS preprocessor is used for styles.
 - Optimistic UI approach is applied in many places for instant feedback to the users.
