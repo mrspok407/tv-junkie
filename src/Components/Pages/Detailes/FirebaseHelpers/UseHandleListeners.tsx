@@ -52,6 +52,7 @@ const useHandleListeners = ({ id }: { id?: number }) => {
 
           const allEpisodesWatched = !allEpisodes.some((episode) => !episode.watched)
           const releasedEpisodesWatched = !releasedUserEpisodes.some((episode) => !episode.watched)
+
           const finished = statusDatabase === "ended" && allEpisodesWatched ? true : false
 
           firebase
