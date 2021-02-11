@@ -5,6 +5,7 @@ import {
   SingleEpisodeInterface
 } from "Components/UserContent/UseUserShows/UseUserShows"
 import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
+import { differenceBtwDatesInDays, todayDate } from "Utils"
 
 interface Arguments {
   showInfo: ShowInfoInterface
@@ -48,7 +49,14 @@ const isAllEpisodesWatched = ({
         .map((episode) => episode.season_number)
         .filter((episode, index, array) => array.indexOf(episode) === index).length === 1
 
-  const finished = (status === "ended" || showInfo.status === "ended") && allEpisodesWatched ? true : false
+  const isAllEpisodesAired = allEpisodes.some((episode) => {
+    const daysToNewEpisode = differenceBtwDatesInDays(episode.air_date, todayDate)
+    return daysToNewEpisode > 0
+  })
+    ? allEpisodesWatched
+    : releasedEpisodesWatched
+
+  const finished = (status === "ended" || showInfo.status === "ended") && isAllEpisodesAired ? true : false
 
   if (releasedEpisodesWatched) {
     firebase.userShowAllEpisodesInfo(authUser.uid, showInfo.id).update({
