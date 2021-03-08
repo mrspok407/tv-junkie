@@ -175,7 +175,7 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false }) =>
               }
         }
       >
-        <img className="logo__img" src={logo} alt="logo" />
+        <img width="517" height="190" className="logo__img" src={logo} alt="logo" />
       </div>
     </header>
   )

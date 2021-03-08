@@ -10,6 +10,7 @@ import ToWatchEpisodesPage from "Components/Pages/ToWatchEpisodes/ToWatchEpisode
 import CalendarPage from "Components/Pages/Calendar/Calendar"
 import MoviesPage from "Components/Pages/Movies/Movies"
 import DetailesPage from "Components/Pages/Detailes/Detailes"
+import UserProfile from "Components/Pages/UserProfile/UserProfile"
 import GridTests from "Utils/GridTests/GridTests"
 import * as ROUTES from "Utils/Constants/routes"
 import PageNotFound from "Components/Pages/PageNotFound/PageNotFound"
@@ -27,6 +28,7 @@ class App extends Component {
             <Route path={ROUTES.TO_WATCH} exact component={ToWatchEpisodesPage} />
             <Route path={ROUTES.CALENDAR} exact component={CalendarPage} />
             <Route path={ROUTES.MOVIES} exact component={MoviesPage} />
+            <Route path={ROUTES.USER_PROFILE} exact component={UserProfile} />
             <Route path={ROUTES.DETAILES_PAGE} exact component={DetailesPage} />
             <Route path={ROUTES.PROFILE} exact component={Profile} />
             <Route path={ROUTES.LOGIN_PAGE} exact component={LoginPage} />
