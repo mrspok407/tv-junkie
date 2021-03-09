@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
-import Profile from "Components/Pages/Profile/Profile"
+import Profile from "Components/Pages/Settings/Settings"
 import Admin from "Components/Pages/Admin/Admin"
 import LoginPage from "Components/Pages/Login/Login"
 import SearchPage from "Components/Pages/SearchPage/SearchPage"

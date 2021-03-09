@@ -23,6 +23,7 @@ type Props = {
   disableRating?: boolean
   showRating?: boolean
   mediaType?: string
+  userRatingData?: number | string
 }
 
 const UserRating: React.FC<Props> = ({
@@ -37,9 +38,10 @@ const UserRating: React.FC<Props> = ({
   disableRating,
   showRating,
   mediaType,
+  userRatingData,
   handleFadeOut = () => {}
 }) => {
-  const [userRating, setUserRating] = useState(0)
+  const [userRating, setUserRating] = useState(userRatingData || 0)
   const [nonAuthWarning, setNonAuthWarning] = useState(false)
   const userRatingRef = useRef<HTMLDivElement>(null)
 
@@ -60,7 +62,7 @@ const UserRating: React.FC<Props> = ({
   }
 
   const getRating = useCallback(() => {
-    if (firebase.auth.currentUser === null || parentComponent === "toWatchPage") return
+    if (firebase.auth.currentUser === null || parentComponent === "toWatchPage" || firebaseRef === "") return
 
     firebase[firebaseRef]({
       uid: firebase.auth.currentUser.uid,
@@ -143,7 +145,9 @@ const UserRating: React.FC<Props> = ({
   return (
     <div
       ref={userRatingRef}
-      className="user-rating"
+      className={classNames("user-rating", {
+        "user-rating--user-profile": firebaseRef === ""
+      })}
       onClick={() => {
         if (authUser !== null) return
         setNonAuthWarning(!nonAuthWarning)

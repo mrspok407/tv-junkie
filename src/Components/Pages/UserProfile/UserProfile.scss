@@ -1,0 +1,50 @@
+@import "../../../styles/globals";
+
+.user-profile {
+  display: grid;
+  position: relative;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 5px;
+  width: 100%;
+  max-width: 350px;
+  margin-bottom: 35px;
+  color: #fff;
+  font: {
+    weight: 400;
+    size: 1.5rem;
+  }
+
+  &--own-profile {
+    grid-template-columns: 1fr;
+    font-size: 1.7rem;
+    text-align: center;
+  }
+
+  @include mediaMaxW(#{$mobileViewPort}) {
+    padding: 0 8px 0 8px;
+
+    .button {
+      font-size: 1.2rem;
+    }
+  }
+
+  &__username {
+    display: flex;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    @include mediaMaxW(#{$mobileViewPort}) {
+      font: {
+        size: 1.2rem;
+      }
+    }
+  }
+
+  .loader {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    right: initial;
+    transform: translate(-50%, -50%);
+  }
+}

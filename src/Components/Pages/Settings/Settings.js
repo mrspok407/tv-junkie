@@ -9,7 +9,8 @@ import Footer from "Components/UI/Footer/Footer"
 import { todayDate } from "Utils"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import PasswordUpdate from "Components/UserAuth/PasswordUpdate/PasswordUpdate"
-import "./Profile.scss"
+import "./Settings.scss"
+import classNames from "classnames"
 
 class Profile extends Component {
   constructor(props) {
@@ -20,10 +21,12 @@ class Profile extends Component {
       loadingVerificationSent: false,
       errorMessage: null,
       passwordUpdate: "",
+      copiedToClipboard: null,
       authUser: null
     }
 
     this.authSubscriber = null
+    this.clipboardTimeout = null
   }
 
   componentDidMount() {
@@ -32,6 +35,7 @@ class Profile extends Component {
 
   componentWillUnmount() {
     this.authSubscriber()
+    window.clearTimeout(this.clipboardTimeout)
   }
 
   sendEmailVerification = () => {
@@ -204,6 +208,15 @@ class Profile extends Component {
     })
   }
 
+  copyToClipboard = (text) => {
+    clearTimeout(this.clipboardTimeout)
+    navigator.clipboard.writeText(text)
+    this.setState({ copiedToClipboard: true })
+    this.clipboardTimeout = setTimeout(() => {
+      this.setState({ copiedToClipboard: false })
+    }, 3000)
+  }
+
   render() {
     return (
       <>
@@ -211,18 +224,18 @@ class Profile extends Component {
           <title>Profile | TV Junkie</title>
         </Helmet>
         <Header />
-        <div className="user-profile">
-          <div className="user-profile__email">
+        <div className="user-settings">
+          <div className="user-settings__email">
             Sign in with <span>{this.context.authUser.email}</span>
           </div>
-          <div className="user-profile__verified">
+          <div className="user-settings__verified">
             {this.context.authUser.emailVerified ? (
               "Email verified"
             ) : (
               <>
                 Email not verified{" "}
                 {this.state.verificationSent ? (
-                  <div className="user-profile__sent-message">Verification sent</div>
+                  <div className="user-settings__sent-message">Verification sent</div>
                 ) : (
                   <button onClick={this.sendEmailVerification} className="button button--profile" type="button">
                     {this.state.loadingVerificationSent ? (
@@ -235,7 +248,7 @@ class Profile extends Component {
               </>
             )}
             {this.state.error && (
-              <div className="user-profile__error-email-verification">{this.state.error.message}</div>
+              <div className="user-settings__error-email-verification">{this.state.error.message}</div>
             )}
           </div>
           <PasswordUpdate />
@@ -249,7 +262,39 @@ class Profile extends Component {
               </div>
             </>
           )}
-          <div className="user-profile__signout">
+          <div className="user-settings__copy-user-link">
+            <div
+              className={classNames("button", {
+                "button--clipboard-copied": this.state.copiedToClipboard
+              })}
+              onClick={() =>
+                this.copyToClipboard(
+                  `${
+                    process.env.NODE_ENV === "production" ? "https://www.tv-junkie.com" : "http://localhost:3000"
+                  }/user/${this.state.authUser.uid}`
+                )
+              }
+            >
+              {!this.state.copiedToClipboard ? (
+                <span
+                  className={classNames("clipboard-message", {
+                    "clipboard-message__not-copied": this.state.copiedToClipboard === false
+                  })}
+                >
+                  Copy profile link
+                </span>
+              ) : (
+                <span
+                  className={classNames("clipboard-message", {
+                    "clipboard-message__copied": this.state.copiedToClipboard
+                  })}
+                >
+                  Copied
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="user-settings__signout">
             <SignOutButton />
           </div>
         </div>
