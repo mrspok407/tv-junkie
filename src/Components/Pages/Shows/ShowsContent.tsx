@@ -60,7 +60,6 @@ const ShowsContent: React.FC = () => {
   }
 
   const renderContent = (section: string) => {
-    console.log(context.userContent.userShows)
     const content = context.userContent.userShows
       .filter((show) => {
         if (section === "finishedShows") {

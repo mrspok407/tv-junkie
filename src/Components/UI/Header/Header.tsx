@@ -117,18 +117,37 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false }) =>
 
           {authUser ? (
             <>
-              <NavLink
-                exact
-                to={ROUTES.PROFILE}
-                className={classNames("nav__link", {
-                  "nav__link--non-auth": !authUser
-                })}
-                activeClassName="nav__item--active"
-              >
-                <li className="nav__item" onClick={() => closeNavMobile()}>
+              <div className="nav__link">
+                <li className="nav__item nav__item--dropdown">
                   Profile
+                  <ul className="nav__list--dropdown">
+                    <NavLink
+                      exact
+                      to={ROUTES.FRIENDS_PAGE}
+                      className={classNames("nav__link", {
+                        "nav__link--non-auth": !authUser
+                      })}
+                      activeClassName="nav__item--active"
+                      onClick={() => closeNavMobile()}
+                    >
+                      <li className="nav__item">Friends</li>
+                    </NavLink>
+                    <NavLink
+                      exact
+                      to={ROUTES.SETTINGS}
+                      className={classNames("nav__link", {
+                        "nav__link--non-auth": !authUser
+                      })}
+                      activeClassName="nav__item--active"
+                      onClick={() => closeNavMobile()}
+                    >
+                      <li className="nav__item" onClick={() => closeNavMobile()}>
+                        Settings
+                      </li>
+                    </NavLink>
+                  </ul>
                 </li>
-              </NavLink>
+              </div>
 
               {/* {authUser.roles && !!authUser.roles[ROLES.ADMIN] && (
                 <NavLink exact to={ROUTES.ADMIN} className="nav__link">

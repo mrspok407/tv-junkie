@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
-import Profile from "Components/Pages/Settings/Settings"
+import Settings from "Components/Pages/Settings/Settings"
 import Admin from "Components/Pages/Admin/Admin"
 import LoginPage from "Components/Pages/Login/Login"
 import SearchPage from "Components/Pages/SearchPage/SearchPage"
@@ -30,7 +30,8 @@ class App extends Component {
             <Route path={ROUTES.MOVIES} exact component={MoviesPage} />
             <Route path={ROUTES.USER_PROFILE} exact component={UserProfile} />
             <Route path={ROUTES.DETAILES_PAGE} exact component={DetailesPage} />
-            <Route path={ROUTES.PROFILE} exact component={Profile} />
+            <Route path={ROUTES.SETTINGS} exact component={Settings} />
+            {/* <Route path={ROUTES.FRIENDS_PAGE} exact component={FriendsPage} /> */}
             <Route path={ROUTES.LOGIN_PAGE} exact component={LoginPage} />
             <Route path={ROUTES.ADMIN} exact component={Admin} />
             <Route path={ROUTES.GRID_TESTS} exact component={GridTests} />

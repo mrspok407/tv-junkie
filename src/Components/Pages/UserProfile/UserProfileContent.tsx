@@ -46,6 +46,11 @@ const UserProfileContent: React.FC<Props> = ({ userUid }) => {
     setLoadingUserName(false)
 
     const userShowsData = await firebase.userAllShows(userUid).once("value")
+    if (userShowsData.val() === null) {
+      setLoadingContent(false)
+      setLoadingUserName(false)
+      return
+    }
     const userShows: UserShowsInterface[] = Object.values(userShowsData.val()).map((show: any) => show)
 
     const showsFromDatabase = await Promise.all(
