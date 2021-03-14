@@ -54,6 +54,13 @@ class Profile extends Component {
     this.authSubscriber = this.context.firebase.onAuthUserListener(
       (authUser) => {
         this.setState({ authUser })
+
+        this.context.firebase
+          .user(this.state.authUser.uid)
+          .child("test")
+          .on("value", (snapshot) => {
+            console.log(snapshot.val())
+          })
       },
       () => {
         this.setState({ authUser: null })
@@ -252,16 +259,17 @@ class Profile extends Component {
             )}
           </div>
           <PasswordUpdate />
-          {(_get(this.state.authUser, "email", "") === process.env.REACT_APP_TEST_EMAIL ||
-            _get(this.state.authUser, "email", "") === process.env.REACT_APP_ADMIN_EMAIL) && (
-            <>
-              <div className="update-database">
-                <button onClick={() => this.databaseModify()} className="button button--profile" type="button">
-                  Update Database
-                </button>
-              </div>
-            </>
-          )}
+          {_get(this.state.authUser, "email", "") === process.env.REACT_APP_TEST_EMAIL ||
+            _get(this.state.authUser, "email", "") === process.env.REACT_APP_ADMIN_EMAIL ||
+            (_get(this.state.authUser, "email", "") === "test2@test.com" && (
+              <>
+                <div className="update-database">
+                  <button onClick={() => this.databaseModify()} className="button button--profile" type="button">
+                    Update Database
+                  </button>
+                </div>
+              </>
+            ))}
           <div className="user-settings__copy-user-link">
             <div
               className={classNames("button", {

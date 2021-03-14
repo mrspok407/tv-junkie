@@ -107,7 +107,6 @@ class Firebase {
   userShow = ({ uid, key }: { uid: string; key: string }) => this.db.ref(`users/${uid}/content/shows/${key}`)
 
   userEpisodes = (uid: string) => this.db.ref(`users/${uid}/content/episodes`)
-  userEpisodesNotFinished = (uid: string) => this.db.ref(`users/${uid}/content/episodes/notFinished`)
 
   userShowEpisodes = (uid: string, showKey: string) => this.db.ref(`users/${uid}/content/episodes/${showKey}`)
   userShowAllEpisodes = (uid: string, showKey: string) =>
