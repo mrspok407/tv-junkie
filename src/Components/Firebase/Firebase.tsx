@@ -27,7 +27,16 @@ const configDevelopment = {
   appId: process.env.REACT_APP_DEV_APP_ID
 }
 
-const config = process.env.NODE_ENV === "production" ? configProduction : configDevelopment
+let config: any = process.env.NODE_ENV === "production" ? configProduction : configDevelopment
+
+if (window.location.hostname === "localhost") {
+  console.log("test")
+  config = {
+    ...config,
+    databaseURL: `http://localhost:9000/?ns=pet-project-development-default-rtdb`
+  }
+  console.log(config)
+}
 
 interface ReferenceInterface {
   uid: string
