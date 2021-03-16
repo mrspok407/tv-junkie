@@ -33,7 +33,7 @@ const getShowsFullInfo = ({ userShows, firebase }: GetUserShowsFullInfoArg) => {
           }
         })
     })
-  ).then(async (showsDatabase) => {
+  ).then((showsDatabase) => {
     const mergedShows: UserShowsInterface[] = merge(userShows, showsDatabase, {
       arrayMerge: combineMergeObjects
     })

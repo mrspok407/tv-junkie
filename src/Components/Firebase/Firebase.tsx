@@ -3,6 +3,7 @@ import { database } from "firebase/app"
 import "firebase/auth"
 import "firebase/database"
 import "firebase/analytics"
+import "firebase/functions"
 import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 
 const configProduction = {
@@ -49,6 +50,7 @@ class Firebase {
   auth: any
   db: any
   analytics: any
+  functions: any
   googleProvider: any
   app: any
 
@@ -58,11 +60,14 @@ class Firebase {
     this.auth = app.auth()
     this.db = app.database()
     this.analytics = app.analytics()
+    this.functions = app.functions()
 
     this.googleProvider = new app.auth.GoogleAuthProvider()
 
     this.app = app
   }
+
+  // httpsCallable = (functionName: string) => this.functions.httpsCallable(functionName)
 
   /// Auth API ///
 
