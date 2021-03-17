@@ -23,38 +23,42 @@ import * as admin from "firebase-admin";
 
 admin.initializeApp();
 
-const database = admin.database();
+// const database = admin.database();
 
 export const onShowUpdate = functions.database
   .ref("users/{uid}/content/shows/{showId}")
-  .onUpdate(async (change, context) => {
-    const uid = context.params.uid;
-    const showId = context.params.showId;
-    console.log({uid, showId});
-    const beforeDatabase = change.before.val();
-    const afterDatabase = change.after.val();
+  .onWrite(async (change) => {
+    // const uid = context.params.uid;
+    // const showId = context.params.showId;
+    // console.log({uid, showId});
+    const before = change.before.val();
+    const after = change.after.val();
 
-    try {
-      await database
-        .ref(`users/${uid}/content/shows`)
-        .orderByKey()
-        .equalTo("82856")
-        .once("value", (snapshot) => {
-          console.log(snapshot.val());
-        });
-    } catch (err) {
-      console.log(err);
-    }
+    console.log({before});
+    console.log({after});
 
-    if (beforeDatabase.database === afterDatabase.database) return null;
+    return "test";
+    // try {
+    //   await database
+    //     .ref(`users/${uid}/content/shows`)
+    //     .orderByKey()
+    //     .equalTo("82856")
+    //     .once("value", (snapshot) => {
+    //       console.log(snapshot.val());
+    //     });
+    // } catch (err) {
+    //   console.log(err);
+    // }
 
-    return change.after.ref.update({
-      previousDatabase: beforeDatabase.database,
-      time: admin.database.ServerValue.TIMESTAMP
-    });
+    // if (before.database === after.database) return null;
+
+    // return change.after.ref.update({
+    //   previousDatabase: before.database,
+    //   time: admin.database.ServerValue.TIMESTAMP
+    // });
   });
 
-// export const callableFunctionTest = functions.https.onCall((data) => {
-//   console.log(data);
-//   return "test";
+// export const callableFunctionTest = functions.https.onCall((data, context) => {
+//   console.log(data.show);
+//   return `test: ${data.show}`;
 // });

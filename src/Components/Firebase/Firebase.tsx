@@ -31,12 +31,10 @@ const configDevelopment = {
 let config: any = process.env.NODE_ENV === "production" ? configProduction : configDevelopment
 
 if (window.location.hostname === "localhost") {
-  console.log("test")
   config = {
     ...config,
     databaseURL: `http://localhost:9000/?ns=pet-project-development-default-rtdb`
   }
-  console.log(config)
 }
 
 interface ReferenceInterface {
@@ -67,7 +65,7 @@ class Firebase {
     this.app = app
   }
 
-  // httpsCallable = (functionName: string) => this.functions.httpsCallable(functionName)
+  httpsCallable = (functionName: string) => this.functions.httpsCallable(functionName)
 
   /// Auth API ///
 

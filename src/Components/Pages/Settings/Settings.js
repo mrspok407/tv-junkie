@@ -54,13 +54,6 @@ class Profile extends Component {
     this.authSubscriber = this.context.firebase.onAuthUserListener(
       (authUser) => {
         this.setState({ authUser })
-
-        this.context.firebase
-          .user(this.state.authUser.uid)
-          .child("test")
-          .on("value", (snapshot) => {
-            console.log(snapshot.val())
-          })
       },
       () => {
         this.setState({ authUser: null })
