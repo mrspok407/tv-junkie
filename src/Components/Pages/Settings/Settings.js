@@ -22,11 +22,14 @@ class Profile extends Component {
       errorMessage: null,
       passwordUpdate: "",
       copiedToClipboard: null,
-      authUser: null
+      authUser: null,
+      limitTo: 2,
+      shows: []
     }
 
     this.authSubscriber = null
     this.clipboardTimeout = null
+    this.fireListener = null
   }
 
   componentDidMount() {
@@ -59,6 +62,32 @@ class Profile extends Component {
         this.setState({ authUser: null })
       }
     )
+  }
+
+  test = () => {
+    this.context.firebase
+      // .userAllShows(this.state.authUser.uid)
+      .userEpisodes(this.state.authUser.uid)
+      // .orderByChild("timeStampString")
+      .limitToLast(this.state.limitTo)
+      .on("value", (snapshot) => {
+        console.log(snapshot.val())
+        let shows = []
+        snapshot.forEach((show) => {
+          shows.push(show.val())
+        })
+        const showsReverse = [...shows].reverse()
+        console.log(showsReverse)
+        this.setState({ shows: showsReverse })
+      })
+  }
+
+  incr = () => {
+    // this.context.firebase.userAllShows(this.state.authUser.uid).off()
+    this.context.firebase.userEpisodes(this.state.authUser.uid).off()
+    this.setState({ limitTo: this.state.limitTo + 1 }, () => {
+      this.test()
+    })
   }
 
   databaseModify = () => {
@@ -217,6 +246,10 @@ class Profile extends Component {
     }, 3000)
   }
 
+  time = () => {
+    console.log(this.context.firebase.timeStamp())
+  }
+
   render() {
     return (
       <>
@@ -295,6 +328,15 @@ class Profile extends Component {
               )}
             </div>
           </div>
+          <button className="button" onClick={() => this.test()}>
+            test
+          </button>
+          <button className="button" onClick={() => this.incr()}>
+            increase number {this.state.limitTo}
+          </button>
+          <button className="button" onClick={() => this.time()}>
+            time
+          </button>
           <div className="user-settings__signout">
             <SignOutButton />
           </div>

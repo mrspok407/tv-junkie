@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import axios from "axios"
 import { Helmet } from "react-helmet"
 import Header from "Components/UI/Header/Header"
@@ -7,6 +7,8 @@ import ScrollToTop from "Utils/ScrollToTopBar"
 import Footer from "Components/UI/Footer/Footer"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
 import useGoogleRedirect from "Components/UserAuth/SignIn/UseGoogleRedirect"
+import { FirebaseContext } from "Components/Firebase"
+import { AppContext } from "Components/AppContext/AppContextHOC"
 const { CancelToken } = require("axios")
 
 let cancelRequest: any
@@ -17,7 +19,114 @@ const Movies: React.FC = () => {
   const [openLinksMoviesId, setOpenLinksMoviesId] = useState<number[]>([])
   const [error, setError] = useState<number[]>([])
 
+  const firebase = useContext(FirebaseContext)
+  const { authUser } = useContext(AppContext)
+
   useGoogleRedirect()
+
+  const [shows, setShows] = useState<any>([])
+  const [lastTS, setLastTS] = useState<number>()
+
+  const loadNewShows = () => {
+    const refShows = firebase.userAllShows(authUser?.uid).orderByChild("timeStamp")
+
+    refShows
+      .endBefore(lastTS)
+      .limitToLast(2)
+      .once("value", (snapshot: any) => {
+        if (snapshot.val() === null) return
+        console.log(snapshot.val())
+        const showsData: any = Object.values(snapshot.val()).map((show) => show)
+        setLastTS(showsData[0].timeStamp)
+        setShows((prevState: any) => {
+          return [...showsData, ...prevState]
+        })
+
+        console.log({ showsDataOnceNEW: showsData })
+
+        refShows
+          .endBefore(lastTS)
+          .limitToLast(2)
+          .on("child_changed", (snapshot: any) => {
+            console.log({ child_changedNEW: snapshot.val() })
+            const changedShowData = snapshot.val()
+            setShows((prevState: any) => {
+              const changedShowIndex = prevState.findIndex((show: any) => show.key === changedShowData.key)
+              prevState[changedShowIndex] = changedShowData
+
+              return [...prevState]
+            })
+          })
+      })
+  }
+
+  useEffect(() => {
+    firebase
+      .userAllShows(authUser?.uid)
+      .orderByChild("timeStamp")
+      .limitToLast(1)
+      .once("value", (snapshot: any) => {
+        const lastShow: any = Object.values(snapshot.val())[0]
+
+        const refShows = firebase.userAllShows(authUser?.uid).orderByChild("timeStamp")
+
+        refShows
+          .endBefore(lastShow.timeStamp)
+          .limitToLast(2)
+          .once("value", (snapshot: any) => {
+            const showsData: any = Object.values(snapshot.val()).map((show) => show)
+            setLastTS(showsData[0].timeStamp)
+            setShows((prevState: any) => {
+              return [...showsData, ...prevState]
+            })
+
+            console.log({ showsDataOnce: showsData })
+
+            refShows
+              .endBefore(lastShow.timeStamp)
+              .limitToLast(2)
+              .on("child_changed", (snapshot: any) => {
+                console.log({ child_changed: snapshot.val() })
+                const changedShowData = snapshot.val()
+                setShows((prevState: any) => {
+                  const changedShowIndex = prevState.findIndex((show: any) => show.key === changedShowData.key)
+                  prevState[changedShowIndex] = changedShowData
+
+                  return [...prevState]
+                })
+              })
+          })
+
+        // refShows.startAt(lastShow.timeStamp).on("value", (snapshot: any) => {
+        //   const showsData = Object.values(snapshot.val()).map((show) => show)
+        //   setShows((prevState: any) => {
+        //     return [...prevState, ...showsData]
+        //   })
+        //   console.log({ latestShows: snapshot.val() })
+        // })
+
+        refShows.startAt(lastShow.timeStamp).on("child_added", (snapshot: any) => {
+          const addedShow = snapshot.val()
+          setShows((prevState: any) => {
+            return [...prevState, addedShow]
+          })
+          console.log({ child_added: snapshot.val() })
+        })
+
+        refShows.startAt(lastShow.timeStamp).on("child_changed", (snapshot: any) => {
+          console.log("child_changed")
+          const changedShowData = snapshot.val()
+          setShows((prevState: any) => {
+            const changedShowIndex = prevState.findIndex((show: any) => show.key === changedShowData.key)
+            prevState[changedShowIndex] = changedShowData
+
+            return [...prevState]
+          })
+        })
+      })
+  }, [])
+
+  console.log({ showsState: shows })
 
   useEffect(() => {
     return () => {
@@ -67,6 +176,9 @@ const Movies: React.FC = () => {
         <title>All your movies | TV Junkie</title>
       </Helmet>
       <Header />
+      <button className="button" onClick={() => loadNewShows()}>
+        Load new shows
+      </button>
       <MoviesContent
         moviesData={moviesData}
         getMovieLinks={getMovieLinks}

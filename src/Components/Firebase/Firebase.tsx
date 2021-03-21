@@ -1,5 +1,4 @@
 import app from "firebase/app"
-import { database } from "firebase/app"
 import "firebase/auth"
 import "firebase/database"
 import "firebase/analytics"
@@ -47,6 +46,7 @@ interface ReferenceInterface {
 class Firebase {
   auth: any
   db: any
+  dbRef: any
   analytics: any
   functions: any
   googleProvider: any
@@ -59,6 +59,8 @@ class Firebase {
     this.db = app.database()
     this.analytics = app.analytics()
     this.functions = app.functions()
+
+    this.dbRef = app.database
 
     this.googleProvider = new app.auth.GoogleAuthProvider()
 
@@ -100,7 +102,7 @@ class Firebase {
       }
     })
 
-  timeStamp = () => database.ServerValue.TIMESTAMP
+  timeStamp = () => this.dbRef.ServerValue.TIMESTAMP
 
   /// Shows In Database ///
   allShowsList = () => this.db.ref(`allShowsList`)
