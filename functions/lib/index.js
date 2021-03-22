@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.onShowUpdate = void 0;
-const functions = require("firebase-functions");
+// import * as functions from "firebase-functions";
 const admin = require("firebase-admin");
 // Cloud Functions interesting points:
 //
@@ -24,36 +23,36 @@ const admin = require("firebase-admin");
 // More info: https://firebase.google.com/docs/functions/callable#web https://youtu.be/8mL1VuiL5Kk?t=593
 admin.initializeApp();
 // const database = admin.database();
-exports.onShowUpdate = functions.database
-    .ref("users/{uid}/content/shows/{showId}")
-    .onWrite(async (change) => {
-    // const uid = context.params.uid;
-    // const showId = context.params.showId;
-    // console.log({uid, showId});
-    const before = change.before.val();
-    const after = change.after.val();
-    console.log({ before });
-    console.log({ after });
-    return "test";
-    // try {
-    //   await database
-    //     .ref(`users/${uid}/content/shows`)
-    //     .orderByKey()
-    //     .equalTo("82856")
-    //     .once("value", (snapshot) => {
-    //       console.log(snapshot.val());
-    //     });
-    // } catch (err) {
-    //   console.log(err);
-    // }
-    // if (before.database === after.database) return null;
-    // return change.after.ref.update({
-    //   previousDatabase: before.database,
-    //   time: admin.database.ServerValue.TIMESTAMP
-    // });
-});
-// export const callableFunctionTest = functions.https.onCall((data, context) => {
-//   console.log(data.show);
-//   return `test: ${data.show}`;
-// });
+// export const onShowUpdate = functions.database
+//   .ref("users/{uid}/content/shows/{showId}")
+//   .onWrite(async (change) => {
+//     // const uid = context.params.uid;
+//     // const showId = context.params.showId;
+//     // console.log({uid, showId});
+//     const before = change.before.val();
+//     const after = change.after.val();
+//     console.log({before});
+//     console.log({after});
+//     return "test";
+//     // try {
+//     //   await database
+//     //     .ref(`users/${uid}/content/shows`)
+//     //     .orderByKey()
+//     //     .equalTo("82856")
+//     //     .once("value", (snapshot) => {
+//     //       console.log(snapshot.val());
+//     //     });
+//     // } catch (err) {
+//     //   console.log(err);
+//     // }
+//     // if (before.database === after.database) return null;
+//     // return change.after.ref.update({
+//     //   previousDatabase: before.database,
+//     //   time: admin.database.ServerValue.TIMESTAMP
+//     // });
+//   });
+// // export const callableFunctionTest = functions.https.onCall((data, context) => {
+// //   console.log(data.show);
+// //   return `test: ${data.show}`;
+// // });
 //# sourceMappingURL=index.js.map

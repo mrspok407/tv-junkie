@@ -12,6 +12,7 @@ import { AppContext } from "Components/AppContext/AppContextHOC"
 const { CancelToken } = require("axios")
 
 let cancelRequest: any
+const MESSAGES_TO_LOAD = 5
 
 const Movies: React.FC = () => {
   const [moviesData, setMoviesData] = useState<ContentDetailes[]>([])
@@ -24,109 +25,147 @@ const Movies: React.FC = () => {
 
   useGoogleRedirect()
 
-  const [shows, setShows] = useState<any>([])
+  const [messages, setMessages] = useState<any>([])
   const [lastTS, setLastTS] = useState<number>()
+  const messagesRef = firebase.user(authUser?.uid).child("content/messages").orderByChild("timeStamp")
 
-  const loadNewShows = () => {
-    const refShows = firebase.userAllShows(authUser?.uid).orderByChild("timeStamp")
-
-    refShows
+  const loadNewMessages = () => {
+    messagesRef
       .endBefore(lastTS)
-      .limitToLast(2)
+      .limitToLast(MESSAGES_TO_LOAD)
       .once("value", (snapshot: any) => {
         if (snapshot.val() === null) return
-        console.log(snapshot.val())
-        const showsData: any = Object.values(snapshot.val()).map((show) => show)
-        setLastTS(showsData[0].timeStamp)
-        setShows((prevState: any) => {
-          return [...showsData, ...prevState]
+        let messagesData: any = []
+        snapshot.forEach((message: any) => {
+          messagesData.push({ ...message.val(), key: message.key })
         })
 
-        console.log({ showsDataOnceNEW: showsData })
+        setLastTS(messagesData[0].timeStamp)
+        setMessages((prevState: any) => {
+          console.log({ messages })
+          console.log({ prevState })
+          return [...messagesData, ...prevState]
+        })
 
-        refShows
+        console.log({ messagesDataOnceNEW: messagesData })
+
+        messagesRef
           .endBefore(lastTS)
-          .limitToLast(2)
+          .limitToLast(MESSAGES_TO_LOAD)
           .on("child_changed", (snapshot: any) => {
             console.log({ child_changedNEW: snapshot.val() })
-            const changedShowData = snapshot.val()
-            setShows((prevState: any) => {
-              const changedShowIndex = prevState.findIndex((show: any) => show.key === changedShowData.key)
-              prevState[changedShowIndex] = changedShowData
+            const changedMessageData = { ...snapshot.val(), key: snapshot.key }
+            setMessages((prevState: any) => {
+              const changedMessageIndex = prevState.findIndex((message: any) => message.key === snapshot.key)
+              const changedMessageInState = prevState[changedMessageIndex]
 
+              prevState[changedMessageIndex] = changedMessageIndex !== -1 && {
+                ...changedMessageData,
+                timeStamp: changedMessageInState.timeStamp
+              }
               return [...prevState]
+            })
+          })
+
+        messagesRef
+          .endBefore(lastTS)
+          .limitToLast(MESSAGES_TO_LOAD)
+          .on("child_removed", (snapshot: any) => {
+            const removedMessage = { ...snapshot.val(), key: snapshot.key }
+            setMessages((prevState: any) => {
+              return [...prevState.filter((message: any) => message.key !== removedMessage.key)]
             })
           })
       })
   }
 
   useEffect(() => {
-    firebase
-      .userAllShows(authUser?.uid)
-      .orderByChild("timeStamp")
-      .limitToLast(1)
-      .once("value", (snapshot: any) => {
-        const lastShow: any = Object.values(snapshot.val())[0]
+    // const messagesRef = firebase.user(authUser?.uid).child("content/messages").orderByChild("timeStamp")
 
-        const refShows = firebase.userAllShows(authUser?.uid).orderByChild("timeStamp")
+    messagesRef.limitToLast(MESSAGES_TO_LOAD).once("value", (snapshot: any) => {
+      let lastMessageTS: any = 0
+      let firstMessageTS: any = 0
 
-        refShows
-          .endBefore(lastShow.timeStamp)
-          .limitToLast(2)
-          .once("value", (snapshot: any) => {
-            const showsData: any = Object.values(snapshot.val()).map((show) => show)
-            setLastTS(showsData[0].timeStamp)
-            setShows((prevState: any) => {
-              return [...showsData, ...prevState]
-            })
-
-            console.log({ showsDataOnce: showsData })
-
-            refShows
-              .endBefore(lastShow.timeStamp)
-              .limitToLast(2)
-              .on("child_changed", (snapshot: any) => {
-                console.log({ child_changed: snapshot.val() })
-                const changedShowData = snapshot.val()
-                setShows((prevState: any) => {
-                  const changedShowIndex = prevState.findIndex((show: any) => show.key === changedShowData.key)
-                  prevState[changedShowIndex] = changedShowData
-
-                  return [...prevState]
-                })
-              })
-          })
-
-        // refShows.startAt(lastShow.timeStamp).on("value", (snapshot: any) => {
-        //   const showsData = Object.values(snapshot.val()).map((show) => show)
-        //   setShows((prevState: any) => {
-        //     return [...prevState, ...showsData]
-        //   })
-        //   console.log({ latestShows: snapshot.val() })
-        // })
-
-        refShows.startAt(lastShow.timeStamp).on("child_added", (snapshot: any) => {
-          const addedShow = snapshot.val()
-          setShows((prevState: any) => {
-            return [...prevState, addedShow]
-          })
-          console.log({ child_added: snapshot.val() })
+      if (snapshot.val() !== null) {
+        let messagesData: any = []
+        snapshot.forEach((message: any) => {
+          messagesData.push({ ...message.val(), key: message.key })
         })
 
-        refShows.startAt(lastShow.timeStamp).on("child_changed", (snapshot: any) => {
-          console.log("child_changed")
-          const changedShowData = snapshot.val()
-          setShows((prevState: any) => {
-            const changedShowIndex = prevState.findIndex((show: any) => show.key === changedShowData.key)
-            prevState[changedShowIndex] = changedShowData
+        lastMessageTS = messagesData[messagesData.length - 1].timeStamp
+        firstMessageTS = messagesData[0].timeStamp
 
-            return [...prevState]
-          })
+        setLastTS(firstMessageTS)
+        setMessages(messagesData)
+      }
+
+      messagesRef.startAfter(lastMessageTS).on("child_added", (snapshot: any) => {
+        const addedMessage = { ...snapshot.val(), key: snapshot.key }
+        console.log({ addedChild: addedMessage })
+        setMessages((prevState: any) => {
+          return [...prevState, addedMessage]
         })
       })
-  }, [])
 
-  console.log({ showsState: shows })
+      messagesRef.startAt(firstMessageTS).on("child_changed", (snapshot: any) => {
+        const changedMessageData = { ...snapshot.val(), key: snapshot.key }
+        console.log({ chagnedChild: changedMessageData })
+        setMessages((prevState: any) => {
+          console.log({ prevState })
+          const changedMessageIndex = prevState.findIndex((message: any) => message.key === snapshot.key)
+          const changedMessageInState = prevState[changedMessageIndex]
+
+          prevState[changedMessageIndex] = changedMessageIndex !== -1 && {
+            ...changedMessageData,
+            timeStamp: changedMessageInState.timeStamp
+          }
+          return [...prevState]
+        })
+      })
+
+      messagesRef.startAt(firstMessageTS).on("child_removed", (snapshot: any) => {
+        const removedMessage = { ...snapshot.val(), key: snapshot.key }
+        setMessages((prevState: any) => {
+          return [...prevState.filter((message: any) => message.key !== removedMessage.key)]
+        })
+      })
+    })
+
+    return () => {
+      firebase.user(authUser?.uid).child("content/messages").off()
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    // console.log({ messages })
+    // console.log("component rerendered")
+  })
+
+  const addNewMessage = () => {
+    const messagesRef = firebase.user(authUser?.uid).child("content/messages")
+    const newMessageRef = messagesRef.push()
+    const randomNumber = Math.floor(Math.random() * Math.floor(201))
+    newMessageRef.set({
+      timeStamp: firebase.timeStamp(),
+      message: "some text",
+      number: randomNumber
+    })
+  }
+
+  const changeMessage = (key: any) => {
+    firebase
+      .user(authUser?.uid)
+      .child(`content/messages/${key}`)
+      .update({
+        number: Math.floor(Math.random() * Math.floor(201))
+      })
+  }
+
+  const deleteMessage = (key: any) => {
+    firebase.user(authUser?.uid).child(`content/messages/${key}`).set(null)
+  }
+
+  // console.log({ messagesState: messages })
 
   useEffect(() => {
     return () => {
@@ -176,9 +215,26 @@ const Movies: React.FC = () => {
         <title>All your movies | TV Junkie</title>
       </Helmet>
       <Header />
-      <button className="button" onClick={() => loadNewShows()}>
+      <button className="button" onClick={() => loadNewMessages()}>
         Load new shows
       </button>
+      <button className="button" onClick={() => addNewMessage()}>
+        Add new message
+      </button>
+      <div>
+        {messages.map((message: any) => (
+          <div
+            key={message.key}
+            style={{ color: "#fff", gridTemplateColumns: "repeat(3, 1fr)", alignItems: "center", display: "grid" }}
+          >
+            <div>
+              {message.message} {message.number}
+            </div>{" "}
+            <button onClick={() => changeMessage(message.key)}>Change number</button>{" "}
+            <button onClick={() => deleteMessage(message.key)}>Delete</button>
+          </div>
+        ))}
+      </div>
       <MoviesContent
         moviesData={moviesData}
         getMovieLinks={getMovieLinks}
