@@ -49,23 +49,22 @@ const Movies: React.FC = () => {
 
         console.log({ messagesDataOnceNEW: messagesData })
 
-        messagesRef
-          .endBefore(lastTS)
-          .limitToLast(MESSAGES_TO_LOAD)
-          .on("child_changed", (snapshot: any) => {
-            console.log({ child_changedNEW: snapshot.val() })
-            const changedMessageData = { ...snapshot.val(), key: snapshot.key }
-            setMessages((prevState: any) => {
-              const changedMessageIndex = prevState.findIndex((message: any) => message.key === snapshot.key)
-              const changedMessageInState = prevState[changedMessageIndex]
+        const testFun = (snapshot: any) => {
+          console.log({ child_changedNEW: snapshot.val() })
+          const changedMessageData = { ...snapshot.val(), key: snapshot.key }
+          setMessages((prevState: any) => {
+            const changedMessageIndex = prevState.findIndex((message: any) => message.key === snapshot.key)
+            const changedMessageInState = prevState[changedMessageIndex]
 
-              prevState[changedMessageIndex] = changedMessageIndex !== -1 && {
-                ...changedMessageData,
-                timeStamp: changedMessageInState.timeStamp
-              }
-              return [...prevState]
-            })
+            prevState[changedMessageIndex] = changedMessageIndex !== -1 && {
+              ...changedMessageData,
+              timeStamp: changedMessageInState.timeStamp
+            }
+            return [...prevState]
           })
+        }
+
+        messagesRef.endBefore(lastTS).limitToLast(MESSAGES_TO_LOAD).on("child_changed", testFun)
 
         messagesRef
           .endBefore(lastTS)
@@ -81,6 +80,9 @@ const Movies: React.FC = () => {
 
   useEffect(() => {
     // const messagesRef = firebase.user(authUser?.uid).child("content/messages").orderByChild("timeStamp")
+
+    firebase.user(authUser?.uid).child("content/messages/status").update({ online: true })
+    firebase.user(authUser?.uid).child("content/messages/status").onDisconnect().update({ online: false })
 
     messagesRef.limitToLast(MESSAGES_TO_LOAD).once("value", (snapshot: any) => {
       let lastMessageTS: any = 0
@@ -132,6 +134,7 @@ const Movies: React.FC = () => {
     })
 
     return () => {
+      firebase.user(authUser?.uid).child("content/messages/status").update({ online: false })
       firebase.user(authUser?.uid).child("content/messages").off()
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
