@@ -1,0 +1,11 @@
+.messages-container {
+  height: 300px;
+  overflow-y: auto;
+}
+
+.message {
+  display: grid;
+  color: #fff;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: center;
+}

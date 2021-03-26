@@ -1,4 +1,4 @@
-import * as functions from "firebase-functions";
+// import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 
 // Cloud Functions interesting points:
@@ -23,46 +23,46 @@ import * as admin from "firebase-admin";
 
 admin.initializeApp();
 
-const database = admin.database();
+// const database = admin.database();
 
-export const onShowUpdate = functions.database
-  .ref("users/{uid}/content/messages/status/online")
-  .onUpdate(async (change, context) => {
-    const uid = context.params.uid;
-    // const showId = context.params.showId;
-    // console.log({uid, showId});
-    const before = change.before.val();
-    const after = change.after.val();
+// export const onShowUpdate = functions.database
+//   .ref("users/{uid}/content/messages/status/online")
+//   .onUpdate(async (change, context) => {
+//     const uid = context.params.uid;
+//     // const showId = context.params.showId;
+//     // console.log({uid, showId});
+//     const before = change.before.val();
+//     const after = change.after.val();
 
-    console.log({before});
-    console.log({after});
+//     console.log({before});
+//     console.log({after});
 
-    if (!after) {
-      return database
-        .ref(`users/${uid}/content/messages/status/timeStamp`)
-        .set(admin.database.ServerValue.TIMESTAMP);
-    } else {
-      return;
-    }
-    // try {
-    //   await database
-    //     .ref(`users/${uid}/content/shows`)
-    //     .orderByKey()
-    //     .equalTo("82856")
-    //     .once("value", (snapshot) => {
-    //       console.log(snapshot.val());
-    //     });
-    // } catch (err) {
-    //   console.log(err);
-    // }
+//     if (!after) {
+//       return database
+//         .ref(`users/${uid}/content/messages/status/timeStamp`)
+//         .set(admin.database.ServerValue.TIMESTAMP);
+//     } else {
+//       return;
+//     }
+//     // try {
+//     //   await database
+//     //     .ref(`users/${uid}/content/shows`)
+//     //     .orderByKey()
+//     //     .equalTo("82856")
+//     //     .once("value", (snapshot) => {
+//     //       console.log(snapshot.val());
+//     //     });
+//     // } catch (err) {
+//     //   console.log(err);
+//     // }
 
-    // if (before.database === after.database) return null;
+//     // if (before.database === after.database) return null;
 
-    // return change.after.ref.update({
-    //   previousDatabase: before.database,
-    //   time: admin.database.ServerValue.TIMESTAMP
-    // });
-  });
+//     // return change.after.ref.update({
+//     //   previousDatabase: before.database,
+//     //   time: admin.database.ServerValue.TIMESTAMP
+//     // });
+//   });
 
 // // export const callableFunctionTest = functions.https.onCall((data, context) => {
 // //   console.log(data.show);

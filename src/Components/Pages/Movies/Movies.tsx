@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react"
+import React, { useContext, useEffect, useState, useRef, useLayoutEffect, useCallback } from "react"
 import axios from "axios"
 import { Helmet } from "react-helmet"
 import Header from "Components/UI/Header/Header"
@@ -9,10 +9,11 @@ import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
 import useGoogleRedirect from "Components/UserAuth/SignIn/UseGoogleRedirect"
 import { FirebaseContext } from "Components/Firebase"
 import { AppContext } from "Components/AppContext/AppContextHOC"
+import "./Movies.scss"
 const { CancelToken } = require("axios")
 
 let cancelRequest: any
-const MESSAGES_TO_LOAD = 5
+const MESSAGES_TO_LOAD = 50
 
 const Movies: React.FC = () => {
   const [moviesData, setMoviesData] = useState<ContentDetailes[]>([])
@@ -28,6 +29,85 @@ const Movies: React.FC = () => {
   const [messages, setMessages] = useState<any>([])
   const [lastTS, setLastTS] = useState<number>()
   const messagesRef = firebase.user(authUser?.uid).child("content/messages").orderByChild("timeStamp")
+
+  const lastMessageRef = useRef<HTMLDivElement>(null)
+  const [test, setTest] = useState<any>(null)
+
+  const [lastMessage, setlastMessage] = useState<any>()
+  const [scrolledToLastMsg, setScrolledToLastMsg] = useState(false)
+  const [messagesContainer, setMessagesContainer] = useState<any>(null)
+
+  const [scrollAtTheBottom, setScrollAtTheBottom] = useState(false)
+
+  // const scrollToBottom = () => {
+  //   lastMessageRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" })
+  // }
+
+  const testRef = useCallback((node) => {
+    if (node !== null) {
+      setTest(node)
+    }
+  }, [])
+
+  const messagesContainerRef = useCallback((node) => {
+    if (node !== null) {
+      setMessagesContainer(node)
+    }
+  }, [])
+
+  useLayoutEffect(() => {
+    console.log({ test })
+    console.log({ messages })
+    if (messages.length === 0 || scrolledToLastMsg) return
+    const firstUnreadMessage = messages.find((msg: any) => msg.read === false)
+    console.log(firstUnreadMessage)
+    const firstUnreadMessageRef: any = document.querySelector(`.message-${firstUnreadMessage?.key}`)
+    const messagesContainer: any = document.querySelector(".messages-container")
+    const contRect = messagesContainer?.getBoundingClientRect().top + document.documentElement.scrollTop
+    const rect = firstUnreadMessageRef?.getBoundingClientRect().top + document.documentElement.scrollTop
+
+    const vertPosRelativeToParent = rect - contRect
+
+    messagesContainer.scroll(0, vertPosRelativeToParent)
+    messagesContainer.addEventListener("scroll", handleScroll)
+    console.log({ vertPosRelativeToParent })
+    console.log({ rect })
+    // firstUnreadMessageRef?.scrollIntoView({ block: "nearest", inline: "start" })
+    setScrolledToLastMsg(true)
+
+    // scrollToBottom()
+  }, [messages, scrolledToLastMsg])
+
+  useEffect(() => {
+    console.log("rerender")
+  })
+
+  useLayoutEffect(() => {
+    messagesContainer?.addEventListener("scroll", handleScroll)
+  }, [messagesContainer])
+
+  const handleScroll = () => {
+    const height = messagesContainer.getBoundingClientRect().height
+    const scrollHeight = messagesContainer.scrollHeight
+    const scrollTop = messagesContainer.scrollTop
+
+    if (scrollHeight === scrollTop + height) {
+      setScrollAtTheBottom(true)
+    } else {
+      setScrollAtTheBottom(false)
+    }
+
+    console.log(messagesContainer.scrollHeight)
+    console.log(messagesContainer.scrollTop)
+    console.log(messagesContainer.getBoundingClientRect().height)
+  }
+
+  useLayoutEffect(() => {
+    if (messages.length === 0 || !scrollAtTheBottom) return
+    const lastMessage = messages[messages.length - 1]
+    const lastMessageRef: any = document.querySelector(`.message-${lastMessage?.key}`)
+    lastMessageRef?.scrollIntoView({ block: "nearest", inline: "start" })
+  }, [messages])
 
   const loadNewMessages = () => {
     messagesRef
@@ -79,10 +159,8 @@ const Movies: React.FC = () => {
   }
 
   useEffect(() => {
-    // const messagesRef = firebase.user(authUser?.uid).child("content/messages").orderByChild("timeStamp")
-
-    firebase.user(authUser?.uid).child("content/messages/status").update({ online: true })
-    firebase.user(authUser?.uid).child("content/messages/status").onDisconnect().update({ online: false })
+    console.log("effect")
+    // firebase.user(authUser?.uid).child("content/messages/status").onDisconnect().update({ online: false })
 
     messagesRef.limitToLast(MESSAGES_TO_LOAD).once("value", (snapshot: any) => {
       let lastMessageTS: any = 0
@@ -97,6 +175,8 @@ const Movies: React.FC = () => {
         lastMessageTS = messagesData[messagesData.length - 1].timeStamp
         firstMessageTS = messagesData[0].timeStamp
 
+        setlastMessage(messagesData[messagesData.length - 1])
+        console.log({ messagesData })
         setLastTS(firstMessageTS)
         setMessages(messagesData)
       }
@@ -134,15 +214,10 @@ const Movies: React.FC = () => {
     })
 
     return () => {
-      firebase.user(authUser?.uid).child("content/messages/status").update({ online: false })
+      // firebase.user(authUser?.uid).child("content/messages/status").update({ online: false })
       firebase.user(authUser?.uid).child("content/messages").off()
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    // console.log({ messages })
-    // console.log("component rerendered")
-  })
 
   const addNewMessage = () => {
     const messagesRef = firebase.user(authUser?.uid).child("content/messages")
@@ -218,17 +293,19 @@ const Movies: React.FC = () => {
         <title>All your movies | TV Junkie</title>
       </Helmet>
       <Header />
-      <button className="button" onClick={() => loadNewMessages()}>
+      <button style={{ width: "300px" }} className="button" onClick={() => loadNewMessages()}>
         Load new shows
       </button>
-      <button className="button" onClick={() => addNewMessage()}>
+      <button style={{ width: "300px" }} className="button" onClick={() => addNewMessage()}>
         Add new message
       </button>
-      <div>
+      <div className="messages-container" ref={messagesContainerRef}>
         {messages.map((message: any) => (
           <div
             key={message.key}
-            style={{ color: "#fff", gridTemplateColumns: "repeat(3, 1fr)", alignItems: "center", display: "grid" }}
+            // ref={messages[messages.length - 1].key === message.key ? lastMessageRef : undefined}
+            ref={messages[messages.length - 1].key === message.key ? testRef : undefined}
+            className={`message message-${message.key}`}
           >
             <div>
               {message.message} {message.number}
@@ -237,6 +314,7 @@ const Movies: React.FC = () => {
             <button onClick={() => deleteMessage(message.key)}>Delete</button>
           </div>
         ))}
+        {/* <div ref={testRef}></div> */}
       </div>
       <MoviesContent
         moviesData={moviesData}
