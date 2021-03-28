@@ -31,23 +31,18 @@ const Movies: React.FC = () => {
   const messagesRef = firebase.user(authUser?.uid).child("content/messages").orderByChild("timeStamp")
 
   const lastMessageRef = useRef<HTMLDivElement>(null)
-  const [test, setTest] = useState<any>(null)
 
-  const [lastMessage, setlastMessage] = useState<any>()
-  const [scrolledToLastMsg, setScrolledToLastMsg] = useState(false)
   const [messagesContainer, setMessagesContainer] = useState<any>(null)
 
   const [scrollAtTheBottom, setScrollAtTheBottom] = useState(false)
 
-  // const scrollToBottom = () => {
-  //   lastMessageRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" })
-  // }
+  const [firstLoad, setFirstLoad] = useState(false)
 
-  const testRef = useCallback((node) => {
-    if (node !== null) {
-      setTest(node)
-    }
-  }, [])
+  const [initialObserver, setInitialObserver] = useState(false)
+
+  const [observedMessages, setObservedMessages] = useState<string[]>([])
+
+  const [unreadMessages, setUnreadMessages] = useState()
 
   const messagesContainerRef = useCallback((node) => {
     if (node !== null) {
@@ -56,35 +51,122 @@ const Movies: React.FC = () => {
   }, [])
 
   useLayoutEffect(() => {
-    console.log({ test })
-    console.log({ messages })
-    if (messages.length === 0 || scrolledToLastMsg) return
-    const firstUnreadMessage = messages.find((msg: any) => msg.read === false)
-    console.log(firstUnreadMessage)
-    const firstUnreadMessageRef: any = document.querySelector(`.message-${firstUnreadMessage?.key}`)
+    if (messages.length === 0 || firstLoad) return
     const messagesContainer: any = document.querySelector(".messages-container")
-    const contRect = messagesContainer?.getBoundingClientRect().top + document.documentElement.scrollTop
-    const rect = firstUnreadMessageRef?.getBoundingClientRect().top + document.documentElement.scrollTop
+    const firstUnreadMessage = messages.find((msg: any) => msg.read === false)
+    const lastMessage = messages[messages.length - 1]
+    const lastMessageRef: any = document.querySelector(`.message-${lastMessage?.key}`)
 
-    const vertPosRelativeToParent = rect - contRect
+    console.log({ firstUnreadMessage })
+    console.log({ scrollAtTheBottom })
 
-    messagesContainer.scroll(0, vertPosRelativeToParent)
-    messagesContainer.addEventListener("scroll", handleScroll)
-    console.log({ vertPosRelativeToParent })
-    console.log({ rect })
-    // firstUnreadMessageRef?.scrollIntoView({ block: "nearest", inline: "start" })
-    setScrolledToLastMsg(true)
+    if (firstUnreadMessage) {
+      const firstUnreadMessageRef: any = document.querySelector(`.message-${firstUnreadMessage?.key}`)
+      const contRect = messagesContainer?.getBoundingClientRect().top + document.documentElement.scrollTop
+      const rect = firstUnreadMessageRef?.getBoundingClientRect().top + document.documentElement.scrollTop
 
-    // scrollToBottom()
-  }, [messages, scrolledToLastMsg])
+      const vertPosRelativeToParent = rect - contRect
+
+      messagesContainer.scroll(0, vertPosRelativeToParent)
+      // setScrollAtTheBottom(false)
+      setFirstLoad(true)
+    } else {
+      lastMessageRef?.scrollIntoView({ block: "nearest", inline: "start" })
+      setScrollAtTheBottom(true)
+      setFirstLoad(true)
+    }
+  }, [messages, firstLoad, scrollAtTheBottom])
 
   useEffect(() => {
     console.log("rerender")
   })
 
+  const observerCallback = (entries: any) => {
+    entries.forEach((entry: any) => {
+      console.log({ targetNumber: entry.target.dataset.number, isIntersecting: entry.isIntersecting })
+      if (entry.isIntersecting) {
+        const messageKey = entry.target.dataset.key
+        const messageRef: any = document.querySelector(`.message-${messageKey}`)
+        firebase
+          .user(authUser?.uid)
+          .child(`content/messages/${messageKey}`)
+          .update(
+            {
+              read: true
+            },
+            () => {
+              observer.unobserve(messageRef)
+
+              firebase
+                .user(authUser?.uid)
+                .child("content/unreadMessages")
+                .once("value", (snapshot: any) => {
+                  if (snapshot.val() === null || snapshot.val() <= 0) return
+                  firebase
+                    .user(authUser?.uid)
+                    .child("content/unreadMessages")
+                    .set(snapshot.val() - 1)
+                })
+            }
+          )
+      }
+      // Each entry describes an intersection change for one observed
+      // target element:
+      //   entry.boundingClientRect
+      //   entry.intersectionRatio
+      //   entry.intersectionRect
+      //   entry.isIntersecting
+      //   entry.rootBounds
+      //   entry.target
+      //   entry.time
+    })
+  }
+
+  let observerOptions = {
+    root: messagesContainer,
+    rootMargin: "0px",
+    threshold: 1.0
+  }
+
+  const observer: any = new IntersectionObserver(observerCallback, observerOptions)
+
+  useEffect(() => {
+    if (messages.length === 0) return
+    if (!initialObserver) {
+      const unreadMessages = messages.filter((msg: any) => msg.read === false)
+      unreadMessages.forEach(({ key }: any) => {
+        const $message = document.querySelector(`.message-${key}`)
+        observer.observe($message)
+      })
+      const observedMessages = unreadMessages.reduce((acc: any, message: any) => {
+        acc.push(message.key)
+        return acc
+      }, [])
+      setObservedMessages(observedMessages)
+      setInitialObserver(true)
+    } else {
+      // if (!scrollAtTheBottom) {
+      const lastMessage = messages[messages.length - 1]
+      console.log({ lastMessage })
+      if (observedMessages.includes(lastMessage.key)) return
+      console.log("new observer")
+
+      const lastMessageRef: any = document.querySelector(`.message-${lastMessage?.key}`)
+      observer.observe(lastMessageRef)
+      setObservedMessages([...observedMessages, lastMessage.key])
+      // }
+    }
+  }, [messages, initialObserver])
+
+  // if (lastMessageRef.current !== null) {
+  //   console.log(lastMessageRef.current)
+
+  //   observer.observe(lastMessageRef.current)
+  // }
+
   useLayoutEffect(() => {
     messagesContainer?.addEventListener("scroll", handleScroll)
-  }, [messagesContainer])
+  }, [messagesContainer]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleScroll = () => {
     const height = messagesContainer.getBoundingClientRect().height
@@ -92,22 +174,21 @@ const Movies: React.FC = () => {
     const scrollTop = messagesContainer.scrollTop
 
     if (scrollHeight === scrollTop + height) {
+      console.log("scroll bottom")
       setScrollAtTheBottom(true)
     } else {
+      console.log("scroll not bottom")
       setScrollAtTheBottom(false)
     }
-
-    console.log(messagesContainer.scrollHeight)
-    console.log(messagesContainer.scrollTop)
-    console.log(messagesContainer.getBoundingClientRect().height)
   }
 
   useLayoutEffect(() => {
+    console.log({ scrollAtTheBottom })
     if (messages.length === 0 || !scrollAtTheBottom) return
     const lastMessage = messages[messages.length - 1]
     const lastMessageRef: any = document.querySelector(`.message-${lastMessage?.key}`)
     lastMessageRef?.scrollIntoView({ block: "nearest", inline: "start" })
-  }, [messages])
+  }, [messages, scrollAtTheBottom])
 
   const loadNewMessages = () => {
     messagesRef
@@ -162,6 +243,13 @@ const Movies: React.FC = () => {
     console.log("effect")
     // firebase.user(authUser?.uid).child("content/messages/status").onDisconnect().update({ online: false })
 
+    firebase
+      .user(authUser?.uid)
+      .child("content/unreadMessages")
+      .on("value", (snapshot: any) => {
+        setUnreadMessages(snapshot.val())
+      })
+
     messagesRef.limitToLast(MESSAGES_TO_LOAD).once("value", (snapshot: any) => {
       let lastMessageTS: any = 0
       let firstMessageTS: any = 0
@@ -175,7 +263,6 @@ const Movies: React.FC = () => {
         lastMessageTS = messagesData[messagesData.length - 1].timeStamp
         firstMessageTS = messagesData[0].timeStamp
 
-        setlastMessage(messagesData[messagesData.length - 1])
         console.log({ messagesData })
         setLastTS(firstMessageTS)
         setMessages(messagesData)
@@ -226,8 +313,23 @@ const Movies: React.FC = () => {
     newMessageRef.set({
       timeStamp: firebase.timeStamp(),
       message: "some text",
-      number: randomNumber
+      number: randomNumber,
+      read: false
     })
+
+    firebase
+      .user(authUser?.uid)
+      .child("content/unreadMessages")
+      .once("value", (snapshot: any) => {
+        if (snapshot.val() === null) {
+          firebase.user(authUser?.uid).child("content/unreadMessages").set(1)
+        } else {
+          firebase
+            .user(authUser?.uid)
+            .child("content/unreadMessages")
+            .set(snapshot.val() + 1)
+        }
+      })
   }
 
   const changeMessage = (key: any) => {
@@ -299,13 +401,16 @@ const Movies: React.FC = () => {
       <button style={{ width: "300px" }} className="button" onClick={() => addNewMessage()}>
         Add new message
       </button>
+      <div style={{ color: "#fff" }}>{unreadMessages}</div>
       <div className="messages-container" ref={messagesContainerRef}>
         {messages.map((message: any) => (
           <div
             key={message.key}
-            // ref={messages[messages.length - 1].key === message.key ? lastMessageRef : undefined}
-            ref={messages[messages.length - 1].key === message.key ? testRef : undefined}
+            ref={messages[messages.length - 1].key === message.key ? lastMessageRef : undefined}
+            // ref={messages[messages.length - 1].key === message.key ? testRef : undefined}
             className={`message message-${message.key}`}
+            data-key={message.key}
+            data-number={message.number}
           >
             <div>
               {message.message} {message.number}
