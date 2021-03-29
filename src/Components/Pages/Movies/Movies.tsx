@@ -9,6 +9,7 @@ import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
 import useGoogleRedirect from "Components/UserAuth/SignIn/UseGoogleRedirect"
 import { FirebaseContext } from "Components/Firebase"
 import { AppContext } from "Components/AppContext/AppContextHOC"
+import { throttle } from "throttle-debounce"
 import "./Movies.scss"
 const { CancelToken } = require("axios")
 
@@ -35,6 +36,7 @@ const Movies: React.FC = () => {
   const [messagesContainer, setMessagesContainer] = useState<any>(null)
 
   const [scrollAtTheBottom, setScrollAtTheBottom] = useState(false)
+  const [chatBottomFire, setChatBottomFire] = useState(false)
 
   const [firstLoad, setFirstLoad] = useState(false)
 
@@ -42,7 +44,9 @@ const Movies: React.FC = () => {
 
   const [observedMessages, setObservedMessages] = useState<string[]>([])
 
-  const [unreadMessages, setUnreadMessages] = useState()
+  const [unreadMessagesKeys, setUnreadMessagesKeys] = useState<string[]>([])
+
+  const unreadMessagesRef = useRef<number>(0)
 
   const messagesContainerRef = useCallback((node) => {
     if (node !== null) {
@@ -50,10 +54,16 @@ const Movies: React.FC = () => {
     }
   }, [])
 
+  useEffect(() => {
+    return () => {
+      firebase.user(authUser?.uid).child("content/unreadMessages_uid1").off()
+    }
+  }, [])
+
   useLayoutEffect(() => {
-    if (messages.length === 0 || firstLoad) return
+    if (!messages.length || firstLoad) return
     const messagesContainer: any = document.querySelector(".messages-container")
-    const firstUnreadMessage = messages.find((msg: any) => msg.read === false)
+    const firstUnreadMessage = messages.find((msg: any) => msg.key === unreadMessagesKeys[0])
     const lastMessage = messages[messages.length - 1]
     const lastMessageRef: any = document.querySelector(`.message-${lastMessage?.key}`)
 
@@ -75,7 +85,7 @@ const Movies: React.FC = () => {
       setScrollAtTheBottom(true)
       setFirstLoad(true)
     }
-  }, [messages, firstLoad, scrollAtTheBottom])
+  }, [messages, unreadMessagesKeys, firstLoad, scrollAtTheBottom])
 
   useEffect(() => {
     console.log("rerender")
@@ -83,32 +93,30 @@ const Movies: React.FC = () => {
 
   const observerCallback = (entries: any) => {
     entries.forEach((entry: any) => {
-      console.log({ targetNumber: entry.target.dataset.number, isIntersecting: entry.isIntersecting })
+      console.log({
+        targetNumber: entry.target.dataset.number,
+        isIntersecting: entry.isIntersecting,
+        entryTime: entry.time
+      })
+
+      console.log({ entryTime: entry.time })
       if (entry.isIntersecting) {
         const messageKey = entry.target.dataset.key
         const messageRef: any = document.querySelector(`.message-${messageKey}`)
+        observer.unobserve(messageRef)
         firebase
           .user(authUser?.uid)
-          .child(`content/messages/${messageKey}`)
-          .update(
-            {
-              read: true
-            },
-            () => {
-              observer.unobserve(messageRef)
+          .child(`content/unreadMessages_uid1/${messageKey}`)
+          .set(null, () => {
+            console.log("unreadMessages deleted")
+            // console.log({ unreadMessagesRef: unreadMessagesRef.current })
 
-              firebase
-                .user(authUser?.uid)
-                .child("content/unreadMessages")
-                .once("value", (snapshot: any) => {
-                  if (snapshot.val() === null || snapshot.val() <= 0) return
-                  firebase
-                    .user(authUser?.uid)
-                    .child("content/unreadMessages")
-                    .set(snapshot.val() - 1)
-                })
-            }
-          )
+            // if (unreadMessagesRef.current <= 0)
+            //   firebase
+            //     .user(authUser?.uid)
+            //     .child("content/unreadMessages_uid1Counter")
+            //     .set(unreadMessagesRef.current > 0 ? unreadMessagesRef.current - 1 : unreadMessagesRef.current)
+          })
       }
       // Each entry describes an intersection change for one observed
       // target element:
@@ -131,32 +139,33 @@ const Movies: React.FC = () => {
   const observer: any = new IntersectionObserver(observerCallback, observerOptions)
 
   useEffect(() => {
-    if (messages.length === 0) return
+    if (unreadMessagesKeys.length === 0 || messages.length === 0) return
     if (!initialObserver) {
-      const unreadMessages = messages.filter((msg: any) => msg.read === false)
-      unreadMessages.forEach(({ key }: any) => {
+      console.log({ unreadMessagesKeys })
+      // const unreadMessages = messages.filter((msg: any) => msg.read === false)
+      unreadMessagesKeys.forEach((key: any) => {
         const $message = document.querySelector(`.message-${key}`)
+        console.log({ messageRef: $message })
         observer.observe($message)
       })
-      const observedMessages = unreadMessages.reduce((acc: any, message: any) => {
-        acc.push(message.key)
-        return acc
-      }, [])
-      setObservedMessages(observedMessages)
+      // const observedMessages = unreadMessages.reduce((acc: any, message: any) => {
+      //   acc.push(message.key)
+      //   return acc
+      // }, [])
+      setObservedMessages(unreadMessagesKeys)
       setInitialObserver(true)
     } else {
       // if (!scrollAtTheBottom) {
-      const lastMessage = messages[messages.length - 1]
-      console.log({ lastMessage })
-      if (observedMessages.includes(lastMessage.key)) return
+      const lastUnreadMessage = unreadMessagesKeys[unreadMessagesKeys.length - 1]
+      console.log({ lastUnreadMessages: lastUnreadMessage })
+      if (observedMessages.includes(lastUnreadMessage)) return
       console.log("new observer")
-
-      const lastMessageRef: any = document.querySelector(`.message-${lastMessage?.key}`)
+      const lastMessageRef: any = document.querySelector(`.message-${lastUnreadMessage}`)
       observer.observe(lastMessageRef)
-      setObservedMessages([...observedMessages, lastMessage.key])
+      setObservedMessages([...observedMessages, lastUnreadMessage])
       // }
     }
-  }, [messages, initialObserver])
+  }, [unreadMessagesKeys, messages, initialObserver])
 
   // if (lastMessageRef.current !== null) {
   //   console.log(lastMessageRef.current)
@@ -164,11 +173,44 @@ const Movies: React.FC = () => {
   //   observer.observe(lastMessageRef.current)
   // }
 
+  const handleResize = useCallback(() => {
+    if (!messagesContainer) return
+    const height = messagesContainer.getBoundingClientRect().height
+    const scrollHeight = messagesContainer.scrollHeight
+
+    if (scrollHeight <= height) {
+      setScrollAtTheBottom(true)
+      firebase.user(authUser?.uid).child("content/chatAtTheBottom").set(true)
+    }
+
+    console.log({ height })
+    console.log({ scrollHeight })
+  }, [messagesContainer])
+
   useLayoutEffect(() => {
+    if (!messagesContainer) return
+
     messagesContainer?.addEventListener("scroll", handleScroll)
+
+    if (window.ResizeObserver) {
+      let resizeObserver = new ResizeObserver(() => handleResize())
+      resizeObserver.observe(messagesContainer)
+
+      return () => {
+        if (!resizeObserver) return
+
+        resizeObserver.disconnect()
+      }
+    } else {
+      window.addEventListener("resize", handleResize)
+
+      return () => {
+        window.removeEventListener("resize", handleResize)
+      }
+    }
   }, [messagesContainer]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleScroll = () => {
+  const handleScroll = throttle(200, () => {
     const height = messagesContainer.getBoundingClientRect().height
     const scrollHeight = messagesContainer.scrollHeight
     const scrollTop = messagesContainer.scrollTop
@@ -176,11 +218,13 @@ const Movies: React.FC = () => {
     if (scrollHeight === scrollTop + height) {
       console.log("scroll bottom")
       setScrollAtTheBottom(true)
+      firebase.user(authUser?.uid).child("content/chatAtTheBottom").set(true)
     } else {
       console.log("scroll not bottom")
       setScrollAtTheBottom(false)
+      firebase.user(authUser?.uid).child("content/chatAtTheBottom").set(false)
     }
-  }
+  })
 
   useLayoutEffect(() => {
     console.log({ scrollAtTheBottom })
@@ -239,15 +283,39 @@ const Movies: React.FC = () => {
       })
   }
 
+  const throttled = useCallback(
+    throttle(50, (newValue: any) => setUnreadMessagesKeys(newValue)),
+    []
+  )
+
   useEffect(() => {
     console.log("effect")
     // firebase.user(authUser?.uid).child("content/messages/status").onDisconnect().update({ online: false })
 
     firebase
       .user(authUser?.uid)
-      .child("content/unreadMessages")
+      .child("content/unreadMessages_uid1")
       .on("value", (snapshot: any) => {
-        setUnreadMessages(snapshot.val())
+        const unreadMessagesData = snapshot.val() === null ? [] : snapshot.val()
+        // if (snapshot.val() === null) {
+        //   setUnreadMessagesKeys([])
+        //   return
+        // }
+        const unreadMessages = Object.keys(unreadMessagesData).map((message: any) => message)
+        throttled(unreadMessages)
+        console.log("unread messages updated")
+        // setUnreadMessagesCounter(snapshot.numChildren())
+        unreadMessagesRef.current = snapshot.numChildren()
+      })
+
+    firebase
+      .user(authUser?.uid)
+      .child("content/chatAtTheBottom")
+      .on("value", (snapshot: any) => {
+        setChatBottomFire(snapshot.val())
+        if (snapshot.val()) {
+          firebase.user(authUser?.uid).child("content/unreadMessages_uid1").set(null)
+        }
       })
 
     messagesRef.limitToLast(MESSAGES_TO_LOAD).once("value", (snapshot: any) => {
@@ -303,6 +371,7 @@ const Movies: React.FC = () => {
     return () => {
       // firebase.user(authUser?.uid).child("content/messages/status").update({ online: false })
       firebase.user(authUser?.uid).child("content/messages").off()
+      firebase.user(authUser?.uid).child("content/unreadMessages_uid1").off()
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -310,26 +379,47 @@ const Movies: React.FC = () => {
     const messagesRef = firebase.user(authUser?.uid).child("content/messages")
     const newMessageRef = messagesRef.push()
     const randomNumber = Math.floor(Math.random() * Math.floor(201))
-    newMessageRef.set({
-      timeStamp: firebase.timeStamp(),
-      message: "some text",
-      number: randomNumber,
-      read: false
-    })
+    newMessageRef.set(
+      {
+        timeStamp: firebase.timeStamp(),
+        message: "some text",
+        number: randomNumber
+        // read: !chatBottomFire ? false : true
+      },
+      () => {
+        if (chatBottomFire) return
+        // firebase
+        //   .user(authUser?.uid)
+        //   .child("content/unreadMessages_uid1Counter")
+        //   .set(unreadMessages + 1)
 
-    firebase
-      .user(authUser?.uid)
-      .child("content/unreadMessages")
-      .once("value", (snapshot: any) => {
-        if (snapshot.val() === null) {
-          firebase.user(authUser?.uid).child("content/unreadMessages").set(1)
-        } else {
-          firebase
-            .user(authUser?.uid)
-            .child("content/unreadMessages")
-            .set(snapshot.val() + 1)
-        }
-      })
+        firebase.user(authUser?.uid).child(`content/unreadMessages_uid1/${newMessageRef.key}`).set(true)
+
+        // firebase
+        //   .user(authUser?.uid)
+        //   .child("content/unreadMessages_uid1Counter")
+        //   .once("value", (snapshot: any) => {
+        //     firebase
+        //       .user(authUser?.uid)
+        //       .child("content/unreadMessages_uid1Counter")
+        //       .set(!chatBottomFire ? snapshot.val() + 1 : snapshot.val())
+        //   })
+      }
+    )
+
+    // firebase
+    //   .user(authUser?.uid)
+    //   .child("content/unreadMessages_uid1Counter")
+    //   .once("value", (snapshot: any) => {
+    //     if (snapshot.val() === null) {
+    //       firebase.user(authUser?.uid).child("content/unreadMessages_uid1Counter").set(1)
+    //     } else {
+    //       firebase
+    //         .user(authUser?.uid)
+    //         .child("content/unreadMessages_uid1Counter")
+    //         .set(snapshot.val() + 1)
+    //     }
+    //   })
   }
 
   const changeMessage = (key: any) => {
@@ -401,26 +491,29 @@ const Movies: React.FC = () => {
       <button style={{ width: "300px" }} className="button" onClick={() => addNewMessage()}>
         Add new message
       </button>
-      <div style={{ color: "#fff" }}>{unreadMessages}</div>
-      <div className="messages-container" ref={messagesContainerRef}>
-        {messages.map((message: any) => (
-          <div
-            key={message.key}
-            ref={messages[messages.length - 1].key === message.key ? lastMessageRef : undefined}
-            // ref={messages[messages.length - 1].key === message.key ? testRef : undefined}
-            className={`message message-${message.key}`}
-            data-key={message.key}
-            data-number={message.number}
-          >
-            <div>
-              {message.message} {message.number}
-            </div>{" "}
-            <button onClick={() => changeMessage(message.key)}>Change number</button>{" "}
-            <button onClick={() => deleteMessage(message.key)}>Delete</button>
-          </div>
-        ))}
-        {/* <div ref={testRef}></div> */}
+      <div style={{ color: "#fff" }}>{unreadMessagesKeys.length}</div>
+      <div className="messages-wrapper">
+        <div className="messages-container" ref={messagesContainerRef}>
+          {messages.map((message: any) => (
+            <div
+              key={message.key}
+              ref={messages[messages.length - 1].key === message.key ? lastMessageRef : undefined}
+              // ref={messages[messages.length - 1].key === message.key ? testRef : undefined}
+              className={`message message-${message.key}`}
+              data-key={message.key}
+              data-number={message.number}
+            >
+              <div>
+                {message.message} {message.number}
+              </div>{" "}
+              <button onClick={() => changeMessage(message.key)}>Change number</button>{" "}
+              <button onClick={() => deleteMessage(message.key)}>Delete</button>
+            </div>
+          ))}
+          {/* <div ref={testRef}></div> */}
+        </div>
       </div>
+
       <MoviesContent
         moviesData={moviesData}
         getMovieLinks={getMovieLinks}

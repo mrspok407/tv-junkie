@@ -1,4 +1,4 @@
-// import * as functions from "firebase-functions";
+import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 
 // Cloud Functions interesting points:
@@ -23,7 +23,18 @@ import * as admin from "firebase-admin";
 
 admin.initializeApp();
 
-// const database = admin.database();
+const database = admin.database();
+
+export const onMessageRemoved = functions.database
+  .ref("users/{uid}/content/messages/{key}")
+  .onDelete(async (change, context) => {
+    const messageKey = context.params.key;
+    return database
+      .ref(
+        `users/drv5lG97VxVBLgkdn8bMhdxmqQT2/content/unreadMessages_uid1/${messageKey}`
+      )
+      .set(null);
+  });
 
 // export const onShowUpdate = functions.database
 //   .ref("users/{uid}/content/messages/status/online")

@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-// import * as functions from "firebase-functions";
+exports.onMessageRemoved = void 0;
+const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 // Cloud Functions interesting points:
 //
@@ -22,7 +23,15 @@ const admin = require("firebase-admin");
 // You can invoke cloud functions on client (by click or something) with callableFunction. See functions at the bottom
 // More info: https://firebase.google.com/docs/functions/callable#web https://youtu.be/8mL1VuiL5Kk?t=593
 admin.initializeApp();
-// const database = admin.database();
+const database = admin.database();
+exports.onMessageRemoved = functions.database
+    .ref("users/{uid}/content/messages/{key}")
+    .onDelete(async (change, context) => {
+    const messageKey = context.params.key;
+    return database
+        .ref(`users/drv5lG97VxVBLgkdn8bMhdxmqQT2/content/unreadMessages_uid1/${messageKey}`)
+        .set(null);
+});
 // export const onShowUpdate = functions.database
 //   .ref("users/{uid}/content/messages/status/online")
 //   .onUpdate(async (change, context) => {
