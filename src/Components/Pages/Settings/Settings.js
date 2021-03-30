@@ -24,7 +24,8 @@ class Profile extends Component {
       copiedToClipboard: null,
       authUser: null,
       limitTo: 2,
-      shows: []
+      shows: [],
+      chatBottomFire: false
     }
 
     this.authSubscriber = null
@@ -34,6 +35,7 @@ class Profile extends Component {
 
   componentDidMount() {
     this.authUserListener()
+    this.chatBottomListener()
   }
 
   componentWillUnmount() {
@@ -80,6 +82,37 @@ class Profile extends Component {
         console.log(showsReverse)
         this.setState({ shows: showsReverse })
       })
+  }
+
+  chatBottomListener = () => {
+    this.context.firebase
+      .user(this.context.authUser?.uid)
+      .child("content/chatAtTheBottom")
+      .on("value", (snapshot) => {
+        this.setState({ chatBottomFire: snapshot.val() })
+      })
+  }
+
+  addNewMessage = () => {
+    const messagesRef = this.context.firebase.user(this.state.authUser?.uid).child("content/messages")
+    const newMessageRef = messagesRef.push()
+    const randomNumber = Math.floor(Math.random() * Math.floor(201))
+    newMessageRef.set(
+      {
+        timeStamp: this.context.firebase.timeStamp(),
+        message: "some text",
+        number: randomNumber
+        // read: !chatBottomFire ? false : true
+      },
+      () => {
+        if (this.state.chatBottomFire) return
+
+        this.context.firebase
+          .user(this.state.authUser?.uid)
+          .child(`content/unreadMessages_uid1/${newMessageRef.key}`)
+          .set(true)
+      }
+    )
   }
 
   incr = () => {
@@ -246,10 +279,6 @@ class Profile extends Component {
     }, 3000)
   }
 
-  time = () => {
-    console.log(this.context.firebase.timeStamp())
-  }
-
   render() {
     return (
       <>
@@ -334,8 +363,8 @@ class Profile extends Component {
           <button className="button" onClick={() => this.incr()}>
             increase number {this.state.limitTo}
           </button>
-          <button className="button" onClick={() => this.time()}>
-            time
+          <button className="button" onClick={() => this.addNewMessage()}>
+            Add new message
           </button>
           <div className="user-settings__signout">
             <SignOutButton />
