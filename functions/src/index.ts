@@ -36,6 +36,12 @@ export const onMessageRemoved = functions.database
       .set(null);
   });
 
+// export const onPageInFocus = functions.database.ref("users/{uid}/content/pageInFocus").onUpdate(async (change) => {
+//   const after = change.after.val()
+//   if ()
+//   return
+// })
+
 // export const onShowUpdate = functions.database
 //   .ref("users/{uid}/content/messages/status/online")
 //   .onUpdate(async (change, context) => {

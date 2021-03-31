@@ -51,8 +51,11 @@ const Movies: React.FC = () => {
   const unreadMessagesRef = useRef<number>(0)
 
   const [pageInFocus, setPageInFocus] = useState(true)
+  const pageInFocusRef = useRef(true)
 
   const documentFocusInterval = useRef<any>()
+
+  const [messagesFirstLoad, setMessagesFirstLoad] = useState(false)
 
   const messagesContainerRef = useCallback((node) => {
     if (node !== null) {
@@ -62,13 +65,19 @@ const Movies: React.FC = () => {
 
   const documentFocusHandler = useCallback(() => {
     documentFocusInterval.current = window.setInterval(() => {
-      if (!document.hasFocus()) {
-        setScrollAtTheBottom(false)
-        firebase.user(authUser?.uid).child("content/chatAtTheBottom").set(false)
-      }
+      // if (!document.hasFocus()) {
+      //   setScrollAtTheBottom(false)
+      //   firebase.user(authUser?.uid).child("content/chatAtTheBottom").set(false)
+      // }
+
       setPageInFocus(document.hasFocus())
+      pageInFocusRef.current = document.hasFocus()
     }, 1000)
   }, [])
+
+  useEffect(() => {
+    firebase.user(authUser?.uid).child("content/pageInFocus").set(pageInFocus)
+  }, [pageInFocus])
 
   useEffect(() => {
     documentFocusHandler()
@@ -95,7 +104,7 @@ const Movies: React.FC = () => {
       const vertPosRelativeToParent = rect - contRect
 
       messagesContainer.scroll(0, vertPosRelativeToParent)
-      // setScrollAtTheBottom(false)
+      setScrollAtTheBottom(false)
       setFirstLoad(true)
     } else {
       lastMessageRef?.scrollIntoView({ block: "nearest", inline: "start" })
@@ -117,23 +126,18 @@ const Movies: React.FC = () => {
       })
 
       console.log({ entryTime: entry.time })
+      console.log({ pageInFocusRef: pageInFocusRef.current })
       if (entry.isIntersecting) {
         const messageKey = entry.target.dataset.key
         const messageRef: any = document.querySelector(`.message-${messageKey}`)
         observer.unobserve(messageRef)
+
+        console.log("intersected")
+
         firebase
           .user(authUser?.uid)
           .child(`content/unreadMessages_uid1/${messageKey}`)
-          .set(null, () => {
-            console.log("unreadMessages deleted")
-            // console.log({ unreadMessagesRef: unreadMessagesRef.current })
-
-            // if (unreadMessagesRef.current <= 0)
-            //   firebase
-            //     .user(authUser?.uid)
-            //     .child("content/unreadMessages_uid1Counter")
-            //     .set(unreadMessagesRef.current > 0 ? unreadMessagesRef.current - 1 : unreadMessagesRef.current)
-          })
+          .set(null, () => {})
       }
     })
   }
@@ -146,8 +150,17 @@ const Movies: React.FC = () => {
 
   const observer: any = new IntersectionObserver(observerCallback, observerOptions)
 
+  // useEffect(() => {
+  //   if (!unreadMessagesKeys.length || !pageInFocus) return
+  //   unreadMessagesKeys.forEach((key: any) => {
+  //     const $message = document.querySelector(`.message-${key}`)
+  //     console.log({ messageRef: $message })
+  //     observer.observe($message)
+  //   })
+  // }, [pageInFocus])
+
   useEffect(() => {
-    if (unreadMessagesKeys.length === 0 || messages.length === 0) return
+    if (!unreadMessagesKeys.length || !messages.length) return
     if (!initialObserver) {
       console.log({ unreadMessagesKeys })
       // const unreadMessages = messages.filter((msg: any) => msg.read === false)
@@ -175,13 +188,8 @@ const Movies: React.FC = () => {
     }
   }, [unreadMessagesKeys, messages, initialObserver])
 
-  // if (lastMessageRef.current !== null) {
-  //   console.log(lastMessageRef.current)
-
-  //   observer.observe(lastMessageRef.current)
-  // }
-
   const handleResize = useCallback(() => {
+    console.log("resizeObserver")
     if (!messagesContainer) return
     const height = messagesContainer.getBoundingClientRect().height
     const scrollHeight = messagesContainer.scrollHeight
@@ -195,6 +203,27 @@ const Movies: React.FC = () => {
     console.log({ height })
     console.log({ scrollHeight })
   }, [messagesContainer])
+
+  const test = useCallback(() => {
+    console.log({ messagesContainer })
+    console.log({ messagesFirstLoad })
+    if (!messagesContainer || !messagesFirstLoad) return
+    const height = messagesContainer.getBoundingClientRect().height
+    const scrollHeight = messagesContainer.scrollHeight
+
+    if (scrollHeight <= height) {
+      setScrollAtTheBottom(true)
+      console.log("test")
+      firebase.user(authUser?.uid).child("content/chatAtTheBottom").set(true)
+    }
+
+    console.log({ height })
+    console.log({ scrollHeight })
+  }, [messagesContainer, messagesFirstLoad])
+
+  useEffect(() => {
+    test()
+  }, [test])
 
   useLayoutEffect(() => {
     if (!messagesContainer) return
@@ -231,29 +260,18 @@ const Movies: React.FC = () => {
     }
   }, [messagesContainerScrolledDown])
 
-  // const handleScroll = throttle(200, () => {
-  //   const height = messagesContainer.getBoundingClientRect().height
-  //   const scrollHeight = messagesContainer.scrollHeight
-  //   const scrollTop = messagesContainer.scrollTop
-
-  //   if (scrollHeight === scrollTop + height) {
-  //     console.log("scroll bottom")
-  //     setScrollAtTheBottom(true)
-  //     firebase.user(authUser?.uid).child("content/chatAtTheBottom").set(true)
-  //   } else {
-  //     console.log("scroll not bottom")
-  //     setScrollAtTheBottom(false)
-  //     firebase.user(authUser?.uid).child("content/chatAtTheBottom").set(false)
-  //   }
-  // })
+  useEffect(() => {
+    console.log({ scrollAtTheBottom })
+  }, [scrollAtTheBottom])
 
   useLayoutEffect(() => {
     console.log({ scrollAtTheBottom })
-    if (messages.length === 0 || !scrollAtTheBottom) return
+    console.log({ pageInFocus })
+    if (messages.length === 0 || !scrollAtTheBottom || !pageInFocus) return
     const lastMessage = messages[messages.length - 1]
     const lastMessageRef: any = document.querySelector(`.message-${lastMessage?.key}`)
     lastMessageRef?.scrollIntoView({ block: "nearest", inline: "start" })
-  }, [messages, scrollAtTheBottom])
+  }, [messages, scrollAtTheBottom, pageInFocus])
 
   const loadNewMessages = () => {
     messagesRef
@@ -333,7 +351,8 @@ const Movies: React.FC = () => {
       .user(authUser?.uid)
       .child("content/chatAtTheBottom")
       .on("value", (snapshot: any) => {
-        setChatBottomFire(snapshot.val())
+        // setChatBottomFire(snapshot.val())
+        setScrollAtTheBottom(snapshot.val())
         if (snapshot.val()) {
           // firebase.user(authUser?.uid).child("content/unreadMessages_uid1").set(null)
         }
@@ -342,6 +361,10 @@ const Movies: React.FC = () => {
     messagesRef.limitToLast(MESSAGES_TO_LOAD).once("value", (snapshot: any) => {
       let lastMessageTS: any = 0
       let firstMessageTS: any = 0
+
+      if (snapshot.val() === null) {
+        setMessagesFirstLoad(true)
+      }
 
       if (snapshot.val() !== null) {
         let messagesData: any = []
@@ -355,6 +378,7 @@ const Movies: React.FC = () => {
         console.log({ messagesData })
         setLastTS(firstMessageTS)
         setMessages(messagesData)
+        setMessagesFirstLoad(true)
       }
 
       messagesRef.startAfter(lastMessageTS).on("child_added", (snapshot: any) => {
@@ -408,9 +432,16 @@ const Movies: React.FC = () => {
         // read: !chatBottomFire ? false : true
       },
       () => {
-        if (chatBottomFire) return
-
-        firebase.user(authUser?.uid).child(`content/unreadMessages_uid1/${newMessageRef.key}`).set(true)
+        // if (!chatBottomFire || !pageInFocus) {
+        if (!scrollAtTheBottom || !pageInFocus) {
+          firebase
+            .user(authUser?.uid)
+            .child(`content/unreadMessages_uid1/${newMessageRef.key}`)
+            .set(true, () => {
+              if (pageInFocus) return
+              firebase.user(authUser?.uid).child(`content/chatAtTheBottom`).set(false)
+            })
+        }
       }
     )
   }

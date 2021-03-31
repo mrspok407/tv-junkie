@@ -25,7 +25,8 @@ class Profile extends Component {
       authUser: null,
       limitTo: 2,
       shows: [],
-      chatBottomFire: false
+      chatBottomFire: false,
+      pageInFocus: false
     }
 
     this.authSubscriber = null
@@ -93,6 +94,15 @@ class Profile extends Component {
       })
   }
 
+  focusListener = () => {
+    this.context.firebase
+      .user(this.context.authUser?.uid)
+      .child("content/pageInFocus")
+      .on("value", (snapshot) => {
+        this.setState({ pageInFocus: snapshot.val() })
+      })
+  }
+
   addNewMessage = () => {
     const messagesRef = this.context.firebase.user(this.state.authUser?.uid).child("content/messages")
     const newMessageRef = messagesRef.push()
@@ -105,12 +115,17 @@ class Profile extends Component {
         // read: !chatBottomFire ? false : true
       },
       () => {
-        if (this.state.chatBottomFire) return
+        // if (this.state.chatBottomFire) return
 
-        this.context.firebase
-          .user(this.state.authUser?.uid)
-          .child(`content/unreadMessages_uid1/${newMessageRef.key}`)
-          .set(true)
+        if (!this.state.chatBottomFire || !this.state.pageInFocus) {
+          this.context.firebase
+            .user(this.state.authUser?.uid)
+            .child(`content/unreadMessages_uid1/${newMessageRef.key}`)
+            .set(true, () => {
+              if (this.state.pageInFocus) return
+              this.context.firebase.user(this.state.authUser?.uid).child(`content/chatAtTheBottom`).set(false)
+            })
+        }
       }
     )
   }
