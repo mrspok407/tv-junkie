@@ -12,6 +12,7 @@ import { AppContext } from "Components/AppContext/AppContextHOC"
 import { throttle } from "throttle-debounce"
 import "./Movies.scss"
 import useElementScrolledDown from "./useElementScrolledDown"
+import classNames from "classnames"
 const { CancelToken } = require("axios")
 
 let cancelRequest: any
@@ -33,6 +34,8 @@ const Movies: React.FC = () => {
   const messagesRef = firebase.user(authUser?.uid).child("content/messages").orderByChild("timeStamp")
 
   const lastMessageRef = useRef<HTMLDivElement>(null)
+
+  const [firstMessagesInDay, setFirstMessagesInDay] = useState([])
 
   const [messagesContainer, setMessagesContainer] = useState<HTMLDivElement>(null!)
   const messagesContainerScrolledDown = useElementScrolledDown({ element: messagesContainer })
@@ -72,12 +75,18 @@ const Movies: React.FC = () => {
 
       setPageInFocus(document.hasFocus())
       pageInFocusRef.current = document.hasFocus()
-    }, 1000)
+    }, 250)
   }, [])
 
   useEffect(() => {
     firebase.user(authUser?.uid).child("content/pageInFocus").set(pageInFocus)
-  }, [pageInFocus])
+
+    // unreadMessagesKeys.forEach((key: any) => {
+    //   const $message = document.querySelector(`.message-${key}`)
+    //   console.log({ messageRef: $message })
+    //   observer.observe($message)
+    // })
+  }, [pageInFocus, unreadMessagesKeys])
 
   useEffect(() => {
     documentFocusHandler()
@@ -159,6 +168,35 @@ const Movies: React.FC = () => {
   //   })
   // }, [pageInFocus])
 
+  const onMouseEnter = () => {
+    if (!unreadMessagesKeys.length || !messages.length) return
+    if (pageInFocusRef.current) return
+
+    console.log({ unreadMessagesKeys })
+
+    unreadMessagesKeys.forEach((key: any) => {
+      if (observedMessages.includes(key)) return
+      const $message = document.querySelector(`.message-${key}`)
+      console.log({ messageRef: $message })
+      observer.observe($message)
+    })
+
+    setObservedMessages(unreadMessagesKeys)
+  }
+
+  useEffect(() => {
+    if (!pageInFocus) return
+
+    unreadMessagesKeys.forEach((key: any) => {
+      if (observedMessages.includes(key)) return
+      const $message = document.querySelector(`.message-${key}`)
+      console.log({ messageRef: $message })
+      observer.observe($message)
+    })
+
+    setObservedMessages(unreadMessagesKeys)
+  }, [pageInFocus])
+
   useEffect(() => {
     if (!unreadMessagesKeys.length || !messages.length) return
     if (!initialObserver) {
@@ -179,7 +217,8 @@ const Movies: React.FC = () => {
       // if (!scrollAtTheBottom) {
       const lastUnreadMessage = unreadMessagesKeys[unreadMessagesKeys.length - 1]
       console.log({ lastUnreadMessages: lastUnreadMessage })
-      if (observedMessages.includes(lastUnreadMessage)) return
+      console.log({ pageInFocusRef: pageInFocusRef.current })
+      if (observedMessages.includes(lastUnreadMessage) || !pageInFocusRef.current) return
       console.log("new observer")
       const lastMessageRef: any = document.querySelector(`.message-${lastUnreadMessage}`)
       observer.observe(lastMessageRef)
@@ -327,6 +366,17 @@ const Movies: React.FC = () => {
     []
   )
 
+  const getFirstMessagesInDay = ({ messages }: any) => {
+    return messages
+      .map((message: any) => new Date(message.timeStamp).toDateString())
+      .reduce((acc: any, date: any, index: any, array: any) => {
+        if (array.indexOf(date) === index) {
+          acc.push({ ...messages[index], index })
+        }
+        return acc
+      }, [])
+  }
+
   useEffect(() => {
     console.log("effect")
     // firebase.user(authUser?.uid).child("content/messages/status").onDisconnect().update({ online: false })
@@ -376,6 +426,9 @@ const Movies: React.FC = () => {
         firstMessageTS = messagesData[0].timeStamp
 
         console.log({ messagesData })
+
+        setFirstMessagesInDay(getFirstMessagesInDay({ messages: messagesData }))
+
         setLastTS(firstMessageTS)
         setMessages(messagesData)
         setMessagesFirstLoad(true)
@@ -443,6 +496,33 @@ const Movies: React.FC = () => {
             })
         }
       }
+    )
+  }
+
+  const getRandomInt = (min: any, max: any) => {
+    min = Math.ceil(min)
+    max = Math.floor(max)
+    return Math.floor(Math.random() * (max - min) + min) //The maximum is exclusive and the minimum is inclusive
+  }
+
+  const addBanchMessages = () => {
+    const messagesToAdd = 50
+
+    Promise.all(
+      [...Array(messagesToAdd).keys()].map(() => {
+        const randomTimeStamp = getRandomInt(1609604010000, 1617380010000)
+        const randomNumber = Math.floor(Math.random() * Math.floor(201))
+
+        const message = {
+          timeStamp: randomTimeStamp,
+          message: "some text",
+          number: randomNumber
+        }
+
+        const messagesRef = firebase.user(authUser?.uid).child("content/messages")
+        const newMessageRef = messagesRef.push()
+        return newMessageRef.set(message)
+      })
     )
   }
 
@@ -516,24 +596,34 @@ const Movies: React.FC = () => {
       <button style={{ width: "300px" }} className="button" onClick={() => addNewMessage()}>
         Add new message
       </button>
+      <button style={{ width: "300px" }} className="button" onClick={() => addBanchMessages()}>
+        Add banch of messages
+      </button>
       <div style={{ color: "#fff" }}>{unreadMessagesKeys.length}</div>
       <div className="messages-wrapper">
-        <div className="messages-container" ref={messagesContainerRef}>
-          {messages.map((message: any) => (
-            <div
-              key={message.key}
-              ref={messages[messages.length - 1].key === message.key ? lastMessageRef : undefined}
-              // ref={messages[messages.length - 1].key === message.key ? testRef : undefined}
-              className={`message message-${message.key}`}
-              data-key={message.key}
-              data-number={message.number}
-            >
-              <div>
-                {message.message} {message.number}
-              </div>{" "}
-              <button onClick={() => changeMessage(message.key)}>Change number</button>{" "}
-              <button onClick={() => deleteMessage(message.key)}>Delete</button>
-            </div>
+        <div className="messages-container" ref={messagesContainerRef} onMouseEnter={() => onMouseEnter()}>
+          {messages.map((message: any, index: any, array: any) => (
+            <React.Fragment key={message.key}>
+              {new Date(message.timeStamp).toDateString() !== new Date(array[index - 1]?.timeStamp).toDateString() && (
+                <div key={message.timeStamp} className="messages-date">
+                  {new Date(message.timeStamp).toDateString()}
+                </div>
+              )}
+              <div
+                // key={message.key}
+                ref={messages[messages.length - 1].key === message.key ? lastMessageRef : undefined}
+                // ref={messages[messages.length - 1].key === message.key ? testRef : undefined}
+                className={`message message-${message.key}`}
+                data-key={message.key}
+                data-number={message.number}
+              >
+                <div>
+                  {message.message} {message.number}
+                </div>{" "}
+                <button onClick={() => changeMessage(message.key)}>Change number</button>{" "}
+                <button onClick={() => deleteMessage(message.key)}>Delete</button>
+              </div>
+            </React.Fragment>
           ))}
           {/* <div ref={testRef}></div> */}
         </div>

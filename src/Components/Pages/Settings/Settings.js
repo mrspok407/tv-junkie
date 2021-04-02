@@ -68,21 +68,25 @@ class Profile extends Component {
   }
 
   test = () => {
-    this.context.firebase
-      // .userAllShows(this.state.authUser.uid)
-      .userEpisodes(this.state.authUser.uid)
-      // .orderByChild("timeStampString")
-      .limitToLast(this.state.limitTo)
-      .on("value", (snapshot) => {
-        console.log(snapshot.val())
-        let shows = []
-        snapshot.forEach((show) => {
-          shows.push(show.val())
-        })
-        const showsReverse = [...shows].reverse()
-        console.log(showsReverse)
-        this.setState({ shows: showsReverse })
-      })
+    const tS = 1617371342929
+    const date = new Date(tS)
+    const date2 = new Date(tS)
+    console.log({ date: new Date(tS).toDateString(), date2: new Date(tS).toDateString() })
+    // this.context.firebase
+    //   // .userAllShows(this.state.authUser.uid)
+    //   .userEpisodes(this.state.authUser.uid)
+    //   // .orderByChild("timeStampString")
+    //   .limitToLast(this.state.limitTo)
+    //   .on("value", (snapshot) => {
+    //     console.log(snapshot.val())
+    //     let shows = []
+    //     snapshot.forEach((show) => {
+    //       shows.push(show.val())
+    //     })
+    //     const showsReverse = [...shows].reverse()
+    //     console.log(showsReverse)
+    //     this.setState({ shows: showsReverse })
+    //   })
   }
 
   chatBottomListener = () => {

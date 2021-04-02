@@ -13,6 +13,14 @@
   color: #fff;
   grid-template-columns: repeat(3, 1fr);
   align-items: center;
+
+  &--unread {
+    background-color: lightblue;
+  }
+}
+
+.messages-date {
+  color: #fff;
 }
 
 .to-bottom-chat {
