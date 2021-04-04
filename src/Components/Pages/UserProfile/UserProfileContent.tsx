@@ -4,7 +4,7 @@ import { useHistory } from "react-router"
 import { listOfGenres } from "Utils"
 import * as ROUTES from "Utils/Constants/routes"
 import { UserShowsInterface } from "Components/UserContent/UseUserShows/UseUserShows"
-import { AppContext, ShowInterface } from "Components/AppContext/AppContextHOC"
+import { ShowInterface } from "Components/AppContext/AppContextHOC"
 import { combineMergeObjects } from "Utils"
 import { throttle } from "throttle-debounce"
 import merge from "deepmerge"
@@ -14,7 +14,7 @@ import { Link } from "react-router-dom"
 import Loader from "Components/UI/Placeholders/Loader"
 import PlaceholderNoShowsUser from "Components/UI/Placeholders/PlaceholderNoShowsUser"
 import UserRating from "Components/UI/UserRating/UserRating"
-import { Helmet } from "react-helmet"
+// import { Helmet } from "react-helmet"
 
 const SCROLL_THRESHOLD = 800
 
@@ -23,12 +23,12 @@ type Props = {
 }
 
 const UserProfileContent: React.FC<Props> = ({ userUid }) => {
-  const { authUser } = useContext(AppContext)
+  // const { authUser } = useContext(AppContext)
   const firebase = useContext(FirebaseContext)
   const history = useHistory()
 
-  const [userName, setUserName] = useState("")
-  const [loadingUserName, setLoadingUserName] = useState(true)
+  // const [userName, setUserName] = useState("")
+  // const [loadingUserName, setLoadingUserName] = useState(true)
   const [loadingContent, setLoadingContent] = useState(true)
   const [sortByState, setSortByState] = useState("name")
 
@@ -38,17 +38,17 @@ const UserProfileContent: React.FC<Props> = ({ userUid }) => {
     const user = await firebase.user(userUid).child("username").once("value")
     if (user.val() === null) {
       setLoadingContent(false)
-      setLoadingUserName(false)
+      // setLoadingUserName(false)
       history.push(ROUTES.PAGE_DOESNT_EXISTS)
       return
     }
-    setUserName(user.val())
-    setLoadingUserName(false)
+    // setUserName(user.val())
+    // setLoadingUserName(false)
 
     const userShowsData = await firebase.userAllShows(userUid).once("value")
     if (userShowsData.val() === null) {
       setLoadingContent(false)
-      setLoadingUserName(false)
+      // setLoadingUserName(false)
       return
     }
     const userShows: UserShowsInterface[] = Object.values(userShowsData.val()).map((show: any) => show)
@@ -201,10 +201,10 @@ const UserProfileContent: React.FC<Props> = ({ userUid }) => {
   const currentNumOfColumns = activeSectionContent.length <= maxColumns - 1 ? activeSectionContent.length : maxColumns
   return (
     <>
-      <Helmet>
+      {/* <Helmet>
         <title>{userName ? userName : "Nameless"} User Profile | TV Junkie</title>
-      </Helmet>
-      <div
+      </Helmet> */}
+      {/* <div
         className={classNames("user-profile", {
           "user-profile--own-profile": authUser?.uid === userUid
         })}
@@ -221,7 +221,7 @@ const UserProfileContent: React.FC<Props> = ({ userUid }) => {
             </div>
           </>
         )}
-      </div>
+      </div> */}
       <div className="content-results">
         <div className="buttons__row buttons__row--shows-page">
           <div className="buttons__col">

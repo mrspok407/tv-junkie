@@ -9,8 +9,8 @@ import Footer from "Components/UI/Footer/Footer"
 import { todayDate } from "Utils"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import PasswordUpdate from "Components/UserAuth/PasswordUpdate/PasswordUpdate"
-import "./Settings.scss"
 import classNames from "classnames"
+import "./Settings.scss"
 
 class Profile extends Component {
   constructor(props) {
@@ -69,8 +69,8 @@ class Profile extends Component {
 
   test = () => {
     const tS = 1617371342929
-    const date = new Date(tS)
-    const date2 = new Date(tS)
+    // const date = new Date(tS)
+    // const date2 = new Date(tS)
     console.log({ date: new Date(tS).toDateString(), date2: new Date(tS).toDateString() })
     // this.context.firebase
     //   // .userAllShows(this.state.authUser.uid)

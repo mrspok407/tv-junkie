@@ -21,6 +21,8 @@ export interface FirebaseInterface {
   createUserWithEmailAndPassword?: any
   sendEmailVerification?: any
   passwordReset?: any
+  contact?: any
+  httpsCallable?: any
 }
 
 export const FirebaseContext = createContext<FirebaseInterface>({})

@@ -25,9 +25,21 @@ admin.initializeApp();
 
 const database = admin.database();
 
+interface ContactInfo {
+  status: boolean;
+  receiver: boolean;
+  userName: string;
+  // eslint-disable-next-line camelcase
+  pinned_lastActivityTS: string;
+  timeStamp: number;
+  recipientNotified: boolean;
+  newActivity: boolean;
+}
+
 export const onMessageRemoved = functions.database
   .ref("users/{uid}/content/messages/{key}")
   .onDelete(async (change, context) => {
+    console.log({params: context.params});
     const messageKey = context.params.key;
     return database
       .ref(
@@ -81,7 +93,57 @@ export const onMessageRemoved = functions.database
 //     // });
 //   });
 
-// // export const callableFunctionTest = functions.https.onCall((data, context) => {
-// //   console.log(data.show);
-// //   return `test: ${data.show}`;
-// // });
+export const contactsListHandler = functions.database
+  .ref("users/{userUid}/contactsDatabase/contactsList/{contactUid}")
+  .onWrite(async (change, context) => {
+    const userUid = context.params.userUid;
+    const contactUid = context.params.contactUid;
+
+    const beforeValue: ContactInfo = change.before.val();
+    const afterValue: ContactInfo = change.after.val();
+
+    const contactsDatabaseRef = database.ref(
+      `users/${userUid}/contactsDatabase`
+    );
+
+    if (!change.before.exists() && !afterValue.receiver) {
+      contactsDatabaseRef.child(`newContactsRequests/${contactUid}`).set(true);
+      return contactsDatabaseRef.child("newContactsActivity").set(true);
+    }
+
+    if (afterValue.recipientNotified) {
+      contactsDatabaseRef.child(`newContactsRequests/${contactUid}`).set(null);
+      return database
+        .ref(`users/${contactUid}/contactsDatabase/contactsList/${userUid}`)
+        .update({recipientNotified: true});
+    }
+
+    console.log({
+      beforeValue,
+      afterValue,
+      userUid,
+      contactUid,
+      params: context.params
+    });
+  });
+
+export const newContactRequest = functions.https.onCall(
+  async (data, context) => {
+    const authUid = context?.auth?.uid;
+    const {contactUid, timeStamp} = data;
+
+    const authUserName = await database.ref(`users/${authUid}/userName`);
+
+    return database
+      .ref(`users/${contactUid}/contactsDatabase/contactsList/${authUid}`)
+      .set({
+        status: false,
+        receiver: false,
+        userName: authUserName,
+        pinned_lastActivityTS: `false_${timeStamp}`,
+        timeStamp,
+        recipientNotified: false,
+        newActivity: true
+      });
+  }
+);

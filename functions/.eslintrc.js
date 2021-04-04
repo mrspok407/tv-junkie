@@ -26,6 +26,7 @@ module.exports = {
     "quotes": ["error", "double"],
     "indent": "off",
     "comma-dangle": "off",
-    "max-len": ["error", {"code": 120}]
+    "max-len": ["error", {"code": 120}],
+    "cabelcase": "off"
   }
 };

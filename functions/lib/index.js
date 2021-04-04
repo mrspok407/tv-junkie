@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.onMessageRemoved = void 0;
+exports.newContactRequest = exports.contactsListHandler = exports.onMessageRemoved = void 0;
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 // Cloud Functions interesting points:
@@ -27,11 +27,17 @@ const database = admin.database();
 exports.onMessageRemoved = functions.database
     .ref("users/{uid}/content/messages/{key}")
     .onDelete(async (change, context) => {
+    console.log({ params: context.params });
     const messageKey = context.params.key;
     return database
         .ref(`users/drv5lG97VxVBLgkdn8bMhdxmqQT2/content/unreadMessages_uid1/${messageKey}`)
         .set(null);
 });
+// export const onPageInFocus = functions.database.ref("users/{uid}/content/pageInFocus").onUpdate(async (change) => {
+//   const after = change.after.val()
+//   if ()
+//   return
+// })
 // export const onShowUpdate = functions.database
 //   .ref("users/{uid}/content/messages/status/online")
 //   .onUpdate(async (change, context) => {
@@ -66,8 +72,47 @@ exports.onMessageRemoved = functions.database
 //     //   time: admin.database.ServerValue.TIMESTAMP
 //     // });
 //   });
-// // export const callableFunctionTest = functions.https.onCall((data, context) => {
-// //   console.log(data.show);
-// //   return `test: ${data.show}`;
-// // });
+exports.contactsListHandler = functions.database
+    .ref("users/{userUid}/contactsDatabase/contactsList/{contactUid}")
+    .onWrite(async (change, context) => {
+    const userUid = context.params.userUid;
+    const contactUid = context.params.contactUid;
+    const beforeValue = change.before.val();
+    const afterValue = change.after.val();
+    const contactsDatabaseRef = database.ref(`users/${userUid}/contactsDatabase`);
+    if (!change.before.exists() && !afterValue.receiver) {
+        contactsDatabaseRef.child(`newContactsRequests/${contactUid}`).set(true);
+        return contactsDatabaseRef.child("newContactsActivity").set(true);
+    }
+    if (afterValue.recipientNotified) {
+        contactsDatabaseRef.child(`newContactsRequests/${contactUid}`).set(null);
+        return database
+            .ref(`users/${contactUid}/contactsDatabase/contactsList/${userUid}`)
+            .update({ recipientNotified: true });
+    }
+    console.log({
+        beforeValue,
+        afterValue,
+        userUid,
+        contactUid,
+        params: context.params
+    });
+});
+exports.newContactRequest = functions.https.onCall(async (data, context) => {
+    var _a;
+    const authUid = (_a = context === null || context === void 0 ? void 0 : context.auth) === null || _a === void 0 ? void 0 : _a.uid;
+    const { contactUid, timeStamp } = data;
+    const authUserName = await database.ref(`users/${authUid}/userName`);
+    return database
+        .ref(`users/${contactUid}/contactsDatabase/contactsList/${authUid}`)
+        .set({
+        status: false,
+        receiver: false,
+        userName: authUserName,
+        pinned_lastActivityTS: `false_${timeStamp}`,
+        timeStamp,
+        recipientNotified: false,
+        newActivity: true
+    });
+});
 //# sourceMappingURL=index.js.map

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useState, useRef, useLayoutEffect, useCallback } from "react"
 import axios from "axios"
 import { Helmet } from "react-helmet"
@@ -12,7 +13,6 @@ import { AppContext } from "Components/AppContext/AppContextHOC"
 import { throttle } from "throttle-debounce"
 import "./Movies.scss"
 import useElementScrolledDown from "./useElementScrolledDown"
-import classNames from "classnames"
 const { CancelToken } = require("axios")
 
 let cancelRequest: any
@@ -35,13 +35,13 @@ const Movies: React.FC = () => {
 
   const lastMessageRef = useRef<HTMLDivElement>(null)
 
-  const [firstMessagesInDay, setFirstMessagesInDay] = useState([])
+  // const [firstMessagesInDay, setFirstMessagesInDay] = useState([])
 
   const [messagesContainer, setMessagesContainer] = useState<HTMLDivElement>(null!)
   const messagesContainerScrolledDown = useElementScrolledDown({ element: messagesContainer })
 
   const [scrollAtTheBottom, setScrollAtTheBottom] = useState(false)
-  const [chatBottomFire, setChatBottomFire] = useState(false)
+  // const [chatBottomFire, setChatBottomFire] = useState(false)
 
   const [firstLoad, setFirstLoad] = useState(false)
 
@@ -366,16 +366,16 @@ const Movies: React.FC = () => {
     []
   )
 
-  const getFirstMessagesInDay = ({ messages }: any) => {
-    return messages
-      .map((message: any) => new Date(message.timeStamp).toDateString())
-      .reduce((acc: any, date: any, index: any, array: any) => {
-        if (array.indexOf(date) === index) {
-          acc.push({ ...messages[index], index })
-        }
-        return acc
-      }, [])
-  }
+  // const getFirstMessagesInDay = ({ messages }: any) => {
+  //   return messages
+  //     .map((message: any) => new Date(message.timeStamp).toDateString())
+  //     .reduce((acc: any, date: any, index: any, array: any) => {
+  //       if (array.indexOf(date) === index) {
+  //         acc.push({ ...messages[index], index })
+  //       }
+  //       return acc
+  //     }, [])
+  // }
 
   useEffect(() => {
     console.log("effect")
@@ -427,7 +427,7 @@ const Movies: React.FC = () => {
 
         console.log({ messagesData })
 
-        setFirstMessagesInDay(getFirstMessagesInDay({ messages: messagesData }))
+        // setFirstMessagesInDay(getFirstMessagesInDay({ messages: messagesData }))
 
         setLastTS(firstMessageTS)
         setMessages(messagesData)

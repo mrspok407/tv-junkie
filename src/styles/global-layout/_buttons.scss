@@ -204,3 +204,10 @@
 .button--profile {
   padding: 5px;
 }
+
+.button--disable-hover {
+  &:after,
+  &:before {
+    display: none;
+  }
+}

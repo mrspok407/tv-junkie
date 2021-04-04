@@ -67,6 +67,8 @@ class Firebase {
     this.app = app
   }
 
+  /// Cloud Functions ///
+
   httpsCallable = (functionName: string) => this.functions.httpsCallable(functionName)
 
   /// Auth API ///
@@ -114,6 +116,12 @@ class Firebase {
   user = (uid: string) => this.db.ref(`users/${uid}`)
   users = () => this.db.ref("users")
   userOnlineStatus = (uid: string) => this.db.ref(`users/${uid}/status`)
+
+  /// Contacts API ///
+  contactsDatabase = ({ uid }: { uid: string }) => this.db.ref(`users/${uid}/contactsDatabase`)
+  contactsList = ({ uid }: { uid: string }) => this.db.ref(`users/${uid}/contactsDatabase/contactsList`)
+  contact = ({ authUid, contactUid }: { authUid: string; contactUid: string }) =>
+    this.db.ref(`users/${authUid}/contactsDatabase/contactsList/${contactUid}`)
 
   /// User Content API ///
   userAllShows = (uid: string) => this.db.ref(`users/${uid}/content/shows`)
