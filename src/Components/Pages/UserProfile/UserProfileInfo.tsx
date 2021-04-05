@@ -4,9 +4,21 @@ import classNames from "classnames"
 import Loader from "Components/UI/Placeholders/Loader"
 import { FirebaseContext } from "Components/Firebase"
 import { Helmet } from "react-helmet"
+import useSendContactRequest from "./Hooks/UseSendContactRequest"
+import useResponseContactRequest from "./Hooks/UseResponseContactRequest"
 
 type Props = {
   userUid: string
+}
+
+interface ContactInfo {
+  status: boolean | string
+  receiver: boolean
+  userName: string
+  pinned_lastActivityTS: string
+  timeStamp: number
+  recipientNotified: boolean
+  newActivity: boolean
 }
 
 const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
@@ -16,8 +28,13 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
   const [userName, setUserName] = useState("")
   const [loadingUserName, setLoadingUserName] = useState(true)
 
-  const [contactStatus, setContactStatus] = useState<null | boolean | string>(null)
-  const [loadingContactStatus, setLoadingConctactStatus] = useState(true)
+  const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null)
+  const [loadingContactInfo, setLoadingContactInfo] = useState(true)
+
+  // const contactInfoRef = firebase.contact({ authUid: authUser?.uid, contactUid: userUid })
+
+  const { sendContactRequest, resendContactRequest } = useSendContactRequest({ userName, userUid })
+  const { acceptContactRequest, rejectContactRequest } = useResponseContactRequest({ userUid })
 
   const getUserName = useCallback(async () => {
     const userName = await firebase.user(userUid).child("username").once("value")
@@ -33,82 +50,76 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
     getUserName()
   }, [getUserName])
 
-  useEffect(() => {
-    const contactStatusRef = firebase.contact({ authUid: authUser?.uid, contactUid: userUid }).child("status")
-    contactStatusRef.on("value", (snapshot: { val: () => null | boolean | string }) => {
-      setContactStatus(snapshot.val())
-      setLoadingConctactStatus(false)
+  const getContactInfo = useCallback(async () => {
+    console.log({ authUser, userUid, firebase })
+    const contactInfoRef = firebase.contact({ authUid: authUser?.uid, contactUid: userUid })
+
+    console.log("getContactInfo")
+    contactInfoRef.on("value", (snapshot: { val: () => ContactInfo }) => {
+      setContactInfo(snapshot.val())
+      setLoadingContactInfo(false)
     })
-    return () => contactStatusRef.off()
-  }, [userUid, firebase, authUser])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const sendContactRequest = () => {
-    const contactRef = firebase.contact({ authUid: authUser?.uid, contactUid: userUid })
-    const timeStamp = firebase.timeStamp()
+  useEffect(() => {
+    getContactInfo()
+    return () => firebase.contact({ authUid: authUser?.uid, contactUid: userUid }).off()
+  }, [getContactInfo]) // eslint-disable-line react-hooks/exhaustive-deps
 
-    contactRef.set(
-      {
-        status: false,
-        receiver: true,
-        userName,
-        pinned_lastActivityTS: "false",
-        timeStamp,
-        recipientNotified: false
-      },
-      async () => {
-        const contactInfo = await contactRef.once("value")
-        const timeStamp = contactInfo.val().timeStamp
-        const isPinned = !!(contactInfo.val().pinned_lastActivityTS.slice(0, 4) === "true")
-        contactRef.update({ pinned_lastActivityTS: `${isPinned}_${timeStamp}` })
+  useEffect(() => {
+    if (contactInfo === null) return
+    if (contactInfo?.receiver || contactInfo?.recipientNotified) return
+    firebase
+      .contact({ authUid: authUser?.uid, contactUid: userUid })
+      .update({ recipientNotified: true, newActivity: null })
+    firebase.contactsDatabase({ uid: authUser?.uid }).child(`newContactsRequests/${userUid}`).set(null)
 
-        // const newContactRequestCloud = firebase.httpsCallable("newContactRequest")
-        // newContactRequestCloud({ contactUid: userUid, timeStamp })
-
-        const authUserName = await firebase.users().child(`${authUser?.uid}/username`).once("value")
-
-        firebase
-          .users()
-          .child(`${userUid}/contactsDatabase/contactsList/${authUser?.uid}`)
-          .set({
-            status: false,
-            receiver: false,
-            userName: authUserName.val(),
-            pinned_lastActivityTS: `false_${timeStamp}`,
-            timeStamp,
-            recipientNotified: false,
-            newActivity: true
-          })
-      }
-    )
-  }
-
-  const resendContactRequest = () => {}
+    // This should be in https callable
+    firebase.user(userUid).child(`contactsDatabase/contactsList/${authUser?.uid}`).update({
+      recipientNotified: true
+    })
+  }, [contactInfo]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const renderUserInfo = () => (
     <>
-      {contactStatus === true ? (
-        `You're friends with ${userName}`
-      ) : contactStatus === false ? (
-        <>
-          <div className="user-profile__username">{!userName ? "Nameless user" : userName}</div>
-          <div className="user-profile__request--sent">
-            <div>Request sent</div>
+      {contactInfo?.status === true ? (
+        <div className="user-profile__request-message">
+          You're friends with <span className="user-profile__name">{userName}</span>
+        </div>
+      ) : contactInfo?.status === false ? (
+        !contactInfo?.receiver ? (
+          <>
+            <div className="user-profile__request-message">
+              {<span className="user-profile__name">{userName}</span>} wants to connect
+            </div>
+            <div className="user-profile__actions--receiver">
+              <button className="button" onClick={() => acceptContactRequest()}>
+                Accept
+              </button>
+              <button className="button" onClick={() => resendContactRequest()}>
+                Reject
+              </button>
+            </div>
+          </>
+        ) : (
+          <div className="user-profile__request-message">
+            The invitation to connect has been sent to {<span className="user-profile__name">{userName}</span>}
           </div>
-        </>
-      ) : contactStatus === "rejected" ? (
+        )
+      ) : contactInfo?.status === "rejected" ? (
         <>
-          <div className="user-profile__username">{!userName ? "Nameless user" : userName}</div>
-          <div className="user-profile__request">
+          <div className="user-profile__username">{<span className="user-profile__name">{userName}</span>}</div>
+          <div className="user-profile__actions">
             <button className="button" onClick={() => resendContactRequest()}>
               Add to contacts
             </button>
           </div>
         </>
       ) : (
-        contactStatus === null && (
+        contactInfo === null && (
           <>
-            <div className="user-profile__username">{!userName ? "Nameless user" : userName}</div>
-            <div className="user-profile__request">
+            <div className="user-profile__username">{<span className="user-profile__name">{userName}</span>}</div>
+            <div className="user-profile__actions">
               <button className="button" onClick={() => sendContactRequest()}>
                 Add to contacts
               </button>
@@ -119,7 +130,7 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
     </>
   )
 
-  const loadingUserInfo = loadingUserName || loadingContactStatus
+  const loadingUserInfo = loadingUserName || loadingContactInfo
 
   return (
     <>
@@ -128,8 +139,7 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
       </Helmet>
       <div
         className={classNames("user-profile", {
-          "user-profile--own-profile": authUser?.uid === userUid,
-          "user-profile--both-friends": contactStatus === true
+          "user-profile--own-profile": authUser?.uid === userUid
         })}
       >
         {authUser?.uid === userUid ? (

@@ -3,26 +3,25 @@
 .user-profile {
   display: grid;
   position: relative;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   column-gap: 5px;
+  row-gap: 15px;
   width: 100%;
   max-width: 400px;
   margin-bottom: 35px;
   color: #fff;
+  text-align: center;
   font: {
     weight: 400;
     size: 1.5rem;
   }
 
   &--own-profile {
-    grid-template-columns: 1fr;
     font-size: 1.7rem;
-    text-align: center;
   }
 
-  &--both-friends {
-    grid-template-columns: 1fr;
-    text-align: center;
+  &__name {
+    color: getColor(blueClr, $mainPalette);
   }
 
   @include mediaMaxW(#{$mobileViewPort}) {
@@ -45,8 +44,8 @@
     }
   }
 
-  &__request {
-    &--sent {
+  &__actions {
+    &--sender {
       div {
         position: relative;
         display: flex;
@@ -67,6 +66,12 @@
         }
         color: getColor(textColor, $btnPalette);
       }
+    }
+
+    &--receiver {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: 5px;
     }
   }
 

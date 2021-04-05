@@ -24,17 +24,38 @@ import * as admin from "firebase-admin";
 admin.initializeApp();
 
 const database = admin.database();
+// const authUserInContactDatabaseRef = ({
+//   contactUid,
+//   authUserUid
+// }: {
+//   contactUid: string;
+//   authUserUid: string;
+// }) =>
+//   database.ref(
+//     `users/${contactUid}/contactsDatabase/contactsList/${authUserUid}`
+//   );
 
-interface ContactInfo {
-  status: boolean;
-  receiver: boolean;
-  userName: string;
-  // eslint-disable-next-line camelcase
-  pinned_lastActivityTS: string;
-  timeStamp: number;
-  recipientNotified: boolean;
-  newActivity: boolean;
-}
+// const contactInAuthUserDatabaseRef = ({
+//   contactUid,
+//   authUserUid
+// }: {
+//   contactUid: string;
+//   authUserUid: string;
+// }) =>
+//   database.ref(
+//     `users/${authUserUid}/contactsDatabase/contactsList/${contactUid}`
+//   );
+
+// interface ContactInfo {
+//   status: boolean;
+//   receiver: boolean;
+//   userName: string;
+//   // eslint-disable-next-line camelcase
+//   pinned_lastActivityTS: string;
+//   timeStamp: number;
+//   recipientNotified: boolean;
+//   newActivity: boolean;
+// }
 
 export const onMessageRemoved = functions.database
   .ref("users/{uid}/content/messages/{key}")
@@ -47,6 +68,123 @@ export const onMessageRemoved = functions.database
       )
       .set(null);
   });
+
+// export const contactsListHandler = functions.database
+//   .ref("users/{userUid}/contactsDatabase/contactsList/{contactUid}")
+//   .onWrite(async (change, context) => {
+//     const authUserUid = context.params.userUid;
+//     const contactUid = context.params.contactUid;
+
+//     // const beforeValue: ContactInfo = change.before.val();
+//     // const afterValue: ContactInfo = change.after.val();
+
+//     console.log({
+//       // beforeValue,
+//       // afterValue,
+//       userUid: authUserUid,
+//       contactUid,
+//       params: context.params
+//     });
+
+//     // const contactsDatabaseRef = database.ref(
+//     //   `users/${authUserUid}/contactsDatabase`
+//     // );
+
+//     // if (!change.before.exists() && !afterValue.receiver) {
+//     //   await contactsDatabaseRef
+//     //     .child(`newContactsRequests/${contactUid}`)
+//     //     .set(true);
+//     //   return contactsDatabaseRef.child("newContactsActivity").set(true);
+//     // }
+
+//     // if (beforeValue.recipientNotified !== afterValue.recipientNotified) {
+//     //   if (!afterValue.receiver) {
+//     //     await contactsDatabaseRef
+//     //       .child(`newContactsRequests/${contactUid}`)
+//     //       .set(null);
+//     //     await contactInAuthUserDatabaseRef({authUserUid, contactUid}).update({
+//     //       newActivity: null
+//     //     });
+//     //   }
+//     //   return database
+//     //     .ref(`users/${contactUid}/contactsDatabase/contactsList/${authUserUid}`)
+//     //     .update({
+//     //       recipientNotified: afterValue.recipientNotified,
+//     //       newActivity: null
+//     //     });
+//     // }
+
+//     // if (beforeValue.status !== afterValue.status) {
+//     //   console.log({beforeValue, afterValue});
+//     //   const timeStamp = admin.database.ServerValue.TIMESTAMP;
+//     //   let isPinned: boolean;
+
+//     //   try {
+//     //     const pinnedLastActivityTS = await authUserInContactDatabaseRef({
+//     //       contactUid,
+//     //       authUserUid
+//     //     })
+//     //       .child("pinned_lastActivityTS")
+//     //       .once("value");
+//     //     isPinned = !!(pinnedLastActivityTS.val().slice(0, 4) === "true");
+//     //   } catch (error) {
+//     //     console.log(error);
+//     //   }
+
+//     //   return authUserInContactDatabaseRef({contactUid, authUserUid}).update(
+//     //     {
+//     //       status: afterValue.status,
+//     //       newActivity: true,
+//     //       timeStamp
+//     //     },
+//     //     async () => {
+//     //       const timeStamp = await authUserInContactDatabaseRef({
+//     //         contactUid,
+//     //         authUserUid
+//     //       })
+//     //         .child("timeStamp")
+//     //         .once("value");
+//     //       return authUserInContactDatabaseRef({contactUid, authUserUid}).update(
+//     //         {
+//     //           pinned_lastActivityTS: `${isPinned}_${timeStamp.val()}`
+//     //         }
+//     //       );
+//     //     }
+//     //   );
+//     // }
+//   });
+
+export const newContactRequest = functions.https.onCall(
+  async (data, context) => {
+    const authUid = context?.auth?.uid;
+    const {contactUid, timeStamp} = data;
+
+    const authUserName = await database.ref(`users/${authUid}/userName`);
+
+    await Promise.all([
+      database
+        .ref(
+          `users/${contactUid}/contactsDatabase/newContactsRequests/${authUid}`
+        )
+        .set(true),
+      database
+        .ref(`users/${contactUid}/contactsDatabase/newContactsActivity`)
+        .set(true)
+    ]);
+
+    return database
+      .ref(`users/${contactUid}/contactsDatabase/contactsList/${authUid}`)
+      .set({
+        status: false,
+        receiver: false,
+        userName: authUserName,
+        pinned_lastActivityTS: `false_${timeStamp}`,
+        timeStamp,
+        recipientNotified: false,
+        newActivity: true
+      });
+  }
+);
 
 // export const onPageInFocus = functions.database.ref("users/{uid}/content/pageInFocus").onUpdate(async (change) => {
 //   const after = change.after.val()
@@ -91,59 +229,4 @@ export const onMessageRemoved = functions.database
 //     //   previousDatabase: before.database,
 //     //   time: admin.database.ServerValue.TIMESTAMP
 //     // });
-//   });
-
-export const contactsListHandler = functions.database
-  .ref("users/{userUid}/contactsDatabase/contactsList/{contactUid}")
-  .onWrite(async (change, context) => {
-    const userUid = context.params.userUid;
-    const contactUid = context.params.contactUid;
-
-    const beforeValue: ContactInfo = change.before.val();
-    const afterValue: ContactInfo = change.after.val();
-
-    const contactsDatabaseRef = database.ref(
-      `users/${userUid}/contactsDatabase`
-    );
-
-    if (!change.before.exists() && !afterValue.receiver) {
-      contactsDatabaseRef.child(`newContactsRequests/${contactUid}`).set(true);
-      return contactsDatabaseRef.child("newContactsActivity").set(true);
-    }
-
-    if (afterValue.recipientNotified) {
-      contactsDatabaseRef.child(`newContactsRequests/${contactUid}`).set(null);
-      return database
-        .ref(`users/${contactUid}/contactsDatabase/contactsList/${userUid}`)
-        .update({recipientNotified: true});
-    }
-
-    console.log({
-      beforeValue,
-      afterValue,
-      userUid,
-      contactUid,
-      params: context.params
-    });
-  });
-
-export const newContactRequest = functions.https.onCall(
-  async (data, context) => {
-    const authUid = context?.auth?.uid;
-    const {contactUid, timeStamp} = data;
-
-    const authUserName = await database.ref(`users/${authUid}/userName`);
-
-    return database
-      .ref(`users/${contactUid}/contactsDatabase/contactsList/${authUid}`)
-      .set({
-        status: false,
-        receiver: false,
-        userName: authUserName,
-        pinned_lastActivityTS: `false_${timeStamp}`,
-        timeStamp,
-        recipientNotified: false,
-        newActivity: true
-      });
-  }
-);
+//   })
