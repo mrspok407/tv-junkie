@@ -31,7 +31,7 @@ class App extends Component {
             <Route path={ROUTES.USER_PROFILE} exact component={UserProfile} />
             <Route path={ROUTES.DETAILES_PAGE} exact component={DetailesPage} />
             <Route path={ROUTES.SETTINGS} exact component={Settings} />
-            {/* <Route path={ROUTES.FRIENDS_PAGE} exact component={FriendsPage} /> */}
+            {/* <Route path={ROUTES.CONTACTS_PAGE} exact component={ContactsPage} /> */}
             <Route path={ROUTES.LOGIN_PAGE} exact component={LoginPage} />
             <Route path={ROUTES.ADMIN} exact component={Admin} />
             <Route path={ROUTES.GRID_TESTS} exact component={GridTests} />

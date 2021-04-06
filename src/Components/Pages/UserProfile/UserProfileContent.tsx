@@ -201,27 +201,6 @@ const UserProfileContent: React.FC<Props> = ({ userUid }) => {
   const currentNumOfColumns = activeSectionContent.length <= maxColumns - 1 ? activeSectionContent.length : maxColumns
   return (
     <>
-      {/* <Helmet>
-        <title>{userName ? userName : "Nameless"} User Profile | TV Junkie</title>
-      </Helmet> */}
-      {/* <div
-        className={classNames("user-profile", {
-          "user-profile--own-profile": authUser?.uid === userUid
-        })}
-      >
-        {authUser?.uid === userUid ? (
-          <div className="user-profile--own-profile-message">This is your profile</div>
-        ) : (
-          <>
-            <div className="user-profile__username">
-              {loadingUserName ? <Loader className="loader--small-pink" /> : !userName ? "Nameless user" : userName}
-            </div>
-            <div className="user-profile__friends-request">
-              <div className="button">Add to friends</div>
-            </div>
-          </>
-        )}
-      </div> */}
       <div className="content-results">
         <div className="buttons__row buttons__row--shows-page">
           <div className="buttons__col">

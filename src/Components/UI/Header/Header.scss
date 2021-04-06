@@ -159,6 +159,10 @@ $navBackground: #352424;
         border: none;
       }
 
+      &--contacts {
+        background-color: rgba(236, 68, 68, 0.4);
+      }
+
       &:before {
         bottom: 0;
       }
@@ -211,6 +215,20 @@ $navBackground: #352424;
     cursor: pointer;
     font-size: 1.3rem;
     z-index: 1;
+
+    &--new-activity {
+      &:after {
+        content: "";
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        border-radius: 50%;
+        width: 15px;
+        height: 15px;
+        background-color: #ec4444;
+        box-shadow: 0px 0px 4px 4px #ec4444;
+      }
+    }
 
     &:before {
       content: "";

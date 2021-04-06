@@ -6,6 +6,7 @@ import { FirebaseContext } from "Components/Firebase"
 import { Helmet } from "react-helmet"
 import useSendContactRequest from "./Hooks/UseSendContactRequest"
 import useResponseContactRequest from "./Hooks/UseResponseContactRequest"
+import { _updateRecipientNotified } from "firebaseHttpCallableFunctionsTests"
 
 type Props = {
   userUid: string
@@ -31,8 +32,6 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
   const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null)
   const [loadingContactInfo, setLoadingContactInfo] = useState(true)
 
-  // const contactInfoRef = firebase.contact({ authUid: authUser?.uid, contactUid: userUid })
-
   const { sendContactRequest, resendContactRequest } = useSendContactRequest({ userName, userUid })
   const { acceptContactRequest, rejectContactRequest } = useResponseContactRequest({ userUid })
 
@@ -51,10 +50,8 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
   }, [getUserName])
 
   const getContactInfo = useCallback(async () => {
-    console.log({ authUser, userUid, firebase })
     const contactInfoRef = firebase.contact({ authUid: authUser?.uid, contactUid: userUid })
 
-    console.log("getContactInfo")
     contactInfoRef.on("value", (snapshot: { val: () => ContactInfo }) => {
       setContactInfo(snapshot.val())
       setLoadingContactInfo(false)
@@ -69,15 +66,36 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
   useEffect(() => {
     if (contactInfo === null) return
     if (contactInfo?.receiver || contactInfo?.recipientNotified) return
-    firebase
-      .contact({ authUid: authUser?.uid, contactUid: userUid })
-      .update({ recipientNotified: true, newActivity: null })
-    firebase.contactsDatabase({ uid: authUser?.uid }).child(`newContactsRequests/${userUid}`).set(null)
+    ;(async () => {
+      const updateAuthContactInfo = firebase
+        .contact({ authUid: authUser?.uid, contactUid: userUid })
+        .update({ recipientNotified: true })
+      const updateAuthNewContactsRequests = firebase
+        .contactsDatabase({ uid: authUser?.uid })
+        .child(`newContactsRequests/${userUid}`)
+        .set(null)
 
-    // This should be in https callable
-    firebase.user(userUid).child(`contactsDatabase/contactsList/${authUser?.uid}`).update({
-      recipientNotified: true
-    })
+      try {
+        await Promise.all([updateAuthContactInfo, updateAuthNewContactsRequests])
+        _updateRecipientNotified({
+          data: { contactUid: userUid },
+          context: { auth: { uid: authUser?.uid } },
+          database: firebase.database()
+        })
+        // This should be in https callable
+
+        //  const updateRecipientNotifiedCloud = firebase.httpsCallable("updateRecipientNotified")
+        //  updateRecipientNotifiedCloud({ contactUid: userUid })
+      } catch (error) {
+        console.log(error)
+        throw new Error(`There has been some error in updating recipientNotified parameter: ${error}`)
+      }
+    })()
+  }, [contactInfo]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (contactInfo === null) return
+    firebase.contact({ authUid: authUser?.uid, contactUid: userUid }).update({ newActivity: null })
   }, [contactInfo]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const renderUserInfo = () => (
@@ -96,7 +114,7 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
               <button className="button" onClick={() => acceptContactRequest()}>
                 Accept
               </button>
-              <button className="button" onClick={() => resendContactRequest()}>
+              <button className="button" onClick={() => rejectContactRequest()}>
                 Reject
               </button>
             </div>
@@ -108,10 +126,12 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
         )
       ) : contactInfo?.status === "rejected" ? (
         <>
-          <div className="user-profile__username">{<span className="user-profile__name">{userName}</span>}</div>
+          <div className="user-profile__request-message">
+            {<span className="user-profile__name">{userName}</span>} rejected you connect request{" "}
+          </div>
           <div className="user-profile__actions">
             <button className="button" onClick={() => resendContactRequest()}>
-              Add to contacts
+              Send again
             </button>
           </div>
         </>

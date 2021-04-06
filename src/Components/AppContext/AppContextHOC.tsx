@@ -13,6 +13,7 @@ import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
 import { UserToWatchShowsInterface } from "Components/UserContent/UseUserShows/Hooks/UseGetUserToWatchShows"
 import { HandleListenersArg } from "Components/Pages/Detailes/FirebaseHelpers/UseHandleListeners"
+import useNewContactsActivity from "Components/Pages/Contacts/Hooks/UseNewContactsActivity"
 
 export interface ShowInterface {
   id: number
@@ -111,6 +112,7 @@ export interface AppContextInterface {
   }
   firebase: FirebaseInterface
   authUser: AuthUserInterface | null
+  newContactsActivity: boolean | null
 }
 
 export const CONTEXT_INITIAL_STATE = {
@@ -144,7 +146,8 @@ export const CONTEXT_INITIAL_STATE = {
     loadingShowsOnRegister: false
   },
   firebase: {},
-  authUser: { uid: "", email: "", emailVerified: false }
+  authUser: { uid: "", email: "", emailVerified: false },
+  newContactsActivity: false
 }
 
 export const AppContext = createContext<AppContextInterface>(CONTEXT_INITIAL_STATE)
@@ -156,7 +159,8 @@ const AppContextHOC = (Component: any) =>
       userContent: useUserShows(),
       userContentHandler: useContentHandler(),
       firebase: useFirebase(),
-      authUser: useAuthUser()
+      authUser: useAuthUser(),
+      newContactsActivity: useNewContactsActivity()
     }
     return (
       <AppContext.Provider value={ContextValue}>

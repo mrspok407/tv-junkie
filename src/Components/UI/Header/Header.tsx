@@ -15,7 +15,7 @@ type Props = {
 
 const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false }) => {
   const [navMobileOpen, setNavMobileOpen] = useState(false)
-  const { authUser } = useContext(AppContext)
+  const { authUser, newContactsActivity } = useContext(AppContext)
   const navRef = useRef<HTMLElement>(null)
   const toggleNavButtonRef = useRef<HTMLButtonElement>(null)
 
@@ -118,19 +118,29 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false }) =>
           {authUser ? (
             <>
               <div className="nav__link">
-                <li className="nav__item nav__item--dropdown">
+                <li
+                  className={classNames("nav__item nav__item--dropdown", {
+                    "nav__item--new-activity": newContactsActivity
+                  })}
+                >
                   Profile
                   <ul className="nav__list--dropdown">
                     <NavLink
                       exact
-                      to={ROUTES.FRIENDS_PAGE}
+                      to={ROUTES.CONTACTS_PAGE}
                       className={classNames("nav__link", {
                         "nav__link--non-auth": !authUser
                       })}
                       activeClassName="nav__item--active"
                       onClick={() => closeNavMobile()}
                     >
-                      <li className="nav__item">Friends</li>
+                      <li
+                        className={classNames("nav__item", {
+                          "nav__item--contacts": newContactsActivity
+                        })}
+                      >
+                        Contacts
+                      </li>
                     </NavLink>
                     <NavLink
                       exact

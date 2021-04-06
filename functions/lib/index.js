@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.newContactRequest = exports.onMessageRemoved = void 0;
+exports.newContactRequest = exports._newContactRequest = exports.onMessageRemoved = void 0;
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 // Cloud Functions interesting points:
@@ -63,6 +63,60 @@ exports.onMessageRemoved = functions.database
         .ref(`users/drv5lG97VxVBLgkdn8bMhdxmqQT2/content/unreadMessages_uid1/${messageKey}`)
         .set(null);
 });
+exports._newContactRequest = async (data, context) => {
+    var _a;
+    const authUid = (_a = context === null || context === void 0 ? void 0 : context.auth) === null || _a === void 0 ? void 0 : _a.uid;
+    const { contactUid, timeStamp } = data;
+    const authUserName = await database.ref(`users/${authUid}/userName`);
+    await Promise.all([
+        database
+            .ref(`users/${contactUid}/contactsDatabase/newContactsRequests/${authUid}`)
+            .set(true),
+        database
+            .ref(`users/${contactUid}/contactsDatabase/newContactsActivity`)
+            .set(true)
+    ]);
+    return database
+        .ref(`users/${contactUid}/contactsDatabase/contactsList/${authUid}`)
+        .set({
+        status: false,
+        receiver: false,
+        userName: authUserName,
+        pinned_lastActivityTS: `false_${timeStamp}`,
+        timeStamp,
+        recipientNotified: false,
+        newActivity: true
+    });
+};
+exports.newContactRequest = functions.https.onCall(exports._newContactRequest);
+// export const newContactRequest = functions.https.onCall(
+//   async (data, context) => {
+//     const authUid = context?.auth?.uid;
+//     const {contactUid, timeStamp} = data;
+//     const authUserName = await database.ref(`users/${authUid}/userName`);
+//     await Promise.all([
+//       database
+//         .ref(
+//           `users/${contactUid}/contactsDatabase/newContactsRequests/${authUid}`
+//         )
+//         .set(true),
+//       database
+//         .ref(`users/${contactUid}/contactsDatabase/newContactsActivity`)
+//         .set(true)
+//     ]);
+//     return database
+//       .ref(`users/${contactUid}/contactsDatabase/contactsList/${authUid}`)
+//       .set({
+//         status: false,
+//         receiver: false,
+//         userName: authUserName,
+//         pinned_lastActivityTS: `false_${timeStamp}`,
+//         timeStamp,
+//         recipientNotified: false,
+//         newActivity: true
+//       });
+//   }
+// );
 // export const contactsListHandler = functions.database
 //   .ref("users/{userUid}/contactsDatabase/contactsList/{contactUid}")
 //   .onWrite(async (change, context) => {
@@ -139,31 +193,6 @@ exports.onMessageRemoved = functions.database
 //     //   );
 //     // }
 //   });
-exports.newContactRequest = functions.https.onCall(async (data, context) => {
-    var _a;
-    const authUid = (_a = context === null || context === void 0 ? void 0 : context.auth) === null || _a === void 0 ? void 0 : _a.uid;
-    const { contactUid, timeStamp } = data;
-    const authUserName = await database.ref(`users/${authUid}/userName`);
-    await Promise.all([
-        database
-            .ref(`users/${contactUid}/contactsDatabase/newContactsRequests/${authUid}`)
-            .set(true),
-        database
-            .ref(`users/${contactUid}/contactsDatabase/newContactsActivity`)
-            .set(true)
-    ]);
-    return database
-        .ref(`users/${contactUid}/contactsDatabase/contactsList/${authUid}`)
-        .set({
-        status: false,
-        receiver: false,
-        userName: authUserName,
-        pinned_lastActivityTS: `false_${timeStamp}`,
-        timeStamp,
-        recipientNotified: false,
-        newActivity: true
-    });
-});
 // export const onPageInFocus = functions.database.ref("users/{uid}/content/pageInFocus").onUpdate(async (change) => {
 //   const after = change.after.val()
 //   if ()

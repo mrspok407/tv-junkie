@@ -1,6 +1,7 @@
 import { useContext } from "react"
 import { FirebaseContext } from "Components/Firebase"
 import { AppContext } from "Components/AppContext/AppContextHOC"
+import { _handleContactRequest } from "firebaseHttpCallableFunctionsTests"
 
 type Props = {
   userUid: string
@@ -10,51 +11,38 @@ const useSendContactRequest = ({ userUid }: Props) => {
   const { authUser } = useContext(AppContext)
   const firebase = useContext(FirebaseContext)
 
+  const contactRef = firebase.contact({ authUid: authUser?.uid, contactUid: userUid })
+
   const acceptContactRequest = () => {
-    const contactRef = firebase.contact({ authUid: authUser?.uid, contactUid: userUid })
     contactRef.update({ status: true }, async () => {
       // This should be in https callable
       const timeStamp = firebase.timeStamp()
-      let isPinned: boolean
+      _handleContactRequest({
+        data: { contactUid: userUid, status: "accept" },
+        context: { auth: { uid: authUser?.uid } },
+        database: firebase.database(),
+        timeStamp
+      })
 
-      try {
-        const pinnedLastActivityTS = await firebase
-          .user(userUid)
-          .child(`contactsDatabase/contactsList/${authUser?.uid}`)
-          .child("pinned_lastActivityTS")
-          .once("value")
-
-        isPinned = !!(pinnedLastActivityTS.val().slice(0, 4) === "true")
-      } catch (error) {
-        console.log(error)
-      }
-
-      firebase
-        .user(userUid)
-        .child(`contactsDatabase/contactsList/${authUser?.uid}`)
-        .update(
-          {
-            status: true,
-            newActivity: true,
-            timeStamp
-          },
-          async () => {
-            const timeStamp = await firebase
-              .user(userUid)
-              .child(`contactsDatabase/contactsList/${authUser?.uid}`)
-              .child("timeStamp")
-              .once("value")
-
-            firebase
-              .user(userUid)
-              .child(`contactsDatabase/contactsList/${authUser?.uid}`)
-              .update({ pinned_lastActivityTS: `${isPinned}_${timeStamp.val()}` })
-          }
-        )
+      // const handleContactRequestCloud = firebase.httpsCallable("handleContactRequest")
+      // handleContactRequestCloud({ contactUid: userUid, status: "accept" })
     })
   }
 
-  const rejectContactRequest = () => {}
+  const rejectContactRequest = () => {
+    contactRef.set(null, async () => {
+      const timeStamp = firebase.timeStamp()
+      _handleContactRequest({
+        data: { contactUid: userUid, status: "rejected" },
+        context: { auth: { uid: authUser?.uid } },
+        database: firebase.database(),
+        timeStamp
+      })
+
+      // const handleContactRequestCloud = firebase.httpsCallable("handleContactRequest")
+      // handleContactRequestCloud({ contactUid: userUid, status: "rejected" })
+    })
+  }
 
   return { acceptContactRequest, rejectContactRequest }
 }

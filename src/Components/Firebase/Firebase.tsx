@@ -65,6 +65,8 @@ class Firebase {
     this.googleProvider = new app.auth.GoogleAuthProvider()
 
     this.app = app
+
+    app.functions().useEmulator("localhost", 4000)
   }
 
   /// Cloud Functions ///
@@ -106,6 +108,8 @@ class Firebase {
 
   timeStamp = () => this.dbRef.ServerValue.TIMESTAMP
 
+  database = () => this.db
+
   /// Shows In Database ///
   allShowsList = () => this.db.ref(`allShowsList`)
   showInDatabase = (showKey: string) => this.db.ref(`allShowsList/${showKey}`)
@@ -118,6 +122,9 @@ class Firebase {
   userOnlineStatus = (uid: string) => this.db.ref(`users/${uid}/status`)
 
   /// Contacts API ///
+
+  newContactsRequests = ({ uid }: { uid: string }) => this.db.ref(`users/${uid}/contactsDatabase/newContactsRequests`)
+  newContactsActivity = ({ uid }: { uid: string }) => this.db.ref(`users/${uid}/contactsDatabase/newContactsActivity`)
   contactsDatabase = ({ uid }: { uid: string }) => this.db.ref(`users/${uid}/contactsDatabase`)
   contactsList = ({ uid }: { uid: string }) => this.db.ref(`users/${uid}/contactsDatabase/contactsList`)
   contact = ({ authUid, contactUid }: { authUid: string; contactUid: string }) =>
