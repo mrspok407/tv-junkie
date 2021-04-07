@@ -102,9 +102,10 @@ export const newContactRequest = functions.https.onCall(
           newActivity: true
         });
     } catch (error) {
-      throw new Error(
-        `There has been some error handling contact request: ${error}`
-      );
+      throw new functions.https.HttpsError("failed-precondition", "ERROR");
+      // throw new Error(
+      //   `There has been some error handling contact request: ${error}`
+      // );
     }
   }
 );

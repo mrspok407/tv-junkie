@@ -44,7 +44,7 @@ const useSendContactRequest = ({ userName, userUid }: Props) => {
 
           const newContactRequestCloud = firebase.httpsCallable("newContactRequest")
           newContactRequestCloud({ contactUid: userUid, timeStamp }).then((res: any) => {
-            console.log(res.data)
+            console.log(res)
           })
           // _newContactRequest({
           //   data: { contactUid: userUid, timeStamp: timeStamp },

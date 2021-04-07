@@ -79,7 +79,8 @@ exports.newContactRequest = functions.https.onCall(async (data, context) => {
             pinned_lastActivityTS: `false_${timeStamp}`,
             timeStamp,
             recipientNotified: false,
-            newActivity: true
+            newActivity: true,
+            test: undefined
         });
     }
     catch (error) {
