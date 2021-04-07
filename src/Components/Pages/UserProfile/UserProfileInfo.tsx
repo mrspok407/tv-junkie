@@ -7,6 +7,8 @@ import { Helmet } from "react-helmet"
 import useSendContactRequest from "./Hooks/UseSendContactRequest"
 import useResponseContactRequest from "./Hooks/UseResponseContactRequest"
 import { _updateRecipientNotified } from "firebaseHttpCallableFunctionsTests"
+import CreatePortal from "Components/UI/Modal/CreatePortal"
+import ModalContent from "Components/UI/Modal/ModalContent"
 
 type Props = {
   userUid: string
@@ -23,7 +25,7 @@ interface ContactInfo {
 }
 
 const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
-  const { authUser } = useContext(AppContext)
+  const { authUser, errors } = useContext(AppContext)
   const firebase = useContext(FirebaseContext)
 
   const [userName, setUserName] = useState("")
@@ -170,6 +172,7 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
           renderUserInfo()
         )}
       </div>
+      {errors.error && <CreatePortal element={<ModalContent message={errors.error.message} />}></CreatePortal>}
     </>
   )
 }

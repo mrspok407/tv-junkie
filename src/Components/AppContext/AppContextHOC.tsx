@@ -14,6 +14,7 @@ import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
 import { UserToWatchShowsInterface } from "Components/UserContent/UseUserShows/Hooks/UseGetUserToWatchShows"
 import { HandleListenersArg } from "Components/Pages/Detailes/FirebaseHelpers/UseHandleListeners"
 import useNewContactsActivity from "Components/Pages/Contacts/Hooks/UseNewContactsActivity"
+import useErrors from "Utils/Hooks/UseErrors"
 
 export interface ShowInterface {
   id: number
@@ -113,6 +114,7 @@ export interface AppContextInterface {
   firebase: FirebaseInterface
   authUser: AuthUserInterface | null
   newContactsActivity: boolean | null
+  errors: { error: any; handleError: ({ errorData, message }: { errorData: any; message: string }) => void }
 }
 
 export const CONTEXT_INITIAL_STATE = {
@@ -147,7 +149,8 @@ export const CONTEXT_INITIAL_STATE = {
   },
   firebase: {},
   authUser: { uid: "", email: "", emailVerified: false },
-  newContactsActivity: false
+  newContactsActivity: false,
+  errors: { error: {}, handleError: () => {} }
 }
 
 export const AppContext = createContext<AppContextInterface>(CONTEXT_INITIAL_STATE)
@@ -160,7 +163,8 @@ const AppContextHOC = (Component: any) =>
       userContentHandler: useContentHandler(),
       firebase: useFirebase(),
       authUser: useAuthUser(),
-      newContactsActivity: useNewContactsActivity()
+      newContactsActivity: useNewContactsActivity(),
+      errors: useErrors()
     }
     return (
       <AppContext.Provider value={ContextValue}>

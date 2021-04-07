@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.newContactRequest = exports._newContactRequest = exports.onMessageRemoved = void 0;
+exports.updateRecipientNotified = exports.handleContactRequest = exports.newContactRequest = exports.onMessageRemoved = void 0;
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 // Cloud Functions interesting points:
@@ -24,16 +24,7 @@ const admin = require("firebase-admin");
 // More info: https://firebase.google.com/docs/functions/callable#web https://youtu.be/8mL1VuiL5Kk?t=593
 admin.initializeApp();
 const database = admin.database();
-// const authUserInContactDatabaseRef = ({
-//   contactUid,
-//   authUserUid
-// }: {
-//   contactUid: string;
-//   authUserUid: string;
-// }) =>
-//   database.ref(
-//     `users/${contactUid}/contactsDatabase/contactsList/${authUserUid}`
-//   );
+const authUserInContactDatabaseRef = ({ contactUid, authUserUid }) => database.ref(`users/${contactUid}/contactsDatabase/contactsList/${authUserUid}`);
 // const contactInAuthUserDatabaseRef = ({
 //   contactUid,
 //   authUserUid
@@ -63,60 +54,91 @@ exports.onMessageRemoved = functions.database
         .ref(`users/drv5lG97VxVBLgkdn8bMhdxmqQT2/content/unreadMessages_uid1/${messageKey}`)
         .set(null);
 });
-exports._newContactRequest = async (data, context) => {
+exports.newContactRequest = functions
+    .region("us-central1")
+    .https.onCall(async (data, context) => {
     var _a;
     const authUid = (_a = context === null || context === void 0 ? void 0 : context.auth) === null || _a === void 0 ? void 0 : _a.uid;
     const { contactUid, timeStamp } = data;
-    const authUserName = await database.ref(`users/${authUid}/userName`);
-    await Promise.all([
-        database
-            .ref(`users/${contactUid}/contactsDatabase/newContactsRequests/${authUid}`)
-            .set(true),
-        database
-            .ref(`users/${contactUid}/contactsDatabase/newContactsActivity`)
-            .set(true)
-    ]);
-    return database
-        .ref(`users/${contactUid}/contactsDatabase/contactsList/${authUid}`)
-        .set({
-        status: false,
-        receiver: false,
-        userName: authUserName,
-        pinned_lastActivityTS: `false_${timeStamp}`,
-        timeStamp,
-        recipientNotified: false,
-        newActivity: true
+    try {
+        const authUserName = await database
+            .ref(`users/${authUid}/userName`)
+            .once("value");
+        await Promise.all([
+            database
+                .ref(`users/${contactUid}/contactsDatabase/newContactsRequests/${authUid}`)
+                .set(true),
+            database
+                .ref(`users/${contactUid}/contactsDatabase/newContactsActivity`)
+                .set(true)
+        ]);
+        return database
+            .ref(`users/${contactUid}/contactsDatabase/contactsList/${authUid}`)
+            .set({
+            status: false,
+            receiver: false,
+            userName: authUserName.val(),
+            pinned_lastActivityTS: `false_${timeStamp}`,
+            timeStamp,
+            recipientNotified: false,
+            newActivity: true
+        });
+    }
+    catch (error) {
+        throw new Error(`There has been some error handling contact request: ${error}`);
+    }
+});
+exports.handleContactRequest = functions.https.onCall(async (data, context) => {
+    var _a;
+    const authUserUid = (_a = context === null || context === void 0 ? void 0 : context.auth) === null || _a === void 0 ? void 0 : _a.uid;
+    const { contactUid, status } = data;
+    const timeStamp = admin.database.ServerValue.TIMESTAMP;
+    let isPinned = false;
+    try {
+        const pinnedLastActivityTS = await authUserInContactDatabaseRef({
+            contactUid,
+            authUserUid
+        })
+            .child("pinned_lastActivityTS")
+            .once("value");
+        isPinned = !!(pinnedLastActivityTS.val().slice(0, 4) === "true");
+    }
+    catch (error) {
+        console.log(error);
+    }
+    return authUserInContactDatabaseRef({
+        contactUid,
+        authUserUid
+    }).update({
+        status: status === "accept" ? true : "rejected",
+        newActivity: true,
+        timeStamp
+    }, async () => {
+        const timeStamp = await authUserInContactDatabaseRef({
+            contactUid,
+            authUserUid
+        })
+            .child("timeStamp")
+            .once("value");
+        authUserInContactDatabaseRef({
+            contactUid,
+            authUserUid
+        }).update({ pinned_lastActivityTS: `${isPinned}_${timeStamp.val()}` });
     });
-};
-exports.newContactRequest = functions.https.onCall(exports._newContactRequest);
-// export const newContactRequest = functions.https.onCall(
-//   async (data, context) => {
-//     const authUid = context?.auth?.uid;
-//     const {contactUid, timeStamp} = data;
-//     const authUserName = await database.ref(`users/${authUid}/userName`);
-//     await Promise.all([
-//       database
-//         .ref(
-//           `users/${contactUid}/contactsDatabase/newContactsRequests/${authUid}`
-//         )
-//         .set(true),
-//       database
-//         .ref(`users/${contactUid}/contactsDatabase/newContactsActivity`)
-//         .set(true)
-//     ]);
-//     return database
-//       .ref(`users/${contactUid}/contactsDatabase/contactsList/${authUid}`)
-//       .set({
-//         status: false,
-//         receiver: false,
-//         userName: authUserName,
-//         pinned_lastActivityTS: `false_${timeStamp}`,
-//         timeStamp,
-//         recipientNotified: false,
-//         newActivity: true
-//       });
-//   }
-// );
+});
+exports.updateRecipientNotified = functions.https.onCall(async (data, context) => {
+    var _a;
+    const authUserUid = (_a = context === null || context === void 0 ? void 0 : context.auth) === null || _a === void 0 ? void 0 : _a.uid;
+    const { contactUid } = data;
+    try {
+        return authUserInContactDatabaseRef({ contactUid, authUserUid }).update({
+            recipientNotified: true
+        });
+    }
+    catch (error) {
+        console.log(error);
+    }
+});
 // export const contactsListHandler = functions.database
 //   .ref("users/{userUid}/contactsDatabase/contactsList/{contactUid}")
 //   .onWrite(async (change, context) => {

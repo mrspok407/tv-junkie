@@ -3,8 +3,8 @@ import ScrollToTop from "Utils/ScrollToTopBar"
 import Header from "Components/UI/Header/Header"
 import Footer from "Components/UI/Footer/Footer"
 import UserProfileContent from "./UserProfileContent"
-import "./UserProfile.scss"
 import UserProfileInfo from "./UserProfileInfo"
+import "./UserProfile.scss"
 
 type Props = {
   match: { params: { uid: string } }

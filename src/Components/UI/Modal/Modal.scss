@@ -1,0 +1,75 @@
+@import "../../../styles/globals";
+
+.modal-container {
+  --bottomPosition: 30px;
+  --topMobilePosition: 10px;
+  position: fixed;
+  display: flex;
+  bottom: var(--bottomPosition);
+  right: 30px;
+  width: 262px;
+  min-height: 60px;
+  border-radius: 3px;
+  box-shadow: 0px 0px 7px 4px rgba(58, 139, 226, 0.65);
+  background-color: peru;
+  opacity: 0;
+  transform: translateY(calc(100% + var(--bottomPosition)));
+  z-index: 9999;
+  animation: errorModalComeUp 300ms forwards cubic-bezier(0.04, 0.96, 0.16, 1.04);
+  @keyframes errorModalComeUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @include mediaMaxW(#{$mobileViewPort}) {
+    top: var(--topMobilePosition);
+    left: 5%;
+    bottom: initial;
+    right: initial;
+    width: 90%;
+    transform: translateY(calc(-100% - var(--topMobilePosition)));
+    animation: errorModalComeUp 300ms forwards cubic-bezier(0.04, 0.96, 0.16, 1.04);
+    @keyframes errorModalComeUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  }
+}
+
+.modal-fade-out {
+  animation: errorModalComeDown 300ms forwards ease-in;
+  @keyframes errorModalComeDown {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(calc(100% + var(--bottomPosition)));
+    }
+  }
+
+  @include mediaMaxW(#{$mobileViewPort}) {
+    animation: errorModalComeDown 300ms forwards ease-in;
+    @keyframes errorModalComeDown {
+      from {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      to {
+        opacity: 0;
+        transform: translateY(calc(-100% - var(--topMobilePosition)));
+      }
+    }
+  }
+}
+
+.modal-message {
+  display: flex;
+  color: #fff;
+  padding: 10px;
+}
