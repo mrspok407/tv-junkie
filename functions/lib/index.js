@@ -25,16 +25,7 @@ const admin = require("firebase-admin");
 admin.initializeApp();
 const database = admin.database();
 const authUserInContactDatabaseRef = ({ contactUid, authUserUid }) => database.ref(`users/${contactUid}/contactsDatabase/contactsList/${authUserUid}`);
-// const contactInAuthUserDatabaseRef = ({
-//   contactUid,
-//   authUserUid
-// }: {
-//   contactUid: string;
-//   authUserUid: string;
-// }) =>
-//   database.ref(
-//     `users/${authUserUid}/contactsDatabase/contactsList/${contactUid}`
-//   );
+const contactInAuthUserDatabaseRef = ({ contactUid, authUserUid }) => database.ref(`users/${authUserUid}/contactsDatabase/contactsList/${contactUid}`);
 // interface ContactInfo {
 //   status: boolean;
 //   receiver: boolean;
@@ -58,32 +49,32 @@ exports.newContactRequest = functions.https.onCall(async (data, context) => {
     var _a;
     const authUid = (_a = context === null || context === void 0 ? void 0 : context.auth) === null || _a === void 0 ? void 0 : _a.uid;
     const { contactUid, timeStamp } = data;
+    const newContactRequestRef = database.ref(`users/${contactUid}/contactsDatabase/newContactsRequests/${authUid}`);
+    const newContactsActivityRef = database.ref(`users/${contactUid}/contactsDatabase/newContactsActivity`);
     try {
         const authUserName = await database
             .ref(`users/${authUid}/userName`)
             .once("value");
-        await Promise.all([
-            database
-                .ref(`users/${contactUid}/contactsDatabase/newContactsRequests/${authUid}`)
-                .set(true),
-            database
-                .ref(`users/${contactUid}/contactsDatabase/newContactsActivity`)
-                .set(true)
+        return Promise.all([
+            newContactRequestRef.set(true),
+            newContactsActivityRef.set(true),
+            authUserInContactDatabaseRef({ contactUid, authUserUid: authUid }).set({
+                status: false,
+                receiver: false,
+                userName: authUserName.val(),
+                pinned_lastActivityTS: `false_${timeStamp}`,
+                timeStamp,
+                recipientNotified: false,
+                newActivity: true,
+                test: undefined
+            })
         ]);
-        return database
-            .ref(`users/${contactUid}/contactsDatabase/contactsList/${authUid}`)
-            .set({
-            status: false,
-            receiver: false,
-            userName: authUserName.val(),
-            pinned_lastActivityTS: `false_${timeStamp}`,
-            timeStamp,
-            recipientNotified: false,
-            newActivity: true,
-            test: undefined
-        });
     }
     catch (error) {
+        newContactRequestRef.set(null);
+        newContactsActivityRef.set(null);
+        authUserInContactDatabaseRef({ contactUid, authUserUid: authUid }).set(null);
+        contactInAuthUserDatabaseRef({ contactUid, authUserUid: authUid }).set(null);
         throw new functions.https.HttpsError("unknown", error.message, error);
         // throw new Error(
         //   `There has been some error handling contact request: ${error}`

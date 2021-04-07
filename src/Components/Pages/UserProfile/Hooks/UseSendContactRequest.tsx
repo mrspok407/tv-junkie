@@ -44,10 +44,14 @@ const useSendContactRequest = ({ userName, userUid }: Props) => {
 
           const newContactRequestCloud = firebase.httpsCallable("newContactRequest")
           try {
-            const result = await newContactRequestCloud({ contactUid: userUid, timeStamp })
-            console.log({ result })
+            newContactRequestCloud({ contactUid: userUid, timeStamp })
           } catch (error) {
-            console.log({ error })
+            errors.handleError({
+              errorData: error,
+              message: "There has been some error sending contact request. Please try again."
+            })
+
+            throw new Error(`There has been some error sending contact request: ${error}`)
           }
           // _newContactRequest({
           //   data: { contactUid: userUid, timeStamp: timeStamp },
