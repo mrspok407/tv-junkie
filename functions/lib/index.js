@@ -57,7 +57,8 @@ exports.newContactRequest = functions.https.onCall(async (data, context) => {
             .once("value");
         return Promise.all([
             newContactRequestRef.set(true),
-            newContactsActivityRef.set(true),
+            // newContactsActivityRef.set(true),
+            newContactsActivityRef.set({ test: undefined }),
             authUserInContactDatabaseRef({ contactUid, authUserUid: authUid }).set({
                 status: false,
                 receiver: false,
@@ -65,8 +66,7 @@ exports.newContactRequest = functions.https.onCall(async (data, context) => {
                 pinned_lastActivityTS: `false_${timeStamp}`,
                 timeStamp,
                 recipientNotified: false,
-                newActivity: true,
-                test: undefined
+                newActivity: true
             })
         ]);
     }
