@@ -67,7 +67,7 @@ class Firebase {
 
     this.app = app
 
-    app.functions().useEmulator("localhost", 4000)
+    // app.functions().useEmulator("localhost", 4000)
   }
 
   /// Cloud Functions ///
