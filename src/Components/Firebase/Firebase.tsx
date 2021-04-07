@@ -27,7 +27,8 @@ const configDevelopment = {
   appId: process.env.REACT_APP_DEV_APP_ID
 }
 
-let config: any = process.env.NODE_ENV === "production" ? configProduction : configDevelopment
+// let config: any = process.env.NODE_ENV === "production" ? configProduction : configDevelopment
+let config: any = configProduction
 
 // if (window.location.hostname === "localhost") {
 //   config = {

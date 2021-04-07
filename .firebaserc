@@ -2,6 +2,6 @@
   "projects": {
     "pet-project": "pet-project-8d5fd",
     "pet-project-development": "pet-project-development",
-    "default": "pet-project-development"
+    "default": "pet-project-8d5fd"
   }
 }

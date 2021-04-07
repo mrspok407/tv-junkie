@@ -54,9 +54,7 @@ exports.onMessageRemoved = functions.database
         .ref(`users/drv5lG97VxVBLgkdn8bMhdxmqQT2/content/unreadMessages_uid1/${messageKey}`)
         .set(null);
 });
-exports.newContactRequest = functions
-    .region("us-central1")
-    .https.onCall(async (data, context) => {
+exports.newContactRequest = functions.https.onCall(async (data, context) => {
     var _a;
     const authUid = (_a = context === null || context === void 0 ? void 0 : context.auth) === null || _a === void 0 ? void 0 : _a.uid;
     const { contactUid, timeStamp } = data;
