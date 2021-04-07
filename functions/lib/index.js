@@ -84,7 +84,10 @@ exports.newContactRequest = functions.https.onCall(async (data, context) => {
         });
     }
     catch (error) {
-        throw new Error(`There has been some error handling contact request: ${error}`);
+        throw new functions.https.HttpsError("unknown", error.message, error);
+        // throw new Error(
+        //   `There has been some error handling contact request: ${error}`
+        // );
     }
 });
 exports.handleContactRequest = functions.https.onCall(async (data, context) => {

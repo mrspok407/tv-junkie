@@ -99,10 +99,11 @@ export const newContactRequest = functions.https.onCall(
           pinned_lastActivityTS: `false_${timeStamp}`,
           timeStamp,
           recipientNotified: false,
-          newActivity: true
+          newActivity: true,
+          test: undefined
         });
     } catch (error) {
-      throw new functions.https.HttpsError("failed-precondition", "ERROR");
+      throw new functions.https.HttpsError("unknown", error.message, error);
       // throw new Error(
       //   `There has been some error handling contact request: ${error}`
       // );

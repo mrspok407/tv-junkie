@@ -43,9 +43,12 @@ const useSendContactRequest = ({ userName, userUid }: Props) => {
           contactRef.update({ pinned_lastActivityTS: `${isPinned}_${timeStamp}` })
 
           const newContactRequestCloud = firebase.httpsCallable("newContactRequest")
-          newContactRequestCloud({ contactUid: userUid, timeStamp }).then((res: any) => {
-            console.log(res)
-          })
+          try {
+            const result = await newContactRequestCloud({ contactUid: userUid, timeStamp })
+            console.log({ result })
+          } catch (error) {
+            console.log({ error })
+          }
           // _newContactRequest({
           //   data: { contactUid: userUid, timeStamp: timeStamp },
           //   context: { auth: { uid: authUser?.uid } },
