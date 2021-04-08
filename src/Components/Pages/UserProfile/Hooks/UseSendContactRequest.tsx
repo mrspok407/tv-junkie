@@ -29,22 +29,29 @@ const useSendContactRequest = ({ userName, userUid }: Props) => {
         async (error: any) => {
           // This should be in https callable
           if (error) {
+            contactRef.set(null)
             errors.handleError({
               errorData: error,
               message: "There has been some error sending contact request. Please try again."
             })
-
             throw new Error(`There has been some error sending contact request: ${error}`)
           }
 
           const contactInfo = await contactRef.once("value")
           const timeStamp = contactInfo.val().timeStamp
           const isPinned = !!(contactInfo.val().pinned_lastActivityTS.slice(0, 4) === "true")
+
+          // const newContactRequestCloud = firebase.httpsCallable("newContactRequest")
+
           contactRef.update({ pinned_lastActivityTS: `${isPinned}_${timeStamp}` })
 
-          const newContactRequestCloud = firebase.httpsCallable("newContactRequest")
           try {
-            await newContactRequestCloud({ contactUid: userUid, timeStamp })
+            // await newContactRequestCloud({ contactUid: userUid, timeStamp })
+            await _newContactRequest({
+              data: { contactUid: userUid, timeStamp: timeStamp },
+              context: { auth: { uid: authUser?.uid } },
+              database: firebase.database()
+            })
           } catch (error) {
             console.log({ error })
             errors.handleError({
@@ -54,11 +61,6 @@ const useSendContactRequest = ({ userName, userUid }: Props) => {
 
             throw new Error(`There has been some error sending contact request: ${error}`)
           }
-          // _newContactRequest({
-          //   data: { contactUid: userUid, timeStamp: timeStamp },
-          //   context: { auth: { uid: authUser?.uid } },
-          //   database: firebase.database()
-          // })
         }
       )
     } catch (error) {
@@ -76,21 +78,48 @@ const useSendContactRequest = ({ userName, userUid }: Props) => {
     const timeStamp = firebase.timeStamp()
 
     try {
-      contactRef.update({ status: false, timeStamp }, async () => {
+      contactRef.update({ status: false, timeStamp }, async (error: any) => {
+        if (error) {
+          contactRef.set(null)
+          errors.handleError({
+            errorData: error,
+            message: "There has been some error sending contact request. Please try again."
+          })
+          throw new Error(`There has been some error sending contact request: ${error}`)
+        }
+
         const contactInfo = await contactRef.once("value")
         const timeStamp = contactInfo.val().timeStamp
         const isPinned = !!(contactInfo.val().pinned_lastActivityTS.slice(0, 4) === "true")
-        contactRef.update({ pinned_lastActivityTS: `${isPinned}_${timeStamp}` })
 
         // const newContactRequestCloud = firebase.httpsCallable("newContactRequest")
-        // newContactRequestCloud({ contactUid: userUid, timeStamp })
-        _newContactRequest({
-          data: { contactUid: userUid, timeStamp: timeStamp },
-          context: { auth: { uid: authUser?.uid } },
-          database: firebase.database()
-        })
+
+        contactRef.update({ pinned_lastActivityTS: `${isPinned}_${timeStamp}` })
+        try {
+          // newContactRequestCloud({ contactUid: userUid, timeStamp })
+          _newContactRequest({
+            data: { contactUid: userUid, timeStamp: timeStamp, resendRequest: true },
+            context: { auth: { uid: authUser?.uid } },
+            database: firebase.database()
+          })
+        } catch (error) {
+          console.log({ error })
+          errors.handleError({
+            errorData: error,
+            message: "There has been some error sending contact request. Please try again."
+          })
+
+          throw new Error(`There has been some error sending contact request: ${error}`)
+        }
       })
-    } catch (error) {}
+    } catch (error) {
+      errors.handleError({
+        errorData: error,
+        message: "There has been some error sending contact request. Please try again."
+      })
+
+      throw new Error(`There has been some error sending contact request: ${error}`)
+    }
   }
 
   return { sendContactRequest, resendContactRequest }

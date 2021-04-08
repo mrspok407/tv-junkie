@@ -35,7 +35,9 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
   const [loadingContactInfo, setLoadingContactInfo] = useState(true)
 
   const { sendContactRequest, resendContactRequest } = useSendContactRequest({ userName, userUid })
-  const { acceptContactRequest, rejectContactRequest } = useResponseContactRequest({ userUid })
+  const { acceptContactRequest } = useResponseContactRequest({ userUid })
+
+  const contactInfoRef = firebase.contact({ authUid: authUser?.uid, contactUid: userUid })
 
   const getUserName = useCallback(async () => {
     const userName = await firebase.user(userUid).child("username").once("value")
@@ -52,8 +54,6 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
   }, [getUserName])
 
   const getContactInfo = useCallback(async () => {
-    const contactInfoRef = firebase.contact({ authUid: authUser?.uid, contactUid: userUid })
-
     contactInfoRef.on("value", (snapshot: { val: () => ContactInfo }) => {
       setContactInfo(snapshot.val())
       setLoadingContactInfo(false)
@@ -69,27 +69,32 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
     if (contactInfo === null) return
     if (contactInfo?.receiver || contactInfo?.recipientNotified) return
     ;(async () => {
-      const updateAuthContactInfo = firebase
-        .contact({ authUid: authUser?.uid, contactUid: userUid })
-        .update({ recipientNotified: true })
+      //  const updateRecipientNotifiedCloud = firebase.httpsCallable("updateRecipientNotified")
+      const updateAuthContactInfo = firebase.contact({ authUid: authUser?.uid, contactUid: userUid })
       const updateAuthNewContactsRequests = firebase
         .contactsDatabase({ uid: authUser?.uid })
         .child(`newContactsRequests/${userUid}`)
-        .set(null)
-
       try {
-        await Promise.all([updateAuthContactInfo, updateAuthNewContactsRequests])
-        _updateRecipientNotified({
+        // This should be in https callable
+
+        //  updateRecipientNotifiedCloud({ contactUid: userUid })
+        await Promise.all([
+          updateAuthContactInfo.update({ recipientNotified: true }),
+          updateAuthNewContactsRequests.set(null)
+        ])
+        await _updateRecipientNotified({
           data: { contactUid: userUid },
           context: { auth: { uid: authUser?.uid } },
           database: firebase.database()
         })
-        // This should be in https callable
-
-        //  const updateRecipientNotifiedCloud = firebase.httpsCallable("updateRecipientNotified")
-        //  updateRecipientNotifiedCloud({ contactUid: userUid })
       } catch (error) {
-        console.log(error)
+        contactInfoRef.off()
+        updateAuthContactInfo.update({ recipientNotified: false })
+        updateAuthNewContactsRequests.set(true)
+        errors.handleError({
+          errorData: error,
+          message: "There has been some error in updating notified parameter. Try to reload the page."
+        })
         throw new Error(`There has been some error in updating recipientNotified parameter: ${error}`)
       }
     })()
@@ -116,7 +121,7 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
               <button className="button" onClick={() => acceptContactRequest()}>
                 Accept
               </button>
-              <button className="button" onClick={() => rejectContactRequest()}>
+              <button className="button" onClick={() => {}}>
                 Reject
               </button>
             </div>
@@ -168,6 +173,8 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
           <div className="user-profile--own-profile-message">This is your profile</div>
         ) : loadingUserInfo ? (
           <Loader className="loader--small-pink" />
+        ) : !authUser ? (
+          <div className="user-profile__username">{<span className="user-profile__name">{userName}</span>}</div>
         ) : (
           renderUserInfo()
         )}

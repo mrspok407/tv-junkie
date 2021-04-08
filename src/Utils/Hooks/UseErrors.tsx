@@ -2,9 +2,10 @@ import { useRef, useState } from "react"
 
 const useErrors = () => {
   const [error, setError] = useState<any>()
+  const modalContainerRef = useRef<HTMLDivElement>(null!)
+
   const timeoutRef = useRef<number | null>(null)
   const fadeOutTimeout = useRef<number | null>(null)
-  const modalContainerRef = useRef<HTMLDivElement>(null!)
 
   const handleError = ({ errorData, message }: { errorData: any; message: string }) => {
     setError({ errorData, message })
@@ -17,10 +18,10 @@ const useErrors = () => {
       const modalContainer = document.querySelector(".modal-container") as HTMLDivElement
       modalContainerRef.current = modalContainer
       modalContainer?.classList.add("modal-fade-out")
-    }, 4700)
+    }, 9700)
     timeoutRef.current = window.setTimeout(() => {
       setError(null)
-    }, 5000)
+    }, 10000)
   }
 
   return { error, handleError }

@@ -1,6 +1,8 @@
 import * as React from "react"
 import { UserShowsInterface } from "Components/UserContent/UseUserShows/UseUserShows"
 
+const SHOWS_TO_LOAD_INITIAL = 16
+
 export enum ActionTypes {
   IncrementLoadedShows = "incrementLoadedShows",
   IncrementLoadedShowsLS = "incrementLoadedShowsLS",
@@ -8,56 +10,6 @@ export enum ActionTypes {
   DisableLoadLS = "disableLoadLS",
   ChangeActiveSection = "changeActiveSection",
   UpdateContent = "updateContent"
-}
-
-export interface ActionInterface {
-  type: ActionTypes
-  payload?: any
-}
-
-interface DisableLoadInterface {
-  [key: string]: boolean
-  watchingShows: boolean
-  droppedShows: boolean
-  willWatchShows: boolean
-  finishedShows: boolean
-  watchingShowsLS: boolean
-}
-
-interface LoadedShowsInterface {
-  [key: string]: number
-  watchingShows: number
-  droppedShows: number
-  willWatchShows: number
-  finishedShows: number
-  watchingShowsLS: number
-}
-
-export interface ShowsContentState {
-  loadedShows: LoadedShowsInterface
-  disableLoad: DisableLoadInterface
-  activeSection: string
-  content: UserShowsInterface[]
-}
-
-const SHOWS_TO_LOAD_INITIAL = 16
-const INITIAL_STATE: ShowsContentState = {
-  disableLoad: {
-    watchingShows: false,
-    droppedShows: false,
-    willWatchShows: false,
-    finishedShows: false,
-    watchingShowsLS: false
-  },
-  loadedShows: {
-    watchingShows: SHOWS_TO_LOAD_INITIAL,
-    watchingShowsLS: SHOWS_TO_LOAD_INITIAL,
-    droppedShows: SHOWS_TO_LOAD_INITIAL,
-    willWatchShows: SHOWS_TO_LOAD_INITIAL,
-    finishedShows: SHOWS_TO_LOAD_INITIAL
-  },
-  activeSection: "watchingShows",
-  content: []
 }
 
 const reducer: React.Reducer<ShowsContentState, ActionInterface> = (state, action) => {
@@ -102,3 +54,52 @@ const reducer: React.Reducer<ShowsContentState, ActionInterface> = (state, actio
 
 export default reducer
 export { INITIAL_STATE }
+
+export interface ActionInterface {
+  type: ActionTypes
+  payload?: any
+}
+
+interface DisableLoadInterface {
+  [key: string]: boolean
+  watchingShows: boolean
+  droppedShows: boolean
+  willWatchShows: boolean
+  finishedShows: boolean
+  watchingShowsLS: boolean
+}
+
+interface LoadedShowsInterface {
+  [key: string]: number
+  watchingShows: number
+  droppedShows: number
+  willWatchShows: number
+  finishedShows: number
+  watchingShowsLS: number
+}
+
+export interface ShowsContentState {
+  loadedShows: LoadedShowsInterface
+  disableLoad: DisableLoadInterface
+  activeSection: string
+  content: UserShowsInterface[]
+}
+
+const INITIAL_STATE: ShowsContentState = {
+  disableLoad: {
+    watchingShows: false,
+    droppedShows: false,
+    willWatchShows: false,
+    finishedShows: false,
+    watchingShowsLS: false
+  },
+  loadedShows: {
+    watchingShows: SHOWS_TO_LOAD_INITIAL,
+    watchingShowsLS: SHOWS_TO_LOAD_INITIAL,
+    droppedShows: SHOWS_TO_LOAD_INITIAL,
+    willWatchShows: SHOWS_TO_LOAD_INITIAL,
+    finishedShows: SHOWS_TO_LOAD_INITIAL
+  },
+  activeSection: "watchingShows",
+  content: []
+}

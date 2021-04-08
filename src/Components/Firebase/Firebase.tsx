@@ -27,15 +27,15 @@ const configDevelopment = {
   appId: process.env.REACT_APP_DEV_APP_ID
 }
 
-// let config: any = process.env.NODE_ENV === "production" ? configProduction : configDevelopment
-let config: any = configProduction
+let config: any = process.env.NODE_ENV === "production" ? configProduction : configDevelopment
+// let config: any = configProduction
 
-// if (window.location.hostname === "localhost") {
-//   config = {
-//     ...config,
-//     databaseURL: `http://localhost:9000/?ns=pet-project-development-default-rtdb`
-//   }
-// }
+if (window.location.hostname === "localhost") {
+  config = {
+    ...config,
+    databaseURL: `http://localhost:9000/?ns=pet-project-development-default-rtdb`
+  }
+}
 
 interface ReferenceInterface {
   uid: string
@@ -67,7 +67,7 @@ class Firebase {
 
     this.app = app
 
-    // app.functions().useEmulator("localhost", 4000)
+    app.functions().useEmulator("localhost", 4000)
   }
 
   /// Cloud Functions ///

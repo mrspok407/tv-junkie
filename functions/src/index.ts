@@ -24,7 +24,7 @@ import * as admin from "firebase-admin";
 admin.initializeApp();
 
 const database = admin.database();
-const authUserInContactDatabaseRef = ({
+const authUserInContactsRef = ({
   contactUid,
   authUserUid
 }: {
@@ -35,7 +35,7 @@ const authUserInContactDatabaseRef = ({
     `users/${contactUid}/contactsDatabase/contactsList/${authUserUid}`
   );
 
-const contactInAuthUserDatabaseRef = ({
+const contactInAuthUserRef = ({
   contactUid,
   authUserUid
 }: {
@@ -72,7 +72,14 @@ export const onMessageRemoved = functions.database
 export const newContactRequest = functions.https.onCall(
   async (data, context) => {
     const authUid = context?.auth?.uid;
-    const {contactUid, timeStamp} = data;
+    const {contactUid, timeStamp, resendRequest = false} = data;
+
+    if (!context.auth) {
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "The function must be called while authenticated."
+      );
+    }
 
     const newContactRequestRef = database.ref(
       `users/${contactUid}/contactsDatabase/newContactsRequests/${authUid}`
@@ -89,9 +96,8 @@ export const newContactRequest = functions.https.onCall(
 
       return Promise.all([
         newContactRequestRef.set(true),
-        // newContactsActivityRef.set(true),
-        newContactsActivityRef.set({test: undefined}),
-        authUserInContactDatabaseRef({contactUid, authUserUid: authUid}).set({
+        newContactsActivityRef.set(true),
+        authUserInContactsRef({contactUid, authUserUid: authUid}).set({
           status: false,
           receiver: false,
           userName: authUserName.val(),
@@ -104,18 +110,12 @@ export const newContactRequest = functions.https.onCall(
     } catch (error) {
       newContactRequestRef.set(null);
       newContactsActivityRef.set(null);
-      authUserInContactDatabaseRef({contactUid, authUserUid: authUid}).set(
-        null
-      );
-      contactInAuthUserDatabaseRef({contactUid, authUserUid: authUid}).set(
-        null
-      );
+      authUserInContactsRef({contactUid, authUserUid: authUid}).set(null);
+      if (!resendRequest) {
+        contactInAuthUserRef({contactUid, authUserUid: authUid}).set(null);
+      }
 
       throw new functions.https.HttpsError("unknown", error.message, error);
-
-      // throw new Error(
-      //   `There has been some error handling contact request: ${error}`
-      // );
     }
   }
 );
@@ -125,45 +125,56 @@ export const handleContactRequest = functions.https.onCall(
     const authUserUid = context?.auth?.uid;
     const {contactUid, status} = data;
 
+    if (!context.auth) {
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "The function must be called while authenticated."
+      );
+    }
+
     const timeStamp = admin.database.ServerValue.TIMESTAMP;
-    let isPinned = false;
+    // let isPinned = false;
 
     try {
-      const pinnedLastActivityTS = await authUserInContactDatabaseRef({
+      const pinnedLastActivityTS = await authUserInContactsRef({
         contactUid,
         authUserUid
       })
         .child("pinned_lastActivityTS")
         .once("value");
 
-      isPinned = !!(pinnedLastActivityTS.val().slice(0, 4) === "true");
-    } catch (error) {
-      console.log(error);
-    }
+      const isPinned = !!(pinnedLastActivityTS.val().slice(0, 4) === "true");
 
-    return authUserInContactDatabaseRef({
-      contactUid,
-      authUserUid
-    }).update(
-      {
+      await authUserInContactsRef({
+        contactUid,
+        authUserUid
+      }).update({
         status: status === "accept" ? true : "rejected",
         newActivity: true,
         timeStamp
-      },
-      async () => {
-        const timeStamp = await authUserInContactDatabaseRef({
-          contactUid,
-          authUserUid
-        })
-          .child("timeStamp")
-          .once("value");
+      });
 
-        authUserInContactDatabaseRef({
-          contactUid,
-          authUserUid
-        }).update({pinned_lastActivityTS: `${isPinned}_${timeStamp.val()}`});
+      const timeStampData = await authUserInContactsRef({
+        contactUid,
+        authUserUid
+      })
+        .child("timeStamp")
+        .once("value");
+
+      return authUserInContactsRef({
+        contactUid,
+        authUserUid
+      }).update({pinned_lastActivityTS: `${isPinned}_${timeStampData.val()}`});
+    } catch (error) {
+      if (status === true) {
+        contactInAuthUserRef({contactUid, authUserUid}).update({status: false});
+        authUserInContactsRef({contactUid, authUserUid}).update({
+          status: false,
+          newActivity: null
+        });
       }
-    );
+      throw new functions.https.HttpsError("unknown", error.message, error);
+    }
   }
 );
 
@@ -172,12 +183,27 @@ export const updateRecipientNotified = functions.https.onCall(
     const authUserUid = context?.auth?.uid;
     const {contactUid} = data;
 
+    if (!context.auth) {
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "The function must be called while authenticated."
+      );
+    }
+
+    const newContactRequestRef = database.ref(
+      `users/${authUserUid}/contactsDatabase/newContactsRequests/${contactUid}`
+    );
+
     try {
-      return authUserInContactDatabaseRef({contactUid, authUserUid}).update({
+      return authUserInContactsRef({contactUid, authUserUid}).update({
         recipientNotified: true
       });
     } catch (error) {
-      console.log(error);
+      contactInAuthUserRef({contactUid, authUserUid}).update({
+        recipientNotified: false
+      });
+      newContactRequestRef.set(true);
+      throw new functions.https.HttpsError("unknown", error.message, error);
     }
   }
 );

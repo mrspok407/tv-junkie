@@ -6,6 +6,7 @@ interface DataInterface {
   contactUid: string
   status?: string
   timeStamp?: number
+  resendRequest?: boolean
 }
 
 export const _newContactRequest = async ({
@@ -18,23 +19,35 @@ export const _newContactRequest = async ({
   database: any
 }) => {
   const authUid = context?.auth?.uid
-  const { contactUid, timeStamp } = data
+  const { contactUid, timeStamp, resendRequest = false } = data
+
+  const newContactRequestRef = database.ref(`users/${contactUid}/contactsDatabase/newContactsRequests/${authUid}`)
+
+  const newContactsActivityRef = database.ref(`users/${contactUid}/contactsDatabase/newContactsActivity`)
 
   try {
     const authUserName = await database.ref(`users/${authUid}/username`).once("value")
 
-    await Promise.all([database.ref(`users/${contactUid}/contactsDatabase/newContactsRequests/${authUid}`).set(true)])
-
-    return database.ref(`users/${contactUid}/contactsDatabase/contactsList/${authUid}`).set({
-      status: false,
-      receiver: false,
-      userName: authUserName.val(),
-      pinned_lastActivityTS: `false_${timeStamp}`,
-      timeStamp,
-      recipientNotified: false,
-      newActivity: true
-    })
+    return Promise.all([
+      newContactRequestRef.set(true),
+      newContactsActivityRef.set(true),
+      database.ref(`users/${contactUid}/contactsDatabase/contactsList/${authUid}`).set({
+        status: false,
+        receiver: false,
+        userName: authUserName.val(),
+        pinned_lastActivityTS: `false_${timeStamp}`,
+        timeStamp,
+        recipientNotified: false,
+        newActivity: true
+      })
+    ])
   } catch (error) {
+    newContactRequestRef.set(null)
+    newContactsActivityRef.set(null)
+    database.ref(`users/${contactUid}/contactsDatabase/contactsList/${authUid}`).set(null)
+    if (!resendRequest) {
+      database.ref(`users/${authUid}/contactsDatabase/contactsList/${contactUid}`).set(null)
+    }
     throw new Error(`There has been some error handling contact request: ${error}`)
   }
 }
@@ -79,7 +92,7 @@ export const _handleContactRequest = async ({
         .child("timeStamp")
         .once("value")
 
-      database
+      return database
         .ref(`users/${contactUid}/contactsDatabase/contactsList/${authUserUid}`)
         .update({ pinned_lastActivityTS: `${isPinned}_${timeStamp.val()}` })
     }
@@ -103,6 +116,10 @@ export const _updateRecipientNotified = async ({
       recipientNotified: true
     })
   } catch (error) {
-    console.log(error)
+    database.ref(`users/${authUserUid}/contactsDatabase/contactsList/${contactUid}`).update({
+      recipientNotified: false
+    })
+    database.ref(`users/${authUserUid}/contactsDatabase/newContactsRequests/${contactUid}`).set(true)
+    throw new Error(`There has been some error handling contact request: ${error}`)
   }
 }
