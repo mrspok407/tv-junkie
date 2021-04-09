@@ -12,64 +12,40 @@ const useSendContactRequest = ({ userName, userUid }: Props) => {
   const { authUser, errors } = useContext(AppContext)
   const firebase = useContext(FirebaseContext)
 
-  const sendContactRequest = () => {
+  const sendContactRequest = async () => {
     const contactRef = firebase.contact({ authUid: authUser?.uid, contactUid: userUid })
-    const timeStamp = firebase.timeStamp()
+    const timeStampData = firebase.timeStamp()
 
     try {
-      contactRef.set(
-        {
-          status: false,
-          receiver: true,
-          userName,
-          pinned_lastActivityTS: "false",
-          timeStamp,
-          recipientNotified: false
-        },
-        async (error: any) => {
-          // This should be in https callable
-          if (error) {
-            contactRef.set(null)
-            errors.handleError({
-              errorData: error,
-              message: "There has been some error sending contact request. Please try again."
-            })
-            throw new Error(`There has been some error sending contact request: ${error}`)
-          }
+      await contactRef.set({
+        status: false,
+        receiver: true,
+        userName,
+        pinned_lastActivityTS: "false",
+        timeStamp: timeStampData,
+        recipientNotified: false
+      })
 
-          const contactInfo = await contactRef.once("value")
-          const timeStamp = contactInfo.val().timeStamp
-          const isPinned = !!(contactInfo.val().pinned_lastActivityTS.slice(0, 4) === "true")
+      // const newContactRequestCloud = firebase.httpsCallable("newContactRequest")
+      // await newContactRequestCloud({ contactUid: userUid, timeStamp })
 
-          // const newContactRequestCloud = firebase.httpsCallable("newContactRequest")
+      const contactInfo = await contactRef.once("value")
+      const timeStamp = contactInfo.val().timeStamp
+      const isPinned = !!(contactInfo.val().pinned_lastActivityTS.slice(0, 4) === "true")
 
-          contactRef.update({ pinned_lastActivityTS: `${isPinned}_${timeStamp}` })
-
-          try {
-            // await newContactRequestCloud({ contactUid: userUid, timeStamp })
-            await _newContactRequest({
-              data: { contactUid: userUid, timeStamp: timeStamp },
-              context: { auth: { uid: authUser?.uid } },
-              database: firebase.database()
-            })
-          } catch (error) {
-            console.log({ error })
-            errors.handleError({
-              errorData: error,
-              message: "There has been some error sending contact request. Please try again."
-            })
-
-            throw new Error(`There has been some error sending contact request: ${error}`)
-          }
-        }
-      )
+      await contactRef.update({ pinned_lastActivityTS: `${isPinned}_${timeStamp}` })
+      await _newContactRequest({
+        data: { contactUid: userUid, timeStamp: timeStamp },
+        context: { auth: { uid: authUser?.uid } },
+        database: firebase.database()
+      })
     } catch (error) {
       errors.handleError({
         errorData: error,
-        message: "There has been some error sending contact request. Please try again."
+        message: "There has been some error updating database. Please try again."
       })
 
-      throw new Error(`There has been some error sending contact request: ${error}`)
+      throw new Error(`There has been some error updating database: ${error}`)
     }
   }
 

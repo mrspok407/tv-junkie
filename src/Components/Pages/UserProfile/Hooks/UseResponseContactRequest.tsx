@@ -13,40 +13,20 @@ const useSendContactRequest = ({ userUid }: Props) => {
 
   const contactRef = firebase.contact({ authUid: authUser?.uid, contactUid: userUid })
 
-  const acceptContactRequest = () => {
+  const acceptContactRequest = async () => {
     const timeStamp = firebase.timeStamp()
 
     try {
-      contactRef.update({ status: true }, async (error: any) => {
-        if (error) {
-          contactRef.update({ status: false })
-          errors.handleError({
-            errorData: error,
-            message: "There has been some error accepting contact request. Please try again."
-          })
-          throw new Error(`There has been some error accepting contact request: ${error}`)
-        }
-
-        try {
-          // This should be in https callable
-          await _handleContactRequest({
-            data: { contactUid: userUid, status: "accept" },
-            context: { auth: { uid: authUser?.uid } },
-            database: firebase.database(),
-            timeStamp
-          })
-
-          // const handleContactRequestCloud = firebase.httpsCallable("handleContactRequest")
-          // handleContactRequestCloud({ contactUid: userUid, status: "accept" })
-        } catch (error) {
-          errors.handleError({
-            errorData: error,
-            message: "There has been some error accepting contact request. Please try again."
-          })
-
-          throw new Error(`There has been some error accepting contact request: ${error}`)
-        }
+      await contactRef.update({ status: true })
+      await _handleContactRequest({
+        data: { contactUid: userUid, status: "accept" },
+        context: { auth: { uid: authUser?.uid } },
+        database: firebase.database(),
+        timeStamp
       })
+
+      // const handleContactRequestCloud = firebase.httpsCallable("handleContactRequest")
+      // handleContactRequestCloud({ contactUid: userUid, status: "accept" })
     } catch (error) {
       errors.handleError({
         errorData: error,

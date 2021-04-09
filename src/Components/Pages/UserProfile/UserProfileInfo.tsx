@@ -6,9 +6,9 @@ import { FirebaseContext } from "Components/Firebase"
 import { Helmet } from "react-helmet"
 import useSendContactRequest from "./Hooks/UseSendContactRequest"
 import useResponseContactRequest from "./Hooks/UseResponseContactRequest"
-import { _updateRecipientNotified } from "firebaseHttpCallableFunctionsTests"
 import CreatePortal from "Components/UI/Modal/CreatePortal"
 import ModalContent from "Components/UI/Modal/ModalContent"
+import useRecipientNotified from "./Hooks/UseRecipientNotified"
 
 type Props = {
   userUid: string
@@ -34,10 +34,14 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
   const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null)
   const [loadingContactInfo, setLoadingContactInfo] = useState(true)
 
+  const [isRecipientNotified, setIsRecipientNotified] = useState<boolean | null>(null)
+  const [isReceiver, setIsReceiver] = useState<boolean | null>(null)
+
   const { sendContactRequest, resendContactRequest } = useSendContactRequest({ userName, userUid })
   const { acceptContactRequest } = useResponseContactRequest({ userUid })
+  const { updateRecipientNotified } = useRecipientNotified({ userUid })
 
-  const contactInfoRef = firebase.contact({ authUid: authUser?.uid, contactUid: userUid })
+  const contactRef = firebase.contact({ authUid: authUser?.uid, contactUid: userUid })
 
   const getUserName = useCallback(async () => {
     const userName = await firebase.user(userUid).child("username").once("value")
@@ -53,52 +57,39 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
     getUserName()
   }, [getUserName])
 
-  const getContactInfo = useCallback(async () => {
-    contactInfoRef.on("value", (snapshot: { val: () => ContactInfo }) => {
+  const attachFirebaseListeners = useCallback(async () => {
+    contactRef.on("value", (snapshot: { val: () => ContactInfo }) => {
       setContactInfo(snapshot.val())
       setLoadingContactInfo(false)
+    })
+    contactRef.child("recipientNotified").on("value", (snapshot: { val: () => boolean | null }) => {
+      console.log({ snapshot: snapshot.val() })
+      setIsRecipientNotified(snapshot.val())
+    })
+    contactRef.child("receiver").on("value", (snapshot: { val: () => boolean | null }) => {
+      setIsReceiver(snapshot.val())
     })
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    getContactInfo()
-    return () => firebase.contact({ authUid: authUser?.uid, contactUid: userUid }).off()
-  }, [getContactInfo]) // eslint-disable-line react-hooks/exhaustive-deps
+    attachFirebaseListeners()
+    return () => {
+      contactRef.off()
+      contactRef.child("recipientNotified").off()
+    }
+  }, [attachFirebaseListeners]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (contactInfo === null) return
-    if (contactInfo?.receiver || contactInfo?.recipientNotified) return
-    ;(async () => {
-      //  const updateRecipientNotifiedCloud = firebase.httpsCallable("updateRecipientNotified")
-      const updateAuthContactInfo = firebase.contact({ authUid: authUser?.uid, contactUid: userUid })
-      const updateAuthNewContactsRequests = firebase
-        .contactsDatabase({ uid: authUser?.uid })
-        .child(`newContactsRequests/${userUid}`)
-      try {
-        // This should be in https callable
+    console.log({ isRecipientNotified })
+  }, [isRecipientNotified])
 
-        //  updateRecipientNotifiedCloud({ contactUid: userUid })
-        await Promise.all([
-          updateAuthContactInfo.update({ recipientNotified: true }),
-          updateAuthNewContactsRequests.set(null)
-        ])
-        await _updateRecipientNotified({
-          data: { contactUid: userUid },
-          context: { auth: { uid: authUser?.uid } },
-          database: firebase.database()
-        })
-      } catch (error) {
-        contactInfoRef.off()
-        updateAuthContactInfo.update({ recipientNotified: false })
-        updateAuthNewContactsRequests.set(true)
-        errors.handleError({
-          errorData: error,
-          message: "There has been some error in updating notified parameter. Try to reload the page."
-        })
-        throw new Error(`There has been some error in updating recipientNotified parameter: ${error}`)
-      }
-    })()
-  }, [contactInfo]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (isRecipientNotified === null || isReceiver === null) return
+    console.log({ isRecipientNotified })
+    console.log({ isReceiver })
+    if (isRecipientNotified === true || isReceiver === true) return
+    updateRecipientNotified()
+  }, [isRecipientNotified, isReceiver, updateRecipientNotified])
 
   useEffect(() => {
     if (contactInfo === null) return

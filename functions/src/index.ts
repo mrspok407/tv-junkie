@@ -81,23 +81,15 @@ export const newContactRequest = functions.https.onCall(
       );
     }
 
-    const newContactRequestRef = database.ref(
-      `users/${contactUid}/contactsDatabase/newContactsRequests/${authUid}`
-    );
-
-    const newContactsActivityRef = database.ref(
-      `users/${contactUid}/contactsDatabase/newContactsActivity`
-    );
-
     try {
       const authUserName = await database
         .ref(`users/${authUid}/userName`)
         .once("value");
 
-      return Promise.all([
-        newContactRequestRef.set(true),
-        newContactsActivityRef.set(true),
-        authUserInContactsRef({contactUid, authUserUid: authUid}).set({
+      return database.ref(`users/${contactUid}/contactsDatabase`).update({
+        [`newContactsRequests/${authUid}`]: true,
+        newContactsActivity: true,
+        [`contactsList/${authUid}`]: {
           status: false,
           receiver: false,
           userName: authUserName.val(),
@@ -105,16 +97,12 @@ export const newContactRequest = functions.https.onCall(
           timeStamp,
           recipientNotified: false,
           newActivity: true
-        })
-      ]);
+        }
+      });
     } catch (error) {
-      newContactRequestRef.set(null);
-      newContactsActivityRef.set(null);
-      authUserInContactsRef({contactUid, authUserUid: authUid}).set(null);
       if (!resendRequest) {
         contactInAuthUserRef({contactUid, authUserUid: authUid}).set(null);
       }
-
       throw new functions.https.HttpsError("unknown", error.message, error);
     }
   }
@@ -144,7 +132,6 @@ export const handleContactRequest = functions.https.onCall(
         .once("value");
 
       const isPinned = !!(pinnedLastActivityTS.val().slice(0, 4) === "true");
-
       await authUserInContactsRef({
         contactUid,
         authUserUid
@@ -166,7 +153,7 @@ export const handleContactRequest = functions.https.onCall(
         authUserUid
       }).update({pinned_lastActivityTS: `${isPinned}_${timeStampData.val()}`});
     } catch (error) {
-      if (status === true) {
+      if (status === "accept") {
         contactInAuthUserRef({contactUid, authUserUid}).update({status: false});
         authUserInContactsRef({contactUid, authUserUid}).update({
           status: false,
@@ -190,19 +177,21 @@ export const updateRecipientNotified = functions.https.onCall(
       );
     }
 
-    const newContactRequestRef = database.ref(
-      `users/${authUserUid}/contactsDatabase/newContactsRequests/${contactUid}`
-    );
-
     try {
       return authUserInContactsRef({contactUid, authUserUid}).update({
         recipientNotified: true
       });
     } catch (error) {
-      contactInAuthUserRef({contactUid, authUserUid}).update({
-        recipientNotified: false
+      database
+        .ref(
+          `users/${authUserUid}/contactsDatabase/contactsList/${contactUid}/recipientNotified`
+        )
+        .off();
+
+      database.ref(`users/${authUserUid}/contactsDatabase`).update({
+        [`contactsList/${contactUid}/recipientNotified`]: false,
+        [`newContactsRequests/${contactUid}`]: true
       });
-      newContactRequestRef.set(true);
       throw new functions.https.HttpsError("unknown", error.message, error);
     }
   }

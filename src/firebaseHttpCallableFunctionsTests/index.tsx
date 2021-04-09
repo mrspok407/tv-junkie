@@ -21,17 +21,17 @@ export const _newContactRequest = async ({
   const authUid = context?.auth?.uid
   const { contactUid, timeStamp, resendRequest = false } = data
 
-  const newContactRequestRef = database.ref(`users/${contactUid}/contactsDatabase/newContactsRequests/${authUid}`)
-
-  const newContactsActivityRef = database.ref(`users/${contactUid}/contactsDatabase/newContactsActivity`)
+  if (!context.auth) {
+    throw new Error("The function must be called while authenticated.")
+  }
 
   try {
     const authUserName = await database.ref(`users/${authUid}/username`).once("value")
 
-    return Promise.all([
-      newContactRequestRef.set(true),
-      newContactsActivityRef.set(true),
-      database.ref(`users/${contactUid}/contactsDatabase/contactsList/${authUid}`).set({
+    return database.ref(`users/${contactUid}/contactsDatabase`).update({
+      [`newContactsRequests/${authUid}`]: true,
+      newContactsActivity: true,
+      [`contactsList/${authUid}`]: {
         status: false,
         receiver: false,
         userName: authUserName.val(),
@@ -39,16 +39,13 @@ export const _newContactRequest = async ({
         timeStamp,
         recipientNotified: false,
         newActivity: true
-      })
-    ])
+      }
+    })
   } catch (error) {
-    newContactRequestRef.set(null)
-    newContactsActivityRef.set(null)
-    database.ref(`users/${contactUid}/contactsDatabase/contactsList/${authUid}`).set(null)
     if (!resendRequest) {
       database.ref(`users/${authUid}/contactsDatabase/contactsList/${contactUid}`).set(null)
     }
-    throw new Error(`There has been some error handling contact request: ${error}`)
+    throw new Error(`There has been some error updating database: ${error}`)
   }
 }
 
@@ -67,36 +64,36 @@ export const _handleContactRequest = async ({
   const { contactUid, status } = data
 
   // const timeStamp = admin.database.ServerValue.TIMESTAMP;
-  let isPinned = false
-
   try {
     const pinnedLastActivityTS = await database
       .ref(`users/${contactUid}/contactsDatabase/contactsList/${authUserUid}`)
       .child("pinned_lastActivityTS")
       .once("value")
+    const isPinned = !!(pinnedLastActivityTS.val().slice(0, 4) === "true")
 
-    isPinned = !!(pinnedLastActivityTS.val().slice(0, 4) === "true")
-  } catch (error) {
-    console.log(error)
-  }
-
-  return database.ref(`users/${contactUid}/contactsDatabase/contactsList/${authUserUid}`).update(
-    {
+    await database.ref(`users/${contactUid}/contactsDatabase/contactsList/${authUserUid}`).update({
       status: status === "accept" ? true : "rejected",
       newActivity: true,
       timeStamp
-    },
-    async () => {
-      const timeStamp = await database
-        .ref(`users/${contactUid}/contactsDatabase/contactsList/${authUserUid}`)
-        .child("timeStamp")
-        .once("value")
+    })
 
-      return database
+    const timeStampData = await database
+      .ref(`users/${contactUid}/contactsDatabase/contactsList/${authUserUid}`)
+      .child("timeStamp")
+      .once("value")
+
+    return database
+      .ref(`users/${contactUid}/contactsDatabase/contactsList/${authUserUid}`)
+      .update({ pinned_lastActivityTS: `${isPinned}_${timeStampData.val()}` })
+  } catch (error) {
+    if (status === "accept") {
+      database.ref(`users/${authUserUid}/contactsDatabase/contactsList/${contactUid}`).update({ status: false })
+      database
         .ref(`users/${contactUid}/contactsDatabase/contactsList/${authUserUid}`)
-        .update({ pinned_lastActivityTS: `${isPinned}_${timeStamp.val()}` })
+        .update({ status: false, newActivity: null })
     }
-  )
+    throw new Error(`There has been some error updating database: ${error}`)
+  }
 }
 
 export const _updateRecipientNotified = async ({
@@ -111,15 +108,21 @@ export const _updateRecipientNotified = async ({
   const authUserUid = context?.auth?.uid
   const { contactUid } = data
 
+  if (!context.auth) {
+    throw new Error("The function must be called while authenticated.")
+  }
+
   try {
     return database.ref(`users/${contactUid}/contactsDatabase/contactsList/${authUserUid}`).update({
       recipientNotified: true
     })
   } catch (error) {
-    database.ref(`users/${authUserUid}/contactsDatabase/contactsList/${contactUid}`).update({
-      recipientNotified: false
+    database.ref(`users/${authUserUid}/contactsDatabase/contactsList/${contactUid}/recipientNotified`).off()
+
+    database.ref(`users/${authUserUid}/contactsDatabase`).update({
+      [`contactsList/${contactUid}/recipientNotified`]: false,
+      [`newContactsRequests/${contactUid}`]: true
     })
-    database.ref(`users/${authUserUid}/contactsDatabase/newContactsRequests/${contactUid}`).set(true)
-    throw new Error(`There has been some error handling contact request: ${error}`)
+    throw new Error(`There has been some error updating database: ${error}`)
   }
 }
