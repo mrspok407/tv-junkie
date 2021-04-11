@@ -27,6 +27,8 @@ module.exports = {
     "indent": "off",
     "comma-dangle": "off",
     "max-len": ["error", {"code": 120}],
-    "cabelcase": "off"
+    "camelcase": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "operator-linebreak": "off"
   }
 };

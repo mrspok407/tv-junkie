@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateRecipientNotified = exports.handleContactRequest = exports.newContactRequest = exports.onMessageRemoved = void 0;
+exports.updateRecipientNotified = exports.handleContactRequest = exports.newContactRequest = exports.updatePinnedTimeStamp = exports.onMessageRemoved = void 0;
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 // Cloud Functions interesting points:
@@ -24,8 +24,16 @@ const admin = require("firebase-admin");
 // More info: https://firebase.google.com/docs/functions/callable#web https://youtu.be/8mL1VuiL5Kk?t=593
 admin.initializeApp();
 const database = admin.database();
-const authUserInContactDatabaseRef = ({ contactUid, authUserUid }) => database.ref(`users/${contactUid}/contactsDatabase/contactsList/${authUserUid}`);
-const contactInAuthUserDatabaseRef = ({ contactUid, authUserUid }) => database.ref(`users/${authUserUid}/contactsDatabase/contactsList/${contactUid}`);
+const authUserInContactsRef = ({ contactUid, authUid }) => database.ref(`users/${contactUid}/contactsDatabase/contactsList/${authUid}`);
+// const contactInAuthUserRef = ({
+//   contactUid,
+//   authUid: authUid
+// }: {
+//   contactUid: string;
+//   authUid: string | undefined;
+// }) =>
+//   database.ref(`users/${authUid}/contactsDatabase/contactsList/${contactUid}`);
+const contactsDatabaseRef = (uid) => `${uid}/contactsDatabase`;
 // interface ContactInfo {
 //   status: boolean;
 //   receiver: boolean;
@@ -45,91 +53,148 @@ exports.onMessageRemoved = functions.database
         .ref(`users/drv5lG97VxVBLgkdn8bMhdxmqQT2/content/unreadMessages_uid1/${messageKey}`)
         .set(null);
 });
+exports.updatePinnedTimeStamp = functions.database
+    .ref("users/{authUid}/contactsDatabase/contactsList/{contactUid}/timeStamp")
+    .onWrite(async (change) => {
+    var _a, _b, _c;
+    const afterData = change.after;
+    const beforeData = change.before;
+    const timeStamp = afterData.val();
+    if (!afterData.exists())
+        return;
+    if (!beforeData.exists()) {
+        return (_a = afterData.ref.parent) === null || _a === void 0 ? void 0 : _a.update({
+            pinned_lastActivityTS: `false_${timeStamp}`
+        });
+    }
+    if (beforeData.val() !== afterData.val()) {
+        const isPinnedData = await ((_b = afterData.ref.parent) === null || _b === void 0 ? void 0 : _b.child("pinned_lastActivityTS").once("value"));
+        const isPinned = !!((isPinnedData === null || isPinnedData === void 0 ? void 0 : isPinnedData.val().slice(0, 4)) === "true");
+        return (_c = afterData.ref.parent) === null || _c === void 0 ? void 0 : _c.update({
+            pinned_lastActivityTS: `${isPinned}_${timeStamp}`
+        });
+    }
+});
+// export const updatePinnedTimeStampStatusChange = functions.database
+//   .ref("users/{authUid}/contactsDatabase/contactsList/{contactUid}/status")
+//   .onUpdate(async (change, context) => {
+//     const {authUid, contactUid} = context.params;
+//     const newStatus = change.after.val();
+//     const timeStampServer = admin.database.ServerValue.TIMESTAMP;
+//     await authUserInContactsRef({contactUid, authUid}).update({
+//       status: newStatus === null ? "rejected" : newStatus,
+//       newActivity: true,
+//       timeStamp: timeStampServer
+//     });
+//     const isPinnedData = await authUserInContactsRef({contactUid, authUid})
+//       .child("pinned_lastActivityTS")
+//       .once("value");
+//     const timeStamp = await authUserInContactsRef({contactUid, authUid})
+//       .child("timeStamp")
+//       .once("value");
+//     const isPinned = !!(isPinnedData.val().slice(0, 4) === "true");
+//     return authUserInContactsRef({contactUid, authUid}).update({
+//       pinned_lastActivityTS: `${isPinned}_${timeStamp.val()}`
+//     });
+//   });
 exports.newContactRequest = functions.https.onCall(async (data, context) => {
     var _a;
     const authUid = (_a = context === null || context === void 0 ? void 0 : context.auth) === null || _a === void 0 ? void 0 : _a.uid;
-    const { contactUid, timeStamp } = data;
-    const newContactRequestRef = database.ref(`users/${contactUid}/contactsDatabase/newContactsRequests/${authUid}`);
-    const newContactsActivityRef = database.ref(`users/${contactUid}/contactsDatabase/newContactsActivity`);
+    const { contactUid, contactName, resendRequest = false } = data;
+    if (!authUid) {
+        throw new functions.https.HttpsError("failed-precondition", "The function must be called while authenticated.");
+    }
+    // const isPinned = !!(contactInfo.val().pinned_lastActivityTS.slice(0, 4) === "true")
+    const timeStamp = admin.database.ServerValue.TIMESTAMP;
+    const contactInfoData = !resendRequest
+        ? {
+            status: false,
+            receiver: true,
+            userName: contactName,
+            timeStamp,
+            recipientNotified: false
+        }
+        : {
+            status: false,
+            timeStamp
+        };
     try {
         const authUserName = await database
             .ref(`users/${authUid}/userName`)
             .once("value");
-        return Promise.all([
-            newContactRequestRef.set(true),
-            // newContactsActivityRef.set(true),
-            newContactsActivityRef.set({ test: undefined }),
-            authUserInContactDatabaseRef({ contactUid, authUserUid: authUid }).set({
+        const updateData = {
+            [`${contactsDatabaseRef(authUid)}/contactsList/${contactUid}`]: contactInfoData,
+            [`${contactsDatabaseRef(contactUid)}/newContactsRequests/${authUid}`]: true,
+            [`${contactsDatabaseRef(contactUid)}/newContactsActivity`]: true,
+            [`${contactsDatabaseRef(contactUid)}/contactsList/${authUid}`]: {
                 status: false,
                 receiver: false,
                 userName: authUserName.val(),
-                pinned_lastActivityTS: `false_${timeStamp}`,
                 timeStamp,
                 recipientNotified: false,
                 newActivity: true
-            })
-        ]);
+            }
+        };
+        return database.ref("users").update(updateData);
     }
     catch (error) {
-        newContactRequestRef.set(null);
-        newContactsActivityRef.set(null);
-        authUserInContactDatabaseRef({ contactUid, authUserUid: authUid }).set(null);
-        contactInAuthUserDatabaseRef({ contactUid, authUserUid: authUid }).set(null);
         throw new functions.https.HttpsError("unknown", error.message, error);
-        // throw new Error(
-        //   `There has been some error handling contact request: ${error}`
-        // );
     }
 });
 exports.handleContactRequest = functions.https.onCall(async (data, context) => {
     var _a;
-    const authUserUid = (_a = context === null || context === void 0 ? void 0 : context.auth) === null || _a === void 0 ? void 0 : _a.uid;
+    const authUid = (_a = context === null || context === void 0 ? void 0 : context.auth) === null || _a === void 0 ? void 0 : _a.uid;
     const { contactUid, status } = data;
+    if (!authUid) {
+        throw new functions.https.HttpsError("failed-precondition", "The function must be called while authenticated.");
+    }
     const timeStamp = admin.database.ServerValue.TIMESTAMP;
-    let isPinned = false;
+    const authPathToUpdate = status === "accept" ? `${contactUid}/status` : "contactUid";
     try {
-        const pinnedLastActivityTS = await authUserInContactDatabaseRef({
-            contactUid,
-            authUserUid
-        })
-            .child("pinned_lastActivityTS")
-            .once("value");
-        isPinned = !!(pinnedLastActivityTS.val().slice(0, 4) === "true");
+        const updateData = {
+            [`${contactsDatabaseRef(authUid)}/contactsList/${authPathToUpdate}`]: status === "accept" ? true : null,
+            [`${contactsDatabaseRef(contactUid)}/contactsList/${authUid}`]: {
+                status: status === "accept" ? true : "rejected",
+                newActivity: true,
+                timeStamp
+            }
+        };
+        return database.ref("users").update(updateData);
     }
     catch (error) {
-        console.log(error);
+        // if (status === "accept") {
+        //   contactInAuthUserRef({contactUid, authUid: authUserUid}).update({
+        //     status: false
+        //   });
+        //   authUserInContactsRef({contactUid, authUid: authUserUid}).update({
+        //     status: false,
+        //     newActivity: null
+        //   });
+        // }
+        throw new functions.https.HttpsError("unknown", error.message, error);
     }
-    return authUserInContactDatabaseRef({
-        contactUid,
-        authUserUid
-    }).update({
-        status: status === "accept" ? true : "rejected",
-        newActivity: true,
-        timeStamp
-    }, async () => {
-        const timeStamp = await authUserInContactDatabaseRef({
-            contactUid,
-            authUserUid
-        })
-            .child("timeStamp")
-            .once("value");
-        authUserInContactDatabaseRef({
-            contactUid,
-            authUserUid
-        }).update({ pinned_lastActivityTS: `${isPinned}_${timeStamp.val()}` });
-    });
 });
 exports.updateRecipientNotified = functions.https.onCall(async (data, context) => {
     var _a;
     const authUserUid = (_a = context === null || context === void 0 ? void 0 : context.auth) === null || _a === void 0 ? void 0 : _a.uid;
     const { contactUid } = data;
+    if (!context.auth) {
+        throw new functions.https.HttpsError("failed-precondition", "The function must be called while authenticated.");
+    }
     try {
-        return authUserInContactDatabaseRef({ contactUid, authUserUid }).update({
+        return authUserInContactsRef({ contactUid, authUid: authUserUid }).update({
             recipientNotified: true
         });
     }
     catch (error) {
-        console.log(error);
+        database
+            .ref(`users/${authUserUid}/contactsDatabase/contactsList/${contactUid}/recipientNotified`)
+            .off();
+        database.ref(`users/${authUserUid}/contactsDatabase`).update({
+            [`contactsList/${contactUid}/recipientNotified`]: false,
+            [`newContactsRequests/${contactUid}`]: true
+        });
+        throw new functions.https.HttpsError("unknown", error.message, error);
     }
 });
 // export const contactsListHandler = functions.database

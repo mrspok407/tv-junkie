@@ -37,8 +37,8 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
   const [isRecipientNotified, setIsRecipientNotified] = useState<boolean | null>(null)
   const [isReceiver, setIsReceiver] = useState<boolean | null>(null)
 
-  const { sendContactRequest, resendContactRequest } = useSendContactRequest({ userName, userUid })
-  const { acceptContactRequest } = useResponseContactRequest({ userUid })
+  const { sendContactRequest } = useSendContactRequest({ userName, userUid })
+  const { acceptContactRequest, rejectContactRequest } = useResponseContactRequest({ userUid })
   const { updateRecipientNotified } = useRecipientNotified({ userUid })
 
   const contactRef = firebase.contact({ authUid: authUser?.uid, contactUid: userUid })
@@ -89,7 +89,7 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
     console.log({ isReceiver })
     if (isRecipientNotified === true || isReceiver === true) return
     updateRecipientNotified()
-  }, [isRecipientNotified, isReceiver, updateRecipientNotified])
+  }, [isRecipientNotified, isReceiver]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (contactInfo === null) return
@@ -112,7 +112,12 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
               <button className="button" onClick={() => acceptContactRequest()}>
                 Accept
               </button>
-              <button className="button" onClick={() => {}}>
+              <button
+                className="button"
+                onClick={() => {
+                  rejectContactRequest()
+                }}
+              >
                 Reject
               </button>
             </div>
@@ -128,7 +133,7 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
             {<span className="user-profile__name">{userName}</span>} rejected you connect request{" "}
           </div>
           <div className="user-profile__actions">
-            <button className="button" onClick={() => resendContactRequest()}>
+            <button className="button" onClick={() => sendContactRequest({ resendRequest: true })}>
               Send again
             </button>
           </div>
@@ -138,7 +143,7 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
           <>
             <div className="user-profile__username">{<span className="user-profile__name">{userName}</span>}</div>
             <div className="user-profile__actions">
-              <button className="button" onClick={() => sendContactRequest()}>
+              <button className="button" onClick={() => sendContactRequest({ resendRequest: false })}>
                 Add to contacts
               </button>
             </div>
