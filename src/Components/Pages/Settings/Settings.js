@@ -10,6 +10,8 @@ import { todayDate } from "Utils"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import PasswordUpdate from "Components/UserAuth/PasswordUpdate/PasswordUpdate"
 import classNames from "classnames"
+import { uniqueNamesGenerator, adjectives, colors, animals } from "unique-names-generator"
+import { LoremIpsum } from "lorem-ipsum"
 import "./Settings.scss"
 
 class Profile extends Component {
@@ -67,26 +69,96 @@ class Profile extends Component {
     )
   }
 
-  test = () => {
-    const tS = 1617371342929
-    // const date = new Date(tS)
-    // const date2 = new Date(tS)
-    console.log({ date: new Date(tS).toDateString(), date2: new Date(tS).toDateString() })
-    // this.context.firebase
-    //   // .userAllShows(this.state.authUser.uid)
-    //   .userEpisodes(this.state.authUser.uid)
-    //   // .orderByChild("timeStampString")
-    //   .limitToLast(this.state.limitTo)
-    //   .on("value", (snapshot) => {
-    //     console.log(snapshot.val())
-    //     let shows = []
-    //     snapshot.forEach((show) => {
-    //       shows.push(show.val())
-    //     })
-    //     const showsReverse = [...shows].reverse()
-    //     console.log(showsReverse)
-    //     this.setState({ shows: showsReverse })
+  test = async () => {
+    const firebase = this.context.firebase
+
+    const lorem = new LoremIpsum({
+      sentencesPerParagraph: {
+        max: 8,
+        min: 4
+      },
+      wordsPerSentence: {
+        max: 8,
+        min: 4
+      }
+    })
+
+    firebase
+      .contactsDatabase({ uid: "drv5lG97VxVBLgkdn8bMhdxmqQT2" })
+      .child("contactsList")
+      .once("value", (snapshot) => {
+        const keysList = Object.keys(snapshot.val())
+        const authUid = "drv5lG97VxVBLgkdn8bMhdxmqQT2"
+
+        keysList.forEach((key) => {
+          if (key !== "-MY5oXFRTo31PGRkBXYD") return
+          const chatKey = key < authUid ? `${key}_${authUid}` : `${authUid}_${key}`
+          const randomMessage = lorem.generateSentences(2)
+
+          for (let i = 0; i <= 20; i++) {
+            const push = firebase.privateChats().child(`${chatKey}/messages`).push({
+              // sender: Math.random() > 0.5 ? key : authUid,
+              sender: key,
+              message: randomMessage,
+              timeStamp: firebase.timeStamp()
+            })
+
+            firebase.privateChats().child(`${chatKey}/members/${authUid}/unreadMessages/${push.key}`).set(true)
+          }
+          // firebase
+          //   .privateChats()
+          //   .child(`${chatKey}`)
+          //   .update(
+          //     {
+          //       ["members"]: {
+          //         [key]: {
+          //           isOnline: true
+          //         },
+          //         [authUid]: {
+          //           isOnline: true
+          //         }
+          //       }
+          //     },
+          //     () => {
+
+          //     }
+          //   )
+        })
+      })
+
+    // for (let i = 0; i <= 1; i++) {
+    //   const randomName = uniqueNamesGenerator({
+    //     dictionaries: [adjectives, colors, animals],
+    //     separator: " ",
+    //     style: "capital"
     //   })
+
+    //   const timeStamp = firebase.timeStamp()
+    //   const userKey = await firebase.users().push({ username: randomName }).key
+
+    //   firebase.contact({ authUid: userKey, contactUid: "drv5lG97VxVBLgkdn8bMhdxmqQT2" }).set({
+    //     receiver: true,
+    //     recipientNotified: false,
+    //     status: false,
+    //     pinned_lastActivityTS: "false",
+    //     timeStamp,
+    //     userName: "Johnny"
+    //   })
+
+    //   firebase.contact({ authUid: "drv5lG97VxVBLgkdn8bMhdxmqQT2", contactUid: userKey }).set({
+    //     status: false,
+    //     receiver: false,
+    //     userName: randomName,
+    //     timeStamp,
+    //     pinned_lastActivityTS: "false",
+    //     recipientNotified: false,
+    //     newActivity: true
+    //   })
+    //   firebase
+    //     .contactsDatabase({ uid: "drv5lG97VxVBLgkdn8bMhdxmqQT2" })
+    //     .child(`newContactsRequests/${userKey}`)
+    //     .set(true)
+    // }
   }
 
   chatBottomListener = () => {

@@ -7,19 +7,16 @@ type Props = {
   userUid: string
 }
 
-const useSendContactRequest = ({ userUid }: Props) => {
+const useResponseContactRequest = ({ userUid }: Props) => {
   const { authUser, errors } = useContext(AppContext)
   const firebase = useContext(FirebaseContext)
 
-  // const contactRef = firebase.contact({ authUid: authUser?.uid, contactUid: userUid })
-
-  const acceptContactRequest = async () => {
+  const handleContactRequest = async ({ status }: { status: string }) => {
     const timeStamp = firebase.timeStamp()
 
     try {
-      // await contactRef.update({ status: true })
       await _handleContactRequest({
-        data: { contactUid: userUid, status: "accept" },
+        data: { contactUid: userUid, status },
         context: { auth: { uid: authUser?.uid } },
         database: firebase.database(),
         timeStamp
@@ -30,37 +27,14 @@ const useSendContactRequest = ({ userUid }: Props) => {
     } catch (error) {
       errors.handleError({
         errorData: error,
-        message: "There has been some error accepting contact request. Please try again."
+        message: "There has been some error handling contact request. Please try again."
       })
 
-      throw new Error(`There has been some error accepting contact request: ${error}`)
+      throw new Error(`There has been some error handling contact request: ${error}`)
     }
   }
 
-  const rejectContactRequest = async () => {
-    // const handleContactRequestCloud = firebase.httpsCallable("handleContactRequest")
-    // handleContactRequestCloud({ contactUid: userUid, status: "rejected" })
-
-    const timeStamp = firebase.timeStamp()
-
-    try {
-      await _handleContactRequest({
-        data: { contactUid: userUid, status: "rejected" },
-        context: { auth: { uid: authUser?.uid } },
-        database: firebase.database(),
-        timeStamp
-      })
-    } catch (error) {
-      errors.handleError({
-        errorData: error,
-        message: "There has been some error accepting contact request. Please try again."
-      })
-
-      throw new Error(`There has been some error accepting contact request: ${error}`)
-    }
-  }
-
-  return { acceptContactRequest, rejectContactRequest }
+  return { handleContactRequest }
 }
 
-export default useSendContactRequest
+export default useResponseContactRequest

@@ -1,4 +1,4 @@
-import { useCallback, useContext } from "react"
+import { useContext } from "react"
 import { FirebaseContext } from "Components/Firebase"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { _updateRecipientNotified } from "firebaseHttpCallableFunctionsTests"
@@ -11,10 +11,8 @@ const useRecipientNotified = ({ userUid }: Props) => {
   const { authUser, errors } = useContext(AppContext)
   const firebase = useContext(FirebaseContext)
 
-  const updateRecipientNotified = useCallback(async () => {
+  const updateRecipientNotified = async () => {
     const contactRef = firebase.contact({ authUid: authUser?.uid, contactUid: userUid })
-
-    console.log("useCallback")
 
     try {
       await _updateRecipientNotified({
@@ -31,7 +29,7 @@ const useRecipientNotified = ({ userUid }: Props) => {
       })
       throw new Error(`There has been some error updating database: ${error}`)
     }
-  }, [firebase, authUser, errors, userUid])
+  }
 
   return { updateRecipientNotified }
 }

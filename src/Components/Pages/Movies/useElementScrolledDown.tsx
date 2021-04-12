@@ -3,9 +3,10 @@ import { throttle } from "throttle-debounce"
 
 type Props = {
   element: HTMLDivElement
+  threshold?: number
 }
 
-const useElementScrolledDown = ({ element }: Props) => {
+const useElementScrolledDown = ({ element, threshold = 0 }: Props) => {
   const [isScrolledDown, setIsScrolledDown] = useState(false)
 
   const handleScroll = useCallback(
@@ -14,11 +15,9 @@ const useElementScrolledDown = ({ element }: Props) => {
       const scrollHeight = element.scrollHeight
       const scrollTop = element.scrollTop
 
-      if (scrollHeight === scrollTop + height) {
-        console.log("scroll bottom")
+      if (scrollHeight <= scrollTop + height + threshold) {
         setIsScrolledDown(true)
       } else {
-        console.log("scroll not bottom")
         setIsScrolledDown(false)
       }
     }),

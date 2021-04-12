@@ -131,6 +131,9 @@ class Firebase {
   contact = ({ authUid, contactUid }: { authUid: string; contactUid: string }) =>
     this.db.ref(`users/${authUid}/contactsDatabase/contactsList/${contactUid}`)
 
+  /// Private Chats API ///
+  privateChats = () => this.db.ref("privateChats")
+
   /// User Content API ///
   userAllShows = (uid: string) => this.db.ref(`users/${uid}/content/shows`)
   userShowsLastUpdateList = (uid: string) => this.db.ref(`users/${uid}/content/showsLastUpdateList`)

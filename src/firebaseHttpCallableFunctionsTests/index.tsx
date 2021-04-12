@@ -64,7 +64,7 @@ export const _newContactRequest = async ({
     const updateData: ContactRequestDataInterface = {
       ...contactInfoData,
       [`${contactsDatabaseRef(contactUid)}/newContactsRequests/${authUid}`]: true,
-      [`${contactsDatabaseRef(contactUid)}/newContactsActivity`]: true,
+      // [`${contactsDatabaseRef(contactUid)}/newContactsActivity/${authUid}`]: true,
       [`${contactsDatabaseRef(contactUid)}/contactsList/${authUid}`]: {
         status: false,
         receiver: false,
@@ -106,6 +106,7 @@ export const _handleContactRequest = async ({
     const updateData = {
       [`${contactsDatabaseRef(authUid)}/contactsList/${authPathToUpdate}`]: status === "accept" ? true : null,
       [`${contactsDatabaseRef(authUid)}/newContactsRequests/${contactUid}`]: null,
+      // [`${contactsDatabaseRef(authUid)}/newContactsActivity/${contactUid}`]: null,
       [`${contactsDatabaseRef(contactUid)}/contactsList/${authUid}/status`]: status === "accept" ? true : "rejected",
       [`${contactsDatabaseRef(contactUid)}/contactsList/${authUid}/newActivity`]: true,
       [`${contactsDatabaseRef(contactUid)}/contactsList/${authUid}/timeStamp`]: timeStamp
@@ -135,7 +136,7 @@ export const _updateRecipientNotified = async ({
 
   const updateData = {
     [`${contactsDatabaseRef(authUid)}/contactsList/${contactUid}/recipientNotified`]: true,
-    [`${contactsDatabaseRef(authUid)}/newContactsRequests/${contactUid}`]: null,
+    // [`${contactsDatabaseRef(authUid)}/newContactsRequests/${contactUid}`]: null,
     [`${contactsDatabaseRef(contactUid)}/contactsList/${authUid}/recipientNotified`]: true
   }
 

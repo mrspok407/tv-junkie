@@ -1,0 +1,28 @@
+@import "../../../styles/globals";
+
+.chat-container {
+  display: grid;
+  grid-template-columns: 30% 70%;
+  padding: 10px;
+  height: 570px;
+  max-width: 100%;
+  width: 1000px;
+  border: 2px solid peru;
+}
+
+.contact-list {
+  display: grid;
+  grid-auto-rows: 70px;
+  border-right: 1px solid lightblue;
+  overflow-y: scroll;
+}
+
+.contact-item {
+  color: #fff;
+  border-bottom: 1px solid getColor(orangeClr, $mainPalette);
+  &__username {
+  }
+}
+
+.chat-window {
+}

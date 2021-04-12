@@ -97,6 +97,34 @@ export const updatePinnedTimeStamp = functions.database
     }
   });
 
+export const incrementContacts = functions.database
+  .ref("users/{authUid}/contactsDatabase/contactsList/{contactUid}")
+  .onCreate(async (snapshot) => {
+    const contactsNumberRef = snapshot.ref.parent?.parent?.child("contactsAmount");
+
+    return contactsNumberRef?.transaction((currentValue) => {
+      if (currentValue === null) {
+        return 1;
+      } else {
+        return currentValue + 1;
+      }
+    });
+  });
+
+export const decrementContacts = functions.database
+  .ref("users/{authUid}/contactsDatabase/contactsList/{contactUid}")
+  .onDelete(async (snapshot) => {
+    const contactsNumberRef = snapshot.ref.parent?.parent?.child("contactsAmount");
+
+    return contactsNumberRef?.transaction((currentValue) => {
+      if (currentValue === null) {
+        return 0;
+      } else {
+        return currentValue - 1;
+      }
+    });
+  });
+
 export const newContactRequest = functions.https.onCall(async (data, context) => {
   const authUid = context?.auth?.uid;
   const {contactUid, contactName, resendRequest = false} = data;
@@ -130,7 +158,7 @@ export const newContactRequest = functions.https.onCall(async (data, context) =>
     const updateData: ContactRequestDataInterface = {
       ...contactInfoData,
       [`${contactsDatabaseRef(contactUid)}/newContactsRequests/${authUid}`]: true,
-      [`${contactsDatabaseRef(contactUid)}/newContactsActivity`]: true,
+      // [`${contactsDatabaseRef(contactUid)}/newContactsActivity/${authUid}`]: true,
       [`${contactsDatabaseRef(contactUid)}/contactsList/${authUid}`]: {
         status: false,
         receiver: false,
@@ -163,6 +191,7 @@ export const handleContactRequest = functions.https.onCall(async (data, context)
     const updateData = {
       [`${contactsDatabaseRef(authUid)}/contactsList/${authPathToUpdate}`]: status === "accept" ? true : null,
       [`${contactsDatabaseRef(authUid)}/newContactsRequests/${contactUid}`]: null,
+      // [`${contactsDatabaseRef(authUid)}/newContactsActivity/${contactUid}`]: null,
       [`${contactsDatabaseRef(contactUid)}/contactsList/${authUid}/status`]: status === "accept" ? true : "rejected",
       [`${contactsDatabaseRef(contactUid)}/contactsList/${authUid}/newActivity`]: true,
       [`${contactsDatabaseRef(contactUid)}/contactsList/${authUid}/timeStamp`]: timeStamp
@@ -184,7 +213,7 @@ export const updateRecipientNotified = functions.https.onCall(async (data, conte
 
   const updateData = {
     [`${contactsDatabaseRef(authUid)}/contactsList/${contactUid}/recipientNotified`]: true,
-    [`${contactsDatabaseRef(authUid)}/newContactsRequests/${contactUid}`]: null,
+    // [`${contactsDatabaseRef(authUid)}/newContactsRequests/${contactUid}`]: null,
     [`${contactsDatabaseRef(contactUid)}/contactsList/${authUid}/recipientNotified`]: true
   };
 

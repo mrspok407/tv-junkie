@@ -15,6 +15,7 @@ import GridTests from "Utils/GridTests/GridTests"
 import * as ROUTES from "Utils/Constants/routes"
 import PageNotFound from "Components/Pages/PageNotFound/PageNotFound"
 import AppContextHOC from "Components/AppContext/AppContextHOC"
+import ContactsPage from "Components/Pages/Contacts/Contacts"
 
 class App extends Component {
   render() {
@@ -31,7 +32,7 @@ class App extends Component {
             <Route path={ROUTES.USER_PROFILE} exact component={UserProfile} />
             <Route path={ROUTES.DETAILES_PAGE} exact component={DetailesPage} />
             <Route path={ROUTES.SETTINGS} exact component={Settings} />
-            {/* <Route path={ROUTES.CONTACTS_PAGE} exact component={ContactsPage} /> */}
+            <Route path={ROUTES.CONTACTS_PAGE} exact component={ContactsPage} />
             <Route path={ROUTES.LOGIN_PAGE} exact component={LoginPage} />
             <Route path={ROUTES.ADMIN} exact component={Admin} />
             <Route path={ROUTES.GRID_TESTS} exact component={GridTests} />

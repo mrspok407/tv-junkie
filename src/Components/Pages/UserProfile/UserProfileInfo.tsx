@@ -38,7 +38,7 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
   const [isReceiver, setIsReceiver] = useState<boolean | null>(null)
 
   const { sendContactRequest } = useSendContactRequest({ userName, userUid })
-  const { acceptContactRequest, rejectContactRequest } = useResponseContactRequest({ userUid })
+  const { handleContactRequest } = useResponseContactRequest({ userUid })
   const { updateRecipientNotified } = useRecipientNotified({ userUid })
 
   const contactRef = firebase.contact({ authUid: authUser?.uid, contactUid: userUid })
@@ -57,36 +57,29 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
     getUserName()
   }, [getUserName])
 
-  const attachFirebaseListeners = useCallback(async () => {
-    contactRef.on("value", (snapshot: { val: () => ContactInfo }) => {
-      setContactInfo(snapshot.val())
-      setLoadingContactInfo(false)
-    })
-    contactRef.child("recipientNotified").on("value", (snapshot: { val: () => boolean | null }) => {
-      console.log({ snapshot: snapshot.val() })
-      setIsRecipientNotified(snapshot.val())
-    })
-    contactRef.child("receiver").on("value", (snapshot: { val: () => boolean | null }) => {
-      setIsReceiver(snapshot.val())
-    })
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
-
   useEffect(() => {
+    const attachFirebaseListeners = async () => {
+      contactRef.on("value", (snapshot: { val: () => ContactInfo }) => {
+        setContactInfo(snapshot.val())
+        setLoadingContactInfo(false)
+      })
+      contactRef.child("recipientNotified").on("value", (snapshot: { val: () => boolean | null }) => {
+        setIsRecipientNotified(snapshot.val())
+      })
+      contactRef.child("receiver").on("value", (snapshot: { val: () => boolean | null }) => {
+        setIsReceiver(snapshot.val())
+      })
+    }
     attachFirebaseListeners()
     return () => {
       contactRef.off()
       contactRef.child("recipientNotified").off()
+      contactRef.child("receiver").off()
     }
-  }, [attachFirebaseListeners]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    console.log({ isRecipientNotified })
-  }, [isRecipientNotified])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (isRecipientNotified === null || isReceiver === null) return
-    console.log({ isRecipientNotified })
-    console.log({ isReceiver })
     if (isRecipientNotified === true || isReceiver === true) return
     updateRecipientNotified()
   }, [isRecipientNotified, isReceiver]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -109,13 +102,13 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
               {<span className="user-profile__name">{userName}</span>} wants to connect
             </div>
             <div className="user-profile__actions--receiver">
-              <button className="button" onClick={() => acceptContactRequest()}>
+              <button className="button" onClick={() => handleContactRequest({ status: "accept" })}>
                 Accept
               </button>
               <button
                 className="button"
                 onClick={() => {
-                  rejectContactRequest()
+                  handleContactRequest({ status: "rejected" })
                 }}
               >
                 Reject
