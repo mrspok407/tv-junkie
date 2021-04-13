@@ -3,22 +3,11 @@ import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
 import Contact from "./Contact"
 import useElementScrolledDown from "Components/Pages/Movies/useElementScrolledDown"
-
-type Props = {}
-
-export interface ContactInfoInterface {
-  status: boolean
-  receiver: boolean
-  userName: string
-  timeStamp: number
-  pinned_lastActivityTS: string
-  recipientNotified: boolean
-  key: string
-}
+import { ContactInfoInterface } from "../../Types"
 
 const CONTACTS_TO_LOAD = 15
 
-const ContactList: React.FC<Props> = () => {
+const ContactList: React.FC = () => {
   const firebase = useContext(FirebaseContext)
   const { authUser } = useContext(AppContext)
 
@@ -48,6 +37,11 @@ const ContactList: React.FC<Props> = () => {
     contactsDatabaseRef.child("contactsAmount").on("value", (snapshot: any) => {
       setAllContactsAmount(snapshot.val())
     })
+
+    return () => {
+      contactsListRef.off()
+      contactsDatabaseRef.off()
+    }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {

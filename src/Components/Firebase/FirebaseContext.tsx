@@ -26,9 +26,3 @@ export interface FirebaseInterface {
 }
 
 export const FirebaseContext = createContext<FirebaseInterface>({})
-
-export const withFirebase = (Component: any) => (props: any) => {
-  return (
-    <FirebaseContext.Consumer>{(firebase) => <Component {...props} firebase={firebase} />}</FirebaseContext.Consumer>
-  )
-}

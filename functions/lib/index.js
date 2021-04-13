@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateRecipientNotified = exports.handleContactRequest = exports.newContactRequest = exports.decrementContacts = exports.incrementContacts = exports.updatePinnedTimeStamp = exports.onMessageRemoved = void 0;
+exports.updateRecipientNotified = exports.handleContactRequest = exports.newContactRequest = exports.decrementContacts = exports.incrementContacts = exports.removeNewContactsActivity = exports.addNewContactsActivity = exports.updatePinnedTimeStamp = exports.onMessageRemoved = void 0;
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 // Cloud Functions interesting points:
@@ -73,6 +73,32 @@ exports.updatePinnedTimeStamp = functions.database
             pinned_lastActivityTS: `${isPinned}_${timeStamp}`
         });
     }
+});
+exports.addNewContactsActivity = functions.database
+    .ref("privateChats/{chatKey}/members/{memberKey}/unreadMessages")
+    .onCreate((snapshot, context) => {
+    const { chatKey, memberKey } = context.params;
+    let otherMemberKey;
+    if (memberKey === chatKey.slice(0, memberKey.length)) {
+        otherMemberKey = chatKey.slice(memberKey.length + 1);
+    }
+    else {
+        otherMemberKey = chatKey.slice(0, -memberKey.length - 1);
+    }
+    return database.ref(`users/${memberKey}/contactsDatabase/newContactsActivity/${otherMemberKey}`).set(true);
+});
+exports.removeNewContactsActivity = functions.database
+    .ref("privateChats/{chatKey}/members/{memberKey}/unreadMessages")
+    .onDelete((snapshot, context) => {
+    const { chatKey, memberKey } = context.params;
+    let otherMemberKey;
+    if (memberKey === chatKey.slice(0, memberKey.length)) {
+        otherMemberKey = chatKey.slice(memberKey.length + 1);
+    }
+    else {
+        otherMemberKey = chatKey.slice(0, -memberKey.length - 1);
+    }
+    return database.ref(`users/${memberKey}/contactsDatabase/newContactsActivity/${otherMemberKey}`).set(null);
 });
 exports.incrementContacts = functions.database
     .ref("users/{authUid}/contactsDatabase/contactsList/{contactUid}")

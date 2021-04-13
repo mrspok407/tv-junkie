@@ -19,8 +19,6 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false }) =>
   const navRef = useRef<HTMLElement>(null)
   const toggleNavButtonRef = useRef<HTMLButtonElement>(null)
 
-  console.log({ newContactsActivity })
-
   const closeNavMobile = () => {
     setNavMobileOpen(false)
   }

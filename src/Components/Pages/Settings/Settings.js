@@ -84,49 +84,44 @@ class Profile extends Component {
     })
 
     firebase
-      .contactsDatabase({ uid: "drv5lG97VxVBLgkdn8bMhdxmqQT2" })
+      .contactsDatabase({ uid: "-MYAYS3QFuhVBFXNgTZl" })
       .child("contactsList")
       .once("value", (snapshot) => {
         const keysList = Object.keys(snapshot.val())
-        const authUid = "drv5lG97VxVBLgkdn8bMhdxmqQT2"
+        const authUid = "-MYAYS3QFuhVBFXNgTZl"
 
-        keysList.forEach((key) => {
-          if (key !== "-MY5oXFRTo31PGRkBXYD") return
+        const timeStamp = new Date().getTime()
+
+        keysList.forEach((key, index) => {
+          // if (key !== "-MYAYS3QFuhVBFXNgTZl") return
           const chatKey = key < authUid ? `${key}_${authUid}` : `${authUid}_${key}`
-          const randomMessage = lorem.generateSentences(2)
 
           for (let i = 0; i <= 20; i++) {
-            const push = firebase.privateChats().child(`${chatKey}/messages`).push({
-              // sender: Math.random() > 0.5 ? key : authUid,
-              sender: key,
-              message: randomMessage,
-              timeStamp: firebase.timeStamp()
-            })
+            const randomMessage = lorem.generateSentences(2)
+
+            const push = firebase
+              .privateChats()
+              .child(`${chatKey}/messages`)
+              .push({
+                // sender: Math.random() > 0.5 ? key : authUid,
+                sender: key,
+                message: randomMessage,
+                timeStamp: timeStamp + (i + 1) * 5000
+              })
 
             firebase.privateChats().child(`${chatKey}/members/${authUid}/unreadMessages/${push.key}`).set(true)
           }
-          // firebase
-          //   .privateChats()
-          //   .child(`${chatKey}`)
-          //   .update(
-          //     {
-          //       ["members"]: {
-          //         [key]: {
-          //           isOnline: true
-          //         },
-          //         [authUid]: {
-          //           isOnline: true
-          //         }
-          //       }
-          //     },
-          //     () => {
-
-          //     }
-          //   )
+          firebase
+            .privateChats()
+            .child(`${chatKey}`)
+            .update({
+              [`members/${key}/isOnline`]: true,
+              [`members/${authUid}/isOnline`]: true
+            })
         })
       })
 
-    // for (let i = 0; i <= 1; i++) {
+    // for (let i = 0; i <= 76; i++) {
     //   const randomName = uniqueNamesGenerator({
     //     dictionaries: [adjectives, colors, animals],
     //     separator: " ",
@@ -374,7 +369,7 @@ class Profile extends Component {
     return (
       <>
         <Helmet>
-          <title>Profile | TV Junkie</title>
+          <title>Settings | TV Junkie</title>
         </Helmet>
         <Header />
         <div className="user-settings">

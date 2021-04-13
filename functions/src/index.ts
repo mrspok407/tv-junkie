@@ -97,6 +97,36 @@ export const updatePinnedTimeStamp = functions.database
     }
   });
 
+export const addNewContactsActivity = functions.database
+  .ref("privateChats/{chatKey}/members/{memberKey}/unreadMessages")
+  .onCreate((snapshot, context) => {
+    const {chatKey, memberKey} = context.params;
+    let otherMemberKey;
+
+    if (memberKey === chatKey.slice(0, memberKey.length)) {
+      otherMemberKey = chatKey.slice(memberKey.length + 1);
+    } else {
+      otherMemberKey = chatKey.slice(0, -memberKey.length - 1);
+    }
+
+    return database.ref(`users/${memberKey}/contactsDatabase/newContactsActivity/${otherMemberKey}`).set(true);
+  });
+
+export const removeNewContactsActivity = functions.database
+  .ref("privateChats/{chatKey}/members/{memberKey}/unreadMessages")
+  .onDelete((snapshot, context) => {
+    const {chatKey, memberKey} = context.params;
+    let otherMemberKey;
+
+    if (memberKey === chatKey.slice(0, memberKey.length)) {
+      otherMemberKey = chatKey.slice(memberKey.length + 1);
+    } else {
+      otherMemberKey = chatKey.slice(0, -memberKey.length - 1);
+    }
+
+    return database.ref(`users/${memberKey}/contactsDatabase/newContactsActivity/${otherMemberKey}`).set(null);
+  });
+
 export const incrementContacts = functions.database
   .ref("users/{authUid}/contactsDatabase/contactsList/{contactUid}")
   .onCreate(async (snapshot) => {
