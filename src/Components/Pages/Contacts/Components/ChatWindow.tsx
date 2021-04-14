@@ -2,15 +2,9 @@ import { FirebaseContext } from "Components/Firebase"
 import React, { useEffect, useContext, useState } from "react"
 import { MessagesInterface } from "../Types"
 import { ContactsContext } from "./Context/ContactsContext"
+import { ActionTypes } from "./Context/_reducerConfig"
 
 type Props = {}
-
-// export interface MessagesInterface {
-//   message: string
-//   sender: string
-//   timeStamp: number
-//   key: string
-// }
 
 const ChatWindow: React.FC<Props> = () => {
   const firebase = useContext(FirebaseContext)
@@ -27,15 +21,21 @@ const ChatWindow: React.FC<Props> = () => {
         snapshot.forEach((message: { val: () => MessagesInterface; key: string }) => {
           messagesData.push({ ...message.val(), key: message.key })
         })
-        console.log({ messagesData })
         setMessages(messagesData)
       })
   }, [context, firebase])
 
-  console.log({ activeChat: context?.state.activeChat })
-
   return (
     <div className="chat-window-container">
+      <button
+        className="chat-window__close-chat"
+        type="button"
+        onClick={() =>
+          context?.dispatch({ type: ActionTypes.UpdateActiveChat, payload: { chatKey: null, contactKey: null } })
+        }
+      >
+        Back
+      </button>
       <div className="chat-window__unread-messages">{context?.state.unreadMessages}</div>
 
       <div className="chat-window__messages-list">

@@ -1,27 +1,60 @@
 @import "../../../styles/globals";
 
+$activeItemColor: #0e5e92;
+$itemHoverColor: #93cff521;
+$lastMessageStatusSize: 17px;
+$unreadMessagesBG: #206ea0;
+$unreadMessagesBGActive: #fff;
+$borderRightContactListClr: #25252561;
+
+$chatHeight: 570px;
+
 .chat-container {
   display: grid;
   grid-template-columns: 30% 70%;
-  padding: 10px;
-  height: 570px;
+  height: $chatHeight;
   max-width: 100%;
   width: 1000px;
-  border: 2px solid peru;
+  border: 1px solid $borderRightContactListClr;
+
+  @include mediaMaxW(#{$mobileViewPort}) {
+    position: relative;
+    grid-template-columns: 1fr;
+    width: 750px;
+    overflow: hidden;
+  }
 }
 
 .contact-list {
-  display: grid;
-  grid-auto-rows: max-content;
-  border-right: 1px solid lightblue;
-  overflow-y: scroll;
+  border-right: 1px solid $borderRightContactListClr;
+  overflow-y: auto;
   @include scrollbar(5px, getColor(blueClr, $mainPalette), #c5bbb1);
+
+  @include mediaMaxW(#{$mobileViewPort}) {
+    position: absolute;
+    height: $chatHeight;
+    width: 100%;
+    opacity: 1;
+    transition: opacity 150ms ease, z-index 0ms 150ms;
+
+    &--hide-mobile {
+      opacity: 0;
+      z-index: -1;
+    }
+  }
 }
 
 .contact-item {
   position: relative;
+  display: grid;
+  grid-template-columns: 1fr max-content max-content;
+  grid-auto-rows: 20px;
+  align-items: center;
+  row-gap: 4px;
+  column-gap: 5px;
+  padding: 10px;
   color: #fff;
-  border-bottom: 1px solid getColor(orangeClr, $mainPalette);
+  font-size: 0.95rem;
   cursor: pointer;
 
   &:after {
@@ -32,7 +65,7 @@
     top: 0;
     left: 0;
     opacity: 0;
-    background-color: #93cff5a8;
+    background-color: $itemHoverColor;
     transition: 200ms;
     z-index: -1;
   }
@@ -41,18 +74,75 @@
     opacity: 1;
   }
 
-  &--new-activity {
-    background-color: #82b0dc14;
-  }
   &--active {
-    // background-color: getColor(blueClr, $mainPalette);
-    background-color: #419dd96e;
+    background-color: $activeItemColor;
 
     &:after {
       display: none;
     }
   }
+
   &__username {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 23px;
+  }
+
+  &__last-message-status {
+    background-image: url("../../../assets/images/icons/one-mark-sign.svg");
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: $lastMessageStatusSize;
+    height: $lastMessageStatusSize;
+    &--unread {
+      background-image: url("../../../assets/images/icons/double-mark-sign.svg");
+    }
+  }
+
+  &__pinned {
+    grid-column-end: -1;
+    justify-self: end;
+    background-image: url("../../../assets/images/icons/pinned-icon.svg");
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: $lastMessageStatusSize - 3px;
+    height: $lastMessageStatusSize - 3px;
+  }
+
+  &__timestamp {
+    justify-self: end;
+    align-self: center;
+    font-size: 0.85rem;
+  }
+
+  &__unread-messages {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    grid-column-end: -1;
+    justify-self: end;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: $unreadMessagesBG;
+    font-size: 0.85rem;
+
+    &--active {
+      color: $activeItemColor;
+      background-color: $unreadMessagesBGActive;
+    }
+  }
+
+  &__last-message-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #c5c5c5;
+
+    span {
+      color: getColor(blueClr, $mainPalette);
+    }
   }
 }
 
@@ -60,4 +150,13 @@
   color: #fff;
   overflow-y: scroll;
   @include scrollbar(5px, getColor(blueClr, $mainPalette), #c5bbb1);
+}
+
+.chat-window {
+  &__close-chat {
+    width: 50px;
+    height: 35px;
+    margin-top: 25px;
+    background-color: peru;
+  }
 }

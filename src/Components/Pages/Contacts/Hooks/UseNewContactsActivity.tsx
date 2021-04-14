@@ -21,7 +21,7 @@ const useNewContactsActivity = () => {
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    setNewContactsActivity(newActivity || newRequests === true ? true : false)
+    setNewContactsActivity(!!(newActivity || newRequests))
   }, [newActivity, newRequests])
 
   return newContactsActivity

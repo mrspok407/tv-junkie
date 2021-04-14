@@ -14,7 +14,7 @@ const Contacts: React.FC<Props> = () => {
       <Helmet>
         <title>Contacts | TV Junkie</title>
       </Helmet>
-      <Header />
+      <Header contactsPage={true} />
       <ContactsContent />
       <Footer />
     </>

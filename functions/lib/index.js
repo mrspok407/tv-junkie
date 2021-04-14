@@ -63,7 +63,7 @@ exports.updatePinnedTimeStamp = functions.database
         return;
     if (!beforeData.exists()) {
         return (_a = afterData.ref.parent) === null || _a === void 0 ? void 0 : _a.update({
-            pinned_lastActivityTS: `false_${timeStamp}`
+            pinned_lastActivityTS: `true_${timeStamp}`
         });
     }
     if (beforeData.val() !== afterData.val()) {

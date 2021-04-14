@@ -71,6 +71,9 @@ class Profile extends Component {
 
   test = async () => {
     const firebase = this.context.firebase
+    const CONTACTS_TO_ADD = 4
+
+    const authUid = "drv5lG97VxVBLgkdn8bMhdxmqQT2"
 
     const lorem = new LoremIpsum({
       sentencesPerParagraph: {
@@ -83,77 +86,101 @@ class Profile extends Component {
       }
     })
 
-    firebase
-      .contactsDatabase({ uid: "-MYAYS3QFuhVBFXNgTZl" })
-      .child("contactsList")
-      .once("value", (snapshot) => {
-        const keysList = Object.keys(snapshot.val())
-        const authUid = "-MYAYS3QFuhVBFXNgTZl"
+    // firebase
+    //   .contactsDatabase({ uid: "drv5lG97VxVBLgkdn8bMhdxmqQT2" })
+    //   .child("contactsList")
+    //   .once("value", (snapshot) => {
+    //     const keysList = Object.keys(snapshot.val())
+    //     const authUid = "drv5lG97VxVBLgkdn8bMhdxmqQT2"
 
-        const timeStamp = new Date().getTime()
+    //     const timeStamp = new Date().getTime()
 
-        keysList.forEach((key, index) => {
-          // if (key !== "-MYAYS3QFuhVBFXNgTZl") return
-          const chatKey = key < authUid ? `${key}_${authUid}` : `${authUid}_${key}`
+    //     keysList.forEach((key, index) => {
+    //       const chatKey = key < authUid ? `${key}_${authUid}` : `${authUid}_${key}`
 
-          for (let i = 0; i <= 20; i++) {
-            const randomMessage = lorem.generateSentences(2)
+    //       for (let i = 0; i <= 20; i++) {
+    //         const randomMessage = lorem.generateSentences(2)
 
-            const push = firebase
-              .privateChats()
-              .child(`${chatKey}/messages`)
-              .push({
-                // sender: Math.random() > 0.5 ? key : authUid,
-                sender: key,
-                message: randomMessage,
-                timeStamp: timeStamp + (i + 1) * 5000
-              })
+    //         const push = firebase
+    //           .privateChats()
+    //           .child(`${chatKey}/messages`)
+    //           .push({
+    //             // sender: Math.random() > 0.5 ? key : authUid,
+    //             sender: key,
+    //             message: randomMessage,
+    //             timeStamp: timeStamp + (i + 1) * 5000
+    //           })
 
-            firebase.privateChats().child(`${chatKey}/members/${authUid}/unreadMessages/${push.key}`).set(true)
-          }
-          firebase
-            .privateChats()
-            .child(`${chatKey}`)
-            .update({
-              [`members/${key}/isOnline`]: true,
-              [`members/${authUid}/isOnline`]: true
-            })
-        })
+    //         firebase.privateChats().child(`${chatKey}/members/${authUid}/unreadMessages/${push.key}`).set(true)
+    //       }
+    //       firebase
+    //         .privateChats()
+    //         .child(`${chatKey}`)
+    //         .update({
+    //           [`members/${key}/isOnline`]: true,
+    //           [`members/${authUid}/isOnline`]: true
+    //         })
+    //     })
+    //   })
+
+    for (let i = 0; i <= CONTACTS_TO_ADD; i++) {
+      const randomName = uniqueNamesGenerator({
+        dictionaries: [adjectives, colors, animals],
+        separator: " ",
+        style: "capital"
       })
 
-    // for (let i = 0; i <= 76; i++) {
-    //   const randomName = uniqueNamesGenerator({
-    //     dictionaries: [adjectives, colors, animals],
-    //     separator: " ",
-    //     style: "capital"
-    //   })
+      const timeStamp = firebase.timeStamp()
+      const userKey = await firebase.users().push({ username: randomName }).key
 
-    //   const timeStamp = firebase.timeStamp()
-    //   const userKey = await firebase.users().push({ username: randomName }).key
+      await Promise.all([
+        firebase.contact({ authUid: userKey, contactUid: authUid }).set({
+          receiver: true,
+          recipientNotified: false,
+          status: false,
+          pinned_lastActivityTS: "false",
+          timeStamp,
+          userName: "Johnny"
+        }),
 
-    //   firebase.contact({ authUid: userKey, contactUid: "drv5lG97VxVBLgkdn8bMhdxmqQT2" }).set({
-    //     receiver: true,
-    //     recipientNotified: false,
-    //     status: false,
-    //     pinned_lastActivityTS: "false",
-    //     timeStamp,
-    //     userName: "Johnny"
-    //   })
+        firebase.contact({ authUid, contactUid: userKey }).set({
+          status: false,
+          receiver: false,
+          userName: randomName,
+          timeStamp,
+          pinned_lastActivityTS: "true",
+          recipientNotified: false
+        }),
+        firebase.contactsDatabase({ uid: authUid }).child(`newContactsRequests/${userKey}`).set(true)
+      ])
 
-    //   firebase.contact({ authUid: "drv5lG97VxVBLgkdn8bMhdxmqQT2", contactUid: userKey }).set({
-    //     status: false,
-    //     receiver: false,
-    //     userName: randomName,
-    //     timeStamp,
-    //     pinned_lastActivityTS: "false",
-    //     recipientNotified: false,
-    //     newActivity: true
-    //   })
-    //   firebase
-    //     .contactsDatabase({ uid: "drv5lG97VxVBLgkdn8bMhdxmqQT2" })
-    //     .child(`newContactsRequests/${userKey}`)
-    //     .set(true)
-    // }
+      const timeStampEpoch = new Date().getTime()
+
+      const chatKey = userKey < authUid ? `${userKey}_${authUid}` : `${authUid}_${userKey}`
+
+      for (let i = 0; i <= 50; i++) {
+        const randomMessage = lorem.generateSentences(2)
+
+        const pushNewMessage = firebase
+          .privateChats()
+          .child(`${chatKey}/messages`)
+          .push({
+            // sender: Math.random() > 0.5 ? key : authUid,
+            sender: userKey,
+            message: randomMessage,
+            timeStamp: timeStampEpoch + (i + 1) * 5000
+          })
+
+        firebase.privateChats().child(`${chatKey}/members/${authUid}/unreadMessages/${pushNewMessage.key}`).set(true)
+      }
+      firebase
+        .privateChats()
+        .child(`${chatKey}`)
+        .update({
+          [`members/${userKey}/isOnline`]: true,
+          [`members/${authUid}/isOnline`]: true
+        })
+    }
   }
 
   chatBottomListener = () => {

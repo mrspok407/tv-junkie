@@ -11,9 +11,10 @@ import "./Header.scss"
 type Props = {
   isLogoVisible?: boolean
   hideLogin?: boolean
+  contactsPage?: boolean
 }
 
-const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false }) => {
+const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false, contactsPage = false }) => {
   const [navMobileOpen, setNavMobileOpen] = useState(false)
   const { authUser, newContactsActivity } = useContext(AppContext)
   const navRef = useRef<HTMLElement>(null)
@@ -41,7 +42,11 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false }) =>
   }
 
   return (
-    <header className="header">
+    <header
+      className={classNames("header", {
+        "header--contacts-page": contactsPage
+      })}
+    >
       <nav
         ref={navRef}
         className={classNames("nav", {
@@ -117,7 +122,41 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false }) =>
 
           {authUser ? (
             <>
-              <div className="nav__link">
+              <div className="nav__link nav__link--dropdown">
+                <div className="nav__item--dropdown-mobile">
+                  <NavLink
+                    exact
+                    to={ROUTES.CONTACTS_PAGE}
+                    className={classNames("nav__link", {
+                      "nav__link--non-auth": !authUser
+                    })}
+                    activeClassName="nav__item--active"
+                    onClick={() => closeNavMobile()}
+                  >
+                    <li
+                      className={classNames("nav__item", {
+                        "nav__item--new-activity": newContactsActivity
+                      })}
+                    >
+                      Contacts
+                    </li>
+                  </NavLink>
+
+                  <NavLink
+                    exact
+                    to={ROUTES.SETTINGS}
+                    className={classNames("nav__link", {
+                      "nav__link--non-auth": !authUser
+                    })}
+                    activeClassName="nav__item--active"
+                    onClick={() => closeNavMobile()}
+                  >
+                    <li className="nav__item" onClick={() => closeNavMobile()}>
+                      Settings
+                    </li>
+                  </NavLink>
+                </div>
+
                 <li
                   className={classNames("nav__item nav__item--dropdown", {
                     "nav__item--new-activity": newContactsActivity

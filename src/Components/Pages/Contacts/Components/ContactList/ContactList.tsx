@@ -4,12 +4,17 @@ import { FirebaseContext } from "Components/Firebase"
 import Contact from "./Contact"
 import useElementScrolledDown from "Components/Pages/Movies/useElementScrolledDown"
 import { ContactInfoInterface } from "../../Types"
+import classNames from "classnames"
+import { ContactsContext } from "../Context/ContactsContext"
 
 const CONTACTS_TO_LOAD = 15
 
 const ContactList: React.FC = () => {
   const firebase = useContext(FirebaseContext)
   const { authUser } = useContext(AppContext)
+  const context = useContext(ContactsContext)
+
+  const [navMobileOpen, setNavMobileOpen] = useState(false)
 
   const [contacts, setContacts] = useState<ContactInfoInterface[]>()
   const [allContactsAmount, setAllContactsAmount] = useState()
@@ -59,7 +64,12 @@ const ContactList: React.FC = () => {
   }, [contacts])
 
   return (
-    <div ref={contactListRef} className="contact-list">
+    <div
+      ref={contactListRef}
+      className={classNames("contact-list", {
+        "contact-list--hide-mobile": context?.state.activeChat.chatKey
+      })}
+    >
       {contacts?.map((contact) => (
         <Contact key={contact.key} contactInfo={contact} />
       ))}
