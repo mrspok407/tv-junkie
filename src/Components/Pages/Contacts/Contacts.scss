@@ -6,24 +6,7 @@ $lastMessageStatusSize: 17px;
 $unreadMessagesBG: #206ea0;
 $unreadMessagesBGActive: #fff;
 $borderRightContactListClr: #25252561;
-
 $chatHeight: 570px;
-
-.chat-container {
-  display: grid;
-  grid-template-columns: 30% 70%;
-  height: $chatHeight;
-  max-width: 100%;
-  width: 1000px;
-  border: 1px solid $borderRightContactListClr;
-
-  @include mediaMaxW(#{$mobileViewPort}) {
-    position: relative;
-    grid-template-columns: 1fr;
-    width: 750px;
-    overflow: hidden;
-  }
-}
 
 .contact-list {
   border-right: 1px solid $borderRightContactListClr;
@@ -50,7 +33,7 @@ $chatHeight: 570px;
   grid-template-columns: 1fr max-content max-content;
   grid-auto-rows: 20px;
   align-items: center;
-  row-gap: 4px;
+  row-gap: 6px;
   column-gap: 5px;
   padding: 10px;
   color: #fff;
@@ -74,6 +57,10 @@ $chatHeight: 570px;
     opacity: 1;
   }
 
+  &--no-message-status {
+    grid-template-columns: 1fr max-content;
+  }
+
   &--active {
     background-color: $activeItemColor;
 
@@ -90,13 +77,13 @@ $chatHeight: 570px;
   }
 
   &__last-message-status {
-    background-image: url("../../../assets/images/icons/one-mark-sign.svg");
+    background-image: url("../../../assets/images/icons/double-mark-sign.svg");
     background-size: contain;
     background-repeat: no-repeat;
     width: $lastMessageStatusSize;
     height: $lastMessageStatusSize;
     &--unread {
-      background-image: url("../../../assets/images/icons/double-mark-sign.svg");
+      background-image: url("../../../assets/images/icons/one-mark-sign.svg");
     }
   }
 
@@ -129,14 +116,17 @@ $chatHeight: 570px;
     font-size: 0.85rem;
 
     &--active {
-      color: $activeItemColor;
-      background-color: $unreadMessagesBGActive;
+      @include mediaMinW(#{$mobileViewPort}) {
+        color: $activeItemColor;
+        background-color: $unreadMessagesBGActive;
+      }
     }
   }
 
   &__last-message-text {
     white-space: nowrap;
     overflow: hidden;
+    line-height: 23px;
     text-overflow: ellipsis;
     color: #c5c5c5;
 
@@ -146,17 +136,19 @@ $chatHeight: 570px;
   }
 }
 
-.chat-window-container {
-  color: #fff;
-  overflow-y: scroll;
-  @include scrollbar(5px, getColor(blueClr, $mainPalette), #c5bbb1);
-}
+.new-request {
+  display: grid;
+  row-gap: 5px;
+  width: 100%;
+  max-width: 400px;
 
-.chat-window {
-  &__close-chat {
-    width: 50px;
-    height: 35px;
-    margin-top: 25px;
-    background-color: peru;
+  &__name {
+    color: #66b4e6;
+  }
+
+  &__actions--receiver {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 5px;
   }
 }

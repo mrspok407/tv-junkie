@@ -8,7 +8,7 @@ import useUserShows, {
 import useContentHandler, { LOADING_ADDING_TO_DATABASE_INITIAL } from "Components/UserContent/UseContentHandler"
 import useFirebase from "Components/Firebase/UseFirebase"
 import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
-import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
+import { FirebaseInterface, FIREBASE_INITIAL_STATE } from "Components/Firebase/FirebaseContext"
 import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
 import { UserToWatchShowsInterface } from "Components/UserContent/UseUserShows/Hooks/UseGetUserToWatchShows"
@@ -147,7 +147,7 @@ export const CONTEXT_INITIAL_STATE = {
     loadingAddShowToDatabase: LOADING_ADDING_TO_DATABASE_INITIAL,
     loadingShowsOnRegister: false
   },
-  firebase: {},
+  firebase: FIREBASE_INITIAL_STATE,
   authUser: { uid: "", email: "", emailVerified: false },
   newContactsActivity: false,
   errors: { error: {}, handleError: () => {} }

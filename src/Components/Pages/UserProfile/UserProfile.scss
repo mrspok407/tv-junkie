@@ -21,7 +21,7 @@
   }
 
   &__name {
-    color: getColor(blueClr, $mainPalette);
+    // color: getColor(blueClr, $mainPalette);
   }
 
   @include mediaMaxW(#{$mobileViewPort}) {
@@ -68,11 +68,11 @@
       }
     }
 
-    &--receiver {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      column-gap: 5px;
-    }
+    // &--receiver {
+    //   display: grid;
+    //   grid-template-columns: 1fr 1fr;
+    //   column-gap: 5px;
+    // }
   }
 
   .loader {

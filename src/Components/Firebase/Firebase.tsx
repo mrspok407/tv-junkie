@@ -124,11 +124,13 @@ class Firebase {
 
   /// Contacts API ///
 
-  newContactsRequests = ({ uid }: { uid: string }) => this.db.ref(`users/${uid}/contactsDatabase/newContactsRequests`)
-  newContactsActivity = ({ uid }: { uid: string }) => this.db.ref(`users/${uid}/contactsDatabase/newContactsActivity`)
-  contactsDatabase = ({ uid }: { uid: string }) => this.db.ref(`users/${uid}/contactsDatabase`)
-  contactsList = ({ uid }: { uid: string }) => this.db.ref(`users/${uid}/contactsDatabase/contactsList`)
-  contact = ({ authUid, contactUid }: { authUid: string; contactUid: string }) =>
+  newContactsRequests = ({ uid }: { uid: string | undefined }) =>
+    this.db.ref(`users/${uid}/contactsDatabase/newContactsRequests`)
+  newContactsActivity = ({ uid }: { uid: string | undefined }) =>
+    this.db.ref(`users/${uid}/contactsDatabase/newContactsActivity`)
+  contactsDatabase = ({ uid }: { uid: string | undefined }) => this.db.ref(`users/${uid}/contactsDatabase`)
+  contactsList = ({ uid }: { uid: string | undefined }) => this.db.ref(`users/${uid}/contactsDatabase/contactsList`)
+  contact = ({ authUid, contactUid }: { authUid: string | undefined; contactUid: string }) =>
     this.db.ref(`users/${authUid}/contactsDatabase/contactsList/${contactUid}`)
 
   /// Private Chats API ///

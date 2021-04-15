@@ -14,8 +14,6 @@ const ContactList: React.FC = () => {
   const { authUser } = useContext(AppContext)
   const context = useContext(ContactsContext)
 
-  const [navMobileOpen, setNavMobileOpen] = useState(false)
-
   const [contacts, setContacts] = useState<ContactInfoInterface[]>()
   const [allContactsAmount, setAllContactsAmount] = useState()
   const [loadedContacts, setLoadedContacts] = useState(0)

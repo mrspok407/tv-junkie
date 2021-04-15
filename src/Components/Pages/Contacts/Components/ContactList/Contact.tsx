@@ -30,23 +30,30 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
     contactInfo.key < authUser?.uid! ? `${contactInfo.key}_${authUser?.uid}` : `${authUser?.uid}_${contactInfo.key}`
 
   const setContactActive = () => {
-    const payload = {
+    const payloadActiveChat = {
       contactKey: contactInfo.key,
       chatKey
     }
+    const payloadContactInfo = contactInfo
 
-    context?.dispatch({ type: ActionTypes.UpdateActiveChat, payload })
+    context?.dispatch({ type: ActionTypes.UpdateActiveChat, payload: payloadActiveChat })
     context?.dispatch({ type: ActionTypes.UpdateUnreadMessages, payload: authUnreadMessages })
+    context?.dispatch({ type: ActionTypes.UpdateContactInfo, payload: payloadContactInfo })
   }
 
   useEffect(() => {
+    console.log({ contactInfo })
+    context?.dispatch({ type: ActionTypes.UpdateContactInfo, payload: contactInfo })
+  }, [contactInfo])
+
+  useEffect(() => {
     firebase
-      .newContactsActivity({ uid: authUser?.uid })
+      .newContactsActivity({ uid: authUser?.uid! })
       .child(`${contactInfo.key}`)
       .on("value", (snapshot: any) => setNewActivity(snapshot.val()))
 
     firebase
-      .newContactsRequests({ uid: authUser?.uid })
+      .newContactsRequests({ uid: authUser?.uid! })
       .child(`${contactInfo.key}`)
       .on("value", (snapshot: any) => setNewContactRequest(snapshot.val()))
 
@@ -78,7 +85,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
     context?.dispatch({ type: ActionTypes.UpdateUnreadMessages, payload: authUnreadMessages })
   }, [authUnreadMessages]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const isPinned = !!(contactInfo.pinned_lastActivityTS.slice(0, 4) === "true")
+  const isPinned = !!(contactInfo.pinned_lastActivityTS?.slice(0, 4) === "true")
   const userNameCutLength = contactInfo.userName
   const userNameFormated =
     userNameCutLength[userNameCutLength.length - 1] === " " ? userNameCutLength.slice(0, -1) : userNameCutLength
@@ -87,29 +94,39 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
   return (
     <div
       className={classNames("contact-item", {
-        "contact-item--active": chatActive
+        "contact-item--active": chatActive,
+        "contact-item--no-message-status": !(lastMessage?.sender === authUser?.uid)
       })}
       onClick={() => setContactActive()}
     >
       <div className="contact-item__username">
         {contactInfo.userName.length > 25 ? `${userNameFormated}...` : contactInfo.userName}
       </div>
-      <div
-        className={classNames("contact-item__last-message-status", {
-          "contact-item__last-message-status--unread": !!(contactUnreadMessages! > 0)
-        })}
-      ></div>
+      {lastMessage?.sender === authUser?.uid && (
+        <div
+          className={classNames("contact-item__last-message-status", {
+            "contact-item__last-message-status--unread": !!(contactUnreadMessages! > 0)
+          })}
+        ></div>
+      )}
+
       <div className="contact-item__timestamp">{formatedDate}</div>
       <div className="contact-item__last-message-text">
-        {lastMessage?.sender === authUser?.uid && <span>You: </span>} {lastMessage?.message?.slice(0, 8)}
+        {newContactRequest ? (
+          "Wants to connect"
+        ) : (
+          <>
+            {lastMessage?.sender === authUser?.uid && <span>You: </span>} {lastMessage?.message?.slice(0, 8)}
+          </>
+        )}
       </div>
-      {authUnreadMessages! > 0 || newContactRequest ? (
+      {newActivity || newContactRequest ? (
         <div
           className={classNames("contact-item__unread-messages", {
             "contact-item__unread-messages--active": chatActive
           })}
         >
-          <span>{authUnreadMessages! > 0 ? authUnreadMessages : newContactRequest ? 1 : null}</span>
+          <span>{newActivity ? authUnreadMessages : newContactRequest ? 1 : null}</span>
         </div>
       ) : (
         isPinned && <div className="contact-item__pinned"></div>

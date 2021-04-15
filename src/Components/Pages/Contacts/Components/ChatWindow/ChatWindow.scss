@@ -1,0 +1,70 @@
+@import "../../../../../styles/globals";
+
+$noActiveChatTextBG: #206ea0;
+$chatHeight: 570px;
+$borderRightContactListClr: #25252561;
+
+.chat-container {
+  display: grid;
+  grid-template-columns: 30% 70%;
+  height: $chatHeight;
+  max-width: 100%;
+  width: 1000px;
+  border: 1px solid $borderRightContactListClr;
+
+  @include mediaMaxW(#{$mobileViewPort}) {
+    position: relative;
+    grid-template-columns: 1fr;
+    width: 750px;
+    max-width: calc(100% - 10px);
+    overflow: hidden;
+  }
+}
+
+.chat-window-container {
+  color: #fff;
+  overflow-y: auto;
+  @include scrollbar(5px, getColor(blueClr, $mainPalette), #c5bbb1);
+
+  &--no-active-chat {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    @include mediaMaxW(#{$mobileViewPort}) {
+      display: none;
+    }
+
+    .chat-window {
+      padding: 5px 15px 5px 15px;
+      border-radius: 14px;
+      background-color: $noActiveChatTextBG;
+    }
+  }
+}
+
+.chat-window {
+  &--request {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+
+    .new-request {
+      row-gap: 10px;
+      margin-top: 30px;
+      font-size: 1.2rem;
+    }
+  }
+
+  &__close-chat {
+    display: none;
+    width: 50px;
+    height: 35px;
+    margin-top: 25px;
+    background-color: peru;
+
+    @include mediaMaxW(#{$mobileViewPort}) {
+      display: initial;
+    }
+  }
+}

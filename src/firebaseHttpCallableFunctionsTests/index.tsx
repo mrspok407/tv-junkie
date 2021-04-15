@@ -108,7 +108,8 @@ export const _handleContactRequest = async ({
       [`${contactsDatabaseRef(authUid)}/newContactsRequests/${contactUid}`]: null,
       // [`${contactsDatabaseRef(authUid)}/newContactsActivity/${contactUid}`]: null,
       [`${contactsDatabaseRef(contactUid)}/contactsList/${authUid}/status`]: status === "accept" ? true : "rejected",
-      [`${contactsDatabaseRef(contactUid)}/contactsList/${authUid}/newActivity`]: true,
+      // [`${contactsDatabaseRef(contactUid)}/contactsList/${authUid}/newActivity`]: true,
+      [`${contactsDatabaseRef(contactUid)}/newContactsActivity/${authUid}`]: true,
       [`${contactsDatabaseRef(contactUid)}/contactsList/${authUid}/timeStamp`]: timeStamp
     }
 

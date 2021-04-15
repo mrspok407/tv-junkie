@@ -1,3 +1,4 @@
+import { CONTEXT_INITIAL_STATE } from "Components/AppContext/AppContextHOC"
 import React, { createContext } from "react"
 
 export interface FirebaseInterface {
@@ -21,8 +22,20 @@ export interface FirebaseInterface {
   createUserWithEmailAndPassword?: any
   sendEmailVerification?: any
   passwordReset?: any
-  contact?: any
   httpsCallable?: any
+  newContactsRequests: ({ uid }: { uid: string | undefined }) => any
+  newContactsActivity: ({ uid }: { uid: string | undefined }) => any
+  contactsDatabase: ({ uid }: { uid: string | undefined }) => any
+  contactsList: ({ uid }: { uid: string | undefined }) => any
+  contact: ({ authUid, contactUid }: { authUid: string | undefined; contactUid: string }) => any
 }
 
-export const FirebaseContext = createContext<FirebaseInterface>({})
+export const FIREBASE_INITIAL_STATE = {
+  newContactsActivity: () => {},
+  newContactsRequests: () => {},
+  contactsDatabase: () => {},
+  contactsList: () => {},
+  contact: () => {}
+}
+
+export const FirebaseContext = createContext<FirebaseInterface>(FIREBASE_INITIAL_STATE)

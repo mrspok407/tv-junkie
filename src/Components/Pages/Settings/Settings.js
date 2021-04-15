@@ -71,7 +71,7 @@ class Profile extends Component {
 
   test = async () => {
     const firebase = this.context.firebase
-    const CONTACTS_TO_ADD = 4
+    const CONTACTS_TO_ADD = 1
 
     const authUid = "drv5lG97VxVBLgkdn8bMhdxmqQT2"
 
@@ -158,20 +158,21 @@ class Profile extends Component {
 
       const chatKey = userKey < authUid ? `${userKey}_${authUid}` : `${authUid}_${userKey}`
 
-      for (let i = 0; i <= 50; i++) {
+      for (let i = 0; i <= 5; i++) {
         const randomMessage = lorem.generateSentences(2)
 
         const pushNewMessage = firebase
           .privateChats()
           .child(`${chatKey}/messages`)
           .push({
-            // sender: Math.random() > 0.5 ? key : authUid,
-            sender: userKey,
+            sender: Math.random() > 0.5 ? userKey : authUid,
+            // sender: userKey,
+            //  sender: authUid,
             message: randomMessage,
-            timeStamp: timeStampEpoch + (i + 1) * 5000
+            timeStamp: timeStampEpoch + (i + 1) * Math.floor(Math.random() * (200000000 - 100000) + 100000)
           })
 
-        firebase.privateChats().child(`${chatKey}/members/${authUid}/unreadMessages/${pushNewMessage.key}`).set(true)
+        firebase.privateChats().child(`${chatKey}/members/${userKey}/unreadMessages/${pushNewMessage.key}`).set(true)
       }
       firebase
         .privateChats()

@@ -5,16 +5,12 @@
 }
 
 @mixin mediaMinW($w) {
-  @media (min-width: $w + 1px) {
+  @media (min-width: $w) {
     @content;
   }
 }
 
-@mixin scrollbar(
-  $size,
-  $foreground-color,
-  $background-color: mix($foreground-color, white, 50%)
-) {
+@mixin scrollbar($size, $foreground-color, $background-color: mix($foreground-color, white, 50%)) {
   &::-webkit-scrollbar {
     width: $size;
     height: $size;

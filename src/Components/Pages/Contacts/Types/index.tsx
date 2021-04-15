@@ -1,5 +1,5 @@
 export interface ContactInfoInterface {
-  status: boolean
+  status: boolean | string
   receiver: boolean
   userName: string
   timeStamp: number
@@ -18,7 +18,8 @@ export interface MessagesInterface {
 export interface ContactsStateInterface {
   unreadMessages: null | number
   activeChat: {
-    contactKey: string | null
-    chatKey: string | null
+    contactKey: string
+    chatKey: string
   }
+  contactInfo: ContactInfoInterface
 }

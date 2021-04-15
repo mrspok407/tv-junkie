@@ -97,11 +97,11 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
         </div>
       ) : contactInfo?.status === false ? (
         !contactInfo?.receiver ? (
-          <>
-            <div className="user-profile__request-message">
-              {<span className="user-profile__name">{userName}</span>} wants to connect
+          <div className="new-request">
+            <div className="new-request__message">
+              {<span className="new-request__name">{userName}</span>} wants to connect
             </div>
-            <div className="user-profile__actions--receiver">
+            <div className="new-request__actions--receiver">
               <button className="button" onClick={() => handleContactRequest({ status: "accept" })}>
                 Accept
               </button>
@@ -114,10 +114,10 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
                 Reject
               </button>
             </div>
-          </>
+          </div>
         ) : (
-          <div className="user-profile__request-message">
-            The invitation to connect has been sent to {<span className="user-profile__name">{userName}</span>}
+          <div className="new-request__message">
+            The invitation to connect has been sent to {<span className="new-request__name">{userName}</span>}
           </div>
         )
       ) : contactInfo?.status === "rejected" ? (

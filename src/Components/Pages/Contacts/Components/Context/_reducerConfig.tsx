@@ -3,7 +3,8 @@ import { ContactsStateInterface } from "../../Types"
 
 export enum ActionTypes {
   UpdateUnreadMessages = "updateUnreadMessages",
-  UpdateActiveChat = "updateActiveChat"
+  UpdateActiveChat = "updateActiveChat",
+  UpdateContactInfo = "updateContactInfo"
 }
 
 const reducer: React.Reducer<ContactsStateInterface, ActionInterface> = (state, action) => {
@@ -18,6 +19,11 @@ const reducer: React.Reducer<ContactsStateInterface, ActionInterface> = (state, 
       ...state,
       activeChat: action.payload
     }
+  } else if (action.type === ActionTypes.UpdateContactInfo) {
+    return {
+      ...state,
+      contactInfo: action.payload
+    }
   } else {
     throw new Error()
   }
@@ -31,8 +37,17 @@ export interface ActionInterface {
 const INITIAL_STATE: ContactsStateInterface = {
   unreadMessages: null,
   activeChat: {
-    contactKey: null,
-    chatKey: null
+    contactKey: "",
+    chatKey: ""
+  },
+  contactInfo: {
+    status: false,
+    receiver: false,
+    userName: "",
+    timeStamp: 0,
+    pinned_lastActivityTS: "",
+    recipientNotified: false,
+    key: ""
   }
 }
 
