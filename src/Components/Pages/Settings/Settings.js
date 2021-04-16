@@ -158,7 +158,7 @@ class Profile extends Component {
 
       const chatKey = userKey < authUid ? `${userKey}_${authUid}` : `${authUid}_${userKey}`
 
-      for (let i = 0; i <= 5; i++) {
+      for (let i = 0; i <= 50; i++) {
         const randomMessage = lorem.generateSentences(2)
 
         const pushNewMessage = firebase
@@ -172,7 +172,7 @@ class Profile extends Component {
             timeStamp: timeStampEpoch + (i + 1) * Math.floor(Math.random() * (200000000 - 100000) + 100000)
           })
 
-        firebase.privateChats().child(`${chatKey}/members/${userKey}/unreadMessages/${pushNewMessage.key}`).set(true)
+        // firebase.privateChats().child(`${chatKey}/members/${authUid}/unreadMessages/${pushNewMessage.key}`).set(true)
       }
       firebase
         .privateChats()

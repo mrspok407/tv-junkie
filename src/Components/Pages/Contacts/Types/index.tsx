@@ -8,7 +8,11 @@ export interface ContactInfoInterface {
   key: string
 }
 
-export interface MessagesInterface {
+export interface ContactsInterface {
+  [key: string]: ContactInfoInterface
+}
+
+export interface MessageInterface {
   message: string
   sender: string
   timeStamp: number
@@ -18,8 +22,13 @@ export interface MessagesInterface {
 export interface ContactsStateInterface {
   unreadMessages: null | number
   activeChat: {
-    contactKey: string
     chatKey: string
+    contactKey: string
   }
-  contactInfo: ContactInfoInterface
+  messages: {
+    [key: string]: MessageInterface[]
+  }
+  contacts: {
+    [key: string]: ContactInfoInterface
+  }
 }

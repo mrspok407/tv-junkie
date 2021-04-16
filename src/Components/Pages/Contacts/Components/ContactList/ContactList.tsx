@@ -16,10 +16,10 @@ const ContactList: React.FC = () => {
 
   const [contacts, setContacts] = useState<ContactInfoInterface[]>()
   const [allContactsAmount, setAllContactsAmount] = useState()
-  const [loadedContacts, setLoadedContacts] = useState(0)
+  const loadedContacts = Object.keys(context?.state.contacts as {}).length
 
   const contactListRef = useRef<HTMLDivElement>(null!)
-  const isScrolledDown = useElementScrolledDown({ element: contactListRef.current, threshold: 400 })
+  const isScrolledDown = useElementScrolledDown({ element: contactListRef.current, threshold: 200 })
 
   const contactsListRef = firebase.contactsList({ uid: authUser?.uid }).orderByChild("pinned_lastActivityTS")
   const contactsDatabaseRef = firebase.contactsDatabase({ uid: authUser?.uid })
@@ -30,8 +30,10 @@ const ContactList: React.FC = () => {
       contactsData.push({ ...contact.val(), key: contact.key })
     })
     contactsData.reverse()
+    console.log({ contactsData })
+
+    context?.dispatch({ type: "updateContacts", payload: snapshot.val() })
     setContacts(contactsData)
-    setLoadedContacts((prevState) => prevState + CONTACTS_TO_LOAD)
   }
 
   useEffect(() => {

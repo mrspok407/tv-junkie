@@ -67,4 +67,29 @@ $borderRightContactListClr: #25252561;
       display: initial;
     }
   }
+
+  &__messages-list {
+    display: grid;
+    grid-auto-rows: max-content;
+    grid-row-gap: 5px;
+    row-gap: 5px;
+    padding: 10px;
+  }
+
+  &__message {
+    display: grid;
+    max-width: 70%;
+    border-radius: 5px;
+    padding: 8px;
+    background-color: #fff;
+    color: #000;
+
+    &--send {
+      justify-self: end;
+    }
+
+    &-info {
+      justify-self: end;
+    }
+  }
 }

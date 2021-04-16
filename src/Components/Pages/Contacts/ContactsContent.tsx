@@ -7,10 +7,12 @@ type Props = {}
 
 const ContactsContent: React.FC<Props> = () => {
   const context = useContext(ContactsContext)
+  const { activeChat, contacts } = context?.state!
+
   return (
     <div className="chat-container">
       <ContactList />
-      {context?.state.activeChat.chatKey === "" ? (
+      {activeChat.chatKey === "" || !contacts[activeChat.contactKey] ? (
         <div className="chat-window-container chat-window-container--no-active-chat">
           <div className="chat-window">Select a chat to start messaging</div>
         </div>

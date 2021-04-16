@@ -3,9 +3,9 @@ import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
 import React, { useContext, useEffect, useState } from "react"
 import useTimestampFormater from "../../Hooks/UseTimestampFormater"
-import { ContactInfoInterface, MessagesInterface } from "../../Types"
+import { ContactInfoInterface, MessageInterface } from "../../Types"
 import { ContactsContext } from "../Context/ContactsContext"
-import { ActionTypes } from "../Context/_reducerConfig"
+// import { ActionTypes } from "../Context/_reducerConfig"
 
 type Props = {
   contactInfo: ContactInfoInterface
@@ -17,34 +17,22 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
 
   const context = useContext(ContactsContext)
 
-  const formatedDate = useTimestampFormater({ timeStamp: contactInfo.pinned_lastActivityTS.slice(-13) })
+  const formatedDate = useTimestampFormater({ timeStamp: contactInfo.pinned_lastActivityTS?.slice(-13) })
 
   const [newActivity, setNewActivity] = useState<boolean | null>(null)
   const [newContactRequest, setNewContactRequest] = useState<boolean | null>(null)
 
   const [authUnreadMessages, setAuthUnreadMessages] = useState<number | null>(null)
   const [contactUnreadMessages, setContactUnreadMessages] = useState<number | null>(null)
-  const [lastMessage, setLastMessage] = useState<MessagesInterface>()
+  const [lastMessage, setLastMessage] = useState<MessageInterface>()
 
   const chatKey =
     contactInfo.key < authUser?.uid! ? `${contactInfo.key}_${authUser?.uid}` : `${authUser?.uid}_${contactInfo.key}`
 
   const setContactActive = () => {
-    const payloadActiveChat = {
-      contactKey: contactInfo.key,
-      chatKey
-    }
-    const payloadContactInfo = contactInfo
-
-    context?.dispatch({ type: ActionTypes.UpdateActiveChat, payload: payloadActiveChat })
-    context?.dispatch({ type: ActionTypes.UpdateUnreadMessages, payload: authUnreadMessages })
-    context?.dispatch({ type: ActionTypes.UpdateContactInfo, payload: payloadContactInfo })
+    context?.dispatch({ type: "updateActiveChat", payload: { chatKey, contactKey: contactInfo.key } })
+    context?.dispatch({ type: "updateUnreadMessages", payload: authUnreadMessages })
   }
-
-  useEffect(() => {
-    console.log({ contactInfo })
-    context?.dispatch({ type: ActionTypes.UpdateContactInfo, payload: contactInfo })
-  }, [contactInfo])
 
   useEffect(() => {
     firebase
@@ -57,7 +45,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
       .child(`${contactInfo.key}`)
       .on("value", (snapshot: any) => setNewContactRequest(snapshot.val()))
 
-    firebase.unreadMessages({ uid: authUser?.uid, chatKey }).on("value", (snapshot: any) => {
+    firebase.unreadMessages({ uid: authUser?.uid!, chatKey }).on("value", (snapshot: any) => {
       setAuthUnreadMessages(snapshot.numChildren())
     })
     firebase.unreadMessages({ uid: contactInfo.key, chatKey }).on("value", (snapshot: any) => {
@@ -68,27 +56,27 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
       .messages({ chatKey })
       .orderByChild("timeStamp")
       .limitToLast(1)
-      .on("value", (snapshot: { val: () => MessagesInterface }) => {
+      .on("value", (snapshot: { val: () => MessageInterface }) => {
         if (snapshot.val() === null) return
         const messageData = Object.values(snapshot.val())[0]
         setLastMessage(messageData)
       })
     return () => {
       firebase.newContactsActivity({ uid: authUser?.uid }).child(`${contactInfo.key}`).off()
-      firebase.unreadMessages({ uid: authUser?.uid, chatKey }).off()
+      firebase.unreadMessages({ uid: authUser?.uid!, chatKey }).off()
       firebase.unreadMessages({ uid: contactInfo.key, chatKey }).off()
       firebase.messages({ chatKey }).off("value", lastMessageListener)
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    context?.dispatch({ type: ActionTypes.UpdateUnreadMessages, payload: authUnreadMessages })
+    context?.dispatch({ type: "updateUnreadMessages", payload: authUnreadMessages })
   }, [authUnreadMessages]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const isPinned = !!(contactInfo.pinned_lastActivityTS?.slice(0, 4) === "true")
   const userNameCutLength = contactInfo.userName
   const userNameFormated =
-    userNameCutLength[userNameCutLength.length - 1] === " " ? userNameCutLength.slice(0, -1) : userNameCutLength
+    userNameCutLength[userNameCutLength?.length - 1] === " " ? userNameCutLength?.slice(0, -1) : userNameCutLength
 
   const chatActive = context?.state.activeChat.contactKey === contactInfo.key
   return (
@@ -100,7 +88,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
       onClick={() => setContactActive()}
     >
       <div className="contact-item__username">
-        {contactInfo.userName.length > 25 ? `${userNameFormated}...` : contactInfo.userName}
+        {contactInfo.userName?.length > 25 ? `${userNameFormated}...` : contactInfo.userName}
       </div>
       {lastMessage?.sender === authUser?.uid && (
         <div

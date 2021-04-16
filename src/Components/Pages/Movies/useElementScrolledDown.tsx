@@ -15,6 +15,8 @@ const useElementScrolledDown = ({ element, threshold = 0 }: Props) => {
       const scrollHeight = element.scrollHeight
       const scrollTop = element.scrollTop
 
+      console.log({ height, scrollHeight, scrollTop })
+
       if (scrollHeight <= scrollTop + height + threshold) {
         setIsScrolledDown(true)
       } else {

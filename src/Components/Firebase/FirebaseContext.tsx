@@ -23,6 +23,9 @@ export interface FirebaseInterface {
   sendEmailVerification?: any
   passwordReset?: any
   httpsCallable?: any
+  messages: ({ chatKey }: { chatKey: string }) => any
+  privateChat: () => any
+  unreadMessages: ({ uid, chatKey }: { uid: string; chatKey: string }) => any
   newContactsRequests: ({ uid }: { uid: string | undefined }) => any
   newContactsActivity: ({ uid }: { uid: string | undefined }) => any
   contactsDatabase: ({ uid }: { uid: string | undefined }) => any
@@ -35,7 +38,10 @@ export const FIREBASE_INITIAL_STATE = {
   newContactsRequests: () => {},
   contactsDatabase: () => {},
   contactsList: () => {},
-  contact: () => {}
+  contact: () => {},
+  messages: () => {},
+  privateChat: () => {},
+  unreadMessages: () => {}
 }
 
 export const FirebaseContext = createContext<FirebaseInterface>(FIREBASE_INITIAL_STATE)
