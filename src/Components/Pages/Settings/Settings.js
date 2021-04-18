@@ -28,7 +28,8 @@ class Profile extends Component {
       limitTo: 2,
       shows: [],
       chatBottomFire: false,
-      pageInFocus: false
+      pageInFocus: false,
+      JSON: {}
     }
 
     this.authSubscriber = null
@@ -71,7 +72,7 @@ class Profile extends Component {
 
   test = async () => {
     const firebase = this.context.firebase
-    const CONTACTS_TO_ADD = 1
+    const CONTACTS_TO_ADD = 3
 
     const authUid = "drv5lG97VxVBLgkdn8bMhdxmqQT2"
 
@@ -85,6 +86,13 @@ class Profile extends Component {
         min: 4
       }
     })
+
+    firebase
+      .database()
+      .ref()
+      .once("value", (snapshot) => {
+        console.log(JSON.stringify(snapshot.val()))
+      })
 
     // firebase
     //   .contactsDatabase({ uid: "drv5lG97VxVBLgkdn8bMhdxmqQT2" })
@@ -123,7 +131,7 @@ class Profile extends Component {
     //     })
     //   })
 
-    for (let i = 0; i <= CONTACTS_TO_ADD; i++) {
+    for (let i = 0; i < CONTACTS_TO_ADD; i++) {
       const randomName = uniqueNamesGenerator({
         dictionaries: [adjectives, colors, animals],
         separator: " ",
@@ -158,21 +166,23 @@ class Profile extends Component {
 
       const chatKey = userKey < authUid ? `${userKey}_${authUid}` : `${authUid}_${userKey}`
 
-      for (let i = 0; i <= 50; i++) {
+      for (let i = 0; i <= 20; i++) {
         const randomMessage = lorem.generateSentences(2)
 
         const pushNewMessage = firebase
           .privateChats()
           .child(`${chatKey}/messages`)
           .push({
-            sender: Math.random() > 0.5 ? userKey : authUid,
+            // sender: i < 25 ? (Math.random() > 0.5 ? userKey : authUid) : userKey,
             // sender: userKey,
-            //  sender: authUid,
+            sender: authUid,
             message: randomMessage,
             timeStamp: timeStampEpoch + (i + 1) * Math.floor(Math.random() * (200000000 - 100000) + 100000)
           })
 
-        // firebase.privateChats().child(`${chatKey}/members/${authUid}/unreadMessages/${pushNewMessage.key}`).set(true)
+        // if (i >= 25) {
+        firebase.privateChats().child(`${chatKey}/members/${userKey}/unreadMessages/${pushNewMessage.key}`).set(true)
+        // }
       }
       firebase
         .privateChats()

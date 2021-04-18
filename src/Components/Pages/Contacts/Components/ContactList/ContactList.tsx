@@ -3,15 +3,18 @@ import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
 import Contact from "./Contact"
 import useElementScrolledDown from "Components/Pages/Movies/useElementScrolledDown"
-import { ContactInfoInterface } from "../../Types"
+import { ContactInfoInterface, CONTACT_INFO_INITIAL_DATA } from "../../Types"
 import classNames from "classnames"
 import { ContactsContext } from "../Context/ContactsContext"
+import { isUnexpectedObject } from "Utils"
+import CreatePortal from "Components/UI/Modal/CreatePortal"
+import ModalContent from "Components/UI/Modal/ModalContent"
 
 const CONTACTS_TO_LOAD = 15
 
 const ContactList: React.FC = () => {
   const firebase = useContext(FirebaseContext)
-  const { authUser } = useContext(AppContext)
+  const { authUser, errors } = useContext(AppContext)
   const context = useContext(ContactsContext)
 
   const [contacts, setContacts] = useState<ContactInfoInterface[]>()
@@ -27,6 +30,13 @@ const ContactList: React.FC = () => {
   const getContactsList = (snapshot: any) => {
     let contactsData: ContactInfoInterface[] = []
     snapshot.forEach((contact: { val: () => ContactInfoInterface; key: string }) => {
+      if (isUnexpectedObject({ exampleObject: CONTACT_INFO_INITIAL_DATA, targetObject: contact.val() })) {
+        errors.handleError({
+          message: "Some of your contacts were not loaded correctly. Try to reload the page."
+        })
+        return
+      }
+
       contactsData.push({ ...contact.val(), key: contact.key })
     })
     contactsData.reverse()
@@ -73,6 +83,7 @@ const ContactList: React.FC = () => {
       {contacts?.map((contact) => (
         <Contact key={contact.key} contactInfo={contact} />
       ))}
+      {errors.error && <CreatePortal element={<ModalContent message={errors.error.message} />}></CreatePortal>}
     </div>
   )
 }

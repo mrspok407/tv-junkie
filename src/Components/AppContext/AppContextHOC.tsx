@@ -114,7 +114,7 @@ export interface AppContextInterface {
   firebase: FirebaseInterface
   authUser: AuthUserInterface | null
   newContactsActivity: boolean | null
-  errors: { error: any; handleError: ({ errorData, message }: { errorData: any; message: string }) => void }
+  errors: { error: any; handleError: ({ errorData, message }: { errorData?: any; message: string }) => void }
 }
 
 export const CONTEXT_INITIAL_STATE = {

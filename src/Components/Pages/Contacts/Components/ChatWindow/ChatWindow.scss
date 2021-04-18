@@ -3,6 +3,7 @@
 $noActiveChatTextBG: #206ea0;
 $chatHeight: 570px;
 $borderRightContactListClr: #25252561;
+$messageStatusSize: 17px;
 
 .chat-container {
   display: grid;
@@ -78,6 +79,8 @@ $borderRightContactListClr: #25252561;
 
   &__message {
     display: grid;
+    grid-template-columns: 1fr 70px;
+    column-gap: 10px;
     max-width: 70%;
     border-radius: 5px;
     padding: 8px;
@@ -89,7 +92,22 @@ $borderRightContactListClr: #25252561;
     }
 
     &-info {
+      display: grid;
+      grid-template-columns: max-content max-content;
+      column-gap: 5px;
       justify-self: end;
+    }
+
+    &-status {
+      background-image: url("../../../../../assets/images/icons/double-mark-sign.svg");
+      background-size: contain;
+      background-repeat: no-repeat;
+      width: $messageStatusSize;
+      height: $messageStatusSize;
+
+      &--unread {
+        background-image: url("../../../../../assets/images/icons/one-mark-sign.svg");
+      }
     }
   }
 }

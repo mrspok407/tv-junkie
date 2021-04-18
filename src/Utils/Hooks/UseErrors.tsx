@@ -7,7 +7,7 @@ const useErrors = () => {
   const timeoutRef = useRef<number | null>(null)
   const fadeOutTimeout = useRef<number | null>(null)
 
-  const handleError = ({ errorData, message }: { errorData: any; message: string }) => {
+  const handleError = ({ errorData, message }: { errorData?: any; message: string }) => {
     setError({ errorData, message })
 
     modalContainerRef.current?.classList.remove("modal-fade-out")

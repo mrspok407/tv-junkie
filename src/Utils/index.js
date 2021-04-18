@@ -202,4 +202,17 @@ export const differenceInObjects = (object, base) => {
   return changes(object, base)
 }
 
+export const isUnexpectedObject = ({ exampleObject, targetObject }) => {
+  return Object.entries(exampleObject).some(([key, value]) => {
+    if (targetObject[key] === undefined) {
+      return true
+    }
+    if (Array.isArray(value)) {
+      return !value.some((item) => typeof item === typeof targetObject[key])
+    }
+
+    return typeof targetObject[key] !== typeof value
+  })
+}
+
 export { releasedEpisodesToOneArray }

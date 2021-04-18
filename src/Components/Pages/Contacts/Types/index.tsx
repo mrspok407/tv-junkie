@@ -8,6 +8,15 @@ export interface ContactInfoInterface {
   key: string
 }
 
+export const CONTACT_INFO_INITIAL_DATA = {
+  status: [false, ""],
+  receiver: false,
+  userName: "",
+  timeStamp: 0,
+  pinned_lastActivityTS: "",
+  recipientNotified: false
+}
+
 export interface ContactsInterface {
   [key: string]: ContactInfoInterface
 }
@@ -19,8 +28,17 @@ export interface MessageInterface {
   key: string
 }
 
+export const MESSAGE_INITIAL_DATA = {
+  message: "",
+  sender: "",
+  timeStamp: 0
+}
+
 export interface ContactsStateInterface {
-  unreadMessages: null | number
+  contactsUnreadMessages: {
+    [key: string]: string[]
+  }
+  authUserUnreadMessages: number
   activeChat: {
     chatKey: string
     contactKey: string

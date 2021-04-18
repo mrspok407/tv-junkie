@@ -5,7 +5,8 @@ import useElementScrolledDown from "Components/Pages/Movies/useElementScrolledDo
 import useRecipientNotified from "Components/Pages/UserProfile/Hooks/UseRecipientNotified"
 import useResponseContactRequest from "Components/Pages/UserProfile/Hooks/UseResponseContactRequest"
 import React, { useEffect, useContext, useState, useRef } from "react"
-import { MessageInterface } from "../../Types"
+import { isUnexpectedObject } from "Utils"
+import { MessageInterface, MESSAGE_INITIAL_DATA } from "../../Types"
 import { ContactsContext } from "../Context/ContactsContext"
 // import { ActionTypes } from "../Context/_reducerConfig"
 import "./ChatWindow.scss"
@@ -13,11 +14,11 @@ import "./ChatWindow.scss"
 type Props = {}
 
 const ChatWindow: React.FC<Props> = () => {
-  const { authUser } = useContext(AppContext)
+  const { authUser, errors } = useContext(AppContext)
   const firebase = useContext(FirebaseContext)
   const context = useContext(ContactsContext)
 
-  const { activeChat, messages, contacts } = context?.state!
+  const { activeChat, messages, contacts, contactsUnreadMessages } = context?.state!
   const contactInfo = contacts[activeChat.contactKey]
 
   const { updateRecipientNotified } = useRecipientNotified({ userUid: activeChat.contactKey })
@@ -39,7 +40,7 @@ const ChatWindow: React.FC<Props> = () => {
     const scrollTop = chatContainer.current.scrollTop
 
     console.log({ height, scrollHeight, scrollTop })
-    chatContainer.current.scrollTo(0, 100)
+    chatContainer.current.scrollTo(0, 0)
   }, [activeChat, messages])
 
   useEffect(() => {
@@ -49,12 +50,30 @@ const ChatWindow: React.FC<Props> = () => {
       .on("value", (snapshot: any) => {
         let messagesData: MessageInterface[] = []
         snapshot.forEach((message: { val: () => MessageInterface; key: string }) => {
+          if (isUnexpectedObject({ exampleObject: MESSAGE_INITIAL_DATA, targetObject: message.val() })) {
+            errors.handleError({
+              message: "Some of the messages were hidden, because of the unexpected error."
+            })
+            return
+          }
+
           messagesData.push({ ...message.val(), key: message.key })
         })
 
         context?.dispatch({ type: "updateMessages", payload: messagesData })
       })
+
+    firebase
+      .unreadMessages({ uid: activeChat.contactKey, chatKey: activeChat.chatKey })
+      .on("value", (snapshot: any) => {
+        if (!snapshot.exists()) return
+        context?.dispatch({ type: "updateContactUnreadMessages", payload: Object.keys(snapshot.val()) })
+      })
   }, [activeChat, firebase])
+
+  useEffect(() => {
+    console.log(context?.state.contactsUnreadMessages)
+  }, [context?.state.contactsUnreadMessages])
 
   useEffect(() => {
     if (contactInfo.recipientNotified === null || contactInfo.receiver === null) return
@@ -79,6 +98,7 @@ const ChatWindow: React.FC<Props> = () => {
 
       {contactInfo.status === true && (
         <>
+          <div className="chat-window__unread-messages">{context?.state.authUserUnreadMessages}</div>
           <div className="chat-window">
             <div className="chat-window__messages-list">
               {messages[activeChat.chatKey]?.map((messageData) => (
@@ -92,16 +112,23 @@ const ChatWindow: React.FC<Props> = () => {
                   <div className="chat-window__message-text">{messageData.message}</div>
 
                   <div className="chat-window__message-info">
+                    {messageData.sender === authUser?.uid && (
+                      <div
+                        className={classNames("chat-window__message-status", {
+                          "chat-window__message-status--unread": contactsUnreadMessages[activeChat.chatKey]?.includes(
+                            messageData.key
+                          )
+                        })}
+                      ></div>
+                    )}
                     <div className="chat-window__message-timestamp">
                       {new Date(Number(messageData.timeStamp)).toLocaleTimeString().slice(0, -3)}
                     </div>
-                    {messageData.sender === authUser?.uid && <div className="chat-window__message-status"></div>}
                   </div>
                 </div>
               ))}
             </div>
           </div>
-          {/* <div className="chat-window__unread-messages">{context?.state.unreadMessages}</div> */}
         </>
       )}
 

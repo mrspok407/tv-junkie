@@ -5,13 +5,12 @@ import React, { useContext, useEffect, useState } from "react"
 import useTimestampFormater from "../../Hooks/UseTimestampFormater"
 import { ContactInfoInterface, MessageInterface } from "../../Types"
 import { ContactsContext } from "../Context/ContactsContext"
-// import { ActionTypes } from "../Context/_reducerConfig"
 
 type Props = {
   contactInfo: ContactInfoInterface
 }
 
-const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
+const Contact: React.FC<Props> = ({ contactInfo }) => {
   const firebase = useContext(FirebaseContext)
   const { authUser } = useContext(AppContext)
 
@@ -22,7 +21,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
   const [newActivity, setNewActivity] = useState<boolean | null>(null)
   const [newContactRequest, setNewContactRequest] = useState<boolean | null>(null)
 
-  const [authUnreadMessages, setAuthUnreadMessages] = useState<number | null>(null)
+  const [authUnreadMessages, setAuthUnreadMessages] = useState<number>(0)
   const [contactUnreadMessages, setContactUnreadMessages] = useState<number | null>(null)
   const [lastMessage, setLastMessage] = useState<MessageInterface>()
 
@@ -31,7 +30,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
 
   const setContactActive = () => {
     context?.dispatch({ type: "updateActiveChat", payload: { chatKey, contactKey: contactInfo.key } })
-    context?.dispatch({ type: "updateUnreadMessages", payload: authUnreadMessages })
+    context?.dispatch({ type: "updateAuthUserUnreadMessages", payload: authUnreadMessages })
   }
 
   useEffect(() => {
@@ -46,7 +45,9 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
       .on("value", (snapshot: any) => setNewContactRequest(snapshot.val()))
 
     firebase.unreadMessages({ uid: authUser?.uid!, chatKey }).on("value", (snapshot: any) => {
+      // context?.dispatch({ type: "updateUnreadMessages", payload: {user: authUser?.uid, unreadMessages: Object.keys(snapshot.val())} })
       setAuthUnreadMessages(snapshot.numChildren())
+      // console.log(context?.state.activeChat.chatKey)
     })
     firebase.unreadMessages({ uid: contactInfo.key, chatKey }).on("value", (snapshot: any) => {
       setContactUnreadMessages(snapshot.numChildren())
@@ -70,7 +71,13 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    context?.dispatch({ type: "updateUnreadMessages", payload: authUnreadMessages })
+    // console.log("test")
+    // context?.dispatch({ type: "updateAuthUserUnreadMessages", payload: authUnreadMessages })
+    console.log(context?.state.activeChat.chatKey)
+    if (context?.state.activeChat.chatKey) {
+      console.log("test")
+      context?.dispatch({ type: "updateAuthUserUnreadMessages", payload: authUnreadMessages })
+    }
   }, [authUnreadMessages]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const isPinned = !!(contactInfo.pinned_lastActivityTS?.slice(0, 4) === "true")
@@ -121,6 +128,6 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
       )}
     </div>
   )
-})
+}
 
 export default Contact
