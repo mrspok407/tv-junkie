@@ -29,9 +29,9 @@ const ShowsButtons: React.FC<Props> = ({
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside as EventListener)
     return () => {
-      document.addEventListener("mousedown", handleClickOutside as EventListener)
+      document.removeEventListener("mousedown", handleClickOutside as EventListener)
     }
-  })
+  }, [])
 
   const handleClickOutside = (e: CustomEvent) => {
     if (authUser) return

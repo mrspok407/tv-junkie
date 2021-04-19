@@ -4,12 +4,12 @@ import { FirebaseContext } from "Components/Firebase"
 import useElementScrolledDown from "Components/Pages/Movies/useElementScrolledDown"
 import useRecipientNotified from "Components/Pages/UserProfile/Hooks/UseRecipientNotified"
 import useResponseContactRequest from "Components/Pages/UserProfile/Hooks/UseResponseContactRequest"
-import React, { useEffect, useContext, useState, useRef } from "react"
+import React, { useEffect, useContext, useState, useRef, useCallback } from "react"
 import { isUnexpectedObject } from "Utils"
 import { MessageInterface, MESSAGE_INITIAL_DATA } from "../../Types"
 import { ContactsContext } from "../Context/ContactsContext"
-// import { ActionTypes } from "../Context/_reducerConfig"
 import "./ChatWindow.scss"
+import MessageInfo from "./MessageInfo"
 
 type Props = {}
 
@@ -27,8 +27,6 @@ const ChatWindow: React.FC<Props> = () => {
   const chatContainer = useRef<HTMLDivElement>(null!)
 
   const scrolldown = useElementScrolledDown({ element: chatContainer.current })
-
-  // const [messages, setMessages] = useState<MessagesInterface[]>()
 
   console.log(messages)
 
@@ -72,10 +70,6 @@ const ChatWindow: React.FC<Props> = () => {
   }, [activeChat, firebase])
 
   useEffect(() => {
-    console.log(context?.state.contactsUnreadMessages)
-  }, [context?.state.contactsUnreadMessages])
-
-  useEffect(() => {
     if (contactInfo.recipientNotified === null || contactInfo.receiver === null) return
     if (contactInfo.recipientNotified === true || contactInfo.receiver === true) return
     updateRecipientNotified()
@@ -101,32 +95,23 @@ const ChatWindow: React.FC<Props> = () => {
           <div className="chat-window__unread-messages">{context?.state.authUserUnreadMessages}</div>
           <div className="chat-window">
             <div className="chat-window__messages-list">
-              {messages[activeChat.chatKey]?.map((messageData) => (
-                <div
-                  key={messageData.key}
-                  className={classNames("chat-window__message", {
-                    "chat-window__message--send": messageData.sender === authUser?.uid,
-                    "chat-window__message--receive": messageData.sender === contactInfo.key
-                  })}
-                >
-                  <div className="chat-window__message-text">{messageData.message}</div>
+              {messages[activeChat.chatKey]?.map((messageData, index, array) => {
+                const nextMessage = array[index + 1]
+                return (
+                  <div
+                    key={messageData.key}
+                    className={classNames("chat-window__message", {
+                      "chat-window__message--send": messageData.sender === authUser?.uid,
+                      "chat-window__message--receive": messageData.sender === activeChat.contactKey,
+                      "chat-window__message--last-in-bunch": messageData.sender !== nextMessage?.sender
+                    })}
+                  >
+                    <div className="chat-window__message-text">{messageData.message}</div>
 
-                  <div className="chat-window__message-info">
-                    {messageData.sender === authUser?.uid && (
-                      <div
-                        className={classNames("chat-window__message-status", {
-                          "chat-window__message-status--unread": contactsUnreadMessages[activeChat.chatKey]?.includes(
-                            messageData.key
-                          )
-                        })}
-                      ></div>
-                    )}
-                    <div className="chat-window__message-timestamp">
-                      {new Date(Number(messageData.timeStamp)).toLocaleTimeString().slice(0, -3)}
-                    </div>
+                    <MessageInfo messageData={messageData} />
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
         </>

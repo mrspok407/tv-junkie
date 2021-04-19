@@ -49,4 +49,5 @@ export interface ContactsStateInterface {
   contacts: {
     [key: string]: ContactInfoInterface
   }
+  messagePopup: string
 }
