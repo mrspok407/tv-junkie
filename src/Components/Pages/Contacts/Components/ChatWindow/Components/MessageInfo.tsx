@@ -1,9 +1,10 @@
 import classNames from "classnames"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import React, { useState, useEffect, useContext, useRef } from "react"
-import { MessageInterface } from "../../Types"
-import { ContactsContext } from "../Context/ContactsContext"
+import { MessageInterface } from "../../../Types"
+import { ContactsContext } from "../../Context/ContactsContext"
 import MessagePopup from "./MessagePopup"
+import "./MessageInfo.scss"
 
 type Props = { messageData: MessageInterface }
 
@@ -20,6 +21,9 @@ const MessageInfo: React.FC<Props> = ({ messageData }) => {
       <div ref={messageOptionsRef} className="chat-window__message-options">
         <button
           type="button"
+          className={classNames("chat-window__open-popup-btn", {
+            "chat-window__open-popup-btn--open": messagePopup === messageData.key
+          })}
           onClick={() => context?.dispatch({ type: "updateMessagePopup", payload: messageData.key })}
         >
           <span></span>

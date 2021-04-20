@@ -1,10 +1,12 @@
 import classNames from "classnames"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
-import React, { useContext, useEffect, useState } from "react"
+import React, { useContext, useEffect, useRef, useState } from "react"
 import useTimestampFormater from "../../Hooks/UseTimestampFormater"
 import { ContactInfoInterface, MessageInterface } from "../../Types"
 import { ContactsContext } from "../Context/ContactsContext"
+import ContactPopup from "./ContactPopup"
+import "./Contact.scss"
 
 type Props = {
   contactInfo: ContactInfoInterface
@@ -15,6 +17,7 @@ const Contact: React.FC<Props> = ({ contactInfo }) => {
   const { authUser } = useContext(AppContext)
 
   const context = useContext(ContactsContext)
+  const { contactPopup } = context?.state!
 
   const formatedDate = useTimestampFormater({ timeStamp: contactInfo.pinned_lastActivityTS?.slice(-13) })
 
@@ -24,6 +27,8 @@ const Contact: React.FC<Props> = ({ contactInfo }) => {
   const [authUnreadMessages, setAuthUnreadMessages] = useState<number>(0)
   const [contactUnreadMessages, setContactUnreadMessages] = useState<number | null>(null)
   const [lastMessage, setLastMessage] = useState<MessageInterface>()
+
+  const contactOptionsRef = useRef<HTMLDivElement>(null!)
 
   const chatKey =
     contactInfo.key < authUser?.uid! ? `${contactInfo.key}_${authUser?.uid}` : `${authUser?.uid}_${contactInfo.key}`
@@ -73,9 +78,7 @@ const Contact: React.FC<Props> = ({ contactInfo }) => {
   useEffect(() => {
     // console.log("test")
     // context?.dispatch({ type: "updateAuthUserUnreadMessages", payload: authUnreadMessages })
-    console.log(context?.state.activeChat.chatKey)
     if (context?.state.activeChat.chatKey) {
-      console.log("test")
       context?.dispatch({ type: "updateAuthUserUnreadMessages", payload: authUnreadMessages })
     }
   }, [authUnreadMessages]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -90,42 +93,67 @@ const Contact: React.FC<Props> = ({ contactInfo }) => {
     <div
       className={classNames("contact-item", {
         "contact-item--active": chatActive,
-        "contact-item--no-message-status": !(lastMessage?.sender === authUser?.uid)
+        "contact-item--auth-last-message-not-pinned": !!(lastMessage?.sender === authUser?.uid && !isPinned),
+        "contact-item--contact-last-message": !!(lastMessage?.sender !== authUser?.uid),
+        "contact-item--not-pinned-no-activity": !!(!isPinned && !newActivity && !newContactRequest)
       })}
       onClick={() => setContactActive()}
     >
-      <div className="contact-item__username">
-        {contactInfo.userName?.length > 25 ? `${userNameFormated}...` : contactInfo.userName}
-      </div>
-      {lastMessage?.sender === authUser?.uid && (
-        <div
-          className={classNames("contact-item__last-message-status", {
-            "contact-item__last-message-status--unread": !!(contactUnreadMessages! > 0)
-          })}
-        ></div>
-      )}
+      <div className="contact-item__row contact-item__row--top">
+        <div className="contact-item__username">
+          {contactInfo.userName?.length > 25 ? `${userNameFormated}...` : contactInfo.userName}
+        </div>
+        {lastMessage?.sender === authUser?.uid && (
+          <div
+            className={classNames("contact-item__last-message-status", {
+              "contact-item__last-message-status--unread": !!(contactUnreadMessages! > 0)
+            })}
+          ></div>
+        )}
 
-      <div className="contact-item__timestamp">{formatedDate}</div>
-      <div className="contact-item__last-message-text">
-        {newContactRequest ? (
-          "Wants to connect"
+        <div className="contact-item__timestamp">{formatedDate}</div>
+      </div>
+
+      <div className="contact-item__row contact-item__row--bottom">
+        <div className="contact-item__last-message-text">
+          {newContactRequest ? (
+            "Wants to connect"
+          ) : (
+            <>
+              {lastMessage?.sender === authUser?.uid && <span>You: </span>} {lastMessage?.message?.slice(0, 30)}
+            </>
+          )}
+        </div>
+        <div ref={contactOptionsRef} className="contact-item__options">
+          <button
+            type="button"
+            className={classNames("contact-item__open-popup-btn", {
+              "contact-item__open-popup-btn--open": contactPopup === contactInfo.key
+            })}
+            onClick={(e) => {
+              e.stopPropagation()
+              context?.dispatch({ type: "updateContactPopup", payload: contactInfo.key })
+            }}
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+
+          {contactPopup === contactInfo.key && <ContactPopup contactOptionsRef={contactOptionsRef.current} />}
+        </div>
+        {newActivity || newContactRequest ? (
+          <div
+            className={classNames("contact-item__unread-messages", {
+              "contact-item__unread-messages--active": chatActive
+            })}
+          >
+            <span>{newActivity ? authUnreadMessages : newContactRequest ? 1 : null}</span>
+          </div>
         ) : (
-          <>
-            {lastMessage?.sender === authUser?.uid && <span>You: </span>} {lastMessage?.message?.slice(0, 8)}
-          </>
+          isPinned && <div className="contact-item__pinned"></div>
         )}
       </div>
-      {newActivity || newContactRequest ? (
-        <div
-          className={classNames("contact-item__unread-messages", {
-            "contact-item__unread-messages--active": chatActive
-          })}
-        >
-          <span>{newActivity ? authUnreadMessages : newContactRequest ? 1 : null}</span>
-        </div>
-      ) : (
-        isPinned && <div className="contact-item__pinned"></div>
-      )}
     </div>
   )
 }

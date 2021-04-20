@@ -3,6 +3,7 @@ import "firebase/auth"
 import "firebase/database"
 import "firebase/analytics"
 import "firebase/functions"
+import * as admin from "firebase-admin"
 import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 
 const configProduction = {

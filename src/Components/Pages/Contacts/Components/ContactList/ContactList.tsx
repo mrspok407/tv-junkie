@@ -19,7 +19,7 @@ const ContactList: React.FC = () => {
 
   const [contacts, setContacts] = useState<ContactInfoInterface[]>()
   const [allContactsAmount, setAllContactsAmount] = useState()
-  const loadedContacts = Object.keys(context?.state.contacts as {}).length
+  const loadedContacts = Object.keys(context?.state?.contacts as {}).length
 
   const contactListRef = useRef<HTMLDivElement>(null!)
   const isScrolledDown = useElementScrolledDown({ element: contactListRef.current, threshold: 200 })

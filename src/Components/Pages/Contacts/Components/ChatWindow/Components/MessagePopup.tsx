@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useLayoutEffect, useCallback, useContext } from "react"
-import { ContactsContext } from "../Context/ContactsContext"
+import { ContactsContext } from "../../Context/ContactsContext"
 
 type Props = {
   messageOptionsRef: HTMLDivElement
@@ -9,10 +9,8 @@ const MessagePopup: React.FC<Props> = ({ messageOptionsRef }) => {
   const context = useContext(ContactsContext)
 
   useEffect(() => {
-    console.log("test")
     document.addEventListener("mousedown", handleClickOutside as EventListener)
     return () => {
-      console.log("unmount")
       document.removeEventListener("mousedown", handleClickOutside as EventListener)
     }
   }, [])
@@ -24,9 +22,16 @@ const MessagePopup: React.FC<Props> = ({ messageOptionsRef }) => {
   }
 
   return (
-    <div className="chat-window__message-popup-wrapper">
-      <div className="chat-window__message-popup">
-        <span>test</span>
+    <div className="popup-container">
+      <div className="popup__option">
+        <button className="popup__option-btn" type="button">
+          Edit
+        </button>
+      </div>
+      <div className="popup__option">
+        <button className="popup__option-btn" type="button">
+          Delete
+        </button>
       </div>
     </div>
   )

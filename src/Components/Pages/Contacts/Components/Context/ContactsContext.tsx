@@ -13,7 +13,7 @@ const ContactsContextHOC = (Component: any) =>
   function Comp(props: any) {
     const [state, dispatch] = useReducer(reducer, INITIAL_STATE)
     return (
-      <ContactsContext.Provider value={{ state: { ...state }, dispatch: dispatch }}>
+      <ContactsContext.Provider value={{ state, dispatch }}>
         <Component {...props} />
       </ContactsContext.Provider>
     )

@@ -4,13 +4,13 @@ export type ACTIONTYPES =
   | { type: "updateContactUnreadMessages"; payload: string[] }
   | { type: "updateAuthUserUnreadMessages"; payload: number }
   | { type: "updateActiveChat"; payload: { chatKey: string; contactKey: string } }
-  // | { type: "updateContactInfo"; payload: ContactInfoInterface }
   | { type: "updateMessages"; payload: MessageInterface[] }
   | { type: "updateContacts"; payload: ContactsInterface }
   | { type: "updateMessagePopup"; payload: string }
+  | { type: "updateContactPopup"; payload: string }
 
 const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
-  const { contactsUnreadMessages, activeChat, messages, contacts, messagePopup } = state
+  const { contactsUnreadMessages, activeChat, messages, messagePopup, contactPopup } = state
   switch (action.type) {
     case "updateMessages":
       return {
@@ -54,6 +54,12 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         messagePopup: messagePopup === action.payload ? "" : action.payload
       }
 
+    case "updateContactPopup":
+      return {
+        ...state,
+        contactPopup: contactPopup === action.payload ? "" : action.payload
+      }
+
     default:
       throw new Error()
   }
@@ -68,7 +74,8 @@ export const INITIAL_STATE = {
   },
   messages: {},
   contacts: {},
-  messagePopup: ""
+  messagePopup: "",
+  contactPopup: ""
 }
 
 export default reducer

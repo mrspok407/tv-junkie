@@ -7,9 +7,10 @@ import useResponseContactRequest from "Components/Pages/UserProfile/Hooks/UseRes
 import React, { useEffect, useContext, useState, useRef, useCallback } from "react"
 import { isUnexpectedObject } from "Utils"
 import { MessageInterface, MESSAGE_INITIAL_DATA } from "../../Types"
+import ContactPopup from "../ContactList/ContactPopup"
 import { ContactsContext } from "../Context/ContactsContext"
 import "./ChatWindow.scss"
-import MessageInfo from "./MessageInfo"
+import MessageInfo from "./Components/MessageInfo"
 
 type Props = {}
 
@@ -24,11 +25,12 @@ const ChatWindow: React.FC<Props> = () => {
   const { updateRecipientNotified } = useRecipientNotified({ userUid: activeChat.contactKey })
   const { handleContactRequest } = useResponseContactRequest({ userUid: activeChat.contactKey })
 
+  const contactOptionsRef = useRef<HTMLDivElement>(null!)
   const chatContainer = useRef<HTMLDivElement>(null!)
 
-  const scrolldown = useElementScrolledDown({ element: chatContainer.current })
+  const [popupOpen, setPopupOpen] = useState(false)
 
-  console.log(messages)
+  const scrolldown = useElementScrolledDown({ element: chatContainer.current })
 
   useEffect(() => {
     if (!messages[activeChat.chatKey]?.length) return
@@ -82,37 +84,55 @@ const ChatWindow: React.FC<Props> = () => {
 
   return (
     <div ref={chatContainer} className="chat-window-container">
-      <button
-        className="chat-window__close-chat"
-        type="button"
-        onClick={() => context?.dispatch({ type: "updateActiveChat", payload: { chatKey: "", contactKey: "" } })}
-      >
-        Back
-      </button>
+      <div className="chat-window__contact-info">
+        <div className="contact-info__close-chat">
+          <button
+            className="contact-info__close-chat-btn"
+            type="button"
+            onClick={() => context?.dispatch({ type: "updateActiveChat", payload: { chatKey: "", contactKey: "" } })}
+          >
+            Back
+          </button>
+        </div>
+        <div className="contact-info__username">{contactInfo.userName}</div>
+        <div ref={contactOptionsRef} className="contact-item__options contact-info__options">
+          <button
+            type="button"
+            className={classNames("contact-item__open-popup-btn", {
+              "contact-item__open-popup-btn--open": popupOpen
+            })}
+            onClick={(e) => setPopupOpen(!popupOpen)}
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
 
+          {popupOpen && <ContactPopup contactOptionsRef={contactOptionsRef.current} action={setPopupOpen} />}
+        </div>
+        <div className="contact-info__status">Online</div>
+      </div>
       {contactInfo.status === true && (
         <>
-          <div className="chat-window__unread-messages">{context?.state.authUserUnreadMessages}</div>
-          <div className="chat-window">
-            <div className="chat-window__messages-list">
-              {messages[activeChat.chatKey]?.map((messageData, index, array) => {
-                const nextMessage = array[index + 1]
-                return (
-                  <div
-                    key={messageData.key}
-                    className={classNames("chat-window__message", {
-                      "chat-window__message--send": messageData.sender === authUser?.uid,
-                      "chat-window__message--receive": messageData.sender === activeChat.contactKey,
-                      "chat-window__message--last-in-bunch": messageData.sender !== nextMessage?.sender
-                    })}
-                  >
-                    <div className="chat-window__message-text">{messageData.message}</div>
+          {/* <div className="chat-window__unread-messages">{context?.state.authUserUnreadMessages}</div> */}
+          <div className="chat-window__messages-list">
+            {messages[activeChat.chatKey]?.map((messageData, index, array) => {
+              const nextMessage = array[index + 1]
+              return (
+                <div
+                  key={messageData.key}
+                  className={classNames("chat-window__message", {
+                    "chat-window__message--send": messageData.sender === authUser?.uid,
+                    "chat-window__message--receive": messageData.sender === activeChat.contactKey,
+                    "chat-window__message--last-in-bunch": messageData.sender !== nextMessage?.sender
+                  })}
+                >
+                  <div className="chat-window__message-text">{messageData.message}</div>
 
-                    <MessageInfo messageData={messageData} />
-                  </div>
-                )
-              })}
-            </div>
+                  <MessageInfo messageData={messageData} />
+                </div>
+              )
+            })}
           </div>
         </>
       )}

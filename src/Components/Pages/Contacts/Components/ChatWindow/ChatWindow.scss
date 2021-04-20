@@ -3,7 +3,6 @@
 $nonActiveChatTextBG: #206ea0;
 $chatHeight: 570px;
 $borderRightContactListClr: #25252561;
-$messageStatusSize: 17px;
 
 $chatContainerBG: $bodyBackgroundClr;
 
@@ -95,7 +94,7 @@ $messageColor: #fff;
     color: $messageColor;
     font-size: 0.95rem;
 
-    &:hover .chat-window__message-options button {
+    &:hover .chat-window__message-options .chat-window__open-popup-btn {
       opacity: 1;
     }
 
@@ -146,66 +145,45 @@ $messageColor: #fff;
         bottom: 0;
       }
     }
+  }
+}
 
-    &-info {
-      position: relative;
-      display: grid;
-      grid-template-columns: 13px max-content max-content;
-      column-gap: 5px;
-      justify-self: end;
+.chat-window__contact-info {
+  display: grid;
+  position: sticky;
+  top: 0;
+  grid-template-columns: 50px 1fr 30px;
+  grid-template-rows: 22px 22px;
+  column-gap: 5px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  grid-auto-rows: auto;
+  align-items: center;
+  background-color: #083b5f;
+  z-index: 9999;
+
+  .contact-item__options {
+    .contact-item__open-popup-btn {
+      opacity: 1;
     }
+  }
 
-    &-options {
-      position: relative;
-      width: 100%;
-      height: 100%;
+  .contact-info__close-chat {
+    grid-row: span 2;
+    justify-self: center;
+  }
 
-      button {
-        display: grid;
-        grid-template-rows: max-content max-content 1fr;
-        justify-content: center;
-        row-gap: 2px;
-        width: 100%;
-        height: 100%;
-        padding: 0;
-        margin: 0;
-        border: 0;
-        margin-top: auto;
-        outline: 0;
-        background-color: transparent;
-        cursor: pointer;
-        opacity: 0;
-        transition: 200ms;
+  .contact-info__options {
+    grid-row: span 2;
+    justify-self: center;
+  }
 
-        span {
-          width: 5px;
-          height: 5px;
-          border-radius: 50%;
-          background-color: #fff;
-        }
-      }
-    }
+  .contact-info__username {
+    font-size: 0.95rem;
+  }
 
-    &-popup {
-      position: absolute;
-      top: 20px;
-      left: -100px;
-      width: 100px;
-      height: 150px;
-      background-color: #fff;
-      z-index: 1;
-    }
-
-    &-status {
-      background-image: url("../../../../../assets/images/icons/double-mark-sign.svg");
-      background-size: contain;
-      background-repeat: no-repeat;
-      width: $messageStatusSize;
-      height: $messageStatusSize;
-
-      &--unread {
-        background-image: url("../../../../../assets/images/icons/one-mark-sign.svg");
-      }
-    }
+  .contact-info__status {
+    font-size: 0.95rem;
+    color: #12c720;
   }
 }

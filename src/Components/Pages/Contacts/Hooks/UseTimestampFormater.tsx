@@ -10,9 +10,9 @@ const useTimestampFormater = ({ timeStamp }: Props) => {
   useMemo(() => {
     const todayDate = new Date()
     const timeStampDate = new Date(Number(timeStamp))
-    const todayDateEpoch = todayDate.getTime()
-    const timeStampDateEpoch = timeStampDate.getTime()
-    const oneDayInMilliseconds = 60 * 1000 * 60 * 24
+    // const todayDateEpoch = todayDate.getTime()
+    // const timeStampDateEpoch = timeStampDate.getTime()
+    // const oneDayInMilliseconds = 60 * 1000 * 60 * 24
 
     const timeStampDay = timeStampDate.toLocaleDateString()
     const todayDay = todayDate.toLocaleDateString()
@@ -22,11 +22,9 @@ const useTimestampFormater = ({ timeStamp }: Props) => {
 
     if (timeStampDay === todayDay) {
       setFormatedDate(timeStampTime)
-    }
-    if (timeStampDay === yesterdayDay) {
+    } else if (timeStampDay === yesterdayDay) {
       setFormatedDate("Yesterday")
-    }
-    if (todayDateEpoch - timeStampDateEpoch > oneDayInMilliseconds * 2) {
+    } else {
       setFormatedDate(timeStampDay)
     }
   }, [timeStamp])
