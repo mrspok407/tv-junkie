@@ -28,7 +28,8 @@ const configDevelopment = {
   appId: process.env.REACT_APP_DEV_APP_ID
 }
 
-let config: any = process.env.NODE_ENV === "production" ? configProduction : configDevelopment
+// let config: any = process.env.NODE_ENV === "production" ? configProduction : configDevelopment
+let config: any = process.env.NODE_ENV === "production" ? configDevelopment : configDevelopment
 // let config: any = configProduction
 
 if (window.location.hostname === "localhost") {
@@ -68,7 +69,7 @@ class Firebase {
 
     this.app = app
 
-    app.functions().useEmulator("localhost", 4000)
+    // app.functions().useEmulator("localhost", 4000)
   }
 
   /// Cloud Functions ///
