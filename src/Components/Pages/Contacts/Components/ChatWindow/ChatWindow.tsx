@@ -50,7 +50,7 @@ const ChatWindow: React.FC<Props> = () => {
     firebase
       .messages({ chatKey: activeChat.chatKey })
       .orderByChild("timeStamp")
-      .limitToLast(20)
+      .limitToLast(50)
       .on("value", (snapshot: any) => {
         console.log("on listener")
         let messagesData: MessageInterface[] = []
