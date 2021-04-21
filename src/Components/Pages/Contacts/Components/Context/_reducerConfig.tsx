@@ -2,7 +2,7 @@ import { ContactsInterface, ContactsStateInterface, MessageInterface } from "../
 
 export type ACTIONTYPES =
   | { type: "updateContactUnreadMessages"; payload: string[] }
-  | { type: "updateAuthUserUnreadMessages"; payload: number }
+  | { type: "updateAuthUserUnreadMessages"; payload: number | null }
   | { type: "updateActiveChat"; payload: { chatKey: string; contactKey: string } }
   | { type: "updateMessages"; payload: MessageInterface[] }
   | { type: "updateContacts"; payload: ContactsInterface }
@@ -66,7 +66,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
 }
 
 export const INITIAL_STATE = {
-  authUserUnreadMessages: 0,
+  authUserUnreadMessages: null,
   contactsUnreadMessages: {},
   activeChat: {
     chatKey: "",

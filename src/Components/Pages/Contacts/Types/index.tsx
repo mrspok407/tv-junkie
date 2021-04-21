@@ -6,6 +6,11 @@ export interface ContactInfoInterface {
   pinned_lastActivityTS: string
   recipientNotified: boolean
   key: string
+  newContactsActivity: boolean | null
+  newContactsRequests: boolean | null
+  lastMessage: MessageInterface
+  unreadMessagesAuth: number
+  unreadMessagesContact: number
 }
 
 export const CONTACT_INFO_INITIAL_DATA = {
@@ -38,7 +43,7 @@ export interface ContactsStateInterface {
   contactsUnreadMessages: {
     [key: string]: string[]
   }
-  authUserUnreadMessages: number
+  authUserUnreadMessages: number | null
   activeChat: {
     chatKey: string
     contactKey: string

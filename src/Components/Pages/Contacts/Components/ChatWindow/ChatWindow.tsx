@@ -6,11 +6,11 @@ import useRecipientNotified from "Components/Pages/UserProfile/Hooks/UseRecipien
 import useResponseContactRequest from "Components/Pages/UserProfile/Hooks/UseResponseContactRequest"
 import React, { useEffect, useContext, useState, useRef, useCallback } from "react"
 import { isUnexpectedObject } from "Utils"
-import { MessageInterface, MESSAGE_INITIAL_DATA } from "../../Types"
+import { CONTACT_INFO_INITIAL_DATA, MessageInterface, MESSAGE_INITIAL_DATA } from "../../Types"
 import ContactPopup from "../ContactList/ContactPopup"
 import { ContactsContext } from "../Context/ContactsContext"
-import "./ChatWindow.scss"
 import MessageInfo from "./Components/MessageInfo"
+import "./ChatWindow.scss"
 
 type Props = {}
 
@@ -20,7 +20,7 @@ const ChatWindow: React.FC<Props> = () => {
   const context = useContext(ContactsContext)
 
   const { activeChat, messages, contacts, contactsUnreadMessages } = context?.state!
-  const contactInfo = contacts[activeChat.contactKey]
+  const contactInfo = contacts[activeChat.contactKey] || {}
 
   const { updateRecipientNotified } = useRecipientNotified({ userUid: activeChat.contactKey })
   const { handleContactRequest } = useResponseContactRequest({ userUid: activeChat.contactKey })
@@ -32,22 +32,27 @@ const ChatWindow: React.FC<Props> = () => {
 
   const scrolldown = useElementScrolledDown({ element: chatContainer.current })
 
+  // useEffect(() => {
+  //   if (!messages[activeChat.chatKey]?.length) return
+
+  //   const height = chatContainer.current.getBoundingClientRect().height
+  //   const scrollHeight = chatContainer.current.scrollHeight
+  //   const scrollTop = chatContainer.current.scrollTop
+
+  //   console.log({ height, scrollHeight, scrollTop })
+  //   chatContainer.current.scrollTo(0, 0)
+  // }, [activeChat, messages])
+
   useEffect(() => {
-    if (!messages[activeChat.chatKey]?.length) return
+    if (context?.state.messages[activeChat.chatKey] !== undefined) return
 
-    const height = chatContainer.current.getBoundingClientRect().height
-    const scrollHeight = chatContainer.current.scrollHeight
-    const scrollTop = chatContainer.current.scrollTop
-
-    console.log({ height, scrollHeight, scrollTop })
-    chatContainer.current.scrollTo(0, 0)
-  }, [activeChat, messages])
-
-  useEffect(() => {
+    console.log("test")
     firebase
       .messages({ chatKey: activeChat.chatKey })
       .orderByChild("timeStamp")
+      .limitToLast(50)
       .on("value", (snapshot: any) => {
+        console.log("on listener")
         let messagesData: MessageInterface[] = []
         snapshot.forEach((message: { val: () => MessageInterface; key: string }) => {
           if (isUnexpectedObject({ exampleObject: MESSAGE_INITIAL_DATA, targetObject: message.val() })) {
@@ -90,9 +95,7 @@ const ChatWindow: React.FC<Props> = () => {
             className="contact-info__close-chat-btn"
             type="button"
             onClick={() => context?.dispatch({ type: "updateActiveChat", payload: { chatKey: "", contactKey: "" } })}
-          >
-            Back
-          </button>
+          ></button>
         </div>
         <div className="contact-info__username">{contactInfo.userName}</div>
         <div ref={contactOptionsRef} className="contact-item__options contact-info__options">
@@ -108,7 +111,13 @@ const ChatWindow: React.FC<Props> = () => {
             <span></span>
           </button>
 
-          {popupOpen && <ContactPopup contactOptionsRef={contactOptionsRef.current} action={setPopupOpen} />}
+          {popupOpen && (
+            <ContactPopup
+              contactOptionsRef={contactOptionsRef.current}
+              contactInfo={contactInfo}
+              action={setPopupOpen}
+            />
+          )}
         </div>
         <div className="contact-info__status">Online</div>
       </div>

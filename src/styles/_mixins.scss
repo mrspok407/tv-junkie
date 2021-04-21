@@ -25,6 +25,14 @@
   }
 }
 
+@mixin buttonRemoveDefaults {
+  padding: 0;
+  margin: 0;
+  border: 0;
+  outline: 0;
+  background-color: transparent;
+}
+
 @mixin hoverBoxShadow($borderRadius, $transition) {
   content: "";
   position: absolute;

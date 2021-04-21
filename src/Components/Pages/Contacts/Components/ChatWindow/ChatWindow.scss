@@ -10,23 +10,6 @@ $messageSentBG: #2b5278;
 $messageReceivedBG: #182533;
 $messageColor: #fff;
 
-.chat-container {
-  display: grid;
-  grid-template-columns: 30% 70%;
-  height: $chatHeight;
-  max-width: 100%;
-  width: 1000px;
-  border: 1px solid $borderRightContactListClr;
-
-  @include mediaMaxW(#{$mobileViewPort}) {
-    position: relative;
-    grid-template-columns: 1fr;
-    width: 750px;
-    max-width: calc(100% - 10px);
-    overflow: hidden;
-  }
-}
-
 .chat-window-container {
   color: #fff;
   overflow-y: auto;
@@ -93,6 +76,10 @@ $messageColor: #fff;
     padding: 10px;
     color: $messageColor;
     font-size: 0.95rem;
+
+    @include mediaMaxW(#{$mobileViewPort}) {
+      grid-template-columns: 1fr;
+    }
 
     &:hover .chat-window__message-options .chat-window__open-popup-btn {
       opacity: 1;
@@ -169,8 +156,39 @@ $messageColor: #fff;
   }
 
   .contact-info__close-chat {
+    position: relative;
     grid-row: span 2;
     justify-self: center;
+    width: 33px;
+    height: 33px;
+
+    &:after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background-color: #ffffff21;
+      opacity: 0;
+      transition: 100ms;
+      z-index: -1;
+    }
+
+    &:hover:after {
+      opacity: 1;
+    }
+
+    &-btn {
+      @include buttonRemoveDefaults;
+      background-image: url("../../../../../assets/images/icons/back-arrow.svg");
+      background-size: contain;
+      background-repeat: no-repeat;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
   }
 
   .contact-info__options {

@@ -8,7 +8,7 @@ import "./MessageInfo.scss"
 
 type Props = { messageData: MessageInterface }
 
-const MessageInfo: React.FC<Props> = ({ messageData }) => {
+const MessageInfo: React.FC<Props> = React.memo(({ messageData }) => {
   const { authUser } = useContext(AppContext)
   const context = useContext(ContactsContext)
 
@@ -46,6 +46,6 @@ const MessageInfo: React.FC<Props> = ({ messageData }) => {
       </div>
     </div>
   )
-}
+})
 
 export default MessageInfo
