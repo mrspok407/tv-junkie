@@ -3,7 +3,7 @@ import Header from "Components/UI/Header/Header"
 import React from "react"
 import { Helmet } from "react-helmet"
 import ContactsContent from "./ContactsContent"
-import "./Contacts.scss"
+import "./styles/index.scss"
 
 type Props = {}
 

@@ -1,0 +1,36 @@
+@import "../../../../styles/globals";
+
+$chatHeight: 570px;
+
+// ContactsList
+$contactListPalette: (
+  borderRight: #25252561
+);
+
+// ContactItem
+$contactItemPalette: (
+  activeItemBG: #0e5e92,
+  onHover: #93cff521,
+  unreadMessagesBG: #206ea0,
+  activeUnreadMessagesBG: #fff
+);
+
+$contactItemDimm: (
+  lastMessageStatus: 17px,
+  unreadMessages: 24px,
+  font: 0.95rem
+);
+
+// ChatWindow
+$chatWindowPalette: (
+  placeholderBg: #206ea0,
+  backG: $bodyBackgroundClr,
+  messageSentBG: #2b5278,
+  messageReceivedBG: #182533,
+  messageText: #fff
+);
+
+$chatWindowDimm: (
+  messageMaxWidth: 70%,
+  contactInfoFont: 0.95rem
+);

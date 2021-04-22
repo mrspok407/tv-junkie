@@ -1,20 +1,10 @@
-@import "../../../../../styles/globals";
-
-$nonActiveChatTextBG: #206ea0;
-$chatHeight: 570px;
-$borderRightContactListClr: #25252561;
-
-$chatContainerBG: $bodyBackgroundClr;
-
-$messageSentBG: #2b5278;
-$messageReceivedBG: #182533;
-$messageColor: #fff;
+@import "../../styles/globalsContacts";
 
 .chat-window-container {
   color: #fff;
   overflow-y: auto;
   overflow-x: hidden;
-  background-color: $chatContainerBG;
+  background-color: getColor(backG, $chatWindowPalette);
   @include scrollbar(5px, getColor(blueClr, $mainPalette), #c5bbb1);
 
   &--no-active-chat {
@@ -29,7 +19,7 @@ $messageColor: #fff;
     .chat-window {
       padding: 5px 15px 5px 15px;
       border-radius: 14px;
-      background-color: $nonActiveChatTextBG;
+      background-color: getColor(placeholderBg, $chatWindowPalette);
     }
   }
 }
@@ -71,10 +61,10 @@ $messageColor: #fff;
     display: grid;
     grid-template-columns: 1fr 73px;
     column-gap: 10px;
-    max-width: 70%;
+    max-width: getDimm(messageMaxWidth, $chatWindowDimm);
     border-radius: 5px;
     padding: 10px;
-    color: $messageColor;
+    color: getColor(messageText, $chatWindowPalette);
     font-size: 0.95rem;
 
     @include mediaMaxW(#{$mobileViewPort}) {
@@ -87,34 +77,34 @@ $messageColor: #fff;
 
     &--send {
       justify-self: end;
-      background-color: $messageSentBG;
+      background-color: getColor(messageSentBG, $chatWindowPalette);
 
       &.chat-window__message--last-in-bunch {
         border-radius: 5px 5px 0px 5px;
         &:before {
           right: -10px;
-          background-color: $messageSentBG;
+          background-color: getColor(messageSentBG, $chatWindowPalette);
         }
         &:after {
           right: -10px;
-          background-color: $chatContainerBG;
+          background-color: getColor(backG, $chatWindowPalette);
           border-radius: 0 0 0 10px;
         }
       }
     }
 
     &--receive {
-      background-color: $messageReceivedBG;
+      background-color: getColor(messageReceivedBG, $chatWindowPalette);
 
       &.chat-window__message--last-in-bunch {
         border-radius: 5px 5px 5px 0px;
         &:before {
           left: -10px;
-          background-color: $messageReceivedBG;
+          background-color: getColor(messageReceivedBG, $chatWindowPalette);
         }
         &:after {
           left: -10px;
-          background-color: $chatContainerBG;
+          background-color: getColor(backG, $chatWindowPalette);
           border-radius: 0 0 10px 0;
         }
       }
@@ -146,6 +136,7 @@ $messageColor: #fff;
   padding-bottom: 5px;
   grid-auto-rows: auto;
   align-items: center;
+  font-size: getDimm(contactInfoFont, $chatWindowDimm);
   background-color: #083b5f;
   z-index: 9999;
 
@@ -196,12 +187,7 @@ $messageColor: #fff;
     justify-self: center;
   }
 
-  .contact-info__username {
-    font-size: 0.95rem;
-  }
-
   .contact-info__status {
-    font-size: 0.95rem;
     color: #12c720;
   }
 }

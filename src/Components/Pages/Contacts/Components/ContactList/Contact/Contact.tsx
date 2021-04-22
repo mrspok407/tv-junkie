@@ -2,9 +2,9 @@ import classNames from "classnames"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
 import React, { useContext, useEffect, useRef, useState } from "react"
-import useTimestampFormater from "../../Hooks/UseTimestampFormater"
-import { ContactInfoInterface, MessageInterface } from "../../Types"
-import { ContactsContext } from "../Context/ContactsContext"
+import useTimestampFormater from "../../../Hooks/UseTimestampFormater"
+import { ContactInfoInterface, MessageInterface } from "../../../Types"
+import { ContactsContext } from "../../Context/ContactsContext"
 import ContactPopup from "./ContactPopup"
 import "./Contact.scss"
 
@@ -50,9 +50,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
       .on("value", (snapshot: any) => setNewContactRequests(snapshot.val()))
 
     firebase.unreadMessages({ uid: authUser?.uid!, chatKey }).on("value", (snapshot: any) => {
-      // context?.dispatch({ type: "updateUnreadMessages", payload: {user: authUser?.uid, unreadMessages: Object.keys(snapshot.val())} })
       setAuthUnreadMessages(snapshot.numChildren())
-      // console.log(context?.state.activeChat.chatKey)
     })
     firebase
       .unreadMessages({ uid: contactInfo.key, chatKey })

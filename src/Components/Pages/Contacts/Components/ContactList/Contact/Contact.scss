@@ -1,10 +1,4 @@
-@import "../../../../../styles/globals";
-
-$activeItemColor: #0e5e92;
-$itemHoverColor: #93cff521;
-$lastMessageStatusSize: 17px;
-$unreadMessagesBG: #206ea0;
-$unreadMessagesBGActive: #fff;
+@import "../../../styles/globalsContacts";
 
 .contact-item {
   position: relative;
@@ -15,7 +9,7 @@ $unreadMessagesBGActive: #fff;
   row-gap: 7px;
   padding: 13px 10px 13px 10px;
   color: #fff;
-  font-size: 0.95rem;
+  font-size: getDimm(font, $contactItemDimm);
   cursor: pointer;
 
   &:nth-last-child(-n + 3) {
@@ -72,7 +66,7 @@ $unreadMessagesBGActive: #fff;
     top: 0;
     left: 0;
     opacity: 0;
-    background-color: $itemHoverColor;
+    background-color: getColor(onHover, $contactItemPalette);
     transition: 200ms;
     z-index: -1;
   }
@@ -86,7 +80,7 @@ $unreadMessagesBGActive: #fff;
   }
 
   &--active {
-    background-color: $activeItemColor;
+    background-color: getColor(activeItemBG, $contactItemPalette);
 
     &:after {
       display: none;
@@ -101,13 +95,13 @@ $unreadMessagesBGActive: #fff;
   }
 
   &__last-message-status {
-    background-image: url("../../../../../assets/images/icons/double-mark-sign.svg");
+    background-image: url("../../../../../../assets/images/icons/double-mark-sign.svg");
     background-size: contain;
     background-repeat: no-repeat;
-    width: $lastMessageStatusSize;
-    height: $lastMessageStatusSize;
+    width: getDimm(lastMessageStatus, $contactItemDimm);
+    height: getDimm(lastMessageStatus, $contactItemDimm);
     &--unread {
-      background-image: url("../../../../../assets/images/icons/one-mark-sign.svg");
+      background-image: url("../../../../../../assets/images/icons/one-mark-sign.svg");
     }
   }
 
@@ -120,11 +114,11 @@ $unreadMessagesBGActive: #fff;
   &__pinned {
     grid-column-end: -1;
     justify-self: end;
-    background-image: url("../../../../../assets/images/icons/pinned-icon.svg");
+    background-image: url("../../../../../../assets/images/icons/pinned-icon.svg");
     background-size: contain;
     background-repeat: no-repeat;
-    width: $lastMessageStatusSize - 3px;
-    height: $lastMessageStatusSize - 3px;
+    width: getDimm(lastMessageStatus, $contactItemDimm) - 3px;
+    height: getDimm(lastMessageStatus, $contactItemDimm) - 3px;
   }
 
   &__unread-messages {
@@ -133,16 +127,16 @@ $unreadMessagesBGActive: #fff;
     align-items: center;
     grid-column-end: -1;
     justify-self: end;
-    width: 24px;
-    height: 24px;
+    width: getDimm(unreadMessages, $contactItemDimm);
+    height: getDimm(unreadMessages, $contactItemDimm);
     border-radius: 50%;
-    background-color: $unreadMessagesBG;
+    background-color: getColor(unreadMessagesBG, $contactItemPalette);
     font-size: 0.85rem;
 
     &--active {
       @include mediaMinW(#{$mobileViewPort}) {
-        color: $activeItemColor;
-        background-color: $unreadMessagesBGActive;
+        color: getColor(activeItemBG, $contactItemPalette);
+        background-color: getColor(activeUnreadMessagesBG, $contactItemPalette);
       }
     }
   }

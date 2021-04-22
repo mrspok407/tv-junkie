@@ -2,6 +2,10 @@
   @return map-get($palette, $colorName);
 }
 
+@function getDimm($value, $palette) {
+  @return map-get($palette, $value);
+}
+
 $bodyBackgroundClr: #131313;
 $mainContainerMaxWidth: 1350px;
 

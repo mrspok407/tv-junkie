@@ -7,7 +7,7 @@ import useResponseContactRequest from "Components/Pages/UserProfile/Hooks/UseRes
 import React, { useEffect, useContext, useState, useRef, useCallback } from "react"
 import { isUnexpectedObject } from "Utils"
 import { CONTACT_INFO_INITIAL_DATA, MessageInterface, MESSAGE_INITIAL_DATA } from "../../Types"
-import ContactPopup from "../ContactList/ContactPopup"
+import ContactPopup from "../ContactList/Contact/ContactPopup"
 import { ContactsContext } from "../Context/ContactsContext"
 import MessageInfo from "./Components/MessageInfo"
 import "./ChatWindow.scss"
@@ -160,6 +160,7 @@ const ChatWindow: React.FC<Props> = () => {
                 className="button"
                 onClick={() => {
                   handleContactRequest({ status: "rejected" })
+                  context?.dispatch({ type: "updateActiveChat", payload: { chatKey: "", contactKey: "" } })
                 }}
               >
                 Reject

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext, useRef } from "react"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
-import Contact from "./Contact"
+import Contact from "./Contact/Contact"
 import useElementScrolledDown from "Components/Pages/Movies/useElementScrolledDown"
 import { ContactInfoInterface, CONTACT_INFO_INITIAL_DATA, MessageInterface } from "../../Types"
 import classNames from "classnames"
@@ -9,6 +9,8 @@ import { ContactsContext } from "../Context/ContactsContext"
 import { isUnexpectedObject } from "Utils"
 import CreatePortal from "Components/UI/Modal/CreatePortal"
 import ModalContent from "Components/UI/Modal/ModalContent"
+import "./ContactList.scss"
+import { getInitialContactInfo } from "./FirebaseHelpers/FirebaseHelpers"
 
 const CONTACTS_TO_LOAD = 20
 
@@ -30,8 +32,11 @@ const ContactList: React.FC = () => {
   const contactsDatabaseRef = firebase.contactsDatabase({ uid: authUser?.uid })
 
   const getContactsList = async (snapshot: any) => {
-    console.log({ snapshot: snapshot.val() })
-    if (snapshot.val() === null) return
+    console.log("on listener fire")
+    if (snapshot.val() === null) {
+      setInitialLoading(false)
+      return
+    }
 
     let contactsData: ContactInfoInterface[] = []
     snapshot.forEach((contact: { val: () => ContactInfoInterface; key: string }) => {
@@ -45,38 +50,7 @@ const ContactList: React.FC = () => {
     })
 
     const contacts: any[] = initialLoading
-      ? await Promise.all(
-          contactsData.map(async (contact: ContactInfoInterface) => {
-            console.log("test")
-
-            const chatKey =
-              contact.key < authUser?.uid! ? `${contact.key}_${authUser?.uid}` : `${authUser?.uid}_${contact.key}`
-
-            const [
-              newContactsActivity,
-              newContactsRequests,
-              unreadMessagesAuth,
-              unreadMessagesContact,
-              lastMessage
-            ] = await Promise.all([
-              firebase.newContactsActivity({ uid: authUser?.uid! }).child(`${contact.key}`).once("value"),
-              firebase.newContactsRequests({ uid: authUser?.uid! }).child(`${contact.key}`).once("value"),
-              firebase.unreadMessages({ uid: authUser?.uid!, chatKey }).once("value"),
-              firebase.unreadMessages({ uid: contact.key, chatKey }).orderByKey().limitToFirst(1).once("value"),
-              firebase.messages({ chatKey }).orderByChild("timeStamp").limitToLast(1).once("value")
-            ])
-
-            return {
-              ...contact,
-              key: contact.key,
-              newContactsActivity: newContactsActivity.val(),
-              newContactsRequests: newContactsRequests.val(),
-              unreadMessagesAuth: unreadMessagesAuth.numChildren(),
-              unreadMessagesContact: unreadMessagesContact.numChildren(),
-              lastMessage: Object.values(lastMessage.val()).map((item) => item)[0]
-            }
-          })
-        )
+      ? await getInitialContactInfo({ firebase, contactsData, authUser })
       : contactsData
 
     contacts.reverse()
@@ -92,6 +66,8 @@ const ContactList: React.FC = () => {
   }, [context?.state.activeChat])
 
   useEffect(() => {
+    console.log("contactListUseEffect")
+
     contactsListRef.limitToLast(CONTACTS_TO_LOAD).on("value", (snapshot: any) => getContactsList(snapshot))
 
     contactsDatabaseRef.child("contactsAmount").on("value", (snapshot: any) => {
@@ -99,7 +75,7 @@ const ContactList: React.FC = () => {
     })
 
     return () => {
-      contactsListRef.off()
+      firebase.contactsList({ uid: authUser?.uid }).off()
       contactsDatabaseRef.off()
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
@@ -108,7 +84,10 @@ const ContactList: React.FC = () => {
     if (!isScrolledDown) return
     if (loadedContacts >= allContactsAmount!) return
 
-    contactsListRef.off()
+    console.log("contactListUseEffect Scroll")
+    console.log(loadedContacts + CONTACTS_TO_LOAD)
+
+    firebase.contactsList({ uid: authUser?.uid }).off()
     contactsListRef
       .limitToLast(loadedContacts + CONTACTS_TO_LOAD)
       .on("value", (snapshot: any) => getContactsList(snapshot))
@@ -123,10 +102,12 @@ const ContactList: React.FC = () => {
       ref={contactListRef}
       className={classNames("contact-list", {
         "contact-list--hide-mobile": context?.state.activeChat.chatKey,
-        "contact-list--no-contacts": !contacts?.length
+        "contact-list--no-contacts": !initialLoading && !contacts?.length
       })}
     >
-      {!contacts?.length ? (
+      {initialLoading ? (
+        <span className="contact-list__loader"></span>
+      ) : !contacts?.length ? (
         <div className="contact-list--no-contacts-text">You don't have any contacts</div>
       ) : (
         contacts?.map((contact) => <Contact key={contact.key} contactInfo={contact} />)

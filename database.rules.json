@@ -1,0 +1,55 @@
+{
+  "rules": {
+    ".read": true,
+    ".write": true,
+    "users": {
+      "$uid": {
+        ".read": "auth != null && auth.uid == $uid",
+        ".write": "!data.exists()",
+        "username": { ".write": true, ".read": true },
+        "email": { ".write": "newData.exists() && auth.token.firebase.sign_in_provider === 'google.com'" },
+        "role": { ".write": "newData.exists() && auth.token.firebase.sign_in_provider === 'google.com'" },
+        "content": {
+          // ".read": "auth != null && auth.uid == $uid",
+          ".read": true,
+          ".write": "auth != null && auth.uid == $uid",
+          "episodes": {
+            ".indexOn": ["info/isAllWatched_database", "info/finished"],
+            "$id": {
+              "episodes": {
+                ".indexOn": ".value"
+              }
+            }
+          }
+        },
+        "contactsDatabase": {
+          ".read": true,
+          ".write": true,
+          "contactsList": {
+            ".indexOn": "pinned_lastActivityTS"
+          }
+        }
+      }
+    },
+    "privateChats": {
+      "$key": {
+        "messages": {
+          ".indexOn": "timeStamp"
+        }
+      }
+    },
+    "allShowsList": {
+      ".read": "root.child('users').child(auth.uid).child('role').val() === 'ADMIN'",
+      ".write": false,
+      "$id": {
+        ".read": "auth != null",
+        ".write": "(auth != null && !data.exists()) || root.child('users').child(auth.uid).child('role').val() === 'ADMIN'",
+        "usersWatching": {
+          ".write": "auth != null && data.exists() && newData.exists()"
+        },
+        "info": { ".read": true },
+        ".validate": "newData.hasChildren(['id', 'info'])"
+      }
+    }
+  }
+}
