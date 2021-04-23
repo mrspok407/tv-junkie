@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateRecipientNotified = exports.handleContactRequest = exports.newContactRequest = exports.decrementContacts = exports.incrementContacts = exports.removeNewContactsActivity = exports.addNewContactsActivity = exports.updatePinnedTimeStamp = exports.onMessageRemoved = void 0;
+exports.handleContactRequest = exports.newContactRequest = exports.decrementContacts = exports.incrementContacts = exports.removeNewContactsActivity = exports.addNewContactsActivity = exports.updatePinnedTimeStamp = exports.onMessageRemoved = void 0;
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 // Cloud Functions interesting points:
@@ -143,14 +143,14 @@ exports.newContactRequest = functions.https.onCall(async (data, context) => {
                 receiver: true,
                 userName: contactName,
                 timeStamp,
-                pinned_lastActivityTS: "false",
-                recipientNotified: false
+                pinned_lastActivityTS: "false"
+                // recipientNotified: false
             }
         }
         : {
             [`${contactsDatabaseRef(authUid)}/contactsList/${contactUid}/status`]: false,
-            [`${contactsDatabaseRef(authUid)}/contactsList/${contactUid}/timeStamp`]: timeStamp,
-            [`${contactsDatabaseRef(authUid)}/contactsList/${contactUid}/recipientNotified`]: false
+            [`${contactsDatabaseRef(authUid)}/contactsList/${contactUid}/timeStamp`]: timeStamp
+            // [`${contactsDatabaseRef(authUid)}/contactsList/${contactUid}/recipientNotified`]: false
         };
     try {
         const authUserName = await database.ref(`users/${authUid}/userName`).once("value");
@@ -162,7 +162,7 @@ exports.newContactRequest = functions.https.onCall(async (data, context) => {
                 userName: authUserName.val(),
                 timeStamp,
                 pinned_lastActivityTS: "false",
-                recipientNotified: false,
+                // recipientNotified: false,
                 newActivity: true
             } });
         return database.ref("users").update(updateData);
@@ -196,25 +196,23 @@ exports.handleContactRequest = functions.https.onCall(async (data, context) => {
         throw new functions.https.HttpsError("unknown", error.message, error);
     }
 });
-exports.updateRecipientNotified = functions.https.onCall(async (data, context) => {
-    var _a;
-    const authUid = (_a = context === null || context === void 0 ? void 0 : context.auth) === null || _a === void 0 ? void 0 : _a.uid;
-    const { contactUid } = data;
-    if (!authUid) {
-        throw new functions.https.HttpsError("failed-precondition", "The function must be called while authenticated.");
-    }
-    const updateData = {
-        [`${contactsDatabaseRef(authUid)}/contactsList/${contactUid}/recipientNotified`]: true,
-        // [`${contactsDatabaseRef(authUid)}/newContactsRequests/${contactUid}`]: null,
-        [`${contactsDatabaseRef(contactUid)}/contactsList/${authUid}/recipientNotified`]: true
-    };
-    try {
-        return database.ref("users").update(updateData);
-    }
-    catch (error) {
-        throw new functions.https.HttpsError("unknown", error.message, error);
-    }
-});
+// export const updateRecipientNotified = functions.https.onCall(async (data, context) => {
+//   const authUid = context?.auth?.uid;
+//   const {contactUid} = data;
+//   if (!authUid) {
+//     throw new functions.https.HttpsError("failed-precondition", "The function must be called while authenticated.");
+//   }
+//   const updateData = {
+//     [`${contactsDatabaseRef(authUid)}/contactsList/${contactUid}/recipientNotified`]: true,
+//     // [`${contactsDatabaseRef(authUid)}/newContactsRequests/${contactUid}`]: null,
+//     [`${contactsDatabaseRef(contactUid)}/contactsList/${authUid}/recipientNotified`]: true
+//   };
+//   try {
+//     return database.ref("users").update(updateData);
+//   } catch (error) {
+//     throw new functions.https.HttpsError("unknown", error.message, error);
+//   }
+// });
 // export const contactsListHandler = functions.database
 //   .ref("users/{userUid}/contactsDatabase/contactsList/{contactUid}")
 //   .onWrite(async (change, context) => {

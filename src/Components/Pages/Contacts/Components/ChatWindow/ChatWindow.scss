@@ -76,7 +76,8 @@
   }
 
   &__message {
-    display: grid;
+    // display: grid;
+    display: flex;
     grid-template-columns: 1fr 73px;
     column-gap: 10px;
     max-width: getDimm(messageMaxWidth, $chatWindowDimm);
@@ -84,7 +85,6 @@
     padding: 10px;
     color: getColor(messageText, $chatWindowPalette);
     font-size: 0.95rem;
-    content-visibility: auto;
 
     @include mediaMaxW(#{$mobileViewPort}) {
       grid-template-columns: 1fr;
