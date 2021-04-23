@@ -4,7 +4,10 @@ export type ACTIONTYPES =
   | { type: "updateContactUnreadMessages"; payload: string[] }
   | { type: "updateAuthUserUnreadMessages"; payload: number | null }
   | { type: "updateActiveChat"; payload: { chatKey: string; contactKey: string } }
-  | { type: "updateMessages"; payload: MessageInterface[] }
+  | { type: "setInitialMessages"; payload: { messagesData: MessageInterface[]; chatKey: string } }
+  | { type: "addNewMessage"; payload: { newMessage: MessageInterface; chatKey: string } }
+  | { type: "removeMessage"; payload: { removedMessage: MessageInterface; chatKey: string } }
+  | { type: "changeMessage"; payload: { changedMessage: MessageInterface; chatKey: string } }
   | { type: "updateContacts"; payload: ContactsInterface }
   | { type: "updateMessagePopup"; payload: string }
   | { type: "updateContactPopup"; payload: string }
@@ -12,12 +15,49 @@ export type ACTIONTYPES =
 const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
   const { contactsUnreadMessages, activeChat, messages, messagePopup, contactPopup } = state
   switch (action.type) {
-    case "updateMessages":
+    case "setInitialMessages":
       return {
         ...state,
         messages: {
           ...messages,
-          [activeChat.chatKey]: action.payload
+          [action.payload.chatKey]: action.payload.messagesData
+        }
+      }
+
+    case "addNewMessage":
+      return {
+        ...state,
+        messages: {
+          ...messages,
+          [action.payload.chatKey]: [...messages[action.payload.chatKey], action.payload.newMessage]
+        }
+      }
+
+    case "removeMessage":
+      return {
+        ...state,
+        messages: {
+          ...messages,
+          [action.payload.chatKey]: [
+            ...messages[action.payload.chatKey].filter((message) => message.key !== action.payload.removedMessage.key)
+          ]
+        }
+      }
+
+    case "changeMessage":
+      const prevStateMessages = [...messages[action.payload.chatKey]]
+      const changedMessageIndex = prevStateMessages.findIndex(
+        (message) => message.key === action.payload.changedMessage.key
+      )
+
+      prevStateMessages[changedMessageIndex] =
+        changedMessageIndex !== -1 ? action.payload.changedMessage : prevStateMessages[changedMessageIndex]
+
+      return {
+        ...state,
+        messages: {
+          ...messages,
+          [action.payload.chatKey]: prevStateMessages
         }
       }
 

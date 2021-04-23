@@ -138,6 +138,8 @@ class Firebase {
   /// Private Chats API ///
   privateChats = () => this.db.ref("privateChats")
   messages = ({ chatKey }: { chatKey: string }) => this.db.ref(`privateChats/${chatKey}/messages`)
+  message = ({ chatKey, messageKey }: { chatKey: string; messageKey: string }) =>
+    this.db.ref(`privateChats/${chatKey}/messages/${messageKey}`)
   unreadMessages = ({ uid, chatKey }: { uid: string; chatKey: string }) =>
     this.db.ref(`privateChats/${chatKey}/members/${uid}/unreadMessages`)
 

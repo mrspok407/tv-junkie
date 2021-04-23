@@ -16,7 +16,7 @@ interface ContactInfoInterface {
   receiver?: boolean
   userName?: string
   timeStamp: unknown
-  recipientNotified?: boolean
+  // recipientNotified?: boolean
 }
 
 interface ContactRequestDataInterface {
@@ -48,14 +48,14 @@ export const _newContactRequest = async ({
           receiver: true,
           userName: contactName,
           timeStamp,
-          pinned_lastActivityTS: "false",
-          recipientNotified: false
+          pinned_lastActivityTS: "false"
+          // recipientNotified: false
         }
       }
     : {
         [`${contactsDatabaseRef(authUid)}/contactsList/${contactUid}/status`]: false,
-        [`${contactsDatabaseRef(authUid)}/contactsList/${contactUid}/timeStamp`]: timeStamp,
-        [`${contactsDatabaseRef(authUid)}/contactsList/${contactUid}/recipientNotified`]: false
+        [`${contactsDatabaseRef(authUid)}/contactsList/${contactUid}/timeStamp`]: timeStamp
+        // [`${contactsDatabaseRef(authUid)}/contactsList/${contactUid}/recipientNotified`]: false
       }
 
   try {
@@ -71,7 +71,7 @@ export const _newContactRequest = async ({
         userName: authUserName.val(),
         timeStamp,
         pinned_lastActivityTS: "false",
-        recipientNotified: false,
+        // recipientNotified: false,
         newActivity: true
       }
     }
@@ -119,31 +119,31 @@ export const _handleContactRequest = async ({
   }
 }
 
-export const _updateRecipientNotified = async ({
-  data,
-  context,
-  database
-}: {
-  data: DataInterface
-  context: ContextInterface
-  database: any
-}) => {
-  const authUid = context?.auth?.uid
-  const { contactUid } = data
+// export const _updateRecipientNotified = async ({
+//   data,
+//   context,
+//   database
+// }: {
+//   data: DataInterface
+//   context: ContextInterface
+//   database: any
+// }) => {
+//   const authUid = context?.auth?.uid
+//   const { contactUid } = data
 
-  if (!authUid) {
-    throw new Error("The function must be called while authenticated.")
-  }
+//   if (!authUid) {
+//     throw new Error("The function must be called while authenticated.")
+//   }
 
-  const updateData = {
-    [`${contactsDatabaseRef(authUid)}/contactsList/${contactUid}/recipientNotified`]: true,
-    // [`${contactsDatabaseRef(authUid)}/newContactsRequests/${contactUid}`]: null,
-    [`${contactsDatabaseRef(contactUid)}/contactsList/${authUid}/recipientNotified`]: true
-  }
+//   const updateData = {
+//     [`${contactsDatabaseRef(authUid)}/contactsList/${contactUid}/recipientNotified`]: true,
+//     // [`${contactsDatabaseRef(authUid)}/newContactsRequests/${contactUid}`]: null,
+//     [`${contactsDatabaseRef(contactUid)}/contactsList/${authUid}/recipientNotified`]: true
+//   }
 
-  try {
-    return database.ref("users").update(updateData)
-  } catch (error) {
-    throw new Error(`There has been some error updating database: ${error}`)
-  }
-}
+//   try {
+//     return database.ref("users").update(updateData)
+//   } catch (error) {
+//     throw new Error(`There has been some error updating database: ${error}`)
+//   }
+// }

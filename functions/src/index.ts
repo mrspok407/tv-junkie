@@ -31,7 +31,7 @@ interface ContactInfoInterface {
   receiver?: boolean;
   userName?: string;
   timeStamp: unknown;
-  recipientNotified?: boolean;
+  // recipientNotified?: boolean;
 }
 
 interface ContactRequestDataInterface {
@@ -172,14 +172,14 @@ export const newContactRequest = functions.https.onCall(async (data, context) =>
           receiver: true,
           userName: contactName,
           timeStamp,
-          pinned_lastActivityTS: "false",
-          recipientNotified: false
+          pinned_lastActivityTS: "false"
+          // recipientNotified: false
         }
       }
     : {
         [`${contactsDatabaseRef(authUid)}/contactsList/${contactUid}/status`]: false,
-        [`${contactsDatabaseRef(authUid)}/contactsList/${contactUid}/timeStamp`]: timeStamp,
-        [`${contactsDatabaseRef(authUid)}/contactsList/${contactUid}/recipientNotified`]: false
+        [`${contactsDatabaseRef(authUid)}/contactsList/${contactUid}/timeStamp`]: timeStamp
+        // [`${contactsDatabaseRef(authUid)}/contactsList/${contactUid}/recipientNotified`]: false
       };
 
   try {
@@ -195,7 +195,7 @@ export const newContactRequest = functions.https.onCall(async (data, context) =>
         userName: authUserName.val(),
         timeStamp,
         pinned_lastActivityTS: "false",
-        recipientNotified: false,
+        // recipientNotified: false,
         newActivity: true
       }
     };
@@ -234,26 +234,26 @@ export const handleContactRequest = functions.https.onCall(async (data, context)
   }
 });
 
-export const updateRecipientNotified = functions.https.onCall(async (data, context) => {
-  const authUid = context?.auth?.uid;
-  const {contactUid} = data;
+// export const updateRecipientNotified = functions.https.onCall(async (data, context) => {
+//   const authUid = context?.auth?.uid;
+//   const {contactUid} = data;
 
-  if (!authUid) {
-    throw new functions.https.HttpsError("failed-precondition", "The function must be called while authenticated.");
-  }
+//   if (!authUid) {
+//     throw new functions.https.HttpsError("failed-precondition", "The function must be called while authenticated.");
+//   }
 
-  const updateData = {
-    [`${contactsDatabaseRef(authUid)}/contactsList/${contactUid}/recipientNotified`]: true,
-    // [`${contactsDatabaseRef(authUid)}/newContactsRequests/${contactUid}`]: null,
-    [`${contactsDatabaseRef(contactUid)}/contactsList/${authUid}/recipientNotified`]: true
-  };
+//   const updateData = {
+//     [`${contactsDatabaseRef(authUid)}/contactsList/${contactUid}/recipientNotified`]: true,
+//     // [`${contactsDatabaseRef(authUid)}/newContactsRequests/${contactUid}`]: null,
+//     [`${contactsDatabaseRef(contactUid)}/contactsList/${authUid}/recipientNotified`]: true
+//   };
 
-  try {
-    return database.ref("users").update(updateData);
-  } catch (error) {
-    throw new functions.https.HttpsError("unknown", error.message, error);
-  }
-});
+//   try {
+//     return database.ref("users").update(updateData);
+//   } catch (error) {
+//     throw new functions.https.HttpsError("unknown", error.message, error);
+//   }
+// });
 
 // export const contactsListHandler = functions.database
 //   .ref("users/{userUid}/contactsDatabase/contactsList/{contactUid}")

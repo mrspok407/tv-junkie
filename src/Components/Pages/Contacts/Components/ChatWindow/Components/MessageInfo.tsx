@@ -31,7 +31,9 @@ const MessageInfo: React.FC<Props> = React.memo(({ messageData }) => {
           <span></span>
         </button>
 
-        {messagePopup === messageData.key && <MessagePopup messageOptionsRef={messageOptionsRef.current} />}
+        {messagePopup === messageData.key && (
+          <MessagePopup messageOptionsRef={messageOptionsRef.current} messageData={messageData} />
+        )}
       </div>
 
       {messageData.sender === authUser?.uid && (

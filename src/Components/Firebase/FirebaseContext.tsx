@@ -24,6 +24,7 @@ export interface FirebaseInterface {
   passwordReset?: any
   httpsCallable?: any
   messages: ({ chatKey }: { chatKey: string }) => any
+  message: ({ chatKey, messageKey }: { chatKey: string; messageKey: string }) => any
   privateChat: () => any
   unreadMessages: ({ uid, chatKey }: { uid: string; chatKey: string }) => any
   newContactsRequests: ({ uid }: { uid: string | undefined }) => any
@@ -40,6 +41,7 @@ export const FIREBASE_INITIAL_STATE = {
   contactsList: () => {},
   contact: () => {},
   messages: () => {},
+  message: () => {},
   privateChat: () => {},
   unreadMessages: () => {}
 }

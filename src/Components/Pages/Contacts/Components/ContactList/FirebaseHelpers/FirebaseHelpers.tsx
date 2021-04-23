@@ -1,5 +1,5 @@
 import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
-import { ContactInfoInterface } from "Components/Pages/Contacts/Types"
+import { ContactInfoInterface, MessageInterface } from "Components/Pages/Contacts/Types"
 import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 
 interface GetInitialInfoInfterface {
@@ -14,12 +14,12 @@ export const getInitialContactInfo = async ({ firebase, contactsData, authUser }
       const chatKey =
         contact.key < authUser?.uid! ? `${contact.key}_${authUser?.uid}` : `${authUser?.uid}_${contact.key}`
 
-      const [
-        newContactsActivity,
-        newContactsRequests,
-        unreadMessagesAuth,
-        unreadMessagesContact,
-        lastMessage
+      const [newContactsActivity, newContactsRequests, unreadMessagesAuth, unreadMessagesContact, lastMessage]: [
+        { val: () => boolean | null },
+        { val: () => boolean | null },
+        { numChildren: () => number | null },
+        { val: () => boolean | null },
+        { val: () => MessageInterface | null }
       ] = await Promise.all([
         firebase.newContactsActivity({ uid: authUser?.uid! }).child(`${contact.key}`).once("value"),
         firebase.newContactsRequests({ uid: authUser?.uid! }).child(`${contact.key}`).once("value"),
@@ -35,7 +35,7 @@ export const getInitialContactInfo = async ({ firebase, contactsData, authUser }
         newContactsRequests: !!newContactsRequests.val(),
         unreadMessagesAuth: unreadMessagesAuth.numChildren(),
         unreadMessagesContact: !!unreadMessagesContact.val(),
-        lastMessage: Object.values(lastMessage.val()).map((item) => item)[0]
+        lastMessage: lastMessage.val() !== null ? Object.values(lastMessage.val()!).map((item) => item)[0] : {}
       }
     })
   )

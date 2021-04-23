@@ -8,7 +8,7 @@ import useSendContactRequest from "./Hooks/UseSendContactRequest"
 import useResponseContactRequest from "./Hooks/UseResponseContactRequest"
 import CreatePortal from "Components/UI/Modal/CreatePortal"
 import ModalContent from "Components/UI/Modal/ModalContent"
-import useRecipientNotified from "./Hooks/UseRecipientNotified"
+// import useRecipientNotified from "./Hooks/UseRecipientNotified"
 
 type Props = {
   userUid: string
@@ -20,7 +20,7 @@ interface ContactInfo {
   userName: string
   pinned_lastActivityTS: string
   timeStamp: number
-  recipientNotified: boolean
+  // recipientNotified: boolean
   newActivity: boolean
 }
 
@@ -34,12 +34,12 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
   const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null)
   const [loadingContactInfo, setLoadingContactInfo] = useState(true)
 
-  const [isRecipientNotified, setIsRecipientNotified] = useState<boolean | null>(null)
-  const [isReceiver, setIsReceiver] = useState<boolean | null>(null)
+  // const [isRecipientNotified, setIsRecipientNotified] = useState<boolean | null>(null)
+  // const [isReceiver, setIsReceiver] = useState<boolean | null>(null)
 
   const { sendContactRequest } = useSendContactRequest({ userName, userUid })
   const { handleContactRequest } = useResponseContactRequest({ userUid })
-  const { updateRecipientNotified } = useRecipientNotified({ userUid })
+  // const { updateRecipientNotified } = useRecipientNotified({ userUid })
 
   const contactRef = firebase.contact({ authUid: authUser?.uid, contactUid: userUid })
 
@@ -58,31 +58,32 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
   }, [getUserName])
 
   useEffect(() => {
-    const attachFirebaseListeners = async () => {
-      contactRef.on("value", (snapshot: { val: () => ContactInfo }) => {
-        setContactInfo(snapshot.val())
-        setLoadingContactInfo(false)
-      })
-      contactRef.child("recipientNotified").on("value", (snapshot: { val: () => boolean | null }) => {
-        setIsRecipientNotified(snapshot.val())
-      })
-      contactRef.child("receiver").on("value", (snapshot: { val: () => boolean | null }) => {
-        setIsReceiver(snapshot.val())
-      })
-    }
-    attachFirebaseListeners()
+    // const attachFirebaseListeners = async () => {
+
+    // contactRef.child("recipientNotified").on("value", (snapshot: { val: () => boolean | null }) => {
+    //   setIsRecipientNotified(snapshot.val())
+    // })
+    // contactRef.child("receiver").on("value", (snapshot: { val: () => boolean | null }) => {
+    //   setIsReceiver(snapshot.val())
+    // })
+    // }
+    contactRef.on("value", (snapshot: { val: () => ContactInfo }) => {
+      setContactInfo(snapshot.val())
+      setLoadingContactInfo(false)
+    })
+    // attachFirebaseListeners()
     return () => {
       contactRef.off()
-      contactRef.child("recipientNotified").off()
+      // contactRef.child("recipientNotified").off()
       contactRef.child("receiver").off()
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => {
-    if (isRecipientNotified === null || isReceiver === null) return
-    if (isRecipientNotified === true || isReceiver === true) return
-    updateRecipientNotified()
-  }, [isRecipientNotified, isReceiver]) // eslint-disable-line react-hooks/exhaustive-deps
+  // useEffect(() => {
+  //   if (isRecipientNotified === null || isReceiver === null) return
+  //   if (isRecipientNotified === true || isReceiver === true) return
+  //   updateRecipientNotified()
+  // }, [isRecipientNotified, isReceiver]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (contactInfo === null) return

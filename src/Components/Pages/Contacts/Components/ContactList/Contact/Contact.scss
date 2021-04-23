@@ -11,6 +11,7 @@
   color: #fff;
   font-size: getDimm(font, $contactItemDimm);
   cursor: pointer;
+  content-visibility: auto;
 
   &:nth-last-child(-n + 3) {
     .contact-item__options .popup-container {
@@ -67,7 +68,7 @@
     left: 0;
     opacity: 0;
     background-color: getColor(onHover, $contactItemPalette);
-    transition: 200ms;
+    // transition: 200ms;
     z-index: -1;
   }
 

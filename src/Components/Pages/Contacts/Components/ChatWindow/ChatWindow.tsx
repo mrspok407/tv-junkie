@@ -1,16 +1,17 @@
 import classNames from "classnames"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
+import { ContactsContext } from "../Context/ContactsContext"
 import useElementScrolledDown from "Components/Pages/Movies/useElementScrolledDown"
-import useRecipientNotified from "Components/Pages/UserProfile/Hooks/UseRecipientNotified"
+// import useRecipientNotified from "Components/Pages/UserProfile/Hooks/UseRecipientNotified"
 import useResponseContactRequest from "Components/Pages/UserProfile/Hooks/UseResponseContactRequest"
 import React, { useEffect, useContext, useState, useRef, useCallback } from "react"
 import { isUnexpectedObject } from "Utils"
 import { CONTACT_INFO_INITIAL_DATA, MessageInterface, MESSAGE_INITIAL_DATA } from "../../Types"
 import ContactPopup from "../ContactList/Contact/ContactPopup"
-import { ContactsContext } from "../Context/ContactsContext"
 import MessageInfo from "./Components/MessageInfo"
 import "./ChatWindow.scss"
+import useGetInitialMessages from "./FirebaseHelpers/UseGetInitialMessages"
 
 type Props = {}
 
@@ -22,7 +23,7 @@ const ChatWindow: React.FC<Props> = () => {
   const { activeChat, messages, contacts, contactsUnreadMessages } = context?.state!
   const contactInfo = contacts[activeChat.contactKey] || {}
 
-  const { updateRecipientNotified } = useRecipientNotified({ userUid: activeChat.contactKey })
+  // const { updateRecipientNotified } = useRecipientNotified({ userUid: activeChat.contactKey })
   const { handleContactRequest } = useResponseContactRequest({ userUid: activeChat.contactKey })
 
   const contactOptionsRef = useRef<HTMLDivElement>(null!)
@@ -43,44 +44,42 @@ const ChatWindow: React.FC<Props> = () => {
   //   chatContainer.current.scrollTo(0, 0)
   // }, [activeChat, messages])
 
+  useGetInitialMessages()
+
   useEffect(() => {
-    if (context?.state.messages[activeChat.chatKey] !== undefined) return
-
-    console.log("test")
-    firebase
-      .messages({ chatKey: activeChat.chatKey })
-      .orderByChild("timeStamp")
-      .limitToLast(50)
-      .on("value", (snapshot: any) => {
-        console.log("on listener")
-        let messagesData: MessageInterface[] = []
-        snapshot.forEach((message: { val: () => MessageInterface; key: string }) => {
-          if (isUnexpectedObject({ exampleObject: MESSAGE_INITIAL_DATA, targetObject: message.val() })) {
-            errors.handleError({
-              message: "Some of the messages were hidden, because of the unexpected error."
-            })
-            return
-          }
-
-          messagesData.push({ ...message.val(), key: message.key })
-        })
-
-        context?.dispatch({ type: "updateMessages", payload: messagesData })
-      })
-
-    firebase
-      .unreadMessages({ uid: activeChat.contactKey, chatKey: activeChat.chatKey })
-      .on("value", (snapshot: any) => {
-        if (!snapshot.exists()) return
-        context?.dispatch({ type: "updateContactUnreadMessages", payload: Object.keys(snapshot.val()) })
-      })
+    // if (context?.state.messages[activeChat.chatKey] !== undefined) return
+    // console.log("test")
+    // firebase
+    //   .messages({ chatKey: activeChat.chatKey })
+    //   .orderByChild("timeStamp")
+    //   .limitToLast(50)
+    //   .on("value", (snapshot: any) => {
+    //     console.log("on listener")
+    //     let messagesData: MessageInterface[] = []
+    //     snapshot.forEach((message: { val: () => MessageInterface; key: string }) => {
+    //       if (isUnexpectedObject({ exampleObject: MESSAGE_INITIAL_DATA, targetObject: message.val() })) {
+    //         errors.handleError({
+    //           message: "Some of the messages were hidden, because of the unexpected error."
+    //         })
+    //         return
+    //       }
+    //       messagesData.push({ ...message.val(), key: message.key })
+    //     })
+    //     context?.dispatch({ type: "updateMessages", payload: { messagesData, chatKey: activeChat.chatKey } })
+    //   })
+    // firebase
+    //   .unreadMessages({ uid: activeChat.contactKey, chatKey: activeChat.chatKey })
+    //   .on("value", (snapshot: any) => {
+    //     if (!snapshot.exists()) return
+    //     context?.dispatch({ type: "updateContactUnreadMessages", payload: Object.keys(snapshot.val()) })
+    //   })
   }, [activeChat, firebase])
 
-  useEffect(() => {
-    if (contactInfo.recipientNotified === null || contactInfo.receiver === null) return
-    if (contactInfo.recipientNotified === true || contactInfo.receiver === true) return
-    updateRecipientNotified()
-  }, [activeChat])
+  // useEffect(() => {
+  //   if (contactInfo.recipientNotified === null || contactInfo.receiver === null) return
+  //   if (contactInfo.recipientNotified === true || contactInfo.receiver === true) return
+  //   updateRecipientNotified()
+  // }, [activeChat])
 
   useEffect(() => {
     if (contactInfo) return
@@ -123,26 +122,32 @@ const ChatWindow: React.FC<Props> = () => {
       </div>
       {contactInfo.status === true && (
         <>
-          {/* <div className="chat-window__unread-messages">{context?.state.authUserUnreadMessages}</div> */}
-          <div className="chat-window__messages-list">
-            {messages[activeChat.chatKey]?.map((messageData, index, array) => {
-              const nextMessage = array[index + 1]
-              return (
-                <div
-                  key={messageData.key}
-                  className={classNames("chat-window__message", {
-                    "chat-window__message--send": messageData.sender === authUser?.uid,
-                    "chat-window__message--receive": messageData.sender === activeChat.contactKey,
-                    "chat-window__message--last-in-bunch": messageData.sender !== nextMessage?.sender
-                  })}
-                >
-                  <div className="chat-window__message-text">{messageData.message}</div>
+          {messages[activeChat.chatKey] === undefined ? (
+            <span className="chat-window__loader"></span>
+          ) : (
+            <>
+              {/* <div className="chat-window__unread-messages">{context?.state.authUserUnreadMessages}</div> */}
+              <div className="chat-window__messages-list">
+                {messages[activeChat.chatKey]?.map((messageData, index, array) => {
+                  const nextMessage = array[index + 1]
+                  return (
+                    <div
+                      key={messageData.key}
+                      className={classNames("chat-window__message", {
+                        "chat-window__message--send": messageData.sender === authUser?.uid,
+                        "chat-window__message--receive": messageData.sender === activeChat.contactKey,
+                        "chat-window__message--last-in-bunch": messageData.sender !== nextMessage?.sender
+                      })}
+                    >
+                      <div className="chat-window__message-text">{messageData.message}</div>
 
-                  <MessageInfo messageData={messageData} />
-                </div>
-              )
-            })}
-          </div>
+                      <MessageInfo messageData={messageData} />
+                    </div>
+                  )
+                })}
+              </div>
+            </>
+          )}
         </>
       )}
 

@@ -17,7 +17,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
   const { authUser } = useContext(AppContext)
 
   const context = useContext(ContactsContext)
-  const { contactPopup } = context?.state!
+  const { contactPopup, activeChat } = context?.state!
 
   const formatedDate = useTimestampFormater({ timeStamp: contactInfo.pinned_lastActivityTS?.slice(-13) })
 
@@ -34,6 +34,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
     contactInfo.key < authUser?.uid! ? `${contactInfo.key}_${authUser?.uid}` : `${authUser?.uid}_${contactInfo.key}`
 
   const setContactActive = () => {
+    if (activeChat.chatKey === chatKey) return
     context?.dispatch({ type: "updateActiveChat", payload: { chatKey, contactKey: contactInfo.key } })
     context?.dispatch({ type: "updateAuthUserUnreadMessages", payload: authUnreadMessages })
   }

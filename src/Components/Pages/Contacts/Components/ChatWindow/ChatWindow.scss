@@ -1,6 +1,8 @@
 @import "../../styles/globalsContacts";
 
 .chat-window-container {
+  display: flex;
+  flex-direction: column;
   color: #fff;
   overflow-y: auto;
   overflow-x: hidden;
@@ -37,6 +39,22 @@
     }
   }
 
+  &__loader {
+    align-self: center;
+    margin-top: 20px;
+    width: 27px;
+    height: 27px;
+    border-radius: 50%;
+    border: 4px solid #fff;
+    border-left-color: transparent;
+    animation: chatWindowLoading 0.5s linear infinite;
+    @keyframes chatWindowLoading {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  }
+
   &__close-chat {
     display: none;
     width: 50px;
@@ -66,6 +84,7 @@
     padding: 10px;
     color: getColor(messageText, $chatWindowPalette);
     font-size: 0.95rem;
+    content-visibility: auto;
 
     @include mediaMaxW(#{$mobileViewPort}) {
       grid-template-columns: 1fr;

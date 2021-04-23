@@ -9,10 +9,9 @@ import { ContactsContext } from "../Context/ContactsContext"
 import { isUnexpectedObject } from "Utils"
 import CreatePortal from "Components/UI/Modal/CreatePortal"
 import ModalContent from "Components/UI/Modal/ModalContent"
-import "./ContactList.scss"
 import { getInitialContactInfo } from "./FirebaseHelpers/FirebaseHelpers"
-
-const CONTACTS_TO_LOAD = 20
+import { CONTACTS_TO_LOAD } from "../Context/Constants"
+import "./ContactList.scss"
 
 const ContactList: React.FC = () => {
   const firebase = useContext(FirebaseContext)
@@ -28,7 +27,7 @@ const ContactList: React.FC = () => {
   const contactListRef = useRef<HTMLDivElement>(null!)
   const isScrolledDown = useElementScrolledDown({ element: contactListRef.current, threshold: 650 })
 
-  const contactsListRef = firebase.contactsList({ uid: authUser?.uid }).orderByChild("pinned_lastActivityTS")
+  const contactsListRef = firebase.contactsList({ uid: authUser?.uid })
   const contactsDatabaseRef = firebase.contactsDatabase({ uid: authUser?.uid })
 
   const getContactsList = async (snapshot: any) => {
@@ -68,14 +67,17 @@ const ContactList: React.FC = () => {
   useEffect(() => {
     console.log("contactListUseEffect")
 
-    contactsListRef.limitToLast(CONTACTS_TO_LOAD).on("value", (snapshot: any) => getContactsList(snapshot))
+    contactsListRef
+      .orderByChild("pinned_lastActivityTS")
+      .limitToLast(CONTACTS_TO_LOAD)
+      .on("value", (snapshot: any) => getContactsList(snapshot))
 
     contactsDatabaseRef.child("contactsAmount").on("value", (snapshot: any) => {
       setAllContactsAmount(snapshot.val())
     })
 
     return () => {
-      firebase.contactsList({ uid: authUser?.uid }).off()
+      contactsListRef.off()
       contactsDatabaseRef.off()
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
@@ -87,8 +89,9 @@ const ContactList: React.FC = () => {
     console.log("contactListUseEffect Scroll")
     console.log(loadedContacts + CONTACTS_TO_LOAD)
 
-    firebase.contactsList({ uid: authUser?.uid }).off()
+    contactsListRef.off()
     contactsListRef
+      .orderByChild("pinned_lastActivityTS")
       .limitToLast(loadedContacts + CONTACTS_TO_LOAD)
       .on("value", (snapshot: any) => getContactsList(snapshot))
   }, [isScrolledDown]) // eslint-disable-line react-hooks/exhaustive-deps

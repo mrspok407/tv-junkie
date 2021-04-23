@@ -4,7 +4,7 @@ export interface ContactInfoInterface {
   userName: string
   timeStamp: number
   pinned_lastActivityTS: string
-  recipientNotified: boolean
+  // recipientNotified: boolean
   key: string
   newContactsActivity: boolean | null
   newContactsRequests: boolean | null
@@ -18,8 +18,8 @@ export const CONTACT_INFO_INITIAL_DATA = {
   receiver: false,
   userName: "",
   timeStamp: 0,
-  pinned_lastActivityTS: "",
-  recipientNotified: false
+  pinned_lastActivityTS: ""
+  // recipientNotified: false
 }
 
 export interface ContactsInterface {
