@@ -4,7 +4,6 @@ export interface ContactInfoInterface {
   userName: string
   timeStamp: number
   pinned_lastActivityTS: string
-  // recipientNotified: boolean
   key: string
   newContactsActivity: boolean | null
   newContactsRequests: boolean | null
@@ -19,7 +18,6 @@ export const CONTACT_INFO_INITIAL_DATA = {
   userName: "",
   timeStamp: 0,
   pinned_lastActivityTS: ""
-  // recipientNotified: false
 }
 
 export interface ContactsInterface {
@@ -51,9 +49,17 @@ export interface ContactsStateInterface {
   messages: {
     [key: string]: MessageInterface[]
   }
+  renderedMessages: {
+    [key: string]: number | undefined
+  }
   contacts: {
     [key: string]: ContactInfoInterface
   }
   messagePopup: string
   contactPopup: string
+}
+
+export interface SnapshotStringBooleanInterface {
+  val: () => { [key: string]: boolean | null } | null
+  numChildren: () => number
 }

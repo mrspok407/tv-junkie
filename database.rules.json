@@ -1,8 +1,8 @@
 {
   "rules": {
-    ".read": true,
-    ".write": true,
     "users": {
+      ".read": true,
+      ".write": true,
       "$uid": {
         ".read": "auth != null && auth.uid == $uid",
         ".write": "!data.exists()",
@@ -32,6 +32,8 @@
       }
     },
     "privateChats": {
+      ".read": true,
+      ".write": true,
       "$key": {
         "messages": {
           ".indexOn": "timeStamp"

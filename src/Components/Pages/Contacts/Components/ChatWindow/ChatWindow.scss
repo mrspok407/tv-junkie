@@ -76,9 +76,7 @@
   }
 
   &__message {
-    // display: grid;
     display: flex;
-    grid-template-columns: 1fr 73px;
     column-gap: 10px;
     max-width: getDimm(messageMaxWidth, $chatWindowDimm);
     border-radius: 5px;
@@ -87,7 +85,8 @@
     font-size: 0.95rem;
 
     @include mediaMaxW(#{$mobileViewPort}) {
-      grid-template-columns: 1fr;
+      flex-direction: column;
+      max-width: getDimm(messageMaxWidthMobile, $chatWindowDimm);
     }
 
     &:hover .chat-window__message-options .chat-window__open-popup-btn {
@@ -141,6 +140,10 @@
         bottom: 0;
       }
     }
+
+    &-text {
+      margin-right: auto;
+    }
   }
 }
 
@@ -171,6 +174,13 @@
     justify-self: center;
     width: 33px;
     height: 33px;
+
+    &--new-activity {
+      @include mediaMaxW(#{$mobileViewPort}) {
+        border-radius: 50%;
+        background-color: #3c9fff;
+      }
+    }
 
     &:after {
       content: "";

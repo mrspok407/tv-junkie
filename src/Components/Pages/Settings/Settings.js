@@ -87,12 +87,36 @@ class Profile extends Component {
       }
     })
 
-    firebase
-      .database()
-      .ref()
-      .once("value", (snapshot) => {
-        console.log(JSON.stringify(snapshot.val()))
-      })
+    // firebase
+    //   .database()
+    //   .ref()
+    //   .once("value", (snapshot) => {
+    //     console.log(JSON.stringify(snapshot.val()))
+    //   })
+
+    const userKey = "-MY_TPe9EW9TqCibVSop"
+
+    const chatKey = userKey < authUid ? `${userKey}_${authUid}` : `${authUid}_${userKey}`
+
+    for (let i = 100; i <= 200; i++) {
+      const randomMessage = lorem.generateSentences(2)
+
+      const timeStampEpoch = new Date().getTime()
+
+      const pushNewMessage = firebase
+        .privateChats()
+        .child(`${chatKey}/messages`)
+        .push({
+          sender: userKey,
+          // sender: Math.random() > 0.5 ? userKey : authUid,
+          message: randomMessage,
+          timeStamp: timeStampEpoch + 2000,
+          number: i,
+          status: "unread"
+        })
+
+      firebase.privateChats().child(`${chatKey}/members/${authUid}/unreadMessages/${pushNewMessage.key}`).set(true)
+    }
 
     // firebase
     //   .contactsDatabase({ uid: "drv5lG97VxVBLgkdn8bMhdxmqQT2" })

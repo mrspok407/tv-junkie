@@ -4,7 +4,10 @@ export type ACTIONTYPES =
   | { type: "updateContactUnreadMessages"; payload: string[] }
   | { type: "updateAuthUserUnreadMessages"; payload: number | null }
   | { type: "updateActiveChat"; payload: { chatKey: string; contactKey: string } }
-  | { type: "setInitialMessages"; payload: { messagesData: MessageInterface[]; chatKey: string } }
+  | {
+      type: "setInitialMessages"
+      payload: { messagesData: MessageInterface[]; loadedMessages?: number; chatKey: string }
+    }
   | { type: "addNewMessage"; payload: { newMessage: MessageInterface; chatKey: string } }
   | { type: "removeMessage"; payload: { removedMessage: MessageInterface; chatKey: string } }
   | { type: "changeMessage"; payload: { changedMessage: MessageInterface; chatKey: string } }
@@ -13,7 +16,7 @@ export type ACTIONTYPES =
   | { type: "updateContactPopup"; payload: string }
 
 const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
-  const { contactsUnreadMessages, activeChat, messages, messagePopup, contactPopup } = state
+  const { contactsUnreadMessages, activeChat, messages, renderedMessages, messagePopup, contactPopup } = state
   switch (action.type) {
     case "setInitialMessages":
       return {
@@ -21,6 +24,10 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         messages: {
           ...messages,
           [action.payload.chatKey]: action.payload.messagesData
+        },
+        renderedMessages: {
+          ...renderedMessages,
+          [action.payload.chatKey]: action.payload.loadedMessages
         }
       }
 
@@ -113,6 +120,7 @@ export const INITIAL_STATE = {
     contactKey: ""
   },
   messages: {},
+  renderedMessages: {},
   contacts: {},
   messagePopup: "",
   contactPopup: ""

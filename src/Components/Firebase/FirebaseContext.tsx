@@ -1,4 +1,5 @@
 import { CONTEXT_INITIAL_STATE } from "Components/AppContext/AppContextHOC"
+import { MessageInterface } from "Components/Pages/Contacts/Types"
 import React, { createContext } from "react"
 
 export interface FirebaseInterface {
@@ -26,7 +27,7 @@ export interface FirebaseInterface {
   messages: ({ chatKey }: { chatKey: string }) => any
   message: ({ chatKey, messageKey }: { chatKey: string; messageKey: string }) => any
   privateChat: () => any
-  unreadMessages: ({ uid, chatKey }: { uid: string; chatKey: string }) => any
+  unreadMessages: ({ uid, chatKey }: { uid: string | undefined; chatKey: string }) => any
   newContactsRequests: ({ uid }: { uid: string | undefined }) => any
   newContactsActivity: ({ uid }: { uid: string | undefined }) => any
   contactsDatabase: ({ uid }: { uid: string | undefined }) => any
