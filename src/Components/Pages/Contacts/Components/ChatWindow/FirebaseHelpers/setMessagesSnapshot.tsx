@@ -1,7 +1,7 @@
 import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
-import { MessageInterface, SnapshotStringBooleanInterface } from "Components/Pages/Contacts/Types"
+import { SnapshotStringBooleanInterface } from "Components/Pages/Contacts/Types"
 import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
-import { MESSAGES_TO_LOAD, UNREAD_MESSAGES_TO_LOAD } from "../../Context/Constants"
+import { MESSAGES_TO_LOAD } from "../../Context/Constants"
 
 export const setMessagesSnapshot = async ({
   chatKey,

@@ -61,10 +61,6 @@ const ContactList: React.FC = () => {
   }
 
   useEffect(() => {
-    console.log(context?.state.activeChat.chatKey)
-  }, [context?.state.activeChat])
-
-  useEffect(() => {
     console.log("contactListUseEffect")
 
     contactsListRef

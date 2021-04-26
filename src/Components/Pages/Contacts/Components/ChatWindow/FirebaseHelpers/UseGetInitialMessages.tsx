@@ -2,10 +2,10 @@ import React, { useState, useEffect, useContext } from "react"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
 import { ContactsContext } from "../../Context/ContactsContext"
-import { MESSAGES_TO_LOAD, UNREAD_MESSAGES_TO_LOAD } from "../../Context/Constants"
 import { MessageInterface, MESSAGE_INITIAL_DATA, SnapshotStringBooleanInterface } from "Components/Pages/Contacts/Types"
 import { isUnexpectedObject } from "Utils"
 import { setMessagesSnapshot } from "./setMessagesSnapshot"
+import { MESSAGES_TO_RENDER } from "../../Context/Constants"
 
 const useGetInitialMessages = () => {
   const { authUser, errors } = useContext(AppContext)
@@ -20,6 +20,8 @@ const useGetInitialMessages = () => {
   useEffect(() => {
     if (context?.state.messages[activeChat.chatKey] !== undefined) return
 
+    console.log("useEffect in useGetInitialMessages")
+    console.log(activeChat.chatKey)
     const getMessages = async () => {
       let messagesSnapshot: any
 
@@ -61,7 +63,7 @@ const useGetInitialMessages = () => {
           type: "setInitialMessages",
           payload: {
             messagesData,
-            loadedMessages: messagesData.length > 50 ? 50 : messagesData.length,
+            loadedMessages: messagesData.length > MESSAGES_TO_RENDER ? MESSAGES_TO_RENDER : messagesData.length,
             chatKey: activeChat.chatKey
           }
         })

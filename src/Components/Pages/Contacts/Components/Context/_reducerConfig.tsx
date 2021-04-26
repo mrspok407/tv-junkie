@@ -8,17 +8,28 @@ export type ACTIONTYPES =
       type: "setInitialMessages"
       payload: { messagesData: MessageInterface[]; loadedMessages?: number; chatKey: string }
     }
+  | { type: "updateRenderedMessages"; payload: { messagesToRender: number } }
   | { type: "addNewMessage"; payload: { newMessage: MessageInterface; chatKey: string } }
   | { type: "removeMessage"; payload: { removedMessage: MessageInterface; chatKey: string } }
   | { type: "changeMessage"; payload: { changedMessage: MessageInterface; chatKey: string } }
   | { type: "updateContacts"; payload: ContactsInterface }
+  | { type: "updateLastScrollTop"; payload: { scrollTop: number; chatKey: string } }
   | { type: "updateMessagePopup"; payload: string }
   | { type: "updateContactPopup"; payload: string }
 
 const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
-  const { contactsUnreadMessages, activeChat, messages, renderedMessages, messagePopup, contactPopup } = state
+  const {
+    contactsUnreadMessages,
+    activeChat,
+    messages,
+    renderedMessages,
+    messagePopup,
+    contactPopup,
+    lastScrollTop
+  } = state
   switch (action.type) {
     case "setInitialMessages":
+      console.log(action.payload.loadedMessages)
       return {
         ...state,
         messages: {
@@ -28,6 +39,18 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         renderedMessages: {
           ...renderedMessages,
           [action.payload.chatKey]: action.payload.loadedMessages
+        }
+      }
+
+    case "updateRenderedMessages":
+      if (renderedMessages[activeChat.chatKey]! >= messages[activeChat.chatKey]?.length) {
+        return { ...state }
+      }
+      return {
+        ...state,
+        renderedMessages: {
+          ...renderedMessages,
+          [activeChat.chatKey]: renderedMessages[activeChat.chatKey]! + action.payload.messagesToRender
         }
       }
 
@@ -72,6 +95,20 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
       return {
         ...state,
         contacts: action.payload
+      }
+
+    case "updateLastScrollTop":
+      console.log(activeChat.chatKey)
+      console.log(action.payload.chatKey)
+      if (activeChat.chatKey !== action.payload.chatKey) {
+        return { ...state }
+      }
+      return {
+        ...state,
+        lastScrollTop: {
+          ...lastScrollTop,
+          [activeChat.chatKey]: action.payload.scrollTop
+        }
       }
 
     case "updateContactUnreadMessages":
@@ -122,6 +159,7 @@ export const INITIAL_STATE = {
   messages: {},
   renderedMessages: {},
   contacts: {},
+  lastScrollTop: {},
   messagePopup: "",
   contactPopup: ""
 }

@@ -5,13 +5,16 @@ import { ContactsContext } from "../Context/ContactsContext"
 import useElementScrolledDown from "Components/Pages/Movies/useElementScrolledDown"
 // import useRecipientNotified from "Components/Pages/UserProfile/Hooks/UseRecipientNotified"
 import useResponseContactRequest from "Components/Pages/UserProfile/Hooks/UseResponseContactRequest"
-import React, { useEffect, useContext, useState, useRef, useCallback } from "react"
+import React, { useEffect, useContext, useState, useRef, useCallback, useLayoutEffect } from "react"
 import { isUnexpectedObject } from "Utils"
 import { CONTACT_INFO_INITIAL_DATA, MessageInterface, MESSAGE_INITIAL_DATA } from "../../Types"
 import ContactPopup from "../ContactList/Contact/ContactPopup"
 import MessageInfo from "./Components/MessageInfo"
 import "./ChatWindow.scss"
 import useGetInitialMessages from "./FirebaseHelpers/UseGetInitialMessages"
+import { MESSAGES_TO_RENDER } from "../Context/Constants"
+import { throttle } from "throttle-debounce"
+import debounce from "debounce"
 
 type Props = {}
 
@@ -20,41 +23,86 @@ const ChatWindow: React.FC<Props> = () => {
   const firebase = useContext(FirebaseContext)
   const context = useContext(ContactsContext)
 
-  const { activeChat, messages, contacts, renderedMessages, contactsUnreadMessages } = context?.state!
+  const { activeChat, messages, contacts, renderedMessages, contactsUnreadMessages, lastScrollTop } = context?.state!
   const contactInfo = contacts[activeChat.contactKey] || {}
 
-  // const { updateRecipientNotified } = useRecipientNotified({ userUid: activeChat.contactKey })
   const { handleContactRequest } = useResponseContactRequest({ userUid: activeChat.contactKey })
 
   const contactOptionsRef = useRef<HTMLDivElement>(null!)
-  const chatContainer = useRef<HTMLDivElement>(null!)
+  const chatContainerRef = useRef<HTMLDivElement>(null!)
 
   const [popupOpen, setPopupOpen] = useState(false)
 
-  const scrolldown = useElementScrolledDown({ element: chatContainer.current })
-
-  // useEffect(() => {
-  //   if (!messages[activeChat.chatKey]?.length) return
-
-  //   const height = chatContainer.current.getBoundingClientRect().height
-  //   const scrollHeight = chatContainer.current.scrollHeight
-  //   const scrollTop = chatContainer.current.scrollTop
-
-  //   console.log({ height, scrollHeight, scrollTop })
-  //   chatContainer.current.scrollTo(0, 0)
-  // }, [activeChat, messages])
-
   useGetInitialMessages()
+
+  const handleScroll = useCallback(
+    throttle(200, () => {
+      const height = chatContainerRef.current.getBoundingClientRect().height
+      const scrollHeight = chatContainerRef.current.scrollHeight
+      const scrollTop = chatContainerRef.current.scrollTop
+
+      if (scrollHeight <= height) return
+      if (scrollHeight <= scrollTop + height + 300) {
+        context?.dispatch({ type: "updateRenderedMessages", payload: { messagesToRender: MESSAGES_TO_RENDER } })
+      }
+    }),
+    [chatContainerRef, activeChat]
+  )
+
+  const handleScrollDeb = useCallback(
+    debounce(() => {
+      if (!chatContainerRef.current) return
+      const scrollTop = chatContainerRef.current.scrollTop
+
+      console.log({ scrollTop })
+
+      context?.dispatch({ type: "updateLastScrollTop", payload: { scrollTop, chatKey: activeChat.chatKey } })
+    }, 500),
+    [chatContainerRef, activeChat]
+  )
+
+  useEffect(() => {
+    // if (lastScrollTop[activeChat.chatKey] === undefined) return
+    if (!messages[activeChat.chatKey]) return
+    // const test = document.querySelector(`.chat-window__message---MZDe48VeLkhFLT_iLmm`)
+    // test?.scrollIntoView({ block: "center", inline: "start" })
+    const lastMessage = messages[activeChat.chatKey][messages[activeChat.chatKey].length - 1]
+    const lastMessageRef = document.querySelector(`.chat-window__message--${lastMessage.key}`)
+    console.log(lastMessageRef)
+    lastMessageRef?.scrollIntoView({ block: "nearest", inline: "start" })
+    // chatContainerRef.current.scrollTop = lastScrollTop[activeChat.chatKey]
+  }, [activeChat, messages])
+
+  useEffect(() => {
+    if (!chatContainerRef) return
+    const chatContainer = chatContainerRef.current
+    chatContainer.addEventListener("scroll", handleScroll)
+    return () => {
+      chatContainer.removeEventListener("scroll", handleScroll)
+    }
+  }, [handleScroll])
+
+  useEffect(() => {
+    if (!chatContainerRef) return
+    const chatContainer = chatContainerRef.current
+    chatContainer.addEventListener("scroll", handleScrollDeb)
+    return () => {
+      chatContainer.removeEventListener("scroll", handleScrollDeb)
+    }
+  }, [handleScrollDeb])
 
   useEffect(() => {
     if (contactInfo) return
     context?.dispatch({ type: "updateActiveChat", payload: { chatKey: "", contactKey: "" } })
   }, [contactInfo])
 
-  const messagesSlice = messages[activeChat.chatKey]?.slice(0, renderedMessages[activeChat.chatKey])
+  const index = messages[activeChat.chatKey]?.findIndex((item: any) => item.key === "-MZDe48LLXcHDfAsbSpR")
+  console.log({ index })
+  const messagesSlice = messages[activeChat.chatKey]?.slice(-50)
+  // const messagesSlice = messages[activeChat.chatKey]?.slice(index, index + 20)
 
   return (
-    <div ref={chatContainer} className="chat-window-container">
+    <div ref={chatContainerRef} className="chat-window-container">
       <div className="chat-window__contact-info">
         <div
           className={classNames("contact-info__close-chat", {
@@ -94,7 +142,9 @@ const ChatWindow: React.FC<Props> = () => {
       {contactInfo.status === true && (
         <>
           {messages[activeChat.chatKey] === undefined ? (
-            <span className="chat-window__loader"></span>
+            <div className="chat-window__loader-container">
+              <span className="chat-window__loader"></span>
+            </div>
           ) : (
             <>
               {/* <div className="chat-window__unread-messages">{context?.state.authUserUnreadMessages}</div> */}
@@ -104,7 +154,7 @@ const ChatWindow: React.FC<Props> = () => {
                   return (
                     <div
                       key={messageData.key}
-                      className={classNames("chat-window__message", {
+                      className={classNames(`chat-window__message chat-window__message--${messageData.key}`, {
                         "chat-window__message--send": messageData.sender === authUser?.uid,
                         "chat-window__message--receive": messageData.sender === activeChat.contactKey,
                         "chat-window__message--last-in-bunch": messageData.sender !== nextMessage?.sender
