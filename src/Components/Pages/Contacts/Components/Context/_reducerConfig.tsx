@@ -1,4 +1,5 @@
 import { ContactsInterface, ContactsStateInterface, MessageInterface } from "../../Types"
+import { MESSAGES_TO_RENDER } from "./Constants"
 
 export type ACTIONTYPES =
   | { type: "updateContactUnreadMessages"; payload: string[] }
@@ -8,7 +9,9 @@ export type ACTIONTYPES =
       type: "setInitialMessages"
       payload: { messagesData: MessageInterface[]; loadedMessages?: number; chatKey: string }
     }
+  | { type: "loadTopMessages"; payload: { newTopMessages: MessageInterface[] } }
   | { type: "updateRenderedMessages"; payload: { messagesToRender: number } }
+  | { type: "renderTopMessages"; payload: { messagesToRender: number } }
   | { type: "addNewMessage"; payload: { newMessage: MessageInterface; chatKey: string } }
   | { type: "removeMessage"; payload: { removedMessage: MessageInterface; chatKey: string } }
   | { type: "changeMessage"; payload: { changedMessage: MessageInterface; chatKey: string } }
@@ -23,6 +26,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
     activeChat,
     messages,
     renderedMessages,
+    renderedMessagesList,
     messagePopup,
     contactPopup,
     lastScrollTop
@@ -39,6 +43,67 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         renderedMessages: {
           ...renderedMessages,
           [action.payload.chatKey]: action.payload.loadedMessages
+        },
+        renderedMessagesList: {
+          ...renderedMessagesList,
+          [action.payload.chatKey]: action.payload.messagesData.slice(50, action.payload.loadedMessages)
+        }
+      }
+
+    case "loadTopMessages":
+      return {
+        ...state,
+        messages: {
+          ...messages,
+          [activeChat.chatKey]: [...action.payload.newTopMessages, ...messages[activeChat.chatKey]]
+        }
+        // renderedMessagesList: {
+        //   ...renderedMessagesList,
+        //   [activeChat.chatKey]: [...action.payload.newTopMessages, ...messages[activeChat.chatKey]].slice(75, 125)
+        // }
+
+        // renderedMessages: {
+        //   ...renderedMessages,
+        //   [activeChat.chatKey]: 0
+        // },
+        // renderedMessagesList: {
+        //   ...renderedMessagesList,
+        //   [activeChat.chatKey]: [...action.payload.newTopMessages, ...messages[activeChat.chatKey]].slice(0, 50)
+        // }
+      }
+
+    case "renderTopMessages":
+      console.log(renderedMessages[activeChat.chatKey])
+      // const lastRenderedMessage = renderedMessages[activeChat.chatKey]! <= 0 ? 25 : renderedMessages[activeChat.chatKey]
+      if (messages[activeChat.chatKey][0].key === renderedMessagesList[activeChat.chatKey][0].key) {
+        return { ...state }
+      }
+
+      const indexStart = messages[activeChat.chatKey].findIndex(
+        (item: any) => item.key === renderedMessagesList[activeChat.chatKey][0].key
+      )
+      const indexEnd = messages[activeChat.chatKey].findIndex(
+        (item: any) =>
+          item.key === renderedMessagesList[activeChat.chatKey][renderedMessagesList[activeChat.chatKey].length - 1].key
+      )
+
+      console.log({ indexStart })
+      console.log({ indexEnd })
+      console.log(messages[activeChat.chatKey])
+
+      return {
+        ...state,
+        // renderedMessages: {
+        //   ...renderedMessages,
+        //   [activeChat.chatKey]:
+        //     lastRenderedMessage! - MESSAGES_TO_RENDER <= 0 ? 0 : lastRenderedMessage! - MESSAGES_TO_RENDER
+        // },
+        renderedMessagesList: {
+          ...renderedMessagesList,
+          [activeChat.chatKey]: messages[activeChat.chatKey].slice(
+            indexStart - 25 <= 0 ? 0 : indexStart - 25,
+            indexEnd - 25 <= 50 ? 50 : indexEnd - 25
+          )
         }
       }
 
@@ -46,11 +111,34 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
       if (renderedMessages[activeChat.chatKey]! >= messages[activeChat.chatKey]?.length) {
         return { ...state }
       }
+      console.log("updateRenderedMessages")
+      // const lastRenderedMessageTest =
+      //   renderedMessages[activeChat.chatKey]! <= 0 ? 25 : renderedMessages[activeChat.chatKey]
+      const indexStartt = messages[activeChat.chatKey].findIndex(
+        (item: any) => item.key === renderedMessagesList[activeChat.chatKey][0].key
+      )
+      const indexEndd = messages[activeChat.chatKey].findIndex(
+        (item: any) =>
+          item.key === renderedMessagesList[activeChat.chatKey][renderedMessagesList[activeChat.chatKey].length - 1].key
+      )
+      // if (
+      //   messages[activeChat.chatKey][indexEndd].key ===
+      //   renderedMessagesList[activeChat.chatKey][renderedMessagesList[activeChat.chatKey].length - 1].key
+      // ) {
+      //   return { ...state }
+      // }
       return {
         ...state,
-        renderedMessages: {
-          ...renderedMessages,
-          [activeChat.chatKey]: renderedMessages[activeChat.chatKey]! + action.payload.messagesToRender
+        // renderedMessages: {
+        //   ...renderedMessages,
+        //   [activeChat.chatKey]: lastRenderedMessageTest! + action.payload.messagesToRender
+        // },
+        renderedMessagesList: {
+          ...renderedMessagesList,
+          [activeChat.chatKey]: messages[activeChat.chatKey].slice(
+            indexStartt + 25 <= 0 ? 0 : indexStartt + 25,
+            indexEndd + 25 <= 50 ? 50 : indexEndd + 25
+          )
         }
       }
 
@@ -158,6 +246,7 @@ export const INITIAL_STATE = {
   },
   messages: {},
   renderedMessages: {},
+  renderedMessagesList: {},
   contacts: {},
   lastScrollTop: {},
   messagePopup: "",

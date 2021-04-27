@@ -32,7 +32,7 @@ export const setMessagesSnapshot = async ({
     const additionalMessages = await messagesRef
       .orderByChild("timeStamp")
       .endBefore(firstUnreadMessageTimeStamp.val())
-      .limitToLast(10)
+      .limitToLast(MESSAGES_TO_LOAD)
       .once("value")
 
     return await messagesRef

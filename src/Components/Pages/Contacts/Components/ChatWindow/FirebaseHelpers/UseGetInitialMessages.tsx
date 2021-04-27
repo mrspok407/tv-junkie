@@ -13,15 +13,13 @@ const useGetInitialMessages = () => {
   const context = useContext(ContactsContext)
   const { activeChat } = context?.state!
 
-  const [initialLoading, setInitialLoading] = useState(true)
-
   const messagesRef = firebase.messages({ chatKey: activeChat.chatKey })
 
   useEffect(() => {
     if (context?.state.messages[activeChat.chatKey] !== undefined) return
 
     console.log("useEffect in useGetInitialMessages")
-    console.log(activeChat.chatKey)
+
     const getMessages = async () => {
       let messagesSnapshot: any
 
@@ -54,8 +52,6 @@ const useGetInitialMessages = () => {
           messagesData.push({ ...message.val(), key: message.key })
         })
 
-        console.log(messagesData)
-
         firstMessageTimeStamp = messagesData[0].timeStamp
         lastMessageTimeStamp = messagesData[messagesData.length - 1].timeStamp
 
@@ -63,7 +59,7 @@ const useGetInitialMessages = () => {
           type: "setInitialMessages",
           payload: {
             messagesData,
-            loadedMessages: messagesData.length > MESSAGES_TO_RENDER ? MESSAGES_TO_RENDER : messagesData.length,
+            loadedMessages: messagesData.length > MESSAGES_TO_RENDER ? 125 : messagesData.length,
             chatKey: activeChat.chatKey
           }
         })

@@ -81,11 +81,17 @@
   }
 
   &__messages-list {
+    position: relative;
     display: grid;
     grid-auto-rows: max-content;
     grid-row-gap: 5px;
     row-gap: 5px;
     padding: 10px;
+    opacity: 0;
+
+    &.messages-list--show {
+      opacity: 1;
+    }
   }
 
   &__message {
@@ -232,4 +238,9 @@
   .contact-info__status {
     color: #12c720;
   }
+}
+
+.chat-window__dummy {
+  position: absolute;
+  bottom: 0px;
 }

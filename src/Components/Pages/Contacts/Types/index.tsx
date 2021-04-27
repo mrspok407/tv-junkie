@@ -52,6 +52,9 @@ export interface ContactsStateInterface {
   renderedMessages: {
     [key: string]: number | undefined
   }
+  renderedMessagesList: {
+    [key: string]: MessageInterface[]
+  }
   contacts: {
     [key: string]: ContactInfoInterface
   }

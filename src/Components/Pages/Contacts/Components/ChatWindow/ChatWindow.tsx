@@ -15,6 +15,7 @@ import useGetInitialMessages from "./FirebaseHelpers/UseGetInitialMessages"
 import { MESSAGES_TO_RENDER } from "../Context/Constants"
 import { throttle } from "throttle-debounce"
 import debounce from "debounce"
+import useLoadTopMessages from "./FirebaseHelpers/UseLoadTopMessages"
 
 type Props = {}
 
@@ -23,15 +24,20 @@ const ChatWindow: React.FC<Props> = () => {
   const firebase = useContext(FirebaseContext)
   const context = useContext(ContactsContext)
 
-  const { activeChat, messages, contacts, renderedMessages, contactsUnreadMessages, lastScrollTop } = context?.state!
+  const { activeChat, messages, contacts, renderedMessages, renderedMessagesList } = context?.state!
   const contactInfo = contacts[activeChat.contactKey] || {}
 
   const { handleContactRequest } = useResponseContactRequest({ userUid: activeChat.contactKey })
 
+  const loadTopMessages = useLoadTopMessages()
+
   const contactOptionsRef = useRef<HTMLDivElement>(null!)
   const chatContainerRef = useRef<HTMLDivElement>(null!)
+  const dummyRef = useRef<HTMLDivElement>(null!)
 
   const [popupOpen, setPopupOpen] = useState(false)
+
+  const [scrolledToBottom, setScrolledToBottom] = useState(false)
 
   useGetInitialMessages()
 
@@ -41,36 +47,43 @@ const ChatWindow: React.FC<Props> = () => {
       const scrollHeight = chatContainerRef.current.scrollHeight
       const scrollTop = chatContainerRef.current.scrollTop
 
+      const thresholdTop = scrollHeight * 0.28
+      const thresholdBottom = scrollHeight * 0.1
+
+      console.log({ scrollHeight })
+
       if (scrollHeight <= height) return
-      if (scrollHeight <= scrollTop + height + 300) {
+      if (scrollHeight <= scrollTop + height + thresholdBottom) {
         context?.dispatch({ type: "updateRenderedMessages", payload: { messagesToRender: MESSAGES_TO_RENDER } })
       }
-    }),
-    [chatContainerRef, activeChat]
-  )
-
-  const handleScrollDeb = useCallback(
-    debounce(() => {
-      if (!chatContainerRef.current) return
-      const scrollTop = chatContainerRef.current.scrollTop
+      if (scrollTop <= thresholdTop) {
+        loadTopMessages()
+      }
+      if (scrollTop <= 150) {
+        context?.dispatch({ type: "renderTopMessages", payload: { messagesToRender: MESSAGES_TO_RENDER } })
+      }
 
       console.log({ scrollTop })
-
-      context?.dispatch({ type: "updateLastScrollTop", payload: { scrollTop, chatKey: activeChat.chatKey } })
-    }, 500),
-    [chatContainerRef, activeChat]
+    }),
+    [chatContainerRef, activeChat, loadTopMessages]
   )
 
   useEffect(() => {
     // if (lastScrollTop[activeChat.chatKey] === undefined) return
-    if (!messages[activeChat.chatKey]) return
+    if (!messages[activeChat.chatKey] || scrolledToBottom) return
     // const test = document.querySelector(`.chat-window__message---MZDe48VeLkhFLT_iLmm`)
     // test?.scrollIntoView({ block: "center", inline: "start" })
+
+    const height = chatContainerRef.current.getBoundingClientRect().height
+    const scrollHeight = chatContainerRef.current.scrollHeight
+    const scrollTop = height + scrollHeight
+
     const lastMessage = messages[activeChat.chatKey][messages[activeChat.chatKey].length - 1]
     const lastMessageRef = document.querySelector(`.chat-window__message--${lastMessage.key}`)
-    console.log(lastMessageRef)
-    lastMessageRef?.scrollIntoView({ block: "nearest", inline: "start" })
-    // chatContainerRef.current.scrollTop = lastScrollTop[activeChat.chatKey]
+    // lastMessageRef?.scrollIntoView({ block: "nearest", inline: "start" })
+    // dummyRef.current?.scrollIntoView()
+    chatContainerRef.current.scrollTop = 1500
+    setScrolledToBottom(true)
   }, [activeChat, messages])
 
   useEffect(() => {
@@ -83,23 +96,14 @@ const ChatWindow: React.FC<Props> = () => {
   }, [handleScroll])
 
   useEffect(() => {
-    if (!chatContainerRef) return
-    const chatContainer = chatContainerRef.current
-    chatContainer.addEventListener("scroll", handleScrollDeb)
-    return () => {
-      chatContainer.removeEventListener("scroll", handleScrollDeb)
-    }
-  }, [handleScrollDeb])
-
-  useEffect(() => {
     if (contactInfo) return
     context?.dispatch({ type: "updateActiveChat", payload: { chatKey: "", contactKey: "" } })
   }, [contactInfo])
 
-  const index = messages[activeChat.chatKey]?.findIndex((item: any) => item.key === "-MZDe48LLXcHDfAsbSpR")
-  console.log({ index })
-  const messagesSlice = messages[activeChat.chatKey]?.slice(-50)
-  // const messagesSlice = messages[activeChat.chatKey]?.slice(index, index + 20)
+  // const messagesSlice = messages[activeChat.chatKey]?.slice(0, renderedMessages[activeChat.chatKey])
+  const messagesSlice = renderedMessagesList[activeChat.chatKey]
+  console.log({ messagesSlice })
+  console.log({ messages })
 
   return (
     <div ref={chatContainerRef} className="chat-window-container">
@@ -148,7 +152,11 @@ const ChatWindow: React.FC<Props> = () => {
           ) : (
             <>
               {/* <div className="chat-window__unread-messages">{context?.state.authUserUnreadMessages}</div> */}
-              <div className="chat-window__messages-list">
+              <div
+                className={classNames("chat-window__messages-list", {
+                  "messages-list--show": scrolledToBottom
+                })}
+              >
                 {messagesSlice?.map((messageData, index, array) => {
                   const nextMessage = array[index + 1]
                   return (
@@ -166,6 +174,7 @@ const ChatWindow: React.FC<Props> = () => {
                     </div>
                   )
                 })}
+                <div ref={dummyRef} className="chat-window__dummy"></div>
               </div>
             </>
           )}
