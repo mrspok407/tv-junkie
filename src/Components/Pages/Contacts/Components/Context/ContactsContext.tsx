@@ -2,7 +2,7 @@ import React, { useReducer, createContext } from "react"
 import { ContactsStateInterface } from "../../Types"
 import reducer, { INITIAL_STATE, ACTIONTYPES } from "./_reducerConfig"
 
-interface ContextInterface {
+export interface ContextInterface {
   state: ContactsStateInterface
   dispatch: React.Dispatch<ACTIONTYPES>
 }

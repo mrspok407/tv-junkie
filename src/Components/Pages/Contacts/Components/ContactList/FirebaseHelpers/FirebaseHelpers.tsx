@@ -1,14 +1,22 @@
 import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
 import { ContactInfoInterface, MessageInterface } from "Components/Pages/Contacts/Types"
+import { useContext } from "react"
 import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
+import { ContactsContext, ContextInterface } from "../../Context/ContactsContext"
 
 interface GetInitialInfoInfterface {
   firebase: FirebaseInterface
   contactsData: ContactInfoInterface[]
   authUser: AuthUserInterface | null
+  context: ContextInterface | null
 }
 
-export const getInitialContactInfo = async ({ firebase, contactsData, authUser }: GetInitialInfoInfterface) => {
+export const getInitialContactInfo = async ({
+  firebase,
+  contactsData,
+  authUser,
+  context
+}: GetInitialInfoInfterface) => {
   return Promise.all(
     contactsData.map(async (contact) => {
       const chatKey =
@@ -27,6 +35,11 @@ export const getInitialContactInfo = async ({ firebase, contactsData, authUser }
         firebase.unreadMessages({ uid: contact.key, chatKey }).orderByKey().limitToFirst(1).once("value"),
         firebase.messages({ chatKey }).orderByChild("timeStamp").limitToLast(1).once("value")
       ])
+
+      context?.dispatch({
+        type: "updateAuthUserUnreadMessages",
+        payload: { chatKey, unreadMessages: unreadMessagesAuth.numChildren()! }
+      })
 
       return {
         ...contact,

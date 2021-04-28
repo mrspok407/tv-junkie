@@ -41,7 +41,9 @@ export interface ContactsStateInterface {
   contactsUnreadMessages: {
     [key: string]: string[]
   }
-  authUserUnreadMessages: number | null
+  authUserUnreadMessages: {
+    [key: string]: number | undefined
+  }
   activeChat: {
     chatKey: string
     contactKey: string

@@ -30,6 +30,8 @@ const ContactList: React.FC = () => {
   const contactsListRef = firebase.contactsList({ uid: authUser?.uid })
   const contactsDatabaseRef = firebase.contactsDatabase({ uid: authUser?.uid })
 
+  // console.log(context?.state.authUserUnreadMessages)
+
   const getContactsList = async (snapshot: any) => {
     console.log("on listener fire")
     if (snapshot.val() === null) {
@@ -49,7 +51,7 @@ const ContactList: React.FC = () => {
     })
 
     const contacts: any[] = initialLoading
-      ? await getInitialContactInfo({ firebase, contactsData, authUser })
+      ? await getInitialContactInfo({ firebase, contactsData, authUser, context })
       : contactsData
 
     contacts.reverse()

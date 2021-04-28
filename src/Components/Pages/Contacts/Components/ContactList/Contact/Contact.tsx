@@ -17,7 +17,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
   const { authUser } = useContext(AppContext)
 
   const context = useContext(ContactsContext)
-  const { contactPopup, activeChat } = context?.state!
+  const { contactPopup, activeChat, authUserUnreadMessages } = context?.state!
 
   const formatedDate = useTimestampFormater({ timeStamp: contactInfo.pinned_lastActivityTS?.slice(-13) })
 
@@ -36,7 +36,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
   const setContactActive = () => {
     if (activeChat.chatKey === chatKey) return
     context?.dispatch({ type: "updateActiveChat", payload: { chatKey, contactKey: contactInfo.key } })
-    context?.dispatch({ type: "updateAuthUserUnreadMessages", payload: authUnreadMessages })
+    // context?.dispatch({ type: "updateAuthUserUnreadMessages", payload: authUnreadMessages })
   }
 
   useEffect(() => {
@@ -81,13 +81,14 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
 
   useEffect(() => {
     if (authUnreadMessages === null) return
+    if (authUnreadMessages === authUserUnreadMessages[chatKey]) return
 
-    // console.log("test")
-    // context?.dispatch({ type: "updateAuthUserUnreadMessages", payload: authUnreadMessages })
-    if (context?.state.activeChat.chatKey) {
-      context?.dispatch({ type: "updateAuthUserUnreadMessages", payload: authUnreadMessages })
-    }
-  }, [authUnreadMessages]) // eslint-disable-line react-hooks/exhaustive-deps
+    console.log("unreadMessagesUpdatedContext")
+    context?.dispatch({
+      type: "updateAuthUserUnreadMessages",
+      payload: { chatKey, unreadMessages: authUnreadMessages }
+    })
+  }, [authUnreadMessages, authUserUnreadMessages[chatKey]]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const isPinned = !!(contactInfo.pinned_lastActivityTS?.slice(0, 4) === "true")
   const userNameCutLength = contactInfo.userName
@@ -157,6 +158,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
             })}
           >
             <span>{newActivity ? authUnreadMessages : newContactsRequests ? 1 : null}</span>
+            {/* <span>{newActivity ? authUserUnreadMessages[chatKey] : newContactsRequests ? 1 : null}</span> */}
           </div>
         ) : (
           isPinned && <div className="contact-item__pinned"></div>

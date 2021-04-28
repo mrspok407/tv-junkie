@@ -20,8 +20,13 @@ export const setMessagesSnapshot = async ({
       .limitToFirst(1)
       .once("value")
 
+    console.log({ authUserUnreadMessages: authUserUnreadMessages.val() })
+
     if (authUserUnreadMessages.val() === null) {
-      return await messagesRef.orderByChild("timeStamp").limitToLast(MESSAGES_TO_LOAD).once("value")
+      return await Promise.all([
+        messagesRef.orderByChild("timeStamp").limitToLast(MESSAGES_TO_LOAD).once("value"),
+        authUserUnreadMessages
+      ])
     }
 
     const firstUnreadMessageTimeStamp: any = await firebase
@@ -35,14 +40,17 @@ export const setMessagesSnapshot = async ({
       .limitToLast(MESSAGES_TO_LOAD)
       .once("value")
 
-    return await messagesRef
-      .orderByChild("timeStamp")
-      .startAt(
-        additionalMessages.val() === null
-          ? firstUnreadMessageTimeStamp.val()
-          : additionalMessages.val()[`${Object.keys(additionalMessages.val())[0]}`].timeStamp
-      )
-      .once("value")
+    return await Promise.all([
+      messagesRef
+        .orderByChild("timeStamp")
+        .startAt(
+          additionalMessages.val() === null
+            ? firstUnreadMessageTimeStamp.val()
+            : additionalMessages.val()[`${Object.keys(additionalMessages.val())[0]}`].timeStamp
+        )
+        .once("value"),
+      authUserUnreadMessages
+    ])
   } catch (error) {
     throw new Error("There were a problem loading messages. Please try to reload the page.")
   }

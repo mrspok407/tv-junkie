@@ -5,13 +5,13 @@ import { ContactsContext } from "../../Context/ContactsContext"
 import { MessageInterface, MESSAGE_INITIAL_DATA, SnapshotStringBooleanInterface } from "Components/Pages/Contacts/Types"
 import { isUnexpectedObject } from "Utils"
 import { setMessagesSnapshot } from "./setMessagesSnapshot"
-import { MESSAGES_TO_RENDER } from "../../Context/Constants"
+import { MESSAGES_TO_RENDER, UNREAD_MESSAGES_TO_RENDER } from "../../Context/Constants"
 
 const useGetInitialMessages = () => {
   const { authUser, errors } = useContext(AppContext)
   const firebase = useContext(FirebaseContext)
   const context = useContext(ContactsContext)
-  const { activeChat } = context?.state!
+  const { activeChat, authUserUnreadMessages } = context?.state!
 
   const messagesRef = firebase.messages({ chatKey: activeChat.chatKey })
 
@@ -22,9 +22,16 @@ const useGetInitialMessages = () => {
 
     const getMessages = async () => {
       let messagesSnapshot: any
+      let firstUnreadMessageKey: any
 
       try {
-        messagesSnapshot = await setMessagesSnapshot({ chatKey: activeChat.chatKey, authUser, messagesRef, firebase })
+        ;[messagesSnapshot, firstUnreadMessageKey] = await setMessagesSnapshot({
+          chatKey: activeChat.chatKey,
+          authUser,
+          messagesRef,
+          firebase
+        })
+        firstUnreadMessageKey = !firstUnreadMessageKey.val() || Object.keys(firstUnreadMessageKey.val()!)[0]
       } catch (error) {
         errors.handleError({
           message: "There were a problem loading messages. Please try to reload the page."
@@ -52,14 +59,34 @@ const useGetInitialMessages = () => {
           messagesData.push({ ...message.val(), key: message.key })
         })
 
+        console.log({ messagesData })
+
         firstMessageTimeStamp = messagesData[0].timeStamp
         lastMessageTimeStamp = messagesData[messagesData.length - 1].timeStamp
+
+        let startIndexRender: number = 0
+        let endIndexRender: number = 0
+
+        if (messagesData.length <= MESSAGES_TO_RENDER) {
+          startIndexRender = 0
+          endIndexRender = messagesData.length
+        } else {
+          if (authUserUnreadMessages[activeChat.chatKey]! <= UNREAD_MESSAGES_TO_RENDER) {
+            startIndexRender = Math.max(messagesData.length - MESSAGES_TO_RENDER, 0)
+            endIndexRender = messagesData.length
+          } else {
+            endIndexRender =
+              messagesData.length - (authUserUnreadMessages[activeChat.chatKey]! - UNREAD_MESSAGES_TO_RENDER)
+            startIndexRender = Math.max(endIndexRender - MESSAGES_TO_RENDER, 0)
+          }
+        }
 
         context?.dispatch({
           type: "setInitialMessages",
           payload: {
             messagesData,
-            loadedMessages: messagesData.length > MESSAGES_TO_RENDER ? 125 : messagesData.length,
+            startIndex: startIndexRender,
+            endIndex: endIndexRender,
             chatKey: activeChat.chatKey
           }
         })
