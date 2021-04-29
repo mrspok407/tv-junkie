@@ -94,13 +94,13 @@ class Profile extends Component {
     //     console.log(JSON.stringify(snapshot.val()))
     //   })
 
-    // const userKey = "-MY_TPe9EW9TqCibVSop"
+    const userKey = "-MY_TPe9EW9TqCibVSop"
     // const userKey = "-MY_R8wzzvABzB8OWakb"
-    const userKey = "-MY_R8pjpBQGf6RDAMTt"
+    // const userKey = "-MY_R8pjpBQGf6RDAMTt"
 
     const chatKey = userKey < authUid ? `${userKey}_${authUid}` : `${authUid}_${userKey}`
 
-    for (let i = 1; i <= 100; i++) {
+    for (let i = 1; i <= 1000; i++) {
       const randomMessage = lorem.generateSentences(1)
 
       const timeStampEpoch = new Date().getTime()
@@ -112,7 +112,7 @@ class Profile extends Component {
           // sender: userKey,
           sender: Math.random() > 0.5 ? userKey : authUid,
           message: randomMessage,
-          timeStamp: timeStampEpoch + 300000 * i,
+          timeStamp: timeStampEpoch,
           number: i,
           status: "read"
         })

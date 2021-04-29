@@ -11,7 +11,7 @@ export type ACTIONTYPES =
     }
   | { type: "loadTopMessages"; payload: { newTopMessages: MessageInterface[] } }
   | { type: "updateRenderedMessages"; payload: { startIndex?: number; endIndex?: number; chatKey: string } }
-  | { type: "renderTopMessages"; payload: { messagesToRender: number } }
+  | { type: "renderTopMessages" }
   | { type: "addNewMessage"; payload: { newMessage: MessageInterface; chatKey: string } }
   | { type: "removeMessage"; payload: { removedMessage: MessageInterface; chatKey: string } }
   | { type: "changeMessage"; payload: { changedMessage: MessageInterface; chatKey: string } }
@@ -65,22 +65,22 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         return { ...state }
       }
 
-      const indexStart = messages[activeChat.chatKey].findIndex(
-        (item: any) => item.key === renderedMessagesList[activeChat.chatKey][0].key
+      const indexStart = Math.max(
+        messages[activeChat.chatKey].findIndex((item) => item.key === renderedMessagesList[activeChat.chatKey][0].key) -
+          (MESSAGES_TO_RENDER - 50),
+        0
       )
-      const indexEnd = messages[activeChat.chatKey].findIndex(
-        (item: any) =>
-          item.key === renderedMessagesList[activeChat.chatKey][renderedMessagesList[activeChat.chatKey].length - 1].key
-      )
+      const indexEnd = indexStart + MESSAGES_TO_RENDER
+      // const indexEnd = messages[activeChat.chatKey].findIndex(
+      //   (item) =>
+      //     item.key === renderedMessagesList[activeChat.chatKey][renderedMessagesList[activeChat.chatKey].length - 1].key
+      // )
 
       return {
         ...state,
         renderedMessagesList: {
           ...renderedMessagesList,
-          [activeChat.chatKey]: messages[activeChat.chatKey].slice(
-            indexStart - 25 <= 0 ? 0 : indexStart - 25,
-            indexEnd - 25 <= 50 ? 50 : indexEnd - 25
-          )
+          [activeChat.chatKey]: messages[activeChat.chatKey].slice(indexStart, indexEnd)
         }
       }
 
@@ -106,11 +106,25 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
       }
 
       if (activeChat.chatKey !== action.payload.chatKey) {
-        return {
-          ...state,
-          messages: {
-            ...messages,
-            [action.payload.chatKey]: [...optionsAdd.messages, action.payload.newMessage]
+        if (optionsAdd.lastMessage.key !== optionsAdd.lastRenderedMessage.key) {
+          return {
+            ...state,
+            messages: {
+              ...messages,
+              [action.payload.chatKey]: [...optionsAdd.messages, action.payload.newMessage]
+            }
+          }
+        } else {
+          return {
+            ...state,
+            messages: {
+              ...messages,
+              [action.payload.chatKey]: [...optionsAdd.messages, action.payload.newMessage]
+            },
+            renderedMessagesList: {
+              ...renderedMessagesList,
+              [action.payload.chatKey]: [...optionsAdd.messages, action.payload.newMessage].slice(-MESSAGES_TO_RENDER)
+            }
           }
         }
       } else {

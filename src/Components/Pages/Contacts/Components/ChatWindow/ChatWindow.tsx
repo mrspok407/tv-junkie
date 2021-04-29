@@ -16,6 +16,7 @@ import { MESSAGES_TO_RENDER, UNREAD_MESSAGES_TO_RENDER } from "../Context/Consta
 import { throttle } from "throttle-debounce"
 import debounce from "debounce"
 import useLoadTopMessages from "./FirebaseHelpers/UseLoadTopMessages"
+import { LoremIpsum } from "lorem-ipsum"
 
 type Props = {}
 
@@ -50,36 +51,64 @@ const ChatWindow: React.FC<Props> = () => {
 
   let prevScrollTop: any
 
-  const handleScroll = useCallback(
-    throttle(200, () => {
-      const height = chatContainerRef.current.getBoundingClientRect().height
-      const scrollHeight = chatContainerRef.current.scrollHeight
-      const scrollTop = chatContainerRef.current.scrollTop
+  const getContainerRect = () => {
+    const height = chatContainerRef.current.getBoundingClientRect().height
+    const scrollHeight = chatContainerRef.current.scrollHeight
+    const scrollTop = chatContainerRef.current.scrollTop
 
-      const thresholdTop = scrollHeight * 0.28
-      const thresholdBottom = scrollHeight * 0.1
+    const thresholdTopLoad = scrollHeight * 0.2
+    const thresholdTopRender = scrollHeight * 0.2
+    const thresholdBottomRender = scrollHeight * 0.1
+
+    return { height, scrollHeight, scrollTop, thresholdTopLoad, thresholdTopRender, thresholdBottomRender }
+  }
+
+  const [scrolledUp, setScrolledUp] = useState(false)
+
+  const handleScrollDebounce = useCallback(
+    throttle(200, () => {
+      const { height, scrollHeight, scrollTop, thresholdTopLoad } = getContainerRect()
 
       if (scrollHeight <= height) return
+      if (scrollTop > prevScrollTop) return
+
+      if (scrollTop <= thresholdTopLoad) {
+        setScrolledUp(true)
+        console.log("true ScrolledUp")
+      } else {
+        console.log("false ScrolledUp")
+        setScrolledUp(false)
+      }
+    }),
+    [chatContainerRef, activeChat]
+  )
+
+  useEffect(() => {
+    if (!scrolledUp) return
+
+    loadTopMessages()
+  }, [scrolledUp, loadTopMessages])
+
+  const handleScrollThrottle = useCallback(
+    throttle(200, () => {
+      const { height, scrollHeight, scrollTop, thresholdTopRender, thresholdBottomRender } = getContainerRect()
+
+      if (scrollHeight <= height) return
+      if (scrollTop < 1) {
+        chatContainerRef.current.scrollTop = 1
+        console.log("scroll top less 1")
+      }
 
       if (scrollTop < prevScrollTop) {
-        if (scrollTop <= thresholdTop) {
-          loadTopMessages()
-        }
-        if (scrollTop <= 150) {
-          context?.dispatch({ type: "renderTopMessages", payload: { messagesToRender: MESSAGES_TO_RENDER } })
-        }
+        if (scrollTop <= thresholdTopRender) context?.dispatch({ type: "renderTopMessages" })
       } else {
-        if (scrollHeight <= scrollTop + height + thresholdBottom) {
+        if (scrollHeight <= scrollTop + height + thresholdBottomRender) {
           // context?.dispatch({ type: "updateRenderedMessages", payload: { messagesToRender: MESSAGES_TO_RENDER } })
         }
       }
-
       prevScrollTop = scrollTop
-
-      console.log({ scrollHeight })
-      console.log({ scrollTop })
     }),
-    [chatContainerRef, activeChat, loadTopMessages]
+    [chatContainerRef, activeChat]
   )
 
   useEffect(() => {
@@ -91,9 +120,6 @@ const ChatWindow: React.FC<Props> = () => {
       return
     }
 
-    console.log("useEffect updateRenderedMessages")
-    console.log({ messages: messages[activeChat.chatKey] })
-
     let startIndexRender: number = 0
     let endIndexRender: number = 0
 
@@ -102,9 +128,11 @@ const ChatWindow: React.FC<Props> = () => {
       endIndexRender = messages[activeChat.chatKey].length
     } else {
       if (authUserUnreadMessages[activeChat.chatKey]! <= UNREAD_MESSAGES_TO_RENDER) {
+        console.log("unreadMsg less than max")
         startIndexRender = Math.max(messages[activeChat.chatKey].length - MESSAGES_TO_RENDER, 0)
         endIndexRender = messages[activeChat.chatKey].length
       } else {
+        console.log("unreadMsg more than max")
         endIndexRender =
           messages[activeChat.chatKey].length -
           (authUserUnreadMessages[activeChat.chatKey]! - UNREAD_MESSAGES_TO_RENDER)
@@ -143,11 +171,13 @@ const ChatWindow: React.FC<Props> = () => {
   useEffect(() => {
     if (!chatContainerRef) return
     const chatContainer = chatContainerRef.current
-    chatContainer.addEventListener("scroll", handleScroll)
+    chatContainer.addEventListener("scroll", handleScrollThrottle)
+    chatContainer.addEventListener("scroll", handleScrollDebounce)
     return () => {
-      chatContainer.removeEventListener("scroll", handleScroll)
+      chatContainer.removeEventListener("scroll", handleScrollThrottle)
+      chatContainer.removeEventListener("scroll", handleScrollDebounce)
     }
-  }, [handleScroll])
+  }, [handleScrollThrottle, handleScrollDebounce])
 
   useEffect(() => {
     if (contactInfo) return
