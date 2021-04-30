@@ -13,11 +13,15 @@ const useLoadTopMessages = () => {
   const firebase = useContext(FirebaseContext)
   const context = useContext(ContactsContext)
   const { messages, renderedMessagesList, activeChat } = context?.state!
-
   const messagesRef = firebase.messages({ chatKey: activeChat.chatKey })
+
+  const [loading, setLoading] = useState(false)
+
+  const loadedMessageGroups = useRef<number[]>([])
 
   const loadTopMessages = useCallback(async () => {
     if (!messages[activeChat.chatKey]) return
+    if (loadedMessageGroups.current.includes(messages[activeChat.chatKey][0].timeStamp)) return
 
     const firstRenderedMessageIndex = messages[activeChat.chatKey].findIndex(
       (item) => item.key === renderedMessagesList[activeChat.chatKey][0].key
@@ -27,26 +31,18 @@ const useLoadTopMessages = () => {
 
     if (!(firstRenderedMessageIndex <= 100 && firstRenderedMessageIndex !== 0)) return
 
-    // if (
-    //   !renderedMessagesList[activeChat.chatKey].find((item: any) => item.key === messages[activeChat.chatKey][0].key)
-    // ) {
-    //   // context?.dispatch({ type: "renderTopMessages", payload: { messagesToRender: MESSAGES_TO_RENDER } })
-    //   return
-    // }
+    loadedMessageGroups.current = [...loadedMessageGroups.current, messages[activeChat.chatKey][0].timeStamp]
 
     console.log("load top messages")
-
+    setLoading(true)
     const topMessagesSnapshot = await messagesRef
       .orderByChild("timeStamp")
       .endBefore(messages[activeChat.chatKey][0].timeStamp)
       .limitToLast(MESSAGES_TO_LOAD)
       .once("value")
 
-    console.log({ topMessagesSnapshot: topMessagesSnapshot.val() })
-
     if (topMessagesSnapshot.val() === null) {
-      //  context?.dispatch({ type: "renderTopMessages", payload: { messagesToRender: MESSAGES_TO_RENDER } })
-      // context?.dispatch({ type: "renderTopMessages", payload: { messagesToRender: MESSAGES_TO_RENDER } })
+      setLoading(false)
       return
     }
 
@@ -61,10 +57,44 @@ const useLoadTopMessages = () => {
       newTopMessages.push({ ...message.val(), key: message.key })
     })
     context?.dispatch({ type: "loadTopMessages", payload: { newTopMessages } })
-    // context?.dispatch({ type: "renderTopMessages", payload: { messagesToRender: MESSAGES_TO_RENDER } })
+
+    messagesRef
+      .orderByChild("timeStamp")
+      .endBefore(messages[activeChat.chatKey][0].timeStamp)
+      .limitToLast(MESSAGES_TO_LOAD)
+      .on("child_changed", (snapshot: { val: () => MessageInterface; key: string }) => {
+        if (isUnexpectedObject({ exampleObject: MESSAGE_INITIAL_DATA, targetObject: snapshot.val() })) {
+          errors.handleError({
+            message: "Message hasn't been changed, because of the unexpected error. Please reload the page."
+          })
+          return
+        }
+
+        const changedMessage = { ...snapshot.val(), key: snapshot.key }
+        context?.dispatch({ type: "changeMessage", payload: { changedMessage, chatKey: activeChat.chatKey } })
+        console.log({ changedChild: changedMessage })
+      })
+
+    messagesRef
+      .orderByChild("timeStamp")
+      .endBefore(messages[activeChat.chatKey][0].timeStamp)
+      .limitToLast(MESSAGES_TO_LOAD)
+      .on("child_removed", (snapshot: { val: () => MessageInterface; key: string }) => {
+        if (isUnexpectedObject({ exampleObject: MESSAGE_INITIAL_DATA, targetObject: snapshot.val() })) {
+          errors.handleError({
+            message: "Message hasn't been deleted, because of the unexpected error. Please reload the page."
+          })
+          return
+        }
+        const removedMessage = { ...snapshot.val(), key: snapshot.key }
+        context?.dispatch({ type: "removeMessage", payload: { removedMessage, chatKey: activeChat.chatKey } })
+        console.log({ removedMessage })
+      })
+
+    setLoading(false)
   }, [activeChat, messages, renderedMessagesList])
 
-  return loadTopMessages
+  return { loadTopMessages, loading }
 }
 
 export default useLoadTopMessages

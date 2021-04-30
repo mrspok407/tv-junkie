@@ -94,8 +94,8 @@ class Profile extends Component {
     //     console.log(JSON.stringify(snapshot.val()))
     //   })
 
-    const userKey = "-MY_TPe9EW9TqCibVSop"
-    // const userKey = "-MY_R8wzzvABzB8OWakb"
+    // const userKey = "-MY_TPe9EW9TqCibVSop"
+    const userKey = "-MY_R8wzzvABzB8OWakb"
     // const userKey = "-MY_R8pjpBQGf6RDAMTt"
 
     const chatKey = userKey < authUid ? `${userKey}_${authUid}` : `${authUid}_${userKey}`

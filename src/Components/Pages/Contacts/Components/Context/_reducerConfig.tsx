@@ -10,8 +10,9 @@ export type ACTIONTYPES =
       payload: { messagesData: MessageInterface[]; startIndex?: number; endIndex?: number; chatKey: string }
     }
   | { type: "loadTopMessages"; payload: { newTopMessages: MessageInterface[] } }
-  | { type: "updateRenderedMessages"; payload: { startIndex?: number; endIndex?: number; chatKey: string } }
+  | { type: "renderMessagesOnLoad"; payload: { startIndex?: number; endIndex?: number; chatKey: string } }
   | { type: "renderTopMessages" }
+  | { type: "renderBottomMessages" }
   | { type: "addNewMessage"; payload: { newMessage: MessageInterface; chatKey: string } }
   | { type: "removeMessage"; payload: { removedMessage: MessageInterface; chatKey: string } }
   | { type: "changeMessage"; payload: { changedMessage: MessageInterface; chatKey: string } }
@@ -60,31 +61,57 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
       }
 
     case "renderTopMessages":
-      console.log(renderedMessages[activeChat.chatKey])
-      if (messages[activeChat.chatKey][0].key === renderedMessagesList[activeChat.chatKey][0].key) {
-        return { ...state }
+      if (true) {
+        if (messages[activeChat.chatKey][0].key === renderedMessagesList[activeChat.chatKey][0].key) {
+          return { ...state }
+        }
+
+        const indexStart = Math.max(
+          messages[activeChat.chatKey].findIndex(
+            (item) => item.key === renderedMessagesList[activeChat.chatKey][0].key
+          ) -
+            (MESSAGES_TO_RENDER - 50),
+          0
+        )
+        const indexEnd = indexStart + MESSAGES_TO_RENDER
+
+        return {
+          ...state,
+          renderedMessagesList: {
+            ...renderedMessagesList,
+            [activeChat.chatKey]: messages[activeChat.chatKey].slice(indexStart, indexEnd)
+          }
+        }
       }
+    case "renderBottomMessages":
+      if (true) {
+        const messagesData = messages[activeChat.chatKey]
+        const renderedMessages = renderedMessagesList[activeChat.chatKey]
 
-      const indexStart = Math.max(
-        messages[activeChat.chatKey].findIndex((item) => item.key === renderedMessagesList[activeChat.chatKey][0].key) -
-          (MESSAGES_TO_RENDER - 50),
-        0
-      )
-      const indexEnd = indexStart + MESSAGES_TO_RENDER
-      // const indexEnd = messages[activeChat.chatKey].findIndex(
-      //   (item) =>
-      //     item.key === renderedMessagesList[activeChat.chatKey][renderedMessagesList[activeChat.chatKey].length - 1].key
-      // )
+        if (messagesData[messagesData.length - 1].key === renderedMessages[renderedMessages.length - 1].key) {
+          console.log("at the bottom")
+          return { ...state }
+        }
 
-      return {
-        ...state,
-        renderedMessagesList: {
-          ...renderedMessagesList,
-          [activeChat.chatKey]: messages[activeChat.chatKey].slice(indexStart, indexEnd)
+        console.log("bottom msg render")
+
+        const indexEnd = Math.max(
+          messagesData.findIndex((item) => item.key === renderedMessages[renderedMessages.length - 1].key) +
+            (MESSAGES_TO_RENDER - 50),
+          0
+        )
+        const indexStart = indexEnd - MESSAGES_TO_RENDER
+
+        return {
+          ...state,
+          renderedMessagesList: {
+            ...renderedMessagesList,
+            [activeChat.chatKey]: messages[activeChat.chatKey].slice(indexStart, indexEnd)
+          }
         }
       }
 
-    case "updateRenderedMessages":
+    case "renderMessagesOnLoad":
       return {
         ...state,
         renderedMessagesList: {
@@ -97,75 +124,74 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
       }
 
     case "addNewMessage":
-      const optionsAdd = {
-        messages: messages[action.payload.chatKey],
-        lastMessage: messages[action.payload.chatKey][messages[action.payload.chatKey].length - 1],
-        renderedMessages: renderedMessagesList[action.payload.chatKey],
-        lastRenderedMessage:
-          renderedMessagesList[action.payload.chatKey][renderedMessagesList[action.payload.chatKey].length - 1]
-      }
+      if (true) {
+        const messagesData = messages[action.payload.chatKey]
+        const lastMessage = messagesData[messagesData.length - 1]
+        const renderedMessages = renderedMessagesList[action.payload.chatKey]
+        const lastRenderedMessage = renderedMessages[renderedMessages.length - 1]
 
-      if (activeChat.chatKey !== action.payload.chatKey) {
-        if (optionsAdd.lastMessage.key !== optionsAdd.lastRenderedMessage.key) {
-          return {
-            ...state,
-            messages: {
-              ...messages,
-              [action.payload.chatKey]: [...optionsAdd.messages, action.payload.newMessage]
-            }
-          }
-        } else {
-          return {
-            ...state,
-            messages: {
-              ...messages,
-              [action.payload.chatKey]: [...optionsAdd.messages, action.payload.newMessage]
-            },
-            renderedMessagesList: {
-              ...renderedMessagesList,
-              [action.payload.chatKey]: [...optionsAdd.messages, action.payload.newMessage].slice(-MESSAGES_TO_RENDER)
-            }
-          }
-        }
-      } else {
-        if (optionsAdd.lastMessage.key !== optionsAdd.lastRenderedMessage.key) {
-          return {
-            ...state,
-            messages: {
-              ...messages,
-              [action.payload.chatKey]: [...optionsAdd.messages, action.payload.newMessage]
-            }
-          }
-        } else {
-          if (authUserUnreadMessages[action.payload.chatKey]! <= UNREAD_MESSAGES_TO_RENDER) {
+        if (activeChat.chatKey !== action.payload.chatKey) {
+          if (lastMessage.key !== lastRenderedMessage.key) {
             return {
               ...state,
               messages: {
                 ...messages,
-                [action.payload.chatKey]: [...optionsAdd.messages, action.payload.newMessage]
-              },
-              renderedMessagesList: {
-                ...renderedMessagesList,
-                [action.payload.chatKey]: [...optionsAdd.messages, action.payload.newMessage].slice(-MESSAGES_TO_RENDER)
+                [action.payload.chatKey]: [...messagesData, action.payload.newMessage]
               }
             }
           } else {
-            const endIndexRender =
-              [...optionsAdd.messages, action.payload.newMessage].length -
-              (authUserUnreadMessages[action.payload.chatKey]! - UNREAD_MESSAGES_TO_RENDER)
-            const startIndexRender = Math.max(endIndexRender - MESSAGES_TO_RENDER, 0)
             return {
               ...state,
               messages: {
                 ...messages,
-                [action.payload.chatKey]: [...optionsAdd.messages, action.payload.newMessage]
+                [action.payload.chatKey]: [...messagesData, action.payload.newMessage]
               },
               renderedMessagesList: {
                 ...renderedMessagesList,
-                [action.payload.chatKey]: [...optionsAdd.messages, action.payload.newMessage].slice(
-                  startIndexRender,
-                  endIndexRender
-                )
+                [action.payload.chatKey]: [...messagesData, action.payload.newMessage].slice(-MESSAGES_TO_RENDER)
+              }
+            }
+          }
+        } else {
+          if (lastMessage.key !== lastRenderedMessage.key) {
+            return {
+              ...state,
+              messages: {
+                ...messages,
+                [action.payload.chatKey]: [...messagesData, action.payload.newMessage]
+              }
+            }
+          } else {
+            if (authUserUnreadMessages[action.payload.chatKey]! <= UNREAD_MESSAGES_TO_RENDER) {
+              return {
+                ...state,
+                messages: {
+                  ...messages,
+                  [action.payload.chatKey]: [...messagesData, action.payload.newMessage]
+                },
+                renderedMessagesList: {
+                  ...renderedMessagesList,
+                  [action.payload.chatKey]: [...messagesData, action.payload.newMessage].slice(-MESSAGES_TO_RENDER)
+                }
+              }
+            } else {
+              const endIndexRender =
+                [...messagesData, action.payload.newMessage].length -
+                (authUserUnreadMessages[action.payload.chatKey]! - UNREAD_MESSAGES_TO_RENDER)
+              const startIndexRender = Math.max(endIndexRender - MESSAGES_TO_RENDER, 0)
+              return {
+                ...state,
+                messages: {
+                  ...messages,
+                  [action.payload.chatKey]: [...messagesData, action.payload.newMessage]
+                },
+                renderedMessagesList: {
+                  ...renderedMessagesList,
+                  [action.payload.chatKey]: [...messagesData, action.payload.newMessage].slice(
+                    startIndexRender,
+                    endIndexRender
+                  )
+                }
               }
             }
           }

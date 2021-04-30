@@ -46,7 +46,7 @@ const ContactsContent: React.FC<Props> = () => {
     })
 
     for (let i = 1; i <= 5; i++) {
-      const userKey = "-MY_TPe9EW9TqCibVSop"
+      const userKey = activeChat.contactKey
       const chatKey = userKey < authUser?.uid! ? `${userKey}_${authUser?.uid}` : `${authUser?.uid}_${userKey}`
 
       const randomMessage = lorem.generateSentences(1)
