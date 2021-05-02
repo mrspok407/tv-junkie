@@ -81,13 +81,14 @@
   }
 
   &__messages-list {
+    --isShown: 1;
     position: relative;
     display: grid;
     grid-auto-rows: max-content;
     grid-row-gap: 5px;
     row-gap: 5px;
     padding: 10px;
-    opacity: 0;
+    opacity: var(--isShown);
 
     &.messages-list--show {
       opacity: 1;
@@ -102,6 +103,14 @@
     padding: 10px;
     color: getColor(messageText, $chatWindowPalette);
     font-size: 0.95rem;
+    // opacity: 0;
+    // will-change: opacity;
+    // animation: fadeInMessages 25ms forwards;
+    // @keyframes fadeInMessages {
+    //   to {
+    //     opacity: 1;
+    //   }
+    // }
 
     @include mediaMaxW(#{$mobileViewPort}) {
       flex-direction: column;

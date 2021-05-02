@@ -60,9 +60,10 @@ export interface ContactsStateInterface {
   contacts: {
     [key: string]: ContactInfoInterface
   }
-  lastScrollTop: {
+  lastScrollPosition: {
     [key: string]: number
   }
+  messagesListRef: any
   messagePopup: string
   contactPopup: string
 }
