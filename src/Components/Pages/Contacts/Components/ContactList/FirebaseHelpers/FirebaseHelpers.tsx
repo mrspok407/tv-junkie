@@ -22,10 +22,10 @@ export const getInitialContactInfo = async ({
       const chatKey =
         contact.key < authUser?.uid! ? `${contact.key}_${authUser?.uid}` : `${authUser?.uid}_${contact.key}`
 
-      const [newContactsActivity, newContactsRequests, unreadMessagesAuth, unreadMessagesContact, lastMessage]: [
+      const [newContactsActivity, newContactsRequests, unreadMessagesAuthData, unreadMessagesContact, lastMessage]: [
         { val: () => boolean | null },
         { val: () => boolean | null },
-        { numChildren: () => number | null },
+        { val: () => { [key: string]: boolean } },
         { val: () => boolean | null },
         { val: () => MessageInterface | null }
       ] = await Promise.all([
@@ -36,9 +36,10 @@ export const getInitialContactInfo = async ({
         firebase.messages({ chatKey }).orderByChild("timeStamp").limitToLast(1).once("value")
       ])
 
+      const unreadMessagesAuth = !unreadMessagesAuthData.val() ? [] : Object.keys(unreadMessagesAuthData.val())
       context?.dispatch({
         type: "updateAuthUserUnreadMessages",
-        payload: { chatKey, unreadMessages: unreadMessagesAuth.numChildren()! }
+        payload: { chatKey, unreadMessages: unreadMessagesAuth }
       })
 
       return {
@@ -46,7 +47,7 @@ export const getInitialContactInfo = async ({
         key: contact.key,
         newContactsActivity: !!newContactsActivity.val(),
         newContactsRequests: !!newContactsRequests.val(),
-        unreadMessagesAuth: unreadMessagesAuth.numChildren(),
+        unreadMessagesAuth: unreadMessagesAuthData.val(),
         unreadMessagesContact: !!unreadMessagesContact.val(),
         lastMessage: lastMessage.val() !== null ? Object.values(lastMessage.val()!).map((item) => item)[0] : {}
       }

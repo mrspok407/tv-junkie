@@ -42,7 +42,7 @@ export interface ContactsStateInterface {
     [key: string]: string[]
   }
   authUserUnreadMessages: {
-    [key: string]: number | undefined
+    [key: string]: string[]
   }
   activeChat: {
     chatKey: string

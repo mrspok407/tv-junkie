@@ -1,9 +1,10 @@
 import { ContactsInterface, ContactsStateInterface, MessageInterface } from "../../Types"
 import { MESSAGES_TO_RENDER, UNREAD_MESSAGES_TO_RENDER } from "./Constants"
+import * as _isEqual from "lodash.isequal"
 
 export type ACTIONTYPES =
   | { type: "updateContactUnreadMessages"; payload: string[] }
-  | { type: "updateAuthUserUnreadMessages"; payload: { chatKey: string; unreadMessages: number } }
+  | { type: "updateAuthUserUnreadMessages"; payload: { chatKey: string; unreadMessages: string[] } }
   | { type: "updateActiveChat"; payload: { chatKey: string; contactKey: string } }
   | { type: "updateMessagesListRef"; payload: { ref: any } }
   | {
@@ -159,7 +160,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
             }
           }
         } else {
-          if (authUserUnreadMessages[action.payload.chatKey]! <= UNREAD_MESSAGES_TO_RENDER) {
+          if (authUserUnreadMessages[action.payload.chatKey].length! <= UNREAD_MESSAGES_TO_RENDER) {
             return {
               ...state,
               messages: {
@@ -174,7 +175,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
           } else {
             const endIndexRender =
               [...messagesData, action.payload.newMessage].length -
-              (authUserUnreadMessages[action.payload.chatKey]! - UNREAD_MESSAGES_TO_RENDER)
+              (authUserUnreadMessages[action.payload.chatKey].length! - UNREAD_MESSAGES_TO_RENDER)
             const startIndexRender = Math.max(endIndexRender - MESSAGES_TO_RENDER, 0)
             return {
               ...state,
@@ -271,6 +272,10 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
       }
 
     case "updateAuthUserUnreadMessages":
+      if (_isEqual(authUserUnreadMessages[action.payload.chatKey]?.sort(), action.payload.unreadMessages?.sort())) {
+        return { ...state }
+      }
+
       return {
         ...state,
         authUserUnreadMessages: {
@@ -280,10 +285,6 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
       }
 
     case "updateActiveChat":
-      console.log({ messagesListRef })
-      if (messagesListRef) {
-        // messagesListRef.style.setProperty("--isShown", "0")
-      }
       return {
         ...state,
         activeChat: action.payload

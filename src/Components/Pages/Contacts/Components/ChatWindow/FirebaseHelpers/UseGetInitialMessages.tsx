@@ -71,12 +71,12 @@ const useGetInitialMessages = () => {
           startIndexRender = 0
           endIndexRender = messagesData.length
         } else {
-          if (authUserUnreadMessages[activeChat.chatKey]! <= UNREAD_MESSAGES_TO_RENDER) {
+          if (authUserUnreadMessages[activeChat.chatKey].length! <= UNREAD_MESSAGES_TO_RENDER) {
             startIndexRender = Math.max(messagesData.length - MESSAGES_TO_RENDER, 0)
             endIndexRender = messagesData.length
           } else {
             endIndexRender =
-              messagesData.length - (authUserUnreadMessages[activeChat.chatKey]! - UNREAD_MESSAGES_TO_RENDER)
+              messagesData.length - (authUserUnreadMessages[activeChat.chatKey].length! - UNREAD_MESSAGES_TO_RENDER)
             startIndexRender = Math.max(endIndexRender - MESSAGES_TO_RENDER, 0)
           }
         }

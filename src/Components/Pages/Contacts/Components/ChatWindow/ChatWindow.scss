@@ -7,7 +7,6 @@
   overflow-y: auto;
   overflow-x: hidden;
   background-color: getColor(backG, $chatWindowPalette);
-  @include scrollbar(5px, getColor(blueClr, $mainPalette), #c5bbb1);
 
   &--no-active-chat {
     display: flex;
@@ -81,17 +80,17 @@
   }
 
   &__messages-list {
-    --isShown: 1;
     position: relative;
     display: grid;
     grid-auto-rows: max-content;
     grid-row-gap: 5px;
     row-gap: 5px;
-    padding: 10px;
-    opacity: var(--isShown);
 
-    &.messages-list--show {
-      opacity: 1;
+    &-container {
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 10px;
+      @include scrollbar(5px, getColor(blueClr, $mainPalette), #c5bbb1);
     }
   }
 
@@ -103,14 +102,6 @@
     padding: 10px;
     color: getColor(messageText, $chatWindowPalette);
     font-size: 0.95rem;
-    // opacity: 0;
-    // will-change: opacity;
-    // animation: fadeInMessages 25ms forwards;
-    // @keyframes fadeInMessages {
-    //   to {
-    //     opacity: 1;
-    //   }
-    // }
 
     @include mediaMaxW(#{$mobileViewPort}) {
       flex-direction: column;
@@ -179,6 +170,7 @@
   display: grid;
   position: sticky;
   top: 0;
+  height: 54px;
   grid-template-columns: 50px 1fr 30px;
   grid-template-rows: 22px 22px;
   column-gap: 5px;

@@ -33,7 +33,7 @@ const ContactsContent: React.FC<Props> = () => {
     }
   }, [])
 
-  const addNewMessage = () => {
+  const addNewMessageCurrent = async () => {
     const lorem = new LoremIpsum({
       sentencesPerParagraph: {
         max: 8,
@@ -45,14 +45,14 @@ const ContactsContent: React.FC<Props> = () => {
       }
     })
 
-    for (let i = 1; i <= 5; i++) {
+    for (let i = 1; i <= 100; i++) {
       const userKey = activeChat.contactKey
       const chatKey = userKey < authUser?.uid! ? `${userKey}_${authUser?.uid}` : `${authUser?.uid}_${userKey}`
 
       const randomMessage = lorem.generateSentences(1)
       const timeStampEpoch = new Date().getTime()
 
-      const pushNewMessage = firebase
+      const pushNewMessage = await firebase
         .privateChats()
         .child(`${chatKey}/messages`)
         .push({
@@ -62,6 +62,44 @@ const ContactsContent: React.FC<Props> = () => {
           timeStamp: timeStampEpoch + 50000000,
           status: "unread"
         })
+
+      firebase
+        .privateChats()
+        .child(`${chatKey}/members/${authUser?.uid}/unreadMessages/${pushNewMessage.key}`)
+        .set(true)
+    }
+  }
+
+  const addNewMessageVsop = async (key: any) => {
+    const lorem = new LoremIpsum({
+      sentencesPerParagraph: {
+        max: 8,
+        min: 4
+      },
+      wordsPerSentence: {
+        max: 8,
+        min: 4
+      }
+    })
+
+    for (let i = 1; i <= 100; i++) {
+      const userKey = key
+      const chatKey = userKey < authUser?.uid! ? `${userKey}_${authUser?.uid}` : `${authUser?.uid}_${userKey}`
+
+      const randomMessage = lorem.generateSentences(1)
+      const timeStampEpoch = new Date().getTime()
+
+      const pushNewMessage = await firebase
+        .privateChats()
+        .child(`${chatKey}/messages`)
+        .push({
+          sender: userKey,
+          // sender: Math.random() > 0.5 ? userKey : authUser?.uid,
+          message: randomMessage,
+          timeStamp: timeStampEpoch + 50000000,
+          status: "unread"
+        })
+
       firebase
         .privateChats()
         .child(`${chatKey}/members/${authUser?.uid}/unreadMessages/${pushNewMessage.key}`)
@@ -71,8 +109,24 @@ const ContactsContent: React.FC<Props> = () => {
 
   return (
     <>
-      <button style={{ width: "200px" }} type="button" className="button" onClick={() => addNewMessage()}>
-        Add new message
+      <button style={{ width: "400px" }} type="button" className="button" onClick={() => addNewMessageCurrent()}>
+        Add new message current
+      </button>
+      <button
+        style={{ width: "400px" }}
+        type="button"
+        className="button"
+        onClick={() => addNewMessageVsop("-MY_TPe9EW9TqCibVSop")}
+      >
+        Add new message Vsop
+      </button>
+      <button
+        style={{ width: "400px" }}
+        type="button"
+        className="button"
+        onClick={() => addNewMessageVsop("-MY_R8wzzvABzB8OWakb")}
+      >
+        Add new message Wakb
       </button>
       <div className="chat-container">
         <ContactList />
