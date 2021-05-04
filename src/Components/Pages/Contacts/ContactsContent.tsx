@@ -82,7 +82,7 @@ const ContactsContent: React.FC<Props> = () => {
       }
     })
 
-    for (let i = 1; i <= 100; i++) {
+    for (let i = 1; i <= 10; i++) {
       const userKey = key
       const chatKey = userKey < authUser?.uid! ? `${userKey}_${authUser?.uid}` : `${authUser?.uid}_${userKey}`
 

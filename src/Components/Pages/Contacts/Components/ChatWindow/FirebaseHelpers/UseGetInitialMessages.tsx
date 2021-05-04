@@ -7,17 +7,26 @@ import { isUnexpectedObject } from "Utils"
 import { setMessagesSnapshot } from "./setMessagesSnapshot"
 import { MESSAGES_TO_RENDER, UNREAD_MESSAGES_TO_RENDER } from "../../Context/Constants"
 
-const useGetInitialMessages = () => {
+type Props = {
+  authUnreadMessages?: string[]
+}
+
+const useGetInitialMessages = ({ authUnreadMessages }: Props) => {
   const { authUser, errors } = useContext(AppContext)
   const firebase = useContext(FirebaseContext)
   const context = useContext(ContactsContext)
-  const { activeChat, authUserUnreadMessages } = context?.state!
+  const { activeChat } = context?.state!
+  const [loading, setLoading] = useState(false)
 
   const messagesRef = firebase.messages({ chatKey: activeChat.chatKey })
 
   useEffect(() => {
     if (context?.state.messages[activeChat.chatKey] !== undefined) return
+    if (loading) return
 
+    console.log({ authUnreadMessages })
+
+    setLoading(true)
     console.log("useEffect in useGetInitialMessages")
 
     const getMessages = async () => {
@@ -31,17 +40,20 @@ const useGetInitialMessages = () => {
           messagesRef,
           firebase
         })
-        firstUnreadMessageKey = !firstUnreadMessageKey.val() || Object.keys(firstUnreadMessageKey.val()!)[0]
+        firstUnreadMessageKey =
+          firstUnreadMessageKey.val() === null ? false : Object.keys(firstUnreadMessageKey.val()!)[0]
       } catch (error) {
         errors.handleError({
           message: "There were a problem loading messages. Please try to reload the page."
         })
         context?.dispatch({ type: "setInitialMessages", payload: { messagesData: [], chatKey: activeChat.chatKey } })
+        setLoading(false)
         throw new Error("There were a problem loading messages. Please try to reload the page.")
       }
 
       if (messagesSnapshot.val() === null) {
         context?.dispatch({ type: "setInitialMessages", payload: { messagesData: [], chatKey: activeChat.chatKey } })
+        setLoading(false)
       }
 
       let firstMessageTimeStamp = 0
@@ -61,6 +73,12 @@ const useGetInitialMessages = () => {
 
         console.log({ messagesData })
 
+        const indexFirstUnreadMessage = messagesData.findIndex((message) => message.key === firstUnreadMessageKey)
+        const authUnreadMessages =
+          indexFirstUnreadMessage === -1 ? [] : [...messagesData].slice(indexFirstUnreadMessage)
+
+        console.log({ authUnreadMessages })
+
         firstMessageTimeStamp = messagesData[0].timeStamp
         lastMessageTimeStamp = messagesData[messagesData.length - 1].timeStamp
 
@@ -71,16 +89,15 @@ const useGetInitialMessages = () => {
           startIndexRender = 0
           endIndexRender = messagesData.length
         } else {
-          if (authUserUnreadMessages[activeChat.chatKey].length! <= UNREAD_MESSAGES_TO_RENDER) {
+          if (authUnreadMessages.length! <= UNREAD_MESSAGES_TO_RENDER) {
             startIndexRender = Math.max(messagesData.length - MESSAGES_TO_RENDER, 0)
             endIndexRender = messagesData.length
           } else {
-            endIndexRender =
-              messagesData.length - (authUserUnreadMessages[activeChat.chatKey].length! - UNREAD_MESSAGES_TO_RENDER)
+            endIndexRender = messagesData.length - (authUnreadMessages.length! - UNREAD_MESSAGES_TO_RENDER)
             startIndexRender = Math.max(endIndexRender - MESSAGES_TO_RENDER, 0)
           }
         }
-
+        console.log({ startIndexRender })
         context?.dispatch({
           type: "setInitialMessages",
           payload: {
@@ -90,6 +107,7 @@ const useGetInitialMessages = () => {
             chatKey: activeChat.chatKey
           }
         })
+        setLoading(false)
       }
 
       messagesRef
@@ -141,9 +159,9 @@ const useGetInitialMessages = () => {
     }
 
     getMessages()
-  }, [activeChat.chatKey, messagesRef])
+  }, [activeChat.chatKey, messagesRef, loading])
 
-  return <></>
+  return [loading]
 }
 
 export default useGetInitialMessages

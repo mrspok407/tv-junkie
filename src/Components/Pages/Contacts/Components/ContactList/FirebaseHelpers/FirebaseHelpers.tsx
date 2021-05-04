@@ -47,7 +47,7 @@ export const getInitialContactInfo = async ({
         key: contact.key,
         newContactsActivity: !!newContactsActivity.val(),
         newContactsRequests: !!newContactsRequests.val(),
-        unreadMessagesAuth: unreadMessagesAuthData.val(),
+        unreadMessagesAuth: unreadMessagesAuth,
         unreadMessagesContact: !!unreadMessagesContact.val(),
         lastMessage: lastMessage.val() !== null ? Object.values(lastMessage.val()!).map((item) => item)[0] : {}
       }

@@ -26,7 +26,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
   const [newActivity, setNewActivity] = useState<boolean | null | undefined>(contactInfo.newContactsActivity)
   const [newContactsRequests, setNewContactRequests] = useState<boolean | null>(contactInfo.newContactsRequests)
 
-  // const [authUnreadMessages, setAuthUnreadMessages] = useState<number | null>(contactInfo.unreadMessagesAuth)
+  const [authUnreadMessages, setAuthUnreadMessages] = useState<string[]>(contactInfo.unreadMessagesAuth)
   const [contactUnreadMessages, setContactUnreadMessages] = useState<number | null>(contactInfo.unreadMessagesContact)
   const [lastMessage, setLastMessage] = useState<MessageInterface>(contactInfo.lastMessage)
 
@@ -42,12 +42,12 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
   }
 
   const debounceUpdateUnreadMessages = useCallback(
-    throttle(350, (value: string[]) => {
+    debounce((value: string[]) => {
       context?.dispatch({
         type: "updateAuthUserUnreadMessages",
         payload: { chatKey, unreadMessages: value }
       })
-    }),
+    }, 350),
     []
   )
 
@@ -68,11 +68,18 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
       .child(`${contactInfo.key}`)
       .on("value", (snapshot: any) => setNewContactRequests(snapshot.val()))
 
-    firebase.unreadMessages({ uid: authUser?.uid!, chatKey }).on("value", (snapshot: any) => {
-      const unreadMessagesAuth = !snapshot.val() ? [] : Object.keys(snapshot.val())
-      console.log({ chatKey })
-      debounceUpdateUnreadMessages(unreadMessagesAuth)
-    })
+    const unreadMessagesListener = firebase
+      .unreadMessages({ uid: authUser?.uid!, chatKey })
+      .on("value", (snapshot: any) => {
+        console.log("unread Contact update")
+        const unreadMessagesAuth = !snapshot.val() ? [] : Object.keys(snapshot.val())
+        setAuthUnreadMessages(unreadMessagesAuth)
+        // context?.dispatch({
+        //   type: "updateAuthUserUnreadMessages",
+        //   payload: { chatKey, unreadMessages: unreadMessagesAuth }
+        // })
+        // debounceUpdateUnreadMessages(unreadMessagesAuth)
+      })
     firebase
       .unreadMessages({ uid: contactInfo.key, chatKey })
       .orderByKey()
@@ -93,7 +100,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
     return () => {
       firebase.newContactsActivity({ uid: authUser?.uid }).child(`${contactInfo.key}`).off()
       firebase.newContactsRequests({ uid: authUser?.uid! }).child(`${contactInfo.key}`).off()
-      firebase.unreadMessages({ uid: authUser?.uid!, chatKey }).off()
+      firebase.unreadMessages({ uid: authUser?.uid!, chatKey }).off("value", unreadMessagesListener)
       firebase.unreadMessages({ uid: contactInfo.key, chatKey }).off()
       firebase.messages({ chatKey }).off("value", lastMessageListener)
     }
@@ -178,7 +185,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
             })}
           >
             {/* <span>{newActivity ? authUnreadMessages : newContactsRequests ? 1 : null}</span> */}
-            <span>{newActivity ? authUserUnreadMessages[chatKey]?.length : newContactsRequests ? 1 : null}</span>
+            <span>{newActivity ? authUnreadMessages?.length : newContactsRequests ? 1 : null}</span>
           </div>
         ) : (
           isPinned && <div className="contact-item__pinned"></div>

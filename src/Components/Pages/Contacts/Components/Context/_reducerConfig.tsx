@@ -32,8 +32,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
     renderedMessagesList,
     messagePopup,
     contactPopup,
-    lastScrollPosition,
-    messagesListRef
+    lastScrollPosition
   } = state
 
   switch (action.type) {

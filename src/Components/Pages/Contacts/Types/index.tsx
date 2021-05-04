@@ -8,7 +8,7 @@ export interface ContactInfoInterface {
   newContactsActivity: boolean | null
   newContactsRequests: boolean | null
   lastMessage: MessageInterface
-  unreadMessagesAuth: number
+  unreadMessagesAuth: string[]
   unreadMessagesContact: number
 }
 
