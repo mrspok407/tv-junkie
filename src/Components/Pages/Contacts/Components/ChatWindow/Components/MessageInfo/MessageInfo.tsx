@@ -1,8 +1,8 @@
 import classNames from "classnames"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import React, { useState, useEffect, useContext, useRef } from "react"
-import { MessageInterface } from "../../../Types"
-import { ContactsContext } from "../../Context/ContactsContext"
+import { MessageInterface } from "../../../../Types"
+import { ContactsContext } from "../../../Context/ContactsContext"
 import MessagePopup from "./MessagePopup"
 import "./MessageInfo.scss"
 

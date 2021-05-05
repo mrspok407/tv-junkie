@@ -7,11 +7,7 @@ import { isUnexpectedObject } from "Utils"
 import { setMessagesSnapshot } from "./setMessagesSnapshot"
 import { MESSAGES_TO_RENDER, UNREAD_MESSAGES_TO_RENDER } from "../../Context/Constants"
 
-type Props = {
-  authUnreadMessages?: string[]
-}
-
-const useGetInitialMessages = ({ authUnreadMessages }: Props) => {
+const useGetInitialMessages = () => {
   const { authUser, errors } = useContext(AppContext)
   const firebase = useContext(FirebaseContext)
   const context = useContext(ContactsContext)
@@ -23,8 +19,6 @@ const useGetInitialMessages = ({ authUnreadMessages }: Props) => {
   useEffect(() => {
     if (context?.state.messages[activeChat.chatKey] !== undefined) return
     if (loading) return
-
-    console.log({ authUnreadMessages })
 
     setLoading(true)
     console.log("useEffect in useGetInitialMessages")

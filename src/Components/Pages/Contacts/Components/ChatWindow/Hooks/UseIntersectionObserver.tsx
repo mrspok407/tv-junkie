@@ -16,6 +16,7 @@ const useIntersectionObserver = ({ chatContainerRef, authUnreadMessages }: Props
   const contactInfo = contacts[activeChat.contactKey] || {}
 
   const observerRef = useRef<any>()
+  const observedMessages = useRef<string[]>([])
 
   const observerOptions: any = {
     root: chatContainerRef,
@@ -31,6 +32,7 @@ const useIntersectionObserver = ({ chatContainerRef, authUnreadMessages }: Props
           const messageKey = entry.target.dataset.key
           const messageRef: any = document.querySelector(`.chat-window__message--${messageKey}`)
           observerRef.current.unobserve(messageRef)
+          observedMessages.current = [...observedMessages.current.filter((message) => message !== messageKey)]
 
           console.log("intersected")
 
@@ -56,23 +58,32 @@ const useIntersectionObserver = ({ chatContainerRef, authUnreadMessages }: Props
     if (contactInfo.status !== true) return
     if (!observerRef.current) return
 
-    console.log("observe Set")
-    console.log({ authUnreadMessages })
     renderedMessagesList[activeChat.chatKey].forEach((message) => {
       if (!authUnreadMessages.includes(message.key)) return
+      if (observedMessages.current.includes(message.key)) return
       console.log("test")
       const unreadMessage = document.querySelector(`.chat-window__message--${message.key}`)
+      observedMessages.current = [...observedMessages.current, message.key]
       observerRef.current?.observe(unreadMessage)
     })
   }, [activeChat, renderedMessagesList, authUnreadMessages, contactInfo.status, observerRef.current])
 
   useEffect(() => {
-    console.log({ chatContainerRef })
+    if (!renderedMessagesList[activeChat.chatKey]?.length) return
+    observedMessages.current = [
+      ...observedMessages.current.filter((message) =>
+        renderedMessagesList[activeChat.chatKey].map((message) => message.key).includes(message)
+      )
+    ]
+  }, [renderedMessagesList[activeChat.chatKey]])
+
+  useEffect(() => {
     if (!chatContainerRef) return
     observerRef.current = new IntersectionObserver(observerCallback, observerOptions)
 
     return () => {
       observerRef.current.disconnect()
+      observedMessages.current = []
     }
   }, [activeChat, chatContainerRef])
 }

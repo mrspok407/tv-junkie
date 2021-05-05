@@ -1,11 +1,11 @@
 @import "../../styles/globalsContacts";
 
 .chat-window-container {
+  position: relative;
   display: flex;
   flex-direction: column;
   color: #fff;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden;
   background-color: getColor(backG, $chatWindowPalette);
 
   &--no-active-chat {
@@ -87,6 +87,7 @@
     row-gap: 5px;
 
     &-container {
+      position: relative;
       overflow-y: auto;
       overflow-x: hidden;
       padding: 10px;
@@ -168,8 +169,6 @@
 
 .chat-window__contact-info {
   display: grid;
-  position: sticky;
-  top: 0;
   height: 54px;
   grid-template-columns: 50px 1fr 30px;
   grid-template-rows: 22px 22px;

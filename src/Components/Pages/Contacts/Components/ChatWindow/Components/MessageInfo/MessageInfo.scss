@@ -1,4 +1,4 @@
-@import "../../../../../../styles/globals";
+@import "../../../../../../../styles/globals";
 
 $messageStatusSize: 17px;
 
@@ -74,13 +74,13 @@ $messageStatusSize: 17px;
 }
 
 .chat-window__message-status {
-  background-image: url("../../../../../../assets/images/icons/double-mark-sign.svg");
+  background-image: url("../../../../../../../assets/images/icons/double-mark-sign.svg");
   background-size: contain;
   background-repeat: no-repeat;
   width: $messageStatusSize;
   height: $messageStatusSize;
 
   &--unread {
-    background-image: url("../../../../../../assets/images/icons/one-mark-sign.svg");
+    background-image: url("../../../../../../../assets/images/icons/one-mark-sign.svg");
   }
 }

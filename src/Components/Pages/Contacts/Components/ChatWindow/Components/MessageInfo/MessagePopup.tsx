@@ -2,7 +2,7 @@ import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
 import { MessageInterface } from "Components/Pages/Contacts/Types"
 import React, { useState, useEffect, useRef, useLayoutEffect, useCallback, useContext } from "react"
-import { ContactsContext } from "../../Context/ContactsContext"
+import { ContactsContext } from "../../../Context/ContactsContext"
 
 type Props = {
   messageOptionsRef: HTMLDivElement

@@ -71,14 +71,8 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
     const unreadMessagesListener = firebase
       .unreadMessages({ uid: authUser?.uid!, chatKey })
       .on("value", (snapshot: any) => {
-        console.log("unread Contact update")
         const unreadMessagesAuth = !snapshot.val() ? [] : Object.keys(snapshot.val())
         setAuthUnreadMessages(unreadMessagesAuth)
-        // context?.dispatch({
-        //   type: "updateAuthUserUnreadMessages",
-        //   payload: { chatKey, unreadMessages: unreadMessagesAuth }
-        // })
-        // debounceUpdateUnreadMessages(unreadMessagesAuth)
       })
     firebase
       .unreadMessages({ uid: contactInfo.key, chatKey })

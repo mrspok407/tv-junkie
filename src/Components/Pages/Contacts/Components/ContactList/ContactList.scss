@@ -1,8 +1,6 @@
 @import "../../styles/globalsContacts";
 
 .contact-list {
-  display: flex;
-  flex-direction: column;
   border-right: 1px solid getColor(borderRight, $contactListPalette);
   overflow-y: auto;
   @include scrollbar(5px, getColor(blueClr, $mainPalette), #c5bbb1);

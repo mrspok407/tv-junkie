@@ -11,10 +11,11 @@ export type ACTIONTYPES =
       type: "setInitialMessages"
       payload: { messagesData: MessageInterface[]; startIndex?: number; endIndex?: number; chatKey: string }
     }
-  | { type: "loadTopMessages"; payload: { newTopMessages: MessageInterface[] } }
   | { type: "renderMessagesOnLoad"; payload: { startIndex?: number; endIndex?: number; chatKey: string } }
+  | { type: "loadTopMessages"; payload: { newTopMessages: MessageInterface[] } }
   | { type: "renderTopMessages" }
   | { type: "renderBottomMessages" }
+  | { type: "handleGoDown"; payload: { unreadMessages: string[] } }
   | { type: "addNewMessage"; payload: { newMessage: MessageInterface; chatKey: string } }
   | { type: "removeMessage"; payload: { removedMessage: MessageInterface; chatKey: string } }
   | { type: "changeMessage"; payload: { changedMessage: MessageInterface; chatKey: string } }
@@ -93,10 +94,13 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
 
       console.log("bottom msg render")
 
-      const indexEnd = Math.max(
-        messagesData.findIndex((item) => item.key === renderedMessages[renderedMessages.length - 1].key) +
-          (MESSAGES_TO_RENDER - 50),
-        0
+      const indexEnd = Math.min(
+        Math.max(
+          messagesData.findIndex((item) => item.key === renderedMessages[renderedMessages.length - 1].key) +
+            (MESSAGES_TO_RENDER - 50),
+          MESSAGES_TO_RENDER
+        ),
+        messagesData.length
       )
       const indexStart = indexEnd - MESSAGES_TO_RENDER
 
@@ -106,6 +110,28 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
           ...renderedMessagesList,
           [activeChat.chatKey]: messages[activeChat.chatKey].slice(indexStart, indexEnd)
         }
+      }
+    }
+
+    case "handleGoDown": {
+      const messagesData = messages[activeChat.chatKey]
+      const renderedMessages = renderedMessagesList[activeChat.chatKey].map((message) => message.key)
+
+      if (action.payload.unreadMessages.some((message) => renderedMessages.includes(message))) {
+        return {
+          ...state,
+          renderedMessagesList: {
+            ...renderedMessagesList,
+            [activeChat.chatKey]: messagesData.slice(-MESSAGES_TO_RENDER)
+          },
+          authUserUnreadMessages: {
+            ...authUserUnreadMessages,
+            [activeChat.chatKey]: []
+          }
+        }
+      }
+      return {
+        ...state
       }
     }
 
@@ -126,6 +152,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
       const lastMessage = messagesData[messagesData.length - 1]
       const renderedMessages = renderedMessagesList[action.payload.chatKey]
       const lastRenderedMessage = renderedMessages[renderedMessages.length - 1]
+      const unreadMessages = authUserUnreadMessages[action.payload.chatKey]
 
       if (activeChat.chatKey !== action.payload.chatKey) {
         if (lastMessage.key !== lastRenderedMessage.key) {
@@ -134,6 +161,10 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
             messages: {
               ...messages,
               [action.payload.chatKey]: [...messagesData, action.payload.newMessage]
+            },
+            authUserUnreadMessages: {
+              ...authUserUnreadMessages,
+              [action.payload.chatKey]: [...unreadMessages, action.payload.newMessage.key]
             }
           }
         } else {
