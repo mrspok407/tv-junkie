@@ -7,7 +7,7 @@ type Props = {
   messages: MessageInterface[]
   renderedMessages: MessageInterface[]
   unreadMessages: string[]
-  initialLoading: boolean
+  initialLoading?: boolean
   chatKey: string
 }
 
@@ -15,11 +15,11 @@ const useFirstRenderMessages = ({ messages, renderedMessages, initialLoading, un
   const context = useContext(ContactsContext)
 
   useEffect(() => {
+    console.log({ messages })
     if (!messages?.length) return
     if (messages[messages.length - 1].key !== renderedMessages[renderedMessages.length - 1].key) {
       return
     }
-    console.log({ initialLoading })
     if (initialLoading) return
 
     let startIndexRender: number = 0
@@ -32,11 +32,16 @@ const useFirstRenderMessages = ({ messages, renderedMessages, initialLoading, un
       if (unreadMessages.length! <= UNREAD_MESSAGES_TO_RENDER) {
         startIndexRender = Math.max(messages.length - MESSAGES_TO_RENDER, 0)
         endIndexRender = messages.length
+        console.log({ endIndexRender })
+        console.log({ startIndexRender })
       } else {
         endIndexRender = messages.length - (unreadMessages.length! - UNREAD_MESSAGES_TO_RENDER)
         startIndexRender = Math.max(endIndexRender - MESSAGES_TO_RENDER, 0)
+        console.log({ endIndexRender })
+        console.log({ startIndexRender })
       }
     }
+    console.log("render on load")
 
     context?.dispatch({
       type: "renderMessagesOnLoad",

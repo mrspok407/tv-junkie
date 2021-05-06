@@ -18,10 +18,11 @@
   }
 
   &--no-contacts {
+    display: flex;
+    justify-content: center;
     &-text {
       height: max-content;
       width: max-content;
-      align-self: center;
       margin-top: 20px;
       color: #fff;
       padding: 5px 15px 5px 15px;
@@ -31,6 +32,7 @@
   }
 
   &__loader {
+    display: block;
     align-self: center;
     margin-top: 20px;
     width: 27px;
@@ -43,6 +45,11 @@
       to {
         transform: rotate(360deg);
       }
+    }
+
+    &-wrapper {
+      display: flex;
+      justify-content: center;
     }
   }
 }

@@ -38,8 +38,6 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
 
   switch (action.type) {
     case "setInitialMessages":
-      console.log(action.payload.startIndex)
-      console.log(action.payload.endIndex)
       const { startIndex, endIndex } = action.payload
       return {
         ...state,
@@ -116,22 +114,41 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
     case "handleGoDown": {
       const messagesData = messages[activeChat.chatKey]
       const renderedMessages = renderedMessagesList[activeChat.chatKey].map((message) => message.key)
+      const unreadMessages = authUserUnreadMessages[activeChat.chatKey]
 
-      if (action.payload.unreadMessages.some((message) => renderedMessages.includes(message))) {
+      if (!action.payload.unreadMessages.length) {
         return {
           ...state,
           renderedMessagesList: {
             ...renderedMessagesList,
             [activeChat.chatKey]: messagesData.slice(-MESSAGES_TO_RENDER)
-          },
-          authUserUnreadMessages: {
-            ...authUserUnreadMessages,
-            [activeChat.chatKey]: []
           }
         }
-      }
-      return {
-        ...state
+      } else {
+        if (action.payload.unreadMessages.some((message) => renderedMessages.includes(message))) {
+          return {
+            ...state,
+            renderedMessagesList: {
+              ...renderedMessagesList,
+              [activeChat.chatKey]: messagesData.slice(-MESSAGES_TO_RENDER)
+            },
+            authUserUnreadMessages: {
+              ...authUserUnreadMessages,
+              [activeChat.chatKey]: []
+            }
+          }
+        } else {
+          const endIndex = messagesData.length - (unreadMessages.length! - UNREAD_MESSAGES_TO_RENDER)
+          const startIndex = Math.max(endIndex - MESSAGES_TO_RENDER, 0)
+
+          return {
+            ...state,
+            renderedMessagesList: {
+              ...renderedMessagesList,
+              [activeChat.chatKey]: messagesData.slice(startIndex, endIndex)
+            }
+          }
+        }
       }
     }
 
@@ -156,6 +173,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
 
       if (activeChat.chatKey !== action.payload.chatKey) {
         if (lastMessage.key !== lastRenderedMessage.key) {
+          console.log("reducer not last bunch")
           return {
             ...state,
             messages: {
@@ -168,6 +186,11 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
             }
           }
         } else {
+          console.log("reducer last bunch")
+          const endIndexRender =
+            [...messagesData, action.payload.newMessage].length -
+            (authUserUnreadMessages[action.payload.chatKey].length! - UNREAD_MESSAGES_TO_RENDER)
+          const startIndexRender = Math.max(endIndexRender - MESSAGES_TO_RENDER, 0)
           return {
             ...state,
             messages: {
@@ -176,7 +199,18 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
             },
             renderedMessagesList: {
               ...renderedMessagesList,
-              [action.payload.chatKey]: [...messagesData, action.payload.newMessage].slice(-MESSAGES_TO_RENDER)
+              [action.payload.chatKey]: [...messagesData, action.payload.newMessage].slice(
+                startIndexRender,
+                endIndexRender
+              )
+            },
+            authUserUnreadMessages: {
+              ...authUserUnreadMessages,
+              [action.payload.chatKey]: [...unreadMessages, action.payload.newMessage.key]
+            },
+            lastScrollPosition: {
+              ...lastScrollPosition,
+              [action.payload.chatKey]: undefined
             }
           }
         }
@@ -187,6 +221,10 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
             messages: {
               ...messages,
               [action.payload.chatKey]: [...messagesData, action.payload.newMessage]
+            },
+            authUserUnreadMessages: {
+              ...authUserUnreadMessages,
+              [action.payload.chatKey]: [...unreadMessages, action.payload.newMessage.key]
             }
           }
         } else {
@@ -200,6 +238,10 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
               renderedMessagesList: {
                 ...renderedMessagesList,
                 [action.payload.chatKey]: [...messagesData, action.payload.newMessage].slice(-MESSAGES_TO_RENDER)
+              },
+              authUserUnreadMessages: {
+                ...authUserUnreadMessages,
+                [action.payload.chatKey]: [...unreadMessages, action.payload.newMessage.key]
               }
             }
           } else {
@@ -219,6 +261,10 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
                   startIndexRender,
                   endIndexRender
                 )
+              },
+              authUserUnreadMessages: {
+                ...authUserUnreadMessages,
+                [action.payload.chatKey]: [...unreadMessages, action.payload.newMessage.key]
               }
             }
           }

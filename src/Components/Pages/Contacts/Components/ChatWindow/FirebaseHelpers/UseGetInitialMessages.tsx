@@ -7,21 +7,19 @@ import { isUnexpectedObject } from "Utils"
 import { setMessagesSnapshot } from "./setMessagesSnapshot"
 import { MESSAGES_TO_RENDER, UNREAD_MESSAGES_TO_RENDER } from "../../Context/Constants"
 
-const useGetInitialMessages = () => {
+const useGetInitialMessages = ({ chatKey }: { chatKey: string }) => {
   const { authUser, errors } = useContext(AppContext)
   const firebase = useContext(FirebaseContext)
   const context = useContext(ContactsContext)
-  const { activeChat } = context?.state!
   const [loading, setLoading] = useState(false)
 
-  const messagesRef = firebase.messages({ chatKey: activeChat.chatKey })
+  const messagesRef = firebase.messages({ chatKey })
 
   useEffect(() => {
-    if (context?.state.messages[activeChat.chatKey] !== undefined) return
+    if (context?.state.messages[chatKey] !== undefined) return
     if (loading) return
-
     setLoading(true)
-    console.log("useEffect in useGetInitialMessages")
+    // console.log("useEffect in useGetInitialMessages")
 
     const getMessages = async () => {
       let messagesSnapshot: any
@@ -29,7 +27,7 @@ const useGetInitialMessages = () => {
 
       try {
         ;[messagesSnapshot, firstUnreadMessageKey] = await setMessagesSnapshot({
-          chatKey: activeChat.chatKey,
+          chatKey,
           authUser,
           messagesRef,
           firebase
@@ -40,13 +38,13 @@ const useGetInitialMessages = () => {
         errors.handleError({
           message: "There were a problem loading messages. Please try to reload the page."
         })
-        context?.dispatch({ type: "setInitialMessages", payload: { messagesData: [], chatKey: activeChat.chatKey } })
+        context?.dispatch({ type: "setInitialMessages", payload: { messagesData: [], chatKey } })
         setLoading(false)
         throw new Error("There were a problem loading messages. Please try to reload the page.")
       }
 
       if (messagesSnapshot.val() === null) {
-        context?.dispatch({ type: "setInitialMessages", payload: { messagesData: [], chatKey: activeChat.chatKey } })
+        context?.dispatch({ type: "setInitialMessages", payload: { messagesData: [], chatKey } })
         setLoading(false)
       }
 
@@ -65,13 +63,13 @@ const useGetInitialMessages = () => {
           messagesData.push({ ...message.val(), key: message.key })
         })
 
-        console.log({ messagesData })
+        // console.log({ messagesData })
 
         const indexFirstUnreadMessage = messagesData.findIndex((message) => message.key === firstUnreadMessageKey)
         const authUnreadMessages =
           indexFirstUnreadMessage === -1 ? [] : [...messagesData].slice(indexFirstUnreadMessage)
 
-        console.log({ authUnreadMessages })
+        // console.log({ authUnreadMessages })
 
         firstMessageTimeStamp = messagesData[0].timeStamp
         lastMessageTimeStamp = messagesData[messagesData.length - 1].timeStamp
@@ -91,14 +89,14 @@ const useGetInitialMessages = () => {
             startIndexRender = Math.max(endIndexRender - MESSAGES_TO_RENDER, 0)
           }
         }
-        console.log({ startIndexRender })
+
         context?.dispatch({
           type: "setInitialMessages",
           payload: {
             messagesData,
             startIndex: startIndexRender,
             endIndex: endIndexRender,
-            chatKey: activeChat.chatKey
+            chatKey
           }
         })
         setLoading(false)
@@ -116,7 +114,7 @@ const useGetInitialMessages = () => {
           }
 
           const newMessage = { ...snapshot.val(), key: snapshot.key }
-          context?.dispatch({ type: "addNewMessage", payload: { newMessage, chatKey: activeChat.chatKey } })
+          context?.dispatch({ type: "addNewMessage", payload: { newMessage, chatKey } })
           console.log({ addedChild: newMessage })
         })
 
@@ -132,7 +130,7 @@ const useGetInitialMessages = () => {
           }
 
           const changedMessage = { ...snapshot.val(), key: snapshot.key }
-          context?.dispatch({ type: "changeMessage", payload: { changedMessage, chatKey: activeChat.chatKey } })
+          context?.dispatch({ type: "changeMessage", payload: { changedMessage, chatKey } })
           console.log({ changedChild: changedMessage })
         })
 
@@ -147,15 +145,13 @@ const useGetInitialMessages = () => {
             return
           }
           const removedMessage = { ...snapshot.val(), key: snapshot.key }
-          context?.dispatch({ type: "removeMessage", payload: { removedMessage, chatKey: activeChat.chatKey } })
+          context?.dispatch({ type: "removeMessage", payload: { removedMessage, chatKey } })
           console.log({ removedMessage })
         })
     }
 
     getMessages()
-  }, [activeChat.chatKey, messagesRef, loading])
-
-  return [loading]
+  }, [chatKey, messagesRef, loading])
 }
 
 export default useGetInitialMessages

@@ -9,6 +9,7 @@ import ContactPopup from "./ContactPopup"
 import { throttle } from "throttle-debounce"
 import debounce from "debounce"
 import "./Contact.scss"
+import useGetInitialMessages from "../../ChatWindow/FirebaseHelpers/UseGetInitialMessages"
 
 type Props = {
   contactInfo: ContactInfoInterface
@@ -35,10 +36,11 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
   const chatKey =
     contactInfo.key < authUser?.uid! ? `${contactInfo.key}_${authUser?.uid}` : `${authUser?.uid}_${contactInfo.key}`
 
+  useGetInitialMessages({ chatKey })
+
   const setContactActive = () => {
     if (activeChat.chatKey === chatKey) return
     context?.dispatch({ type: "updateActiveChat", payload: { chatKey, contactKey: contactInfo.key } })
-    // context?.dispatch({ type: "updateAuthUserUnreadMessages", payload: authUnreadMessages })
   }
 
   const debounceUpdateUnreadMessages = useCallback(
@@ -50,12 +52,6 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
     }, 350),
     []
   )
-
-  useEffect(() => {
-    return () => {
-      // debounceUpdateUnreadMessages.flush()
-    }
-  }, [activeChat])
 
   useEffect(() => {
     firebase
@@ -100,23 +96,13 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // useEffect(() => {
-  //   if (authUnreadMessages === null) return
-  //   if (authUnreadMessages === authUserUnreadMessages[chatKey]) return
-
-  //   console.log("unreadMessagesUpdatedContext")
-  //   context?.dispatch({
-  //     type: "updateAuthUserUnreadMessages",
-  //     payload: { chatKey, unreadMessages: authUnreadMessages }
-  //   })
-  // }, [authUnreadMessages, authUserUnreadMessages[chatKey]]) // eslint-disable-line react-hooks/exhaustive-deps
-
   const isPinned = !!(contactInfo.pinned_lastActivityTS?.slice(0, 4) === "true")
   const userNameCutLength = contactInfo.userName
   const userNameFormated =
     userNameCutLength[userNameCutLength?.length - 1] === " " ? userNameCutLength?.slice(0, -1) : userNameCutLength
 
   const chatActive = context?.state.activeChat.contactKey === contactInfo.key
+  const unreadMessagesAmount = authUnreadMessages?.length === 0 ? null : authUnreadMessages?.length
   return (
     <div
       className={classNames("contact-item", {
@@ -178,8 +164,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
               "contact-item__unread-messages--active": chatActive
             })}
           >
-            {/* <span>{newActivity ? authUnreadMessages : newContactsRequests ? 1 : null}</span> */}
-            <span>{newActivity ? authUnreadMessages?.length : newContactsRequests ? 1 : null}</span>
+            <span>{newActivity ? unreadMessagesAmount : newContactsRequests ? 1 : null}</span>
           </div>
         ) : (
           isPinned && <div className="contact-item__pinned"></div>

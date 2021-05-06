@@ -107,7 +107,9 @@ const ContactList: React.FC = () => {
       })}
     >
       {initialLoading ? (
-        <span className="contact-list__loader"></span>
+        <div className="contact-list__loader-wrapper">
+          <span className="contact-list__loader"></span>
+        </div>
       ) : !contacts?.length ? (
         <div className="contact-list--no-contacts-text">You don't have any contacts</div>
       ) : (

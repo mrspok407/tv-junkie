@@ -1,6 +1,6 @@
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
-import React, { useState, useEffect, useContext, useCallback, useRef } from "react"
+import { useEffect, useContext, useCallback, useRef } from "react"
 import { ContactsContext } from "../../Context/ContactsContext"
 
 type Props = {
@@ -14,8 +14,12 @@ const useIntersectionObserver = ({ chatContainerRef, authUnreadMessages }: Props
   const context = useContext(ContactsContext)
   const { activeChat, renderedMessagesList, contacts } = context?.state!
   const contactInfo = contacts[activeChat.contactKey] || {}
+  console.log({ authUnreadMessages })
+  console.log({ chatContainerRef })
+  // const observerRef = useRef<any>()
 
-  const observerRef = useRef<any>()
+  let observerRef: any
+
   const observedMessages = useRef<string[]>([])
 
   const observerOptions: any = {
@@ -24,39 +28,41 @@ const useIntersectionObserver = ({ chatContainerRef, authUnreadMessages }: Props
     threshold: 1.0
   }
 
-  const observerCallback = useCallback(
-    (entries: any) => {
-      console.log({ entries })
-      entries.forEach((entry: any) => {
-        if (entry.isIntersecting) {
-          const messageKey = entry.target.dataset.key
-          const messageRef: any = document.querySelector(`.chat-window__message--${messageKey}`)
-          observerRef.current.unobserve(messageRef)
-          observedMessages.current = [...observedMessages.current.filter((message) => message !== messageKey)]
+  const observerCallback = (entries: any) => {
+    console.log({ entries })
+    entries.forEach((entry: any) => {
+      if (entry.isIntersecting) {
+        const messageKey = entry.target.dataset.key
+        const messageRef: any = document.querySelector(`.chat-window__message--${messageKey}`)
+        observerRef.unobserve(messageRef)
+        console.log(observerRef)
+        observedMessages.current = [...observedMessages.current.filter((message) => message !== messageKey)]
 
-          console.log("intersected")
+        console.log("intersected")
 
-          firebase
-            .unreadMessages({ uid: authUser?.uid!, chatKey: activeChat.chatKey })
-            .orderByKey()
-            .endAt(`${messageKey}`)
-            .once("value", (snapshot: any) => {
-              if (snapshot.val() === null) return
-              Object.keys(snapshot.val()).forEach((key: string) => {
-                firebase.unreadMessages({ uid: authUser?.uid!, chatKey: activeChat.chatKey }).child(key).set(null)
-              })
+        firebase
+          .unreadMessages({ uid: authUser?.uid!, chatKey: activeChat.chatKey })
+          .orderByKey()
+          .endAt(`${messageKey}`)
+          .once("value", (snapshot: any) => {
+            if (snapshot.val() === null) return
+            Object.keys(snapshot.val()).forEach((key: string) => {
+              firebase.unreadMessages({ uid: authUser?.uid!, chatKey: activeChat.chatKey }).child(key).set(null)
             })
-        }
-      })
-    },
-    [activeChat]
-  )
+          })
+      }
+    })
+  }
 
   useEffect(() => {
+    console.log("tt")
+    console.log({ renderedMessagesList })
+    console.log({ authUnreadMessages })
+    console.log(observerRef)
     if (!renderedMessagesList[activeChat.chatKey]?.length) return
     if (!authUnreadMessages?.length) return
     if (contactInfo.status !== true) return
-    if (!observerRef.current) return
+    if (!observerRef) return
 
     renderedMessagesList[activeChat.chatKey].forEach((message) => {
       if (!authUnreadMessages.includes(message.key)) return
@@ -64,9 +70,9 @@ const useIntersectionObserver = ({ chatContainerRef, authUnreadMessages }: Props
       console.log("test")
       const unreadMessage = document.querySelector(`.chat-window__message--${message.key}`)
       observedMessages.current = [...observedMessages.current, message.key]
-      observerRef.current?.observe(unreadMessage)
+      observerRef?.observe(unreadMessage)
     })
-  }, [activeChat, renderedMessagesList, authUnreadMessages, contactInfo.status, observerRef.current])
+  }, [activeChat, renderedMessagesList, authUnreadMessages, contactInfo.status])
 
   useEffect(() => {
     if (!renderedMessagesList[activeChat.chatKey]?.length) return
@@ -77,15 +83,14 @@ const useIntersectionObserver = ({ chatContainerRef, authUnreadMessages }: Props
     ]
   }, [renderedMessagesList[activeChat.chatKey]])
 
-  useEffect(() => {
-    if (!chatContainerRef) return
-    observerRef.current = new IntersectionObserver(observerCallback, observerOptions)
+  observerRef = new IntersectionObserver(observerCallback, observerOptions)
 
+  useEffect(() => {
     return () => {
-      observerRef.current.disconnect()
+      observerRef.disconnect()
       observedMessages.current = []
     }
-  }, [activeChat, chatContainerRef])
+  }, [activeChat])
 }
 
 export default useIntersectionObserver

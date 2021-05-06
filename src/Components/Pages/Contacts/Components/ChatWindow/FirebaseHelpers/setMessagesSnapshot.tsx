@@ -20,8 +20,6 @@ export const setMessagesSnapshot = async ({
       .limitToFirst(1)
       .once("value")
 
-    console.log({ authUserUnreadMessages: authUserUnreadMessages.val() })
-
     if (authUserUnreadMessages.val() === null) {
       return await Promise.all([
         messagesRef.orderByChild("timeStamp").limitToLast(MESSAGES_TO_LOAD).once("value"),

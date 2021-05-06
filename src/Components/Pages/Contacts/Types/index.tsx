@@ -61,7 +61,7 @@ export interface ContactsStateInterface {
     [key: string]: ContactInfoInterface
   }
   lastScrollPosition: {
-    [key: string]: number
+    [key: string]: number | undefined
   }
   messagesListRef: any
   messagePopup: string
@@ -71,4 +71,13 @@ export interface ContactsStateInterface {
 export interface SnapshotStringBooleanInterface {
   val: () => { [key: string]: boolean | null } | null
   numChildren: () => number
+}
+
+export interface ContainerRectInterface {
+  height: number
+  scrollHeight: number
+  scrollTop: number
+  thresholdTopLoad: number
+  thresholdTopRender: number
+  thresholdBottomRender: number
 }
