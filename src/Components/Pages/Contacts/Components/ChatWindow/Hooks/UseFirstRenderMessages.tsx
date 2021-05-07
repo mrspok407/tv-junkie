@@ -1,5 +1,5 @@
 import { MessageInterface } from "Components/Pages/Contacts/Types"
-import { useEffect, useContext } from "react"
+import { useEffect, useContext, useRef } from "react"
 import { MESSAGES_TO_RENDER, UNREAD_MESSAGES_TO_RENDER } from "../../Context/Constants"
 import { ContactsContext } from "../../Context/ContactsContext"
 
@@ -14,13 +14,17 @@ type Props = {
 const useFirstRenderMessages = ({ messages, renderedMessages, initialLoading, unreadMessages, chatKey }: Props) => {
   const context = useContext(ContactsContext)
 
+  const rendered = useRef(false)
+
   useEffect(() => {
     console.log({ messages })
     if (!messages?.length) return
-    if (messages[messages.length - 1].key !== renderedMessages[renderedMessages.length - 1].key) {
+    if (messages[messages.length - 1]?.key !== renderedMessages[renderedMessages.length - 1]?.key) {
       return
     }
     if (initialLoading) return
+    console.log(rendered.current)
+    if (rendered.current) return
 
     let startIndexRender: number = 0
     let endIndexRender: number = 0
@@ -52,6 +56,13 @@ const useFirstRenderMessages = ({ messages, renderedMessages, initialLoading, un
       }
     })
   }, [messages, chatKey])
+
+  useEffect(() => {
+    rendered.current = true
+    return () => {
+      rendered.current = false
+    }
+  }, [chatKey])
 }
 
 export default useFirstRenderMessages

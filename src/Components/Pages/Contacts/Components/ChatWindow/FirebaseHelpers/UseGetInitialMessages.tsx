@@ -115,7 +115,7 @@ const useGetInitialMessages = ({ chatKey }: { chatKey: string }) => {
 
           const newMessage = { ...snapshot.val(), key: snapshot.key }
           context?.dispatch({ type: "addNewMessage", payload: { newMessage, chatKey } })
-          console.log({ addedChild: newMessage })
+          // console.log({ addedChild: newMessage })
         })
 
       messagesRef

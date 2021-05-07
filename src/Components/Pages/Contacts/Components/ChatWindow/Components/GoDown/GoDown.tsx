@@ -14,16 +14,13 @@ type Props = {
   getContainerRect: () => ContainerRectInterface
 }
 
-const ToLastMessage: React.FC<Props> = ({
-  chatContainerRef,
-  chatKey,
-  authUnreadMessagesRef,
-  getContainerRect
-}: Props) => {
+const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, authUnreadMessagesRef, getContainerRect }: Props) => {
   const firebase = useContext(FirebaseContext)
   const { authUser } = useContext(AppContext)
   const context = useContext(ContactsContext)
   const { renderedMessagesList, messages, activeChat } = context?.state!
+  const messagesData = messages[chatKey]
+  const renderedMessages = renderedMessagesList[chatKey]
 
   const [fadeInButton, setFadeInButton] = useState(false)
   const [unreadMessages, setUnreadMessages] = useState<string[]>([])
@@ -35,8 +32,8 @@ const ToLastMessage: React.FC<Props> = ({
     const unreadMessagesListener = firebase
       .unreadMessages({ uid: authUser?.uid!, chatKey })
       .on("value", (snapshot: any) => {
-        const unreadMessagesAuth = !snapshot.val() ? [] : Object.keys(snapshot.val())
-        setUnreadMessages(unreadMessagesAuth)
+        const unreadMessagesData = !snapshot.val() ? [] : Object.keys(snapshot.val())
+        setUnreadMessages(unreadMessagesData)
       })
 
     return () => {
@@ -45,7 +42,7 @@ const ToLastMessage: React.FC<Props> = ({
   }, [firebase, chatKey])
 
   const onGoDown = () => {
-    const renderedMessagesData = renderedMessagesList[activeChat.chatKey].map((message) => message.key)
+    const renderedMessagesArray = renderedMessages.map((message) => message.key)
     if (!unreadMessages.length) {
       context?.dispatch({
         type: "handleGoDown",
@@ -53,7 +50,7 @@ const ToLastMessage: React.FC<Props> = ({
       })
       setWentToLastMessage(true)
     } else {
-      if (unreadMessages.some((message) => renderedMessagesData.includes(message))) {
+      if (unreadMessages.some((message) => renderedMessagesArray.includes(message))) {
         firebase.unreadMessages({ uid: authUser?.uid!, chatKey }).set(null)
         setUnreadMessages([])
         authUnreadMessagesRef = []
@@ -72,9 +69,6 @@ const ToLastMessage: React.FC<Props> = ({
     const { height, scrollHeight, scrollTop } = getContainerRect()
     const threshold = 400
 
-    const renderedMessages = renderedMessagesList[activeChat.chatKey]
-    const messagesData = messages[activeChat.chatKey]
-
     if (!messagesData || !renderedMessages) return
     if (scrollHeight <= height) {
       setFadeInButton(false)
@@ -84,46 +78,47 @@ const ToLastMessage: React.FC<Props> = ({
       scrollHeight - scrollTop - height >= threshold ||
       renderedMessages[renderedMessages?.length - 1].key !== messagesData[messagesData?.length - 1].key
     ) {
+      // console.log("fade in true")
       setFadeInButton(true)
     } else {
+      // console.log("fade in false")
       setFadeInButton(false)
     }
   }
 
   const handleScroll = useCallback(
     throttle(200, () => {
-      if (!renderedMessagesList[chatKey] || !messages[chatKey]) return
+      if (!renderedMessages || !messagesData) return
       handleFadeIn()
     }),
-    [chatContainerRef, renderedMessagesList[chatKey], messages[chatKey], chatKey]
+    [chatContainerRef, renderedMessages, messagesData, chatKey]
   )
 
   useLayoutEffect(() => {
-    if (!renderedMessagesList[activeChat.chatKey]?.length) return
+    if (!renderedMessages?.length) return
     if (!wentToFirstUnread) return
     const firstUnreadMessage = unreadMessages[0]
     const firstUnreadMessageRef = document.querySelector(`.chat-window__message--${firstUnreadMessage}`)
     firstUnreadMessageRef?.scrollIntoView({ block: "start", inline: "start" })
     console.log("go down first unread")
     setWentToFirstUnread(false)
-  }, [renderedMessagesList[activeChat.chatKey], wentToFirstUnread])
+  }, [renderedMessages, wentToFirstUnread])
 
   useLayoutEffect(() => {
-    if (!renderedMessagesList[activeChat.chatKey]?.length) return
+    if (!renderedMessages?.length) return
     if (!wentToLastMessage) return
-    const renderedMessages = renderedMessagesList[activeChat.chatKey]
     const lastMessage = renderedMessages[renderedMessages.length - 1]
     const lastMessageRef = document.querySelector(`.chat-window__message--${lastMessage.key}`)
     console.log("go down last msg")
     lastMessageRef?.scrollIntoView({ block: "start", inline: "start" })
     setWentToLastMessage(false)
-  }, [renderedMessagesList[activeChat.chatKey], wentToLastMessage])
+  }, [renderedMessages, wentToLastMessage])
 
   useLayoutEffect(() => {
     if (!chatContainerRef) return
-    if (!renderedMessagesList[chatKey] || !messages[chatKey]) return
+    if (!renderedMessages || !messagesData) return
     handleFadeIn()
-  }, [chatContainerRef, chatKey, renderedMessagesList[chatKey], messages[chatKey]])
+  }, [chatContainerRef, chatKey, renderedMessages, messagesData])
 
   useEffect(() => {
     if (!chatContainerRef) return
@@ -158,4 +153,4 @@ const ToLastMessage: React.FC<Props> = ({
   )
 }
 
-export default ToLastMessage
+export default GoDown

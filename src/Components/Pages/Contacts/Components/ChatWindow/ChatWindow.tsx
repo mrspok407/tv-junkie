@@ -27,18 +27,19 @@ const ChatWindow: React.FC = () => {
     lastScrollPosition,
     authUserUnreadMessages
   } = context?.state!
+  const messagesData = messages[activeChat.chatKey]
+  const renderedMessages = renderedMessagesList[activeChat.chatKey]
+  const unreadMessagesAuth = authUserUnreadMessages[activeChat.chatKey]
   const contactInfo = contacts[activeChat.contactKey] || {}
 
-  const { handleContactRequest } = useResponseContactRequest({ userUid: activeChat.contactKey })
-
-  const contactOptionsRef = useRef<HTMLDivElement>(null!)
   const [chatContainer, setChatContainer] = useState<HTMLDivElement>(null!)
-  // const chatContainer = useRef<HTMLDivElement>(null!)
-  const authUnreadMessagesRef = useRef<string[]>([])
+  const contactOptionsRef = useRef<HTMLDivElement>(null!)
+  const unreadMessagesAuthRef = useRef<string[]>([])
 
   const [popupContactInfoOpen, setPopupContactInfoOpen] = useState(false)
 
-  const [initialScroll, setInitialScroll] = useState(false)
+  const isScrolledFirstRenderRef = useRef(false)
+  const isScrollBottomRef = useRef(false)
 
   const chatContainerRef = useCallback((node) => {
     if (node !== null) {
@@ -46,17 +47,16 @@ const ChatWindow: React.FC = () => {
     }
   }, [])
 
-  // const [initialLoading] = useGetInitialMessages()
-  console.log(chatContainer)
   const { loadTopMessages, loading } = useLoadTopMessages()
+  const { handleContactRequest } = useResponseContactRequest({ userUid: activeChat.contactKey })
   useIntersectionObserver({
     chatContainerRef: chatContainer,
-    authUnreadMessages: authUnreadMessagesRef.current
+    unreadMessagesAuth: unreadMessagesAuthRef.current
   })
   useFirstRenderMessages({
-    messages: messages[activeChat.chatKey],
-    renderedMessages: renderedMessagesList[activeChat.chatKey],
-    unreadMessages: authUserUnreadMessages[activeChat.chatKey],
+    messages: messagesData,
+    renderedMessages: renderedMessages,
+    unreadMessages: unreadMessagesAuth,
     chatKey: activeChat.chatKey
   })
 
@@ -77,15 +77,16 @@ const ChatWindow: React.FC = () => {
     debounce(() => {
       if (!chatContainer) return
       const { scrollTop } = getContainerRect()
+      console.log({ scrollTop })
       context?.dispatch({ type: "updateLastScrollPosition", payload: { scrollTop, chatKey: activeChat.chatKey } })
     }, 150),
-    [activeChat]
+    [activeChat, chatContainer]
   )
 
   let prevScrollTop: any
   const handleScroll = useCallback(
     throttle(200, () => {
-      if (messages[activeChat.chatKey] === undefined) return
+      if (messagesData === undefined) return
       if (!chatContainer) return
       const {
         height,
@@ -96,23 +97,20 @@ const ChatWindow: React.FC = () => {
         thresholdBottomRender
       } = getContainerRect()!
 
-      const firstRenderedMessageIndex = messages[activeChat.chatKey].findIndex(
-        (item) => item.key === renderedMessagesList[activeChat.chatKey][0]?.key
-      )
-      const lastRenderedMessageIndex = messages[activeChat.chatKey].findIndex(
-        (item) =>
-          item.key ===
-          renderedMessagesList[activeChat.chatKey][renderedMessagesList[activeChat.chatKey].length - 1]?.key
+      const firstRenderedMessageIndex = messagesData.findIndex((item) => item.key === renderedMessages[0]?.key)
+      const lastRenderedMessageIndex = messagesData.findIndex(
+        (item) => item.key === renderedMessages[renderedMessages.length - 1]?.key
       )
 
       if (scrollHeight <= height) return
       if (scrollTop < 1 && firstRenderedMessageIndex !== 0) {
         chatContainer.scrollTop = 1
       }
-      if (scrollHeight <= scrollTop + height && lastRenderedMessageIndex !== messages[activeChat.chatKey].length - 1) {
+      if (scrollHeight <= scrollTop + height && lastRenderedMessageIndex !== messagesData.length - 1) {
         chatContainer.scrollTop = scrollHeight - height - 1
       }
-
+      console.log({ scrollTop })
+      console.log({ prevScrollTop })
       if (scrollTop < prevScrollTop || prevScrollTop === undefined) {
         if (scrollTop <= thresholdTopRender) {
           console.log("render top")
@@ -127,6 +125,13 @@ const ChatWindow: React.FC = () => {
           context?.dispatch({ type: "renderBottomMessages" })
         }
       }
+      if (scrollHeight <= scrollTop + height) {
+        console.log("set bottom TRUE")
+        isScrollBottomRef.current = true
+      } else {
+        console.log("set bottom FALSE")
+        isScrollBottomRef.current = false
+      }
       prevScrollTop = scrollTop
     }),
     [chatContainer, activeChat, loadTopMessages]
@@ -137,37 +142,48 @@ const ChatWindow: React.FC = () => {
       .unreadMessages({ uid: authUser?.uid!, chatKey: activeChat.chatKey })
       .on("value", (snapshot: any) => {
         console.log("chatWindow unread UPDATE")
-        const unreadMessagesAuth = !snapshot.val() ? [] : Object.keys(snapshot.val())
-        authUnreadMessagesRef.current = unreadMessagesAuth
+        const unreadMessagesData = !snapshot.val() ? [] : Object.keys(snapshot.val())
+        unreadMessagesAuthRef.current = unreadMessagesData
       })
     return () => {
       firebase.unreadMessages({ uid: authUser?.uid!, chatKey: activeChat.chatKey }).off("value", unreadMessagesListener)
       context?.dispatch({
         type: "updateAuthUserUnreadMessages",
-        payload: { chatKey: activeChat.chatKey, unreadMessages: authUnreadMessagesRef.current }
+        payload: { chatKey: activeChat.chatKey, unreadMessages: unreadMessagesAuthRef.current }
       })
     }
   }, [activeChat])
 
+  useEffect(() => {
+    if (!chatContainer) return
+    if (!renderedMessages?.length || !messagesData?.length) return
+    if (messagesData[messagesData.length - 1].key !== renderedMessages[renderedMessages.length - 1].key) return
+
+    if (!isScrolledFirstRenderRef.current) return
+    if (!isScrollBottomRef.current) return
+
+    const lastMessage = renderedMessages[renderedMessages.length - 1]
+    const lastMessageRef = document.querySelector(`.chat-window__message--${lastMessage.key}`)
+
+    lastMessageRef?.scrollIntoView({ block: "start", inline: "start" })
+  }, [activeChat, renderedMessagesList, messages, chatContainer])
+
   useLayoutEffect(() => {
     if (!chatContainer) return
-    if (!messages[activeChat.chatKey]?.length) return
+    if (!messagesData?.length) return
     if (contactInfo.status !== true) return
-    if (initialScroll) return
+    if (isScrolledFirstRenderRef.current) return
 
     const { scrollHeight, height } = getContainerRect()
-    console.log(authUserUnreadMessages[activeChat.chatKey])
-    const firstUnreadMessage = authUserUnreadMessages[activeChat.chatKey][0]
-    const lastMessage = messages[activeChat.chatKey][messages[activeChat.chatKey].length - 1]
-
-    const firstUnreadMessageRef = document.querySelector(`.chat-window__message--${firstUnreadMessage}`)
-    const lastMessageRef = document.querySelector(`.chat-window__message--${lastMessage.key}`)
+    const firstUnreadMessageRef = document.querySelector(`.chat-window__message--${unreadMessagesAuth[0]}`)
+    const lastMessageRef = document.querySelector(`.chat-window__message--${messagesData[messagesData.length - 1].key}`)
 
     const isScrollBottom = !!(
       lastScrollPosition[activeChat.chatKey] === undefined ||
       scrollHeight <= lastScrollPosition[activeChat.chatKey]! + height
     )
-    if (firstUnreadMessage) {
+
+    if (firstUnreadMessageRef) {
       if (isScrollBottom) {
         console.log("to first unread ChatWindow")
         firstUnreadMessageRef?.scrollIntoView({ block: "start", inline: "start" })
@@ -179,26 +195,32 @@ const ChatWindow: React.FC = () => {
       if (isScrollBottom) {
         console.log("scroll, no unread, scrollAtBottom")
         lastMessageRef?.scrollIntoView({ block: "start", inline: "start" })
+        isScrollBottomRef.current = true
       } else {
         console.log("scroll previous no unread")
         chatContainer.scrollTop = lastScrollPosition[activeChat.chatKey]!
       }
     }
-    setInitialScroll(true)
-  }, [activeChat, messages[activeChat.chatKey], initialScroll, chatContainer])
+    isScrolledFirstRenderRef.current = true
+  }, [activeChat, messagesData, chatContainer])
+
+  useLayoutEffect(() => {
+    return () => {
+      isScrollBottomRef.current = false
+      isScrolledFirstRenderRef.current = false
+    }
+  }, [activeChat, chatContainer])
 
   useEffect(() => {
     if (!chatContainer) return
-    const chatContainerRef = chatContainer
-    chatContainerRef.addEventListener("scroll", handleScroll)
+    chatContainer.addEventListener("scroll", handleScroll)
     return () => {
-      chatContainerRef.removeEventListener("scroll", handleScroll)
+      chatContainer.removeEventListener("scroll", handleScroll)
     }
   }, [handleScroll, chatContainer])
 
   useEffect(() => {
     if (!chatContainer) return
-    setInitialScroll(false)
     chatContainer.addEventListener("scroll", scrollPositionHandler)
     return () => {
       scrollPositionHandler.flush()
@@ -249,15 +271,20 @@ const ChatWindow: React.FC = () => {
         </div>
         <div className="contact-info__status">Online</div>
       </div>
-      <div className="chat-window__messages-list-container" ref={chatContainerRef}>
+      <div
+        className={classNames("chat-window__messages-list-container", {
+          "chat-window__messages-list-container--loading": messagesData === undefined
+        })}
+        ref={chatContainerRef}
+      >
         {contactInfo.status === true &&
-          (messages[activeChat.chatKey] === undefined ? (
+          (messagesData === undefined ? (
             <div className="chat-window__loader-container">
               <span className="chat-window__loader"></span>
             </div>
           ) : (
             <div className="chat-window__messages-list">
-              {renderedMessagesList[activeChat.chatKey]?.map((messageData, index, array) => {
+              {renderedMessages?.map((messageData, index, array) => {
                 const nextMessage = array[index + 1]
                 return (
                   <div
@@ -319,7 +346,7 @@ const ChatWindow: React.FC = () => {
       <GoDown
         chatContainerRef={chatContainer}
         chatKey={activeChat.chatKey}
-        authUnreadMessagesRef={authUnreadMessagesRef.current}
+        authUnreadMessagesRef={unreadMessagesAuthRef.current}
         getContainerRect={getContainerRect}
       />
     </div>

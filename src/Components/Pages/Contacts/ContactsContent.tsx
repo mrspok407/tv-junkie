@@ -82,23 +82,20 @@ const ContactsContent: React.FC<Props> = () => {
       }
     })
 
-    for (let i = 1; i <= 50; i++) {
+    for (let i = 1; i <= 10; i++) {
       const userKey = key
       const chatKey = userKey < authUser?.uid! ? `${userKey}_${authUser?.uid}` : `${authUser?.uid}_${userKey}`
 
       const randomMessage = lorem.generateSentences(1)
       const timeStampEpoch = new Date().getTime()
 
-      const pushNewMessage = await firebase
-        .privateChats()
-        .child(`${chatKey}/messages`)
-        .push({
-          sender: userKey,
-          // sender: Math.random() > 0.5 ? userKey : authUser?.uid,
-          message: randomMessage,
-          timeStamp: timeStampEpoch + 50000000,
-          status: "unread"
-        })
+      const pushNewMessage = await firebase.privateChats().child(`${chatKey}/messages`).push({
+        sender: userKey,
+        // sender: Math.random() > 0.5 ? userKey : authUser?.uid,
+        message: randomMessage,
+        timeStamp: timeStampEpoch,
+        status: "unread"
+      })
 
       firebase
         .privateChats()
