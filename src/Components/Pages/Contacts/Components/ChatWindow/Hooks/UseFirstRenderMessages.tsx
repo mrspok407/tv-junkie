@@ -7,24 +7,20 @@ type Props = {
   messages: MessageInterface[]
   renderedMessages: MessageInterface[]
   unreadMessages: string[]
-  initialLoading?: boolean
   chatKey: string
 }
 
-const useFirstRenderMessages = ({ messages, renderedMessages, initialLoading, unreadMessages, chatKey }: Props) => {
+const useFirstRenderMessages = ({ messages, renderedMessages, unreadMessages, chatKey }: Props) => {
   const context = useContext(ContactsContext)
-
-  const rendered = useRef(false)
+  const isRenderedRef = useRef(false)
 
   useEffect(() => {
-    console.log({ messages })
     if (!messages?.length) return
     if (messages[messages.length - 1]?.key !== renderedMessages[renderedMessages.length - 1]?.key) {
       return
     }
-    if (initialLoading) return
-    console.log(rendered.current)
-    if (rendered.current) return
+    console.log(isRenderedRef.current)
+    if (isRenderedRef.current) return
 
     let startIndexRender: number = 0
     let endIndexRender: number = 0
@@ -55,12 +51,12 @@ const useFirstRenderMessages = ({ messages, renderedMessages, initialLoading, un
         chatKey
       }
     })
-  }, [messages, chatKey])
+  }, [messages, chatKey]) // esline-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    rendered.current = true
+    isRenderedRef.current = true
     return () => {
-      rendered.current = false
+      isRenderedRef.current = false
     }
   }, [chatKey])
 }

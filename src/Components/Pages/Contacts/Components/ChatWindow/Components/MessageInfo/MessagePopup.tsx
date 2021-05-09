@@ -1,7 +1,7 @@
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
 import { MessageInterface } from "Components/Pages/Contacts/Types"
-import React, { useState, useEffect, useRef, useLayoutEffect, useCallback, useContext } from "react"
+import React, { useEffect, useContext } from "react"
 import { ContactsContext } from "../../../Context/ContactsContext"
 
 type Props = {
@@ -20,7 +20,7 @@ const MessagePopup: React.FC<Props> = ({ messageOptionsRef, messageData }) => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside as EventListener)
     }
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleClickOutside = (e: CustomEvent) => {
     if (!messageOptionsRef?.contains(e.target as Node)) {

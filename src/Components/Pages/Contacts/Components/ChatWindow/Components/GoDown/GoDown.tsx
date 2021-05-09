@@ -10,11 +10,11 @@ import "./GoDown.scss"
 type Props = {
   chatContainerRef: HTMLDivElement
   chatKey: string
-  authUnreadMessagesRef: string[]
+  unreadMessagesAuthRef: string[]
   getContainerRect: () => ContainerRectInterface
 }
 
-const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, authUnreadMessagesRef, getContainerRect }: Props) => {
+const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuthRef, getContainerRect }: Props) => {
   const firebase = useContext(FirebaseContext)
   const { authUser } = useContext(AppContext)
   const context = useContext(ContactsContext)
@@ -53,7 +53,7 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, authUnreadMessages
       if (unreadMessages.some((message) => renderedMessagesArray.includes(message))) {
         firebase.unreadMessages({ uid: authUser?.uid!, chatKey }).set(null)
         setUnreadMessages([])
-        authUnreadMessagesRef = []
+        unreadMessagesAuthRef = []
         setWentToLastMessage(true)
       } else {
         setWentToFirstUnread(true)

@@ -19,12 +19,6 @@ const useIntersectionObserver = ({ chatContainerRef, unreadMessagesAuth }: Props
   let observerRef: any
   const observedMessages = useRef<string[]>([])
 
-  const observerOptions: any = {
-    root: chatContainerRef,
-    rootMargin: "0px",
-    threshold: 1.0
-  }
-
   const observerCallback = (entries: any) => {
     entries.forEach((entry: any) => {
       if (entry.isIntersecting) {
@@ -59,6 +53,13 @@ const useIntersectionObserver = ({ chatContainerRef, unreadMessagesAuth }: Props
     })
   }
 
+  const observerOptions: any = {
+    root: chatContainerRef && chatContainerRef,
+    rootMargin: "0px",
+    threshold: 1.0
+  }
+  observerRef = new IntersectionObserver(observerCallback, observerOptions)
+
   useEffect(() => {
     if (!renderedMessages?.length) return
     if (!unreadMessagesAuth?.length) return
@@ -80,8 +81,6 @@ const useIntersectionObserver = ({ chatContainerRef, unreadMessagesAuth }: Props
       ...observedMessages.current.filter((message) => renderedMessages.map((message) => message.key).includes(message))
     ]
   }, [renderedMessages])
-
-  observerRef = new IntersectionObserver(observerCallback, observerOptions)
 
   useEffect(() => {
     return () => {

@@ -9,7 +9,7 @@ import { MESSAGES_TO_LOAD, MESSAGES_TO_RENDER } from "../../Context/Constants"
 import debounce from "debounce"
 
 const useLoadTopMessages = () => {
-  const { authUser, errors } = useContext(AppContext)
+  const { errors } = useContext(AppContext)
   const firebase = useContext(FirebaseContext)
   const context = useContext(ContactsContext)
   const { messages, renderedMessagesList, activeChat } = context?.state!

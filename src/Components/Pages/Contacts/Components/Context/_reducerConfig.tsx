@@ -124,6 +124,10 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
           renderedMessagesList: {
             ...renderedMessagesList,
             [activeChat.chatKey]: messagesData.slice(-MESSAGES_TO_RENDER)
+          },
+          authUserUnreadMessages: {
+            ...authUserUnreadMessages,
+            [activeChat.chatKey]: []
           }
         }
       } else {
@@ -140,7 +144,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
             }
           }
         } else {
-          const endIndex = messagesData.length - (unreadMessages.length! - UNREAD_MESSAGES_TO_RENDER)
+          const endIndex = messagesData.length - Math.max(unreadMessages.length! - UNREAD_MESSAGES_TO_RENDER, 0)
           const startIndex = Math.max(endIndex - MESSAGES_TO_RENDER, 0)
           console.log("handleGoDown no unread in bunch")
           return {
@@ -234,7 +238,25 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
           }
         }
       } else {
+        if (!lastMessage || !lastRenderedMessage) {
+          return {
+            ...state,
+            messages: {
+              ...messages,
+              [action.payload.chatKey]: [...messagesData, action.payload.newMessage]
+            },
+            renderedMessagesList: {
+              ...renderedMessagesList,
+              [action.payload.chatKey]: [...messagesData, action.payload.newMessage]
+            },
+            authUserUnreadMessages: {
+              ...authUserUnreadMessages,
+              [action.payload.chatKey]: [...unreadMessages, action.payload.newMessage.key]
+            }
+          }
+        }
         if (lastMessage.key !== lastRenderedMessage.key) {
+          console.log("not last bunch")
           return {
             ...state,
             messages: {
@@ -248,6 +270,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
           }
         } else {
           console.log("last bunch")
+          console.log(authUserUnreadMessages[action.payload.chatKey])
           if (authUserUnreadMessages[action.payload.chatKey].length! <= UNREAD_MESSAGES_TO_RENDER) {
             return {
               ...state,
@@ -265,6 +288,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
               }
             }
           } else {
+            console.log("unread msg more 50")
             const endIndexRender =
               [...messagesData, action.payload.newMessage].length -
               (authUserUnreadMessages[action.payload.chatKey].length! - UNREAD_MESSAGES_TO_RENDER)
