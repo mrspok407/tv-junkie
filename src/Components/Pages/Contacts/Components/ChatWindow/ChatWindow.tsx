@@ -13,6 +13,7 @@ import useIntersectionObserver from "./Hooks/UseIntersectionObserver"
 import useFirstRenderMessages from "./Hooks/UseFirstRenderMessages"
 import GoDown from "./Components/GoDown/GoDown"
 import "./ChatWindow.scss"
+import useResizeObserver from "./Hooks/UseResizeObserver"
 
 const ChatWindow: React.FC = () => {
   const { authUser, newContactsActivity, errors } = useContext(AppContext)
@@ -53,6 +54,7 @@ const ChatWindow: React.FC = () => {
     chatContainerRef: chatContainerRef,
     unreadMessagesAuth: unreadMessagesAuthRef.current
   })
+  useResizeObserver({ chatContainerRef: chatContainerRef, isScrollBottomRef: isScrollBottomRef.current })
   useFirstRenderMessages({
     messages: messagesData,
     renderedMessages: renderedMessages,
@@ -85,6 +87,7 @@ const ChatWindow: React.FC = () => {
   let prevScrollTop: any
   const handleScroll = useCallback(
     throttle(200, () => {
+      console.log("test")
       if (messagesData === undefined) return
       if (!chatContainerRef) return
       const {
@@ -139,9 +142,15 @@ const ChatWindow: React.FC = () => {
           type: "updateAuthUserUnreadMessages",
           payload: { chatKey: activeChat.chatKey, unreadMessages: [] }
         })
+        firebase
+          .chatMemberStatus({ chatKey: activeChat.chatKey, memberKey: authUser?.uid! })
+          .update({ chatBottom: true })
       } else {
         console.log("set bottom FALSE")
         isScrollBottomRef.current = false
+        firebase
+          .chatMemberStatus({ chatKey: activeChat.chatKey, memberKey: authUser?.uid! })
+          .update({ chatBottom: false })
       }
       prevScrollTop = scrollTop
     }),
@@ -165,7 +174,7 @@ const ChatWindow: React.FC = () => {
     }
   }, [activeChat])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!chatContainerRef) return
     if (!renderedMessages?.length || !messagesData?.length) return
 
@@ -212,6 +221,9 @@ const ChatWindow: React.FC = () => {
         console.log("scroll, no unread, scrollAtBottom")
         lastMessageRef?.scrollIntoView({ block: "start", inline: "start" })
         isScrollBottomRef.current = true
+        firebase
+          .chatMemberStatus({ chatKey: activeChat.chatKey, memberKey: authUser?.uid! })
+          .update({ chatBottom: true })
       } else {
         console.log("scroll previous no unread")
         chatContainerRef.scrollTop = lastScrollPosition[activeChat.chatKey]!
@@ -221,6 +233,12 @@ const ChatWindow: React.FC = () => {
   }, [activeChat, messagesData, chatContainerRef])
 
   useLayoutEffect(() => {
+    if (!chatContainerRef) return
+    const { scrollHeight, height } = getContainerRect()
+    if (scrollHeight <= height) {
+      isScrollBottomRef.current = true
+      firebase.chatMemberStatus({ chatKey: activeChat.chatKey, memberKey: authUser?.uid! }).update({ chatBottom: true })
+    }
     return () => {
       isScrollBottomRef.current = false
       isScrolledFirstRenderRef.current = false
@@ -246,8 +264,10 @@ const ChatWindow: React.FC = () => {
   }, [activeChat, chatContainerRef])
 
   useEffect(() => {
-    if (activeChat.chatKey) return
-    context?.dispatch({ type: "updateActiveChat", payload: { chatKey: "", contactKey: "" } })
+    firebase.chatMemberStatus({ chatKey: activeChat.chatKey, memberKey: authUser?.uid! }).update({ isOnline: true })
+    return () => {
+      firebase.chatMemberStatus({ chatKey: activeChat.chatKey, memberKey: authUser?.uid! }).update({ isOnline: null })
+    }
   }, [activeChat])
 
   return (

@@ -63,14 +63,6 @@ const contactsDatabaseRef = (uid: string) => `${uid}/contactsDatabase`;
 //   newActivity: boolean;
 // }
 
-export const onMessageRemoved = functions.database
-  .ref("users/{uid}/content/messages/{key}")
-  .onDelete(async (change, context) => {
-    console.log({params: context.params});
-    const messageKey = context.params.key;
-    return database.ref(`users/drv5lG97VxVBLgkdn8bMhdxmqQT2/content/unreadMessages_uid1/${messageKey}`).set(null);
-  });
-
 export const updatePinnedTimeStamp = functions.database
   .ref("users/{authUid}/contactsDatabase/contactsList/{contactUid}/timeStamp")
   .onWrite(async (change) => {
@@ -153,6 +145,13 @@ export const decrementContacts = functions.database
         return currentValue - 1;
       }
     });
+  });
+
+export const updateLastSeen = functions.database
+  .ref("privateChats/{chatKey}/members/{memberKey}/status/isOnline")
+  .onDelete(async (snapshot) => {
+    const timeStamp = admin.database.ServerValue.TIMESTAMP;
+    snapshot.ref.parent?.update({lastSeen: timeStamp});
   });
 
 export const newContactRequest = functions.https.onCall(async (data, context) => {

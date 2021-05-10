@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.handleContactRequest = exports.newContactRequest = exports.decrementContacts = exports.incrementContacts = exports.removeNewContactsActivity = exports.addNewContactsActivity = exports.updatePinnedTimeStamp = exports.onMessageRemoved = void 0;
+exports.handleContactRequest = exports.newContactRequest = exports.updateLastSeen = exports.decrementContacts = exports.incrementContacts = exports.removeNewContactsActivity = exports.addNewContactsActivity = exports.updatePinnedTimeStamp = void 0;
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 // Cloud Functions interesting points:
@@ -45,13 +45,6 @@ const contactsDatabaseRef = (uid) => `${uid}/contactsDatabase`;
 //   recipientNotified: boolean;
 //   newActivity: boolean;
 // }
-exports.onMessageRemoved = functions.database
-    .ref("users/{uid}/content/messages/{key}")
-    .onDelete(async (change, context) => {
-    console.log({ params: context.params });
-    const messageKey = context.params.key;
-    return database.ref(`users/drv5lG97VxVBLgkdn8bMhdxmqQT2/content/unreadMessages_uid1/${messageKey}`).set(null);
-});
 exports.updatePinnedTimeStamp = functions.database
     .ref("users/{authUid}/contactsDatabase/contactsList/{contactUid}/timeStamp")
     .onWrite(async (change) => {
@@ -127,6 +120,13 @@ exports.decrementContacts = functions.database
             return currentValue - 1;
         }
     });
+});
+exports.updateLastSeen = functions.database
+    .ref("privateChats/{chatKey}/members/{memberKey}/status/isOnline")
+    .onDelete(async (snapshot) => {
+    var _a;
+    const timeStamp = admin.database.ServerValue.TIMESTAMP;
+    (_a = snapshot.ref.parent) === null || _a === void 0 ? void 0 : _a.update({ lastSeen: timeStamp });
 });
 exports.newContactRequest = functions.https.onCall(async (data, context) => {
     var _a;

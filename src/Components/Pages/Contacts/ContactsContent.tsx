@@ -28,10 +28,18 @@ const ContactsContent: React.FC<Props> = () => {
       if (!messagesRef.current) return
       Object.keys(messagesRef.current).forEach((chatKey) => {
         console.log(chatKey)
+        let otherMemberKey: string
+        if (authUser?.uid === chatKey.slice(0, authUser?.uid.length)) {
+          otherMemberKey = chatKey.slice(authUser?.uid.length + 1)
+        } else {
+          otherMemberKey = chatKey.slice(0, -authUser?.uid.length! - 1)
+        }
+
         firebase.messages({ chatKey }).off()
+        firebase.chatMemberStatus({ chatKey, memberKey: otherMemberKey }).off()
       })
     }
-  }, [])
+  }, [authUser, firebase])
 
   const addNewMessageCurrent = async () => {
     const lorem = new LoremIpsum({
@@ -82,7 +90,7 @@ const ContactsContent: React.FC<Props> = () => {
       }
     })
 
-    for (let i = 1; i <= 25; i++) {
+    for (let i = 1; i <= 1; i++) {
       const userKey = key
       const chatKey = userKey < authUser?.uid! ? `${userKey}_${authUser?.uid}` : `${authUser?.uid}_${userKey}`
 
@@ -93,14 +101,19 @@ const ContactsContent: React.FC<Props> = () => {
         sender: userKey,
         // sender: Math.random() > 0.5 ? userKey : authUser?.uid,
         message: randomMessage,
-        timeStamp: timeStampEpoch,
-        status: "unread"
+        timeStamp: timeStampEpoch
       })
 
-      firebase
-        .privateChats()
-        .child(`${chatKey}/members/${authUser?.uid}/unreadMessages/${pushNewMessage.key}`)
-        .set(true)
+      const contactStatus = await firebase.chatMemberStatus({ chatKey, memberKey: authUser?.uid! }).once("value")
+
+      console.log(contactStatus.val())
+
+      if (!contactStatus.val().isOnline || !contactStatus.val().chatBottom) {
+        firebase
+          .privateChats()
+          .child(`${chatKey}/members/${authUser?.uid}/unreadMessages/${pushNewMessage.key}`)
+          .set(true)
+      }
     }
   }
 

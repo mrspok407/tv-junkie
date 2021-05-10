@@ -31,6 +31,12 @@ export interface MessageInterface {
   key: string
 }
 
+export interface ContactStatusInterface {
+  isOnline: boolean
+  lastSeen: number | undefined
+  chatBottom: boolean | undefined
+}
+
 export const MESSAGE_INITIAL_DATA = {
   message: "",
   sender: "",
@@ -62,6 +68,9 @@ export interface ContactsStateInterface {
   }
   lastScrollPosition: {
     [key: string]: number | undefined
+  }
+  contactsStatus: {
+    [key: string]: ContactStatusInterface
   }
   messagesListRef: any
   messagePopup: string

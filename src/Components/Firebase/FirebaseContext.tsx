@@ -33,6 +33,7 @@ export interface FirebaseInterface {
   contactsDatabase: ({ uid }: { uid: string | undefined }) => any
   contactsList: ({ uid }: { uid: string | undefined }) => any
   contact: ({ authUid, contactUid }: { authUid: string | undefined; contactUid: string }) => any
+  chatMemberStatus: ({ chatKey, memberKey }: { chatKey: string; memberKey: string }) => any
 }
 
 export const FIREBASE_INITIAL_STATE = {
@@ -44,7 +45,8 @@ export const FIREBASE_INITIAL_STATE = {
   messages: () => {},
   message: () => {},
   privateChat: () => {},
-  unreadMessages: () => {}
+  unreadMessages: () => {},
+  chatMemberStatus: () => {}
 }
 
 export const FirebaseContext = createContext<FirebaseInterface>(FIREBASE_INITIAL_STATE)

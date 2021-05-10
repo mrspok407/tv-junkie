@@ -10,6 +10,7 @@ import { throttle } from "throttle-debounce"
 import debounce from "debounce"
 import "./Contact.scss"
 import useGetInitialMessages from "../../ChatWindow/FirebaseHelpers/UseGetInitialMessages"
+import useHandleContactsStatus from "../../ChatWindow/FirebaseHelpers/UseHandleContactsStatus"
 
 type Props = {
   contactInfo: ContactInfoInterface
@@ -37,21 +38,12 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
     contactInfo.key < authUser?.uid! ? `${contactInfo.key}_${authUser?.uid}` : `${authUser?.uid}_${contactInfo.key}`
 
   useGetInitialMessages({ chatKey })
+  useHandleContactsStatus({ chatKey, contactKey: contactInfo.key })
 
   const setContactActive = () => {
     if (activeChat.chatKey === chatKey) return
     context?.dispatch({ type: "updateActiveChat", payload: { chatKey, contactKey: contactInfo.key } })
   }
-
-  const debounceUpdateUnreadMessages = useCallback(
-    debounce((value: string[]) => {
-      context?.dispatch({
-        type: "updateAuthUserUnreadMessages",
-        payload: { chatKey, unreadMessages: value }
-      })
-    }, 350),
-    []
-  )
 
   useEffect(() => {
     firebase

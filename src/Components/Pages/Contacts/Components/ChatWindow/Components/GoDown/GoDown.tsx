@@ -18,7 +18,7 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
   const firebase = useContext(FirebaseContext)
   const { authUser } = useContext(AppContext)
   const context = useContext(ContactsContext)
-  const { renderedMessagesList, messages, activeChat } = context?.state!
+  const { renderedMessagesList, messages } = context?.state!
   const messagesData = messages[chatKey]
   const renderedMessages = renderedMessagesList[chatKey]
 
@@ -43,7 +43,7 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
 
   const onGoDown = () => {
     const renderedMessagesArray = renderedMessages.map((message) => message.key)
-    if (!unreadMessages.length) {
+    if (!unreadMessages?.length) {
       context?.dispatch({
         type: "handleGoDown",
         payload: { unreadMessages }
@@ -67,9 +67,10 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
 
   const handleFadeIn = () => {
     const { height, scrollHeight, scrollTop } = getContainerRect()
-    const threshold = 400
+    const threshold = scrollHeight * 0.1
+    console.log("handleFadeIn")
 
-    if (!messagesData || !renderedMessages) return
+    if (!messagesData?.length || !renderedMessages?.length) return
     if (scrollHeight <= height) {
       setFadeInButton(false)
       return
@@ -78,21 +79,27 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
       scrollHeight - scrollTop - height >= threshold ||
       renderedMessages[renderedMessages?.length - 1].key !== messagesData[messagesData?.length - 1].key
     ) {
-      // console.log("fade in true")
+      console.log("fade in true")
       setFadeInButton(true)
     } else {
-      // console.log("fade in false")
+      console.log("fade in false")
       setFadeInButton(false)
     }
   }
 
   const handleScroll = useCallback(
     throttle(200, () => {
-      if (!renderedMessages || !messagesData) return
+      console.log("test")
+      if (!renderedMessages?.length || !messagesData?.length) return
       handleFadeIn()
     }),
     [chatContainerRef, renderedMessages, messagesData, chatKey]
   )
+
+  useEffect(() => {
+    console.log({ renderedMessages })
+    console.log({ messagesData })
+  }, [renderedMessages, messagesData])
 
   useLayoutEffect(() => {
     if (!renderedMessages?.length) return
@@ -116,15 +123,24 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
 
   useLayoutEffect(() => {
     if (!chatContainerRef) return
-    if (!renderedMessages || !messagesData) return
+    if (!renderedMessages?.length || !messagesData?.length) return
     handleFadeIn()
-  }, [chatContainerRef, chatKey, renderedMessages, messagesData])
+  }, [chatContainerRef, chatKey])
+
+  useLayoutEffect(() => {
+    if (!chatContainerRef) return
+    if (!renderedMessages?.length || !messagesData?.length) return
+    if (messagesData?.length <= 75) {
+      handleFadeIn()
+    }
+  }, [chatContainerRef, chatKey, messagesData])
 
   useEffect(() => {
     if (!chatContainerRef) return
     const chatContainer = chatContainerRef
     chatContainer.addEventListener("scroll", handleScroll)
     return () => {
+      console.log("scroll GoDown remove")
       chatContainer.removeEventListener("scroll", handleScroll)
     }
   }, [handleScroll, chatKey])

@@ -1,4 +1,4 @@
-import { ContactsInterface, ContactsStateInterface, MessageInterface } from "../../Types"
+import { ContactsInterface, ContactsStateInterface, ContactStatusInterface, MessageInterface } from "../../Types"
 import { MESSAGES_TO_RENDER, UNREAD_MESSAGES_TO_RENDER } from "./Constants"
 import * as _isEqual from "lodash.isequal"
 
@@ -23,6 +23,13 @@ export type ACTIONTYPES =
   | { type: "updateLastScrollPosition"; payload: { scrollTop: number; chatKey: string } }
   | { type: "updateMessagePopup"; payload: string }
   | { type: "updateContactPopup"; payload: string }
+  | {
+      type: "updateContactsStatus"
+      payload: {
+        status: ContactStatusInterface
+        chatKey: string
+      }
+    }
 
 const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
   const {
@@ -33,7 +40,8 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
     renderedMessagesList,
     messagePopup,
     contactPopup,
-    lastScrollPosition
+    lastScrollPosition,
+    contactsStatus
   } = state
 
   switch (action.type) {
@@ -316,24 +324,31 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
       }
     }
 
-    case "removeMessage":
+    case "removeMessage": {
+      const messagesData = messages[action.payload.chatKey]
+      const renderedMessages = renderedMessagesList[action.payload.chatKey]
+      const endIndex = messagesData.findIndex(
+        (message: MessageInterface) => message.key === renderedMessages[renderedMessages.length - 1].key
+      )
+      const startIndex = Math.max(endIndex + 1 - MESSAGES_TO_RENDER, 0)
       return {
         ...state,
         messages: {
           ...messages,
           [action.payload.chatKey]: [
-            ...messages[action.payload.chatKey].filter((message) => message.key !== action.payload.removedMessage.key)
+            ...messagesData.filter((message) => message.key !== action.payload.removedMessage.key)
           ]
         },
         renderedMessagesList: {
           ...renderedMessagesList,
           [action.payload.chatKey]: [
-            ...renderedMessagesList[action.payload.chatKey].filter(
-              (message) => message.key !== action.payload.removedMessage.key
-            )
+            ...messagesData
+              .filter((message) => message.key !== action.payload.removedMessage.key)
+              .slice(startIndex, endIndex + 1)
           ]
         }
       }
+    }
 
     case "changeMessage":
       const prevStateMessages = [...messages[action.payload.chatKey]]
@@ -429,6 +444,15 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         contactPopup: contactPopup === action.payload ? "" : action.payload
       }
 
+    case "updateContactsStatus":
+      return {
+        ...state,
+        contactsStatus: {
+          ...contactsStatus,
+          [action.payload.chatKey]: action.payload.status
+        }
+      }
+
     default:
       throw new Error()
   }
@@ -448,7 +472,8 @@ export const INITIAL_STATE = {
   lastScrollPosition: {},
   messagePopup: "",
   contactPopup: "",
-  messagesListRef: ""
+  messagesListRef: "",
+  contactsStatus: {}
 }
 
 export default reducer
