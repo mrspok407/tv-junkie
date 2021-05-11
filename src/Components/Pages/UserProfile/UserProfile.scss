@@ -20,10 +20,6 @@
     font-size: 1.7rem;
   }
 
-  &__name {
-    // color: getColor(blueClr, $mainPalette);
-  }
-
   @include mediaMaxW(#{$mobileViewPort}) {
     padding: 0 8px 0 8px;
 

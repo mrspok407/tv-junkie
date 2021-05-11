@@ -75,7 +75,7 @@ export const updatePinnedTimeStamp = functions.database
 
     if (!beforeData.exists()) {
       return afterData.ref.parent?.update({
-        pinned_lastActivityTS: `true_${timeStamp}`
+        pinned_lastActivityTS: `false_${timeStamp}`
       });
     }
 

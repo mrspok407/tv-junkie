@@ -26,7 +26,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
   const formatedDate = useTimestampFormater({ timeStamp: contactInfo.pinned_lastActivityTS?.slice(-13) })
 
   const [newActivity, setNewActivity] = useState<boolean | null | undefined>(contactInfo.newContactsActivity)
-  const [newContactsRequests, setNewContactRequests] = useState<boolean | null>(contactInfo.newContactsRequests)
+  const [newContactsRequest, setNewContactRequest] = useState<boolean | null>(contactInfo.newContactsRequests)
 
   const [authUnreadMessages, setAuthUnreadMessages] = useState<string[]>(contactInfo.unreadMessagesAuth)
   const [contactUnreadMessages, setContactUnreadMessages] = useState<number | null>(contactInfo.unreadMessagesContact)
@@ -54,7 +54,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
     firebase
       .newContactsRequests({ uid: authUser?.uid! })
       .child(`${contactInfo.key}`)
-      .on("value", (snapshot: any) => setNewContactRequests(snapshot.val()))
+      .on("value", (snapshot: any) => setNewContactRequest(snapshot.val()))
 
     const unreadMessagesListener = firebase
       .unreadMessages({ uid: authUser?.uid!, chatKey })
@@ -101,7 +101,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
         "contact-item--active": chatActive,
         "contact-item--auth-last-message-not-pinned": !!(lastMessage?.sender === authUser?.uid && !isPinned),
         "contact-item--contact-last-message": !!(lastMessage?.sender !== authUser?.uid),
-        "contact-item--not-pinned-no-activity": !!(!isPinned && !newActivity && !newContactsRequests)
+        "contact-item--not-pinned-no-activity": !!(!isPinned && !newActivity && !newContactsRequest)
       })}
       onClick={() => setContactActive()}
     >
@@ -122,7 +122,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
 
       <div className="contact-item__row contact-item__row--bottom">
         <div className="contact-item__last-message-text">
-          {newContactsRequests ? (
+          {newContactsRequest ? (
             "Wants to connect"
           ) : (
             <>
@@ -150,13 +150,13 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
             <ContactPopup contactOptionsRef={contactOptionsRef.current} contactInfo={contactInfo} />
           )}
         </div>
-        {newActivity || newContactsRequests ? (
+        {newActivity || newContactsRequest ? (
           <div
             className={classNames("contact-item__unread-messages", {
               "contact-item__unread-messages--active": chatActive
             })}
           >
-            <span>{newActivity ? unreadMessagesAmount : newContactsRequests ? 1 : null}</span>
+            <span>{newActivity ? unreadMessagesAmount : newContactsRequest ? "" : null}</span>
           </div>
         ) : (
           isPinned && <div className="contact-item__pinned"></div>

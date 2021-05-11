@@ -33,9 +33,12 @@ const ContactList: React.FC = () => {
   // console.log(context?.state.authUserUnreadMessages)
 
   const getContactsList = async (snapshot: any) => {
-    console.log("on listener fire")
+    // console.log("on listener fire")
     if (snapshot.val() === null) {
       setInitialLoading(false)
+      context?.dispatch({ type: "updateContacts", payload: {} })
+      setContacts([])
+      // console.log("contacts null")
       return
     }
 
@@ -55,7 +58,6 @@ const ContactList: React.FC = () => {
       : contactsData
 
     contacts.reverse()
-    console.log({ contacts })
 
     context?.dispatch({ type: "updateContacts", payload: snapshot.val() })
     setContacts(contacts)
@@ -63,8 +65,6 @@ const ContactList: React.FC = () => {
   }
 
   useEffect(() => {
-    console.log("contactListUseEffect")
-
     contactsListRef
       .orderByChild("pinned_lastActivityTS")
       .limitToLast(CONTACTS_TO_LOAD)
@@ -84,19 +84,12 @@ const ContactList: React.FC = () => {
     if (!isScrolledDown) return
     if (loadedContacts >= allContactsAmount!) return
 
-    console.log("contactListUseEffect Scroll")
-    console.log(loadedContacts + CONTACTS_TO_LOAD)
-
     contactsListRef.off()
     contactsListRef
       .orderByChild("pinned_lastActivityTS")
       .limitToLast(loadedContacts + CONTACTS_TO_LOAD)
       .on("value", (snapshot: any) => getContactsList(snapshot))
   }, [isScrolledDown]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    console.log({ contacts })
-  }, [contacts])
 
   return (
     <div

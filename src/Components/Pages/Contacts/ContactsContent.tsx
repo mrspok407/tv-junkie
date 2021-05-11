@@ -58,27 +58,32 @@ const ContactsContent: React.FC<Props> = () => {
       const chatKey = userKey < authUser?.uid! ? `${userKey}_${authUser?.uid}` : `${authUser?.uid}_${userKey}`
 
       const randomMessage = lorem.generateSentences(1)
-      const timeStampEpoch = new Date().getTime()
+      const timeStampEpoch = new Date().getTime() * 2
 
       const pushNewMessage = await firebase
         .privateChats()
         .child(`${chatKey}/messages`)
         .push({
-          sender: userKey,
-          // sender: Math.random() > 0.5 ? userKey : authUser?.uid,
+          // sender: userKey,
+          sender: Math.random() > 0.5 ? userKey : authUser?.uid,
           message: randomMessage,
-          timeStamp: timeStampEpoch + 50000000,
-          status: "unread"
+          timeStamp: timeStampEpoch + i * 8640000
         })
 
-      firebase
-        .privateChats()
-        .child(`${chatKey}/members/${authUser?.uid}/unreadMessages/${pushNewMessage.key}`)
-        .set(true)
+      const contactStatus = await firebase.chatMemberStatus({ chatKey, memberKey: authUser?.uid! }).once("value")
+
+      console.log(contactStatus.val())
+
+      // if (!contactStatus.val().isOnline || !contactStatus.val().chatBottom) {
+      //   firebase
+      //     .privateChats()
+      //     .child(`${chatKey}/members/${authUser?.uid}/unreadMessages/${pushNewMessage.key}`)
+      //     .set(true)
+      // }
     }
   }
 
-  const addNewMessageVsop = async (key: any) => {
+  const addNewMessageTopContact = async () => {
     const lorem = new LoremIpsum({
       sentencesPerParagraph: {
         max: 8,
@@ -90,8 +95,8 @@ const ContactsContent: React.FC<Props> = () => {
       }
     })
 
-    for (let i = 1; i <= 1; i++) {
-      const userKey = key
+    for (let i = 1; i <= 10; i++) {
+      const userKey = Object.keys(contacts)[Object.keys(contacts).length - 1]
       const chatKey = userKey < authUser?.uid! ? `${userKey}_${authUser?.uid}` : `${authUser?.uid}_${userKey}`
 
       const randomMessage = lorem.generateSentences(1)
@@ -122,21 +127,8 @@ const ContactsContent: React.FC<Props> = () => {
       <button style={{ width: "400px" }} type="button" className="button" onClick={() => addNewMessageCurrent()}>
         Add new message current
       </button>
-      <button
-        style={{ width: "400px" }}
-        type="button"
-        className="button"
-        onClick={() => addNewMessageVsop("-MY_TPe9EW9TqCibVSop")}
-      >
-        Add new message Vsop
-      </button>
-      <button
-        style={{ width: "400px" }}
-        type="button"
-        className="button"
-        onClick={() => addNewMessageVsop("-MY_R8wzzvABzB8OWakb")}
-      >
-        Add new message Wakb
+      <button style={{ width: "400px" }} type="button" className="button" onClick={() => addNewMessageTopContact()}>
+        Add new message top
       </button>
       <div className="chat-container">
         <ContactList />

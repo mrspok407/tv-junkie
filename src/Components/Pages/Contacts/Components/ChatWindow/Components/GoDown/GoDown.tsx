@@ -68,7 +68,6 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
   const handleFadeIn = () => {
     const { height, scrollHeight, scrollTop } = getContainerRect()
     const threshold = scrollHeight * 0.1
-    console.log("handleFadeIn")
 
     if (!messagesData?.length || !renderedMessages?.length) return
     if (scrollHeight <= height) {
@@ -79,27 +78,22 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
       scrollHeight - scrollTop - height >= threshold ||
       renderedMessages[renderedMessages?.length - 1].key !== messagesData[messagesData?.length - 1].key
     ) {
-      console.log("fade in true")
+      // console.log("fade in true")
       setFadeInButton(true)
     } else {
-      console.log("fade in false")
+      // console.log("fade in false")
       setFadeInButton(false)
     }
   }
 
   const handleScroll = useCallback(
     throttle(200, () => {
-      console.log("test")
+      // console.log("test")
       if (!renderedMessages?.length || !messagesData?.length) return
       handleFadeIn()
     }),
     [chatContainerRef, renderedMessages, messagesData, chatKey]
   )
-
-  useEffect(() => {
-    console.log({ renderedMessages })
-    console.log({ messagesData })
-  }, [renderedMessages, messagesData])
 
   useLayoutEffect(() => {
     if (!renderedMessages?.length) return
@@ -107,7 +101,7 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
     const firstUnreadMessage = unreadMessages[0]
     const firstUnreadMessageRef = document.querySelector(`.chat-window__message--${firstUnreadMessage}`)
     firstUnreadMessageRef?.scrollIntoView({ block: "start", inline: "start" })
-    console.log("go down first unread")
+    // console.log("go down first unread")
     setWentToFirstUnread(false)
   }, [renderedMessages, wentToFirstUnread])
 
@@ -116,7 +110,7 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
     if (!wentToLastMessage) return
     const lastMessage = renderedMessages[renderedMessages.length - 1]
     const lastMessageRef = document.querySelector(`.chat-window__message--${lastMessage.key}`)
-    console.log("go down last msg")
+    //("go down last msg")
     lastMessageRef?.scrollIntoView({ block: "start", inline: "start" })
     setWentToLastMessage(false)
   }, [renderedMessages, wentToLastMessage])
@@ -140,7 +134,7 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
     const chatContainer = chatContainerRef
     chatContainer.addEventListener("scroll", handleScroll)
     return () => {
-      console.log("scroll GoDown remove")
+      // console.log("scroll GoDown remove")
       chatContainer.removeEventListener("scroll", handleScroll)
     }
   }, [handleScroll, chatKey])

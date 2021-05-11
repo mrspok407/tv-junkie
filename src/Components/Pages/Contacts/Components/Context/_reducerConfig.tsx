@@ -94,7 +94,6 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
       const renderedMessages = renderedMessagesList[activeChat.chatKey]
 
       if (messagesData[messagesData.length - 1].key === renderedMessages[renderedMessages.length - 1].key) {
-        console.log("at the bottom")
         return { ...state }
       }
 

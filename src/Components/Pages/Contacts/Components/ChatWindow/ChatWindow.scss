@@ -26,6 +26,19 @@
 }
 
 .chat-window {
+  &__date {
+    padding: 5px 15px 5px 15px;
+    margin: 15px auto 0px auto;
+    max-width: max-content;
+    font-size: 0.9rem;
+    border-radius: 14px;
+    background-color: getColor(dateBG, $chatWindowPalette);
+
+    &--top {
+      margin: 0px auto 0px auto;
+    }
+  }
+
   &--request {
     display: flex;
     justify-content: center;
@@ -56,7 +69,7 @@
       width: 27px;
       height: 27px;
       align-self: center;
-      margin-top: 20px;
+      margin: 20px auto auto auto;
       opacity: 0;
       animation: chatWindowLoaderContainerShow 0s 400ms forwards;
       @keyframes chatWindowLoaderContainerShow {
@@ -76,6 +89,19 @@
 
     @include mediaMaxW(#{$mobileViewPort}) {
       display: initial;
+    }
+  }
+
+  &__no-messages {
+    margin: 20px auto auto auto;
+    max-width: max-content;
+    text-align: center;
+    padding: 5px 15px 5px 15px;
+    border-radius: 14px;
+    background-color: #206ea0;
+
+    span {
+      color: #ff9024;
     }
   }
 
@@ -179,7 +205,7 @@
   align-items: center;
   font-size: getDimm(contactInfoFont, $chatWindowDimm);
   background-color: #083b5f;
-  z-index: 9999;
+  z-index: 100;
 
   .contact-item__options {
     .contact-item__open-popup-btn {

@@ -15,7 +15,7 @@ const useFirstRenderMessages = ({ messages, renderedMessages, unreadMessages, ch
   const isRenderedRef = useRef(false)
 
   useEffect(() => {
-    if (!messages?.length) return
+    if (!messages?.length || !unreadMessages || !renderedMessages?.length) return
     if (messages[messages.length - 1]?.key !== renderedMessages[renderedMessages.length - 1]?.key) {
       return
     }

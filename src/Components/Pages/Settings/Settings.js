@@ -86,39 +86,20 @@ class Profile extends Component {
         min: 4
       }
     })
-
-    // firebase
-    //   .database()
-    //   .ref()
-    //   .once("value", (snapshot) => {
-    //     console.log(JSON.stringify(snapshot.val()))
-    //   })
+    console.log("test")
+    firebase
+      .database()
+      .ref("privateChats")
+      .once("value", (snapshot) => {
+        // console.log(snapshot.val())
+        console.log(JSON.stringify(snapshot.val()))
+      })
 
     // const userKey = "-MY_TPe9EW9TqCibVSop"
     const userKey = "-MY_R8wzzvABzB8OWakb"
     // const userKey = "-MY_R8pjpBQGf6RDAMTt"
 
     const chatKey = userKey < authUid ? `${userKey}_${authUid}` : `${authUid}_${userKey}`
-
-    for (let i = 1; i <= 1000; i++) {
-      const randomMessage = lorem.generateSentences(1)
-
-      const timeStampEpoch = new Date().getTime()
-
-      const pushNewMessage = firebase
-        .privateChats()
-        .child(`${chatKey}/messages`)
-        .push({
-          // sender: userKey,
-          sender: Math.random() > 0.5 ? userKey : authUid,
-          message: randomMessage,
-          timeStamp: timeStampEpoch,
-          number: i,
-          status: "read"
-        })
-
-      // firebase.privateChats().child(`${chatKey}/members/${authUid}/unreadMessages/${pushNewMessage.key}`).set(true)
-    }
 
     // firebase
     //   .contactsDatabase({ uid: "drv5lG97VxVBLgkdn8bMhdxmqQT2" })
@@ -141,10 +122,10 @@ class Profile extends Component {
     //     })
     //   })
 
-    // for (let i = 0; i < CONTACTS_TO_ADD; i++) {
+    // for (let i = 1; i <= 2; i++) {
     //   const randomName = uniqueNamesGenerator({
-    //     dictionaries: [adjectives, colors, animals],
-    //     separator: " ",
+    //     dictionaries: [animals],
+    //     // separator: " ",
     //     style: "capital"
     //   })
 
@@ -154,53 +135,50 @@ class Profile extends Component {
     //   await Promise.all([
     //     firebase.contact({ authUid: userKey, contactUid: authUid }).set({
     //       receiver: true,
-    //       recipientNotified: false,
-    //       status: false,
+    //       status: true,
     //       pinned_lastActivityTS: "false",
     //       timeStamp,
     //       userName: "Johnny"
     //     }),
-
     //     firebase.contact({ authUid, contactUid: userKey }).set({
-    //       status: false,
+    //       status: true,
     //       receiver: false,
     //       userName: randomName,
     //       timeStamp,
-    //       pinned_lastActivityTS: "true",
-    //       recipientNotified: false
-    //     }),
-    //     firebase.contactsDatabase({ uid: authUid }).child(`newContactsRequests/${userKey}`).set(true)
+    //       pinned_lastActivityTS: "true"
+    //     })
+    //     // firebase.contactsDatabase({ uid: authUid }).child(`newContactsRequests/${userKey}`).set(true)
     //   ])
 
     //   const timeStampEpoch = new Date().getTime()
 
     //   const chatKey = userKey < authUid ? `${userKey}_${authUid}` : `${authUid}_${userKey}`
 
-    //   for (let i = 0; i <= 20; i++) {
-    //     const randomMessage = lorem.generateSentences(2)
+    //   for (let i = 1; i <= 500; i++) {
+    //     const randomMessage = lorem.generateSentences(Math.ceil(Math.random() * 2))
 
-    //     const pushNewMessage = firebase
+    //     const pushNewMessage = await firebase
     //       .privateChats()
     //       .child(`${chatKey}/messages`)
     //       .push({
-    //         // sender: i < 25 ? (Math.random() > 0.5 ? userKey : authUid) : userKey,
+    //         sender: Math.random() > 0.5 ? userKey : authUid,
     //         // sender: userKey,
-    //         sender: authUid,
+    //         // sender: authUid,
     //         message: randomMessage,
-    //         timeStamp: timeStampEpoch + (i + 1) * Math.floor(Math.random() * (200000000 - 100000) + 100000)
+    //         timeStamp: timeStampEpoch + i * 1800000
     //       })
 
     //     // if (i >= 25) {
-    //     firebase.privateChats().child(`${chatKey}/members/${userKey}/unreadMessages/${pushNewMessage.key}`).set(true)
+    //     // firebase.privateChats().child(`${chatKey}/members/${userKey}/unreadMessages/${pushNewMessage.key}`).set(true)
     //     // }
     //   }
-    //   firebase
-    //     .privateChats()
-    //     .child(`${chatKey}`)
-    //     .update({
-    //       [`members/${userKey}/isOnline`]: true,
-    //       [`members/${authUid}/isOnline`]: true
-    //     })
+    // firebase
+    //   .privateChats()
+    //   .child(`${chatKey}`)
+    //   .update({
+    //     [`members/${userKey}/isOnline`]: true,
+    //     [`members/${authUid}/isOnline`]: true
+    //   })
     // }
   }
 
