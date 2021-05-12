@@ -70,6 +70,48 @@ class Profile extends Component {
     )
   }
 
+  addNewMessageTopContact = async () => {
+    const firebase = this.context.firebase
+    const lorem = new LoremIpsum({
+      sentencesPerParagraph: {
+        max: 8,
+        min: 4
+      },
+      wordsPerSentence: {
+        max: 8,
+        min: 4
+      }
+    })
+
+    const authUid = "drv5lG97VxVBLgkdn8bMhdxmqQT2"
+
+    for (let i = 1; i <= 10; i++) {
+      const userKey = "-M_RA1TH89UezfmnVMzX"
+      const chatKey = userKey < authUid ? `${userKey}_${authUid}` : `${authUid}_${userKey}`
+
+      const randomMessage = lorem.generateSentences(1)
+      const timeStampEpoch = new Date().getTime()
+
+      const pushNewMessage = await firebase
+        .privateChats()
+        .child(`${chatKey}/messages`)
+        .push({
+          sender: userKey,
+          // sender: Math.random() > 0.5 ? userKey : authUser?.uid,
+          message: randomMessage,
+          timeStamp: timeStampEpoch * 2
+        })
+
+      const contactStatus = await firebase.chatMemberStatus({ chatKey, memberKey: authUid }).once("value")
+
+      console.log(contactStatus.val())
+
+      if (!contactStatus.val().isOnline || !contactStatus.val().chatBottom || !contactStatus.val().pageInFocus) {
+        firebase.privateChats().child(`${chatKey}/members/${authUid}/unreadMessages/${pushNewMessage.key}`).set(true)
+      }
+    }
+  }
+
   test = async () => {
     const firebase = this.context.firebase
     const CONTACTS_TO_ADD = 3
@@ -469,6 +511,9 @@ class Profile extends Component {
               )}
             </div>
           </div>
+          <button className="button" onClick={() => this.addNewMessageTopContact()}>
+            topContact
+          </button>
           <button className="button" onClick={() => this.test()}>
             test
           </button>

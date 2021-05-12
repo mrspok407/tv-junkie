@@ -8,6 +8,7 @@ import merge from "deepmerge"
 import * as _transform from "lodash.transform"
 import * as _isEqual from "lodash.isequal"
 import * as _isObject from "lodash.isobject"
+import { isInteger } from "formik"
 
 export const todayDate = new Date()
 
@@ -213,6 +214,18 @@ export const isUnexpectedObject = ({ exampleObject, targetObject }) => {
 
     return typeof targetObject[key] !== typeof value
   })
+}
+
+export const convertTimeStampToDate = ({ timeStamp }) => {
+  if (!timeStamp || !Number.isInteger(timeStamp)) return
+  const timeStampISO = new Date(timeStamp).toISOString()
+  const options = {
+    month: "long",
+    day: "numeric",
+    year: "numeric"
+  }
+  const formatedTimeStamp = new Date(timeStampISO)
+  return new Intl.DateTimeFormat("en-US", options).format(formatedTimeStamp)
 }
 
 export { releasedEpisodesToOneArray }

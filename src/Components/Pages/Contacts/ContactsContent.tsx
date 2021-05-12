@@ -53,33 +53,33 @@ const ContactsContent: React.FC<Props> = () => {
       }
     })
 
-    for (let i = 1; i <= 100; i++) {
+    for (let i = 1; i <= 10; i++) {
       const userKey = activeChat.contactKey
       const chatKey = userKey < authUser?.uid! ? `${userKey}_${authUser?.uid}` : `${authUser?.uid}_${userKey}`
 
       const randomMessage = lorem.generateSentences(1)
-      const timeStampEpoch = new Date().getTime() * 2
+      const timeStampEpoch = new Date().getTime()
 
       const pushNewMessage = await firebase
         .privateChats()
         .child(`${chatKey}/messages`)
         .push({
-          // sender: userKey,
-          sender: Math.random() > 0.5 ? userKey : authUser?.uid,
+          sender: userKey,
+          // sender: Math.random() > 0.5 ? userKey : authUser?.uid,
           message: randomMessage,
-          timeStamp: timeStampEpoch + i * 8640000
+          timeStamp: timeStampEpoch * 2
         })
 
       const contactStatus = await firebase.chatMemberStatus({ chatKey, memberKey: authUser?.uid! }).once("value")
 
       console.log(contactStatus.val())
 
-      // if (!contactStatus.val().isOnline || !contactStatus.val().chatBottom) {
-      //   firebase
-      //     .privateChats()
-      //     .child(`${chatKey}/members/${authUser?.uid}/unreadMessages/${pushNewMessage.key}`)
-      //     .set(true)
-      // }
+      if (!contactStatus.val().isOnline || !contactStatus.val().chatBottom) {
+        firebase
+          .privateChats()
+          .child(`${chatKey}/members/${authUser?.uid}/unreadMessages/${pushNewMessage.key}`)
+          .set(true)
+      }
     }
   }
 
@@ -102,12 +102,15 @@ const ContactsContent: React.FC<Props> = () => {
       const randomMessage = lorem.generateSentences(1)
       const timeStampEpoch = new Date().getTime()
 
-      const pushNewMessage = await firebase.privateChats().child(`${chatKey}/messages`).push({
-        sender: userKey,
-        // sender: Math.random() > 0.5 ? userKey : authUser?.uid,
-        message: randomMessage,
-        timeStamp: timeStampEpoch
-      })
+      const pushNewMessage = await firebase
+        .privateChats()
+        .child(`${chatKey}/messages`)
+        .push({
+          sender: userKey,
+          // sender: Math.random() > 0.5 ? userKey : authUser?.uid,
+          message: randomMessage,
+          timeStamp: timeStampEpoch * 2
+        })
 
       const contactStatus = await firebase.chatMemberStatus({ chatKey, memberKey: authUser?.uid! }).once("value")
 

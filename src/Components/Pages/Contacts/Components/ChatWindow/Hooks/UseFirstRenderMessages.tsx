@@ -19,7 +19,6 @@ const useFirstRenderMessages = ({ messages, renderedMessages, unreadMessages, ch
     if (messages[messages.length - 1]?.key !== renderedMessages[renderedMessages.length - 1]?.key) {
       return
     }
-    console.log(isRenderedRef.current)
     if (isRenderedRef.current) return
 
     let startIndexRender: number = 0
@@ -32,16 +31,11 @@ const useFirstRenderMessages = ({ messages, renderedMessages, unreadMessages, ch
       if (unreadMessages.length! <= UNREAD_MESSAGES_TO_RENDER) {
         startIndexRender = Math.max(messages.length - MESSAGES_TO_RENDER, 0)
         endIndexRender = messages.length
-        console.log({ endIndexRender })
-        console.log({ startIndexRender })
       } else {
         endIndexRender = messages.length - (unreadMessages.length! - UNREAD_MESSAGES_TO_RENDER)
         startIndexRender = Math.max(endIndexRender - MESSAGES_TO_RENDER, 0)
-        console.log({ endIndexRender })
-        console.log({ startIndexRender })
       }
     }
-    console.log("render on load")
 
     context?.dispatch({
       type: "renderMessagesOnLoad",

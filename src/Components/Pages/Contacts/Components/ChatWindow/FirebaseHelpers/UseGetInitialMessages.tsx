@@ -19,7 +19,6 @@ const useGetInitialMessages = ({ chatKey }: { chatKey: string }) => {
     if (context?.state.messages[chatKey] !== undefined) return
     if (loading) return
     setLoading(true)
-    // console.log("useEffect in useGetInitialMessages")
 
     const getMessages = async () => {
       let messagesSnapshot: any
@@ -115,7 +114,6 @@ const useGetInitialMessages = ({ chatKey }: { chatKey: string }) => {
 
           const newMessage = { ...snapshot.val(), key: snapshot.key }
           context?.dispatch({ type: "addNewMessage", payload: { newMessage, chatKey } })
-          // console.log({ addedChild: newMessage })
         })
 
       messagesRef
@@ -131,7 +129,6 @@ const useGetInitialMessages = ({ chatKey }: { chatKey: string }) => {
 
           const changedMessage = { ...snapshot.val(), key: snapshot.key }
           context?.dispatch({ type: "changeMessage", payload: { changedMessage, chatKey } })
-          console.log({ changedChild: changedMessage })
         })
 
       messagesRef
@@ -146,7 +143,6 @@ const useGetInitialMessages = ({ chatKey }: { chatKey: string }) => {
           }
           const removedMessage = { ...snapshot.val(), key: snapshot.key }
           context?.dispatch({ type: "removeMessage", payload: { removedMessage, chatKey } })
-          console.log({ removedMessage })
         })
     }
 

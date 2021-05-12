@@ -15,20 +15,14 @@ const useResizeObserver = ({ chatContainerRef, isScrollBottomRef }: Props) => {
   const { activeChat } = context?.state!
 
   const handleResize = useCallback(() => {
-    console.log("resizeObserver")
     if (!chatContainerRef) return
     const height = chatContainerRef.getBoundingClientRect().height
     const scrollHeight = chatContainerRef.scrollHeight
 
     if (scrollHeight <= height) {
       isScrollBottomRef = true
-      console.log("resizeObserver")
-      console.log(activeChat.chatKey)
       firebase.chatMemberStatus({ chatKey: activeChat.chatKey, memberKey: authUser?.uid! }).update({ chatBottom: true })
     }
-
-    console.log({ height })
-    console.log({ scrollHeight })
   }, [chatContainerRef, activeChat])
 
   useLayoutEffect(() => {
@@ -39,7 +33,6 @@ const useResizeObserver = ({ chatContainerRef, isScrollBottomRef }: Props) => {
 
       return () => {
         if (!resizeObserver) return
-
         resizeObserver.disconnect()
       }
     } else {

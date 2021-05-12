@@ -25,7 +25,7 @@ const useLoadTopMessages = () => {
 
     const firstRenderedMessageIndex = messagesData.findIndex((item) => item.key === renderedMessages[0].key)
 
-    console.log({ firstRenderedMessageIndex })
+    // console.log({ firstRenderedMessageIndex })
 
     if (!(firstRenderedMessageIndex <= 100 && firstRenderedMessageIndex !== 0)) return
 

@@ -24,11 +24,8 @@ const useIntersectionObserver = ({ chatContainerRef, unreadMessagesAuth }: Props
       if (entry.isIntersecting) {
         const messageKey = entry.target.dataset.key
         const messageRef: any = document.querySelector(`.chat-window__message--${messageKey}`)
-        console.log({ renderedMessagesList })
         observerRef.unobserve(messageRef)
         observedMessages.current = [...observedMessages.current.filter((message) => message !== messageKey)]
-
-        console.log("intersected")
 
         firebase
           .unreadMessages({ uid: authUser?.uid!, chatKey: activeChat.chatKey })

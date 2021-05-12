@@ -1,0 +1,36 @@
+import { AppContext } from "Components/AppContext/AppContextHOC"
+import { FirebaseContext } from "Components/Firebase"
+import { useState, useEffect, useCallback, useRef, useContext } from "react"
+
+type Props = {
+  activeChat: { chatKey: string }
+}
+
+const usePageFocusHandler = ({ activeChat }: Props) => {
+  const firebase = useContext(FirebaseContext)
+  const { authUser } = useContext(AppContext)
+  const [pageInFocus, setPageInFocus] = useState(true)
+  const focusInterval = useRef<number | null>(null)
+
+  const focusHandler = useCallback(() => {
+    focusInterval.current = window.setInterval(() => {
+      if (!document.hasFocus()) {
+        firebase
+          .chatMemberStatus({ chatKey: activeChat.chatKey, memberKey: authUser?.uid! })
+          .update({ pageInFocus: false })
+      }
+      setPageInFocus(document.hasFocus())
+    }, 250)
+  }, [])
+
+  useEffect(() => {
+    focusHandler()
+    return () => {
+      window.clearInterval(focusInterval.current || 0)
+    }
+  }, [activeChat, focusHandler])
+
+  return { pageInFocus }
+}
+
+export default usePageFocusHandler

@@ -37,6 +37,21 @@
     &--top {
       margin: 0px auto 0px auto;
     }
+
+    &--float {
+      position: absolute;
+      top: 49px;
+      left: 50%;
+      transform: translateX(-52%);
+      background-color: getColor(dateFloatBG, $chatWindowPalette);
+      opacity: 0.00001;
+      transition: opacity 300ms ease;
+      z-index: 20;
+
+      &-fadein {
+        opacity: 0.9;
+      }
+    }
   }
 
   &--request {

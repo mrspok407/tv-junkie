@@ -21,7 +21,10 @@ const useHandleContactsStatus = ({ chatKey, contactKey }: Props) => {
       })
     })
 
-    firebase.chatMemberStatus({ chatKey, memberKey: authUser?.uid! }).onDisconnect().update({ isOnline: null })
+    firebase
+      .chatMemberStatus({ chatKey, memberKey: authUser?.uid! })
+      .onDisconnect()
+      .update({ isOnline: null, pageInFocus: false })
   }, [chatKey, contactKey])
 }
 
