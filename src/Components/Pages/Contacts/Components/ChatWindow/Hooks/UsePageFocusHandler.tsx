@@ -14,11 +14,10 @@ const usePageFocusHandler = ({ activeChat }: Props) => {
 
   const focusHandler = useCallback(() => {
     focusInterval.current = window.setInterval(() => {
-      if (!document.hasFocus()) {
-        firebase
-          .chatMemberStatus({ chatKey: activeChat.chatKey, memberKey: authUser?.uid! })
-          .update({ pageInFocus: false })
-      }
+      firebase
+        .chatMemberStatus({ chatKey: activeChat.chatKey, memberKey: authUser?.uid! })
+        .update({ pageInFocus: document.hasFocus() })
+
       setPageInFocus(document.hasFocus())
     }, 250)
   }, [])
