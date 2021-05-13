@@ -32,8 +32,6 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
     const unreadMessagesListener = firebase
       .unreadMessages({ uid: authUser?.uid!, chatKey })
       .on("value", (snapshot: any) => {
-        console.log({ GoDown: chatKey })
-        console.log({ unreadGoDown: snapshot.val() })
         const unreadMessagesData = !snapshot.val() ? [] : Object.keys(snapshot.val())
         setUnreadMessages(unreadMessagesData)
       })

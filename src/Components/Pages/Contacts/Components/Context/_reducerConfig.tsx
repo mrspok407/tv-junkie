@@ -75,7 +75,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
 
       const indexStart = Math.max(
         messages[activeChat.chatKey].findIndex((item) => item.key === renderedMessagesList[activeChat.chatKey][0].key) -
-          (MESSAGES_TO_RENDER - (MESSAGES_TO_RENDER - 15)),
+          (MESSAGES_TO_RENDER - (MESSAGES_TO_RENDER - 25)),
         0
       )
       const indexEnd = indexStart + MESSAGES_TO_RENDER
@@ -102,7 +102,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
       const indexEnd = Math.min(
         Math.max(
           messagesData.findIndex((item) => item.key === renderedMessages[renderedMessages.length - 1].key) +
-            (MESSAGES_TO_RENDER - (MESSAGES_TO_RENDER - 15)),
+            (MESSAGES_TO_RENDER - (MESSAGES_TO_RENDER - 25)),
           MESSAGES_TO_RENDER
         ),
         messagesData.length
