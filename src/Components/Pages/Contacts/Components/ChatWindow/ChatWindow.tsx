@@ -15,9 +15,11 @@ import GoDown from "./Components/GoDown/GoDown"
 import useResizeObserver from "./Hooks/UseResizeObserver"
 import { MessageInterface } from "../../Types"
 import { convertTimeStampToDate } from "Utils"
-import "./ChatWindow.scss"
 import useShowFloatDate from "./Hooks/UseShowFloatDate"
 import usePageFocusHandler from "./Hooks/UsePageFocusHandler"
+import { Virtuoso, VirtuosoHandle } from "react-virtuoso"
+import styled from "styled-components"
+import "./ChatWindow.scss"
 
 const ChatWindow: React.FC = () => {
   const { authUser, newContactsActivity, errors } = useContext(AppContext)
@@ -56,6 +58,8 @@ const ChatWindow: React.FC = () => {
       setChatContainerRef(node)
     }
   }, [])
+
+  const virtuosoRef = useRef<VirtuosoHandle>(null)
 
   useEffect(() => {
     const listener = firebase
@@ -101,11 +105,14 @@ const ChatWindow: React.FC = () => {
   }
 
   const scrollPositionHandler = useCallback(
-    debounce(() => {
-      if (!chatContainerRef) return
+    debounce((top: number) => {
+      // if (!chatContainerRef) return
       const { scrollTop } = getContainerRect()
       // console.log({ scrollTop })
-      context?.dispatch({ type: "updateLastScrollPosition", payload: { scrollTop, chatKey: activeChat.chatKey } })
+      console.log("scroll position")
+      // context?.dispatch({ type: "updateLastScrollPosition", payload: { scrollTop, chatKey: activeChat.chatKey } })
+      console.log({ top })
+      context?.dispatch({ type: "updateLastScrollPosition", payload: { scrollTop: top, chatKey: activeChat.chatKey } })
     }, 150),
     [activeChat, chatContainerRef]
   )
@@ -188,6 +195,12 @@ const ChatWindow: React.FC = () => {
   }, [activeChat])
 
   useLayoutEffect(() => {
+    if (!virtuosoRef) return
+    console.log("test")
+    // virtuosoRef.current?.scrollToIndex(messagesData.length - 1)
+    console.log(lastScrollPosition)
+    virtuosoRef.current?.scrollTo({ top: lastScrollPosition[activeChat.chatKey] })
+
     if (!chatContainerRef) return
     if (!renderedMessages?.length || !messagesData?.length) return
     if (messagesData[messagesData.length - 1].key !== renderedMessages[renderedMessages.length - 1].key) return
@@ -196,50 +209,50 @@ const ChatWindow: React.FC = () => {
     if (!isScrollBottomRef.current) return
     if (!pageInFocus) return
 
-    const lastMessage = renderedMessages[renderedMessages.length - 1]
-    const lastMessageRef = document.querySelector(`.chat-window__message--${lastMessage.key}`)
+    // const lastMessage = renderedMessages[renderedMessages.length - 1]
+    // const lastMessageRef = document.querySelector(`.chat-window__message--${lastMessage.key}`)
 
-    lastMessageRef?.scrollIntoView({ block: "start", inline: "start" })
-  }, [activeChat, renderedMessages, messagesData, chatContainerRef])
+    // lastMessageRef?.scrollIntoView({ block: "start", inline: "start" })
+  }, [activeChat, renderedMessages, messagesData, chatContainerRef, lastScrollPosition])
 
-  useLayoutEffect(() => {
-    if (!chatContainerRef) return
-    if (!messagesData?.length || !unreadMessagesAuth) return
-    if (contactInfo.status !== true) return
-    if (isScrolledFirstRenderRef.current) return
+  // useLayoutEffect(() => {
+  //   if (!chatContainerRef) return
+  //   if (!messagesData?.length || !unreadMessagesAuth) return
+  //   if (contactInfo.status !== true) return
+  //   if (isScrolledFirstRenderRef.current) return
 
-    const { scrollHeight, height } = getContainerRect()
-    const firstUnreadMessageRef = document.querySelector(`.chat-window__message--${unreadMessagesAuth[0]}`)
-    const lastMessageRef = document.querySelector(`.chat-window__message--${messagesData[messagesData.length - 1].key}`)
+  //   const { scrollHeight, height } = getContainerRect()
+  //   const firstUnreadMessageRef = document.querySelector(`.chat-window__message--${unreadMessagesAuth[0]}`)
+  //   const lastMessageRef = document.querySelector(`.chat-window__message--${messagesData[messagesData.length - 1].key}`)
 
-    const isScrollBottom = !!(
-      lastScrollPosition[activeChat.chatKey] === undefined ||
-      scrollHeight <= lastScrollPosition[activeChat.chatKey]! + height
-    )
+  //   const isScrollBottom = !!(
+  //     lastScrollPosition[activeChat.chatKey] === undefined ||
+  //     scrollHeight <= lastScrollPosition[activeChat.chatKey]! + height
+  //   )
 
-    if (firstUnreadMessageRef) {
-      if (isScrollBottom) {
-        console.log("to first unread ChatWindow")
-        firstUnreadMessageRef?.scrollIntoView({ block: "start", inline: "start" })
-      } else {
-        console.log("scroll previous")
-        chatContainerRef.scrollTop = lastScrollPosition[activeChat.chatKey]!
-      }
-    } else {
-      if (isScrollBottom) {
-        console.log("scroll, no unread, scrollAtBottom")
-        lastMessageRef?.scrollIntoView({ block: "start", inline: "start" })
-        isScrollBottomRef.current = true
-        firebase
-          .chatMemberStatus({ chatKey: activeChat.chatKey, memberKey: authUser?.uid! })
-          .update({ chatBottom: true })
-      } else {
-        // console.log("scroll previous no unread")
-        chatContainerRef.scrollTop = lastScrollPosition[activeChat.chatKey]!
-      }
-    }
-    isScrolledFirstRenderRef.current = true
-  }, [activeChat, messagesData, chatContainerRef])
+  //   if (firstUnreadMessageRef) {
+  //     if (isScrollBottom) {
+  //       console.log("to first unread ChatWindow")
+  //       firstUnreadMessageRef?.scrollIntoView({ block: "start", inline: "start" })
+  //     } else {
+  //       console.log("scroll previous")
+  //       chatContainerRef.scrollTop = lastScrollPosition[activeChat.chatKey]!
+  //     }
+  //   } else {
+  //     if (isScrollBottom) {
+  //       console.log("scroll, no unread, scrollAtBottom")
+  //       lastMessageRef?.scrollIntoView({ block: "start", inline: "start" })
+  //       isScrollBottomRef.current = true
+  //       firebase
+  //         .chatMemberStatus({ chatKey: activeChat.chatKey, memberKey: authUser?.uid! })
+  //         .update({ chatBottom: true })
+  //     } else {
+  //       // console.log("scroll previous no unread")
+  //       chatContainerRef.scrollTop = lastScrollPosition[activeChat.chatKey]!
+  //     }
+  //   }
+  //   isScrolledFirstRenderRef.current = true
+  // }, [activeChat, messagesData, chatContainerRef])
 
   useLayoutEffect(() => {
     if (!chatContainerRef) return
@@ -256,7 +269,7 @@ const ChatWindow: React.FC = () => {
 
   useEffect(() => {
     if (!chatContainerRef) return
-    chatContainerRef.addEventListener("scroll", handleScroll)
+    // chatContainerRef.addEventListener("scroll", handleScroll)
     return () => {
       // console.log("remove handleScroll")
       chatContainerRef.removeEventListener("scroll", handleScroll)
@@ -278,6 +291,29 @@ const ChatWindow: React.FC = () => {
       firebase.chatMemberStatus({ chatKey: activeChat.chatKey, memberKey: authUser?.uid! }).update({ isOnline: null })
     }
   }, [activeChat])
+
+  console.log(virtuosoRef.current)
+
+  const List = styled.div`
+    position: relative;
+    display: grid;
+    grid-auto-rows: max-content;
+    row-gap: 5px;
+  `
+  const Item = styled.div`
+    display: flex;
+    column-gap: 10px;
+    max-width: 70%;
+    border-radius: 5px;
+    padding: 10px;
+    color: #fff;
+    font-size: 0.95rem;
+
+    @media (max-width: 1000px) {
+      flex-direction: column;
+      max-width: 85%;
+    }
+  `
 
   return (
     <div className="chat-window-container">
@@ -342,47 +378,121 @@ const ChatWindow: React.FC = () => {
               The chat is very empty, <span>so sad</span>.
             </div>
           ) : (
-            <div className="chat-window__messages-list">
-              {renderedMessages?.map((renderedMessage, index, array) => {
-                const nextMessage = array[index + 1]
-                const prevMessage = array[Math.max(index - 1, 0)]
+            <>
+              <Virtuoso
+                style={{
+                  height: "514px",
+                  position: "relative",
+                  display: "grid",
+                  gridAutoRows: "max-content",
+                  rowGap: "5px"
+                }}
+                onScroll={(e: any) => scrollPositionHandler(e.target.scrollTop)}
+                // initialScrollTop={lastScrollPosition[activeChat.chatKey]}
+                initialTopMostItemIndex={75}
+                followOutput={true}
+                ref={virtuosoRef}
+                endReached={(index) => console.log(index)}
+                // initialTopMostItemIndex={messagesData.length - 1}
+                data={messagesData}
+                itemContent={(index, message) => {
+                  const nextMessage = messagesData[index + 1]
+                  const prevMessage = messagesData[Math.max(index - 1, 0)]
 
-                const date = convertTimeStampToDate({ timeStamp: renderedMessage?.timeStamp })
+                  const date = convertTimeStampToDate({ timeStamp: message?.timeStamp })
 
-                const currentMessageDate = new Date(renderedMessage?.timeStamp).toDateString()
-                const prevMessageDate = new Date(prevMessage?.timeStamp).toDateString()
-
-                return (
-                  <React.Fragment key={renderedMessage.key}>
-                    {currentMessageDate !== prevMessageDate || firstMessage === renderedMessage.key ? (
-                      <div
-                        key={renderedMessage.timeStamp}
-                        className={classNames("chat-window__date", {
-                          "chat-window__date--top": firstMessage === renderedMessage.key
-                        })}
-                        data-timestamp={renderedMessage.timeStamp}
+                  const currentMessageDate = new Date(message?.timeStamp).toDateString()
+                  const prevMessageDate = new Date(prevMessage?.timeStamp).toDateString()
+                  return (
+                    <React.Fragment key={message.key}>
+                      {currentMessageDate !== prevMessageDate || firstMessage === message.key ? (
+                        <div
+                          key={message.timeStamp}
+                          style={{
+                            padding: "5px 15px 5px 15px",
+                            margin: firstMessage === message.key ? "0px auto 0px auto" : "15px auto 0px auto",
+                            maxWidth: "max-content",
+                            fontSize: "0.9rem",
+                            borderRadius: "14px",
+                            backgroundColor: "#4a996099"
+                          }}
+                          // className={classNames("chat-window__date", {
+                          //   "chat-window__date--top": firstMessage === message.key
+                          // })}
+                          data-timestamp={message.timeStamp}
+                        >
+                          {date}
+                        </div>
+                      ) : (
+                        ""
+                      )}
+                      <Item
+                        // style={{
+                        //   display: "flex",
+                        //   columnGap: "10px",
+                        //   maxWidth: "70%",
+                        //   borderRadius: "5px",
+                        //   padding: "10px",
+                        //   color: "#fff",
+                        //   fontSize: "0.95rem"
+                        // }}
+                        // className={classNames(`chat-window__message chat-window__message--${message.key}`, {
+                        //   "chat-window__message--send": message.sender === authUser?.uid,
+                        //   "chat-window__message--receive": message.sender === activeChat.contactKey,
+                        //   "chat-window__message--last-in-bunch": message.sender !== nextMessage?.sender
+                        // })}
+                        data-key={message.key}
                       >
-                        {date}
-                      </div>
-                    ) : (
-                      ""
-                    )}
-                    <div
-                      className={classNames(`chat-window__message chat-window__message--${renderedMessage.key}`, {
-                        "chat-window__message--send": renderedMessage.sender === authUser?.uid,
-                        "chat-window__message--receive": renderedMessage.sender === activeChat.contactKey,
-                        "chat-window__message--last-in-bunch": renderedMessage.sender !== nextMessage?.sender
-                      })}
-                      data-key={renderedMessage.key}
-                    >
-                      <div className="chat-window__message-text">{renderedMessage.message}</div>
+                        <div className="chat-window__message-text">{message.message}</div>
 
-                      <MessageInfo messageData={renderedMessage} />
-                    </div>
-                  </React.Fragment>
-                )
-              })}
-            </div>
+                        <MessageInfo messageData={message} />
+                      </Item>
+                    </React.Fragment>
+                  )
+                }}
+              />
+              {/* <div className="chat-window__messages-list">
+                {renderedMessages?.map((renderedMessage, index, array) => {
+                  const nextMessage = array[index + 1]
+                  const prevMessage = array[Math.max(index - 1, 0)]
+
+                  const date = convertTimeStampToDate({ timeStamp: renderedMessage?.timeStamp })
+
+                  const currentMessageDate = new Date(renderedMessage?.timeStamp).toDateString()
+                  const prevMessageDate = new Date(prevMessage?.timeStamp).toDateString()
+
+                  return (
+                    <React.Fragment key={renderedMessage.key}>
+                      {currentMessageDate !== prevMessageDate || firstMessage === renderedMessage.key ? (
+                        <div
+                          key={renderedMessage.timeStamp}
+                          className={classNames("chat-window__date", {
+                            "chat-window__date--top": firstMessage === renderedMessage.key
+                          })}
+                          data-timestamp={renderedMessage.timeStamp}
+                        >
+                          {date}
+                        </div>
+                      ) : (
+                        ""
+                      )}
+                      <div
+                        className={classNames(`chat-window__message chat-window__message--${renderedMessage.key}`, {
+                          "chat-window__message--send": renderedMessage.sender === authUser?.uid,
+                          "chat-window__message--receive": renderedMessage.sender === activeChat.contactKey,
+                          "chat-window__message--last-in-bunch": renderedMessage.sender !== nextMessage?.sender
+                        })}
+                        data-key={renderedMessage.key}
+                      >
+                        <div className="chat-window__message-text">{renderedMessage.message}</div>
+
+                        <MessageInfo messageData={renderedMessage} />
+                      </div>
+                    </React.Fragment>
+                  )
+                })}
+              </div> */}
+            </>
           ))}
 
         {!contactInfo.receiver && contactInfo.status === false && (
