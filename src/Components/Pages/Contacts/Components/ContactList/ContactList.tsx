@@ -17,8 +17,9 @@ const ContactList: React.FC = () => {
   const firebase = useContext(FirebaseContext)
   const { authUser, errors } = useContext(AppContext)
   const context = useContext(ContactsContext)
-
-  const [contacts, setContacts] = useState<ContactInfoInterface[]>()
+  const { contacts } = context?.state!
+  const contactsData = Object.values(contacts)?.map((contact) => contact)
+  // const [contacts, setContacts] = useState<ContactInfoInterface[]>()
   const [allContactsAmount, setAllContactsAmount] = useState()
   const loadedContacts = context?.state?.contacts ? Object.keys(context.state.contacts).length : 0
 
@@ -30,15 +31,11 @@ const ContactList: React.FC = () => {
   const contactsListRef = firebase.contactsList({ uid: authUser?.uid })
   const contactsDatabaseRef = firebase.contactsDatabase({ uid: authUser?.uid })
 
-  // console.log(context?.state.authUserUnreadMessages)
-
   const getContactsList = async (snapshot: any) => {
-    // console.log("on listener fire")
     if (snapshot.val() === null) {
       setInitialLoading(false)
-      context?.dispatch({ type: "updateContacts", payload: {} })
-      setContacts([])
-      // console.log("contacts null")
+      context?.dispatch({ type: "updateContacts", payload: { contacts: {}, unreadMessages: {} } })
+      // setContacts([])
       return
     }
 
@@ -53,14 +50,21 @@ const ContactList: React.FC = () => {
       contactsData.push({ ...contact.val(), key: contact.key })
     })
 
-    const contacts: any[] = initialLoading
-      ? await getInitialContactInfo({ firebase, contactsData, authUser, context })
-      : contactsData
-
+    const contacts: any[] = await getInitialContactInfo({ firebase, contactsData, authUser, context })
+    const unreadMessages = contacts.reduce((acc, contact) => {
+      acc = { ...acc, [contact.chatKey]: contact.unreadMessages }
+      return acc
+    }, {})
     contacts.reverse()
+    const contactsDispatch = contacts.reduce((acc, contact) => {
+      acc = { ...acc, [contact.key]: { ...contact } }
+      return acc
+    }, {})
 
-    context?.dispatch({ type: "updateContacts", payload: snapshot.val() })
-    setContacts(contacts)
+    console.log({ contactsDispatch })
+
+    context?.dispatch({ type: "updateContacts", payload: { contacts: contactsDispatch, unreadMessages } })
+    // setContacts(contacts)
     setInitialLoading(false)
   }
 
@@ -68,7 +72,18 @@ const ContactList: React.FC = () => {
     contactsListRef
       .orderByChild("pinned_lastActivityTS")
       .limitToLast(CONTACTS_TO_LOAD)
-      .on("value", (snapshot: any) => getContactsList(snapshot))
+      .once("value", (snapshot: any) => getContactsList(snapshot))
+
+    // contactsListRef
+    //   .orderByChild("pinned_lastActivityTS")
+    //   .limitToLast(CONTACTS_TO_LOAD)
+    //   .on("child_changed", (snapshot: any) => {
+    //     console.log(snapshot.val())
+    //     context?.dispatch({
+    //       type: "updateContactInfo",
+    //       payload: { changedInfo: { ...snapshot.val(), key: snapshot.key } }
+    //     })
+    //   })
 
     contactsDatabaseRef.child("contactsAmount").on("value", (snapshot: any) => {
       setAllContactsAmount(snapshot.val())
@@ -88,7 +103,14 @@ const ContactList: React.FC = () => {
     contactsListRef
       .orderByChild("pinned_lastActivityTS")
       .limitToLast(loadedContacts + CONTACTS_TO_LOAD)
-      .on("value", (snapshot: any) => getContactsList(snapshot))
+      .on("child_changed", (snapshot: any) => {
+        context?.dispatch({ type: "updateContactInfo", payload: { changedInfo: snapshot.val() } })
+      })
+
+    contactsListRef
+      .orderByChild("pinned_lastActivityTS")
+      .limitToLast(loadedContacts + CONTACTS_TO_LOAD)
+      .once("value", (snapshot: any) => getContactsList(snapshot))
   }, [isScrolledDown]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
@@ -96,17 +118,17 @@ const ContactList: React.FC = () => {
       ref={contactListRef}
       className={classNames("contact-list", {
         "contact-list--hide-mobile": context?.state.activeChat.chatKey,
-        "contact-list--no-contacts": !initialLoading && !contacts?.length
+        "contact-list--no-contacts": !initialLoading && !contactsData?.length
       })}
     >
       {initialLoading ? (
         <div className="contact-list__loader-wrapper">
           <span className="contact-list__loader"></span>
         </div>
-      ) : !contacts?.length ? (
+      ) : !contactsData?.length ? (
         <div className="contact-list--no-contacts-text">You don't have any contacts</div>
       ) : (
-        contacts?.map((contact) => <Contact key={contact.key} contactInfo={contact} />)
+        contactsData?.map((contact) => <Contact key={contact.key} contactInfo={contact} />)
       )}
 
       {errors.error && <CreatePortal element={<ModalContent message={errors.error.message} />}></CreatePortal>}

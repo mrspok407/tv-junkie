@@ -116,7 +116,7 @@ const ContactsContent: React.FC<Props> = () => {
 
       console.log(contactStatus.val())
 
-      if (!contactStatus.val().isOnline || !contactStatus.val().chatBottom) {
+      if (!contactStatus.val()?.isOnline || !contactStatus.val()?.chatBottom) {
         firebase
           .privateChats()
           .child(`${chatKey}/members/${authUser?.uid}/unreadMessages/${pushNewMessage.key}`)

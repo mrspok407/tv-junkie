@@ -21,7 +21,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
   const { authUser } = useContext(AppContext)
 
   const context = useContext(ContactsContext)
-  const { contactPopup, activeChat, authUserUnreadMessages } = context?.state!
+  const { contactPopup, activeChat } = context?.state!
 
   const formatedDate = useTimestampFormater({ timeStamp: contactInfo.pinned_lastActivityTS?.slice(-13) })
 

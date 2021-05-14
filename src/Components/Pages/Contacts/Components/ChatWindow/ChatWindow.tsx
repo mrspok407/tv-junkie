@@ -15,9 +15,9 @@ import GoDown from "./Components/GoDown/GoDown"
 import useResizeObserver from "./Hooks/UseResizeObserver"
 import { MessageInterface } from "../../Types"
 import { convertTimeStampToDate } from "Utils"
-import "./ChatWindow.scss"
 import useShowFloatDate from "./Hooks/UseShowFloatDate"
 import usePageFocusHandler from "./Hooks/UsePageFocusHandler"
+import "./ChatWindow.scss"
 
 const ChatWindow: React.FC = () => {
   const { authUser, newContactsActivity, errors } = useContext(AppContext)
@@ -33,9 +33,9 @@ const ChatWindow: React.FC = () => {
     authUserUnreadMessages,
     contactsStatus
   } = context?.state!
-  const messagesData = messages[activeChat.chatKey]
-  const renderedMessages = renderedMessagesList[activeChat.chatKey]
-  const unreadMessagesAuth = authUserUnreadMessages[activeChat.chatKey]
+  const messagesData = messages[activeChat.chatKey] || []
+  const renderedMessages = renderedMessagesList[activeChat.chatKey] || []
+  const unreadMessagesAuth = authUserUnreadMessages[activeChat.chatKey] || []
   const contactInfo = contacts[activeChat.contactKey] || {}
 
   const [chatContainerRef, setChatContainerRef] = useState<HTMLDivElement>(null!)
@@ -48,7 +48,7 @@ const ChatWindow: React.FC = () => {
   const isScrollBottomRef = useRef(false)
   const { pageInFocus } = usePageFocusHandler({ activeChat })
 
-  const [firstMessage, setFirstMessage] = useState<string>()
+  // const [firstMessage, setFirstMessage] = useState<string>()
   const { floatDate, isScrollingTop } = useShowFloatDate({ activeChat, chatContainerRef, renderedMessages })
 
   const chatContainerCallback = useCallback((node) => {
@@ -57,21 +57,21 @@ const ChatWindow: React.FC = () => {
     }
   }, [])
 
-  useEffect(() => {
-    const listener = firebase
-      .messages({ chatKey: activeChat.chatKey })
-      .orderByChild("timeStamp")
-      .limitToFirst(1)
-      .on("value", (snapshot: any) => {
-        console.log(snapshot.val())
-        if (snapshot.val() === null) return
-        const key = Object.keys(snapshot.val())[0]
-        setFirstMessage(key)
-      })
-    return () => {
-      firebase.messages({ chatKey: activeChat.chatKey }).off("value", listener)
-    }
-  }, [firebase, activeChat])
+  // useEffect(() => {
+  //   const listener = firebase
+  //     .messages({ chatKey: activeChat.chatKey })
+  //     .orderByChild("timeStamp")
+  //     .limitToFirst(1)
+  //     .on("value", (snapshot: any) => {
+  //       console.log(snapshot.val())
+  //       if (snapshot.val() === null) return
+  //       const key = Object.keys(snapshot.val())[0]
+  //       setFirstMessage(key)
+  //     })
+  //   return () => {
+  //     firebase.messages({ chatKey: activeChat.chatKey }).off("value", listener)
+  //   }
+  // }, [firebase, activeChat])
 
   const { loadTopMessages, loading } = useLoadTopMessages()
   const { handleContactRequest } = useResponseContactRequest({ userUid: activeChat.contactKey })
@@ -100,11 +100,61 @@ const ChatWindow: React.FC = () => {
     return { height, scrollHeight, scrollTop, thresholdTopLoad, thresholdTopRender, thresholdBottomRender, top }
   }
 
+  const messagesRef = useRef<MessageInterface[]>([])
+  const renderedMessagesRef = useRef<MessageInterface[]>([])
+  const loadingRef = useRef<boolean>()
+
+  useEffect(() => {
+    messagesRef.current = messagesData
+    renderedMessagesRef.current = renderedMessages
+    loadingRef.current = loading
+  }, [messagesData, renderedMessages, activeChat, loading])
+
   const scrollPositionHandler = useCallback(
     debounce(() => {
       if (!chatContainerRef) return
-      const { scrollTop } = getContainerRect()
-      // console.log({ scrollTop })
+      const { scrollTop, scrollHeight, height } = getContainerRect()
+      console.log({ scrollTop })
+      if (scrollHeight <= height) return
+
+      const firstRenderedMessageIndex = messagesRef?.current.findIndex(
+        (item) => item.key === renderedMessagesRef?.current[0]?.key
+      )
+      const lastRenderedMessageIndex = messagesRef.current.findIndex(
+        (item) => item.key === renderedMessagesRef.current[renderedMessagesRef.current.length - 1]?.key
+      )
+
+      if (scrollTop < 1) {
+        if (firstRenderedMessageIndex === 0) {
+          if (loadingRef.current) {
+            chatContainerRef.scrollTop = 1
+          }
+        } else {
+          chatContainerRef.scrollTop = 1
+        }
+      }
+      if (scrollHeight <= scrollTop + height && lastRenderedMessageIndex !== messagesRef.current.length - 1) {
+        chatContainerRef.scrollTop = scrollHeight - height - 1
+      }
+
+      if (scrollHeight <= scrollTop + height) {
+        isScrollBottomRef.current = true
+        context?.dispatch({
+          type: "updateAuthUserUnreadMessages",
+          payload: { chatKey: activeChat.chatKey, unreadMessages: [] }
+        })
+        console.log("bottom")
+        firebase
+          .chatMemberStatus({ chatKey: activeChat.chatKey, memberKey: authUser?.uid! })
+          .update({ chatBottom: true })
+      } else {
+        console.log("not bottom")
+        isScrollBottomRef.current = false
+        firebase
+          .chatMemberStatus({ chatKey: activeChat.chatKey, memberKey: authUser?.uid! })
+          .update({ chatBottom: false })
+      }
+
       context?.dispatch({ type: "updateLastScrollPosition", payload: { scrollTop, chatKey: activeChat.chatKey } })
     }, 150),
     [activeChat, chatContainerRef]
@@ -118,28 +168,18 @@ const ChatWindow: React.FC = () => {
       const { height, scrollHeight, scrollTop, thresholdTopRender, thresholdTopLoad, thresholdBottomRender } =
         getContainerRect()
 
-      const firstRenderedMessageIndex = messagesData.findIndex((item) => item.key === renderedMessages[0]?.key)
       const lastRenderedMessageIndex = messagesData.findIndex(
         (item) => item.key === renderedMessages[renderedMessages.length - 1]?.key
       )
 
       if (scrollHeight <= height) return
-      if (scrollTop < 1) {
-        if (firstRenderedMessageIndex === 0) {
-          if (loading) {
-            chatContainerRef.scrollTop = 1
-          }
-        } else {
-          chatContainerRef.scrollTop = 1
-        }
-      }
-
-      if (scrollHeight <= scrollTop + height && lastRenderedMessageIndex !== messagesData.length - 1) {
-        chatContainerRef.scrollTop = scrollHeight - height - 1
-      }
+      // if (scrollHeight <= scrollTop + height && lastRenderedMessageIndex !== messagesData.length - 1) {
+      //   chatContainerRef.scrollTop = scrollHeight - height - 1
+      // }
 
       if (scrollTop < prevScrollTop || prevScrollTop === undefined) {
         if (scrollTop <= thresholdTopRender) {
+          console.log("renderTopMessages")
           context?.dispatch({ type: "renderTopMessages" })
         }
         if (scrollTop <= thresholdTopLoad) {
@@ -150,21 +190,6 @@ const ChatWindow: React.FC = () => {
         if (scrollHeight <= scrollTop + height + thresholdBottomRender) {
           context?.dispatch({ type: "renderBottomMessages" })
         }
-      }
-      if (scrollHeight <= scrollTop + height) {
-        isScrollBottomRef.current = true
-        context?.dispatch({
-          type: "updateAuthUserUnreadMessages",
-          payload: { chatKey: activeChat.chatKey, unreadMessages: [] }
-        })
-        firebase
-          .chatMemberStatus({ chatKey: activeChat.chatKey, memberKey: authUser?.uid! })
-          .update({ chatBottom: true })
-      } else {
-        isScrollBottomRef.current = false
-        firebase
-          .chatMemberStatus({ chatKey: activeChat.chatKey, memberKey: authUser?.uid! })
-          .update({ chatBottom: false })
       }
       prevScrollTop = scrollTop
     }),
@@ -234,7 +259,8 @@ const ChatWindow: React.FC = () => {
           .chatMemberStatus({ chatKey: activeChat.chatKey, memberKey: authUser?.uid! })
           .update({ chatBottom: true })
       } else {
-        // console.log("scroll previous no unread")
+        console.log("scroll previous no unread")
+        console.log(lastScrollPosition[activeChat.chatKey])
         chatContainerRef.scrollTop = lastScrollPosition[activeChat.chatKey]!
       }
     }
@@ -354,11 +380,11 @@ const ChatWindow: React.FC = () => {
 
                 return (
                   <React.Fragment key={renderedMessage.key}>
-                    {currentMessageDate !== prevMessageDate || firstMessage === renderedMessage.key ? (
+                    {currentMessageDate !== prevMessageDate || renderedMessage.timeStamp === prevMessage.timeStamp ? (
                       <div
                         key={renderedMessage.timeStamp}
                         className={classNames("chat-window__date", {
-                          "chat-window__date--top": firstMessage === renderedMessage.key
+                          "chat-window__date--top": renderedMessage.timeStamp === prevMessage.timeStamp
                         })}
                         data-timestamp={renderedMessage.timeStamp}
                       >

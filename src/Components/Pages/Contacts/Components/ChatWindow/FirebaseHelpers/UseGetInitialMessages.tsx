@@ -62,13 +62,9 @@ const useGetInitialMessages = ({ chatKey }: { chatKey: string }) => {
           messagesData.push({ ...message.val(), key: message.key })
         })
 
-        // console.log({ messagesData })
-
         const indexFirstUnreadMessage = messagesData.findIndex((message) => message.key === firstUnreadMessageKey)
         const authUnreadMessages =
           indexFirstUnreadMessage === -1 ? [] : [...messagesData].slice(indexFirstUnreadMessage)
-
-        // console.log({ authUnreadMessages })
 
         firstMessageTimeStamp = messagesData[0].timeStamp
         lastMessageTimeStamp = messagesData[messagesData.length - 1].timeStamp

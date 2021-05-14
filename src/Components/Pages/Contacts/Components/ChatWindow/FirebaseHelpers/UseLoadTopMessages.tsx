@@ -11,8 +11,8 @@ const useLoadTopMessages = () => {
   const firebase = useContext(FirebaseContext)
   const context = useContext(ContactsContext)
   const { messages, renderedMessagesList, activeChat } = context?.state!
-  const messagesData = messages[activeChat.chatKey]
-  const renderedMessages = renderedMessagesList[activeChat.chatKey]
+  const messagesData = messages[activeChat.chatKey] || []
+  const renderedMessages = renderedMessagesList[activeChat.chatKey] || []
   const messagesRef = firebase.messages({ chatKey: activeChat.chatKey })
 
   const [loading, setLoading] = useState(false)
@@ -20,7 +20,7 @@ const useLoadTopMessages = () => {
   const loadedMessageGroups = useRef<number[]>([])
 
   const loadTopMessages = useCallback(async () => {
-    if (!messagesData) return
+    if (!messagesData?.length) return
     if (loadedMessageGroups.current.includes(messagesData[0].timeStamp)) return
 
     const firstRenderedMessageIndex = messagesData.findIndex((item) => item.key === renderedMessages[0].key)

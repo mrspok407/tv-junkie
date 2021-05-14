@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useLayoutEffect, useCallback, useContext } from "react"
 import { ContactInfoInterface } from "../../../Types"
 import { ContactsContext } from "../../Context/ContactsContext"
+import useContactOptions from "../Hooks/UseContactOptions"
 
 type Props = {
   contactOptionsRef: HTMLDivElement
@@ -11,6 +12,8 @@ type Props = {
 const ContactPopup: React.FC<Props> = ({ contactOptionsRef, contactInfo, action = false }) => {
   const context = useContext(ContactsContext)
   const { contacts, activeChat } = context?.state!
+
+  const optionsHandler = useContactOptions({ contactInfo })
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside as EventListener)
@@ -35,11 +38,25 @@ const ContactPopup: React.FC<Props> = ({ contactOptionsRef, contactInfo, action 
     <div className="popup-container">
       <div className="popup__option">
         {isPinned ? (
-          <button className="popup__option-btn" type="button">
+          <button
+            className="popup__option-btn"
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              optionsHandler.updateIsPinned()
+            }}
+          >
             Unpin from top
           </button>
         ) : (
-          <button className="popup__option-btn" type="button">
+          <button
+            className="popup__option-btn"
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              optionsHandler.updateIsPinned()
+            }}
+          >
             Pin to top
           </button>
         )}
