@@ -5,15 +5,15 @@ import useContactOptions from "../Hooks/UseContactOptions"
 
 type Props = {
   contactOptionsRef: HTMLDivElement
-  action?: any
+  togglePopup?: any
   contactInfo: ContactInfoInterface
 }
 
-const ContactPopup: React.FC<Props> = ({ contactOptionsRef, contactInfo, action = false }) => {
+const ContactPopup: React.FC<Props> = ({ contactOptionsRef, contactInfo, togglePopup = false }) => {
   const context = useContext(ContactsContext)
   const { contacts, activeChat } = context?.state!
 
-  const optionsHandler = useContactOptions({ contactInfo })
+  const optionsHandler = useContactOptions({ contactInfo, togglePopup })
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside as EventListener)
@@ -24,10 +24,10 @@ const ContactPopup: React.FC<Props> = ({ contactOptionsRef, contactInfo, action 
 
   const handleClickOutside = (e: CustomEvent) => {
     if (!contactOptionsRef?.contains(e.target as Node)) {
-      if (!action) {
+      if (!togglePopup) {
         context?.dispatch({ type: "updateContactPopup", payload: "" })
       } else {
-        action(false)
+        togglePopup(false)
       }
     }
   }

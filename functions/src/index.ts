@@ -101,7 +101,13 @@ export const addNewContactsActivity = functions.database
       otherMemberKey = chatKey.slice(0, -memberKey.length - 1);
     }
 
-    return database.ref(`users/${memberKey}/contactsDatabase/newContactsActivity/${otherMemberKey}`).set(true);
+    const timeStamp = admin.database.ServerValue.TIMESTAMP;
+    const updateData = {
+      [`${contactsDatabaseRef(memberKey)}/newContactsActivity/${otherMemberKey}`]: true,
+      [`${contactsDatabaseRef(memberKey)}/contactsList/${otherMemberKey}/timeStamp`]: timeStamp
+    };
+
+    return database.ref("users").update(updateData);
   });
 
 export const removeNewContactsActivity = functions.database

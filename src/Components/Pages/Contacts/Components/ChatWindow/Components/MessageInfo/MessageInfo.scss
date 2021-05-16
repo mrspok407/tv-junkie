@@ -74,13 +74,25 @@ $messageStatusSize: 17px;
 }
 
 .chat-window__message-status {
-  background-image: url("../../../../../../../assets/images/icons/double-mark-sign.svg");
+  background-image: url("../../../../../../../assets/images/icons/one-mark-sign.svg");
   background-size: contain;
   background-repeat: no-repeat;
   width: $messageStatusSize;
   height: $messageStatusSize;
+  // opacity: 0;
+  // will-change: opacity;
+  // animation: messageStatusFadeIn 150ms forwards ease;
+  // @keyframes messageStatusFadeIn {
+  //   to {
+  //     opacity: 1;
+  //   }
+  // }
 
-  &--unread {
-    background-image: url("../../../../../../../assets/images/icons/one-mark-sign.svg");
+  &--read {
+    background-image: url("../../../../../../../assets/images/icons/double-mark-sign.svg");
+  }
+
+  &--loading {
+    background-image: initial;
   }
 }

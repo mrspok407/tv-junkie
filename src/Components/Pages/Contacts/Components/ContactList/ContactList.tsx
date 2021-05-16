@@ -55,9 +55,9 @@ const ContactList: React.FC = () => {
       acc = { ...acc, [contact.chatKey]: contact.unreadMessages }
       return acc
     }, {})
-    contacts.reverse()
+
     const contactsDispatch = contacts.reduce((acc, contact) => {
-      acc = { ...acc, [contact.key]: { ...contact } }
+      acc = { [contact.key]: { ...contact }, ...acc }
       return acc
     }, {})
 
@@ -72,7 +72,7 @@ const ContactList: React.FC = () => {
     contactsListRef
       .orderByChild("pinned_lastActivityTS")
       .limitToLast(CONTACTS_TO_LOAD)
-      .once("value", (snapshot: any) => getContactsList(snapshot))
+      .on("value", (snapshot: any) => getContactsList(snapshot))
 
     // contactsListRef
     //   .orderByChild("pinned_lastActivityTS")
@@ -100,17 +100,17 @@ const ContactList: React.FC = () => {
     if (loadedContacts >= allContactsAmount!) return
 
     contactsListRef.off()
-    contactsListRef
-      .orderByChild("pinned_lastActivityTS")
-      .limitToLast(loadedContacts + CONTACTS_TO_LOAD)
-      .on("child_changed", (snapshot: any) => {
-        context?.dispatch({ type: "updateContactInfo", payload: { changedInfo: snapshot.val() } })
-      })
+    // contactsListRef
+    //   .orderByChild("pinned_lastActivityTS")
+    //   .limitToLast(loadedContacts + CONTACTS_TO_LOAD)
+    //   .on("child_changed", (snapshot: any) => {
+    //     context?.dispatch({ type: "updateContactInfo", payload: { changedInfo: snapshot.val() } })
+    //   })
 
     contactsListRef
       .orderByChild("pinned_lastActivityTS")
       .limitToLast(loadedContacts + CONTACTS_TO_LOAD)
-      .once("value", (snapshot: any) => getContactsList(snapshot))
+      .on("value", (snapshot: any) => getContactsList(snapshot))
   }, [isScrolledDown]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (

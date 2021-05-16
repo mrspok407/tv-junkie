@@ -5,11 +5,12 @@ export interface ContactInfoInterface {
   timeStamp: number
   pinned_lastActivityTS: string
   key: string
+  chatKey: string
   newContactsActivity: boolean | null
   newContactsRequests: boolean | null
   lastMessage: MessageInterface
-  unreadMessagesAuth: string[]
-  unreadMessagesContact: number
+  unreadMessages: string[]
+  unreadMessagesContact: boolean
 }
 
 export const CONTACT_INFO_INITIAL_DATA = {

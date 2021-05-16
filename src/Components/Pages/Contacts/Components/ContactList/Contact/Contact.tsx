@@ -28,8 +28,8 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
   const [newActivity, setNewActivity] = useState<boolean | null | undefined>(contactInfo.newContactsActivity)
   const [newContactsRequest, setNewContactRequest] = useState<boolean | null>(contactInfo.newContactsRequests)
 
-  const [authUnreadMessages, setAuthUnreadMessages] = useState<string[]>(contactInfo.unreadMessagesAuth)
-  const [contactUnreadMessages, setContactUnreadMessages] = useState<number | null>(contactInfo.unreadMessagesContact)
+  const [authUnreadMessages, setAuthUnreadMessages] = useState<string[]>(contactInfo.unreadMessages)
+  const [contactUnreadMessages, setContactUnreadMessages] = useState<boolean>(contactInfo.unreadMessagesContact)
   const [lastMessage, setLastMessage] = useState<MessageInterface>(contactInfo.lastMessage)
 
   const contactOptionsRef = useRef<HTMLDivElement>(null!)
@@ -67,7 +67,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
       .orderByKey()
       .limitToFirst(1)
       .on("value", (snapshot: any) => {
-        setContactUnreadMessages(snapshot.numChildren())
+        setContactUnreadMessages(!!snapshot.val())
       })
 
     const lastMessageListener = firebase
@@ -112,7 +112,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
         {lastMessage?.sender === authUser?.uid && (
           <div
             className={classNames("contact-item__last-message-status", {
-              "contact-item__last-message-status--unread": !!(contactUnreadMessages! > 0)
+              "contact-item__last-message-status--unread": contactUnreadMessages
             })}
           ></div>
         )}

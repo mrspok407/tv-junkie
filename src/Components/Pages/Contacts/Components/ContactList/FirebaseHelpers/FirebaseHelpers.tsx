@@ -11,28 +11,20 @@ interface GetInitialInfoInfterface {
   context: ContextInterface | null
 }
 
-export const getInitialContactInfo = async ({
-  firebase,
-  contactsData,
-  authUser,
-  context
-}: GetInitialInfoInfterface) => {
+let loadedContactsRef: { [key: string]: ContactInfoInterface } = {}
+
+export const getInitialContactInfo = async ({ firebase, contactsData, authUser }: GetInitialInfoInfterface) => {
   return Promise.all(
     contactsData.map(async (contact) => {
-      const chatKey =
-        contact.key < authUser?.uid! ? `${contact.key}_${authUser?.uid}` : `${authUser?.uid}_${contact.key}`
-      if (context?.state.contacts[contact.key]) {
-        const unreadMessages = context?.state.authUserUnreadMessages[chatKey]
+      if (loadedContactsRef[contact.key]) {
         return {
-          ...context?.state.contacts[contact.key],
-          key: contact.key,
-          unreadMessages,
-          chatKey
+          ...loadedContactsRef[contact.key],
+          ...contact
         }
       }
 
-      console.log("test")
-
+      const chatKey =
+        contact.key < authUser?.uid! ? `${contact.key}_${authUser?.uid}` : `${authUser?.uid}_${contact.key}`
       const [newContactsActivity, newContactsRequests, unreadMessagesAuthData, unreadMessagesContact, lastMessage]: [
         { val: () => boolean | null },
         { val: () => boolean | null },
@@ -48,8 +40,7 @@ export const getInitialContactInfo = async ({
       ])
 
       const unreadMessages = !unreadMessagesAuthData.val() ? [] : Object.keys(unreadMessagesAuthData.val())
-
-      return {
+      const contactInfo = {
         ...contact,
         key: contact.key,
         chatKey,
@@ -59,6 +50,13 @@ export const getInitialContactInfo = async ({
         unreadMessagesContact: !!unreadMessagesContact.val(),
         lastMessage: lastMessage.val() !== null ? Object.values(lastMessage.val()!).map((item) => item)[0] : {}
       }
+
+      loadedContactsRef = {
+        ...loadedContactsRef,
+        [contact.key]: contactInfo
+      }
+
+      return contactInfo
     })
   )
 }

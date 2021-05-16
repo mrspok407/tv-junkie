@@ -42,6 +42,8 @@ const ChatWindow: React.FC = () => {
   const contactOptionsRef = useRef<HTMLDivElement>(null!)
   const unreadMessagesAuthRef = useRef<string[]>([])
 
+  const [contactUnreadMessages, setContactUnreadMessages] = useState<string[] | null>(null)
+
   const [popupContactInfoOpen, setPopupContactInfoOpen] = useState(false)
 
   const isScrolledFirstRenderRef = useRef(false)
@@ -56,6 +58,18 @@ const ChatWindow: React.FC = () => {
       setChatContainerRef(node)
     }
   }, [])
+
+  useEffect(() => {
+    const listener = firebase
+      .unreadMessages({ uid: activeChat.contactKey, chatKey: activeChat.chatKey })
+      .on("value", (snapshot: any) => {
+        setContactUnreadMessages(Object.keys(snapshot.val() || {}))
+      })
+    return () => {
+      // setContactUnreadMessages(null)
+      // firebase.unreadMessages({ uid: activeChat.contactKey, chatKey: activeChat.chatKey }).off("value", listener)
+    }
+  }, [firebase, activeChat])
 
   // useEffect(() => {
   //   const listener = firebase
@@ -344,7 +358,7 @@ const ChatWindow: React.FC = () => {
             <ContactPopup
               contactOptionsRef={contactOptionsRef.current}
               contactInfo={contactInfo}
-              action={setPopupContactInfoOpen}
+              togglePopup={setPopupContactInfoOpen}
             />
           )}
         </div>
@@ -403,7 +417,7 @@ const ChatWindow: React.FC = () => {
                     >
                       <div className="chat-window__message-text">{renderedMessage.message}</div>
 
-                      <MessageInfo messageData={renderedMessage} />
+                      <MessageInfo messageData={renderedMessage} contactUnreadMessages={contactUnreadMessages} />
                     </div>
                   </React.Fragment>
                 )

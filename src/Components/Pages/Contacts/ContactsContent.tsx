@@ -53,33 +53,52 @@ const ContactsContent: React.FC<Props> = () => {
       }
     })
 
-    for (let i = 1; i <= 10; i++) {
+    for (let i = 1; i <= 1; i++) {
       const userKey = activeChat.contactKey
       const chatKey = userKey < authUser?.uid! ? `${userKey}_${authUser?.uid}` : `${authUser?.uid}_${userKey}`
 
       const randomMessage = lorem.generateSentences(1)
       const timeStampEpoch = new Date().getTime()
 
-      const pushNewMessage = await firebase
-        .privateChats()
-        .child(`${chatKey}/messages`)
-        .push({
-          sender: userKey,
+      const contactStatus = await firebase.chatMemberStatus({ chatKey, memberKey: userKey }).once("value")
+
+      const messageRef = firebase.privateChats().child(`${chatKey}/messages`).push()
+      const messageKey = messageRef.key
+
+      const updateData = {
+        [`messages/${messageKey}`]: {
+          sender: authUser?.uid,
           // sender: Math.random() > 0.5 ? userKey : authUser?.uid,
           message: randomMessage,
           timeStamp: timeStampEpoch * 2
-        })
-
-      const contactStatus = await firebase.chatMemberStatus({ chatKey, memberKey: authUser?.uid! }).once("value")
-
-      console.log(contactStatus.val())
-
-      if (!contactStatus.val().isOnline || !contactStatus.val().chatBottom) {
-        firebase
-          .privateChats()
-          .child(`${chatKey}/members/${authUser?.uid}/unreadMessages/${pushNewMessage.key}`)
-          .set(true)
+        },
+        [`members/${userKey}/unreadMessages/${messageKey}`]:
+          !contactStatus.val()?.isOnline || !contactStatus.val()?.chatBottom ? true : null
       }
+
+      firebase.privateChats().child(chatKey).update(updateData)
+
+      // const pushNewMessage = await firebase
+      //   .privateChats()
+      //   .child(`${chatKey}/messages`)
+      //   .push({
+      //     sender: authUser?.uid,
+      //     // sender: Math.random() > 0.5 ? userKey : authUser?.uid,
+      //     message: randomMessage,
+      //     timeStamp: timeStampEpoch * 2
+      //   })
+
+      // const contactStatus = await firebase.chatMemberStatus({ chatKey, memberKey: authUser?.uid! }).once("value")
+
+      // console.log(contactStatus.val())
+
+      // if (!contactStatus.val()?.isOnline || !contactStatus.val()?.chatBottom) {
+      //   firebase
+      //     .privateChats()
+      //     // .child(`${chatKey}/members/${authUser?.uid}/unreadMessages/${pushNewMessage.key}`)
+      //     .child(`${chatKey}/members/${userKey}/unreadMessages/${pushNewMessage.key}`)
+      //     .set(true)
+      // }
     }
   }
 
@@ -94,9 +113,11 @@ const ContactsContent: React.FC<Props> = () => {
         min: 4
       }
     })
+    console.log({ contacts })
+    console.log(Object.keys(contacts))
 
     for (let i = 1; i <= 10; i++) {
-      const userKey = Object.keys(contacts)[Object.keys(contacts).length - 1]
+      const userKey = Object.keys(contacts)[0]
       const chatKey = userKey < authUser?.uid! ? `${userKey}_${authUser?.uid}` : `${authUser?.uid}_${userKey}`
 
       const randomMessage = lorem.generateSentences(1)

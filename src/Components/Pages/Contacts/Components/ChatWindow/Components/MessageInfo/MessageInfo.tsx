@@ -6,13 +6,13 @@ import { ContactsContext } from "../../../Context/ContactsContext"
 import MessagePopup from "./MessagePopup"
 import "./MessageInfo.scss"
 
-type Props = { messageData: MessageInterface }
+type Props = { messageData: MessageInterface; contactUnreadMessages: string[] | null }
 
-const MessageInfo: React.FC<Props> = React.memo(({ messageData }) => {
+const MessageInfo: React.FC<Props> = React.memo(({ messageData, contactUnreadMessages }) => {
   const { authUser } = useContext(AppContext)
   const context = useContext(ContactsContext)
 
-  const { activeChat, contactsUnreadMessages, messagePopup } = context?.state!
+  const { activeChat, messagePopup } = context?.state!
 
   const messageOptionsRef = useRef<HTMLDivElement>(null!)
 
@@ -39,7 +39,8 @@ const MessageInfo: React.FC<Props> = React.memo(({ messageData }) => {
       {messageData.sender === authUser?.uid && (
         <div
           className={classNames("chat-window__message-status", {
-            "chat-window__message-status--unread": contactsUnreadMessages[activeChat.chatKey]?.includes(messageData.key)
+            "chat-window__message-status--read": !contactUnreadMessages?.includes(messageData.key),
+            "chat-window__message-status--loading": contactUnreadMessages === null
           })}
         ></div>
       )}
