@@ -16,7 +16,6 @@ interface ContactInfoInterface {
   receiver?: boolean
   userName?: string
   timeStamp: unknown
-  // recipientNotified?: boolean
 }
 
 interface ContactRequestDataInterface {
@@ -47,15 +46,13 @@ export const _newContactRequest = async ({
           status: false,
           receiver: true,
           userName: contactName,
-          timeStamp,
           pinned_lastActivityTS: "false"
-          // recipientNotified: false
-        }
+        },
+        [`${contactsDatabaseRef(authUid)}/contactsLastActivity/${contactUid}`]: timeStamp
       }
     : {
         [`${contactsDatabaseRef(authUid)}/contactsList/${contactUid}/status`]: false,
-        [`${contactsDatabaseRef(authUid)}/contactsList/${contactUid}/timeStamp`]: timeStamp
-        // [`${contactsDatabaseRef(authUid)}/contactsList/${contactUid}/recipientNotified`]: false
+        [`${contactsDatabaseRef(authUid)}/contactsLastActivity/${contactUid}`]: timeStamp
       }
 
   try {
@@ -64,15 +61,12 @@ export const _newContactRequest = async ({
     const updateData: ContactRequestDataInterface = {
       ...contactInfoData,
       [`${contactsDatabaseRef(contactUid)}/newContactsRequests/${authUid}`]: true,
-      // [`${contactsDatabaseRef(contactUid)}/newContactsActivity/${authUid}`]: true,
+      [`${contactsDatabaseRef(contactUid)}/contactsLastActivity/${authUid}`]: timeStamp,
       [`${contactsDatabaseRef(contactUid)}/contactsList/${authUid}`]: {
         status: false,
         receiver: false,
         userName: authUserName.val(),
-        timeStamp,
-        pinned_lastActivityTS: "false",
-        // recipientNotified: false,
-        newActivity: true
+        pinned_lastActivityTS: "false"
       }
     }
 
@@ -106,11 +100,9 @@ export const _handleContactRequest = async ({
     const updateData = {
       [`${contactsDatabaseRef(authUid)}/contactsList/${authPathToUpdate}`]: status === "accept" ? true : null,
       [`${contactsDatabaseRef(authUid)}/newContactsRequests/${contactUid}`]: null,
-      // [`${contactsDatabaseRef(authUid)}/newContactsActivity/${contactUid}`]: null,
       [`${contactsDatabaseRef(contactUid)}/contactsList/${authUid}/status`]: status === "accept" ? true : "rejected",
-      // [`${contactsDatabaseRef(contactUid)}/contactsList/${authUid}/newActivity`]: true,
       [`${contactsDatabaseRef(contactUid)}/newContactsActivity/${authUid}`]: true,
-      [`${contactsDatabaseRef(contactUid)}/contactsList/${authUid}/timeStamp`]: timeStamp
+      [`${contactsDatabaseRef(contactUid)}/contactsLastActivity/${authUid}`]: timeStamp
     }
 
     return database.ref("users").update(updateData)
@@ -118,32 +110,3 @@ export const _handleContactRequest = async ({
     throw new Error(`There has been some error updating database: ${error}`)
   }
 }
-
-// export const _updateRecipientNotified = async ({
-//   data,
-//   context,
-//   database
-// }: {
-//   data: DataInterface
-//   context: ContextInterface
-//   database: any
-// }) => {
-//   const authUid = context?.auth?.uid
-//   const { contactUid } = data
-
-//   if (!authUid) {
-//     throw new Error("The function must be called while authenticated.")
-//   }
-
-//   const updateData = {
-//     [`${contactsDatabaseRef(authUid)}/contactsList/${contactUid}/recipientNotified`]: true,
-//     // [`${contactsDatabaseRef(authUid)}/newContactsRequests/${contactUid}`]: null,
-//     [`${contactsDatabaseRef(contactUid)}/contactsList/${authUid}/recipientNotified`]: true
-//   }
-
-//   try {
-//     return database.ref("users").update(updateData)
-//   } catch (error) {
-//     throw new Error(`There has been some error updating database: ${error}`)
-//   }
-// }

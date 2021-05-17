@@ -62,22 +62,57 @@ const ContactPopup: React.FC<Props> = ({ contactOptionsRef, contactInfo, toggleP
         )}
       </div>
       <div className="popup__option">
-        <button className="popup__option-btn" type="button">
+        <a
+          onClick={(e) => {
+            e.stopPropagation()
+            if (togglePopup) togglePopup()
+            context?.dispatch({ type: "updateContactPopup", payload: "" })
+          }}
+          className="popup__option-btn"
+          href={`${
+            process.env.NODE_ENV === "production"
+              ? `https://www.tv-junkie.com/user/${contactInfo.key}`
+              : `http://localhost:3000/user/${contactInfo.key}`
+          }`}
+          rel="noopener noreferrer"
+          target="_blank"
+        >
           View profile
-        </button>
+        </a>
       </div>
       <div className="popup__option">
-        <button className="popup__option-btn" type="button">
+        <button
+          className="popup__option-btn"
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation()
+            optionsHandler.handleClearHistory()
+          }}
+        >
           Clear history
         </button>
       </div>
       <div className="popup__option">
-        <button className="popup__option-btn" type="button">
+        <button
+          className="popup__option-btn"
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation()
+            optionsHandler.handleMarkRead()
+          }}
+        >
           Mark as read
         </button>
       </div>
       <div className="popup__option">
-        <button className="popup__option-btn" type="button">
+        <button
+          className="popup__option-btn"
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation()
+            optionsHandler.handleRemoveContact()
+          }}
+        >
           Remove from contacts
         </button>
       </div>

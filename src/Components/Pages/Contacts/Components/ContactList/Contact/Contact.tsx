@@ -1,13 +1,11 @@
 import classNames from "classnames"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
-import React, { useCallback, useContext, useEffect, useRef, useState } from "react"
+import React, { useContext, useEffect, useRef, useState } from "react"
 import useTimestampFormater from "../../../Hooks/UseTimestampFormater"
 import { ContactInfoInterface, MessageInterface } from "../../../Types"
 import { ContactsContext } from "../../Context/ContactsContext"
 import ContactPopup from "./ContactPopup"
-import { throttle } from "throttle-debounce"
-import debounce from "debounce"
 import "./Contact.scss"
 import useGetInitialMessages from "../../ChatWindow/FirebaseHelpers/UseGetInitialMessages"
 import useHandleContactsStatus from "../../ChatWindow/FirebaseHelpers/UseHandleContactsStatus"
@@ -150,13 +148,13 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
             <ContactPopup contactOptionsRef={contactOptionsRef.current} contactInfo={contactInfo} />
           )}
         </div>
-        {newActivity || newContactsRequest ? (
+        {newActivity || newContactsRequest || unreadMessagesAmount ? (
           <div
             className={classNames("contact-item__unread-messages", {
               "contact-item__unread-messages--active": chatActive
             })}
           >
-            <span>{newActivity ? unreadMessagesAmount : newContactsRequest ? "" : null}</span>
+            <span>{unreadMessagesAmount && contactInfo.status === true ? unreadMessagesAmount : null}</span>
           </div>
         ) : (
           isPinned && <div className="contact-item__pinned"></div>

@@ -30,6 +30,7 @@ export interface FirebaseInterface {
   unreadMessages: ({ uid, chatKey }: { uid: string | undefined; chatKey: string }) => any
   newContactsRequests: ({ uid }: { uid: string | undefined }) => any
   newContactsActivity: ({ uid }: { uid: string | undefined }) => any
+  contactsLastActivity: ({ uid }: { uid: string | undefined }) => any
   contactsDatabase: ({ uid }: { uid: string | undefined }) => any
   contactsList: ({ uid }: { uid: string | undefined }) => any
   contact: ({ authUid, contactUid }: { authUid: string | undefined; contactUid: string }) => any
@@ -38,6 +39,7 @@ export interface FirebaseInterface {
 
 export const FIREBASE_INITIAL_STATE = {
   newContactsActivity: () => {},
+  contactsLastActivity: () => {},
   newContactsRequests: () => {},
   contactsDatabase: () => {},
   contactsList: () => {},

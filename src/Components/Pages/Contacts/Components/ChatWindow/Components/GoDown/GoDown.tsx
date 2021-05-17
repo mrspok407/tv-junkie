@@ -31,7 +31,7 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
   const messagesRef = useRef<MessageInterface[]>([])
   const renderedMessagesRef = useRef<MessageInterface[]>([])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     messagesRef.current = messagesData
     renderedMessagesRef.current = renderedMessages
   }, [messagesData, renderedMessages, chatKey])
@@ -77,8 +77,7 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
     const { height, scrollHeight, scrollTop } = getContainerRect()
     const threshold = scrollHeight * 0.1
 
-    if (!messagesRef.current?.length || !renderedMessagesRef.current?.length) return
-    if (scrollHeight <= height) {
+    if (!messagesRef.current?.length || !renderedMessagesRef.current?.length || scrollHeight <= height) {
       setFadeInButton(false)
       return
     }
@@ -120,7 +119,10 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
 
   useLayoutEffect(() => {
     if (!chatContainerRef) return
-    if (!renderedMessages?.length || !messagesData?.length) return
+    if (!renderedMessages?.length || !messagesData?.length) {
+      setFadeInButton(false)
+      return
+    }
     handleFadeIn()
   }, [chatContainerRef, chatKey])
 

@@ -41,7 +41,19 @@ const ContactsContent: React.FC<Props> = () => {
     }
   }, [authUser, firebase])
 
-  const addNewMessageCurrent = async () => {
+  const addNewMessageCurrent = async (authIsSender: any) => {
+    // const contactsList = await firebase.contactsList({ uid: authUser?.uid }).once("value")
+    // const contactsLastActivity = Object.entries(contactsList.val()).reduce((acc: any, [key, value]: [any, any]) => {
+    //   acc = { ...acc, [key]: value.timeStamp }
+    //   return acc
+    // }, {})
+
+    // Object.keys(contactsList.val()).forEach((key) => {
+    //   firebase.contact({ authUid: authUser?.uid, contactUid: key }).update({ timeStamp: null })
+    // })
+
+    // firebase.contactsLastActivity({ uid: authUser?.uid }).set(contactsLastActivity)
+
     const lorem = new LoremIpsum({
       sentencesPerParagraph: {
         max: 8,
@@ -54,8 +66,9 @@ const ContactsContent: React.FC<Props> = () => {
     })
 
     for (let i = 1; i <= 1; i++) {
-      const userKey = activeChat.contactKey
-      const chatKey = userKey < authUser?.uid! ? `${userKey}_${authUser?.uid}` : `${authUser?.uid}_${userKey}`
+      const userKey = authIsSender ? activeChat.contactKey : authUser?.uid!
+      const authUid = authIsSender ? authUser?.uid! : activeChat.contactKey
+      const chatKey = userKey < authUid! ? `${userKey}_${authUid}` : `${authUid}_${userKey}`
 
       const randomMessage = lorem.generateSentences(1)
       const timeStampEpoch = new Date().getTime()
@@ -67,7 +80,7 @@ const ContactsContent: React.FC<Props> = () => {
 
       const updateData = {
         [`messages/${messageKey}`]: {
-          sender: authUser?.uid,
+          sender: authUid,
           // sender: Math.random() > 0.5 ? userKey : authUser?.uid,
           message: randomMessage,
           timeStamp: timeStampEpoch * 2
@@ -77,28 +90,6 @@ const ContactsContent: React.FC<Props> = () => {
       }
 
       firebase.privateChats().child(chatKey).update(updateData)
-
-      // const pushNewMessage = await firebase
-      //   .privateChats()
-      //   .child(`${chatKey}/messages`)
-      //   .push({
-      //     sender: authUser?.uid,
-      //     // sender: Math.random() > 0.5 ? userKey : authUser?.uid,
-      //     message: randomMessage,
-      //     timeStamp: timeStampEpoch * 2
-      //   })
-
-      // const contactStatus = await firebase.chatMemberStatus({ chatKey, memberKey: authUser?.uid! }).once("value")
-
-      // console.log(contactStatus.val())
-
-      // if (!contactStatus.val()?.isOnline || !contactStatus.val()?.chatBottom) {
-      //   firebase
-      //     .privateChats()
-      //     // .child(`${chatKey}/members/${authUser?.uid}/unreadMessages/${pushNewMessage.key}`)
-      //     .child(`${chatKey}/members/${userKey}/unreadMessages/${pushNewMessage.key}`)
-      //     .set(true)
-      // }
     }
   }
 
@@ -148,8 +139,11 @@ const ContactsContent: React.FC<Props> = () => {
 
   return (
     <>
-      <button style={{ width: "400px" }} type="button" className="button" onClick={() => addNewMessageCurrent()}>
-        Add new message current
+      <button style={{ width: "400px" }} type="button" className="button" onClick={() => addNewMessageCurrent(true)}>
+        Add NM current authSender
+      </button>
+      <button style={{ width: "400px" }} type="button" className="button" onClick={() => addNewMessageCurrent(false)}>
+        Add NM current contactSender
       </button>
       <button style={{ width: "400px" }} type="button" className="button" onClick={() => addNewMessageTopContact()}>
         Add new message top

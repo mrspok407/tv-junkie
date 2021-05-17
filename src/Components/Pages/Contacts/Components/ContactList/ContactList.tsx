@@ -50,13 +50,13 @@ const ContactList: React.FC = () => {
       contactsData.push({ ...contact.val(), key: contact.key })
     })
 
-    const contacts: any[] = await getInitialContactInfo({ firebase, contactsData, authUser, context })
+    const contacts = await getInitialContactInfo({ firebase, contactsData, authUser, context })
     const unreadMessages = contacts.reduce((acc, contact) => {
       acc = { ...acc, [contact.chatKey]: contact.unreadMessages }
       return acc
     }, {})
 
-    const contactsDispatch = contacts.reduce((acc, contact) => {
+    const contactsDispatch = contacts.reduce((acc: { [key: string]: ContactInfoInterface }, contact) => {
       acc = { [contact.key]: { ...contact }, ...acc }
       return acc
     }, {})
@@ -64,7 +64,6 @@ const ContactList: React.FC = () => {
     console.log({ contactsDispatch })
 
     context?.dispatch({ type: "updateContacts", payload: { contacts: contactsDispatch, unreadMessages } })
-    // setContacts(contacts)
     setInitialLoading(false)
   }
 
@@ -73,17 +72,6 @@ const ContactList: React.FC = () => {
       .orderByChild("pinned_lastActivityTS")
       .limitToLast(CONTACTS_TO_LOAD)
       .on("value", (snapshot: any) => getContactsList(snapshot))
-
-    // contactsListRef
-    //   .orderByChild("pinned_lastActivityTS")
-    //   .limitToLast(CONTACTS_TO_LOAD)
-    //   .on("child_changed", (snapshot: any) => {
-    //     console.log(snapshot.val())
-    //     context?.dispatch({
-    //       type: "updateContactInfo",
-    //       payload: { changedInfo: { ...snapshot.val(), key: snapshot.key } }
-    //     })
-    //   })
 
     contactsDatabaseRef.child("contactsAmount").on("value", (snapshot: any) => {
       setAllContactsAmount(snapshot.val())
@@ -100,13 +88,6 @@ const ContactList: React.FC = () => {
     if (loadedContacts >= allContactsAmount!) return
 
     contactsListRef.off()
-    // contactsListRef
-    //   .orderByChild("pinned_lastActivityTS")
-    //   .limitToLast(loadedContacts + CONTACTS_TO_LOAD)
-    //   .on("child_changed", (snapshot: any) => {
-    //     context?.dispatch({ type: "updateContactInfo", payload: { changedInfo: snapshot.val() } })
-    //   })
-
     contactsListRef
       .orderByChild("pinned_lastActivityTS")
       .limitToLast(loadedContacts + CONTACTS_TO_LOAD)

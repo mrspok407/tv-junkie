@@ -33,7 +33,7 @@ const ChatWindow: React.FC = () => {
     authUserUnreadMessages,
     contactsStatus
   } = context?.state!
-  const messagesData = messages[activeChat.chatKey] || []
+  const messagesData = messages[activeChat.chatKey]
   const renderedMessages = renderedMessagesList[activeChat.chatKey] || []
   const unreadMessagesAuth = authUserUnreadMessages[activeChat.chatKey] || []
   const contactInfo = contacts[activeChat.contactKey] || {}
@@ -279,7 +279,7 @@ const ChatWindow: React.FC = () => {
       }
     }
     isScrolledFirstRenderRef.current = true
-  }, [activeChat, messagesData, chatContainerRef])
+  }, [activeChat, messagesData, chatContainerRef, contactInfo])
 
   useLayoutEffect(() => {
     if (!chatContainerRef) return
@@ -318,6 +318,13 @@ const ChatWindow: React.FC = () => {
       firebase.chatMemberStatus({ chatKey: activeChat.chatKey, memberKey: authUser?.uid! }).update({ isOnline: null })
     }
   }, [activeChat])
+
+  useEffect(() => {
+    if (!chatContainerRef) return
+    // if (contactInfo.status !== "rejected") return
+    console.log("test")
+    firebase.newContactsActivity({ uid: authUser?.uid }).child(`${contactInfo.key}`).set(null)
+  }, [activeChat, contactInfo, chatContainerRef])
 
   return (
     <div className="chat-window-container">

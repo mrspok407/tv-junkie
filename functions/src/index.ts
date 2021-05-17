@@ -63,27 +63,75 @@ const contactsDatabaseRef = (uid: string) => `${uid}/contactsDatabase`;
 //   newActivity: boolean;
 // }
 
+export const onMessageDelete = functions.database
+  .ref("privateChats/{chatKey}/messages/{messageKey}")
+  .onDelete(async (snapshot, context) => {
+    const {chatKey, messageKey} = context.params;
+    const senderKey = snapshot.val().sender;
+    let recipientKey: string;
+
+    if (senderKey === chatKey.slice(0, senderKey.length)) {
+      recipientKey = chatKey.slice(senderKey.length + 1);
+    } else {
+      recipientKey = chatKey.slice(0, -senderKey.length - 1);
+    }
+
+    const unreadMessage = await snapshot.ref.parent?.parent
+      ?.child(`members/${recipientKey}/unreadMessages/${messageKey}`)
+      .once("value");
+
+    if (unreadMessage?.val() === null) return;
+
+    const unreadMessages = await database
+      .ref(`privateChats/${chatKey}/members/${recipientKey}/unreadMessages`)
+      .once("value");
+    if (unreadMessages.val() === null) return;
+    const unreadMessagesData = Object.keys(unreadMessages?.val());
+
+    if (unreadMessagesData[unreadMessagesData.length - 1] !== messageKey) {
+      return database.ref(`privateChats/${chatKey}/members/${recipientKey}/unreadMessages/${messageKey}`).set(null);
+    }
+
+    let previousMessage;
+    if (unreadMessagesData.length === 1) {
+      previousMessage = snapshot.val();
+    } else {
+      const previousMessageKey = unreadMessagesData[unreadMessagesData.length - 2];
+      const previousMessageData = await snapshot.ref.parent?.child(previousMessageKey).once("value");
+      previousMessage = previousMessageData?.val();
+    }
+
+    const updateData = {
+      [`users/${contactsDatabaseRef(recipientKey)}/contactsLastActivity/${senderKey}`]: previousMessage.timeStamp,
+      [`privateChats/${chatKey}/members/${recipientKey}/unreadMessages/${messageKey}`]: null
+    };
+
+    return database.ref().update(updateData);
+  });
+
 export const updatePinnedTimeStamp = functions.database
-  .ref("users/{authUid}/contactsDatabase/contactsList/{contactUid}/timeStamp")
-  .onWrite(async (change) => {
+  .ref("users/{authUid}/contactsDatabase/contactsLastActivity/{contactUid}")
+  .onWrite(async (change, context) => {
+    const {authUid, contactUid} = context.params;
     const afterData = change.after;
     const beforeData = change.before;
 
+    const contactRef = database.ref(`users/${contactsDatabaseRef(authUid)}/contactsList/${contactUid}`);
     const timeStamp = afterData.val();
 
     if (!afterData.exists()) return;
 
     if (!beforeData.exists()) {
-      return afterData.ref.parent?.update({
+      return contactRef.update({
         pinned_lastActivityTS: `false_${timeStamp}`
       });
     }
 
     if (beforeData.val() !== afterData.val()) {
-      const isPinnedData = await afterData.ref.parent?.child("pinned_lastActivityTS").once("value");
+      const isPinnedData = await contactRef.child("pinned_lastActivityTS").once("value");
       const isPinned = !!(isPinnedData?.val().slice(0, 4) === "true");
-
-      return afterData.ref.parent?.update({
+      console.log(`${isPinned}_${timeStamp}`);
+      return contactRef.update({
         pinned_lastActivityTS: `${isPinned}_${timeStamp}`
       });
     }
@@ -104,7 +152,7 @@ export const addNewContactsActivity = functions.database
     const timeStamp = admin.database.ServerValue.TIMESTAMP;
     const updateData = {
       [`${contactsDatabaseRef(memberKey)}/newContactsActivity/${otherMemberKey}`]: true,
-      [`${contactsDatabaseRef(memberKey)}/contactsList/${otherMemberKey}/timeStamp`]: timeStamp
+      [`${contactsDatabaseRef(memberKey)}/contactsLastActivity/${otherMemberKey}`]: timeStamp
     };
 
     return database.ref("users").update(updateData);
@@ -176,15 +224,12 @@ export const newContactRequest = functions.https.onCall(async (data, context) =>
           status: false,
           receiver: true,
           userName: contactName,
-          timeStamp,
           pinned_lastActivityTS: "false"
-          // recipientNotified: false
         }
       }
     : {
         [`${contactsDatabaseRef(authUid)}/contactsList/${contactUid}/status`]: false,
-        [`${contactsDatabaseRef(authUid)}/contactsList/${contactUid}/timeStamp`]: timeStamp
-        // [`${contactsDatabaseRef(authUid)}/contactsList/${contactUid}/recipientNotified`]: false
+        [`${contactsDatabaseRef(authUid)}/contactsLastActivity/${contactUid}`]: timeStamp
       };
 
   try {
@@ -193,15 +238,11 @@ export const newContactRequest = functions.https.onCall(async (data, context) =>
     const updateData: ContactRequestDataInterface = {
       ...contactInfoData,
       [`${contactsDatabaseRef(contactUid)}/newContactsRequests/${authUid}`]: true,
-      // [`${contactsDatabaseRef(contactUid)}/newContactsActivity/${authUid}`]: true,
       [`${contactsDatabaseRef(contactUid)}/contactsList/${authUid}`]: {
         status: false,
         receiver: false,
         userName: authUserName.val(),
-        timeStamp,
-        pinned_lastActivityTS: "false",
-        // recipientNotified: false,
-        newActivity: true
+        pinned_lastActivityTS: "false"
       }
     };
 
@@ -226,11 +267,9 @@ export const handleContactRequest = functions.https.onCall(async (data, context)
     const updateData = {
       [`${contactsDatabaseRef(authUid)}/contactsList/${authPathToUpdate}`]: status === "accept" ? true : null,
       [`${contactsDatabaseRef(authUid)}/newContactsRequests/${contactUid}`]: null,
-      // [`${contactsDatabaseRef(authUid)}/newContactsActivity/${contactUid}`]: null,
       [`${contactsDatabaseRef(contactUid)}/contactsList/${authUid}/status`]: status === "accept" ? true : "rejected",
       [`${contactsDatabaseRef(contactUid)}/newContactsActivity/${authUid}`]: true,
-      // [`${contactsDatabaseRef(contactUid)}/contactsList/${authUid}/newActivity`]: true,
-      [`${contactsDatabaseRef(contactUid)}/contactsList/${authUid}/timeStamp`]: timeStamp
+      [`${contactsDatabaseRef(contactUid)}/contactsLastActivity/${authUid}`]: timeStamp
     };
 
     return database.ref("users").update(updateData);

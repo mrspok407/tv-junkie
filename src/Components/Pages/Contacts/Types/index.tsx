@@ -17,7 +17,6 @@ export const CONTACT_INFO_INITIAL_DATA = {
   status: [false, ""],
   receiver: false,
   userName: "",
-  timeStamp: 0,
   pinned_lastActivityTS: ""
 }
 
