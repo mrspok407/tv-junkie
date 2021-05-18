@@ -7,6 +7,8 @@ import ContactsContextHOC, { ContactsContext } from "./Components/Context/Contac
 import { MessageInterface } from "./Types"
 import { LoremIpsum } from "lorem-ipsum"
 import { AppContext } from "Components/AppContext/AppContextHOC"
+import ConfirmModal from "./Components/ChatWindow/Components/ConfirmModal/ConfirmModal"
+import useContactOptions from "./Components/ContactList/Hooks/UseContactOptions"
 
 type Props = {}
 
@@ -14,9 +16,11 @@ const ContactsContent: React.FC<Props> = () => {
   const firebase = useContext(FirebaseContext)
   const context = useContext(ContactsContext)
   const { authUser } = useContext(AppContext)
-  const { activeChat, contacts, messages } = context?.state!
+  const { activeChat, contacts, messages, confirmModal } = context?.state!
 
   const messagesRef = useRef<{ [key: string]: MessageInterface[] }>()
+
+  const confirmModalFunctions = useContactOptions({})
 
   useEffect(() => {
     messagesRef.current = messages
@@ -86,7 +90,9 @@ const ContactsContent: React.FC<Props> = () => {
           timeStamp: timeStampEpoch * 2
         },
         [`members/${userKey}/unreadMessages/${messageKey}`]:
-          !contactStatus.val()?.isOnline || !contactStatus.val()?.chatBottom ? true : null
+          !contactStatus.val()?.isOnline || !contactStatus.val()?.chatBottom || !contactStatus.val()?.pageInFocus
+            ? true
+            : null
       }
 
       firebase.privateChats().child(chatKey).update(updateData)
@@ -140,17 +146,16 @@ const ContactsContent: React.FC<Props> = () => {
   return (
     <>
       <button style={{ width: "400px" }} type="button" className="button" onClick={() => addNewMessageCurrent(true)}>
-        Add NM current authSender
+        Add msg current
       </button>
-      <button style={{ width: "400px" }} type="button" className="button" onClick={() => addNewMessageCurrent(false)}>
+      {/* <button style={{ width: "400px" }} type="button" className="button" onClick={() => addNewMessageCurrent(false)}>
         Add NM current contactSender
-      </button>
-      <button style={{ width: "400px" }} type="button" className="button" onClick={() => addNewMessageTopContact()}>
+      </button> */}
+      {/* <button style={{ width: "400px" }} type="button" className="button" onClick={() => addNewMessageTopContact()}>
         Add new message top
-      </button>
+      </button> */}
       <div className="chat-container">
         <ContactList />
-
         {activeChat.chatKey === "" || !contacts[activeChat.contactKey] ? (
           !Object.keys(contacts)?.length ? (
             ""
@@ -162,6 +167,7 @@ const ContactsContent: React.FC<Props> = () => {
         ) : (
           <ChatWindow />
         )}
+        {confirmModal.isActive && <ConfirmModal confirmFunctions={confirmModalFunctions} />}
       </div>
     </>
   )

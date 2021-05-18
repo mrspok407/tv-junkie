@@ -6,9 +6,10 @@ import { ContactsContext } from "../../Context/ContactsContext"
 type Props = {
   chatContainerRef: HTMLDivElement
   unreadMessagesAuth: string[]
+  pageInFocus: boolean
 }
 
-const useIntersectionObserver = ({ chatContainerRef, unreadMessagesAuth }: Props) => {
+const useIntersectionObserver = ({ chatContainerRef, unreadMessagesAuth, pageInFocus }: Props) => {
   const { authUser, errors } = useContext(AppContext)
   const firebase = useContext(FirebaseContext)
   const context = useContext(ContactsContext)
@@ -62,6 +63,7 @@ const useIntersectionObserver = ({ chatContainerRef, unreadMessagesAuth }: Props
     if (!unreadMessagesAuth?.length) return
     if (contactInfo.status !== true) return
     if (!observerRef) return
+    if (!pageInFocus) return
 
     renderedMessages.forEach((message) => {
       if (!unreadMessagesAuth.includes(message.key)) return
@@ -70,7 +72,23 @@ const useIntersectionObserver = ({ chatContainerRef, unreadMessagesAuth }: Props
       observedMessages.current = [...observedMessages.current, message.key]
       observerRef?.observe(unreadMessage)
     })
-  }, [activeChat, renderedMessages, unreadMessagesAuth, contactInfo.status])
+  }, [activeChat, renderedMessages, unreadMessagesAuth, contactInfo.status, pageInFocus])
+
+  const onMouseEnter = () => {
+    if (!renderedMessages?.length) return
+    if (!unreadMessagesAuth?.length) return
+    if (contactInfo.status !== true) return
+    if (!observerRef) return
+    if (pageInFocus) return
+
+    renderedMessages.forEach((message) => {
+      if (!unreadMessagesAuth.includes(message.key)) return
+      if (observedMessages.current.includes(message.key)) return
+      const unreadMessage = document.querySelector(`.chat-window__message--${message.key}`)
+      observedMessages.current = [...observedMessages.current, message.key]
+      observerRef?.observe(unreadMessage)
+    })
+  }
 
   useEffect(() => {
     if (!renderedMessages?.length) return
@@ -85,6 +103,8 @@ const useIntersectionObserver = ({ chatContainerRef, unreadMessagesAuth }: Props
       observedMessages.current = []
     }
   }, [activeChat])
+
+  return { onMouseEnter }
 }
 
 export default useIntersectionObserver

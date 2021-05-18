@@ -5,21 +5,22 @@ import React, { useContext, useEffect, useRef, useState } from "react"
 import useTimestampFormater from "../../../Hooks/UseTimestampFormater"
 import { ContactInfoInterface, MessageInterface } from "../../../Types"
 import { ContactsContext } from "../../Context/ContactsContext"
-import ContactPopup from "./ContactPopup"
+import ContactPopup from "../../OptionsPopup/OptionsPopup"
 import "./Contact.scss"
 import useGetInitialMessages from "../../ChatWindow/FirebaseHelpers/UseGetInitialMessages"
 import useHandleContactsStatus from "../../ChatWindow/FirebaseHelpers/UseHandleContactsStatus"
 
 type Props = {
   contactInfo: ContactInfoInterface
+  allContactsAmount: number | null
 }
 
-const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
+const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount }) => {
   const firebase = useContext(FirebaseContext)
   const { authUser } = useContext(AppContext)
 
   const context = useContext(ContactsContext)
-  const { contactPopup, activeChat } = context?.state!
+  const { optionsPopupContactList, activeChat } = context?.state!
 
   const formatedDate = useTimestampFormater({ timeStamp: contactInfo.pinned_lastActivityTS?.slice(-13) })
 
@@ -28,7 +29,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
 
   const [authUnreadMessages, setAuthUnreadMessages] = useState<string[]>(contactInfo.unreadMessages)
   const [contactUnreadMessages, setContactUnreadMessages] = useState<boolean>(contactInfo.unreadMessagesContact)
-  const [lastMessage, setLastMessage] = useState<MessageInterface>(contactInfo.lastMessage)
+  const [lastMessage, setLastMessage] = useState<MessageInterface | null>(contactInfo.lastMessage)
 
   const contactOptionsRef = useRef<HTMLDivElement>(null!)
 
@@ -73,7 +74,10 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
       .orderByChild("timeStamp")
       .limitToLast(1)
       .on("value", (snapshot: { val: () => MessageInterface }) => {
-        if (snapshot.val() === null) return
+        if (snapshot.val() === null) {
+          setLastMessage(null)
+          return
+        }
         const messageData = Object.values(snapshot.val())[0]
         setLastMessage(messageData)
       })
@@ -99,7 +103,8 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
         "contact-item--active": chatActive,
         "contact-item--auth-last-message-not-pinned": !!(lastMessage?.sender === authUser?.uid && !isPinned),
         "contact-item--contact-last-message": !!(lastMessage?.sender !== authUser?.uid),
-        "contact-item--not-pinned-no-activity": !!(!isPinned && !newActivity && !newContactsRequest)
+        "contact-item--not-pinned-no-activity": !!(!isPinned && !newActivity && !newContactsRequest),
+        "contact-item--popup-open-top": allContactsAmount! >= 4
       })}
       onClick={() => setContactActive()}
     >
@@ -132,11 +137,11 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
           <button
             type="button"
             className={classNames("contact-item__open-popup-btn", {
-              "contact-item__open-popup-btn--open": contactPopup === contactInfo.key
+              "contact-item__open-popup-btn--open": optionsPopupContactList === contactInfo.key
             })}
             onClick={(e) => {
               e.stopPropagation()
-              context?.dispatch({ type: "updateContactPopup", payload: contactInfo.key })
+              context?.dispatch({ type: "updateOptionsPopupContactList", payload: contactInfo.key })
             }}
           >
             <span></span>
@@ -144,7 +149,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
             <span></span>
           </button>
 
-          {contactPopup === contactInfo.key && (
+          {optionsPopupContactList === contactInfo.key && (
             <ContactPopup contactOptionsRef={contactOptionsRef.current} contactInfo={contactInfo} />
           )}
         </div>

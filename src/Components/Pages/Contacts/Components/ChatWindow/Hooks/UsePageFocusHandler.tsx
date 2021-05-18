@@ -17,7 +17,6 @@ const usePageFocusHandler = ({ activeChat }: Props) => {
       firebase
         .chatMemberStatus({ chatKey: activeChat.chatKey, memberKey: authUser?.uid! })
         .update({ pageInFocus: document.hasFocus() })
-
       setPageInFocus(document.hasFocus())
     }, 250)
   }, [])

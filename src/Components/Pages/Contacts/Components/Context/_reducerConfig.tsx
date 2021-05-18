@@ -17,6 +17,7 @@ export type ACTIONTYPES =
       type: "setInitialMessages"
       payload: { messagesData: MessageInterface[]; startIndex?: number; endIndex?: number; chatKey: string }
     }
+  | { type: "removeAllMessages"; payload: { chatKey: string } }
   | { type: "renderMessagesOnLoad"; payload: { startIndex?: number; endIndex?: number; chatKey: string } }
   | { type: "loadTopMessages"; payload: { newTopMessages: MessageInterface[] } }
   | { type: "renderTopMessages" }
@@ -29,7 +30,10 @@ export type ACTIONTYPES =
   | { type: "updateContacts"; payload: { contacts: ContactsInterface; unreadMessages: { [key: string]: string[] } } }
   | { type: "updateLastScrollPosition"; payload: { scrollTop: number; chatKey: string } }
   | { type: "updateMessagePopup"; payload: string }
-  | { type: "updateContactPopup"; payload: string }
+  | { type: "updateOptionsPopupContactList"; payload: string }
+  | { type: "updateOptionsPopupChatWindow"; payload: string }
+  | { type: "closePopups"; payload: string }
+  | { type: "updateConfirmModal"; payload: { isActive: boolean; function: string; contactKey?: string } }
   | {
       type: "updateContactsStatus"
       payload: {
@@ -46,7 +50,8 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
     messages,
     renderedMessagesList,
     messagePopup,
-    contactPopup,
+    optionsPopupContactList,
+    optionsPopupChatWindow,
     lastScrollPosition,
     contactsStatus,
     contacts
@@ -64,6 +69,23 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         renderedMessagesList: {
           ...renderedMessagesList,
           [action.payload.chatKey]: action.payload.messagesData.slice(startIndex, endIndex)
+        }
+      }
+
+    case "removeAllMessages":
+      return {
+        ...state,
+        messages: {
+          ...messages,
+          [action.payload.chatKey]: []
+        },
+        renderedMessagesList: {
+          ...renderedMessagesList,
+          [action.payload.chatKey]: []
+        },
+        authUserUnreadMessages: {
+          ...authUserUnreadMessages,
+          [action.payload.chatKey]: []
         }
       }
 
@@ -333,6 +355,10 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
 
     case "removeMessage": {
       const messagesData = messages[action.payload.chatKey]
+      if (!messagesData.length) {
+        return { ...state }
+      }
+      console.log({ messagesData })
       const renderedMessages = renderedMessagesList[action.payload.chatKey]
       const endIndex = messagesData.findIndex(
         (message: MessageInterface) => message.key === renderedMessages[renderedMessages.length - 1].key
@@ -439,6 +465,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
       }
 
     case "updateActiveChat":
+      console.log(action.payload)
       return {
         ...state,
         activeChat: action.payload
@@ -457,10 +484,23 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         messagePopup: messagePopup === action.payload ? "" : action.payload
       }
 
-    case "updateContactPopup":
+    case "updateOptionsPopupContactList":
       return {
         ...state,
-        contactPopup: contactPopup === action.payload ? "" : action.payload
+        optionsPopupContactList: optionsPopupContactList === action.payload ? "" : action.payload
+      }
+
+    case "updateOptionsPopupChatWindow":
+      return {
+        ...state,
+        optionsPopupChatWindow: optionsPopupChatWindow === action.payload ? "" : action.payload
+      }
+
+    case "closePopups":
+      return {
+        ...state,
+        optionsPopupContactList: "",
+        optionsPopupChatWindow: ""
       }
 
     case "updateContactsStatus":
@@ -469,6 +509,16 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         contactsStatus: {
           ...contactsStatus,
           [action.payload.chatKey]: action.payload.status
+        }
+      }
+
+    case "updateConfirmModal":
+      return {
+        ...state,
+        confirmModal: {
+          isActive: action.payload.isActive,
+          function: action.payload.function,
+          contactKey: action.payload.contactKey
         }
       }
 
@@ -485,14 +535,19 @@ export const INITIAL_STATE = {
     contactKey: ""
   },
   messages: {},
-  renderedMessages: {},
   renderedMessagesList: {},
   contacts: {},
   lastScrollPosition: {},
   messagePopup: "",
-  contactPopup: "",
+  optionsPopupContactList: "",
+  optionsPopupChatWindow: "",
   messagesListRef: "",
-  contactsStatus: {}
+  contactsStatus: {},
+  confirmModal: {
+    isActive: false,
+    function: "",
+    contactKey: ""
+  }
 }
 
 export default reducer

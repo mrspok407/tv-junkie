@@ -37,3 +37,19 @@ $chatWindowDimm: (
   messageMaxWidthMobile: 85%,
   contactInfoFont: 0.95rem
 );
+
+// ConfirmModal
+$confirmModalPalette: (
+  containerBG: rgba(0, 0, 0, 0.39),
+  contentBG: #487c9e,
+  warning: #fff,
+  contactName: #67c348,
+  buttonAprove: #78a574,
+  buttonAproveHover: #78a574a1,
+  buttonCancel: #7b4b42,
+  buttonCancelHover: #7b4b42a2
+);
+
+$confirmModalDimm: (
+  contentMaxWidth: 400px
+);

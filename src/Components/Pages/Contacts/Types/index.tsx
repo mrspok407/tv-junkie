@@ -57,9 +57,6 @@ export interface ContactsStateInterface {
   messages: {
     [key: string]: MessageInterface[]
   }
-  renderedMessages: {
-    [key: string]: number | undefined
-  }
   renderedMessagesList: {
     [key: string]: MessageInterface[]
   }
@@ -74,7 +71,13 @@ export interface ContactsStateInterface {
   }
   messagesListRef: any
   messagePopup: string
-  contactPopup: string
+  optionsPopupContactList: string
+  optionsPopupChatWindow: string
+  confirmModal: {
+    isActive: boolean
+    function: string
+    contactKey?: string
+  }
 }
 
 export interface SnapshotStringBooleanInterface {
@@ -89,4 +92,8 @@ export interface ContainerRectInterface {
   thresholdTopLoad: number
   thresholdTopRender: number
   thresholdBottomRender: number
+}
+
+export interface ConfirmFunctionsInterface {
+  [key: string]: ({ contactInfo }: { contactInfo: ContactInfoInterface }) => any
 }

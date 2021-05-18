@@ -20,7 +20,7 @@ const ContactList: React.FC = () => {
   const { contacts } = context?.state!
   const contactsData = Object.values(contacts)?.map((contact) => contact)
   // const [contacts, setContacts] = useState<ContactInfoInterface[]>()
-  const [allContactsAmount, setAllContactsAmount] = useState()
+  const [allContactsAmount, setAllContactsAmount] = useState<number | null>(null)
   const loadedContacts = context?.state?.contacts ? Object.keys(context.state.contacts).length : 0
 
   const [initialLoading, setInitialLoading] = useState(true)
@@ -109,7 +109,9 @@ const ContactList: React.FC = () => {
       ) : !contactsData?.length ? (
         <div className="contact-list--no-contacts-text">You don't have any contacts</div>
       ) : (
-        contactsData?.map((contact) => <Contact key={contact.key} contactInfo={contact} />)
+        contactsData?.map((contact) => (
+          <Contact key={contact.key} contactInfo={contact} allContactsAmount={allContactsAmount} />
+        ))
       )}
 
       {errors.error && <CreatePortal element={<ModalContent message={errors.error.message} />}></CreatePortal>}

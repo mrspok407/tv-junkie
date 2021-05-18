@@ -11,13 +11,15 @@
   font-size: getDimm(font, $contactItemDimm);
   cursor: pointer;
 
-  &:nth-last-child(-n + 3) {
-    .contact-item__options .popup-container {
-      top: -182px;
-      border-radius: 5px 5px 0px 5px;
+  &--popup-open-top {
+    &:nth-last-child(-n + 3) {
+      .contact-item__options .popup-container {
+        top: -182px;
+        border-radius: 5px 5px 0px 5px;
 
-      .popup__option-btn:after {
-        background-color: #3375b5;
+        .popup__option-btn:after {
+          background-color: #3375b5;
+        }
       }
     }
   }
@@ -56,12 +58,14 @@
     z-index: -1;
   }
 
-  &:hover:after {
-    opacity: 1;
-  }
+  @include mediaMinW(#{$mobileViewPort}) {
+    &:hover:after {
+      opacity: 1;
+    }
 
-  &:hover .contact-item__options .contact-item__open-popup-btn {
-    opacity: 1;
+    &:hover .contact-item__options .contact-item__open-popup-btn {
+      opacity: 1;
+    }
   }
 
   &--active {

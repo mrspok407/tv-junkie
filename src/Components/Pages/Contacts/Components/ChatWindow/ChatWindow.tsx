@@ -4,7 +4,7 @@ import { FirebaseContext } from "Components/Firebase"
 import { ContactsContext } from "../Context/ContactsContext"
 import useResponseContactRequest from "Components/Pages/UserProfile/Hooks/UseResponseContactRequest"
 import React, { useEffect, useContext, useState, useRef, useCallback, useLayoutEffect } from "react"
-import ContactPopup from "../ContactList/Contact/ContactPopup"
+import ContactPopup from "../OptionsPopup/OptionsPopup"
 import MessageInfo from "./Components/MessageInfo/MessageInfo"
 import { throttle } from "throttle-debounce"
 import debounce from "debounce"
@@ -31,7 +31,8 @@ const ChatWindow: React.FC = () => {
     renderedMessagesList,
     lastScrollPosition,
     authUserUnreadMessages,
-    contactsStatus
+    contactsStatus,
+    optionsPopupChatWindow
   } = context?.state!
   const messagesData = messages[activeChat.chatKey]
   const renderedMessages = renderedMessagesList[activeChat.chatKey] || []
@@ -43,8 +44,6 @@ const ChatWindow: React.FC = () => {
   const unreadMessagesAuthRef = useRef<string[]>([])
 
   const [contactUnreadMessages, setContactUnreadMessages] = useState<string[] | null>(null)
-
-  const [popupContactInfoOpen, setPopupContactInfoOpen] = useState(false)
 
   const isScrolledFirstRenderRef = useRef(false)
   const isScrollBottomRef = useRef(false)
@@ -71,27 +70,12 @@ const ChatWindow: React.FC = () => {
     }
   }, [firebase, activeChat])
 
-  // useEffect(() => {
-  //   const listener = firebase
-  //     .messages({ chatKey: activeChat.chatKey })
-  //     .orderByChild("timeStamp")
-  //     .limitToFirst(1)
-  //     .on("value", (snapshot: any) => {
-  //       console.log(snapshot.val())
-  //       if (snapshot.val() === null) return
-  //       const key = Object.keys(snapshot.val())[0]
-  //       setFirstMessage(key)
-  //     })
-  //   return () => {
-  //     firebase.messages({ chatKey: activeChat.chatKey }).off("value", listener)
-  //   }
-  // }, [firebase, activeChat])
-
   const { loadTopMessages, loading } = useLoadTopMessages()
   const { handleContactRequest } = useResponseContactRequest({ userUid: activeChat.contactKey })
-  useIntersectionObserver({
+  const { onMouseEnter } = useIntersectionObserver({
     chatContainerRef: chatContainerRef,
-    unreadMessagesAuth: unreadMessagesAuthRef.current
+    unreadMessagesAuth: unreadMessagesAuthRef.current,
+    pageInFocus
   })
   useResizeObserver({ chatContainerRef: chatContainerRef, isScrollBottomRef: isScrollBottomRef.current })
   useFirstRenderMessages({
@@ -182,15 +166,7 @@ const ChatWindow: React.FC = () => {
       const { height, scrollHeight, scrollTop, thresholdTopRender, thresholdTopLoad, thresholdBottomRender } =
         getContainerRect()
 
-      const lastRenderedMessageIndex = messagesData.findIndex(
-        (item) => item.key === renderedMessages[renderedMessages.length - 1]?.key
-      )
-
       if (scrollHeight <= height) return
-      // if (scrollHeight <= scrollTop + height && lastRenderedMessageIndex !== messagesData.length - 1) {
-      //   chatContainerRef.scrollTop = scrollHeight - height - 1
-      // }
-
       if (scrollTop < prevScrollTop || prevScrollTop === undefined) {
         if (scrollTop <= thresholdTopRender) {
           console.log("renderTopMessages")
@@ -215,6 +191,7 @@ const ChatWindow: React.FC = () => {
       .unreadMessages({ uid: authUser?.uid!, chatKey: activeChat.chatKey })
       .on("value", (snapshot: any) => {
         const unreadMessagesData = !snapshot.val() ? [] : Object.keys(snapshot.val())
+        console.log(unreadMessagesData)
         unreadMessagesAuthRef.current = unreadMessagesData
       })
     return () => {
@@ -327,7 +304,7 @@ const ChatWindow: React.FC = () => {
   }, [activeChat, contactInfo, chatContainerRef])
 
   return (
-    <div className="chat-window-container">
+    <div className="chat-window-container" onMouseEnter={onMouseEnter}>
       <div
         className={classNames("chat-window__date chat-window__date--float", {
           "chat-window__date--float-fadein": isScrollingTop
@@ -352,21 +329,17 @@ const ChatWindow: React.FC = () => {
           <button
             type="button"
             className={classNames("contact-item__open-popup-btn", {
-              "contact-item__open-popup-btn--open": popupContactInfoOpen
+              "contact-item__open-popup-btn--open": optionsPopupChatWindow
             })}
-            onClick={() => setPopupContactInfoOpen(!popupContactInfoOpen)}
+            onClick={() => context?.dispatch({ type: "updateOptionsPopupChatWindow", payload: activeChat.contactKey })}
           >
             <span></span>
             <span></span>
             <span></span>
           </button>
 
-          {popupContactInfoOpen && (
-            <ContactPopup
-              contactOptionsRef={contactOptionsRef.current}
-              contactInfo={contactInfo}
-              togglePopup={setPopupContactInfoOpen}
-            />
+          {optionsPopupChatWindow && (
+            <ContactPopup contactOptionsRef={contactOptionsRef.current} contactInfo={contactInfo} />
           )}
         </div>
         <div className="contact-info__status">

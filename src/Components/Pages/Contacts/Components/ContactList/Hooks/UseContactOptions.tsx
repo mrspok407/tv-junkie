@@ -5,24 +5,22 @@ import React, { useState, useEffect, useContext } from "react"
 import { ContactsContext } from "../../Context/ContactsContext"
 
 type Props = {
-  contactInfo: ContactInfoInterface
-  togglePopup: any
+  contactInfo?: ContactInfoInterface
 }
 
-const useContactOptions = ({ contactInfo, togglePopup }: Props) => {
+const useContactOptions = ({ contactInfo }: Props) => {
   const { authUser, errors } = useContext(AppContext)
   const firebase = useContext(FirebaseContext)
   const context = useContext(ContactsContext)
   const { activeChat, renderedMessagesList, contacts } = context?.state!
 
   const updateIsPinned = async () => {
-    if (togglePopup) togglePopup(false)
-    context?.dispatch({ type: "updateContactPopup", payload: "" })
+    context?.dispatch({ type: "closePopups", payload: "" })
 
     try {
       const timeStamp = new Date().getTime()
-      const isPinned = !(contactInfo.pinned_lastActivityTS?.slice(0, 4) === "true")
-      await firebase.contact({ authUid: authUser?.uid, contactUid: contactInfo.key }).update({
+      const isPinned = !(contactInfo?.pinned_lastActivityTS?.slice(0, 4) === "true")
+      await firebase.contact({ authUid: authUser?.uid, contactUid: contactInfo?.key! }).update({
         pinned_lastActivityTS: `${isPinned}_${timeStamp}`
       })
     } catch (error) {
@@ -36,14 +34,13 @@ const useContactOptions = ({ contactInfo, togglePopup }: Props) => {
   }
 
   const handleMarkRead = async () => {
-    if (togglePopup) togglePopup(false)
-    context?.dispatch({ type: "updateContactPopup", payload: "" })
+    context?.dispatch({ type: "closePopups", payload: "" })
 
     try {
       const updateData = {
-        [`privateChats/${contactInfo.chatKey}/members/${authUser?.uid}/unreadMessages`]: null,
-        [`users/${authUser?.uid}/contactsDatabase/newContactsActivity/${contactInfo.key}`]: null,
-        [`users/${authUser?.uid}/contactsDatabase/newContactsRequests/${contactInfo.key}`]: null
+        [`privateChats/${contactInfo?.chatKey}/members/${authUser?.uid}/unreadMessages`]: null,
+        [`users/${authUser?.uid}/contactsDatabase/newContactsActivity/${contactInfo?.key}`]: null,
+        [`users/${authUser?.uid}/contactsDatabase/newContactsRequests/${contactInfo?.key}`]: null
       }
       await firebase.database().ref().update(updateData)
       context?.dispatch({
@@ -60,12 +57,8 @@ const useContactOptions = ({ contactInfo, togglePopup }: Props) => {
     }
   }
 
-  const handleRemoveContact = async () => {
-    if (togglePopup) togglePopup(false)
-    context?.dispatch({ type: "updateContactPopup", payload: "" })
-
+  const handleRemoveContact = async ({ contactInfo }: { contactInfo: ContactInfoInterface }) => {
     const timeStamp = new Date().getTime()
-    console.log(timeStamp)
     try {
       const updateData = {
         [`users/${authUser?.uid}/contactsDatabase/contactsList/${contactInfo.key}`]: null,
@@ -75,7 +68,18 @@ const useContactOptions = ({ contactInfo, togglePopup }: Props) => {
         [`users/${contactInfo.key}/contactsDatabase/newContactsActivity/${authUser?.uid}`]: true,
         [`users/${contactInfo.key}/contactsDatabase/contactsLastActivity/${authUser?.uid}`]: timeStamp
       }
-      await firebase.database().ref().update(updateData)
+      await firebase
+        .database()
+        .ref()
+        .update(updateData, () =>
+          context?.dispatch({
+            type: "updateActiveChat",
+            payload: {
+              chatKey: activeChat.chatKey === contactInfo.chatKey ? "" : activeChat.chatKey,
+              contactKey: activeChat.contactKey === contactInfo.key ? "" : activeChat.contactKey
+            }
+          })
+        )
     } catch (error) {
       errors.handleError({
         errorData: error,
@@ -86,10 +90,7 @@ const useContactOptions = ({ contactInfo, togglePopup }: Props) => {
     }
   }
 
-  const handleClearHistory = async () => {
-    if (togglePopup) togglePopup(false)
-    context?.dispatch({ type: "updateContactPopup", payload: "" })
-
+  const handleClearHistory = async ({ contactInfo }: { contactInfo: ContactInfoInterface }) => {
     try {
       const updateData = {
         [`privateChats/${contactInfo.chatKey}/messages`]: null,
@@ -100,11 +101,13 @@ const useContactOptions = ({ contactInfo, togglePopup }: Props) => {
         [`users/${contactInfo.key}/contactsDatabase/newContactsRequests/${authUser?.uid}`]: null,
         [`users/${contactInfo.key}/contactsDatabase/newContactsActivity/${authUser?.uid}`]: null
       }
+      context?.dispatch({ type: "removeAllMessages", payload: { chatKey: contactInfo.chatKey } })
       await firebase.database().ref().update(updateData)
     } catch (error) {
       errors.handleError({
         errorData: error,
-        message: "There has been some error updating database. Please try again."
+        message:
+          "There has been some error deleting chat history, it may not work. Please reload the page and try again."
       })
 
       throw new Error(`There has been some error updating database: ${error}`)

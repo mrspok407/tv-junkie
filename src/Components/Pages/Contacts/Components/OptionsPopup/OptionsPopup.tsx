@@ -1,19 +1,19 @@
 import React, { useState, useEffect, useRef, useLayoutEffect, useCallback, useContext } from "react"
-import { ContactInfoInterface } from "../../../Types"
-import { ContactsContext } from "../../Context/ContactsContext"
-import useContactOptions from "../Hooks/UseContactOptions"
+import { ContactInfoInterface } from "../../Types"
+import { ContactsContext } from "../Context/ContactsContext"
+import useContactOptions from "../ContactList/Hooks/UseContactOptions"
+import "./OptionsPopup.scss"
 
 type Props = {
   contactOptionsRef: HTMLDivElement
-  togglePopup?: any
   contactInfo: ContactInfoInterface
 }
 
-const ContactPopup: React.FC<Props> = ({ contactOptionsRef, contactInfo, togglePopup = false }) => {
+const ContactPopup: React.FC<Props> = ({ contactOptionsRef, contactInfo }) => {
   const context = useContext(ContactsContext)
   const { contacts, activeChat } = context?.state!
 
-  const optionsHandler = useContactOptions({ contactInfo, togglePopup })
+  const optionsHandler = useContactOptions({ contactInfo })
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside as EventListener)
@@ -24,11 +24,7 @@ const ContactPopup: React.FC<Props> = ({ contactOptionsRef, contactInfo, toggleP
 
   const handleClickOutside = (e: CustomEvent) => {
     if (!contactOptionsRef?.contains(e.target as Node)) {
-      if (!togglePopup) {
-        context?.dispatch({ type: "updateContactPopup", payload: "" })
-      } else {
-        togglePopup(false)
-      }
+      context?.dispatch({ type: "closePopups", payload: "" })
     }
   }
 
@@ -65,8 +61,7 @@ const ContactPopup: React.FC<Props> = ({ contactOptionsRef, contactInfo, toggleP
         <a
           onClick={(e) => {
             e.stopPropagation()
-            if (togglePopup) togglePopup()
-            context?.dispatch({ type: "updateContactPopup", payload: "" })
+            context?.dispatch({ type: "closePopups", payload: "" })
           }}
           className="popup__option-btn"
           href={`${
@@ -86,7 +81,10 @@ const ContactPopup: React.FC<Props> = ({ contactOptionsRef, contactInfo, toggleP
           type="button"
           onClick={(e) => {
             e.stopPropagation()
-            optionsHandler.handleClearHistory()
+            context?.dispatch({
+              type: "updateConfirmModal",
+              payload: { isActive: true, function: "handleClearHistory", contactKey: contactInfo.key }
+            })
           }}
         >
           Clear history
@@ -110,7 +108,10 @@ const ContactPopup: React.FC<Props> = ({ contactOptionsRef, contactInfo, toggleP
           type="button"
           onClick={(e) => {
             e.stopPropagation()
-            optionsHandler.handleRemoveContact()
+            context?.dispatch({
+              type: "updateConfirmModal",
+              payload: { isActive: true, function: "handleRemoveContact", contactKey: contactInfo.key }
+            })
           }}
         >
           Remove from contacts
