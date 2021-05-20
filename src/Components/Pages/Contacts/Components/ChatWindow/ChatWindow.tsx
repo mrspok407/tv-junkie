@@ -1,7 +1,7 @@
 import classNames from "classnames"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
-import { ContactsContext } from "../Context/ContactsContext"
+import { ContactsContext } from "../@Context/ContactsContext"
 import useResponseContactRequest from "Components/Pages/UserProfile/Hooks/UseResponseContactRequest"
 import React, { useEffect, useContext, useState, useRef, useCallback, useLayoutEffect } from "react"
 import ContactPopup from "../OptionsPopup/OptionsPopup"
@@ -18,6 +18,7 @@ import { convertTimeStampToDate } from "Utils"
 import useShowFloatDate from "./Hooks/UseShowFloatDate"
 import usePageFocusHandler from "./Hooks/UsePageFocusHandler"
 import "./ChatWindow.scss"
+import useTimestampFormater from "../../Hooks/UseTimestampFormater"
 
 const ChatWindow: React.FC = () => {
   const { authUser, newContactsActivity, errors } = useContext(AppContext)
@@ -44,6 +45,7 @@ const ChatWindow: React.FC = () => {
   const unreadMessagesAuthRef = useRef<string[]>([])
 
   const [contactUnreadMessages, setContactUnreadMessages] = useState<string[] | null>(null)
+  const formatedDate = useTimestampFormater({ timeStamp: contactsStatus[activeChat.chatKey]?.lastSeen! })
 
   const isScrolledFirstRenderRef = useRef(false)
   const isScrollBottomRef = useRef(false)
@@ -343,7 +345,7 @@ const ChatWindow: React.FC = () => {
           )}
         </div>
         <div className="contact-info__status">
-          {contactsStatus[activeChat.chatKey]?.isOnline ? "Online" : "Offline"}
+          {contactsStatus[activeChat.chatKey]?.isOnline ? "Online" : formatedDate ? `Last seen ${formatedDate}` : ""}
         </div>
       </div>
       <div

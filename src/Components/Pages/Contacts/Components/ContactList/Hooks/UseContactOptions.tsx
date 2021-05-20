@@ -2,7 +2,7 @@ import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
 import { ContactInfoInterface } from "Components/Pages/Contacts/Types"
 import React, { useState, useEffect, useContext } from "react"
-import { ContactsContext } from "../../Context/ContactsContext"
+import { ContactsContext } from "../../@Context/ContactsContext"
 
 type Props = {
   contactInfo?: ContactInfoInterface
@@ -94,6 +94,7 @@ const useContactOptions = ({ contactInfo }: Props) => {
     try {
       const updateData = {
         [`privateChats/${contactInfo.chatKey}/messages`]: null,
+        [`privateChats/${contactInfo.chatKey}/historyDeleted`]: true,
         [`privateChats/${contactInfo.chatKey}/members/${contactInfo.key}/unreadMessages`]: null,
         [`privateChats/${contactInfo.chatKey}/members/${authUser?.uid}/unreadMessages`]: null,
         [`users/${authUser?.uid}/contactsDatabase/newContactsRequests/${contactInfo.key}`]: null,

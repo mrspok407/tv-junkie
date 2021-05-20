@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.handleContactRequest = exports.newContactRequest = exports.updateLastSeen = exports.decrementContacts = exports.incrementContacts = exports.removeNewContactsActivity = exports.addNewContactsActivity = exports.updatePinnedTimeStamp = exports.onMessageDelete = void 0;
+exports.handleContactRequest = exports.newContactRequest = exports.updateLastSeen = exports.decrementContacts = exports.incrementContacts = exports.removeNewContactsActivity = exports.addNewContactsActivity = exports.updatePinnedTimeStamp = void 0;
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 // Cloud Functions interesting points:
@@ -45,46 +45,43 @@ const contactsDatabaseRef = (uid) => `${uid}/contactsDatabase`;
 //   recipientNotified: boolean;
 //   newActivity: boolean;
 // }
-exports.onMessageDelete = functions.database
-    .ref("privateChats/{chatKey}/messages/{messageKey}")
-    .onDelete(async (snapshot, context) => {
-    var _a, _b, _c;
-    const { chatKey, messageKey } = context.params;
-    const senderKey = snapshot.val().sender;
-    let recipientKey;
-    if (senderKey === chatKey.slice(0, senderKey.length)) {
-        recipientKey = chatKey.slice(senderKey.length + 1);
-    }
-    else {
-        recipientKey = chatKey.slice(0, -senderKey.length - 1);
-    }
-    const unreadMessage = await ((_b = (_a = snapshot.ref.parent) === null || _a === void 0 ? void 0 : _a.parent) === null || _b === void 0 ? void 0 : _b.child(`members/${recipientKey}/unreadMessages/${messageKey}`).once("value"));
-    if ((unreadMessage === null || unreadMessage === void 0 ? void 0 : unreadMessage.val()) === null)
-        return;
-    const unreadMessages = await database
-        .ref(`privateChats/${chatKey}/members/${recipientKey}/unreadMessages`)
-        .once("value");
-    if (unreadMessages.val() === null)
-        return;
-    const unreadMessagesData = Object.keys(unreadMessages === null || unreadMessages === void 0 ? void 0 : unreadMessages.val());
-    if (unreadMessagesData[unreadMessagesData.length - 1] !== messageKey) {
-        return database.ref(`privateChats/${chatKey}/members/${recipientKey}/unreadMessages/${messageKey}`).set(null);
-    }
-    let previousMessage;
-    if (unreadMessagesData.length === 1) {
-        previousMessage = snapshot.val();
-    }
-    else {
-        const previousMessageKey = unreadMessagesData[unreadMessagesData.length - 2];
-        const previousMessageData = await ((_c = snapshot.ref.parent) === null || _c === void 0 ? void 0 : _c.child(previousMessageKey).once("value"));
-        previousMessage = previousMessageData === null || previousMessageData === void 0 ? void 0 : previousMessageData.val();
-    }
-    const updateData = {
-        [`users/${contactsDatabaseRef(recipientKey)}/contactsLastActivity/${senderKey}`]: previousMessage.timeStamp,
-        [`privateChats/${chatKey}/members/${recipientKey}/unreadMessages/${messageKey}`]: null
-    };
-    return database.ref().update(updateData);
-});
+// export const onMessageDelete = functions.database
+//   .ref("privateChats/{chatKey}/messages/{messageKey}")
+//   .onDelete(async (snapshot, context) => {
+//     const {chatKey, messageKey} = context.params;
+//     const senderKey = snapshot.val().sender;
+//     let recipientKey: string;
+//     if (senderKey === chatKey.slice(0, senderKey.length)) {
+//       recipientKey = chatKey.slice(senderKey.length + 1);
+//     } else {
+//       recipientKey = chatKey.slice(0, -senderKey.length - 1);
+//     }
+//     const unreadMessage = await snapshot.ref.parent?.parent
+//       ?.child(`members/${recipientKey}/unreadMessages/${messageKey}`)
+//       .once("value");
+//     if (unreadMessage?.val() === null) return;
+//     const unreadMessages = await database
+//       .ref(`privateChats/${chatKey}/members/${recipientKey}/unreadMessages`)
+//       .once("value");
+//     if (unreadMessages.val() === null) return;
+//     const unreadMessagesData = Object.keys(unreadMessages?.val());
+//     if (unreadMessagesData[unreadMessagesData.length - 1] !== messageKey) {
+//       return database.ref(`privateChats/${chatKey}/members/${recipientKey}/unreadMessages/${messageKey}`).set(null);
+//     }
+//     let previousMessage;
+//     if (unreadMessagesData.length === 1) {
+//       previousMessage = snapshot.val();
+//     } else {
+//       const previousMessageKey = unreadMessagesData[unreadMessagesData.length - 2];
+//       const previousMessageData = await snapshot.ref.parent?.child(previousMessageKey).once("value");
+//       previousMessage = previousMessageData?.val();
+//     }
+//     const updateData = {
+//       [`users/${contactsDatabaseRef(recipientKey)}/contactsLastActivity/${senderKey}`]: previousMessage.timeStamp,
+//       [`privateChats/${chatKey}/members/${recipientKey}/unreadMessages/${messageKey}`]: null
+//     };
+//     return database.ref().update(updateData);
+//   });
 exports.updatePinnedTimeStamp = functions.database
     .ref("users/{authUid}/contactsDatabase/contactsLastActivity/{contactUid}")
     .onWrite(async (change, context) => {

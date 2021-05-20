@@ -7,6 +7,7 @@ export interface ContactInfoInterface {
   key: string
   chatKey: string
   newContactsActivity: boolean | null
+  lastContactActivity: number | null
   newContactsRequests: boolean | null
   lastMessage: MessageInterface
   unreadMessages: string[]

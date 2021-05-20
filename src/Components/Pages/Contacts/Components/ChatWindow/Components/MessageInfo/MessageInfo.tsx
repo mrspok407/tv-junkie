@@ -2,7 +2,7 @@ import classNames from "classnames"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import React, { useContext, useRef } from "react"
 import { MessageInterface } from "../../../../Types"
-import { ContactsContext } from "../../../Context/ContactsContext"
+import { ContactsContext } from "../../../@Context/ContactsContext"
 import MessagePopup from "./MessagePopup"
 import "./MessageInfo.scss"
 
@@ -32,7 +32,11 @@ const MessageInfo: React.FC<Props> = React.memo(({ messageData, contactUnreadMes
         </button>
 
         {messagePopup === messageData.key && (
-          <MessagePopup messageOptionsRef={messageOptionsRef.current} messageData={messageData} />
+          <MessagePopup
+            messageOptionsRef={messageOptionsRef.current}
+            messageData={messageData}
+            contactUnreadMessages={contactUnreadMessages}
+          />
         )}
       </div>
 

@@ -1,7 +1,7 @@
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
 import { useEffect, useContext, useCallback, useRef } from "react"
-import { ContactsContext } from "../../Context/ContactsContext"
+import { ContactsContext } from "../../@Context/ContactsContext"
 
 type Props = {
   chatContainerRef: HTMLDivElement

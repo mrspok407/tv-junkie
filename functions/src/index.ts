@@ -63,51 +63,51 @@ const contactsDatabaseRef = (uid: string) => `${uid}/contactsDatabase`;
 //   newActivity: boolean;
 // }
 
-export const onMessageDelete = functions.database
-  .ref("privateChats/{chatKey}/messages/{messageKey}")
-  .onDelete(async (snapshot, context) => {
-    const {chatKey, messageKey} = context.params;
-    const senderKey = snapshot.val().sender;
-    let recipientKey: string;
+// export const onMessageDelete = functions.database
+//   .ref("privateChats/{chatKey}/messages/{messageKey}")
+//   .onDelete(async (snapshot, context) => {
+//     const {chatKey, messageKey} = context.params;
+//     const senderKey = snapshot.val().sender;
+//     let recipientKey: string;
 
-    if (senderKey === chatKey.slice(0, senderKey.length)) {
-      recipientKey = chatKey.slice(senderKey.length + 1);
-    } else {
-      recipientKey = chatKey.slice(0, -senderKey.length - 1);
-    }
+//     if (senderKey === chatKey.slice(0, senderKey.length)) {
+//       recipientKey = chatKey.slice(senderKey.length + 1);
+//     } else {
+//       recipientKey = chatKey.slice(0, -senderKey.length - 1);
+//     }
 
-    const unreadMessage = await snapshot.ref.parent?.parent
-      ?.child(`members/${recipientKey}/unreadMessages/${messageKey}`)
-      .once("value");
+//     const unreadMessage = await snapshot.ref.parent?.parent
+//       ?.child(`members/${recipientKey}/unreadMessages/${messageKey}`)
+//       .once("value");
 
-    if (unreadMessage?.val() === null) return;
+//     if (unreadMessage?.val() === null) return;
 
-    const unreadMessages = await database
-      .ref(`privateChats/${chatKey}/members/${recipientKey}/unreadMessages`)
-      .once("value");
-    if (unreadMessages.val() === null) return;
-    const unreadMessagesData = Object.keys(unreadMessages?.val());
+//     const unreadMessages = await database
+//       .ref(`privateChats/${chatKey}/members/${recipientKey}/unreadMessages`)
+//       .once("value");
+//     if (unreadMessages.val() === null) return;
+//     const unreadMessagesData = Object.keys(unreadMessages?.val());
 
-    if (unreadMessagesData[unreadMessagesData.length - 1] !== messageKey) {
-      return database.ref(`privateChats/${chatKey}/members/${recipientKey}/unreadMessages/${messageKey}`).set(null);
-    }
+//     if (unreadMessagesData[unreadMessagesData.length - 1] !== messageKey) {
+//       return database.ref(`privateChats/${chatKey}/members/${recipientKey}/unreadMessages/${messageKey}`).set(null);
+//     }
 
-    let previousMessage;
-    if (unreadMessagesData.length === 1) {
-      previousMessage = snapshot.val();
-    } else {
-      const previousMessageKey = unreadMessagesData[unreadMessagesData.length - 2];
-      const previousMessageData = await snapshot.ref.parent?.child(previousMessageKey).once("value");
-      previousMessage = previousMessageData?.val();
-    }
+//     let previousMessage;
+//     if (unreadMessagesData.length === 1) {
+//       previousMessage = snapshot.val();
+//     } else {
+//       const previousMessageKey = unreadMessagesData[unreadMessagesData.length - 2];
+//       const previousMessageData = await snapshot.ref.parent?.child(previousMessageKey).once("value");
+//       previousMessage = previousMessageData?.val();
+//     }
 
-    const updateData = {
-      [`users/${contactsDatabaseRef(recipientKey)}/contactsLastActivity/${senderKey}`]: previousMessage.timeStamp,
-      [`privateChats/${chatKey}/members/${recipientKey}/unreadMessages/${messageKey}`]: null
-    };
+//     const updateData = {
+//       [`users/${contactsDatabaseRef(recipientKey)}/contactsLastActivity/${senderKey}`]: previousMessage.timeStamp,
+//       [`privateChats/${chatKey}/members/${recipientKey}/unreadMessages/${messageKey}`]: null
+//     };
 
-    return database.ref().update(updateData);
-  });
+//     return database.ref().update(updateData);
+//   });
 
 export const updatePinnedTimeStamp = functions.database
   .ref("users/{authUid}/contactsDatabase/contactsLastActivity/{contactUid}")

@@ -1,7 +1,7 @@
 import { MessageInterface } from "Components/Pages/Contacts/Types"
 import { useEffect, useContext, useRef } from "react"
-import { MESSAGES_TO_RENDER, UNREAD_MESSAGES_TO_RENDER } from "../../Context/Constants"
-import { ContactsContext } from "../../Context/ContactsContext"
+import { MESSAGES_TO_RENDER, UNREAD_MESSAGES_TO_RENDER } from "../../@Context/Constants"
+import { ContactsContext } from "../../@Context/ContactsContext"
 
 type Props = {
   messages: MessageInterface[]

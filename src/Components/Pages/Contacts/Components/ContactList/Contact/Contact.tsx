@@ -4,7 +4,7 @@ import { FirebaseContext } from "Components/Firebase"
 import React, { useContext, useEffect, useRef, useState } from "react"
 import useTimestampFormater from "../../../Hooks/UseTimestampFormater"
 import { ContactInfoInterface, MessageInterface } from "../../../Types"
-import { ContactsContext } from "../../Context/ContactsContext"
+import { ContactsContext } from "../../@Context/ContactsContext"
 import ContactPopup from "../../OptionsPopup/OptionsPopup"
 import "./Contact.scss"
 import useGetInitialMessages from "../../ChatWindow/FirebaseHelpers/UseGetInitialMessages"
@@ -22,14 +22,14 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
   const context = useContext(ContactsContext)
   const { optionsPopupContactList, activeChat } = context?.state!
 
-  const formatedDate = useTimestampFormater({ timeStamp: contactInfo.pinned_lastActivityTS?.slice(-13) })
-
   const [newActivity, setNewActivity] = useState<boolean | null | undefined>(contactInfo.newContactsActivity)
   const [newContactsRequest, setNewContactRequest] = useState<boolean | null>(contactInfo.newContactsRequests)
 
   const [authUnreadMessages, setAuthUnreadMessages] = useState<string[]>(contactInfo.unreadMessages)
   const [contactUnreadMessages, setContactUnreadMessages] = useState<boolean>(contactInfo.unreadMessagesContact)
   const [lastMessage, setLastMessage] = useState<MessageInterface | null>(contactInfo.lastMessage)
+
+  const formatedDate = useTimestampFormater({ timeStamp: lastMessage?.timeStamp! })
 
   const contactOptionsRef = useRef<HTMLDivElement>(null!)
 
@@ -68,6 +68,14 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
       .on("value", (snapshot: any) => {
         setContactUnreadMessages(!!snapshot.val())
       })
+    firebase
+      .privateChats()
+      .child(`${chatKey}/historyDeleted`)
+      .on("value", (snapshot: any) => {
+        if (snapshot.val() === null) return
+        context?.dispatch({ type: "removeAllMessages", payload: { chatKey } })
+        firebase.privateChats().child(`${chatKey}/historyDeleted`).set(null)
+      })
 
     const lastMessageListener = firebase
       .messages({ chatKey })
@@ -81,6 +89,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
         const messageData = Object.values(snapshot.val())[0]
         setLastMessage(messageData)
       })
+
     return () => {
       firebase.newContactsActivity({ uid: authUser?.uid }).child(`${contactInfo.key}`).off()
       firebase.newContactsRequests({ uid: authUser?.uid! }).child(`${contactInfo.key}`).off()
@@ -119,8 +128,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
             })}
           ></div>
         )}
-
-        <div className="contact-item__timestamp">{formatedDate}</div>
+        {lastMessage?.timeStamp && <div className="contact-item__timestamp">{formatedDate}</div>}
       </div>
 
       <div className="contact-item__row contact-item__row--bottom">

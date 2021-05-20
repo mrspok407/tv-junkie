@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useLayoutEffect, useCallback, useContext } from "react"
 import { ContactInfoInterface } from "../../Types"
-import { ContactsContext } from "../Context/ContactsContext"
+import { ContactsContext } from "../@Context/ContactsContext"
 import useContactOptions from "../ContactList/Hooks/UseContactOptions"
 import "./OptionsPopup.scss"
 

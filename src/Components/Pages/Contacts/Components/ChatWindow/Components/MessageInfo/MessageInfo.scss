@@ -56,7 +56,7 @@ $messageStatusSize: 17px;
   }
 }
 
-.chat-window__message:last-child {
+.chat-window__message:nth-last-child(-n + 2) {
   .chat-window__message-options .popup-container {
     top: -54px;
     border-radius: 5px 5px 0px 5px;
@@ -79,14 +79,6 @@ $messageStatusSize: 17px;
   background-repeat: no-repeat;
   width: $messageStatusSize;
   height: $messageStatusSize;
-  // opacity: 0;
-  // will-change: opacity;
-  // animation: messageStatusFadeIn 150ms forwards ease;
-  // @keyframes messageStatusFadeIn {
-  //   to {
-  //     opacity: 1;
-  //   }
-  // }
 
   &--read {
     background-image: url("../../../../../../../assets/images/icons/double-mark-sign.svg");
