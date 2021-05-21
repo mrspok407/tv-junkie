@@ -8,7 +8,6 @@ const useTimestampFormater = ({ timeStamp }: Props) => {
   const [formatedDate, setFormatedDate] = useState<number | string | null>(timeStamp)
 
   useMemo(() => {
-    console.log(timeStamp)
     if (!timeStamp) {
       setFormatedDate(null)
       return

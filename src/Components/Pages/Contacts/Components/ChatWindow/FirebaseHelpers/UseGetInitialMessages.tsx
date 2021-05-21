@@ -2,7 +2,11 @@ import React, { useState, useEffect, useContext } from "react"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
 import { ContactsContext } from "../../@Context/ContactsContext"
-import { MessageInterface, MESSAGE_INITIAL_DATA, SnapshotStringBooleanInterface } from "Components/Pages/Contacts/Types"
+import {
+  MessageInterface,
+  MESSAGE_INITIAL_DATA,
+  SnapshotStringBooleanInterface
+} from "Components/Pages/Contacts/@Types"
 import { isUnexpectedObject } from "Utils"
 import { setMessagesSnapshot } from "./setMessagesSnapshot"
 import { MESSAGES_TO_RENDER, UNREAD_MESSAGES_TO_RENDER } from "../../@Context/Constants"

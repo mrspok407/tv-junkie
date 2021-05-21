@@ -1,4 +1,4 @@
-import { MessageInterface } from "Components/Pages/Contacts/Types"
+import { MessageInterface } from "Components/Pages/Contacts/@Types"
 import React, { useState, useEffect, useRef, useCallback } from "react"
 import { throttle } from "throttle-debounce"
 

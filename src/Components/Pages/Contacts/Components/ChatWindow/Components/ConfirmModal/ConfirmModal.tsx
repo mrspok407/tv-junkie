@@ -1,4 +1,4 @@
-import { ConfirmFunctionsInterface } from "Components/Pages/Contacts/Types"
+import { ConfirmFunctionsInterface } from "Components/Pages/Contacts/@Types"
 import React, { useState, useEffect, useContext, useRef } from "react"
 import { ContactsContext } from "../../../@Context/ContactsContext"
 import "./ConfirmModal.scss"

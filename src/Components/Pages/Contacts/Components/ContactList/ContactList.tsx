@@ -3,7 +3,7 @@ import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
 import Contact from "./Contact/Contact"
 import useElementScrolledDown from "Components/Pages/Movies/useElementScrolledDown"
-import { ContactInfoInterface, CONTACT_INFO_INITIAL_DATA, MessageInterface } from "../../Types"
+import { ContactInfoInterface, CONTACT_INFO_INITIAL_DATA, MessageInterface } from "../../@Types"
 import classNames from "classnames"
 import { ContactsContext } from "../@Context/ContactsContext"
 import { isUnexpectedObject } from "Utils"
@@ -60,8 +60,6 @@ const ContactList: React.FC = () => {
       acc = { [contact.key]: { ...contact }, ...acc }
       return acc
     }, {})
-
-    console.log({ contactsDispatch })
 
     context?.dispatch({ type: "updateContacts", payload: { contacts: contactsDispatch, unreadMessages } })
     setInitialLoading(false)

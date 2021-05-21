@@ -1,5 +1,5 @@
 import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
-import { SnapshotStringBooleanInterface } from "Components/Pages/Contacts/Types"
+import { SnapshotStringBooleanInterface } from "Components/Pages/Contacts/@Types"
 import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 import { MESSAGES_TO_LOAD } from "../../@Context/Constants"
 

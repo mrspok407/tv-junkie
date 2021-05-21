@@ -1,5 +1,5 @@
 import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
-import { ContactInfoInterface, MessageInterface } from "Components/Pages/Contacts/Types"
+import { ContactInfoInterface, MessageInterface } from "Components/Pages/Contacts/@Types"
 import { useContext } from "react"
 import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 import { ContactsContext, ContextInterface } from "../../@Context/ContactsContext"

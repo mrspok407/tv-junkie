@@ -1,5 +1,5 @@
 import { CONTEXT_INITIAL_STATE } from "Components/AppContext/AppContextHOC"
-import { MessageInterface } from "Components/Pages/Contacts/Types"
+import { MessageInterface } from "Components/Pages/Contacts/@Types"
 import React, { createContext } from "react"
 
 export interface FirebaseInterface {

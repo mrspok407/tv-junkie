@@ -13,12 +13,13 @@ import useIntersectionObserver from "./Hooks/UseIntersectionObserver"
 import useFirstRenderMessages from "./Hooks/UseFirstRenderMessages"
 import GoDown from "./Components/GoDown/GoDown"
 import useResizeObserver from "./Hooks/UseResizeObserver"
-import { MessageInterface } from "../../Types"
+import { MessageInterface } from "../../@Types"
 import { convertTimeStampToDate } from "Utils"
 import useShowFloatDate from "./Hooks/UseShowFloatDate"
 import usePageFocusHandler from "./Hooks/UsePageFocusHandler"
 import "./ChatWindow.scss"
 import useTimestampFormater from "../../Hooks/UseTimestampFormater"
+import MessageInput from "./Components/Input/MessageInput"
 
 const ChatWindow: React.FC = () => {
   const { authUser, newContactsActivity, errors } = useContext(AppContext)
@@ -114,7 +115,6 @@ const ChatWindow: React.FC = () => {
     debounce(() => {
       if (!chatContainerRef) return
       const { scrollTop, scrollHeight, height } = getContainerRect()
-      console.log({ scrollTop })
       if (scrollHeight <= height) return
 
       const firstRenderedMessageIndex = messagesRef?.current.findIndex(
@@ -136,6 +136,10 @@ const ChatWindow: React.FC = () => {
       if (scrollHeight <= scrollTop + height && lastRenderedMessageIndex !== messagesRef.current.length - 1) {
         chatContainerRef.scrollTop = scrollHeight - height - 1
       }
+
+      console.log({ scrollHeight })
+      console.log({ scrollTop })
+      console.log({ height })
 
       if (scrollHeight <= scrollTop + height) {
         isScrollBottomRef.current = true
@@ -193,7 +197,6 @@ const ChatWindow: React.FC = () => {
       .unreadMessages({ uid: authUser?.uid!, chatKey: activeChat.chatKey })
       .on("value", (snapshot: any) => {
         const unreadMessagesData = !snapshot.val() ? [] : Object.keys(snapshot.val())
-        console.log(unreadMessagesData)
         unreadMessagesAuthRef.current = unreadMessagesData
       })
     return () => {
@@ -277,7 +280,6 @@ const ChatWindow: React.FC = () => {
     if (!chatContainerRef) return
     chatContainerRef.addEventListener("scroll", handleScroll)
     return () => {
-      // console.log("remove handleScroll")
       chatContainerRef.removeEventListener("scroll", handleScroll)
     }
   }, [handleScroll, chatContainerRef])
@@ -301,7 +303,6 @@ const ChatWindow: React.FC = () => {
   useEffect(() => {
     if (!chatContainerRef) return
     // if (contactInfo.status !== "rejected") return
-    console.log("test")
     firebase.newContactsActivity({ uid: authUser?.uid }).child(`${contactInfo.key}`).set(null)
   }, [activeChat, contactInfo, chatContainerRef])
 
@@ -374,6 +375,10 @@ const ChatWindow: React.FC = () => {
                 const currentMessageDate = new Date(renderedMessage?.timeStamp).toDateString()
                 const prevMessageDate = new Date(prevMessage?.timeStamp).toDateString()
 
+                const innerHTML = {
+                  __html: `${renderedMessage.message}`
+                }
+
                 return (
                   <React.Fragment key={renderedMessage.key}>
                     {currentMessageDate !== prevMessageDate || renderedMessage.timeStamp === prevMessage.timeStamp ? (
@@ -397,7 +402,7 @@ const ChatWindow: React.FC = () => {
                       })}
                       data-key={renderedMessage.key}
                     >
-                      <div className="chat-window__message-text">{renderedMessage.message}</div>
+                      <div className="chat-window__message-text" dangerouslySetInnerHTML={innerHTML}></div>
 
                       <MessageInfo messageData={renderedMessage} contactUnreadMessages={contactUnreadMessages} />
                     </div>
@@ -445,6 +450,7 @@ const ChatWindow: React.FC = () => {
             )
           ))}
       </div>
+      <MessageInput />
       <GoDown
         chatContainerRef={chatContainerRef}
         chatKey={activeChat.chatKey}

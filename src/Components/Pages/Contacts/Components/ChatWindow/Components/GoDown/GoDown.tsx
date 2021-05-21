@@ -1,7 +1,7 @@
 import classNames from "classnames"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
-import { ContainerRectInterface, MessageInterface } from "Components/Pages/Contacts/Types"
+import { ContainerRectInterface, MessageInterface } from "Components/Pages/Contacts/@Types"
 import React, { useState, useEffect, useCallback, useLayoutEffect, useContext, useRef } from "react"
 import { throttle } from "throttle-debounce"
 import { ContactsContext } from "../../../@Context/ContactsContext"

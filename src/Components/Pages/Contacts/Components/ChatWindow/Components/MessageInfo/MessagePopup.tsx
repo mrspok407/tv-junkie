@@ -1,6 +1,6 @@
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
-import { MessageInterface } from "Components/Pages/Contacts/Types"
+import { MessageInterface } from "Components/Pages/Contacts/@Types"
 import React, { useEffect, useContext } from "react"
 import { ContactsContext } from "../../../@Context/ContactsContext"
 

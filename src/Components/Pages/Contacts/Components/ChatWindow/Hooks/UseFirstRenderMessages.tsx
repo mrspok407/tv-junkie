@@ -1,4 +1,4 @@
-import { MessageInterface } from "Components/Pages/Contacts/Types"
+import { MessageInterface } from "Components/Pages/Contacts/@Types"
 import { useEffect, useContext, useRef } from "react"
 import { MESSAGES_TO_RENDER, UNREAD_MESSAGES_TO_RENDER } from "../../@Context/Constants"
 import { ContactsContext } from "../../@Context/ContactsContext"

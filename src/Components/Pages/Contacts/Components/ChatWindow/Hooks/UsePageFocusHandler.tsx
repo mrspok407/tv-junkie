@@ -13,7 +13,6 @@ const usePageFocusHandler = ({ activeChat }: Props) => {
   const focusInterval = useRef<number | null>(null)
 
   const focusHandler = useCallback(() => {
-    console.log(activeChat.chatKey)
     focusInterval.current = window.setInterval(() => {
       firebase
         .chatMemberStatus({ chatKey: activeChat.chatKey, memberKey: authUser?.uid! })

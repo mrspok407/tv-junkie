@@ -1,5 +1,5 @@
 import React, { useReducer, createContext } from "react"
-import { ContactsStateInterface } from "../../Types"
+import { ContactsStateInterface } from "../../@Types"
 import reducer, { INITIAL_STATE, ACTIONTYPES } from "./_reducerConfig"
 
 export interface ContextInterface {

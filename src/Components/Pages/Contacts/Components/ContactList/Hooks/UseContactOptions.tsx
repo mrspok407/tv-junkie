@@ -1,6 +1,6 @@
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
-import { ContactInfoInterface } from "Components/Pages/Contacts/Types"
+import { ContactInfoInterface } from "Components/Pages/Contacts/@Types"
 import React, { useState, useEffect, useContext } from "react"
 import { ContactsContext } from "../../@Context/ContactsContext"
 

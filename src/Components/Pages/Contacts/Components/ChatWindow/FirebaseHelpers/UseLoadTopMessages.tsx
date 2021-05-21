@@ -2,7 +2,7 @@ import { useState, useContext, useCallback, useRef } from "react"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
 import { ContactsContext } from "../../@Context/ContactsContext"
-import { MessageInterface, MESSAGE_INITIAL_DATA } from "Components/Pages/Contacts/Types"
+import { MessageInterface, MESSAGE_INITIAL_DATA } from "Components/Pages/Contacts/@Types"
 import { isUnexpectedObject } from "Utils"
 import { MESSAGES_TO_LOAD } from "../../@Context/Constants"
 
