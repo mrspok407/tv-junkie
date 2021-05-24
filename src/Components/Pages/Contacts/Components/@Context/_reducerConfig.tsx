@@ -3,6 +3,7 @@ import {
   ContactsInterface,
   ContactsStateInterface,
   ContactStatusInterface,
+  MessageInputInterface,
   MessageInterface
 } from "../../@Types"
 import { MESSAGES_TO_RENDER, UNREAD_MESSAGES_TO_RENDER } from "./Constants"
@@ -26,6 +27,7 @@ export type ACTIONTYPES =
   | { type: "addNewMessage"; payload: { newMessage: MessageInterface; chatKey: string } }
   | { type: "removeMessage"; payload: { removedMessage: MessageInterface; chatKey: string } }
   | { type: "changeMessage"; payload: { changedMessage: MessageInterface; chatKey: string } }
+  | { type: "updateMessageInput"; payload: MessageInputInterface }
   | { type: "updateContactInfo"; payload: { changedInfo: ContactInfoInterface } }
   | { type: "updateContacts"; payload: { contacts: ContactsInterface; unreadMessages: { [key: string]: string[] } } }
   | { type: "updateLastScrollPosition"; payload: { scrollTop: number; chatKey: string } }
@@ -48,6 +50,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
     authUserUnreadMessages,
     activeChat,
     messages,
+    messagesInput,
     renderedMessagesList,
     messagePopup,
     optionsPopupContactList,
@@ -402,6 +405,19 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         }
       }
 
+    case "updateMessageInput":
+      console.log(action.payload)
+      return {
+        ...state,
+        messagesInput: {
+          ...messagesInput,
+          [activeChat.chatKey]: {
+            ...messagesInput[activeChat.chatKey],
+            ...action.payload
+          }
+        }
+      }
+
     case "updateContacts": {
       return {
         ...state,
@@ -522,6 +538,7 @@ export const INITIAL_STATE = {
     contactKey: ""
   },
   messages: {},
+  messagesInput: {},
   renderedMessagesList: {},
   contacts: {},
   lastScrollPosition: {},

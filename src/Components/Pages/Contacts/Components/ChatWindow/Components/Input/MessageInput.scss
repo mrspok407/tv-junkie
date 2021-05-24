@@ -2,7 +2,6 @@
 
 .chat-window__input-wrapper {
   display: flex;
-  //   min-height: 50px;
   max-width: 100%;
   width: 502px;
   margin: 5px auto 13px auto;
@@ -11,24 +10,24 @@
 }
 
 .chat-window__input-message {
+  --max-height: 200px;
   --messages-text-size: 16px;
   --line-height: 25px;
   --text-color: #000;
   background: none;
   border: none;
   width: 100%;
-  // padding: 0.5rem 0.5625rem;
   height: 100%;
-  max-height: 110px;
+  max-height: var(--max-height);
   overflow-y: auto;
   resize: none;
   border: none;
   outline: none;
-  white-space: pre-line;
+  white-space: pre-wrap;
   font-size: var(--messages-text-size);
   line-height: var(--line-height);
   color: var(--text-color);
-  @include scrollbar(0px, getColor(blueClr, $mainPalette), #c5bbb1);
+  @include scrollbar(5px, getColor(blueClr, $mainPalette), #c5bbb1);
 
   &-container {
     display: flex;

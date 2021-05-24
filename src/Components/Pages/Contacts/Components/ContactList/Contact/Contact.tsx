@@ -6,9 +6,9 @@ import useTimestampFormater from "../../../Hooks/UseTimestampFormater"
 import { ContactInfoInterface, MessageInterface } from "../../../@Types"
 import { ContactsContext } from "../../@Context/ContactsContext"
 import ContactPopup from "../../OptionsPopup/OptionsPopup"
-import "./Contact.scss"
 import useGetInitialMessages from "../../ChatWindow/FirebaseHelpers/UseGetInitialMessages"
 import useHandleContactsStatus from "../../ChatWindow/FirebaseHelpers/UseHandleContactsStatus"
+import "./Contact.scss"
 
 type Props = {
   contactInfo: ContactInfoInterface

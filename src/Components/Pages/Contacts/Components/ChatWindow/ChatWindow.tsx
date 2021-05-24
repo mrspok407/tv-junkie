@@ -17,9 +17,9 @@ import { MessageInterface } from "../../@Types"
 import { convertTimeStampToDate } from "Utils"
 import useShowFloatDate from "./Hooks/UseShowFloatDate"
 import usePageFocusHandler from "./Hooks/UsePageFocusHandler"
-import "./ChatWindow.scss"
 import useTimestampFormater from "../../Hooks/UseTimestampFormater"
 import MessageInput from "./Components/Input/MessageInput"
+import "./ChatWindow.scss"
 
 const ChatWindow: React.FC = () => {
   const { authUser, newContactsActivity, errors } = useContext(AppContext)
@@ -379,6 +379,8 @@ const ChatWindow: React.FC = () => {
                   __html: `${renderedMessage.message}`
                 }
 
+                console.log(renderedMessage.message)
+
                 return (
                   <React.Fragment key={renderedMessage.key}>
                     {currentMessageDate !== prevMessageDate || renderedMessage.timeStamp === prevMessage.timeStamp ? (
@@ -450,7 +452,7 @@ const ChatWindow: React.FC = () => {
             )
           ))}
       </div>
-      <MessageInput />
+      <MessageInput chatContainerRef={chatContainerRef} getContainerRect={getContainerRect} />
       <GoDown
         chatContainerRef={chatContainerRef}
         chatKey={activeChat.chatKey}
