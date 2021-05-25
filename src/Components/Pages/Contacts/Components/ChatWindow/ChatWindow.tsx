@@ -379,8 +379,6 @@ const ChatWindow: React.FC = () => {
                   __html: `${renderedMessage.message}`
                 }
 
-                console.log(renderedMessage.message)
-
                 return (
                   <React.Fragment key={renderedMessage.key}>
                     {currentMessageDate !== prevMessageDate || renderedMessage.timeStamp === prevMessage.timeStamp ? (
@@ -400,7 +398,8 @@ const ChatWindow: React.FC = () => {
                       className={classNames(`chat-window__message chat-window__message--${renderedMessage.key}`, {
                         "chat-window__message--send": renderedMessage.sender === authUser?.uid,
                         "chat-window__message--receive": renderedMessage.sender === activeChat.contactKey,
-                        "chat-window__message--last-in-bunch": renderedMessage.sender !== nextMessage?.sender
+                        "chat-window__message--last-in-bunch": renderedMessage.sender !== nextMessage?.sender,
+                        "chat-window__message--deliver-failed": renderedMessage.isDelivered === false
                       })}
                       data-key={renderedMessage.key}
                     >

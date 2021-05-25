@@ -44,6 +44,7 @@ const MessageInfo: React.FC<Props> = React.memo(({ messageData, contactUnreadMes
         <div
           className={classNames("chat-window__message-status", {
             "chat-window__message-status--read": !contactUnreadMessages?.includes(messageData.key),
+            "chat-window__message-status--deliver-failed": messageData.isDelivered === false,
             "chat-window__message-status--loading": contactUnreadMessages === null
           })}
         ></div>

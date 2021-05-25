@@ -1,3 +1,4 @@
+import classNames from "classnames"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
 import { MessageInterface } from "Components/Pages/Contacts/@Types"
@@ -14,7 +15,8 @@ const MessagePopup: React.FC<Props> = ({ messageOptionsRef, messageData, contact
   const { authUser, errors } = useContext(AppContext)
   const firebase = useContext(FirebaseContext)
   const context = useContext(ContactsContext)
-  const { activeChat, messages } = context?.state!
+  const { activeChat, messages, contactsStatus } = context?.state!
+  const contactsStatusData = contactsStatus[activeChat.chatKey]
   const messagesData = messages[activeChat.chatKey]
 
   useEffect(() => {
@@ -31,6 +33,13 @@ const MessagePopup: React.FC<Props> = ({ messageOptionsRef, messageData, contact
   }
 
   const deleteMessage = async () => {
+    if (messageData.isDelivered === false) {
+      context?.dispatch({
+        type: "removeMessage",
+        payload: { removedMessage: messageData, chatKey: activeChat.chatKey }
+      })
+    }
+
     try {
       let updateData = {}
       const senderKey = messageData.sender

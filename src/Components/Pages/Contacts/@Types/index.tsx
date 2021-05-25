@@ -30,6 +30,7 @@ export interface MessageInterface {
   sender: string
   timeStamp: number
   key: string
+  isDelivered?: boolean
 }
 
 export interface ContactStatusInterface {
@@ -51,6 +52,11 @@ export interface MessageInputInterface {
   scrollTop: number
 }
 
+export interface ActiveChatInterface {
+  chatKey: string
+  contactKey: string
+}
+
 export interface ContactsStateInterface {
   contactsUnreadMessages: {
     [key: string]: string[]
@@ -58,10 +64,7 @@ export interface ContactsStateInterface {
   authUserUnreadMessages: {
     [key: string]: string[]
   }
-  activeChat: {
-    chatKey: string
-    contactKey: string
-  }
+  activeChat: ActiveChatInterface
   messages: {
     [key: string]: MessageInterface[]
   }

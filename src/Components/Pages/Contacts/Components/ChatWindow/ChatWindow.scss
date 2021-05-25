@@ -147,8 +147,6 @@
     padding: 10px;
     color: getColor(messageText, $chatWindowPalette);
     font-size: 0.95rem;
-    white-space: pre-wrap;
-    word-break: break-word;
 
     @include mediaMaxW(#{$mobileViewPort}) {
       flex-direction: column;
@@ -207,8 +205,27 @@
       }
     }
 
+    &--deliver-failed {
+      background-color: brown;
+
+      &.chat-window__message--last-in-bunch {
+        border-radius: 5px 5px 0px 5px;
+        &:before {
+          right: -10px;
+          background-color: brown;
+        }
+        &:after {
+          right: -10px;
+          background-color: getColor(backG, $chatWindowPalette);
+          border-radius: 0 0 0 10px;
+        }
+      }
+    }
+
     &-text {
       margin-right: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
     }
   }
 }

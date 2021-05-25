@@ -75,6 +75,11 @@ export interface ToggleMovieLSArg {
   data: ContentDetailes[] | ContentDetailes
 }
 
+export interface ErrorsInterface {
+  error: any
+  handleError: ({ errorData, message }: { errorData?: any; message: string }) => void
+}
+
 export interface AppContextInterface {
   userContentLocalStorage: {
     watchLaterMovies: ContentDetailes[]
@@ -114,7 +119,7 @@ export interface AppContextInterface {
   firebase: FirebaseInterface
   authUser: AuthUserInterface | null
   newContactsActivity: boolean | null
-  errors: { error: any; handleError: ({ errorData, message }: { errorData?: any; message: string }) => void }
+  errors: ErrorsInterface
 }
 
 export const CONTEXT_INITIAL_STATE = {

@@ -1,16 +1,19 @@
-import { ContainerRectInterface, MessageInputInterface } from "Components/Pages/Contacts/@Types"
-import React, { useState, useEffect, useRef, useContext, useCallback, useLayoutEffect } from "react"
+import { ContainerRectInterface, MessageInputInterface, MessageInterface } from "Components/Pages/Contacts/@Types"
+import React, { useEffect, useRef, useContext, useCallback, useLayoutEffect } from "react"
 import debounce from "debounce"
-import "./MessageInput.scss"
 import { ContactsContext } from "../../../@Context/ContactsContext"
-import { INPUT_MESSAGE_MAX_HEIGHT } from "../../../@Context/Constants"
+import { INPUT_MESSAGE_MAX_HEIGHT, MESSAGE_LINE_HEIGHT } from "../../../@Context/Constants"
 import { FirebaseContext } from "Components/Firebase"
 import { AppContext } from "Components/AppContext/AppContextHOC"
+import "./MessageInput.scss"
+import { sendMessage } from "./FirebaseHelpers/SendMessage"
 
 type Props = {
   chatContainerRef: HTMLDivElement
   getContainerRect: () => ContainerRectInterface
 }
+
+const arrowKeys = ["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown"]
 
 const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect }) => {
   const firebase = useContext(FirebaseContext)
@@ -19,100 +22,115 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect }) =
   const { activeChat, messagesInput, contactsStatus } = context?.state!
   const messageInputData = messagesInput[activeChat.chatKey]
   const contactsStatusData = contactsStatus[activeChat.chatKey]
-  const inputRef = useRef<HTMLDivElement>(null!)
 
+  const inputRef = useRef<HTMLDivElement>(null!)
   const keysMap = useRef<any>({})
 
-  const anchorOffsetRef = useRef<number>(null!)
+  const getSelection = () => {
+    const selection = window.getSelection()
+    const anchorOffset = selection?.anchorOffset!
+    return { selection, anchorOffset }
+  }
+
+  const handleCursorLine = ({
+    node,
+    anchorOffset,
+    anchorShift = 0
+  }: {
+    node: any
+    anchorOffset: number
+    anchorShift?: number
+  }) => {
+    const { selection } = getSelection()
+    const range = document.createRange()
+    range.setStart(node, Math.min(anchorOffset + anchorShift, node?.textContent?.length!))
+    range.collapse(true)
+
+    selection?.removeAllRanges()
+    selection?.addRange(range)
+  }
 
   useLayoutEffect(() => {
-    const selection = window.getSelection()
     inputRef.current.innerHTML = messageInputData?.message || ""
+
     if (!inputRef.current.innerHTML) {
       inputRef.current.focus()
     } else {
-      const range = document.createRange()
-      console.log({ length: inputRef.current.childNodes[0] })
-      range.setStart(
-        inputRef.current.childNodes[0],
-        Math.min(messageInputData.anchorOffset, inputRef.current.childNodes[0]?.textContent?.length!)
-      )
-      range.collapse(true)
-
-      selection?.removeAllRanges()
-      selection?.addRange(range)
-
+      handleCursorLine({ node: inputRef.current.childNodes[0], anchorOffset: messageInputData.anchorOffset })
       inputRef.current.scrollTop = messageInputData.scrollTop
     }
     return () => {
-      debounced.flush()
+      dispatchDeb.flush()
     }
   }, [activeChat])
 
-  const debounced = useCallback(
+  const dispatchDeb = useCallback(
     debounce((payload: MessageInputInterface) => context?.dispatch({ type: "updateMessageInput", payload }), 100),
     []
   )
 
-  const onClick = (e: any) => {
-    // const inputRef = document.querySelector(".chat-window__input-message") as Node
-    // console.log(inputRef.childNodes)
-
-    const anchorOffset = window.getSelection()?.anchorOffset
-    anchorOffsetRef.current = anchorOffset!
-
-    const innerHtml = e.currentTarget.innerHTML
-
-    debounced({ anchorOffset })
-
-    // console.log(e.target.childNodes)
-
-    console.log({ anchorOffset: anchorOffset })
-    // console.log({ focusOffset: sel?.focusOffset })
-    // console.log({ collapsed: sel?.isCollapsed })
-    // console.log({ rangeCount: sel?.rangeCount })
-    // console.log({ anchorNode: sel?.anchorNode?.parentNode?.childNodes[0] })
-
-    // if (sel?.rangeCount! > 0) {
-    //   sel?.removeAllRanges()
-    // }
-
-    // let range: any = document.createRange()
-    // range.setStart(e.target.childNodes[0], 2)
-    // range.setEnd(e.target.childNodes[0], 4)
-
-    // sel?.addRange(range)
+  const onClick = () => {
+    const { anchorOffset } = getSelection()
+    dispatchDeb({ anchorOffset })
   }
 
-  const scrollPositionHandler = useCallback(
-    debounce(() => {
-      const scrollTop = inputRef.current.scrollTop
-      const innerHTML = inputRef.current.innerHTML
-      const anchorOffset = window.getSelection()?.anchorOffset!
-      context?.dispatch({ type: "updateMessageInput", payload: { message: innerHTML, anchorOffset, scrollTop } })
-    }, 100),
-    [activeChat]
-  )
+  const scrollPositionHandler = () => {
+    const { scrollTop } = inputRef.current
+    dispatchDeb({ scrollTop })
+  }
 
   const handleOnChange = (e: any) => {
     const { innerHTML, textContent } = e.currentTarget
-    const anchorOffset = window.getSelection()?.anchorOffset!
+    const { anchorOffset } = getSelection()
     const scrollTop = inputRef.current.scrollTop
-    if (textContent === "" || textContent === "\n") {
+    if (["", "\n"].includes(textContent)) {
       e.currentTarget.innerHTML = ""
-      debounced({ message: "", anchorOffset: 0, scrollTop: 0 })
+      dispatchDeb({ message: "", anchorOffset: 0, scrollTop: 0 })
+    } else {
+      dispatchDeb({ message: innerHTML, anchorOffset, scrollTop })
     }
-    debounced({ message: innerHTML, anchorOffset, scrollTop })
+  }
+
+  const prevHeight = useRef(0)
+  const handleNextLine = ({ textContent, innerHTML, e }: { textContent: string; innerHTML: string; e: any }) => {
+    const { anchorOffset } = getSelection()
+    const { scrollTop } = inputRef.current
+    const height = inputRef.current.getBoundingClientRect().height
+
+    if (textContent === "") {
+      e.currentTarget.innerHTML = ""
+      return
+    }
+    const lastIndexBr = innerHTML.lastIndexOf("\n")
+
+    if (lastIndexBr === -1 || lastIndexBr < innerHTML.length - 1) {
+      if (anchorOffset === innerHTML.length) {
+        // No "\n" at all or it's somewhere, BUT not at the end, which means two "\n" needed to be add
+        e.currentTarget.innerHTML = `${innerHTML}\n\n`
+      } else {
+        e.currentTarget.innerHTML = `${innerHTML.slice(0, anchorOffset)}\n${innerHTML.slice(anchorOffset)}`
+      }
+    } else {
+      if (anchorOffset === innerHTML.length) {
+        // "\n" at the end, which means only one "\n" needed to be add
+        e.currentTarget.innerHTML = `${innerHTML}\n`
+      } else {
+        e.currentTarget.innerHTML = `${innerHTML.slice(0, anchorOffset)}\n${innerHTML.slice(anchorOffset!)}`
+      }
+    }
+
+    handleCursorLine({ node: e.currentTarget.childNodes[0], anchorOffset, anchorShift: 1 })
+    inputRef.current.scrollTop = scrollTop + MESSAGE_LINE_HEIGHT
+    if (prevHeight.current + MESSAGE_LINE_HEIGHT < INPUT_MESSAGE_MAX_HEIGHT) {
+      chatContainerRef.scrollTop = getContainerRect().scrollTop + MESSAGE_LINE_HEIGHT
+    }
+    prevHeight.current = height
   }
 
   const handleKeyDown = async (e: any) => {
-    const selection = window.getSelection()
-    anchorOffsetRef.current = selection?.anchorOffset!
     const { innerHTML, textContent } = e.currentTarget
-    const scrollTop = inputRef.current.scrollTop
 
     keysMap.current[e.key] = e.type === "keydown"
-
     if (e.which === 32 && textContent === "") {
       e.preventDefault()
       e.currentTarget.innerHTML = ""
@@ -121,66 +139,36 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect }) =
       e.preventDefault()
       if (e.currentTarget.innerHTML === "") return
       if (keysMap.current.Shift) {
-        console.log({ textContent })
-        if (textContent === "") {
-          e.currentTarget.innerHTML = ""
-          return
-        }
-        const lastIndexBr = innerHTML.lastIndexOf("\n")
-
-        if (lastIndexBr === -1 || lastIndexBr < innerHTML.length - 1) {
-          if (selection?.anchorOffset! === innerHTML.length) {
-            e.currentTarget.innerHTML = `${innerHTML}\n\n`
-          } else {
-            e.currentTarget.innerHTML = `${innerHTML.slice(0, selection?.anchorOffset!)}\n${innerHTML.slice(
-              selection?.anchorOffset!
-            )}`
-          }
-        } else {
-          if (selection?.anchorOffset! === innerHTML.length) {
-            e.currentTarget.innerHTML = `${innerHTML}\n`
-          } else {
-            e.currentTarget.innerHTML = `${innerHTML.slice(0, selection?.anchorOffset!)}\n${innerHTML.slice(
-              selection?.anchorOffset!
-            )}`
-          }
-        }
-
-        const range = document.createRange()
-        range.setStart(e.currentTarget.childNodes[0], anchorOffsetRef.current + 1)
-        range.collapse(true)
-
-        selection?.removeAllRanges()
-        selection?.addRange(range)
-
-        inputRef.current.scrollTop = scrollTop + 25
-        if (inputRef.current.getBoundingClientRect().height <= INPUT_MESSAGE_MAX_HEIGHT) {
-          chatContainerRef.scrollTop = getContainerRect().scrollTop + 25
-        }
+        handleNextLine({ textContent, innerHTML, e })
       } else {
-        console.log("enter")
         try {
-          const timeStampEpoch = new Date().getTime()
-          const messageRef = firebase.privateChats().child(`${activeChat.chatKey}/messages`).push()
-          const messageKey = messageRef.key
-          const updateData = {
-            [`messages/${messageKey}`]: {
-              sender: authUser?.uid,
-              message: e.currentTarget.innerHTML,
-              timeStamp: timeStampEpoch * 2
-            },
-            [`members/${activeChat.contactKey}/unreadMessages/${messageKey}`]:
-              !contactsStatusData?.isOnline || !contactsStatusData?.chatBottom || !contactsStatusData?.pageInFocus
-                ? true
-                : null
-          }
-          e.currentTarget.innerHTML = ""
-          context?.dispatch({ type: "updateMessageInput", payload: { message: "", anchorOffset: 0, scrollTop: 0 } })
-          await firebase.privateChats().child(activeChat.chatKey).update(updateData)
+          const messageKey = await sendMessage({
+            activeChat,
+            authUser,
+            firebase,
+            message: inputRef.current.innerHTML,
+            contactsStatusData
+          })
+
+          const newMessageRef = document.querySelector(`.chat-window__message--${messageKey}`)
+          newMessageRef?.scrollIntoView({ block: "start", inline: "start" })
         } catch (error) {
+          const timeStampEpoch = new Date().getTime()
+          const newMessage: MessageInterface = {
+            message: inputRef.current.innerHTML,
+            sender: authUser?.uid!,
+            timeStamp: timeStampEpoch,
+            key: timeStampEpoch.toString(),
+            isDelivered: false
+          }
+          context?.dispatch({ type: "addNewMessage", payload: { newMessage, chatKey: activeChat.chatKey } })
+
           errors.handleError({
             message: "Message hasn't been sent, because of the unexpected error. Please reload the page."
           })
+        } finally {
+          inputRef.current.innerHTML = ""
+          context?.dispatch({ type: "updateMessageInput", payload: { message: "", anchorOffset: 0, scrollTop: 0 } })
         }
       }
     }
@@ -188,11 +176,10 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect }) =
 
   const handleKeyUp = (e: any) => {
     const { innerHTML } = e.currentTarget
+    const { anchorOffset } = getSelection()
     const scrollTop = inputRef.current.scrollTop
-    const selection = window.getSelection()
-    console.log(selection?.anchorOffset)
-    if (e.key === "ArrowRight" || e.key === "ArrowLeft" || e.key === "ArrowUp" || e.key === "ArrowDown") {
-      debounced({ message: innerHTML, anchorOffset: selection?.anchorOffset, scrollTop })
+    if (arrowKeys.includes(e.key) || e.key === "Enter") {
+      dispatchDeb({ message: innerHTML, anchorOffset, scrollTop })
     }
     keysMap.current[e.key] = e.type === "keydown"
   }
@@ -219,6 +206,7 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect }) =
           data-placeholder="Message"
           suppressContentEditableWarning={true}
           spellCheck="false"
+          autoCorrect="off"
         ></div>
       </div>
     </div>
