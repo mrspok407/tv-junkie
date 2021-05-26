@@ -47,18 +47,21 @@ const ConfirmModal: React.FC<Props> = ({ confirmFunctions }) => {
   }, [])
 
   const messageMap: { [key: string]: string } = {
-    handleRemoveContact: `Are you sure you want to remove ${
+    handleRemoveContact: `Are you sure you want to remove <span>${
       contacts[confirmModal.contactKey!].userName
-    } from your contacts?`,
-    handleClearHistory: `Are you sure you want to clear chat history? This will also remove it for  ${
+    }</span> from your contacts?`,
+    handleClearHistory: `Are you sure you want to clear chat history? This will also remove it for <span>${
       contacts[confirmModal.contactKey!].userName
-    }.`
+    }</span>.`
   }
 
   return (
     <div className="chat-window__confirm-container">
       <div className="chat-window__confirm" ref={confirmRef}>
-        <div className="chat-window__confirm-warning">{messageMap[confirmModal.function]}</div>
+        <div
+          className="chat-window__confirm-warning"
+          dangerouslySetInnerHTML={{ __html: messageMap[confirmModal.function] }}
+        ></div>
         <div className="chat-window__confirm-button">
           <button className="button" type="button" onClick={() => handleAprove()}>
             Yes

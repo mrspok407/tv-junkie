@@ -58,6 +58,14 @@
     z-index: -1;
   }
 
+  &--active {
+    background-color: getColor(activeItemBG, $contactItemPalette);
+
+    &:after {
+      display: none;
+    }
+  }
+
   @include mediaMinW(#{$mobileViewPort}) {
     &:hover:after {
       opacity: 1;
@@ -68,11 +76,9 @@
     }
   }
 
-  &--active {
-    background-color: getColor(activeItemBG, $contactItemPalette);
-
-    &:after {
-      display: none;
+  @include mediaMaxW(#{$mobileViewPort}) {
+    &--active {
+      background-color: initial;
     }
   }
 

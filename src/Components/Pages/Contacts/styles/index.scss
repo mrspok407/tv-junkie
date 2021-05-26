@@ -4,7 +4,9 @@
   position: relative;
   display: grid;
   grid-template-columns: 30% 70%;
+  height: 100%;
   height: $chatHeight;
+  max-height: $chatHeight;
   max-width: 100%;
   width: 1000px;
   border: 1px solid getColor(borderRight, $contactListPalette);
@@ -12,9 +14,10 @@
   @include mediaMaxW(#{$mobileViewPort}) {
     position: relative;
     grid-template-columns: 1fr;
+    margin-top: 50px;
     margin-bottom: 10px;
     width: 750px;
-    max-width: calc(100% - 10px);
+    max-width: 100%;
     overflow: hidden;
   }
 }

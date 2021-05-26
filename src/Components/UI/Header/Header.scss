@@ -18,7 +18,7 @@ $navBackground: #352424;
     background-color: transparent;
     border: none;
     opacity: 0;
-    z-index: 20;
+    z-index: 200;
     animation: showNavBtn 0.5s forwards;
     @keyframes showNavBtn {
       to {
@@ -92,7 +92,7 @@ $navBackground: #352424;
     padding-top: 5px;
     padding-bottom: 20px;
     transform: translate(0, 0);
-    z-index: 10;
+    z-index: 100;
   }
 
   &--mobile-open {

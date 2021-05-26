@@ -64,6 +64,16 @@ $messageStatusSize: 17px;
     .popup__option-btn:after {
       background-color: #3375b5;
     }
+    .popup__option:first-child {
+      .popup__option-btn:after {
+        border-radius: 5px 5px 0px 0px;
+      }
+    }
+    .popup__option:last-child {
+      .popup__option-btn:after {
+        border-radius: 0px 0px 0px 5px;
+      }
+    }
   }
 }
 
@@ -89,6 +99,28 @@ $messageStatusSize: 17px;
   }
 
   &--deliver-failed {
-    background-image: initial;
+    position: relative;
+    background-image: url("../../../../../../../assets/images/icons/failed-icon.svg");
+    cursor: pointer;
+
+    &:after {
+      content: "Failed delivery";
+      position: absolute;
+      width: max-content;
+      top: -23px;
+      left: -37px;
+      color: #000;
+      font-size: 0.8rem;
+      padding: 4px;
+      border-radius: 5px;
+      background-color: #fff;
+      will-change: opacity;
+      transition: 150ms;
+      opacity: 0;
+    }
+
+    &:hover:after {
+      opacity: 1;
+    }
   }
 }

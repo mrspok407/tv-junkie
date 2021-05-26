@@ -142,6 +142,7 @@
   &__message {
     display: flex;
     column-gap: 10px;
+    row-gap: 6px;
     max-width: getDimm(messageMaxWidth, $chatWindowDimm);
     border-radius: 5px;
     padding: 10px;
@@ -242,7 +243,7 @@
   align-items: center;
   font-size: getDimm(contactInfoFont, $chatWindowDimm);
   background-color: #083b5f;
-  z-index: 100;
+  z-index: 15;
 
   .contact-item__options {
     .contact-item__open-popup-btn {

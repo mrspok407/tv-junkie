@@ -2,29 +2,34 @@ import { ContainerRectInterface, MessageInputInterface, MessageInterface } from 
 import React, { useEffect, useRef, useContext, useCallback, useLayoutEffect } from "react"
 import debounce from "debounce"
 import { ContactsContext } from "../../../@Context/ContactsContext"
-import { INPUT_MESSAGE_MAX_HEIGHT, MESSAGE_LINE_HEIGHT } from "../../../@Context/Constants"
+import { INPUT_MESSAGE_MAX_HEIGHT, MESSAGE_LINE_HEIGHT, MOBILE_LAYOUT_THRESHOLD } from "../../../@Context/Constants"
 import { FirebaseContext } from "Components/Firebase"
 import { AppContext } from "Components/AppContext/AppContextHOC"
-import "./MessageInput.scss"
 import { sendMessage } from "./FirebaseHelpers/SendMessage"
+import classNames from "classnames"
+import GoDown from "../GoDown/GoDown"
+import "./MessageInput.scss"
 
 type Props = {
+  unreadMessagesAuthRef: string[]
   chatContainerRef: HTMLDivElement
   getContainerRect: () => ContainerRectInterface
 }
 
 const arrowKeys = ["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown"]
 
-const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect }) => {
+const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unreadMessagesAuthRef }) => {
   const firebase = useContext(FirebaseContext)
   const context = useContext(ContactsContext)
   const { authUser, errors } = useContext(AppContext)
   const { activeChat, messagesInput, contactsStatus } = context?.state!
-  const messageInputData = messagesInput[activeChat.chatKey]
-  const contactsStatusData = contactsStatus[activeChat.chatKey]
+  const messageInputData = messagesInput[activeChat.chatKey] || {}
+  const contactsStatusData = contactsStatus[activeChat.chatKey] || {}
 
   const inputRef = useRef<HTMLDivElement>(null!)
   const keysMap = useRef<any>({})
+
+  const windowWidth = window.innerWidth
 
   const getSelection = () => {
     const selection = window.getSelection()
@@ -53,7 +58,8 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect }) =
   useLayoutEffect(() => {
     inputRef.current.innerHTML = messageInputData?.message || ""
 
-    if (!inputRef.current.innerHTML) {
+    if (windowWidth < MOBILE_LAYOUT_THRESHOLD) return
+    if (!inputRef.current.innerHTML && windowWidth > MOBILE_LAYOUT_THRESHOLD) {
       inputRef.current.focus()
     } else {
       handleCursorLine({ node: inputRef.current.childNodes[0], anchorOffset: messageInputData.anchorOffset })
@@ -77,6 +83,42 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect }) =
   const scrollPositionHandler = () => {
     const { scrollTop } = inputRef.current
     dispatchDeb({ scrollTop })
+  }
+
+  const handleSendMessage = async () => {
+    if (["", "\n"].includes(inputRef.current?.textContent!)) return
+    try {
+      const messageKey = await sendMessage({
+        activeChat,
+        authUser,
+        firebase,
+        message: inputRef.current.innerHTML,
+        contactsStatusData
+      })
+
+      const newMessageRef = document.querySelector(`.chat-window__message--${messageKey}`)
+      newMessageRef?.scrollIntoView({ block: "start", inline: "start" })
+    } catch (error) {
+      const timeStampEpoch = new Date().getTime()
+      const newMessage: MessageInterface = {
+        message: inputRef.current.innerHTML,
+        sender: authUser?.uid!,
+        timeStamp: timeStampEpoch,
+        key: timeStampEpoch.toString(),
+        isDelivered: false
+      }
+      context?.dispatch({ type: "addNewMessage", payload: { newMessage, chatKey: activeChat.chatKey } })
+
+      const newMessageRef = document.querySelector(`.chat-window__message--${timeStampEpoch.toString()}`)
+      newMessageRef?.scrollIntoView({ block: "start", inline: "start" })
+
+      errors.handleError({
+        message: "Message hasn't been sent, because of the unexpected error. Please reload the page."
+      })
+    } finally {
+      inputRef.current.innerHTML = ""
+      context?.dispatch({ type: "updateMessageInput", payload: { message: "", anchorOffset: 0, scrollTop: 0 } })
+    }
   }
 
   const handleOnChange = (e: any) => {
@@ -128,6 +170,7 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect }) =
   }
 
   const handleKeyDown = async (e: any) => {
+    if (windowWidth < MOBILE_LAYOUT_THRESHOLD) return
     const { innerHTML, textContent } = e.currentTarget
 
     keysMap.current[e.key] = e.type === "keydown"
@@ -141,35 +184,7 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect }) =
       if (keysMap.current.Shift) {
         handleNextLine({ textContent, innerHTML, e })
       } else {
-        try {
-          const messageKey = await sendMessage({
-            activeChat,
-            authUser,
-            firebase,
-            message: inputRef.current.innerHTML,
-            contactsStatusData
-          })
-
-          const newMessageRef = document.querySelector(`.chat-window__message--${messageKey}`)
-          newMessageRef?.scrollIntoView({ block: "start", inline: "start" })
-        } catch (error) {
-          const timeStampEpoch = new Date().getTime()
-          const newMessage: MessageInterface = {
-            message: inputRef.current.innerHTML,
-            sender: authUser?.uid!,
-            timeStamp: timeStampEpoch,
-            key: timeStampEpoch.toString(),
-            isDelivered: false
-          }
-          context?.dispatch({ type: "addNewMessage", payload: { newMessage, chatKey: activeChat.chatKey } })
-
-          errors.handleError({
-            message: "Message hasn't been sent, because of the unexpected error. Please reload the page."
-          })
-        } finally {
-          inputRef.current.innerHTML = ""
-          context?.dispatch({ type: "updateMessageInput", payload: { message: "", anchorOffset: 0, scrollTop: 0 } })
-        }
+        handleSendMessage()
       }
     }
   }
@@ -209,6 +224,19 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect }) =
           autoCorrect="off"
         ></div>
       </div>
+      <div
+        className={classNames("chat-window__send-message", {
+          "chat-window__send-message--fade-in": !!messageInputData?.message?.length
+        })}
+      >
+        <button className="chat-window__send-message-btn" type="button" onClick={() => handleSendMessage()}></button>
+      </div>
+      <GoDown
+        chatContainerRef={chatContainerRef}
+        chatKey={activeChat.chatKey}
+        unreadMessagesAuthRef={unreadMessagesAuthRef}
+        getContainerRect={getContainerRect}
+      />
     </div>
   )
 }

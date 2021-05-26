@@ -23,8 +23,7 @@ export const sendMessage = async ({
     [`messages/${messageKey}`]: {
       sender: authUser?.uid,
       message,
-      timeStamp: timeStampEpoch * 2,
-      test: undefined
+      timeStamp: timeStampEpoch * 2
     },
     [`members/${activeChat.contactKey}/unreadMessages/${messageKey}`]:
       !contactsStatusData?.isOnline || !contactsStatusData?.chatBottom || !contactsStatusData?.pageInFocus ? true : null

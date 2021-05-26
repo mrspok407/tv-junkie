@@ -145,9 +145,14 @@ const ContactsContent: React.FC<Props> = () => {
 
   return (
     <>
-      <button style={{ width: "400px" }} type="button" className="button" onClick={() => addNewMessageCurrent(true)}>
+      {/* <button
+        style={{ width: "400px", maxWidth: "100%" }}
+        type="button"
+        className="button"
+        onClick={() => addNewMessageCurrent(true)}
+      >
         Add msg current
-      </button>
+      </button> */}
       {/* <button style={{ width: "400px" }} type="button" className="button" onClick={() => addNewMessageCurrent(false)}>
         Add NM current contactSender
       </button> */}

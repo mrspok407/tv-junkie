@@ -375,10 +375,6 @@ const ChatWindow: React.FC = () => {
                 const currentMessageDate = new Date(renderedMessage?.timeStamp).toDateString()
                 const prevMessageDate = new Date(prevMessage?.timeStamp).toDateString()
 
-                const innerHTML = {
-                  __html: `${renderedMessage.message}`
-                }
-
                 return (
                   <React.Fragment key={renderedMessage.key}>
                     {currentMessageDate !== prevMessageDate || renderedMessage.timeStamp === prevMessage.timeStamp ? (
@@ -403,7 +399,12 @@ const ChatWindow: React.FC = () => {
                       })}
                       data-key={renderedMessage.key}
                     >
-                      <div className="chat-window__message-text" dangerouslySetInnerHTML={innerHTML}></div>
+                      <div
+                        className="chat-window__message-text"
+                        dangerouslySetInnerHTML={{
+                          __html: `${renderedMessage.message}`
+                        }}
+                      ></div>
 
                       <MessageInfo messageData={renderedMessage} contactUnreadMessages={contactUnreadMessages} />
                     </div>
@@ -451,12 +452,10 @@ const ChatWindow: React.FC = () => {
             )
           ))}
       </div>
-      <MessageInput chatContainerRef={chatContainerRef} getContainerRect={getContainerRect} />
-      <GoDown
+      <MessageInput
         chatContainerRef={chatContainerRef}
-        chatKey={activeChat.chatKey}
-        unreadMessagesAuthRef={unreadMessagesAuthRef.current}
         getContainerRect={getContainerRect}
+        unreadMessagesAuthRef={unreadMessagesAuthRef.current}
       />
     </div>
   )

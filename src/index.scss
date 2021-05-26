@@ -28,6 +28,11 @@ a {
   height: 100vh;
   max-width: $mainContainerMaxWidth;
   margin: auto;
+
+  @include mediaMaxW(#{$mobileViewPort + 80px}) {
+    height: 100%;
+    min-height: 700px;
+  }
 }
 
 .scroll-to {
