@@ -48,8 +48,8 @@ export const MESSAGE_INITIAL_DATA = {
 
 export interface MessageInputInterface {
   message: string
-  anchorOffset: number
-  scrollTop: number
+  anchorOffset?: number
+  scrollTop?: number
 }
 
 export interface ActiveChatInterface {

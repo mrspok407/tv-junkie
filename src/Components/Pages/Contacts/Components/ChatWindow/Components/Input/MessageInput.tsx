@@ -62,8 +62,8 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
     if (!inputRef.current.innerHTML && windowWidth > MOBILE_LAYOUT_THRESHOLD) {
       inputRef.current.focus()
     } else {
-      handleCursorLine({ node: inputRef.current.childNodes[0], anchorOffset: messageInputData.anchorOffset })
-      inputRef.current.scrollTop = messageInputData.scrollTop
+      handleCursorLine({ node: inputRef.current.childNodes[0], anchorOffset: messageInputData.anchorOffset! })
+      inputRef.current.scrollTop = messageInputData.scrollTop!
     }
     return () => {
       dispatchDeb.flush()
@@ -77,22 +77,33 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
 
   const onClick = () => {
     const { anchorOffset } = getSelection()
+    console.log("onClick: anchorOffset")
     dispatchDeb({ anchorOffset })
   }
 
   const scrollPositionHandler = () => {
     const { scrollTop } = inputRef.current
+    console.log("scroll: scrollTop")
     dispatchDeb({ scrollTop })
   }
 
   const handleSendMessage = async () => {
     if (["", "\n"].includes(inputRef.current?.textContent!)) return
+    if (windowWidth < MOBILE_LAYOUT_THRESHOLD) {
+      inputRef.current.focus()
+    }
+
+    const newMessageText = inputRef.current.innerHTML
+
+    inputRef.current.innerHTML = ""
+    context?.dispatch({ type: "updateMessageInput", payload: { message: "", anchorOffset: 0, scrollTop: 0 } })
+
     try {
       const messageKey = await sendMessage({
         activeChat,
         authUser,
         firebase,
-        message: inputRef.current.innerHTML,
+        message: newMessageText,
         contactsStatusData
       })
 
@@ -101,7 +112,7 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
     } catch (error) {
       const timeStampEpoch = new Date().getTime()
       const newMessage: MessageInterface = {
-        message: inputRef.current.innerHTML,
+        message: newMessageText,
         sender: authUser?.uid!,
         timeStamp: timeStampEpoch,
         key: timeStampEpoch.toString(),
@@ -116,8 +127,9 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
         message: "Message hasn't been sent, because of the unexpected error. Please reload the page."
       })
     } finally {
-      inputRef.current.innerHTML = ""
-      context?.dispatch({ type: "updateMessageInput", payload: { message: "", anchorOffset: 0, scrollTop: 0 } })
+      console.log("sendMessage: all to zero")
+      // inputRef.current.innerHTML = ""
+      // context?.dispatch({ type: "updateMessageInput", payload: { message: "", anchorOffset: 0, scrollTop: 0 } })
     }
   }
 
@@ -126,9 +138,11 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
     const { anchorOffset } = getSelection()
     const scrollTop = inputRef.current.scrollTop
     if (["", "\n"].includes(textContent)) {
+      console.log("onChangeEmpty: all to zero")
       e.currentTarget.innerHTML = ""
       dispatchDeb({ message: "", anchorOffset: 0, scrollTop: 0 })
     } else {
+      console.log("onChangeNotEmpty: all")
       dispatchDeb({ message: innerHTML, anchorOffset, scrollTop })
     }
   }
@@ -143,6 +157,7 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
       e.currentTarget.innerHTML = ""
       return
     }
+
     const lastIndexBr = innerHTML.lastIndexOf("\n")
 
     if (lastIndexBr === -1 || lastIndexBr < innerHTML.length - 1) {
@@ -170,7 +185,6 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
   }
 
   const handleKeyDown = async (e: any) => {
-    if (windowWidth < MOBILE_LAYOUT_THRESHOLD) return
     const { innerHTML, textContent } = e.currentTarget
 
     keysMap.current[e.key] = e.type === "keydown"
@@ -193,8 +207,16 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
     const { innerHTML } = e.currentTarget
     const { anchorOffset } = getSelection()
     const scrollTop = inputRef.current.scrollTop
-    if (arrowKeys.includes(e.key) || e.key === "Enter") {
-      dispatchDeb({ message: innerHTML, anchorOffset, scrollTop })
+    if (arrowKeys.includes(e.key)) {
+      console.log("keyUpArrows: anchorOffset")
+      dispatchDeb({ anchorOffset, scrollTop })
+    }
+    if (e.key === "Enter") {
+      e.preventDefault()
+      console.log(keysMap.current.Shift)
+      if (keysMap.current.Shift) {
+        dispatchDeb({ message: innerHTML, anchorOffset, scrollTop })
+      }
     }
     keysMap.current[e.key] = e.type === "keydown"
   }

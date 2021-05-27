@@ -20,14 +20,15 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
   const { authUser } = useContext(AppContext)
 
   const context = useContext(ContactsContext)
-  const { optionsPopupContactList, activeChat } = context?.state!
+  const { optionsPopupContactList, activeChat, messages } = context?.state!
+  const messagesData = messages[contactInfo.chatKey]
 
   const [newActivity, setNewActivity] = useState<boolean | null | undefined>(contactInfo.newContactsActivity)
   const [newContactsRequest, setNewContactRequest] = useState<boolean | null>(contactInfo.newContactsRequests)
 
   const [authUnreadMessages, setAuthUnreadMessages] = useState<string[]>(contactInfo.unreadMessages)
   const [contactUnreadMessages, setContactUnreadMessages] = useState<boolean>(contactInfo.unreadMessagesContact)
-  const [lastMessage, setLastMessage] = useState<MessageInterface | null>(contactInfo.lastMessage)
+  const lastMessage = messagesData === undefined ? contactInfo.lastMessage : messagesData[messagesData?.length - 1]
 
   const formatedDate = useTimestampFormater({ timeStamp: lastMessage?.timeStamp! })
 
@@ -77,25 +78,26 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
         firebase.privateChats().child(`${chatKey}/historyDeleted`).set(null)
       })
 
-    const lastMessageListener = firebase
-      .messages({ chatKey })
-      .orderByChild("timeStamp")
-      .limitToLast(1)
-      .on("value", (snapshot: { val: () => MessageInterface }) => {
-        if (snapshot.val() === null) {
-          setLastMessage(null)
-          return
-        }
-        const messageData = Object.values(snapshot.val())[0]
-        setLastMessage(messageData)
-      })
+    // const lastMessageListener = firebase
+    //   .messages({ chatKey })
+    //   .orderByChild("timeStamp")
+    //   .limitToLast(1)
+    //   .on("value", (snapshot: { val: () => MessageInterface }) => {
+    //     console.log(snapshot.val())
+    //     if (snapshot.val() === null) {
+    //       // setLastMessage(null)
+    //       return
+    //     }
+    //     // const messageData = Object.values(snapshot.val())[0]
+    //     // setLastMessage(messageData)
+    //   })
 
     return () => {
       firebase.newContactsActivity({ uid: authUser?.uid }).child(`${contactInfo.key}`).off()
       firebase.newContactsRequests({ uid: authUser?.uid! }).child(`${contactInfo.key}`).off()
       firebase.unreadMessages({ uid: authUser?.uid!, chatKey }).off("value", unreadMessagesListener)
       firebase.unreadMessages({ uid: contactInfo.key, chatKey }).off()
-      firebase.messages({ chatKey }).off("value", lastMessageListener)
+      // firebase.messages({ chatKey }).off("value", lastMessageListener)
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 

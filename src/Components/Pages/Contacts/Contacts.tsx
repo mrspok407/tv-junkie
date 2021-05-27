@@ -17,7 +17,7 @@ const Contacts: React.FC<Props> = () => {
       </Helmet>
       <Header contactsPage={true} isLogoVisible={false} />
       <ContactsContent />
-      <Footer />
+      {/* <Footer /> */}
     </>
   )
 }

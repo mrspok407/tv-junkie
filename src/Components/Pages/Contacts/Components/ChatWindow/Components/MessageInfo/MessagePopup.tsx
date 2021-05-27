@@ -32,6 +32,25 @@ const MessagePopup: React.FC<Props> = ({ messageOptionsRef, messageData, contact
     }
   }
 
+  const editMessage = async () => {
+    const message = messagesData.find((message) => message.key === messageData.key)
+    const inputRef = document.querySelector(".chat-window__input-message")
+    const chatContainerRef = document.querySelector(".chat-window__messages-list-container")
+    const heightBefore = inputRef?.getBoundingClientRect().height
+    if (inputRef) inputRef.innerHTML = message?.message!
+    const height = inputRef?.getBoundingClientRect().height
+    // @ts-ignore
+    inputRef.focus()
+    console.log({ height })
+    console.log({ heightBefore })
+
+    if (chatContainerRef) chatContainerRef.scrollTop = chatContainerRef?.scrollTop! + height!
+
+    // chatContainerRef = getContainerRect().scrollTop + MESSAGE_LINE_HEIGHT
+    context?.dispatch({ type: "updateMessagePopup", payload: "" })
+    context?.dispatch({ type: "updateMessageInput", payload: { message: message?.message! } })
+  }
+
   const deleteMessage = async () => {
     if (messageData.isDelivered === false) {
       context?.dispatch({
@@ -84,7 +103,7 @@ const MessagePopup: React.FC<Props> = ({ messageOptionsRef, messageData, contact
   return (
     <div className="popup-container">
       <div className="popup__option">
-        <button className="popup__option-btn" type="button">
+        <button className="popup__option-btn" type="button" onClick={() => editMessage()}>
           Edit
         </button>
       </div>

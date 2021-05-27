@@ -149,7 +149,8 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
       {fadeInButton && (
         <div
           className={classNames("chat-window__go-down", {
-            "chat-window__to-last-message--unread": !!unreadMessages
+            "chat-window__to-last-message--unread": !!unreadMessages,
+            "chat-window__go-down--fadein": fadeInButton
           })}
         >
           <button type="button" onClick={() => onGoDown()}></button>

@@ -4,11 +4,11 @@
   position: relative;
   display: grid;
   grid-template-columns: 30% 70%;
-  height: 100%;
-  height: $chatHeight;
-  max-height: $chatHeight;
+  height: calc(100% - 85px);
+  // height: $chatHeight;
+  // max-height: $chatHeight;
   max-width: 100%;
-  width: 1000px;
+  width: 1100px;
   border: 1px solid getColor(borderRight, $contactListPalette);
 
   @include mediaMaxW(#{$mobileViewPort}) {
@@ -16,6 +16,7 @@
     grid-template-columns: 1fr;
     margin-top: 50px;
     margin-bottom: 10px;
+    height: 655px;
     width: 750px;
     max-width: 100%;
     overflow: hidden;

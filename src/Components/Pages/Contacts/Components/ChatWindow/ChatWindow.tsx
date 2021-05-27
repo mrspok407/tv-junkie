@@ -137,10 +137,6 @@ const ChatWindow: React.FC = () => {
         chatContainerRef.scrollTop = scrollHeight - height - 1
       }
 
-      console.log({ scrollHeight })
-      console.log({ scrollTop })
-      console.log({ height })
-
       if (scrollHeight <= scrollTop + height) {
         isScrollBottomRef.current = true
         context?.dispatch({

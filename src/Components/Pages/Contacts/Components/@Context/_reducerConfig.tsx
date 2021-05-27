@@ -76,6 +76,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
       }
 
     case "removeAllMessages":
+      console.log("removeAllMessages")
       return {
         ...state,
         messages: {
