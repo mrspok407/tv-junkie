@@ -18,7 +18,12 @@ const useNewContactsActivity = () => {
     firebase.newContactsRequests({ uid: authUser?.uid }).on("value", (snapshot: any) => {
       setNewRequests(!!snapshot.exists())
     })
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+    return () => {
+      firebase.newContactsActivity({ uid: authUser?.uid }).off()
+      firebase.newContactsRequests({ uid: authUser?.uid }).off()
+    }
+  }, [authUser]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     setNewContactsActivity(!!(newActivity || newRequests))

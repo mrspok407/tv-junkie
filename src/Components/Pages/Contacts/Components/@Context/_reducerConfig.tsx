@@ -416,7 +416,8 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
             ...messagesInput[activeChat.chatKey],
             ...action.payload
           }
-        }
+        },
+        messagePopup: action.payload.editingMsgKey !== null ? "" : messagePopup
       }
 
     case "updateContacts": {

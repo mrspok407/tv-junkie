@@ -20,6 +20,7 @@ import usePageFocusHandler from "./Hooks/UsePageFocusHandler"
 import useTimestampFormater from "../../Hooks/UseTimestampFormater"
 import MessageInput from "./Components/Input/MessageInput"
 import "./ChatWindow.scss"
+import Loader from "Components/UI/Placeholders/Loader"
 
 const ChatWindow: React.FC = () => {
   const { authUser, newContactsActivity, errors } = useContext(AppContext)
@@ -342,7 +343,17 @@ const ChatWindow: React.FC = () => {
           )}
         </div>
         <div className="contact-info__status">
-          {contactsStatus[activeChat.chatKey]?.isOnline ? "Online" : formatedDate ? `Last seen ${formatedDate}` : ""}
+          {contactsStatus[activeChat.chatKey]?.isTyping ? (
+            <>
+              <div>Typing</div> <Loader className="loader--typing" />
+            </>
+          ) : contactsStatus[activeChat.chatKey]?.isOnline ? (
+            "Online"
+          ) : formatedDate ? (
+            `Last seen ${formatedDate}`
+          ) : (
+            ""
+          )}
         </div>
       </div>
       <div

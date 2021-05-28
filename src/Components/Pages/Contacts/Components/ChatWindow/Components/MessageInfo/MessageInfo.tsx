@@ -50,7 +50,9 @@ const MessageInfo: React.FC<Props> = React.memo(({ messageData, contactUnreadMes
         ></div>
       )}
       <div className="chat-window__message-timestamp">
-        {new Date(Number(messageData.timeStamp)).toLocaleTimeString().slice(0, -3)}
+        <div> {new Date(Number(messageData.timeStamp)).toLocaleTimeString().slice(0, -3)}</div>
+
+        <div className="chat-window__message-edited">{messageData.isEdited && "edited"}</div>
       </div>
     </div>
   )

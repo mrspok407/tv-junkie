@@ -31,6 +31,7 @@ export interface MessageInterface {
   timeStamp: number
   key: string
   isDelivered?: boolean
+  isEdited?: boolean
 }
 
 export interface ContactStatusInterface {
@@ -38,6 +39,7 @@ export interface ContactStatusInterface {
   lastSeen: number | undefined
   chatBottom: boolean | undefined
   pageInFocus: boolean | undefined
+  isTyping: boolean | null
 }
 
 export const MESSAGE_INITIAL_DATA = {
@@ -50,6 +52,7 @@ export interface MessageInputInterface {
   message: string
   anchorOffset?: number
   scrollTop?: number
+  editingMsgKey?: string | null
 }
 
 export interface ActiveChatInterface {

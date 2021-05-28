@@ -9,6 +9,7 @@ import ContactPopup from "../../OptionsPopup/OptionsPopup"
 import useGetInitialMessages from "../../ChatWindow/FirebaseHelpers/UseGetInitialMessages"
 import useHandleContactsStatus from "../../ChatWindow/FirebaseHelpers/UseHandleContactsStatus"
 import "./Contact.scss"
+import Loader from "Components/UI/Placeholders/Loader"
 
 type Props = {
   contactInfo: ContactInfoInterface
@@ -20,7 +21,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
   const { authUser } = useContext(AppContext)
 
   const context = useContext(ContactsContext)
-  const { optionsPopupContactList, activeChat, messages } = context?.state!
+  const { optionsPopupContactList, activeChat, messages, contactsStatus } = context?.state!
   const messagesData = messages[contactInfo.chatKey]
 
   const [newActivity, setNewActivity] = useState<boolean | null | undefined>(contactInfo.newContactsActivity)
@@ -134,15 +135,22 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
       </div>
 
       <div className="contact-item__row contact-item__row--bottom">
-        <div className="contact-item__last-message-text">
-          {newContactsRequest ? (
-            "Wants to connect"
-          ) : (
-            <>
-              {lastMessage?.sender === authUser?.uid && <span>You: </span>} {lastMessage?.message?.slice(0, 30)}
-            </>
-          )}
-        </div>
+        {contactsStatus[contactInfo.chatKey]?.isTyping ? (
+          <div className="contact-item__typing">
+            <div>Typing</div> <Loader className="loader--typing" />
+          </div>
+        ) : (
+          <div className="contact-item__last-message-text">
+            {newContactsRequest ? (
+              "Wants to connect"
+            ) : (
+              <>
+                {lastMessage?.sender === authUser?.uid && <span>You: </span>} {lastMessage?.message?.slice(0, 30)}
+              </>
+            )}
+          </div>
+        )}
+
         <div ref={contactOptionsRef} className="contact-item__options">
           <button
             type="button"

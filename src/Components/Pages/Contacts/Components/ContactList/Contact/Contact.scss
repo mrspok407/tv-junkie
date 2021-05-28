@@ -137,7 +137,8 @@
     }
   }
 
-  &__last-message-text {
+  &__last-message-text,
+  &__typing {
     width: 215px;
     white-space: nowrap;
     overflow: hidden;
@@ -148,6 +149,20 @@
 
     span {
       color: getColor(blueClr, $mainPalette);
+    }
+  }
+
+  &__typing {
+    display: flex;
+    column-gap: 3px;
+    color: #d8d8d8;
+
+    .loader--typing {
+      margin-bottom: 4px;
+
+      .loader-dots div {
+        background-color: #d8d8d8;
+      }
     }
   }
 

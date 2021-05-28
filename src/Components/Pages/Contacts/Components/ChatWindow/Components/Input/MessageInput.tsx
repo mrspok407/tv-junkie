@@ -8,6 +8,8 @@ import { AppContext } from "Components/AppContext/AppContextHOC"
 import { sendMessage } from "./FirebaseHelpers/SendMessage"
 import classNames from "classnames"
 import GoDown from "../GoDown/GoDown"
+import { editMessage } from "./FirebaseHelpers/EditMessage"
+import { updateTyping } from "./FirebaseHelpers/UpdateTyping"
 import "./MessageInput.scss"
 
 type Props = {
@@ -17,16 +19,19 @@ type Props = {
 }
 
 const arrowKeys = ["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown"]
+const debounceTimeout = 100
 
 const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unreadMessagesAuthRef }) => {
   const firebase = useContext(FirebaseContext)
   const context = useContext(ContactsContext)
   const { authUser, errors } = useContext(AppContext)
-  const { activeChat, messagesInput, contactsStatus } = context?.state!
+  const { activeChat, messagesInput, contactsStatus, messages } = context?.state!
   const messageInputData = messagesInput[activeChat.chatKey] || {}
+  const messagesData = messages[activeChat.chatKey]
   const contactsStatusData = contactsStatus[activeChat.chatKey] || {}
 
   const inputRef = useRef<HTMLDivElement>(null!)
+  // const typingTimer = useRef<number | null>()
   const keysMap = useRef<any>({})
 
   const windowWidth = window.innerWidth
@@ -71,7 +76,10 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
   }, [activeChat])
 
   const dispatchDeb = useCallback(
-    debounce((payload: MessageInputInterface) => context?.dispatch({ type: "updateMessageInput", payload }), 100),
+    debounce(
+      (payload: MessageInputInterface) => context?.dispatch({ type: "updateMessageInput", payload }),
+      debounceTimeout
+    ),
     []
   )
 
@@ -94,9 +102,13 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
     }
 
     const newMessageText = inputRef.current.innerHTML
-
     inputRef.current.innerHTML = ""
-    context?.dispatch({ type: "updateMessageInput", payload: { message: "", anchorOffset: 0, scrollTop: 0 } })
+
+    dispatchDeb.clear()
+    context?.dispatch({
+      type: "updateMessageInput",
+      payload: { message: "", anchorOffset: 0, scrollTop: 0, editingMsgKey: null }
+    })
 
     try {
       const messageKey = await sendMessage({
@@ -126,10 +138,39 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
       errors.handleError({
         message: "Message hasn't been sent, because of the unexpected error. Please reload the page."
       })
-    } finally {
-      console.log("sendMessage: all to zero")
-      // inputRef.current.innerHTML = ""
-      // context?.dispatch({ type: "updateMessageInput", payload: { message: "", anchorOffset: 0, scrollTop: 0 } })
+    }
+  }
+
+  const handleEditMessage = async () => {
+    if (["", "\n"].includes(inputRef.current?.textContent!)) return
+    if (windowWidth < MOBILE_LAYOUT_THRESHOLD) {
+      // inputRef.current.focus()
+    }
+
+    const editedMessageText = inputRef.current.innerHTML
+    const originalMessage = messagesData.find((message) => message.key === messageInputData.editingMsgKey)!
+
+    inputRef.current.innerHTML = ""
+
+    dispatchDeb.clear()
+    context?.dispatch({
+      type: "updateMessageInput",
+      payload: { message: "", anchorOffset: 0, scrollTop: 0, editingMsgKey: null }
+    })
+
+    try {
+      console.log(editedMessageText)
+      await editMessage({
+        activeChat,
+        firebase,
+        authUser,
+        editedMessageText,
+        originalMessage
+      })
+    } catch (error) {
+      errors.handleError({
+        message: "Message hasn't been edited, because of the unexpected error. Please reload the page."
+      })
     }
   }
 
@@ -140,10 +181,19 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
     if (["", "\n"].includes(textContent)) {
       console.log("onChangeEmpty: all to zero")
       e.currentTarget.innerHTML = ""
-      dispatchDeb({ message: "", anchorOffset: 0, scrollTop: 0 })
+      dispatchDeb({ message: "", anchorOffset: 0, scrollTop: 0, editingMsgKey: null })
+      updateTyping({ activeChat, authUser, firebase, setTypingNull: true })
     } else {
       console.log("onChangeNotEmpty: all")
       dispatchDeb({ message: innerHTML, anchorOffset, scrollTop })
+
+      updateTyping({ activeChat, authUser, firebase })
+
+      // if (typingTimer.current) window.clearTimeout(typingTimer.current)
+      // typingTimer.current = window.setTimeout(
+      //   () => updateTyping({ activeChat, authUser, firebase, isTyping: null }),
+      //   2500
+      // )
     }
   }
 
@@ -198,7 +248,12 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
       if (keysMap.current.Shift) {
         handleNextLine({ textContent, innerHTML, e })
       } else {
-        handleSendMessage()
+        console.log(messageInputData.editingMsgKey)
+        if (!messageInputData.editingMsgKey) {
+          handleSendMessage()
+        } else {
+          handleEditMessage()
+        }
       }
     }
   }
@@ -213,7 +268,6 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
     }
     if (e.key === "Enter") {
       e.preventDefault()
-      console.log(keysMap.current.Shift)
       if (keysMap.current.Shift) {
         dispatchDeb({ message: innerHTML, anchorOffset, scrollTop })
       }
@@ -251,7 +305,17 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
           "chat-window__send-message--fade-in": !!messageInputData?.message?.length
         })}
       >
-        <button className="chat-window__send-message-btn" type="button" onClick={() => handleSendMessage()}></button>
+        <button
+          className="chat-window__send-message-btn"
+          type="button"
+          onClick={() => {
+            if (messageInputData.editingMsgKey !== null) {
+              handleEditMessage()
+            } else {
+              handleSendMessage()
+            }
+          }}
+        ></button>
       </div>
       <GoDown
         chatContainerRef={chatContainerRef}

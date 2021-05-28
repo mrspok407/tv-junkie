@@ -33,22 +33,20 @@ const MessagePopup: React.FC<Props> = ({ messageOptionsRef, messageData, contact
   }
 
   const editMessage = async () => {
+    const inputRef = document.querySelector(".chat-window__input-message") as HTMLElement
+    const chatContainerRef = document.querySelector(".chat-window__messages-list-container") as HTMLElement
     const message = messagesData.find((message) => message.key === messageData.key)
-    const inputRef = document.querySelector(".chat-window__input-message")
-    const chatContainerRef = document.querySelector(".chat-window__messages-list-container")
-    const heightBefore = inputRef?.getBoundingClientRect().height
-    if (inputRef) inputRef.innerHTML = message?.message!
-    const height = inputRef?.getBoundingClientRect().height
-    // @ts-ignore
+
+    inputRef.innerHTML = message?.message!
+    const inputHeight = inputRef?.getBoundingClientRect().height
+
     inputRef.focus()
-    console.log({ height })
-    console.log({ heightBefore })
+    chatContainerRef.scrollTop = chatContainerRef?.scrollTop! + inputHeight!
 
-    if (chatContainerRef) chatContainerRef.scrollTop = chatContainerRef?.scrollTop! + height!
-
-    // chatContainerRef = getContainerRect().scrollTop + MESSAGE_LINE_HEIGHT
-    context?.dispatch({ type: "updateMessagePopup", payload: "" })
-    context?.dispatch({ type: "updateMessageInput", payload: { message: message?.message! } })
+    context?.dispatch({
+      type: "updateMessageInput",
+      payload: { message: message?.message!, editingMsgKey: messageData.key }
+    })
   }
 
   const deleteMessage = async () => {
@@ -101,12 +99,20 @@ const MessagePopup: React.FC<Props> = ({ messageOptionsRef, messageData, contact
   }
 
   return (
-    <div className="popup-container">
-      <div className="popup__option">
-        <button className="popup__option-btn" type="button" onClick={() => editMessage()}>
-          Edit
-        </button>
-      </div>
+    <div
+      className={classNames("popup-container", {
+        "popup-container--sended-message": messageData.sender === authUser?.uid,
+        "popup-container--received-message": messageData.sender !== authUser?.uid
+      })}
+    >
+      {messageData.sender === authUser?.uid && (
+        <div className="popup__option">
+          <button className="popup__option-btn" type="button" onClick={() => editMessage()}>
+            Edit
+          </button>
+        </div>
+      )}
+
       <div className="popup__option">
         <button className="popup__option-btn" type="button" onClick={() => deleteMessage()}>
           Delete

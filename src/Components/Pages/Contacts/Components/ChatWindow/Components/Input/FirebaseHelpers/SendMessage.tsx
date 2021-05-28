@@ -26,7 +26,10 @@ export const sendMessage = async ({
       timeStamp: timeStampEpoch * 2
     },
     [`members/${activeChat.contactKey}/unreadMessages/${messageKey}`]:
-      !contactsStatusData?.isOnline || !contactsStatusData?.chatBottom || !contactsStatusData?.pageInFocus ? true : null
+      !contactsStatusData?.isOnline || !contactsStatusData?.chatBottom || !contactsStatusData?.pageInFocus
+        ? true
+        : null,
+    [`members/${authUser?.uid}/status/isTyping`]: null
   }
   await firebase.privateChats().child(activeChat.chatKey).update(updateData)
   return messageKey

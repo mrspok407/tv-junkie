@@ -1,3 +1,5 @@
+@import "../../Components/Pages/Contacts/styles/globalsContacts";
+
 .loader {
   position: relative;
   opacity: 0;
@@ -86,6 +88,33 @@
   .loader-shadow {
     div {
       box-shadow: 0px 0px 15px 3px rgb(238, 54, 106);
+    }
+  }
+}
+
+.loader--typing {
+  position: relative;
+  top: 0;
+  right: 0;
+  margin-top: auto;
+  margin-bottom: 2px;
+  animation: show 0.4s forwards;
+  .loader-shadow,
+  .loader-dots {
+    div {
+      margin: 0 1px 0 1px;
+      width: 3px;
+      height: 3px;
+    }
+  }
+  .loader-dots {
+    div {
+      background-color: $typingColor;
+    }
+  }
+  .loader-shadow {
+    div {
+      box-shadow: initial;
     }
   }
 }
