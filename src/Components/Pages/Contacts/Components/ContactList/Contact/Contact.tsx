@@ -28,7 +28,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
   const [newContactsRequest, setNewContactRequest] = useState<boolean | null>(contactInfo.newContactsRequests)
 
   const [authUnreadMessages, setAuthUnreadMessages] = useState<string[]>(contactInfo.unreadMessages)
-  const [contactUnreadMessages, setContactUnreadMessages] = useState<boolean>(contactInfo.unreadMessagesContact)
+  const [contactUnreadMessages, setContactUnreadMessages] = useState<string[]>(contactInfo.unreadMessagesContact)
   const lastMessage = messagesData === undefined ? contactInfo.lastMessage : messagesData[messagesData?.length - 1]
 
   const formatedDate = useTimestampFormater({ timeStamp: lastMessage?.timeStamp! })
@@ -57,19 +57,10 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
       .child(`${contactInfo.key}`)
       .on("value", (snapshot: any) => setNewContactRequest(snapshot.val()))
 
-    const unreadMessagesListener = firebase
-      .unreadMessages({ uid: authUser?.uid!, chatKey })
-      .on("value", (snapshot: any) => {
-        const unreadMessagesAuth = !snapshot.val() ? [] : Object.keys(snapshot.val())
-        setAuthUnreadMessages(unreadMessagesAuth)
-      })
-    firebase
-      .unreadMessages({ uid: contactInfo.key, chatKey })
-      .orderByKey()
-      .limitToFirst(1)
-      .on("value", (snapshot: any) => {
-        setContactUnreadMessages(!!snapshot.val())
-      })
+    firebase.unreadMessages({ uid: authUser?.uid!, chatKey }).on("value", (snapshot: any) => {
+      const unreadMessagesAuth = !snapshot.val() ? [] : Object.keys(snapshot.val())
+      setAuthUnreadMessages(unreadMessagesAuth)
+    })
     firebase
       .privateChats()
       .child(`${chatKey}/historyDeleted`)
@@ -96,7 +87,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
     return () => {
       firebase.newContactsActivity({ uid: authUser?.uid }).child(`${contactInfo.key}`).off()
       firebase.newContactsRequests({ uid: authUser?.uid! }).child(`${contactInfo.key}`).off()
-      firebase.unreadMessages({ uid: authUser?.uid!, chatKey }).off("value", unreadMessagesListener)
+      firebase.unreadMessages({ uid: authUser?.uid!, chatKey }).off()
       firebase.unreadMessages({ uid: contactInfo.key, chatKey }).off()
       // firebase.messages({ chatKey }).off("value", lastMessageListener)
     }
@@ -127,7 +118,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
         {lastMessage?.sender === authUser?.uid && (
           <div
             className={classNames("contact-item__last-message-status", {
-              "contact-item__last-message-status--unread": contactUnreadMessages
+              "contact-item__last-message-status--unread": contactUnreadMessages.length
             })}
           ></div>
         )}

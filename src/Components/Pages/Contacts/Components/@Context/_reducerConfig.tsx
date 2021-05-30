@@ -10,7 +10,7 @@ import { MESSAGES_TO_RENDER, UNREAD_MESSAGES_TO_RENDER } from "./Constants"
 import * as _isEqual from "lodash.isequal"
 
 export type ACTIONTYPES =
-  | { type: "updateContactUnreadMessages"; payload: string[] }
+  | { type: "updateContactUnreadMessages"; payload: { unreadMessages: string[]; chatKey: string } }
   | { type: "updateAuthUserUnreadMessages"; payload: { chatKey: string; unreadMessages: string[] } }
   | { type: "updateActiveChat"; payload: { chatKey: string; contactKey: string } }
   | { type: "updateMessagesListRef"; payload: { ref: any } }
@@ -27,9 +27,17 @@ export type ACTIONTYPES =
   | { type: "addNewMessage"; payload: { newMessage: MessageInterface; chatKey: string } }
   | { type: "removeMessage"; payload: { removedMessage: MessageInterface; chatKey: string } }
   | { type: "changeMessage"; payload: { changedMessage: MessageInterface; chatKey: string } }
+  | { type: "updateSelectedMessages"; payload: { messageKey: string; unselectAll?: boolean; chatKey: string } }
   | { type: "updateMessageInput"; payload: MessageInputInterface }
   | { type: "updateContactInfo"; payload: { changedInfo: ContactInfoInterface } }
-  | { type: "updateContacts"; payload: { contacts: ContactsInterface; unreadMessages: { [key: string]: string[] } } }
+  | {
+      type: "updateContacts"
+      payload: {
+        contacts: ContactsInterface
+        unreadMessages: { [key: string]: string[] }
+        unreadMessagesContacts: { [key: string]: string[] }
+      }
+    }
   | { type: "updateLastScrollPosition"; payload: { scrollTop: number; chatKey: string } }
   | { type: "updateMessagePopup"; payload: string }
   | { type: "updateOptionsPopupContactList"; payload: string }
@@ -50,6 +58,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
     authUserUnreadMessages,
     activeChat,
     messages,
+    selectedMessages,
     messagesInput,
     renderedMessagesList,
     messagePopup,
@@ -406,6 +415,22 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         }
       }
 
+    case "updateSelectedMessages": {
+      const { messageKey, chatKey, unselectAll } = action.payload
+      const messagesData = selectedMessages[chatKey] || []
+      const selectedMessagesData = messagesData?.includes(messageKey)
+        ? messagesData.filter((key) => key !== messageKey)
+        : [...messagesData, messageKey]
+
+      return {
+        ...state,
+        selectedMessages: {
+          ...selectedMessages,
+          [chatKey]: unselectAll ? [] : selectedMessagesData
+        }
+      }
+    }
+
     case "updateMessageInput":
       console.log(action.payload)
       return {
@@ -424,7 +449,8 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
       return {
         ...state,
         contacts: action.payload.contacts,
-        authUserUnreadMessages: action.payload.unreadMessages
+        authUserUnreadMessages: action.payload.unreadMessages,
+        contactsUnreadMessages: action.payload.unreadMessagesContacts
       }
     }
 
@@ -454,7 +480,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         ...state,
         contactsUnreadMessages: {
           ...contactsUnreadMessages,
-          [activeChat.chatKey]: action.payload
+          [action.payload.chatKey]: action.payload.unreadMessages
         }
       }
 
@@ -540,6 +566,7 @@ export const INITIAL_STATE = {
     contactKey: ""
   },
   messages: {},
+  selectedMessages: {},
   messagesInput: {},
   renderedMessagesList: {},
   contacts: {},

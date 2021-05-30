@@ -11,7 +11,7 @@ export interface ContactInfoInterface {
   newContactsRequests: boolean | null
   lastMessage: MessageInterface
   unreadMessages: string[]
-  unreadMessagesContact: boolean
+  unreadMessagesContact: string[]
 }
 
 export const CONTACT_INFO_INITIAL_DATA = {
@@ -70,6 +70,9 @@ export interface ContactsStateInterface {
   activeChat: ActiveChatInterface
   messages: {
     [key: string]: MessageInterface[]
+  }
+  selectedMessages: {
+    [key: string]: string[]
   }
   messagesInput: {
     [key: string]: MessageInputInterface

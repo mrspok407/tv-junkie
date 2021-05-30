@@ -25,21 +25,28 @@ export const getInitialContactInfo = async ({ firebase, contactsData, authUser }
 
       const chatKey =
         contact.key < authUser?.uid! ? `${contact.key}_${authUser?.uid}` : `${authUser?.uid}_${contact.key}`
-      const [newContactsActivity, newContactsRequests, unreadMessagesAuthData, unreadMessagesContact, lastMessage]: [
+      const [
+        newContactsActivity,
+        newContactsRequests,
+        unreadMessagesAuthData,
+        unreadMessagesContactData,
+        lastMessage
+      ]: [
         { val: () => boolean | null },
         { val: () => boolean | null },
         { val: () => { [key: string]: boolean } },
-        { val: () => boolean | null },
+        { val: () => { [key: string]: boolean } },
         { val: () => MessageInterface | null }
       ] = await Promise.all([
         firebase.newContactsActivity({ uid: authUser?.uid! }).child(`${contact.key}`).once("value"),
         firebase.newContactsRequests({ uid: authUser?.uid! }).child(`${contact.key}`).once("value"),
         firebase.unreadMessages({ uid: authUser?.uid!, chatKey }).once("value"),
-        firebase.unreadMessages({ uid: contact.key, chatKey }).orderByKey().limitToFirst(1).once("value"),
+        firebase.unreadMessages({ uid: contact.key, chatKey }).once("value"),
         firebase.messages({ chatKey }).orderByChild("timeStamp").limitToLast(1).once("value")
       ])
 
       const unreadMessages = !unreadMessagesAuthData.val() ? [] : Object.keys(unreadMessagesAuthData.val())
+      const unreadMessagesContact = !unreadMessagesContactData.val() ? [] : Object.keys(unreadMessagesContactData.val())
       const contactInfo = {
         ...contact,
         key: contact.key,
@@ -47,7 +54,7 @@ export const getInitialContactInfo = async ({ firebase, contactsData, authUser }
         newContactsActivity: !!newContactsActivity.val(),
         newContactsRequests: !!newContactsRequests.val(),
         unreadMessages,
-        unreadMessagesContact: !!unreadMessagesContact.val(),
+        unreadMessagesContact,
         lastMessage: lastMessage.val() !== null ? Object.values(lastMessage.val()!).map((item) => item)[0] : {}
       }
 

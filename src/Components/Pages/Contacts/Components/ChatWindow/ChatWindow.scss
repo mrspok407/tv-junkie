@@ -140,69 +140,111 @@
   }
 
   &__message {
-    display: flex;
-    column-gap: 10px;
-    row-gap: 6px;
-    max-width: getDimm(messageMaxWidth, $chatWindowDimm);
-    border-radius: 5px;
-    padding: 10px;
+    position: relative;
+    width: 70%;
     color: getColor(messageText, $chatWindowPalette);
     font-size: 0.95rem;
 
     @include mediaMaxW(#{$mobileViewPort}) {
-      flex-direction: column;
-      max-width: getDimm(messageMaxWidthMobile, $chatWindowDimm);
+      width: getDimm(messageMaxWidthMobile, $chatWindowDimm);
     }
 
     &:hover .chat-window__message-options .chat-window__open-popup-btn {
       opacity: 1;
     }
 
+    &-inner {
+      display: flex;
+      position: relative;
+      grid-column-gap: 10px;
+      column-gap: 10px;
+      grid-row-gap: 6px;
+      row-gap: 6px;
+      max-width: max-content;
+      border-radius: 5px;
+      padding: 10px;
+
+      @include mediaMaxW(#{$mobileViewPort}) {
+        flex-direction: column;
+      }
+    }
+
+    &-selected-background {
+      position: absolute;
+      top: 0;
+      left: -76%;
+      width: 200%;
+      height: 100%;
+      background-color: brown;
+    }
+
     &--send {
       justify-self: end;
-      background-color: getColor(messageSentBG, $chatWindowPalette);
+
+      .chat-window__message-inner {
+        margin-left: auto;
+        background-color: getColor(messageSentBG, $chatWindowPalette);
+      }
 
       &.chat-window__message--last-in-bunch {
-        border-radius: 5px 5px 0px 5px;
-        &:before {
-          right: -10px;
-          background-color: getColor(messageSentBG, $chatWindowPalette);
-        }
-        &:after {
-          right: -10px;
-          background-color: getColor(backG, $chatWindowPalette);
-          border-radius: 0 0 0 10px;
+        .chat-window__message-inner {
+          border-radius: 5px 5px 0px 5px;
+          &:before {
+            right: -10px;
+            background-color: getColor(messageSentBG, $chatWindowPalette);
+          }
+          &:after {
+            right: -10px;
+            background-color: getColor(backG, $chatWindowPalette);
+            border-radius: 0 0 0 10px;
+          }
         }
       }
     }
 
     &--receive {
-      background-color: getColor(messageReceivedBG, $chatWindowPalette);
+      .chat-window__message-inner {
+        background-color: getColor(messageReceivedBG, $chatWindowPalette);
+      }
 
       &.chat-window__message--last-in-bunch {
-        border-radius: 5px 5px 5px 0px;
-        &:before {
-          left: -10px;
-          background-color: getColor(messageReceivedBG, $chatWindowPalette);
-        }
-        &:after {
-          left: -10px;
-          background-color: getColor(backG, $chatWindowPalette);
-          border-radius: 0 0 10px 0;
+        .chat-window__message-inner {
+          border-radius: 5px 5px 5px 0px;
+          &:before {
+            left: -10px;
+            background-color: getColor(messageReceivedBG, $chatWindowPalette);
+          }
+          &:after {
+            left: -10px;
+            background-color: getColor(backG, $chatWindowPalette);
+            border-radius: 0 0 10px 0;
+          }
         }
       }
     }
 
     &--last-in-bunch {
-      position: relative;
+      .chat-window__message-inner {
+        position: relative;
 
-      &:after,
-      &:before {
-        content: "";
-        position: absolute;
-        width: 10px;
-        height: 20px;
-        bottom: 0;
+        &:after,
+        &:before {
+          content: "";
+          position: absolute;
+          width: 10px;
+          height: 20px;
+          bottom: 0;
+        }
+      }
+    }
+
+    &--selected {
+      &.chat-window__message--last-in-bunch {
+        .chat-window__message-inner {
+          &:after {
+            background-color: brown;
+          }
+        }
       }
     }
 
@@ -224,7 +266,6 @@
     }
 
     &-text {
-      margin-right: auto;
       white-space: pre-wrap;
       word-break: break-word;
     }

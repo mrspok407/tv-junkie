@@ -34,7 +34,10 @@ const ContactList: React.FC = () => {
   const getContactsList = async (snapshot: any) => {
     if (snapshot.val() === null) {
       setInitialLoading(false)
-      context?.dispatch({ type: "updateContacts", payload: { contacts: {}, unreadMessages: {} } })
+      context?.dispatch({
+        type: "updateContacts",
+        payload: { contacts: {}, unreadMessages: {}, unreadMessagesContacts: {} }
+      })
       // setContacts([])
       return
     }
@@ -55,13 +58,20 @@ const ContactList: React.FC = () => {
       acc = { ...acc, [contact.chatKey]: contact.unreadMessages }
       return acc
     }, {})
+    const unreadMessagesContacts = contacts.reduce((acc, contact) => {
+      acc = { ...acc, [contact.chatKey]: contact.unreadMessagesContact }
+      return acc
+    }, {})
 
     const contactsDispatch = contacts.reduce((acc: { [key: string]: ContactInfoInterface }, contact) => {
       acc = { [contact.key]: { ...contact }, ...acc }
       return acc
     }, {})
 
-    context?.dispatch({ type: "updateContacts", payload: { contacts: contactsDispatch, unreadMessages } })
+    context?.dispatch({
+      type: "updateContacts",
+      payload: { contacts: contactsDispatch, unreadMessages, unreadMessagesContacts }
+    })
     setInitialLoading(false)
   }
 

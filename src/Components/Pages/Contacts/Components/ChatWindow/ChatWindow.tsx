@@ -32,6 +32,7 @@ const ChatWindow: React.FC = () => {
     messages,
     contacts,
     renderedMessagesList,
+    selectedMessages,
     lastScrollPosition,
     authUserUnreadMessages,
     contactsStatus,
@@ -40,13 +41,13 @@ const ChatWindow: React.FC = () => {
   const messagesData = messages[activeChat.chatKey]
   const renderedMessages = renderedMessagesList[activeChat.chatKey] || []
   const unreadMessagesAuth = authUserUnreadMessages[activeChat.chatKey] || []
+  const selectedMessagesData = selectedMessages[activeChat.chatKey] || []
   const contactInfo = contacts[activeChat.contactKey] || {}
 
   const [chatContainerRef, setChatContainerRef] = useState<HTMLDivElement>(null!)
   const contactOptionsRef = useRef<HTMLDivElement>(null!)
   const unreadMessagesAuthRef = useRef<string[]>([])
 
-  const [contactUnreadMessages, setContactUnreadMessages] = useState<string[] | null>(null)
   const formatedDate = useTimestampFormater({ timeStamp: contactsStatus[activeChat.chatKey]?.lastSeen! })
 
   const isScrolledFirstRenderRef = useRef(false)
@@ -63,15 +64,15 @@ const ChatWindow: React.FC = () => {
   }, [])
 
   useEffect(() => {
-    const listener = firebase
+    firebase
       .unreadMessages({ uid: activeChat.contactKey, chatKey: activeChat.chatKey })
       .on("value", (snapshot: any) => {
-        setContactUnreadMessages(Object.keys(snapshot.val() || {}))
+        const unreadMessagesContact = !snapshot.val() ? [] : Object.keys(snapshot.val())
+        context?.dispatch({
+          type: "updateContactUnreadMessages",
+          payload: { unreadMessages: unreadMessagesContact, chatKey: activeChat.chatKey }
+        })
       })
-    return () => {
-      // setContactUnreadMessages(null)
-      // firebase.unreadMessages({ uid: activeChat.contactKey, chatKey: activeChat.chatKey }).off("value", listener)
-    }
   }, [firebase, activeChat])
 
   const { loadTopMessages, loading } = useLoadTopMessages()
@@ -402,18 +403,23 @@ const ChatWindow: React.FC = () => {
                         "chat-window__message--send": renderedMessage.sender === authUser?.uid,
                         "chat-window__message--receive": renderedMessage.sender === activeChat.contactKey,
                         "chat-window__message--last-in-bunch": renderedMessage.sender !== nextMessage?.sender,
-                        "chat-window__message--deliver-failed": renderedMessage.isDelivered === false
+                        "chat-window__message--deliver-failed": renderedMessage.isDelivered === false,
+                        "chat-window__message--selected": selectedMessagesData.includes(renderedMessage.key)
                       })}
                       data-key={renderedMessage.key}
                     >
-                      <div
-                        className="chat-window__message-text"
-                        dangerouslySetInnerHTML={{
-                          __html: `${renderedMessage.message}`
-                        }}
-                      ></div>
-
-                      <MessageInfo messageData={renderedMessage} contactUnreadMessages={contactUnreadMessages} />
+                      <div className="chat-window__message-inner">
+                        <div
+                          className="chat-window__message-text"
+                          dangerouslySetInnerHTML={{
+                            __html: `${renderedMessage.message}`
+                          }}
+                        ></div>
+                        <MessageInfo messageData={renderedMessage} />
+                      </div>
+                      {selectedMessagesData.includes(renderedMessage.key) && (
+                        <div className="chat-window__message-selected-background"></div>
+                      )}
                     </div>
                   </React.Fragment>
                 )

@@ -39,6 +39,13 @@ $chatWindowDimm: (
   contactInfoFont: 0.95rem
 );
 
+// PopupOptions
+$popupOptionsPalette: (
+  mainBg: #17212b,
+  mainHoverBg: #257bce,
+  receivedMsgBg: #2b5278
+);
+
 // ConfirmModal
 $confirmModalPalette: (
   containerBG: rgba(0, 0, 0, 0.39),

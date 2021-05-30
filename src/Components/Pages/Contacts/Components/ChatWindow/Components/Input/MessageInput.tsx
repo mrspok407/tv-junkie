@@ -31,7 +31,6 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
   const contactsStatusData = contactsStatus[activeChat.chatKey] || {}
 
   const inputRef = useRef<HTMLDivElement>(null!)
-  // const typingTimer = useRef<number | null>()
   const keysMap = useRef<any>({})
 
   const windowWidth = window.innerWidth
@@ -186,14 +185,7 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
     } else {
       console.log("onChangeNotEmpty: all")
       dispatchDeb({ message: innerHTML, anchorOffset, scrollTop })
-
       updateTyping({ activeChat, authUser, firebase })
-
-      // if (typingTimer.current) window.clearTimeout(typingTimer.current)
-      // typingTimer.current = window.setTimeout(
-      //   () => updateTyping({ activeChat, authUser, firebase, isTyping: null }),
-      //   2500
-      // )
     }
   }
 

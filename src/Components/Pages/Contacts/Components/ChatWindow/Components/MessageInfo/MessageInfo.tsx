@@ -6,13 +6,13 @@ import { ContactsContext } from "../../../@Context/ContactsContext"
 import MessagePopup from "./MessagePopup"
 import "./MessageInfo.scss"
 
-type Props = { messageData: MessageInterface; contactUnreadMessages: string[] | null }
+type Props = { messageData: MessageInterface }
 
-const MessageInfo: React.FC<Props> = React.memo(({ messageData, contactUnreadMessages }) => {
+const MessageInfo: React.FC<Props> = React.memo(({ messageData }) => {
   const { authUser } = useContext(AppContext)
   const context = useContext(ContactsContext)
-
-  const { activeChat, messagePopup } = context?.state!
+  const { activeChat, messagePopup, contactsUnreadMessages } = context?.state!
+  const contactsUnreadMessagesData = contactsUnreadMessages[activeChat.chatKey]
 
   const messageOptionsRef = useRef<HTMLDivElement>(null!)
 
@@ -32,26 +32,21 @@ const MessageInfo: React.FC<Props> = React.memo(({ messageData, contactUnreadMes
         </button>
 
         {messagePopup === messageData.key && (
-          <MessagePopup
-            messageOptionsRef={messageOptionsRef.current}
-            messageData={messageData}
-            contactUnreadMessages={contactUnreadMessages}
-          />
+          <MessagePopup messageOptionsRef={messageOptionsRef.current} messageData={messageData} />
         )}
       </div>
 
       {messageData.sender === authUser?.uid && (
         <div
           className={classNames("chat-window__message-status", {
-            "chat-window__message-status--read": !contactUnreadMessages?.includes(messageData.key),
+            "chat-window__message-status--read": !contactsUnreadMessagesData?.includes(messageData.key),
             "chat-window__message-status--deliver-failed": messageData.isDelivered === false,
-            "chat-window__message-status--loading": contactUnreadMessages === null
+            "chat-window__message-status--loading": contactsUnreadMessagesData === null
           })}
         ></div>
       )}
       <div className="chat-window__message-timestamp">
         <div> {new Date(Number(messageData.timeStamp)).toLocaleTimeString().slice(0, -3)}</div>
-
         <div className="chat-window__message-edited">{messageData.isEdited && "edited"}</div>
       </div>
     </div>

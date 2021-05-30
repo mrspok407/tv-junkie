@@ -30,6 +30,7 @@ $messageStatusSize: 17px;
 
   .popup-container {
     left: -68px;
+    z-index: 2;
   }
 
   .chat-window__open-popup-btn {
@@ -87,14 +88,14 @@ $messageStatusSize: 17px;
     }
 
     &--sended-message {
-      top: -54px;
+      top: -92px;
     }
     &--received-message {
-      top: -18px;
-
+      top: -54px;
+      background-color: #2b5278;
       .popup__option:first-child {
         .popup__option-btn:after {
-          border-radius: 5px 5px 0px 5px;
+          border-radius: 5px 5px 0px 0px;
         }
       }
     }

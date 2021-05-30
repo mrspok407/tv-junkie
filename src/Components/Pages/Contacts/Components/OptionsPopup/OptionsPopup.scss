@@ -58,10 +58,20 @@
   }
 
   &--received-message {
+    background-color: #2b5278;
     .popup__option {
       &:first-child {
         .popup__option-btn:after {
-          border-radius: 5px 0px 5px 5px;
+          border-radius: 5px 0px 0px 0px;
+        }
+      }
+    }
+  }
+  &--sended-message {
+    .popup__option {
+      &:first-child {
+        .popup__option-btn:after {
+          border-radius: 5px 0px 0px 0px;
         }
       }
     }
