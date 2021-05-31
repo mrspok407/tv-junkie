@@ -11,6 +11,7 @@ import GoDown from "../GoDown/GoDown"
 import { editMessage } from "./FirebaseHelpers/EditMessage"
 import { updateTyping } from "./FirebaseHelpers/UpdateTyping"
 import "./MessageInput.scss"
+import SelectOptions from "../SelectOptions/SelectOptions"
 
 type Props = {
   unreadMessagesAuthRef: string[]
@@ -25,7 +26,8 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
   const firebase = useContext(FirebaseContext)
   const context = useContext(ContactsContext)
   const { authUser, errors } = useContext(AppContext)
-  const { activeChat, messagesInput, contactsStatus, messages } = context?.state!
+  const { activeChat, messagesInput, contactsStatus, messages, selectedMessages } = context?.state!
+  const selectedMessagesData = selectedMessages[activeChat.chatKey]
   const messageInputData = messagesInput[activeChat.chatKey] || {}
   const messagesData = messages[activeChat.chatKey]
   const contactsStatusData = contactsStatus[activeChat.chatKey] || {}
@@ -86,6 +88,24 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
     const { anchorOffset } = getSelection()
     console.log("onClick: anchorOffset")
     dispatchDeb({ anchorOffset })
+  }
+
+  const onPaste = (e: any) => {
+    e.preventDefault()
+    const { anchorOffset } = getSelection()
+    // Get user's pasted data
+    let data = e.clipboardData.getData("text/html") || e.clipboardData.getData("text/plain")
+
+    // Filter out everything except simple text and allowable HTML elements
+    const regex = /<(?!(\/\s*)?(a|b|i|em|s|strong|u)[>,\s])([^>])*>/g
+    data = data.replace(regex, "").trim()
+
+    console.log({ data })
+
+    // Insert the filtered content
+    e.currentTarget.innerHTML = `${e.currentTarget.innerHTML.slice(0, anchorOffset)}${data}`
+    handleCursorLine({ node: e.currentTarget.childNodes[0], anchorOffset, anchorShift: 1 })
+    // e.currentTarget.innerHTML = data.trim()
   }
 
   const scrollPositionHandler = () => {
@@ -177,6 +197,8 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
     const { innerHTML, textContent } = e.currentTarget
     const { anchorOffset } = getSelection()
     const scrollTop = inputRef.current.scrollTop
+    const height = inputRef.current.getBoundingClientRect().height
+
     if (["", "\n"].includes(textContent)) {
       console.log("onChangeEmpty: all to zero")
       e.currentTarget.innerHTML = ""
@@ -184,6 +206,11 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
       updateTyping({ activeChat, authUser, firebase, setTypingNull: true })
     } else {
       console.log("onChangeNotEmpty: all")
+      inputRef.current.scrollTop = scrollTop + MESSAGE_LINE_HEIGHT
+      if (prevHeight.current + MESSAGE_LINE_HEIGHT < INPUT_MESSAGE_MAX_HEIGHT) {
+        chatContainerRef.scrollTop = getContainerRect().scrollTop + MESSAGE_LINE_HEIGHT
+      }
+      prevHeight.current = height
       dispatchDeb({ message: innerHTML, anchorOffset, scrollTop })
       updateTyping({ activeChat, authUser, firebase })
     }
@@ -276,9 +303,11 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
 
   return (
     <div className="chat-window__input-wrapper">
+      {selectedMessagesData?.length ? <SelectOptions /> : ""}
       <div className="chat-window__input-message-container">
         <div
           ref={inputRef}
+          onPaste={onPaste}
           onClick={onClick}
           onKeyDown={handleKeyDown}
           onKeyUp={handleKeyUp}

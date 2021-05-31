@@ -119,20 +119,19 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
 
   useLayoutEffect(() => {
     if (!chatContainerRef) return
-    if (!renderedMessages?.length || !messagesData?.length) {
-      setFadeInButton(false)
-      return
-    }
     handleFadeIn()
   }, [chatContainerRef, chatKey])
 
   useLayoutEffect(() => {
     if (!chatContainerRef) return
-    if (!renderedMessages?.length || !messagesData?.length) return
+    if (!renderedMessages?.length || !messagesData?.length) {
+      setFadeInButton(false)
+      return
+    }
     if (messagesData?.length <= 75) {
       handleFadeIn()
     }
-  }, [chatContainerRef, chatKey, messagesData])
+  }, [chatContainerRef, chatKey, messagesData, renderedMessages])
 
   useEffect(() => {
     if (!chatContainerRef) return

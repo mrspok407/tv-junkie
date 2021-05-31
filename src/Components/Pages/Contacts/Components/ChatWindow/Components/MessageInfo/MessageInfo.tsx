@@ -24,7 +24,10 @@ const MessageInfo: React.FC<Props> = React.memo(({ messageData }) => {
           className={classNames("chat-window__open-popup-btn", {
             "chat-window__open-popup-btn--open": messagePopup === messageData.key
           })}
-          onClick={() => context?.dispatch({ type: "updateMessagePopup", payload: messageData.key })}
+          onClick={(e) => {
+            e.stopPropagation()
+            context?.dispatch({ type: "updateMessagePopup", payload: messageData.key })
+          }}
         >
           <span></span>
           <span></span>

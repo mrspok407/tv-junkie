@@ -69,33 +69,35 @@ $messageStatusSize: 17px;
   }
 }
 
-.chat-window__message:nth-last-child(-n + 2) {
-  .chat-window__message-options .popup-container {
-    border-radius: 5px 5px 0px 5px;
+.chat-window__message-wrapper:nth-last-child(-n + 2) {
+  .chat-window__message {
+    .chat-window__message-options .popup-container {
+      border-radius: 5px 5px 0px 5px;
 
-    .popup__option-btn:after {
-      background-color: #3375b5;
-    }
-    .popup__option:first-child {
       .popup__option-btn:after {
-        border-radius: 5px 5px 0px 0px;
+        background-color: #3375b5;
       }
-    }
-    .popup__option:last-child {
-      .popup__option-btn:after {
-        border-radius: 0px 0px 0px 5px;
-      }
-    }
-
-    &--sended-message {
-      top: -92px;
-    }
-    &--received-message {
-      top: -54px;
-      background-color: #2b5278;
       .popup__option:first-child {
         .popup__option-btn:after {
           border-radius: 5px 5px 0px 0px;
+        }
+      }
+      .popup__option:last-child {
+        .popup__option-btn:after {
+          border-radius: 0px 0px 0px 5px;
+        }
+      }
+
+      &--sended-message {
+        top: -92px;
+      }
+      &--received-message {
+        top: -54px;
+        background-color: #2b5278;
+        .popup__option:first-child {
+          .popup__option-btn:after {
+            border-radius: 5px 5px 0px 0px;
+          }
         }
       }
     }

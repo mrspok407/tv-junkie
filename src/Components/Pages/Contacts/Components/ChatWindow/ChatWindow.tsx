@@ -21,6 +21,8 @@ import useTimestampFormater from "../../Hooks/UseTimestampFormater"
 import MessageInput from "./Components/Input/MessageInput"
 import "./ChatWindow.scss"
 import Loader from "Components/UI/Placeholders/Loader"
+import useHandleMessageOptions from "./FirebaseHelpers/UseHandleMessageOptions"
+import SelectOptions from "./Components/SelectOptions/SelectOptions"
 
 const ChatWindow: React.FC = () => {
   const { authUser, newContactsActivity, errors } = useContext(AppContext)
@@ -399,27 +401,41 @@ const ChatWindow: React.FC = () => {
                       ""
                     )}
                     <div
-                      className={classNames(`chat-window__message chat-window__message--${renderedMessage.key}`, {
-                        "chat-window__message--send": renderedMessage.sender === authUser?.uid,
-                        "chat-window__message--receive": renderedMessage.sender === activeChat.contactKey,
-                        "chat-window__message--last-in-bunch": renderedMessage.sender !== nextMessage?.sender,
-                        "chat-window__message--deliver-failed": renderedMessage.isDelivered === false,
-                        "chat-window__message--selected": selectedMessagesData.includes(renderedMessage.key)
+                      className={classNames("chat-window__message-wrapper", {
+                        "chat-window__message-wrapper--send": renderedMessage.sender === authUser?.uid,
+                        "chat-window__message-wrapper--receive": renderedMessage.sender === activeChat.contactKey,
+                        "chat-window__message-wrapper--selected": selectedMessagesData.includes(renderedMessage.key),
+                        "chat-window__message-wrapper--selection-active": selectedMessagesData.length
                       })}
-                      data-key={renderedMessage.key}
+                      onClick={() => {
+                        if (!selectedMessagesData.length) return
+                        context?.dispatch({
+                          type: "updateSelectedMessages",
+                          payload: { messageKey: renderedMessage.key, chatKey: activeChat.chatKey }
+                        })
+                      }}
                     >
-                      <div className="chat-window__message-inner">
-                        <div
-                          className="chat-window__message-text"
-                          dangerouslySetInnerHTML={{
-                            __html: `${renderedMessage.message}`
-                          }}
-                        ></div>
-                        <MessageInfo messageData={renderedMessage} />
+                      <div
+                        className={classNames(`chat-window__message chat-window__message--${renderedMessage.key}`, {
+                          "chat-window__message--send": renderedMessage.sender === authUser?.uid,
+                          "chat-window__message--receive": renderedMessage.sender === activeChat.contactKey,
+                          "chat-window__message--last-in-bunch": renderedMessage.sender !== nextMessage?.sender,
+                          "chat-window__message--deliver-failed": renderedMessage.isDelivered === false,
+                          "chat-window__message--selected": selectedMessagesData.includes(renderedMessage.key)
+                        })}
+                        data-key={renderedMessage.key}
+                      >
+                        <div className="chat-window__message-inner">
+                          <div
+                            className="chat-window__message-text"
+                            dangerouslySetInnerHTML={{
+                              __html: `${renderedMessage.message}`
+                            }}
+                          ></div>
+                          <MessageInfo messageData={renderedMessage} />
+                        </div>
                       </div>
-                      {selectedMessagesData.includes(renderedMessage.key) && (
-                        <div className="chat-window__message-selected-background"></div>
-                      )}
+                      <button type="button" className="chat-window__select-btn"></button>
                     </div>
                   </React.Fragment>
                 )

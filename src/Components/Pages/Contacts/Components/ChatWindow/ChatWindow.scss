@@ -6,7 +6,7 @@
   flex-direction: column;
   color: #fff;
   overflow: hidden;
-  background-color: getColor(backG, $chatWindowPalette);
+  // background-color: getColor(backG, $chatWindowPalette);
 
   &--no-active-chat {
     display: flex;
@@ -139,9 +139,88 @@
     }
   }
 
+  &__message-wrapper {
+    --selectBtnSize: 25px;
+    --msgWidth: 75%;
+    --msgWidthMobile: 85%;
+    position: relative;
+
+    .chat-window__select-btn {
+      @include buttonRemoveDefaults;
+      position: absolute;
+      top: 50%;
+      left: calc((100% - var(--msgWidth)) - (var(--selectBtnSize) + 25px));
+      width: var(--selectBtnSize);
+      height: var(--selectBtnSize);
+      border-radius: 50%;
+      background-color: transparent;
+      transform: translateY(-50%);
+      border: 2px solid #fff;
+      opacity: 0;
+      transition: 100ms;
+      will-change: opacity;
+      &:after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background-color: getColor(selectBtnBG, $chatWindowPalette);
+        transform: scale(0);
+        opacity: 0;
+        transition: 125ms;
+        will-change: opacity, transform;
+      }
+
+      @include mediaMaxW(#{$mobileViewPort}) {
+        left: calc((100% - var(--msgWidthMobile)) - (var(--selectBtnSize) + 10px));
+      }
+    }
+
+    &--receive {
+      .chat-window__select-btn {
+        left: calc(var(--msgWidth) + var(--selectBtnSize));
+      }
+      @include mediaMaxW(#{$mobileViewPort}) {
+        .chat-window__select-btn {
+          left: calc(var(--msgWidthMobile) + 10px);
+        }
+      }
+    }
+
+    &--selected {
+      &:after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: getColor(selectMsgBG, $chatWindowPalette);
+        z-index: -1;
+      }
+
+      .chat-window__select-btn {
+        &:after {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+    }
+
+    &--selection-active {
+      cursor: default;
+      .chat-window__select-btn {
+        cursor: pointer;
+        opacity: 1;
+      }
+    }
+  }
   &__message {
     position: relative;
-    width: 70%;
+    width: getDimm(messageMaxWidth, $chatWindowDimm);
     color: getColor(messageText, $chatWindowPalette);
     font-size: 0.95rem;
 
@@ -169,18 +248,8 @@
       }
     }
 
-    &-selected-background {
-      position: absolute;
-      top: 0;
-      left: -76%;
-      width: 200%;
-      height: 100%;
-      background-color: brown;
-    }
-
     &--send {
-      justify-self: end;
-
+      margin-left: auto;
       .chat-window__message-inner {
         margin-left: auto;
         background-color: getColor(messageSentBG, $chatWindowPalette);
@@ -242,20 +311,20 @@
       &.chat-window__message--last-in-bunch {
         .chat-window__message-inner {
           &:after {
-            background-color: brown;
+            background-color: getColor(selectMsgBG, $chatWindowPalette);
           }
         }
       }
     }
 
     &--deliver-failed {
-      background-color: brown;
+      background-color: getColor(deliverFailedBG, $chatWindowPalette);
 
       &.chat-window__message--last-in-bunch {
         border-radius: 5px 5px 0px 5px;
         &:before {
           right: -10px;
-          background-color: brown;
+          background-color: getColor(deliverFailedBG, $chatWindowPalette);
         }
         &:after {
           right: -10px;

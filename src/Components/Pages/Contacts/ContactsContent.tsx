@@ -9,6 +9,7 @@ import { LoremIpsum } from "lorem-ipsum"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import ConfirmModal from "./Components/ChatWindow/Components/ConfirmModal/ConfirmModal"
 import useContactOptions from "./Components/ContactList/Hooks/UseContactOptions"
+import useSelectOptions from "./Components/ChatWindow/Components/SelectOptions/Hooks/UseSelectOptions"
 
 type Props = {}
 
@@ -19,8 +20,7 @@ const ContactsContent: React.FC<Props> = () => {
   const { activeChat, contacts, messages, confirmModal } = context?.state!
 
   const messagesRef = useRef<{ [key: string]: MessageInterface[] }>()
-
-  const confirmModalFunctions = useContactOptions({})
+  const confirmModalFunctions = { ...useContactOptions({}), ...useSelectOptions() }
 
   useEffect(() => {
     messagesRef.current = messages
@@ -149,7 +149,7 @@ const ContactsContent: React.FC<Props> = () => {
         style={{ width: "400px", maxWidth: "100%" }}
         type="button"
         className="button"
-        onClick={() => addNewMessageCurrent(true)}
+        onClick={() => addNewMessageCurrent(false)}
       >
         Add msg current
       </button> */}

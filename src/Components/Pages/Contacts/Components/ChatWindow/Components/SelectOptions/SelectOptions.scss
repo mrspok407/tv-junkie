@@ -1,0 +1,67 @@
+@import "../../../../styles/globalsContacts";
+
+.chat-window__select-options {
+  --height: 50px;
+  position: absolute;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  column-gap: 10px;
+  top: calc((var(--height) * -1) - 20px);
+  left: 50%;
+  width: getDimm(width, $selectOptionsDimm);
+  padding: 10px;
+  transform: translateX(-50%);
+  background-color: getColor(bgClr, $selectOptionsPalette);
+  border-radius: 10px;
+  opacity: 0.6;
+  will-change: opacity;
+  transition: 100ms;
+
+  @include mediaMaxW(#{$mobileViewPort}) {
+    width: getDimm(widthMobile, $selectOptionsDimm);
+  }
+
+  &:hover {
+    opacity: 1;
+  }
+
+  .button {
+    border-radius: 5px;
+    transition: 150ms;
+    &:after,
+    &:before {
+      display: none;
+    }
+  }
+
+  &-delete {
+    .button {
+      background-color: getColor(btnDeleteBg, $selectOptionsPalette);
+
+      @include mediaMinW(#{$mobileViewPort}) {
+        &:hover {
+          background-color: getColor(btnDeleteBgHover, $selectOptionsPalette);
+        }
+      }
+    }
+  }
+
+  &-cancel {
+    .button {
+      background-color: getColor(btnCancelBg, $selectOptionsPalette);
+
+      @include mediaMinW(#{$mobileViewPort}) {
+        &:hover {
+          background-color: getColor(btnCancelBgHover, $selectOptionsPalette);
+        }
+      }
+    }
+  }
+
+  &-messages {
+    display: flex;
+    align-items: center;
+    color: #000;
+    cursor: default;
+  }
+}

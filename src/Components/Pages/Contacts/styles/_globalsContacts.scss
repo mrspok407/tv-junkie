@@ -27,16 +27,33 @@ $chatWindowPalette: (
   placeholderBg: #206ea0,
   backG: $bodyBackgroundClr,
   messageSentBG: #2b5278,
+  deliverFailedBG: brown,
   messageReceivedBG: #182533,
   messageText: #fff,
   dateBG: #4a996099,
-  dateFloatBG: #4a9960
+  dateFloatBG: #4a9960,
+  selectBtnBG: #56d27a8a,
+  selectMsgBG: #121d1c
 );
 
 $chatWindowDimm: (
   messageMaxWidth: 70%,
   messageMaxWidthMobile: 85%,
   contactInfoFont: 0.95rem
+);
+
+// SelectOptions
+$selectOptionsPalette: (
+  bgClr: #fff,
+  btnCancelBg: #78a574,
+  btnDeleteBg: #7b4b42,
+  btnCancelBgHover: #78a574d6,
+  btnDeleteBgHover: #7b4b42db
+);
+
+$selectOptionsDimm: (
+  width: 400px,
+  widthMobile: 325px
 );
 
 // PopupOptions

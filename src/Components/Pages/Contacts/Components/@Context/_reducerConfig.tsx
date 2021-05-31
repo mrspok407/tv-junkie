@@ -27,7 +27,8 @@ export type ACTIONTYPES =
   | { type: "addNewMessage"; payload: { newMessage: MessageInterface; chatKey: string } }
   | { type: "removeMessage"; payload: { removedMessage: MessageInterface; chatKey: string } }
   | { type: "changeMessage"; payload: { changedMessage: MessageInterface; chatKey: string } }
-  | { type: "updateSelectedMessages"; payload: { messageKey: string; unselectAll?: boolean; chatKey: string } }
+  | { type: "updateSelectedMessages"; payload: { messageKey: string; chatKey: string } }
+  | { type: "clearSelectedMessages"; payload: { chatKey: string } }
   | { type: "updateMessageInput"; payload: MessageInputInterface }
   | { type: "updateContactInfo"; payload: { changedInfo: ContactInfoInterface } }
   | {
@@ -382,6 +383,12 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
               .filter((message) => message.key !== action.payload.removedMessage.key)
               .slice(startIndex, endIndex + 1)
           ]
+        },
+        selectedMessages: {
+          ...selectedMessages,
+          [action.payload.chatKey]: selectedMessages[action.payload.chatKey]?.filter(
+            (messageKey) => messageKey !== action.payload.removedMessage.key
+          )
         }
       }
     }
@@ -416,7 +423,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
       }
 
     case "updateSelectedMessages": {
-      const { messageKey, chatKey, unselectAll } = action.payload
+      const { messageKey, chatKey } = action.payload
       const messagesData = selectedMessages[chatKey] || []
       const selectedMessagesData = messagesData?.includes(messageKey)
         ? messagesData.filter((key) => key !== messageKey)
@@ -426,7 +433,17 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         ...state,
         selectedMessages: {
           ...selectedMessages,
-          [chatKey]: unselectAll ? [] : selectedMessagesData
+          [chatKey]: selectedMessagesData
+        }
+      }
+    }
+
+    case "clearSelectedMessages": {
+      return {
+        ...state,
+        selectedMessages: {
+          ...selectedMessages,
+          [action.payload.chatKey]: []
         }
       }
     }
