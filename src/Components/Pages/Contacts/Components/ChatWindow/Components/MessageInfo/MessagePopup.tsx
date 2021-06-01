@@ -5,7 +5,7 @@ import { MessageInterface } from "Components/Pages/Contacts/@Types"
 import React, { useEffect, useContext } from "react"
 import { MESSAGE_LINE_HEIGHT } from "../../../@Context/Constants"
 import { ContactsContext } from "../../../@Context/ContactsContext"
-import useHandleMessageOptions from "../../FirebaseHelpers/UseHandleMessageOptions"
+import useHandleMessageOptions from "./FirebaseHelpers/UseHandleMessageOptions"
 
 type Props = {
   messageOptionsRef: HTMLDivElement
@@ -51,7 +51,11 @@ const MessagePopup: React.FC<Props> = ({ messageOptionsRef, messageData }) => {
       )}
 
       <div className="popup__option">
-        <button className="popup__option-btn" type="button" onClick={() => deleteMessage()}>
+        <button
+          className="popup__option-btn"
+          type="button"
+          onClick={() => deleteMessage({ deleteMessagesKeys: [messageData.key] })}
+        >
           Delete
         </button>
       </div>

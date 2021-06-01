@@ -104,6 +104,16 @@ $messageStatusSize: 17px;
   }
 }
 
+.chat-window__message-wrapper:first-child {
+  .chat-window__message {
+    .chat-window__message-options .popup-container {
+      &--sended-message {
+        top: -17px;
+      }
+    }
+  }
+}
+
 .chat-window__message-status {
   background-image: url("../../../../../../../assets/images/icons/one-mark-sign.svg");
   background-size: contain;

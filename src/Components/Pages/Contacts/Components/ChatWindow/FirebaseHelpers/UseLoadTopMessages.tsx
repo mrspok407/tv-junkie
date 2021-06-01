@@ -5,6 +5,7 @@ import { ContactsContext } from "../../@Context/ContactsContext"
 import { MessageInterface, MESSAGE_INITIAL_DATA } from "Components/Pages/Contacts/@Types"
 import { isUnexpectedObject } from "Utils"
 import { MESSAGES_TO_LOAD } from "../../@Context/Constants"
+import debounce from "debounce"
 
 const useLoadTopMessages = () => {
   const { errors } = useContext(AppContext)
@@ -18,6 +19,16 @@ const useLoadTopMessages = () => {
   const [loading, setLoading] = useState(false)
 
   const loadedMessageGroups = useRef<number[]>([])
+
+  // let messagesToDelete: MessageInterface[] = []
+  const messagesToDelete = useRef<MessageInterface[]>([])
+  const removeMessagesThrottle = useCallback(
+    debounce((removedMessage: any) => {
+      context?.dispatch({ type: "removeMessage", payload: { removedMessage, chatKey: activeChat.chatKey } })
+      messagesToDelete.current = []
+    }, 100),
+    []
+  )
 
   const loadTopMessages = useCallback(async () => {
     if (!messagesData?.length) return
@@ -85,8 +96,8 @@ const useLoadTopMessages = () => {
           return
         }
         const removedMessage = { ...snapshot.val(), key: snapshot.key }
-        context?.dispatch({ type: "removeMessage", payload: { removedMessage, chatKey: activeChat.chatKey } })
-        console.log({ removedMessage })
+        messagesToDelete.current.push(removedMessage)
+        removeMessagesThrottle(messagesToDelete.current)
       })
 
     setLoading(false)

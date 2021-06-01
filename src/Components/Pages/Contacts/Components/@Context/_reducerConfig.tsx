@@ -25,7 +25,7 @@ export type ACTIONTYPES =
   | { type: "renderBottomMessages" }
   | { type: "handleGoDown"; payload: { unreadMessages: string[] } }
   | { type: "addNewMessage"; payload: { newMessage: MessageInterface; chatKey: string } }
-  | { type: "removeMessage"; payload: { removedMessage: MessageInterface; chatKey: string } }
+  | { type: "removeMessage"; payload: { removedMessage: MessageInterface[]; chatKey: string } }
   | { type: "changeMessage"; payload: { changedMessage: MessageInterface; chatKey: string } }
   | { type: "updateSelectedMessages"; payload: { messageKey: string; chatKey: string } }
   | { type: "clearSelectedMessages"; payload: { chatKey: string } }
@@ -363,6 +363,8 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
       if (!messagesData.length) {
         return { ...state }
       }
+      console.log({ reducerRemovedMessages: action.payload.removedMessage })
+      const removedMessagesKeys = action.payload.removedMessage.map((message) => message.key)
       const renderedMessages = renderedMessagesList[action.payload.chatKey]
       const endIndex = messagesData.findIndex(
         (message: MessageInterface) => message.key === renderedMessages[renderedMessages.length - 1].key
@@ -372,22 +374,20 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         ...state,
         messages: {
           ...messages,
-          [action.payload.chatKey]: [
-            ...messagesData.filter((message) => message.key !== action.payload.removedMessage.key)
-          ]
+          [action.payload.chatKey]: [...messagesData.filter((message) => !removedMessagesKeys.includes(message.key))]
         },
         renderedMessagesList: {
           ...renderedMessagesList,
           [action.payload.chatKey]: [
             ...messagesData
-              .filter((message) => message.key !== action.payload.removedMessage.key)
+              .filter((message) => !removedMessagesKeys.includes(message.key))
               .slice(startIndex, endIndex + 1)
           ]
         },
         selectedMessages: {
           ...selectedMessages,
           [action.payload.chatKey]: selectedMessages[action.payload.chatKey]?.filter(
-            (messageKey) => messageKey !== action.payload.removedMessage.key
+            (messageKey) => !removedMessagesKeys.includes(messageKey)
           )
         }
       }

@@ -21,7 +21,7 @@ import useTimestampFormater from "../../Hooks/UseTimestampFormater"
 import MessageInput from "./Components/Input/MessageInput"
 import "./ChatWindow.scss"
 import Loader from "Components/UI/Placeholders/Loader"
-import useHandleMessageOptions from "./FirebaseHelpers/UseHandleMessageOptions"
+import useHandleMessageOptions from "./Components/MessageInfo/FirebaseHelpers/UseHandleMessageOptions"
 import SelectOptions from "./Components/SelectOptions/SelectOptions"
 
 const ChatWindow: React.FC = () => {

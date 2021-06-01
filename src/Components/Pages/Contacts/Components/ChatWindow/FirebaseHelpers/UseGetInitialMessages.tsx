@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react"
+import React, { useState, useEffect, useContext, useRef, useCallback } from "react"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
 import { ContactsContext } from "../../@Context/ContactsContext"
@@ -10,6 +10,8 @@ import {
 import { isUnexpectedObject } from "Utils"
 import { setMessagesSnapshot } from "./setMessagesSnapshot"
 import { MESSAGES_TO_RENDER, UNREAD_MESSAGES_TO_RENDER } from "../../@Context/Constants"
+import { throttle } from "throttle-debounce"
+import debounce from "debounce"
 
 const useGetInitialMessages = ({ chatKey }: { chatKey: string }) => {
   const { authUser, errors } = useContext(AppContext)
@@ -18,6 +20,17 @@ const useGetInitialMessages = ({ chatKey }: { chatKey: string }) => {
   const [loading, setLoading] = useState(false)
 
   const messagesRef = firebase.messages({ chatKey })
+
+  // let messagesToDelete: MessageInterface[] = []
+  const messagesToDelete = useRef<MessageInterface[]>([])
+  const removeMessagesThrottle = useCallback(
+    debounce((removedMessage: any) => {
+      context?.dispatch({ type: "removeMessage", payload: { removedMessage, chatKey } })
+      messagesToDelete.current = []
+      console.log({ deb: removedMessage })
+    }, 100),
+    []
+  )
 
   useEffect(() => {
     if (context?.state.messages[chatKey] !== undefined) return
@@ -142,7 +155,9 @@ const useGetInitialMessages = ({ chatKey }: { chatKey: string }) => {
             return
           }
           const removedMessage = { ...snapshot.val(), key: snapshot.key }
-          context?.dispatch({ type: "removeMessage", payload: { removedMessage, chatKey } })
+          messagesToDelete.current.push(removedMessage)
+          console.log({ messagesToDelete: messagesToDelete.current })
+          removeMessagesThrottle(messagesToDelete.current)
         })
     }
 

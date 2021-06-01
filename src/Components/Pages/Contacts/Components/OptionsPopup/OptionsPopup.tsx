@@ -11,8 +11,6 @@ type Props = {
 
 const ContactPopup: React.FC<Props> = ({ contactOptionsRef, contactInfo }) => {
   const context = useContext(ContactsContext)
-  const { contacts, activeChat } = context?.state!
-
   const optionsHandler = useContactOptions({ contactInfo })
 
   useEffect(() => {

@@ -206,11 +206,11 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
       updateTyping({ activeChat, authUser, firebase, setTypingNull: true })
     } else {
       console.log("onChangeNotEmpty: all")
-      inputRef.current.scrollTop = scrollTop + MESSAGE_LINE_HEIGHT
-      if (prevHeight.current + MESSAGE_LINE_HEIGHT < INPUT_MESSAGE_MAX_HEIGHT) {
-        chatContainerRef.scrollTop = getContainerRect().scrollTop + MESSAGE_LINE_HEIGHT
-      }
-      prevHeight.current = height
+      // inputRef.current.scrollTop = scrollTop + MESSAGE_LINE_HEIGHT
+      // if (prevHeight.current + MESSAGE_LINE_HEIGHT < INPUT_MESSAGE_MAX_HEIGHT) {
+      //   chatContainerRef.scrollTop = getContainerRect().scrollTop + MESSAGE_LINE_HEIGHT
+      // }
+      // prevHeight.current = height
       dispatchDeb({ message: innerHTML, anchorOffset, scrollTop })
       updateTyping({ activeChat, authUser, firebase })
     }
