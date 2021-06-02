@@ -25,33 +25,29 @@ export type ACTIONTYPES =
   | { type: "renderBottomMessages" }
   | { type: "handleGoDown"; payload: { unreadMessages: string[] } }
   | { type: "addNewMessage"; payload: { newMessage: MessageInterface; chatKey: string } }
-  | { type: "removeMessage"; payload: { removedMessage: MessageInterface[]; chatKey: string } }
+  | { type: "removeMessages"; payload: { removedMessages: MessageInterface[]; chatKey: string } }
   | { type: "changeMessage"; payload: { changedMessage: MessageInterface; chatKey: string } }
   | { type: "updateSelectedMessages"; payload: { messageKey: string; chatKey: string } }
   | { type: "clearSelectedMessages"; payload: { chatKey: string } }
   | { type: "updateMessageInput"; payload: MessageInputInterface }
   | { type: "updateContactInfo"; payload: { changedInfo: ContactInfoInterface } }
   | {
-      type: "updateContacts"
+      type: "updateContactsInitial"
       payload: {
         contacts: ContactsInterface
         unreadMessages: { [key: string]: string[] }
         unreadMessagesContacts: { [key: string]: string[] }
       }
     }
+  | { type: "updateContacts"; payload: { contacts: ContactInfoInterface[] } }
   | { type: "updateLastScrollPosition"; payload: { scrollTop: number; chatKey: string } }
   | { type: "updateMessagePopup"; payload: string }
   | { type: "updateOptionsPopupContactList"; payload: string }
   | { type: "updateOptionsPopupChatWindow"; payload: string }
   | { type: "closePopups"; payload: string }
   | { type: "updateConfirmModal"; payload: { isActive: boolean; function: string; contactKey?: string } }
-  | {
-      type: "updateContactsStatus"
-      payload: {
-        status: ContactStatusInterface
-        chatKey: string
-      }
-    }
+  | { type: "updateContactsStatus"; payload: { status: ContactStatusInterface; chatKey: string } }
+  | { type: "updateContactsPageIsOpen"; payload: { isPageOpen: boolean | null; chatKey: string } }
 
 const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
   const {
@@ -358,13 +354,13 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
       }
     }
 
-    case "removeMessage": {
+    case "removeMessages": {
       const messagesData = messages[action.payload.chatKey]
       if (!messagesData.length) {
         return { ...state }
       }
-      console.log({ reducerRemovedMessages: action.payload.removedMessage })
-      const removedMessagesKeys = action.payload.removedMessage.map((message) => message.key)
+      console.log({ reducerRemovedMessages: action.payload.removedMessages })
+      const removedMessagesKeys = action.payload.removedMessages.map((message) => message.key)
       const renderedMessages = renderedMessagesList[action.payload.chatKey]
       const endIndex = messagesData.findIndex(
         (message: MessageInterface) => message.key === renderedMessages[renderedMessages.length - 1].key
@@ -462,12 +458,28 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         messagePopup: action.payload.editingMsgKey !== null ? "" : messagePopup
       }
 
-    case "updateContacts": {
+    case "updateContactsInitial": {
       return {
         ...state,
         contacts: action.payload.contacts,
         authUserUnreadMessages: action.payload.unreadMessages,
         contactsUnreadMessages: action.payload.unreadMessagesContacts
+      }
+    }
+
+    case "updateContacts": {
+      console.log(contacts)
+      console.log(action.payload.contacts)
+      action.payload.contacts.reverse()
+      const roflan = action.payload.contacts.reduce((acc: any, contact: any) => {
+        acc[contact.key] = { ...contacts[contact.key], ...contact }
+        return acc
+      }, {})
+
+      console.log({ roflan })
+      return {
+        ...state,
+        contacts: roflan
       }
     }
 
@@ -493,6 +505,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
       }
 
     case "updateContactUnreadMessages":
+      console.log(action.payload.unreadMessages)
       return {
         ...state,
         contactsUnreadMessages: {
@@ -557,6 +570,18 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         contactsStatus: {
           ...contactsStatus,
           [action.payload.chatKey]: action.payload.status
+        }
+      }
+
+    case "updateContactsPageIsOpen":
+      return {
+        ...state,
+        contactsStatus: {
+          ...contactsStatus,
+          [action.payload.chatKey]: {
+            ...contactsStatus[action.payload.chatKey],
+            pageIsOpen: action.payload.isPageOpen
+          }
         }
       }
 

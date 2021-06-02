@@ -23,11 +23,10 @@ const useGetInitialMessages = ({ chatKey }: { chatKey: string }) => {
 
   // let messagesToDelete: MessageInterface[] = []
   const messagesToDelete = useRef<MessageInterface[]>([])
-  const removeMessagesThrottle = useCallback(
-    debounce((removedMessage: any) => {
-      context?.dispatch({ type: "removeMessage", payload: { removedMessage, chatKey } })
+  const removeMessagesDebounce = useCallback(
+    debounce((removedMessages: any) => {
+      context?.dispatch({ type: "removeMessages", payload: { removedMessages, chatKey } })
       messagesToDelete.current = []
-      console.log({ deb: removedMessage })
     }, 100),
     []
   )
@@ -156,8 +155,7 @@ const useGetInitialMessages = ({ chatKey }: { chatKey: string }) => {
           }
           const removedMessage = { ...snapshot.val(), key: snapshot.key }
           messagesToDelete.current.push(removedMessage)
-          console.log({ messagesToDelete: messagesToDelete.current })
-          removeMessagesThrottle(messagesToDelete.current)
+          removeMessagesDebounce(messagesToDelete.current)
         })
     }
 

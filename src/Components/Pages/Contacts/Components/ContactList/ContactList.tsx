@@ -23,7 +23,9 @@ const ContactList: React.FC = () => {
   const [allContactsAmount, setAllContactsAmount] = useState<number | null>(null)
   const loadedContacts = context?.state?.contacts ? Object.keys(context.state.contacts).length : 0
 
-  const [initialLoading, setInitialLoading] = useState(true)
+  // const [initialLoading, setInitialLoading] = useState(true)
+  const initialLoading = useRef(true)
+  const newLoad = useRef(true)
 
   const contactListRef = useRef<HTMLDivElement>(null!)
   const isScrolledDown = useElementScrolledDown({ element: contactListRef.current, threshold: 650 })
@@ -33,15 +35,16 @@ const ContactList: React.FC = () => {
 
   const getContactsList = async (snapshot: any) => {
     if (snapshot.val() === null) {
-      setInitialLoading(false)
+      // setInitialLoading(false)
+      initialLoading.current = false
       context?.dispatch({
-        type: "updateContacts",
+        type: "updateContactsInitial",
         payload: { contacts: {}, unreadMessages: {}, unreadMessagesContacts: {} }
       })
       // setContacts([])
       return
     }
-
+    console.log(snapshot.val())
     let contactsData: ContactInfoInterface[] = []
     snapshot.forEach((contact: { val: () => ContactInfoInterface; key: string }) => {
       if (isUnexpectedObject({ exampleObject: CONTACT_INFO_INITIAL_DATA, targetObject: contact.val() })) {
@@ -53,26 +56,47 @@ const ContactList: React.FC = () => {
       contactsData.push({ ...contact.val(), key: contact.key })
     })
 
-    const contacts = await getInitialContactInfo({ firebase, contactsData, authUser, context })
-    const unreadMessages = contacts.reduce((acc, contact) => {
-      acc = { ...acc, [contact.chatKey]: contact.unreadMessages }
-      return acc
-    }, {})
-    const unreadMessagesContacts = contacts.reduce((acc, contact) => {
-      acc = { ...acc, [contact.chatKey]: contact.unreadMessagesContact }
-      return acc
-    }, {})
+    console.log(contactsData)
+    console.log({ initialLoading: initialLoading.current })
 
-    const contactsDispatch = contacts.reduce((acc: { [key: string]: ContactInfoInterface }, contact) => {
-      acc = { [contact.key]: { ...contact }, ...acc }
-      return acc
-    }, {})
+    if (initialLoading.current || newLoad.current) {
+      const contacts = await getInitialContactInfo({ firebase, contactsData, authUser, context })
+      const unreadMessages = contacts.reduce((acc, contact) => {
+        acc = { ...acc, [contact.chatKey]: contact.unreadMessages }
+        return acc
+      }, {})
+      const unreadMessagesContacts = contacts.reduce((acc, contact) => {
+        acc = { ...acc, [contact.chatKey]: contact.unreadMessagesContact }
+        return acc
+      }, {})
 
-    context?.dispatch({
-      type: "updateContacts",
-      payload: { contacts: contactsDispatch, unreadMessages, unreadMessagesContacts }
-    })
-    setInitialLoading(false)
+      const contactsDispatch = contacts.reduce((acc: { [key: string]: ContactInfoInterface }, contact) => {
+        acc = { [contact.key]: { ...contact }, ...acc }
+        return acc
+      }, {})
+
+      console.log(contactsDispatch)
+
+      context?.dispatch({
+        type: "updateContactsInitial",
+        payload: { contacts: contactsDispatch, unreadMessages, unreadMessagesContacts }
+      })
+      // setInitialLoading(false)
+      initialLoading.current = false
+      newLoad.current = false
+    } else {
+      // const test = contactsData.reduce((acc: { [key: string]: ContactInfoInterface }, contact) => {
+      //   console.log(contact)
+      //   acc = { [contact.key]: { ...contact }, ...acc }
+      //   return acc
+      // }, {})
+      console.log(contactsData)
+
+      context?.dispatch({
+        type: "updateContacts",
+        payload: { contacts: contactsData }
+      })
+    }
   }
 
   useEffect(() => {
@@ -96,6 +120,7 @@ const ContactList: React.FC = () => {
     if (loadedContacts >= allContactsAmount!) return
 
     contactsListRef.off()
+    newLoad.current = true
     contactsListRef
       .orderByChild("pinned_lastActivityTS")
       .limitToLast(loadedContacts + CONTACTS_TO_LOAD)
@@ -107,10 +132,10 @@ const ContactList: React.FC = () => {
       ref={contactListRef}
       className={classNames("contact-list", {
         "contact-list--hide-mobile": context?.state.activeChat.chatKey,
-        "contact-list--no-contacts": !initialLoading && !contactsData?.length
+        "contact-list--no-contacts": !initialLoading.current && !contactsData?.length
       })}
     >
-      {initialLoading ? (
+      {initialLoading.current ? (
         <div className="contact-list__loader-wrapper">
           <span className="contact-list__loader"></span>
         </div>

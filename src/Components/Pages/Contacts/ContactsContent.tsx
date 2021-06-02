@@ -40,10 +40,20 @@ const ContactsContent: React.FC<Props> = () => {
         }
 
         firebase.messages({ chatKey }).off()
+        firebase.unreadMessages({ uid: otherMemberKey, chatKey }).off()
+        firebase.contactsDatabase({ uid: otherMemberKey }).child("pageIsOpen").off()
         firebase.chatMemberStatus({ chatKey, memberKey: otherMemberKey }).off()
       })
     }
   }, [authUser, firebase])
+
+  useEffect(() => {
+    firebase.contactsDatabase({ uid: authUser?.uid }).update({ pageIsOpen: true })
+    firebase.contactsDatabase({ uid: authUser?.uid }).onDisconnect().update({ pageIsOpen: null })
+    return () => {
+      firebase.contactsDatabase({ uid: authUser?.uid }).update({ pageIsOpen: null })
+    }
+  }, [])
 
   const addNewMessageCurrent = async (authIsSender: any) => {
     // const contactsList = await firebase.contactsList({ uid: authUser?.uid }).once("value")

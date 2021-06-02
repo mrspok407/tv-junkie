@@ -26,11 +26,12 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
   const firebase = useContext(FirebaseContext)
   const context = useContext(ContactsContext)
   const { authUser, errors } = useContext(AppContext)
-  const { activeChat, messagesInput, contactsStatus, messages, selectedMessages } = context?.state!
+  const { activeChat, messagesInput, contactsStatus, messages, selectedMessages, contacts } = context?.state!
   const selectedMessagesData = selectedMessages[activeChat.chatKey]
   const messageInputData = messagesInput[activeChat.chatKey] || {}
   const messagesData = messages[activeChat.chatKey]
-  const contactsStatusData = contactsStatus[activeChat.chatKey] || {}
+  const contactsData = Object.values(contacts || {})
+  const contactStatusData = contactsStatus[activeChat.chatKey] || {}
 
   const inputRef = useRef<HTMLDivElement>(null!)
   const keysMap = useRef<any>({})
@@ -135,7 +136,8 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
         authUser,
         firebase,
         message: newMessageText,
-        contactsStatusData
+        contactStatusData: contactStatusData,
+        contactsData
       })
 
       const newMessageRef = document.querySelector(`.chat-window__message--${messageKey}`)

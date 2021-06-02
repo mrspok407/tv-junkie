@@ -23,6 +23,7 @@ import "./ChatWindow.scss"
 import Loader from "Components/UI/Placeholders/Loader"
 import useHandleMessageOptions from "./Components/MessageInfo/FirebaseHelpers/UseHandleMessageOptions"
 import SelectOptions from "./Components/SelectOptions/SelectOptions"
+import useContactListeners from "./Hooks/UseContactListeners"
 
 const ChatWindow: React.FC = () => {
   const { authUser, newContactsActivity, errors } = useContext(AppContext)
@@ -38,13 +39,16 @@ const ChatWindow: React.FC = () => {
     lastScrollPosition,
     authUserUnreadMessages,
     contactsStatus,
-    optionsPopupChatWindow
+    optionsPopupChatWindow,
+    contactsUnreadMessages
   } = context?.state!
   const messagesData = messages[activeChat.chatKey]
   const renderedMessages = renderedMessagesList[activeChat.chatKey] || []
   const unreadMessagesAuth = authUserUnreadMessages[activeChat.chatKey] || []
   const selectedMessagesData = selectedMessages[activeChat.chatKey] || []
   const contactInfo = contacts[activeChat.contactKey] || {}
+
+  const contactsUnreadMessagesData = contactsUnreadMessages[activeChat.chatKey]
 
   const [chatContainerRef, setChatContainerRef] = useState<HTMLDivElement>(null!)
   const contactOptionsRef = useRef<HTMLDivElement>(null!)
@@ -65,18 +69,6 @@ const ChatWindow: React.FC = () => {
     }
   }, [])
 
-  useEffect(() => {
-    firebase
-      .unreadMessages({ uid: activeChat.contactKey, chatKey: activeChat.chatKey })
-      .on("value", (snapshot: any) => {
-        const unreadMessagesContact = !snapshot.val() ? [] : Object.keys(snapshot.val())
-        context?.dispatch({
-          type: "updateContactUnreadMessages",
-          payload: { unreadMessages: unreadMessagesContact, chatKey: activeChat.chatKey }
-        })
-      })
-  }, [firebase, activeChat])
-
   const { loadTopMessages, loading } = useLoadTopMessages()
   const { handleContactRequest } = useResponseContactRequest({ userUid: activeChat.contactKey })
   const { onMouseEnter } = useIntersectionObserver({
@@ -91,6 +83,7 @@ const ChatWindow: React.FC = () => {
     unreadMessages: unreadMessagesAuth,
     chatKey: activeChat.chatKey
   })
+  useContactListeners()
 
   const getContainerRect = () => {
     const height = chatContainerRef.getBoundingClientRect().height

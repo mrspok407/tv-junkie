@@ -39,8 +39,8 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
 
     if (failedDeliverMessages.length) {
       context?.dispatch({
-        type: "removeMessage",
-        payload: { removedMessage: failedDeliverMessages, chatKey: activeChat.chatKey }
+        type: "removeMessages",
+        payload: { removedMessages: failedDeliverMessages, chatKey: activeChat.chatKey }
       })
     }
 

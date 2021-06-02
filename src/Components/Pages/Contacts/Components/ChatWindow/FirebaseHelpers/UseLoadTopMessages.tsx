@@ -17,14 +17,12 @@ const useLoadTopMessages = () => {
   const messagesRef = firebase.messages({ chatKey: activeChat.chatKey })
 
   const [loading, setLoading] = useState(false)
-
   const loadedMessageGroups = useRef<number[]>([])
 
-  // let messagesToDelete: MessageInterface[] = []
   const messagesToDelete = useRef<MessageInterface[]>([])
-  const removeMessagesThrottle = useCallback(
-    debounce((removedMessage: any) => {
-      context?.dispatch({ type: "removeMessage", payload: { removedMessage, chatKey: activeChat.chatKey } })
+  const removeMessagesDebounce = useCallback(
+    debounce((removedMessages: any) => {
+      context?.dispatch({ type: "removeMessages", payload: { removedMessages, chatKey: activeChat.chatKey } })
       messagesToDelete.current = []
     }, 100),
     []
@@ -97,7 +95,7 @@ const useLoadTopMessages = () => {
         }
         const removedMessage = { ...snapshot.val(), key: snapshot.key }
         messagesToDelete.current.push(removedMessage)
-        removeMessagesThrottle(messagesToDelete.current)
+        removeMessagesDebounce(messagesToDelete.current)
       })
 
     setLoading(false)

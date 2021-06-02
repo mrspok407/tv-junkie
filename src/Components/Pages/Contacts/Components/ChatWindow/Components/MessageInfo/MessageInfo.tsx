@@ -8,11 +8,13 @@ import "./MessageInfo.scss"
 
 type Props = { messageData: MessageInterface }
 
-const MessageInfo: React.FC<Props> = React.memo(({ messageData }) => {
+const MessageInfo: React.FC<Props> = ({ messageData }) => {
   const { authUser } = useContext(AppContext)
   const context = useContext(ContactsContext)
   const { activeChat, messagePopup, contactsUnreadMessages } = context?.state!
   const contactsUnreadMessagesData = contactsUnreadMessages[activeChat.chatKey]
+
+  // console.log({ contactsUnreadMessagesData })
 
   const messageOptionsRef = useRef<HTMLDivElement>(null!)
 
@@ -54,6 +56,6 @@ const MessageInfo: React.FC<Props> = React.memo(({ messageData }) => {
       </div>
     </div>
   )
-})
+}
 
 export default MessageInfo

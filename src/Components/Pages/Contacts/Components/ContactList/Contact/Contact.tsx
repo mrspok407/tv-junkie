@@ -7,7 +7,7 @@ import { ContactInfoInterface, MessageInterface } from "../../../@Types"
 import { ContactsContext } from "../../@Context/ContactsContext"
 import ContactPopup from "../../OptionsPopup/OptionsPopup"
 import useGetInitialMessages from "../../ChatWindow/FirebaseHelpers/UseGetInitialMessages"
-import useHandleContactsStatus from "../../ChatWindow/FirebaseHelpers/UseHandleContactsStatus"
+import useHandleContactsStatus from "../../ChatWindow/Hooks/UseHandleContactsStatus"
 import "./Contact.scss"
 import Loader from "Components/UI/Placeholders/Loader"
 
@@ -70,26 +70,11 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
         firebase.privateChats().child(`${chatKey}/historyDeleted`).set(null)
       })
 
-    // const lastMessageListener = firebase
-    //   .messages({ chatKey })
-    //   .orderByChild("timeStamp")
-    //   .limitToLast(1)
-    //   .on("value", (snapshot: { val: () => MessageInterface }) => {
-    //     console.log(snapshot.val())
-    //     if (snapshot.val() === null) {
-    //       // setLastMessage(null)
-    //       return
-    //     }
-    //     // const messageData = Object.values(snapshot.val())[0]
-    //     // setLastMessage(messageData)
-    //   })
-
     return () => {
       firebase.newContactsActivity({ uid: authUser?.uid }).child(`${contactInfo.key}`).off()
       firebase.newContactsRequests({ uid: authUser?.uid! }).child(`${contactInfo.key}`).off()
       firebase.unreadMessages({ uid: authUser?.uid!, chatKey }).off()
       firebase.unreadMessages({ uid: contactInfo.key, chatKey }).off()
-      // firebase.messages({ chatKey }).off("value", lastMessageListener)
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
