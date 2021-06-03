@@ -468,18 +468,16 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
     }
 
     case "updateContacts": {
-      console.log(contacts)
-      console.log(action.payload.contacts)
+      console.log("updateContacts")
       action.payload.contacts.reverse()
-      const roflan = action.payload.contacts.reduce((acc: any, contact: any) => {
+      const contactsData = action.payload.contacts.reduce((acc: any, contact: any) => {
         acc[contact.key] = { ...contacts[contact.key], ...contact }
         return acc
       }, {})
-
-      console.log({ roflan })
+      console.log({ contactsData })
       return {
         ...state,
-        contacts: roflan
+        contacts: contactsData
       }
     }
 
@@ -505,7 +503,6 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
       }
 
     case "updateContactUnreadMessages":
-      console.log(action.payload.unreadMessages)
       return {
         ...state,
         contactsUnreadMessages: {

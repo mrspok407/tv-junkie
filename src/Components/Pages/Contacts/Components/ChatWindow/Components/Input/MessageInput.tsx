@@ -5,13 +5,12 @@ import { ContactsContext } from "../../../@Context/ContactsContext"
 import { INPUT_MESSAGE_MAX_HEIGHT, MESSAGE_LINE_HEIGHT, MOBILE_LAYOUT_THRESHOLD } from "../../../@Context/Constants"
 import { FirebaseContext } from "Components/Firebase"
 import { AppContext } from "Components/AppContext/AppContextHOC"
-import { sendMessage } from "./FirebaseHelpers/SendMessage"
 import classNames from "classnames"
 import GoDown from "../GoDown/GoDown"
-import { editMessage } from "./FirebaseHelpers/EditMessage"
 import { updateTyping } from "./FirebaseHelpers/UpdateTyping"
-import "./MessageInput.scss"
 import SelectOptions from "../SelectOptions/SelectOptions"
+import useHandleMessage from "./Hooks/UseHandleMessage"
+import "./MessageInput.scss"
 
 type Props = {
   unreadMessagesAuthRef: string[]
@@ -37,6 +36,8 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
   const keysMap = useRef<any>({})
 
   const windowWidth = window.innerWidth
+
+  const { sendMessage, editMessage } = useHandleMessage()
 
   const getSelection = () => {
     const selection = window.getSelection()
@@ -131,14 +132,16 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
     })
 
     try {
-      const messageKey = await sendMessage({
-        activeChat,
-        authUser,
-        firebase,
-        message: newMessageText,
-        contactStatusData: contactStatusData,
-        contactsData
-      })
+      const messageKey = await sendMessage({ message: newMessageText })
+      // const messageKey = await sendMessage({
+      //   activeChat,
+      //   authUser,
+      //   firebase,
+      //   message: newMessageText,
+      //   contactStatusData,
+      //   contactsData,
+      //   context
+      // })
 
       const newMessageRef = document.querySelector(`.chat-window__message--${messageKey}`)
       newMessageRef?.scrollIntoView({ block: "start", inline: "start" })
@@ -181,13 +184,14 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
 
     try {
       console.log(editedMessageText)
-      await editMessage({
-        activeChat,
-        firebase,
-        authUser,
-        editedMessageText,
-        originalMessage
-      })
+      await editMessage({ message: editedMessageText, originalMessage })
+      // await editMessage({
+      //   activeChat,
+      //   firebase,
+      //   authUser,
+      //   editedMessageText,
+      //   originalMessage
+      // })
     } catch (error) {
       errors.handleError({
         message: "Message hasn't been edited, because of the unexpected error. Please reload the page."

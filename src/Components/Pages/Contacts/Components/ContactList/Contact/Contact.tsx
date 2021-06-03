@@ -19,7 +19,6 @@ type Props = {
 const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount }) => {
   const firebase = useContext(FirebaseContext)
   const { authUser } = useContext(AppContext)
-
   const context = useContext(ContactsContext)
   const { optionsPopupContactList, activeChat, messages, contactsStatus } = context?.state!
   const messagesData = messages[contactInfo.chatKey]
@@ -61,6 +60,15 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
       const unreadMessagesAuth = !snapshot.val() ? [] : Object.keys(snapshot.val())
       setAuthUnreadMessages(unreadMessagesAuth)
     })
+
+    const unreadMessagesListenerContact = firebase
+      .unreadMessages({ uid: contactInfo.key, chatKey })
+      .limitToFirst(1)
+      .on("value", (snapshot: any) => {
+        const unreadMessagesContact = !snapshot.val() ? [] : Object.keys(snapshot.val())
+        setContactUnreadMessages(unreadMessagesContact)
+      })
+
     firebase
       .privateChats()
       .child(`${chatKey}/historyDeleted`)
@@ -74,7 +82,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
       firebase.newContactsActivity({ uid: authUser?.uid }).child(`${contactInfo.key}`).off()
       firebase.newContactsRequests({ uid: authUser?.uid! }).child(`${contactInfo.key}`).off()
       firebase.unreadMessages({ uid: authUser?.uid!, chatKey }).off()
-      firebase.unreadMessages({ uid: contactInfo.key, chatKey }).off()
+      firebase.unreadMessages({ uid: contactInfo.key, chatKey }).off("value", unreadMessagesListenerContact)
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -85,6 +93,13 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
 
   const chatActive = context?.state.activeChat.contactKey === contactInfo.key
   const unreadMessagesAmount = authUnreadMessages?.length === 0 ? null : authUnreadMessages?.length
+  if (contactInfo.key === "0iSDFz7cfEWR0XVc3QLsysPfXOb2") {
+    console.log({ contactUnreadMessages })
+  }
+  if (contactInfo.key === "drv5lG97VxVBLgkdn8bMhdxmqQT2") {
+    console.log({ contactUnreadMessages })
+  }
+
   return (
     <div
       className={classNames("contact-item", {
@@ -103,7 +118,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
         {lastMessage?.sender === authUser?.uid && (
           <div
             className={classNames("contact-item__last-message-status", {
-              "contact-item__last-message-status--unread": contactUnreadMessages.length
+              "contact-item__last-message-status--unread": contactUnreadMessages?.length
             })}
           ></div>
         )}

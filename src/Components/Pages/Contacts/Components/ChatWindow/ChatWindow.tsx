@@ -48,8 +48,6 @@ const ChatWindow: React.FC = () => {
   const selectedMessagesData = selectedMessages[activeChat.chatKey] || []
   const contactInfo = contacts[activeChat.contactKey] || {}
 
-  const contactsUnreadMessagesData = contactsUnreadMessages[activeChat.chatKey]
-
   const [chatContainerRef, setChatContainerRef] = useState<HTMLDivElement>(null!)
   const contactOptionsRef = useRef<HTMLDivElement>(null!)
   const unreadMessagesAuthRef = useRef<string[]>([])
@@ -60,7 +58,6 @@ const ChatWindow: React.FC = () => {
   const isScrollBottomRef = useRef(false)
   const { pageInFocus } = usePageFocusHandler({ activeChat })
 
-  // const [firstMessage, setFirstMessage] = useState<string>()
   const { floatDate, isScrollingTop } = useShowFloatDate({ activeChat, chatContainerRef, renderedMessages })
 
   const chatContainerCallback = useCallback((node) => {

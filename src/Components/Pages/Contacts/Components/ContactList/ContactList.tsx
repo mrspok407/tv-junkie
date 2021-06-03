@@ -44,7 +44,7 @@ const ContactList: React.FC = () => {
       // setContacts([])
       return
     }
-    console.log(snapshot.val())
+
     let contactsData: ContactInfoInterface[] = []
     snapshot.forEach((contact: { val: () => ContactInfoInterface; key: string }) => {
       if (isUnexpectedObject({ exampleObject: CONTACT_INFO_INITIAL_DATA, targetObject: contact.val() })) {
@@ -55,9 +55,6 @@ const ContactList: React.FC = () => {
       }
       contactsData.push({ ...contact.val(), key: contact.key })
     })
-
-    console.log(contactsData)
-    console.log({ initialLoading: initialLoading.current })
 
     if (initialLoading.current || newLoad.current) {
       const contacts = await getInitialContactInfo({ firebase, contactsData, authUser, context })
@@ -75,23 +72,14 @@ const ContactList: React.FC = () => {
         return acc
       }, {})
 
-      console.log(contactsDispatch)
+      initialLoading.current = false
+      newLoad.current = false
 
       context?.dispatch({
         type: "updateContactsInitial",
         payload: { contacts: contactsDispatch, unreadMessages, unreadMessagesContacts }
       })
-      // setInitialLoading(false)
-      initialLoading.current = false
-      newLoad.current = false
     } else {
-      // const test = contactsData.reduce((acc: { [key: string]: ContactInfoInterface }, contact) => {
-      //   console.log(contact)
-      //   acc = { [contact.key]: { ...contact }, ...acc }
-      //   return acc
-      // }, {})
-      console.log(contactsData)
-
       context?.dispatch({
         type: "updateContacts",
         payload: { contacts: contactsData }
