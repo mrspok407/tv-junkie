@@ -133,16 +133,6 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
 
     try {
       const messageKey = await sendMessage({ message: newMessageText })
-      // const messageKey = await sendMessage({
-      //   activeChat,
-      //   authUser,
-      //   firebase,
-      //   message: newMessageText,
-      //   contactStatusData,
-      //   contactsData,
-      //   context
-      // })
-
       const newMessageRef = document.querySelector(`.chat-window__message--${messageKey}`)
       newMessageRef?.scrollIntoView({ block: "start", inline: "start" })
     } catch (error) {
@@ -185,13 +175,6 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
     try {
       console.log(editedMessageText)
       await editMessage({ message: editedMessageText, originalMessage })
-      // await editMessage({
-      //   activeChat,
-      //   firebase,
-      //   authUser,
-      //   editedMessageText,
-      //   originalMessage
-      // })
     } catch (error) {
       errors.handleError({
         message: "Message hasn't been edited, because of the unexpected error. Please reload the page."
