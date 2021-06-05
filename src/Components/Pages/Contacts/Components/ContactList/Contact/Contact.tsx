@@ -93,12 +93,6 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
 
   const chatActive = context?.state.activeChat.contactKey === contactInfo.key
   const unreadMessagesAmount = authUnreadMessages?.length === 0 ? null : authUnreadMessages?.length
-  if (contactInfo.key === "0iSDFz7cfEWR0XVc3QLsysPfXOb2") {
-    console.log({ contactUnreadMessages })
-  }
-  if (contactInfo.key === "drv5lG97VxVBLgkdn8bMhdxmqQT2") {
-    console.log({ contactUnreadMessages })
-  }
 
   return (
     <div

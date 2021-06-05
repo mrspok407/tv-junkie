@@ -23,9 +23,10 @@ const useLoadTopMessages = () => {
   const removeMessagesDebounce = useCallback(
     debounce((removedMessages: any) => {
       context?.dispatch({ type: "removeMessages", payload: { removedMessages, chatKey: activeChat.chatKey } })
+      console.log(activeChat.chatKey)
       messagesToDelete.current = []
     }, 100),
-    []
+    [activeChat]
   )
 
   const loadTopMessages = useCallback(async () => {
@@ -94,6 +95,7 @@ const useLoadTopMessages = () => {
           return
         }
         const removedMessage = { ...snapshot.val(), key: snapshot.key }
+        console.log({ removedMessage })
         messagesToDelete.current.push(removedMessage)
         removeMessagesDebounce(messagesToDelete.current)
       })

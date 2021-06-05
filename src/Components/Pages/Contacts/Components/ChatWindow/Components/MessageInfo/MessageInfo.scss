@@ -31,6 +31,11 @@ $messageStatusSize: 17px;
   .popup-container {
     left: -68px;
     z-index: 2;
+
+    &--received-message {
+      left: 14px;
+      border-radius: 0px 5px 5px 5px;
+    }
   }
 
   .chat-window__open-popup-btn {
@@ -90,15 +95,25 @@ $messageStatusSize: 17px;
 
       &--sended-message {
         top: -92px;
+        border-radius: 5px 5px 0px 5px;
       }
       &--received-message {
         top: -54px;
         background-color: #2b5278;
+        border-radius: 5px 5px 5px 0;
         .popup__option:first-child {
           .popup__option-btn:after {
             border-radius: 5px 5px 0px 0px;
           }
         }
+        .popup__option:last-child {
+          .popup__option-btn:after {
+            border-radius: 0px 0px 5px 0;
+          }
+        }
+      }
+      &--failed-deliver {
+        top: -54px;
       }
     }
   }

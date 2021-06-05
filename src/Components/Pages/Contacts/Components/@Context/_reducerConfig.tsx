@@ -26,6 +26,11 @@ export type ACTIONTYPES =
   | { type: "handleGoDown"; payload: { unreadMessages: string[] } }
   | { type: "addNewMessage"; payload: { newMessage: MessageInterface; chatKey: string } }
   | { type: "removeMessages"; payload: { removedMessages: MessageInterface[]; chatKey: string } }
+  | {
+      type: "updateMsgDeletionProcess"
+      payload: { messageDeletionProcess: boolean; deletedMessages: MessageInterface[] }
+    }
+  | { type: "updateMsgDeletionProcessLoading"; payload: { messageDeletionProcess: boolean } }
   | { type: "changeMessage"; payload: { changedMessage: MessageInterface; chatKey: string } }
   | { type: "updateSelectedMessages"; payload: { messageKey: string; chatKey: string } }
   | { type: "clearSelectedMessages"; payload: { chatKey: string } }
@@ -63,7 +68,8 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
     optionsPopupChatWindow,
     lastScrollPosition,
     contactsStatus,
-    contacts
+    contacts,
+    messageDeletionProcess
   } = state
 
   switch (action.type) {
@@ -359,13 +365,30 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
       if (!messagesData.length) {
         return { ...state }
       }
-      console.log({ reducerRemovedMessages: action.payload.removedMessages })
       const removedMessagesKeys = action.payload.removedMessages.map((message) => message.key)
       const renderedMessages = renderedMessagesList[action.payload.chatKey]
       const endIndex = messagesData.findIndex(
         (message: MessageInterface) => message.key === renderedMessages[renderedMessages.length - 1].key
       )
       const startIndex = Math.max(endIndex + 1 - MESSAGES_TO_RENDER, 0)
+
+      console.log({ reducerRemovedMessages: action.payload.removedMessages })
+      console.log({ messagesData })
+      console.log({ endIndex })
+      console.log({ startIndex })
+
+      const inputRef = document.querySelector(".chat-window__input-message") as HTMLElement
+      let messageInput = {}
+      const currentMessageEdit = messagesInput[activeChat.chatKey]?.editingMsgKey
+      if (currentMessageEdit && removedMessagesKeys.includes(currentMessageEdit)) {
+        messageInput = {
+          message: "",
+          anchorOffset: 0,
+          scrollTop: 0,
+          editingMsgKey: null
+        }
+        inputRef.innerHTML = ""
+      }
       return {
         ...state,
         messages: {
@@ -385,7 +408,49 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
           [action.payload.chatKey]: selectedMessages[action.payload.chatKey]?.filter(
             (messageKey) => !removedMessagesKeys.includes(messageKey)
           )
+        },
+        messagesInput: {
+          ...messagesInput,
+          [action.payload.chatKey]: {
+            ...messagesInput[activeChat.chatKey],
+            ...messageInput
+          }
         }
+      }
+    }
+
+    case "updateMsgDeletionProcess": {
+      const inputRef = document.querySelector(".chat-window__input-message") as HTMLElement
+      const deletedMessagesData = action.payload.deletedMessages.map((message) => message.key)
+      const currentMessageEdit = messagesInput[activeChat.chatKey]?.editingMsgKey
+      let messageInput = {}
+      if (currentMessageEdit && deletedMessagesData.includes(currentMessageEdit)) {
+        messageInput = {
+          message: "",
+          anchorOffset: 0,
+          scrollTop: 0,
+          editingMsgKey: null
+        }
+        inputRef.innerHTML = ""
+      }
+
+      return {
+        ...state,
+        messageDeletionProcess: action.payload.messageDeletionProcess,
+        messagesInput: {
+          ...messagesInput,
+          [activeChat.chatKey]: {
+            ...messagesInput[activeChat.chatKey],
+            ...messageInput
+          }
+        }
+      }
+    }
+
+    case "updateMsgDeletionProcessLoading": {
+      return {
+        ...state,
+        messageDeletionProcess: action.payload.messageDeletionProcess
       }
     }
 
@@ -503,6 +568,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
       }
 
     case "updateContactUnreadMessages":
+      if (messageDeletionProcess) return { ...state }
       return {
         ...state,
         contactsUnreadMessages: {
@@ -619,7 +685,8 @@ export const INITIAL_STATE = {
     isActive: false,
     function: "",
     contactKey: ""
-  }
+  },
+  messageDeletionProcess: false
 }
 
 export default reducer

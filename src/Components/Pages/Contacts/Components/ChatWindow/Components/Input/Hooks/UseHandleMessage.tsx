@@ -32,7 +32,7 @@ const useHandleMessage = () => {
       [`privateChats/${activeChat.chatKey}/messages/${messageKey}`]: {
         sender: authUser?.uid,
         message,
-        timeStamp: timeStampEpoch * 2
+        timeStamp: timeStampEpoch
       },
       [`privateChats/${activeChat.chatKey}/members/${activeChat.contactKey}/unreadMessages/${messageKey}`]:
         !contactStatusData?.isOnline || !contactStatusData?.chatBottom || !contactStatusData?.pageInFocus ? true : null,
@@ -52,8 +52,6 @@ const useHandleMessage = () => {
   }
 
   const editMessage = async ({ message, originalMessage }: { message: string; originalMessage: MessageInterface }) => {
-    console.log(originalMessage.message)
-    console.log(message)
     if (originalMessage.message === message) return
     const updateData = {
       [`messages/${originalMessage.key}`]: {

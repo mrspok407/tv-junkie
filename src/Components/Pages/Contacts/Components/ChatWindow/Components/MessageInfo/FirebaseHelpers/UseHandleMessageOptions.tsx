@@ -13,7 +13,8 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
   const firebase = useContext(FirebaseContext)
   const { authUser, errors } = useContext(AppContext)
   const context = useContext(ContactsContext)
-  const { activeChat, messages, contactsStatus, contactsUnreadMessages } = context?.state!
+  const { activeChat, messages, contactsStatus, contactsUnreadMessages, messagesInput } = context?.state!
+  const messagesInputData = messagesInput[activeChat.chatKey]
   const contactsUnreadMessagesData = contactsUnreadMessages[activeChat.chatKey]
   const contactsStatusData = contactsStatus[activeChat.chatKey]
   const messagesData = messages[activeChat.chatKey]
@@ -26,7 +27,7 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
   }
 
   const deleteMessage = async ({ deleteMessagesKeys }: { deleteMessagesKeys: string[] }) => {
-    console.log({ deleteMessagesKeys })
+    context?.dispatch({ type: "updateMsgDeletionProcessLoading", payload: { messageDeletionProcess: true } })
 
     const deletedMessagesData = messagesData.reduce((deletedMessagesData: MessageInterface[], message) => {
       if (deleteMessagesKeys.includes(message.key)) {
@@ -44,6 +45,8 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
       })
     }
 
+    console.log({ deletedMessagesData })
+
     try {
       let updateData: { [key: string]: any } = {}
       const unreadMsgsDataAfterDeletion = contactsUnreadMessagesData.filter(
@@ -53,10 +56,9 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
         (message) => message.key === unreadMsgsDataAfterDeletion[unreadMsgsDataAfterDeletion.length - 1]
       )
       const lastUnreadMsgBeforeDeletion = contactsUnreadMessagesData[contactsUnreadMessagesData.length - 1]
+      const lastReadMessage = messagesData[Math.max(messagesData.length - 1 - contactsUnreadMessagesData.length, 0)]
 
       successDeliverMessages.forEach((messageData) => {
-        // const senderKey = messageData.sender
-        // const recipientKey = senderKey === activeChat.contactKey ? authUser?.uid : activeChat.contactKey
         const unreadMessage = contactsUnreadMessagesData?.includes(messageData.key)
         if (!unreadMessage) {
           updateData[`privateChats/${activeChat.chatKey}/messages/${messageData.key}`] = null
@@ -70,49 +72,27 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
 
       if (lastUnreadMsgAfterDeletion && lastUnreadMsgBeforeDeletion !== lastUnreadMsgAfterDeletion.key) {
         updateData[`users/${activeChat.contactKey}/contactsDatabase/contactsLastActivity/${authUser?.uid}`] =
-          lastUnreadMsgAfterDeletion.timeStamp
+          lastUnreadMsgAfterDeletion?.timeStamp
+      }
+      if (!unreadMsgsDataAfterDeletion.length) {
+        updateData[`users/${activeChat.contactKey}/contactsDatabase/contactsLastActivity/${authUser?.uid}`] =
+          lastReadMessage?.timeStamp
       }
 
       console.log({ updateData })
 
       await firebase.database().ref().update(updateData)
-
-      // const senderKey = messageData.sender
-      // const recipientKey = senderKey === activeChat.contactKey ? authUser?.uid : activeChat.contactKey
-      // const unreadMessage = contactsUnreadMessagesData?.includes(messageData.key)
-      // if (!unreadMessage) {
-      //   return await firebase.message({ chatKey: activeChat.chatKey, messageKey: messageData.key }).set(null)
-      // }
-      // // if (contactsUnreadMessagesData === null) return
-      // if (contactsUnreadMessagesData[contactsUnreadMessagesData.length - 1] !== messageData.key) {
-      //   updateData = {
-      //     [`privateChats/${activeChat.chatKey}/members/${recipientKey}/unreadMessages/${messageData.key}`]: null,
-      //     [`privateChats/${activeChat.chatKey}/messages/${messageData.key}`]: null
-      //   }
-      //   return await firebase.database().ref().update(updateData)
-      // }
-
-      // let previousMessage: MessageInterface
-      // if (contactsUnreadMessagesData?.length === 1) {
-      //   previousMessage = messageData
-      // } else {
-      //   const previousMessageKey = contactsUnreadMessagesData[contactsUnreadMessagesData.length - 2]
-      //   previousMessage = messagesData.find((message) => message.key === previousMessageKey)!
-      // }
-
-      // updateData = {
-      //   [`users/${recipientKey}/contactsDatabase/contactsLastActivity/${senderKey}`]: previousMessage.timeStamp,
-      //   [`privateChats/${activeChat.chatKey}/members/${recipientKey}/unreadMessages/${messageData.key}`]: null,
-      //   [`privateChats/${activeChat.chatKey}/messages/${messageData.key}`]: null
-      // }
-
-      // await firebase.database().ref().update(updateData)
     } catch (error) {
       errors.handleError({
         errorData: error,
         message: "Message hasn't been deleted, because of the unexpected error."
       })
       throw new Error(`There has been some error updating database: ${error}`)
+    } finally {
+      context?.dispatch({
+        type: "updateMsgDeletionProcess",
+        payload: { messageDeletionProcess: false, deletedMessages: deletedMessagesData }
+      })
     }
   }
 

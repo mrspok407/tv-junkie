@@ -21,14 +21,14 @@ const useGetInitialMessages = ({ chatKey }: { chatKey: string }) => {
 
   const messagesRef = firebase.messages({ chatKey })
 
-  // let messagesToDelete: MessageInterface[] = []
   const messagesToDelete = useRef<MessageInterface[]>([])
   const removeMessagesDebounce = useCallback(
     debounce((removedMessages: any) => {
       context?.dispatch({ type: "removeMessages", payload: { removedMessages, chatKey } })
+      console.log(chatKey)
       messagesToDelete.current = []
-    }, 100),
-    []
+    }, 0),
+    [chatKey]
   )
 
   useEffect(() => {

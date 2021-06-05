@@ -93,6 +93,7 @@ export interface ContactsStateInterface {
   messagePopup: string
   optionsPopupContactList: string
   optionsPopupChatWindow: string
+  messageDeletionProcess: boolean
   confirmModal: {
     isActive: boolean
     function: string

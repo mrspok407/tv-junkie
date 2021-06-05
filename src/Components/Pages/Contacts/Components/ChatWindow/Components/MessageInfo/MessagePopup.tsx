@@ -35,14 +35,15 @@ const MessagePopup: React.FC<Props> = ({ messageOptionsRef, messageData }) => {
     <div
       className={classNames("popup-container", {
         "popup-container--sended-message": messageData.sender === authUser?.uid,
-        "popup-container--received-message": messageData.sender !== authUser?.uid
+        "popup-container--received-message": messageData.sender !== authUser?.uid,
+        "popup-container--failed-deliver": messageData.isDelivered === false
       })}
       onClick={(e) => {
         e.stopPropagation()
         context?.dispatch({ type: "updateMessagePopup", payload: "" })
       }}
     >
-      {messageData.sender === authUser?.uid && (
+      {messageData.sender === authUser?.uid && messageData.isDelivered !== false && (
         <div className="popup__option">
           <button className="popup__option-btn" type="button" onClick={() => editMessage()}>
             Edit

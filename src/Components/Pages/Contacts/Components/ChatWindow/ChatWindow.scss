@@ -307,29 +307,23 @@
       }
     }
 
-    &--selected {
+    &--deliver-failed {
+      .chat-window__message-inner {
+        background-color: getColor(deliverFailedBG, $chatWindowPalette);
+      }
+
       &.chat-window__message--last-in-bunch {
         .chat-window__message-inner {
-          &:after {
-            background-color: getColor(selectMsgBG, $chatWindowPalette);
+          border-radius: 5px 5px 0px 5px;
+          &:before {
+            right: -10px;
+            background-color: getColor(deliverFailedBG, $chatWindowPalette);
           }
-        }
-      }
-    }
-
-    &--deliver-failed {
-      background-color: getColor(deliverFailedBG, $chatWindowPalette);
-
-      &.chat-window__message--last-in-bunch {
-        border-radius: 5px 5px 0px 5px;
-        &:before {
-          right: -10px;
-          background-color: getColor(deliverFailedBG, $chatWindowPalette);
-        }
-        &:after {
-          right: -10px;
-          background-color: getColor(backG, $chatWindowPalette);
-          border-radius: 0 0 0 10px;
+          &:after {
+            right: -10px;
+            background-color: getColor(backG, $chatWindowPalette);
+            border-radius: 0 0 0 10px;
+          }
         }
       }
     }
