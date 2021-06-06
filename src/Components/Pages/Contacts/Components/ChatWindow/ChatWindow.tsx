@@ -206,11 +206,11 @@ const ChatWindow: React.FC = () => {
     if (!isScrolledFirstRenderRef.current) return
     if (!isScrollBottomRef.current) return
     if (!pageInFocus) return
+    chatContainerRef.scrollTop = getContainerRect().scrollHeight + getContainerRect().height
+    // const lastMessage = renderedMessages[renderedMessages.length - 1]
+    // const lastMessageRef = document.querySelector(`.chat-window__message--${lastMessage.key}`)
 
-    const lastMessage = renderedMessages[renderedMessages.length - 1]
-    const lastMessageRef = document.querySelector(`.chat-window__message--${lastMessage.key}`)
-
-    lastMessageRef?.scrollIntoView({ block: "start", inline: "start" })
+    // lastMessageRef?.scrollIntoView({ block: "start", inline: "start" })
   }, [activeChat, renderedMessages, messagesData, chatContainerRef])
 
   useLayoutEffect(() => {
@@ -239,7 +239,8 @@ const ChatWindow: React.FC = () => {
     } else {
       if (isScrollBottom) {
         console.log("scroll, no unread, scrollAtBottom")
-        lastMessageRef?.scrollIntoView({ block: "start", inline: "start" })
+        chatContainerRef.scrollTop = getContainerRect().scrollHeight + getContainerRect().height
+        // lastMessageRef?.scrollIntoView({ block: "start", inline: "start" })
         isScrollBottomRef.current = true
         firebase
           .chatMemberStatus({ chatKey: activeChat.chatKey, memberKey: authUser?.uid! })

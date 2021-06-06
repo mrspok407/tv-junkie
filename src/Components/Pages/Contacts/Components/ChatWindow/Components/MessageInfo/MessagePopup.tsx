@@ -15,6 +15,8 @@ type Props = {
 const MessagePopup: React.FC<Props> = ({ messageOptionsRef, messageData }) => {
   const { authUser } = useContext(AppContext)
   const context = useContext(ContactsContext)
+  const { activeChat, messages } = context?.state!
+  const messagesData = messages[activeChat.chatKey] || []
 
   const { selectMessage, deleteMessage, editMessage } = useHandleMessageOptions({ messageData })
 
@@ -36,6 +38,7 @@ const MessagePopup: React.FC<Props> = ({ messageOptionsRef, messageData }) => {
       className={classNames("popup-container", {
         "popup-container--sended-message": messageData.sender === authUser?.uid,
         "popup-container--received-message": messageData.sender !== authUser?.uid,
+        "popup-container--messages-less-two": messagesData.length <= 2,
         "popup-container--failed-deliver": messageData.isDelivered === false
       })}
       onClick={(e) => {

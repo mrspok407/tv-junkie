@@ -10,6 +10,7 @@ import GoDown from "../GoDown/GoDown"
 import { updateTyping } from "./FirebaseHelpers/UpdateTyping"
 import SelectOptions from "../SelectOptions/SelectOptions"
 import useHandleMessage from "./Hooks/UseHandleMessage"
+import useInputResizeObserver from "./Hooks/UseInputResizeObserver"
 import "./MessageInput.scss"
 
 type Props = {
@@ -38,6 +39,7 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
   const windowWidth = window.innerWidth
 
   const { sendMessage, editMessage } = useHandleMessage()
+  useInputResizeObserver({ inputRef: inputRef.current, chatContainerRef: chatContainerRef, getContainerRect })
 
   const getSelection = () => {
     const selection = window.getSelection()
@@ -79,11 +81,11 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
   }, [activeChat])
 
   const dispatchDeb = useCallback(
-    debounce(
-      (payload: MessageInputInterface) => context?.dispatch({ type: "updateMessageInput", payload }),
-      debounceTimeout
-    ),
-    []
+    debounce((payload: MessageInputInterface) => {
+      console.log(activeChat.chatKey)
+      context?.dispatch({ type: "updateMessageInput", payload })
+    }, debounceTimeout),
+    [activeChat]
   )
 
   const onClick = () => {
@@ -95,19 +97,20 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
   const onPaste = (e: any) => {
     e.preventDefault()
     const { anchorOffset } = getSelection()
+    const innerHTML = e.currentTarget.innerHTML
     // Get user's pasted data
     let data = e.clipboardData.getData("text/html") || e.clipboardData.getData("text/plain")
 
-    // Filter out everything except simple text and allowable HTML elements
     const regex = /<(?!(\/\s*)?(a|b|i|em|s|strong|u)[>,\s])([^>])*>/g
     data = data.replace(regex, "").trim()
+    data = data.replace(/&#160;/g, " ")
 
-    console.log({ data })
-
-    // Insert the filtered content
-    e.currentTarget.innerHTML = `${e.currentTarget.innerHTML.slice(0, anchorOffset)}${data}`
-    handleCursorLine({ node: e.currentTarget.childNodes[0], anchorOffset, anchorShift: 1 })
-    // e.currentTarget.innerHTML = data.trim()
+    if (e.currentTarget.innerHTML === "") {
+      e.currentTarget.innerHTML = data
+    } else {
+      e.currentTarget.innerHTML = `${innerHTML.slice(0, anchorOffset)}${data}${innerHTML.slice(anchorOffset)}`
+    }
+    handleCursorLine({ node: e.currentTarget.childNodes[0], anchorOffset, anchorShift: data.length })
   }
 
   const scrollPositionHandler = () => {
@@ -122,7 +125,15 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
       inputRef.current.focus()
     }
 
-    const newMessageText = inputRef.current.innerHTML
+    const urlRegex = /(((https?:\/\/)|(www\.))[^\s]+)/g
+    const newMessageText = inputRef.current.innerHTML.replace(urlRegex, (url) => {
+      let hyperlink = url
+      if (!hyperlink.match("^https?://")) {
+        hyperlink = "http://" + hyperlink
+      }
+      return '<a href="' + hyperlink + '" target="_blank" rel="noopener noreferrer">' + url + "</a>"
+    })
+
     inputRef.current.innerHTML = ""
 
     dispatchDeb.clear()
@@ -195,21 +206,14 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
       updateTyping({ activeChat, authUser, firebase, setTypingNull: true })
     } else {
       console.log("onChangeNotEmpty: all")
-      // inputRef.current.scrollTop = scrollTop + MESSAGE_LINE_HEIGHT
-      // if (prevHeight.current + MESSAGE_LINE_HEIGHT < INPUT_MESSAGE_MAX_HEIGHT) {
-      //   chatContainerRef.scrollTop = getContainerRect().scrollTop + MESSAGE_LINE_HEIGHT
-      // }
-      // prevHeight.current = height
       dispatchDeb({ message: innerHTML, anchorOffset, scrollTop })
       updateTyping({ activeChat, authUser, firebase })
     }
   }
 
-  const prevHeight = useRef(0)
   const handleNextLine = ({ textContent, innerHTML, e }: { textContent: string; innerHTML: string; e: any }) => {
     const { anchorOffset } = getSelection()
     const { scrollTop } = inputRef.current
-    const height = inputRef.current.getBoundingClientRect().height
 
     if (textContent === "") {
       e.currentTarget.innerHTML = ""
@@ -236,10 +240,6 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
 
     handleCursorLine({ node: e.currentTarget.childNodes[0], anchorOffset, anchorShift: 1 })
     inputRef.current.scrollTop = scrollTop + MESSAGE_LINE_HEIGHT
-    if (prevHeight.current + MESSAGE_LINE_HEIGHT < INPUT_MESSAGE_MAX_HEIGHT) {
-      chatContainerRef.scrollTop = getContainerRect().scrollTop + MESSAGE_LINE_HEIGHT
-    }
-    prevHeight.current = height
   }
 
   const handleKeyDown = async (e: any) => {

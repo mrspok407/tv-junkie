@@ -97,6 +97,20 @@ $messageStatusSize: 17px;
         top: -92px;
         border-radius: 5px 5px 0px 5px;
       }
+      &--sended-message.popup-container--messages-less-two {
+        top: initial;
+        border-radius: 5px 0px 5px 5px;
+        .popup__option:first-child {
+          .popup__option-btn:after {
+            border-radius: 5px 0 0 0;
+          }
+        }
+        .popup__option:last-child {
+          .popup__option-btn:after {
+            border-radius: 0 0 5px 5px;
+          }
+        }
+      }
       &--received-message {
         top: -54px;
         background-color: #2b5278;
@@ -112,18 +126,22 @@ $messageStatusSize: 17px;
           }
         }
       }
+      &--received-message.popup-container--messages-less-two {
+        top: initial;
+        border-radius: 0 5px 5px 5px;
+        .popup__option:first-child {
+          .popup__option-btn:after {
+            border-radius: 0 5px 0 0;
+          }
+        }
+        .popup__option:last-child {
+          .popup__option-btn:after {
+            border-radius: 0 0 5px 5px;
+          }
+        }
+      }
       &--failed-deliver {
         top: -54px;
-      }
-    }
-  }
-}
-
-.chat-window__message-wrapper:first-child {
-  .chat-window__message {
-    .chat-window__message-options .popup-container {
-      &--sended-message {
-        top: -17px;
       }
     }
   }

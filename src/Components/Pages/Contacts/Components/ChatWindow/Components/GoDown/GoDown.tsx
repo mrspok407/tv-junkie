@@ -111,9 +111,10 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
   useLayoutEffect(() => {
     if (!renderedMessages?.length) return
     if (!wentToLastMessage) return
-    const lastMessage = renderedMessages[renderedMessages.length - 1]
-    const lastMessageRef = document.querySelector(`.chat-window__message--${lastMessage.key}`)
-    lastMessageRef?.scrollIntoView({ block: "start", inline: "start" })
+    chatContainerRef.scrollTop = getContainerRect().scrollHeight + getContainerRect().height
+    // const lastMessage = renderedMessages[renderedMessages.length - 1]
+    // const lastMessageRef = document.querySelector(`.chat-window__message--${lastMessage.key}`)
+    // lastMessageRef?.scrollIntoView({ block: "start", inline: "start" })
     setWentToLastMessage(false)
   }, [renderedMessages, wentToLastMessage])
 

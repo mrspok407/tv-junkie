@@ -163,6 +163,7 @@ exports.handleContactRequest = functions.https.onCall(async (data, context) => {
         const updateData = {
             [`${contactsDatabaseRef(authUid)}/contactsList/${authPathToUpdate}`]: status === "accept" ? true : null,
             [`${contactsDatabaseRef(authUid)}/newContactsRequests/${contactUid}`]: null,
+            [`${contactsDatabaseRef(authUid)}/contactsLastActivity/${contactUid}`]: timeStamp,
             [`${contactsDatabaseRef(contactUid)}/contactsList/${authUid}/status`]: status === "accept" ? true : "rejected",
             [`${contactsDatabaseRef(contactUid)}/newContactsActivity/${authUid}`]: true,
             [`${contactsDatabaseRef(contactUid)}/contactsLastActivity/${authUid}`]: timeStamp
