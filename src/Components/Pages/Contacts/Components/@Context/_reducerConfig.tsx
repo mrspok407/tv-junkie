@@ -89,6 +89,8 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
 
     case "removeAllMessages":
       console.log("removeAllMessages")
+      const inputRef = document.querySelector(".chat-window__input-message") as HTMLElement
+      inputRef.innerHTML = ""
       return {
         ...state,
         messages: {
@@ -102,6 +104,19 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         authUserUnreadMessages: {
           ...authUserUnreadMessages,
           [action.payload.chatKey]: []
+        },
+        selectedMessages: {
+          ...selectedMessages,
+          [action.payload.chatKey]: []
+        },
+        messagesInput: {
+          ...messagesInput,
+          [action.payload.chatKey]: {
+            message: "",
+            anchorOffset: 0,
+            scrollTop: 0,
+            editingMsgKey: null
+          }
         }
       }
 
@@ -371,11 +386,6 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         (message: MessageInterface) => message.key === renderedMessages[renderedMessages.length - 1].key
       )
       const startIndex = Math.max(endIndex + 1 - MESSAGES_TO_RENDER, 0)
-
-      console.log({ reducerRemovedMessages: action.payload.removedMessages })
-      console.log({ messagesData })
-      console.log({ endIndex })
-      console.log({ startIndex })
 
       const inputRef = document.querySelector(".chat-window__input-message") as HTMLElement
       let messageInput = {}

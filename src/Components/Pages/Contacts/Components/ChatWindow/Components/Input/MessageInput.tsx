@@ -11,7 +11,9 @@ import { updateTyping } from "./FirebaseHelpers/UpdateTyping"
 import SelectOptions from "../SelectOptions/SelectOptions"
 import useHandleMessage from "./Hooks/UseHandleMessage"
 import useInputResizeObserver from "./Hooks/UseInputResizeObserver"
+import striptags from "striptags"
 import "./MessageInput.scss"
+import { textToUrl } from "Utils"
 
 type Props = {
   unreadMessagesAuthRef: string[]
@@ -30,8 +32,6 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
   const selectedMessagesData = selectedMessages[activeChat.chatKey]
   const messageInputData = messagesInput[activeChat.chatKey] || {}
   const messagesData = messages[activeChat.chatKey]
-  const contactsData = Object.values(contacts || {})
-  const contactStatusData = contactsStatus[activeChat.chatKey] || {}
 
   const inputRef = useRef<HTMLDivElement>(null!)
   const keysMap = useRef<any>({})
@@ -42,9 +42,10 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
   useInputResizeObserver({ inputRef: inputRef.current, chatContainerRef: chatContainerRef, getContainerRect })
 
   const getSelection = () => {
-    const selection = window.getSelection()
+    const selection = window.getSelection()!
     const anchorOffset = selection?.anchorOffset!
-    return { selection, anchorOffset }
+    const focusOffset = selection?.focusOffset!
+    return { selection, anchorOffset, focusOffset }
   }
 
   const handleCursorLine = ({
@@ -76,11 +77,11 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
       inputRef.current.scrollTop = messageInputData.scrollTop!
     }
     return () => {
-      dispatchDeb.flush()
+      updateInputDeb.flush()
     }
   }, [activeChat])
 
-  const dispatchDeb = useCallback(
+  const updateInputDeb = useCallback(
     debounce((payload: MessageInputInterface) => {
       console.log(activeChat.chatKey)
       context?.dispatch({ type: "updateMessageInput", payload })
@@ -91,32 +92,31 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
   const onClick = () => {
     const { anchorOffset } = getSelection()
     console.log("onClick: anchorOffset")
-    dispatchDeb({ anchorOffset })
+    updateInputDeb({ anchorOffset })
   }
 
   const onPaste = (e: any) => {
     e.preventDefault()
-    const { anchorOffset } = getSelection()
-    const innerHTML = e.currentTarget.innerHTML
-    // Get user's pasted data
-    let data = e.clipboardData.getData("text/html") || e.clipboardData.getData("text/plain")
+    const { selection, anchorOffset, focusOffset } = getSelection()
+    selection.deleteFromDocument()
 
-    const regex = /<(?!(\/\s*)?(a|b|i|em|s|strong|u)[>,\s])([^>])*>/g
-    data = data.replace(regex, "").trim()
-    data = data.replace(/&#160;/g, " ")
+    const data = striptags(e.clipboardData.getData("text/plain"))
+    const innerHTML = e.currentTarget.innerHTML
+    const anchor = Math.min(anchorOffset, focusOffset)
 
     if (e.currentTarget.innerHTML === "") {
       e.currentTarget.innerHTML = data
     } else {
-      e.currentTarget.innerHTML = `${innerHTML.slice(0, anchorOffset)}${data}${innerHTML.slice(anchorOffset)}`
+      e.currentTarget.innerHTML = `${innerHTML.slice(0, anchor)}${data}${innerHTML.slice(anchor)}`
     }
-    handleCursorLine({ node: e.currentTarget.childNodes[0], anchorOffset, anchorShift: data.length })
+    updateInputDeb({ message: e.currentTarget.innerHTML, anchorOffset: anchor })
+    handleCursorLine({ node: e.currentTarget.childNodes[0], anchorOffset: anchor, anchorShift: data.length })
   }
 
   const scrollPositionHandler = () => {
     const { scrollTop } = inputRef.current
     console.log("scroll: scrollTop")
-    dispatchDeb({ scrollTop })
+    updateInputDeb({ scrollTop })
   }
 
   const handleSendMessage = async () => {
@@ -125,18 +125,10 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
       inputRef.current.focus()
     }
 
-    const urlRegex = /(((https?:\/\/)|(www\.))[^\s]+)/g
-    const newMessageText = inputRef.current.innerHTML.replace(urlRegex, (url) => {
-      let hyperlink = url
-      if (!hyperlink.match("^https?://")) {
-        hyperlink = "http://" + hyperlink
-      }
-      return '<a href="' + hyperlink + '" target="_blank" rel="noopener noreferrer">' + url + "</a>"
-    })
-
+    const newMessageText = textToUrl({ text: inputRef.current.innerHTML })
     inputRef.current.innerHTML = ""
 
-    dispatchDeb.clear()
+    updateInputDeb.clear()
     context?.dispatch({
       type: "updateMessageInput",
       payload: { message: "", anchorOffset: 0, scrollTop: 0, editingMsgKey: null }
@@ -172,12 +164,11 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
       // inputRef.current.focus()
     }
 
-    const editedMessageText = inputRef.current.innerHTML
+    const editedMessageText = textToUrl({ text: inputRef.current.innerHTML })
     const originalMessage = messagesData.find((message) => message.key === messageInputData.editingMsgKey)!
-
     inputRef.current.innerHTML = ""
 
-    dispatchDeb.clear()
+    updateInputDeb.clear()
     context?.dispatch({
       type: "updateMessageInput",
       payload: { message: "", anchorOffset: 0, scrollTop: 0, editingMsgKey: null }
@@ -197,16 +188,15 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
     const { innerHTML, textContent } = e.currentTarget
     const { anchorOffset } = getSelection()
     const scrollTop = inputRef.current.scrollTop
-    const height = inputRef.current.getBoundingClientRect().height
 
     if (["", "\n"].includes(textContent)) {
       console.log("onChangeEmpty: all to zero")
       e.currentTarget.innerHTML = ""
-      dispatchDeb({ message: "", anchorOffset: 0, scrollTop: 0, editingMsgKey: null })
+      updateInputDeb({ message: "", anchorOffset: 0, scrollTop: 0, editingMsgKey: null })
       updateTyping({ activeChat, authUser, firebase, setTypingNull: true })
     } else {
       console.log("onChangeNotEmpty: all")
-      dispatchDeb({ message: innerHTML, anchorOffset, scrollTop })
+      updateInputDeb({ message: innerHTML, anchorOffset, scrollTop })
       updateTyping({ activeChat, authUser, firebase })
     }
   }
@@ -272,12 +262,12 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
     const scrollTop = inputRef.current.scrollTop
     if (arrowKeys.includes(e.key)) {
       console.log("keyUpArrows: anchorOffset")
-      dispatchDeb({ anchorOffset, scrollTop })
+      updateInputDeb({ anchorOffset, scrollTop })
     }
     if (e.key === "Enter") {
       e.preventDefault()
       if (keysMap.current.Shift) {
-        dispatchDeb({ message: innerHTML, anchorOffset, scrollTop })
+        updateInputDeb({ message: innerHTML, anchorOffset, scrollTop })
       }
     }
     keysMap.current[e.key] = e.type === "keydown"

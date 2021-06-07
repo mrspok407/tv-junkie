@@ -2,6 +2,7 @@ import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
 import { MessageInterface } from "Components/Pages/Contacts/@Types"
 import React, { useState, useEffect, useContext } from "react"
+import striptags from "striptags"
 import { MESSAGE_LINE_HEIGHT } from "../../../../@Context/Constants"
 import { ContactsContext } from "../../../../@Context/ContactsContext"
 
@@ -101,7 +102,7 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
     const chatContainerRef = document.querySelector(".chat-window__messages-list-container") as HTMLElement
     const message = messagesData.find((message) => message.key === messageData?.key)
 
-    inputRef.innerHTML = message?.message!
+    inputRef.innerHTML = striptags(message?.message!)
     const inputHeight = inputRef?.getBoundingClientRect().height
 
     inputRef.focus()

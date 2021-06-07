@@ -1,4 +1,4 @@
-@import "../../../../../../../styles/globals";
+@import "../../../../styles/globalsContacts";
 
 $messageStatusSize: 17px;
 
@@ -113,7 +113,7 @@ $messageStatusSize: 17px;
       }
       &--received-message {
         top: -54px;
-        background-color: #2b5278;
+        background-color: getColor(receivedMsgBg, $popupOptionsPalette);
         border-radius: 5px 5px 5px 0;
         .popup__option:first-child {
           .popup__option-btn:after {

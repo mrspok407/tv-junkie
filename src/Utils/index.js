@@ -228,4 +228,16 @@ export const convertTimeStampToDate = ({ timeStamp }) => {
   return new Intl.DateTimeFormat("en-US", options).format(formatedTimeStamp)
 }
 
+export const textToUrl = ({ text }) => {
+  const urlRegex = /(((https?:\/\/)|(www\.))[^\s]+)/g
+  const textWithUrls = text.replace(urlRegex, (url) => {
+    let hyperlink = url
+    if (!hyperlink.match("^https?://")) {
+      hyperlink = "http://" + hyperlink
+    }
+    return '<a href="' + hyperlink + '" target="_blank" rel="noopener noreferrer">' + url + "</a>"
+  })
+  return textWithUrls
+}
+
 export { releasedEpisodesToOneArray }

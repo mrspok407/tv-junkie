@@ -10,6 +10,7 @@ import useGetInitialMessages from "../../ChatWindow/FirebaseHelpers/UseGetInitia
 import useHandleContactsStatus from "../../ChatWindow/Hooks/UseHandleContactsStatus"
 import "./Contact.scss"
 import Loader from "Components/UI/Placeholders/Loader"
+import striptags from "striptags"
 
 type Props = {
   contactInfo: ContactInfoInterface
@@ -94,6 +95,8 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
   const chatActive = context?.state.activeChat.contactKey === contactInfo.key
   const unreadMessagesAmount = authUnreadMessages?.length === 0 ? null : authUnreadMessages?.length
 
+  const lastMessageText = striptags(lastMessage?.message).slice(0, 30)
+
   return (
     <div
       className={classNames("contact-item", {
@@ -130,7 +133,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
               "Wants to connect"
             ) : (
               <>
-                {lastMessage?.sender === authUser?.uid && <span>You: </span>} {lastMessage?.message?.slice(0, 30)}
+                {lastMessage?.sender === authUser?.uid && <span>You: </span>} {lastMessageText}
               </>
             )}
           </div>

@@ -1,3 +1,5 @@
+@import "../../styles/globalsContacts";
+
 .popup-container {
   position: absolute;
   display: grid;
@@ -6,7 +8,7 @@
   left: -100px;
   font-size: 0.95rem;
   border-radius: 5px 0px 5px 5px;
-  background-color: #17212b;
+  background-color: getColor(mainBg, $popupOptionsPalette);
   z-index: 1;
 
   .popup__option {
@@ -45,7 +47,7 @@
         height: 100%;
         top: 0;
         left: 0;
-        background-color: #257bce;
+        background-color: getColor(mainHoverBg, $popupOptionsPalette);
         opacity: 0;
         transition: 200ms;
         z-index: -1;
@@ -58,7 +60,7 @@
   }
 
   &--received-message {
-    background-color: #2b5278;
+    background-color: getColor(receivedMsgBg, $popupOptionsPalette);
     .popup__option {
       &:first-child {
         .popup__option-btn:after {

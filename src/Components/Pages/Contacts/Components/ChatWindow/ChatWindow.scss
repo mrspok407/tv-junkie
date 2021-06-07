@@ -331,6 +331,13 @@
     &-text {
       white-space: pre-wrap;
       word-break: break-word;
+
+      a {
+        color: #29b9f1;
+        &:hover {
+          text-decoration: underline;
+        }
+      }
     }
   }
 }

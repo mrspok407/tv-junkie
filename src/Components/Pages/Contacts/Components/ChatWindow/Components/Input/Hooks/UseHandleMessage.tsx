@@ -2,6 +2,7 @@ import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
 import { MessageInterface } from "Components/Pages/Contacts/@Types"
 import React, { useState, useEffect, useContext } from "react"
+import striptags from "striptags"
 import { ContactsContext } from "../../../../@Context/ContactsContext"
 import useContactListeners from "../../../Hooks/UseContactListeners"
 
