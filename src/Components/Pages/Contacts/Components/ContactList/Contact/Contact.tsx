@@ -22,14 +22,14 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
   const { authUser } = useContext(AppContext)
   const context = useContext(ContactsContext)
   const { optionsPopupContactList, activeChat, messages, contactsStatus } = context?.state!
-  const messagesData = messages[contactInfo.chatKey]
+  const messagesData = messages[contactInfo.chatKey] || []
 
   const [newActivity, setNewActivity] = useState<boolean | null | undefined>(contactInfo.newContactsActivity)
   const [newContactsRequest, setNewContactRequest] = useState<boolean | null>(contactInfo.newContactsRequests)
 
   const [authUnreadMessages, setAuthUnreadMessages] = useState<string[]>(contactInfo.unreadMessages)
   const [contactUnreadMessages, setContactUnreadMessages] = useState<string[]>(contactInfo.unreadMessagesContact)
-  const lastMessage = messagesData === undefined ? contactInfo.lastMessage : messagesData[messagesData?.length - 1]
+  const lastMessage = !messagesData.length ? contactInfo.lastMessage : messagesData[messagesData?.length - 1]
 
   const formatedDate = useTimestampFormater({ timeStamp: lastMessage?.timeStamp! })
 

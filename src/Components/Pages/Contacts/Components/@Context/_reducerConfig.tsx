@@ -30,6 +30,7 @@ export type ACTIONTYPES =
       type: "updateMsgDeletionProcess"
       payload: { messageDeletionProcess: boolean; deletedMessages: MessageInterface[] }
     }
+  | { type: "updateCreateNewGroup"; payload: { isActive: boolean; members: string[] } }
   | { type: "updateMsgDeletionProcessLoading"; payload: { messageDeletionProcess: boolean } }
   | { type: "changeMessage"; payload: { changedMessage: MessageInterface; chatKey: string } }
   | { type: "updateSelectedMessages"; payload: { messageKey: string; chatKey: string } }
@@ -59,6 +60,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
     contactsUnreadMessages,
     authUserUnreadMessages,
     activeChat,
+    groupCreation,
     messages,
     selectedMessages,
     messagesInput,
@@ -73,6 +75,16 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
   } = state
 
   switch (action.type) {
+    case "updateCreateNewGroup": {
+      return {
+        ...state,
+        groupCreation: {
+          isActive: action.payload.isActive,
+          members: action.payload.members
+        }
+      }
+    }
+
     case "setInitialMessages":
       const { startIndex, endIndex } = action.payload
       return {
@@ -679,6 +691,10 @@ export const INITIAL_STATE = {
   activeChat: {
     chatKey: "",
     contactKey: ""
+  },
+  groupCreation: {
+    isActive: false,
+    members: []
   },
   messages: {},
   selectedMessages: {},

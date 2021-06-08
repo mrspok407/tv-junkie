@@ -34,7 +34,7 @@ const useContactListeners = () => {
       })
 
     firebase
-      .contactsLastActivity({ uid: authUser?.uid })
+      .contactsLastActivity({ uid: activeChat.contactKey })
       .orderByValue()
       .limitToLast(1)
       .on("value", (snapshot: any) => {

@@ -9,8 +9,8 @@ import { ContactsContext } from "../@Context/ContactsContext"
 import { isUnexpectedObject } from "Utils"
 import CreatePortal from "Components/UI/Modal/CreatePortal"
 import ModalContent from "Components/UI/Modal/ModalContent"
-import { getInitialContactInfo } from "./FirebaseHelpers/FirebaseHelpers"
 import { CONTACTS_TO_LOAD } from "../@Context/Constants"
+import useGetInitialContactInfo from "./Hooks/UseGetInitialContactInfo"
 import "./ContactList.scss"
 
 const ContactList: React.FC = () => {
@@ -24,19 +24,28 @@ const ContactList: React.FC = () => {
   const loadedContacts = context?.state?.contacts ? Object.keys(context.state.contacts).length : 0
 
   // const [initialLoading, setInitialLoading] = useState(true)
-  const initialLoading = useRef(true)
+  const [initialLoading, setInitialLoading] = useState(true)
+  const initialLoadingRef = useRef(true)
   const newLoad = useRef(true)
 
-  const contactListRef = useRef<HTMLDivElement>(null!)
-  const isScrolledDown = useElementScrolledDown({ element: contactListRef.current, threshold: 650 })
+  // const contactListRef = useRef<HTMLDivElement>(null!)
+  const contactListWrapperRef = useRef<HTMLDivElement>(null!)
+  const isScrolledDown = useElementScrolledDown({ element: contactListWrapperRef.current, threshold: 650 })
+
+  const { getContactsInfo } = useGetInitialContactInfo()
 
   const contactsListRef = firebase.contactsList({ uid: authUser?.uid })
   const contactsDatabaseRef = firebase.contactsDatabase({ uid: authUser?.uid })
 
+  useEffect(() => {
+    if (!initialLoading) {
+      initialLoadingRef.current = false
+    }
+  }, [initialLoading])
+
   const getContactsList = async (snapshot: any) => {
     if (snapshot.val() === null) {
-      // setInitialLoading(false)
-      initialLoading.current = false
+      setInitialLoading(false)
       context?.dispatch({
         type: "updateContactsInitial",
         payload: { contacts: {}, unreadMessages: {}, unreadMessagesContacts: {} }
@@ -56,8 +65,8 @@ const ContactList: React.FC = () => {
       contactsData.push({ ...contact.val(), key: contact.key })
     })
 
-    if (initialLoading.current || newLoad.current) {
-      const contacts = await getInitialContactInfo({ firebase, contactsData, authUser, context })
+    if (initialLoadingRef.current || newLoad.current) {
+      const contacts = await getContactsInfo({ contactsData })
       const unreadMessages = contacts.reduce((acc, contact) => {
         acc = { ...acc, [contact.chatKey]: contact.unreadMessages }
         return acc
@@ -72,13 +81,17 @@ const ContactList: React.FC = () => {
         return acc
       }, {})
 
-      initialLoading.current = false
-      newLoad.current = false
+      console.log({ contactsDispatch })
+
+      // initialLoadingRef.current = false
+      // newLoad.current = false
 
       context?.dispatch({
         type: "updateContactsInitial",
         payload: { contacts: contactsDispatch, unreadMessages, unreadMessagesContacts }
       })
+
+      setInitialLoading(false)
     } else {
       context?.dispatch({
         type: "updateContacts",
@@ -117,25 +130,31 @@ const ContactList: React.FC = () => {
 
   return (
     <div
-      ref={contactListRef}
-      className={classNames("contact-list", {
-        "contact-list--hide-mobile": context?.state.activeChat.chatKey,
-        "contact-list--no-contacts": !initialLoading.current && !contactsData?.length
+      className={classNames("contact-list-wrapper", {
+        "contact-list-wrapper--hide-mobile": context?.state.activeChat.chatKey
       })}
+      ref={contactListWrapperRef}
     >
-      {initialLoading.current ? (
-        <div className="contact-list__loader-wrapper">
-          <span className="contact-list__loader"></span>
-        </div>
-      ) : !contactsData?.length ? (
-        <div className="contact-list--no-contacts-text">You don't have any contacts</div>
-      ) : (
-        contactsData?.map((contact) => (
-          <Contact key={contact.key} contactInfo={contact} allContactsAmount={allContactsAmount} />
-        ))
-      )}
+      <div
+        className={classNames("contact-list", {
+          // "contact-list--hide-mobile": context?.state.activeChat.chatKey,
+          "contact-list--no-contacts": !initialLoadingRef.current && !contactsData?.length
+        })}
+      >
+        {initialLoading ? (
+          <div className="contact-list__loader-wrapper">
+            <span className="contact-list__loader"></span>
+          </div>
+        ) : !contactsData?.length ? (
+          <div className="contact-list--no-contacts-text">You don't have any contacts</div>
+        ) : (
+          contactsData?.map((contact) => (
+            <Contact key={contact.key} contactInfo={contact} allContactsAmount={allContactsAmount} />
+          ))
+        )}
 
-      {errors.error && <CreatePortal element={<ModalContent message={errors.error.message} />}></CreatePortal>}
+        {errors.error && <CreatePortal element={<ModalContent message={errors.error.message} />}></CreatePortal>}
+      </div>
     </div>
   )
 }

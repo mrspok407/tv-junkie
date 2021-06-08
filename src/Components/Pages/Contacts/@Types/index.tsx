@@ -60,6 +60,11 @@ export interface ActiveChatInterface {
   contactKey: string
 }
 
+export interface GroupCreationInterface {
+  isActive: boolean
+  members: string[]
+}
+
 export interface ContactsStateInterface {
   contactsUnreadMessages: {
     [key: string]: string[]
@@ -68,6 +73,7 @@ export interface ContactsStateInterface {
     [key: string]: string[]
   }
   activeChat: ActiveChatInterface
+  groupCreation: GroupCreationInterface
   messages: {
     [key: string]: MessageInterface[]
   }

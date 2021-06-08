@@ -1,19 +1,22 @@
 @import "../../styles/globalsContacts";
 
 .contact-list {
-  border-right: 1px solid getColor(borderRight, $contactListPalette);
-  overflow-y: auto;
-  @include scrollbar(5px, getColor(blueClr, $mainPalette), #c5bbb1);
-  @include mediaMaxW(#{$mobileViewPort}) {
-    position: absolute;
-    height: $chatHeight;
-    width: 100%;
-    opacity: 1;
-    transition: opacity 150ms ease, z-index 0ms 150ms;
+  &-wrapper {
+    position: relative;
+    overflow-y: auto;
+    border-right: 1px solid getColor(borderRight, $contactListPalette);
+    @include scrollbar(5px, getColor(blueClr, $mainPalette), #c5bbb1);
+    @include mediaMaxW(#{$mobileViewPort}) {
+      position: absolute;
+      height: $chatHeight;
+      width: 100%;
+      opacity: 1;
+      transition: opacity 150ms ease, z-index 0ms 150ms;
 
-    &--hide-mobile {
-      opacity: 0;
-      z-index: -1;
+      &--hide-mobile {
+        opacity: 0;
+        z-index: -1;
+      }
     }
   }
 

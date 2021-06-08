@@ -10,6 +10,7 @@ import { AppContext } from "Components/AppContext/AppContextHOC"
 import ConfirmModal from "./Components/ChatWindow/Components/ConfirmModal/ConfirmModal"
 import useContactOptions from "./Components/ContactList/Hooks/UseContactOptions"
 import useSelectOptions from "./Components/ChatWindow/Components/SelectOptions/Hooks/UseSelectOptions"
+import HandleNewGroup from "./Components/GroupChat/HandleNewGroup/HandleNewGroup"
 
 type Props = {}
 
@@ -31,7 +32,6 @@ const ContactsContent: React.FC<Props> = () => {
       console.log(messagesRef.current)
       if (!messagesRef.current) return
       Object.keys(messagesRef.current).forEach((chatKey) => {
-        console.log(chatKey)
         let otherMemberKey: string
         if (authUser?.uid === chatKey.slice(0, authUser?.uid.length)) {
           otherMemberKey = chatKey.slice(authUser?.uid.length + 1)
@@ -171,6 +171,7 @@ const ContactsContent: React.FC<Props> = () => {
       </button> */}
       <div className="chat-container">
         <ContactList />
+        <HandleNewGroup />
         {activeChat.chatKey === "" || !contacts[activeChat.contactKey] ? (
           !Object.keys(contacts)?.length ? (
             ""
