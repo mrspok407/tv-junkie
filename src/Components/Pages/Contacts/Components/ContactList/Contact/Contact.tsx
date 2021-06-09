@@ -21,7 +21,8 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
   const firebase = useContext(FirebaseContext)
   const { authUser } = useContext(AppContext)
   const context = useContext(ContactsContext)
-  const { optionsPopupContactList, activeChat, messages, contactsStatus } = context?.state!
+  const { optionsPopupContactList, activeChat, messages, contactsStatus, contacts, initialMsgLoadedFinished } =
+    context?.state!
   const messagesData = messages[contactInfo.chatKey] || []
 
   const [newActivity, setNewActivity] = useState<boolean | null | undefined>(contactInfo.newContactsActivity)
@@ -29,7 +30,10 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
 
   const [authUnreadMessages, setAuthUnreadMessages] = useState<string[]>(contactInfo.unreadMessages)
   const [contactUnreadMessages, setContactUnreadMessages] = useState<string[]>(contactInfo.unreadMessagesContact)
-  const lastMessage = !messagesData.length ? contactInfo.lastMessage : messagesData[messagesData?.length - 1]
+  const lastMessage =
+    Object.keys(messages).length !== Object.keys(contacts).length
+      ? contactInfo.lastMessage
+      : messagesData[messagesData?.length - 1]
 
   const formatedDate = useTimestampFormater({ timeStamp: lastMessage?.timeStamp! })
 

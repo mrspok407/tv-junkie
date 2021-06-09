@@ -77,6 +77,7 @@ export interface ContactsStateInterface {
   messages: {
     [key: string]: MessageInterface[]
   }
+  initialMsgLoadedFinished: string[]
   selectedMessages: {
     [key: string]: string[]
   }

@@ -11,6 +11,8 @@ import ConfirmModal from "./Components/ChatWindow/Components/ConfirmModal/Confir
 import useContactOptions from "./Components/ContactList/Hooks/UseContactOptions"
 import useSelectOptions from "./Components/ChatWindow/Components/SelectOptions/Hooks/UseSelectOptions"
 import HandleNewGroup from "./Components/GroupChat/HandleNewGroup/HandleNewGroup"
+import GroupCreation from "./Components/GroupChat/GroupCreation/GroupCreation"
+import "./Components/ContactList/ContactList.scss"
 
 type Props = {}
 
@@ -18,7 +20,9 @@ const ContactsContent: React.FC<Props> = () => {
   const firebase = useContext(FirebaseContext)
   const context = useContext(ContactsContext)
   const { authUser } = useContext(AppContext)
-  const { activeChat, contacts, messages, confirmModal } = context?.state!
+  const { activeChat, contacts, messages, confirmModal, groupCreation } = context?.state!
+
+  const contactListWrapperRef = useRef<HTMLDivElement>(null!)
 
   const messagesRef = useRef<{ [key: string]: MessageInterface[] }>()
   const confirmModalFunctions = { ...useContactOptions({}), ...useSelectOptions() }
@@ -170,7 +174,16 @@ const ContactsContent: React.FC<Props> = () => {
         Add new message top
       </button> */}
       <div className="chat-container">
-        <ContactList />
+        <div
+          className={classNames("contact-list-wrapper", {
+            "contact-list-wrapper--hide-mobile": context?.state.activeChat.chatKey,
+            "contact-list-wrapper--group-creation-active": groupCreation.isActive
+          })}
+          ref={contactListWrapperRef}
+        >
+          <ContactList contactListWrapperRef={contactListWrapperRef.current} />
+          {groupCreation.isActive && <GroupCreation contactListWrapperRef={contactListWrapperRef.current} />}
+        </div>
         <HandleNewGroup />
         {activeChat.chatKey === "" || !contacts[activeChat.contactKey] ? (
           !Object.keys(contacts)?.length ? (

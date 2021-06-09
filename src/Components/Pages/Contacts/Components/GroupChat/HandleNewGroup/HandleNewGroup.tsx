@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useContext } from "react"
+import { ContactsContext } from "../../@Context/ContactsContext"
 import "./HandleNewGroup.scss"
 
 type Props = {
@@ -7,8 +8,9 @@ type Props = {
 }
 
 const HandleNewGroup: React.FC<Props> = ({ createNewGroup = false, createNewGroupFun }) => {
+  const context = useContext(ContactsContext)
   const openAddMembersComponent = () => {
-    console.log("test")
+    context?.dispatch({ type: "toggleIsActiveGroupCreation", payload: { isActive: true } })
   }
   return (
     <div className="handle-new-group">

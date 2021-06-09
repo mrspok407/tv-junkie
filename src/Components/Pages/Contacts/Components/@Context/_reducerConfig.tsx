@@ -31,6 +31,7 @@ export type ACTIONTYPES =
       payload: { messageDeletionProcess: boolean; deletedMessages: MessageInterface[] }
     }
   | { type: "updateCreateNewGroup"; payload: { isActive: boolean; members: string[] } }
+  | { type: "toggleIsActiveGroupCreation"; payload: { isActive: boolean } }
   | { type: "updateMsgDeletionProcessLoading"; payload: { messageDeletionProcess: boolean } }
   | { type: "changeMessage"; payload: { changedMessage: MessageInterface; chatKey: string } }
   | { type: "updateSelectedMessages"; payload: { messageKey: string; chatKey: string } }
@@ -71,7 +72,8 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
     lastScrollPosition,
     contactsStatus,
     contacts,
-    messageDeletionProcess
+    messageDeletionProcess,
+    initialMsgLoadedFinished
   } = state
 
   switch (action.type) {
@@ -81,6 +83,16 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         groupCreation: {
           isActive: action.payload.isActive,
           members: action.payload.members
+        }
+      }
+    }
+
+    case "toggleIsActiveGroupCreation": {
+      return {
+        ...state,
+        groupCreation: {
+          ...groupCreation,
+          isActive: action.payload.isActive
         }
       }
     }
@@ -96,13 +108,14 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         renderedMessagesList: {
           ...renderedMessagesList,
           [action.payload.chatKey]: action.payload.messagesData.slice(startIndex, endIndex)
-        }
+        },
+        initialMsgLoadedFinished: [...initialMsgLoadedFinished, action.payload.chatKey]
       }
 
     case "removeAllMessages":
       console.log("removeAllMessages")
       const inputRef = document.querySelector(".chat-window__input-message") as HTMLElement
-      inputRef.innerHTML = ""
+      if (inputRef) inputRef.innerHTML = ""
       return {
         ...state,
         messages: {
@@ -409,7 +422,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
           scrollTop: 0,
           editingMsgKey: null
         }
-        inputRef.innerHTML = ""
+        if (inputRef) inputRef.innerHTML = ""
       }
       return {
         ...state,
@@ -453,7 +466,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
           scrollTop: 0,
           editingMsgKey: null
         }
-        inputRef.innerHTML = ""
+        if (inputRef) inputRef.innerHTML = ""
       }
 
       return {
@@ -697,6 +710,7 @@ export const INITIAL_STATE = {
     members: []
   },
   messages: {},
+  initialMsgLoadedFinished: [],
   selectedMessages: {},
   messagesInput: {},
   renderedMessagesList: {},

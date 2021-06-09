@@ -1,0 +1,80 @@
+@import "../../../styles/globalsContacts";
+
+.group-creation {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-right: 1px solid #25252561;
+  transform: translateX(100%);
+  will-change: transform;
+  z-index: 100;
+  animation: groupCreationShow 150ms forwards;
+  @include scrollbar(5px, getColor(blueClr, $mainPalette), #c5bbb1);
+  @keyframes groupCreationShow {
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  &__heading {
+    display: flex;
+    align-items: center;
+    column-gap: 30px;
+    padding: 12px;
+
+    &-go-back {
+      position: relative;
+      width: 33px;
+      height: 33px;
+
+      &:after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background-color: #ffffff21;
+        opacity: 0;
+        transition: 100ms;
+        will-change: opacity;
+        z-index: -1;
+      }
+      &:hover:after {
+        opacity: 1;
+      }
+
+      button {
+        @include buttonRemoveDefaults;
+        background-color: transparent;
+        background-image: url("../../../../../../assets/images/icons/back-arrow.svg");
+        background-size: contain;
+        background-repeat: no-repeat;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+      }
+    }
+
+    &-text {
+      font-size: 1.2rem;
+      color: #fff;
+      user-select: none;
+    }
+  }
+
+  &__search {
+    border-bottom: 1px solid #333333;
+    .search__input {
+      font-size: 1.2rem;
+      padding-right: 10px;
+    }
+  }
+}

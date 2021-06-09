@@ -11,13 +11,16 @@ import CreatePortal from "Components/UI/Modal/CreatePortal"
 import ModalContent from "Components/UI/Modal/ModalContent"
 import { CONTACTS_TO_LOAD } from "../@Context/Constants"
 import useGetInitialContactInfo from "./Hooks/UseGetInitialContactInfo"
-import "./ContactList.scss"
 
-const ContactList: React.FC = () => {
+type Props = {
+  contactListWrapperRef: HTMLDivElement
+}
+
+const ContactList: React.FC<Props> = ({ contactListWrapperRef }) => {
   const firebase = useContext(FirebaseContext)
   const { authUser, errors } = useContext(AppContext)
   const context = useContext(ContactsContext)
-  const { contacts } = context?.state!
+  const { contacts, groupCreation } = context?.state!
   const contactsData = Object.values(contacts)?.map((contact) => contact)
   // const [contacts, setContacts] = useState<ContactInfoInterface[]>()
   const [allContactsAmount, setAllContactsAmount] = useState<number | null>(null)
@@ -29,8 +32,8 @@ const ContactList: React.FC = () => {
   const newLoad = useRef(true)
 
   // const contactListRef = useRef<HTMLDivElement>(null!)
-  const contactListWrapperRef = useRef<HTMLDivElement>(null!)
-  const isScrolledDown = useElementScrolledDown({ element: contactListWrapperRef.current, threshold: 650 })
+  // const contactListWrapperRef = useRef<HTMLDivElement>(null!)
+  const isScrolledDown = useElementScrolledDown({ element: contactListWrapperRef, threshold: 650 })
 
   const { getContactsInfo } = useGetInitialContactInfo()
 
@@ -62,6 +65,7 @@ const ContactList: React.FC = () => {
         })
         return
       }
+
       contactsData.push({ ...contact.val(), key: contact.key })
     })
 
@@ -106,18 +110,19 @@ const ContactList: React.FC = () => {
       .limitToLast(CONTACTS_TO_LOAD)
       .on("value", (snapshot: any) => getContactsList(snapshot))
 
-    contactsDatabaseRef.child("contactsAmount").on("value", (snapshot: any) => {
+    const contactsAmountListener = contactsDatabaseRef.child("contactsAmount").on("value", (snapshot: any) => {
       setAllContactsAmount(snapshot.val())
     })
 
     return () => {
       contactsListRef.off()
-      contactsDatabaseRef.off()
+      contactsDatabaseRef.child("contactsAmount").off("value", contactsAmountListener)
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!isScrolledDown) return
+    if (groupCreation.isActive) return
     if (loadedContacts >= allContactsAmount!) return
 
     contactsListRef.off()
@@ -126,35 +131,29 @@ const ContactList: React.FC = () => {
       .orderByChild("pinned_lastActivityTS")
       .limitToLast(loadedContacts + CONTACTS_TO_LOAD)
       .on("value", (snapshot: any) => getContactsList(snapshot))
-  }, [isScrolledDown]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isScrolledDown, groupCreation]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div
-      className={classNames("contact-list-wrapper", {
-        "contact-list-wrapper--hide-mobile": context?.state.activeChat.chatKey
+      className={classNames("contact-list", {
+        // "contact-list--hide-mobile": context?.state.activeChat.chatKey,
+        "contact-list--no-contacts": !initialLoadingRef.current && !contactsData?.length,
+        "contact-list--group-creation-active": groupCreation.isActive
       })}
-      ref={contactListWrapperRef}
     >
-      <div
-        className={classNames("contact-list", {
-          // "contact-list--hide-mobile": context?.state.activeChat.chatKey,
-          "contact-list--no-contacts": !initialLoadingRef.current && !contactsData?.length
-        })}
-      >
-        {initialLoading ? (
-          <div className="contact-list__loader-wrapper">
-            <span className="contact-list__loader"></span>
-          </div>
-        ) : !contactsData?.length ? (
-          <div className="contact-list--no-contacts-text">You don't have any contacts</div>
-        ) : (
-          contactsData?.map((contact) => (
-            <Contact key={contact.key} contactInfo={contact} allContactsAmount={allContactsAmount} />
-          ))
-        )}
+      {initialLoading ? (
+        <div className="contact-list__loader-wrapper">
+          <span className="contact-list__loader"></span>
+        </div>
+      ) : !contactsData?.length ? (
+        <div className="contact-list--no-contacts-text">You don't have any contacts</div>
+      ) : (
+        contactsData?.map((contact) => (
+          <Contact key={contact.key} contactInfo={contact} allContactsAmount={allContactsAmount} />
+        ))
+      )}
 
-        {errors.error && <CreatePortal element={<ModalContent message={errors.error.message} />}></CreatePortal>}
-      </div>
+      {errors.error && <CreatePortal element={<ModalContent message={errors.error.message} />}></CreatePortal>}
     </div>
   )
 }

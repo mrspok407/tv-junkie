@@ -17,7 +17,7 @@ const useHandleContactsStatus = ({ chatKey, contactKey }: Props) => {
     firebase.chatMemberStatus({ chatKey, memberKey: contactKey }).on("value", (snapshot: any) => {
       context?.dispatch({
         type: "updateContactsStatus",
-        payload: { status: snapshot.val(), chatKey }
+        payload: { status: snapshot.val() || {}, chatKey }
       })
     })
 

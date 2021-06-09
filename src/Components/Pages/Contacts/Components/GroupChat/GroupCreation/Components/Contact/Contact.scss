@@ -1,0 +1,55 @@
+@import "../../../../../styles/globalsContacts";
+
+.group-creation {
+  .contact-item {
+    display: flex;
+    flex-direction: row;
+
+    &__select {
+      width: 20%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      button {
+        --selectBtnSize: 25px;
+        @include buttonRemoveDefaults;
+        position: relative;
+        width: var(--selectBtnSize);
+        height: var(--selectBtnSize);
+        border-radius: 50%;
+        background-color: transparent;
+        border: 2px solid #fff;
+        transition: 100ms;
+        cursor: pointer;
+
+        &:after {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+          background-color: #56d27a8a;
+          transform: scale(0);
+          opacity: 0;
+          transition: 125ms;
+          will-change: opacity, transform;
+        }
+      }
+    }
+    &__info {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      grid-row-gap: 5px;
+      row-gap: 5px;
+      width: 80%;
+    }
+    &__status {
+      font-size: 0.9rem;
+      color: #b5b5b5;
+    }
+  }
+}

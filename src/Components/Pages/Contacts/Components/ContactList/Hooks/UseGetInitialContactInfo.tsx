@@ -4,6 +4,7 @@ import { ContactInfoInterface, ContactsInterface, MessageInterface } from "Compo
 import { useContext, useEffect, useRef, useState } from "react"
 import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 import { ContactsContext, ContextInterface } from "../../@Context/ContactsContext"
+import useGetInitialMessages from "../../ChatWindow/FirebaseHelpers/UseGetInitialMessages"
 
 // let loadedContactsRef: { [key: string]: ContactInfoInterface } = {}
 

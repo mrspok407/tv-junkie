@@ -1,9 +1,12 @@
 @import "../../styles/globalsContacts";
+@import "./Contact/Contact.scss";
 
 .contact-list {
+  transition: 100ms;
   &-wrapper {
     position: relative;
     overflow-y: auto;
+    overflow-x: hidden;
     border-right: 1px solid getColor(borderRight, $contactListPalette);
     @include scrollbar(5px, getColor(blueClr, $mainPalette), #c5bbb1);
     @include mediaMaxW(#{$mobileViewPort}) {
@@ -18,6 +21,14 @@
         z-index: -1;
       }
     }
+
+    &--group-creation-active {
+      overflow-y: hidden;
+    }
+  }
+
+  &--group-creation-active {
+    transform: translateX(-100%);
   }
 
   &--no-contacts {

@@ -36,6 +36,7 @@ const useGetInitialMessages = ({ chatKey }: { chatKey: string }) => {
     if (loading) return
     setLoading(true)
 
+    console.log("useGetInitialMessages")
     const getMessages = async () => {
       let messagesSnapshot: any
       let firstUnreadMessageKey: any
