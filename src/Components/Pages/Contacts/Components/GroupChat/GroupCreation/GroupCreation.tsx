@@ -35,10 +35,6 @@ const GroupCreation: React.FC<Props> = ({ contactListWrapperRef }) => {
     contactListWrapperRef.scrollTop = 0
   }, [])
 
-  useEffect(() => {
-    console.log("rerender")
-  })
-
   const getContactsData = async (snapshot: any) => {
     let contacts: ContactInfoInterface[] = []
     snapshot.forEach((contact: { val: () => ContactInfoInterface; key: string }) => {
