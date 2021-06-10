@@ -5,6 +5,20 @@
     display: flex;
     flex-direction: row;
 
+    &--selected {
+      &:after {
+        opacity: 1;
+        background-color: #173446;
+      }
+
+      .contact-item__select {
+        button:after {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+    }
+
     &__select {
       width: 20%;
       display: flex;
@@ -46,6 +60,7 @@
       grid-row-gap: 5px;
       row-gap: 5px;
       width: 80%;
+      user-select: none;
     }
     &__status {
       font-size: 0.9rem;

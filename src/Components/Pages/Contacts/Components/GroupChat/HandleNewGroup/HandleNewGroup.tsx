@@ -9,7 +9,7 @@ type Props = {
 
 const HandleNewGroup: React.FC<Props> = ({ createNewGroup = false, createNewGroupFun }) => {
   const context = useContext(ContactsContext)
-  const openAddMembersComponent = () => {
+  const openGroupCreation = () => {
     context?.dispatch({ type: "toggleIsActiveGroupCreation", payload: { isActive: true } })
   }
   return (
@@ -20,7 +20,7 @@ const HandleNewGroup: React.FC<Props> = ({ createNewGroup = false, createNewGrou
           if (createNewGroup && createNewGroupFun) {
             createNewGroupFun()
           } else {
-            openAddMembersComponent()
+            openGroupCreation()
           }
         }}
       ></button>

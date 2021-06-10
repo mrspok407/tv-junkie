@@ -62,7 +62,7 @@ export interface ActiveChatInterface {
 
 export interface GroupCreationInterface {
   isActive: boolean
-  members: string[]
+  members: { key: string; username: string }[]
 }
 
 export interface ContactsStateInterface {

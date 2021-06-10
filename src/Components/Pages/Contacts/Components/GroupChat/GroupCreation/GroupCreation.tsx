@@ -20,10 +20,9 @@ const GroupCreation: React.FC<Props> = ({ contactListWrapperRef }) => {
   const firebase = useContext(FirebaseContext)
   const { authUser, errors } = useContext(AppContext)
   const context = useContext(ContactsContext)
-  const { contactsStatus } = context?.state!
+  const { groupCreation } = context?.state!
 
   const [contacts, setContacts] = useState<ContactInfoInterface[]>([])
-  const [loadedContacts, setLoadedContacts] = useState(CONTACTS_TO_LOAD)
   const [allContactsAmount, setAllContactsAmount] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
   const [initialLoading, setInitialLoading] = useState(true)
@@ -35,6 +34,10 @@ const GroupCreation: React.FC<Props> = ({ contactListWrapperRef }) => {
   useLayoutEffect(() => {
     contactListWrapperRef.scrollTop = 0
   }, [])
+
+  useEffect(() => {
+    console.log("rerender")
+  })
 
   const getContactsData = async (snapshot: any) => {
     let contacts: ContactInfoInterface[] = []
@@ -67,6 +70,7 @@ const GroupCreation: React.FC<Props> = ({ contactListWrapperRef }) => {
         setInitialLoading(false)
       }
     })()
+
     const contactsAmountListener = firebase
       .contactsDatabase({ uid: authUser?.uid })
       .child("contactsAmount")
@@ -110,6 +114,25 @@ const GroupCreation: React.FC<Props> = ({ contactListWrapperRef }) => {
           ></button>
         </div>
         <div className="group-creation__heading-text">Add members</div>
+      </div>
+      <div className="group-creation__selected-members">
+        {groupCreation.members.map((member) => (
+          <div
+            key={member.key}
+            className="group-creation__selected-contact"
+            onClick={() =>
+              context?.dispatch({
+                type: "updateCreateNewGroup",
+                payload: { isActive: null, newMember: { key: member.key, username: member.username } }
+              })
+            }
+          >
+            <div className="group-creation__selected-contact-name">{member.username}</div>
+            <div className="group-creation__selected-contact-remove">
+              <button type="button"></button>
+            </div>
+          </div>
+        ))}
       </div>
       <div className="group-creation__search">
         <input type="text" placeholder="Search for contact" className="search__input" />

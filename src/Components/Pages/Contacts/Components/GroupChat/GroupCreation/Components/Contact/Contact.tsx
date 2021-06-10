@@ -1,3 +1,4 @@
+import classNames from "classnames"
 import { ContactInfoInterface } from "Components/Pages/Contacts/@Types"
 import { ContactsContext } from "Components/Pages/Contacts/Components/@Context/ContactsContext"
 import useTimestampFormater from "Components/Pages/Contacts/Hooks/UseTimestampFormater"
@@ -10,12 +11,24 @@ type Props = {
 
 const Contact: React.FC<Props> = ({ contact }) => {
   const context = useContext(ContactsContext)
-  const { contactsStatus } = context?.state!
+  const { contactsStatus, groupCreation } = context?.state!
+  const membersData = groupCreation.members.map((member) => member.key)
 
   const formatedDate = useTimestampFormater({ timeStamp: contactsStatus[contact.chatKey]?.lastSeen! })
 
   return (
-    <div className="contact-item" key={contact.key}>
+    <div
+      className={classNames("contact-item", {
+        "contact-item--selected": membersData.includes(contact.key)
+      })}
+      key={contact.key}
+      onClick={() =>
+        context?.dispatch({
+          type: "updateCreateNewGroup",
+          payload: { isActive: null, newMember: { key: contact.key, username: contact.userName } }
+        })
+      }
+    >
       <div className="contact-item__select">
         <button type="button"></button>
       </div>
