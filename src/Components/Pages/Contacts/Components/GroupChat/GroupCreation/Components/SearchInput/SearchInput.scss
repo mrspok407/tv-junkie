@@ -1,0 +1,24 @@
+@import "../../../../../styles/globalsContacts";
+
+.group-creation__search {
+  position: relative;
+  border-bottom: 1px solid #333333;
+  .search__input {
+    font-size: 1.2rem;
+    padding-right: 32px;
+  }
+  .loader {
+    top: 22px;
+    right: 37px;
+    padding-right: 0;
+
+    .loader-shadow {
+      top: initial;
+      left: initial;
+      transform: initial;
+    }
+  }
+  .button--input-clear {
+    top: 30px;
+  }
+}

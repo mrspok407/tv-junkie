@@ -93,6 +93,7 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
           .user(authUser.user.uid)
           .set({
             username: inputs.login,
+            usernameLowerCase: inputs.login.toLowerCase(),
             email,
             role: ROLES.USER
           })

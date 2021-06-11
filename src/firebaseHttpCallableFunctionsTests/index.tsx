@@ -15,6 +15,7 @@ interface ContactInfoInterface {
   status: boolean
   receiver?: boolean
   userName?: string
+  userNameLowerCase?: string
   timeStamp: unknown
 }
 
@@ -46,6 +47,7 @@ export const _newContactRequest = async ({
           status: false,
           receiver: true,
           userName: contactName,
+          userNameLowerCase: contactName?.toLowerCase(),
           pinned_lastActivityTS: "false"
         },
         [`${contactsDatabaseRef(authUid)}/contactsLastActivity/${contactUid}`]: timeStamp
@@ -66,6 +68,7 @@ export const _newContactRequest = async ({
         status: false,
         receiver: false,
         userName: authUserName.val(),
+        userNameLoserCase: authUserName.val().toLowerCase(),
         pinned_lastActivityTS: "false"
       }
     }

@@ -139,11 +139,8 @@
     }
   }
 
-  &__search {
-    border-bottom: 1px solid #333333;
-    .search__input {
-      font-size: 1.2rem;
-      padding-right: 10px;
-    }
+  .contact-list--no-contacts-text {
+    margin-right: auto;
+    margin-left: auto;
   }
 }

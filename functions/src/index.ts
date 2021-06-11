@@ -30,6 +30,7 @@ interface ContactInfoInterface {
   status: boolean;
   receiver?: boolean;
   userName?: string;
+  userNameLowerCase?: string;
   timeStamp: unknown;
 }
 
@@ -154,6 +155,7 @@ export const newContactRequest = functions.https.onCall(async (data, context) =>
           status: false,
           receiver: true,
           userName: contactName,
+          userNameLowerCase: contactName.toLowerCase(),
           pinned_lastActivityTS: "false"
         }
       }
@@ -172,6 +174,7 @@ export const newContactRequest = functions.https.onCall(async (data, context) =>
         status: false,
         receiver: false,
         userName: authUserName.val(),
+        userNameLowerCase: authUserName.val().toLowerCase(),
         pinned_lastActivityTS: "false"
       }
     };

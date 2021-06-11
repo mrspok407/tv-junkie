@@ -33,7 +33,6 @@ const Search: React.FC<Props> = ({ navSearch, navRef, closeNavMobile }) => {
   const [error, setError] = useState("")
 
   const searchContRef = useRef<HTMLDivElement>(null)
-
   const history = useHistory()
 
   useEffect(() => {
@@ -70,7 +69,7 @@ const Search: React.FC<Props> = ({ navSearch, navRef, closeNavMobile }) => {
           })
         }
       )
-      .then(({ data: { results, total_pages: totalPages } }) => {
+      .then(({ data: { results } }) => {
         const content = [...results]
         const contentSortByPopularity = content.sort((a, b) => (a.popularity > b.popularity ? -1 : 1)).slice(0, 5)
 
