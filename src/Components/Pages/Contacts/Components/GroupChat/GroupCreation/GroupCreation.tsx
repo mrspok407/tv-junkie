@@ -114,12 +114,12 @@ const GroupCreation: React.FC<Props> = ({ contactListWrapperRef }) => {
           <div
             key={member.key}
             className="group-creation__selected-contact"
-            // onClick={() =>
-            //   context?.dispatch({
-            //     type: "updateCreateNewGroup",
-            //     payload: { isActive: null, newMember: { key: member.key, username: member.username } }
-            //   })
-            // }
+            onClick={() =>
+              context?.dispatch({
+                type: "updateCreateNewGroup",
+                payload: { isActive: null, newMember: { key: member.key, username: member.username } }
+              })
+            }
           >
             <div className="group-creation__selected-contact-name">{member.username}</div>
             <div className="group-creation__selected-contact-remove">

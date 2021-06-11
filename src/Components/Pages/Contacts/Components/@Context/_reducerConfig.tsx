@@ -30,7 +30,10 @@ export type ACTIONTYPES =
       type: "updateMsgDeletionProcess"
       payload: { messageDeletionProcess: boolean; deletedMessages: MessageInterface[] }
     }
-  | { type: "updateCreateNewGroup"; payload: { isActive: boolean; members: string[] } }
+  | {
+      type: "updateCreateNewGroup"
+      payload: { isActive: boolean | null; newMember: { key: string; username: string } }
+    }
   | { type: "toggleIsActiveGroupCreation"; payload: { isActive: boolean } }
   | { type: "updateMsgDeletionProcessLoading"; payload: { messageDeletionProcess: boolean } }
   | { type: "changeMessage"; payload: { changedMessage: MessageInterface; chatKey: string } }
@@ -78,11 +81,15 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
 
   switch (action.type) {
     case "updateCreateNewGroup": {
+      const newMember = action.payload.newMember
+      const currentMembers = groupCreation.members
       return {
         ...state,
         groupCreation: {
-          isActive: action.payload.isActive,
-          members: action.payload.members
+          isActive: action.payload.isActive === null ? groupCreation.isActive : action.payload.isActive,
+          members: currentMembers.find((member) => member.key === newMember.key)
+            ? currentMembers.filter((member) => member.key !== newMember.key)
+            : [...currentMembers, newMember]
         }
       }
     }
