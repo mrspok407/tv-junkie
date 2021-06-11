@@ -28,7 +28,7 @@ const useFirstRenderMessages = ({ messages, renderedMessages, unreadMessages, ch
       startIndexRender = 0
       endIndexRender = messages.length
     } else {
-      if (unreadMessages.length! <= UNREAD_MESSAGES_TO_RENDER) {
+      if (unreadMessages.length <= UNREAD_MESSAGES_TO_RENDER) {
         startIndexRender = Math.max(messages.length - MESSAGES_TO_RENDER, 0)
         endIndexRender = messages.length
       } else {

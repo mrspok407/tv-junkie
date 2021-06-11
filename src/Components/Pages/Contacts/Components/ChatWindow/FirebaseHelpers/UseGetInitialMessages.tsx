@@ -93,7 +93,7 @@ const useGetInitialMessages = ({ chatKey }: { chatKey: string }) => {
           startIndexRender = 0
           endIndexRender = messagesData.length
         } else {
-          if (authUnreadMessages.length! <= UNREAD_MESSAGES_TO_RENDER) {
+          if (authUnreadMessages.length <= UNREAD_MESSAGES_TO_RENDER) {
             startIndexRender = Math.max(messagesData.length - MESSAGES_TO_RENDER, 0)
             endIndexRender = messagesData.length
           } else {

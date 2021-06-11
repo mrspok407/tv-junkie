@@ -363,7 +363,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
             }
           }
         } else {
-          if (authUserUnreadMessages[action.payload.chatKey].length! <= UNREAD_MESSAGES_TO_RENDER) {
+          if (authUserUnreadMessages[action.payload.chatKey].length <= UNREAD_MESSAGES_TO_RENDER) {
             return {
               ...state,
               messages: {
