@@ -22,12 +22,12 @@ const Contact: React.FC<Props> = ({ contact }) => {
         "contact-item--selected": membersData.includes(contact.key)
       })}
       key={contact.key}
-      onClick={() =>
-        context?.dispatch({
-          type: "updateCreateNewGroup",
-          payload: { isActive: null, newMember: { key: contact.key, username: contact.userName } }
-        })
-      }
+      // onClick={() =>
+      //   context?.dispatch({
+      //     type: "updateCreateNewGroup",
+      //     payload: { isActive: null, newMember: { key: contact.key, username: contact.userName } }
+      //   })
+      // }
     >
       <div className="contact-item__select">
         <button type="button"></button>
