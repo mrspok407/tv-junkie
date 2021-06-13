@@ -34,7 +34,8 @@ export type ACTIONTYPES =
       type: "updateCreateNewGroup"
       payload: { isActive: boolean | null; newMember: { key: string; username: string } }
     }
-  | { type: "toggleIsActiveGroupCreation"; payload: { isActive: boolean } }
+  | { type: "updateGroupCreation"; payload: { isActive?: boolean; selectNameActive?: boolean; error?: string } }
+  // | { type: "updateGroupCreationSelectName"; payload: { selectNameActive: boolean } }
   | { type: "updateMsgDeletionProcessLoading"; payload: { messageDeletionProcess: boolean } }
   | { type: "changeMessage"; payload: { changedMessage: MessageInterface; chatKey: string } }
   | { type: "updateSelectedMessages"; payload: { messageKey: string; chatKey: string } }
@@ -86,6 +87,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
       return {
         ...state,
         groupCreation: {
+          ...groupCreation,
           isActive: action.payload.isActive === null ? groupCreation.isActive : action.payload.isActive,
           members: currentMembers.find((member) => member.key === newMember.key)
             ? currentMembers.filter((member) => member.key !== newMember.key)
@@ -94,15 +96,25 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
       }
     }
 
-    case "toggleIsActiveGroupCreation": {
+    case "updateGroupCreation": {
       return {
         ...state,
         groupCreation: {
           ...groupCreation,
-          isActive: action.payload.isActive
+          ...action.payload
         }
       }
     }
+
+    // case "updateGroupCreationSelectName": {
+    //   return {
+    //     ...state,
+    //     groupCreation: {
+    //       ...groupCreation,
+    //       selectNameActive: action.payload.selectNameActive
+    //     }
+    //   }
+    // }
 
     case "setInitialMessages":
       const { startIndex, endIndex } = action.payload
@@ -714,6 +726,8 @@ export const INITIAL_STATE = {
   },
   groupCreation: {
     isActive: false,
+    selectNameActive: false,
+    error: "",
     members: []
   },
   messages: {},

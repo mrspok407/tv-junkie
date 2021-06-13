@@ -5,16 +5,14 @@ import { MessageInterface } from "../../../../@Types"
 import { ContactsContext } from "../../../@Context/ContactsContext"
 import MessagePopup from "./MessagePopup"
 import "./MessageInfo.scss"
+import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
 
 type Props = { messageData: MessageInterface }
 
 const MessageInfo: React.FC<Props> = ({ messageData }) => {
-  const { authUser } = useContext(AppContext)
-  const context = useContext(ContactsContext)
-  const { activeChat, messagePopup, contactsUnreadMessages } = context?.state!
+  const { authUser, contactsContext, contactsState } = useFrequentVariables()
+  const { activeChat, messagePopup, contactsUnreadMessages } = contactsState
   const contactsUnreadMessagesData = contactsUnreadMessages[activeChat.chatKey]
-
-  // console.log({ contactsUnreadMessagesData })
 
   const messageOptionsRef = useRef<HTMLDivElement>(null!)
 
@@ -28,7 +26,7 @@ const MessageInfo: React.FC<Props> = ({ messageData }) => {
           })}
           onClick={(e) => {
             e.stopPropagation()
-            context?.dispatch({ type: "updateMessagePopup", payload: messageData.key })
+            contactsContext?.dispatch({ type: "updateMessagePopup", payload: messageData.key })
           }}
         >
           <span></span>

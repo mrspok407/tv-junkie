@@ -2,6 +2,7 @@ import classNames from "classnames"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
 import { ContainerRectInterface, MessageInterface } from "Components/Pages/Contacts/@Types"
+import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
 import React, { useState, useEffect, useCallback, useLayoutEffect, useContext, useRef } from "react"
 import { throttle } from "throttle-debounce"
 import { ContactsContext } from "../../../@Context/ContactsContext"
@@ -15,10 +16,8 @@ type Props = {
 }
 
 const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuthRef, getContainerRect }: Props) => {
-  const firebase = useContext(FirebaseContext)
-  const { authUser } = useContext(AppContext)
-  const context = useContext(ContactsContext)
-  const { renderedMessagesList, messages } = context?.state!
+  const { firebase, authUser, contactsContext, contactsState } = useFrequentVariables()
+  const { renderedMessagesList, messages } = contactsState
   const messagesData = messages[chatKey]
   const renderedMessages = renderedMessagesList[chatKey]
 
@@ -52,7 +51,7 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
   const onGoDown = () => {
     const renderedMessagesArray = renderedMessages.map((message) => message.key)
     if (!unreadMessages?.length) {
-      context?.dispatch({
+      contactsContext?.dispatch({
         type: "handleGoDown",
         payload: { unreadMessages }
       })
@@ -66,7 +65,7 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
       } else {
         setWentToFirstUnread(true)
       }
-      context?.dispatch({
+      contactsContext?.dispatch({
         type: "handleGoDown",
         payload: { unreadMessages }
       })

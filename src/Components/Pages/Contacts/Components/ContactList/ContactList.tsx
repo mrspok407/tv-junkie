@@ -59,7 +59,10 @@ const ContactList: React.FC<Props> = ({ contactListWrapperRef }) => {
 
     let contactsData: ContactInfoInterface[] = []
     snapshot.forEach((contact: { val: () => ContactInfoInterface; key: string }) => {
-      if (isUnexpectedObject({ exampleObject: CONTACT_INFO_INITIAL_DATA, targetObject: contact.val() })) {
+      if (
+        isUnexpectedObject({ exampleObject: CONTACT_INFO_INITIAL_DATA, targetObject: contact.val() }) &&
+        !contact.val().isGroupChat
+      ) {
         errors.handleError({
           message: "Some of your contacts were not loaded correctly. Try to reload the page."
         })

@@ -129,6 +129,7 @@ exports.newContactRequest = functions.https.onCall(async (data, context) => {
                 status: false,
                 receiver: true,
                 userName: contactName,
+                userNameLowerCase: contactName.toLowerCase(),
                 pinned_lastActivityTS: "false"
             }
         }
@@ -142,6 +143,7 @@ exports.newContactRequest = functions.https.onCall(async (data, context) => {
                 status: false,
                 receiver: false,
                 userName: authUserName.val(),
+                userNameLowerCase: authUserName.val().toLowerCase(),
                 pinned_lastActivityTS: "false"
             } });
         return database.ref("users").update(updateData);

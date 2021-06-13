@@ -11,7 +11,9 @@
   overflow-y: auto;
   overflow-x: hidden;
   border-right: 1px solid #25252561;
+  background-color: #131313;
   transform: translateX(100%);
+  transition: 150ms;
   will-change: transform;
   z-index: 20;
   animation: groupCreationShow 150ms forwards;

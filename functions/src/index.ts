@@ -38,6 +38,14 @@ interface ContactRequestDataInterface {
   [key: string]: ContactInfoInterface | boolean;
 }
 
+interface GroupChatInfoInterface {
+  [key: string]: string | boolean;
+}
+
+interface GroupChatMemberStatusInterface {
+  [key: string]: string | boolean;
+}
+
 const contactsDatabaseRef = (uid: string) => `${uid}/contactsDatabase`;
 
 export const updatePinnedTimeStamp = functions.database
@@ -139,6 +147,60 @@ export const updateLastSeen = functions.database
     snapshot.ref.parent?.update({lastSeen: timeStamp});
   });
 
+export const createNewGroup = functions.https.onCall(
+  async (data: {members: {key: string; username: string}[]}, context) => {
+    const authUid = context?.auth?.uid;
+    const {members} = data;
+
+    if (!authUid) {
+      throw new functions.https.HttpsError("failed-precondition", "The function must be called while authenticated.");
+    }
+
+    const timeStamp = admin.database.ServerValue.TIMESTAMP;
+
+    const membersUpdateData: any = {};
+    const groupChatRef = database.ref("groupChats").push();
+    const newMessageRef = database.ref(`groupChats/${groupChatRef.key}/messages`).push();
+    members.forEach((member) => {
+      membersUpdateData[`groupChats/${groupChatRef.key}/members/${member.key}/status`] = {
+        isOnline: false,
+        role: "USER"
+      };
+      membersUpdateData[`users/${member.key}/contactsDatabase/contactsList/${groupChatRef.key}`] = {
+        pinned_lastActivityTS: "false",
+        isGroupChat: true,
+        role: "USER"
+      };
+      membersUpdateData[`users/${member.key}/contactsDatabase/contactsLastActivity/${groupChatRef.key}`] = timeStamp;
+      membersUpdateData[`users/${member.key}/contactsDatabase/newContactsActivity/${groupChatRef.key}`] = true;
+    });
+
+    try {
+      const updateData: {[key: string]: GroupChatInfoInterface | GroupChatMemberStatusInterface} = {
+        ...membersUpdateData,
+        [`groupChats/${groupChatRef.key}/members/${authUid}/status`]: {
+          isOnline: false,
+          role: "ADMIN"
+        },
+        [`users/${authUid}/contactsDatabase/contactsList/${groupChatRef.key}`]: {
+          pinned_lastActivityTS: "false",
+          isGroupChat: true,
+          role: "ADMIN"
+        },
+        [`users/${authUid}/contactsDatabase/contactsLastActivity/${groupChatRef.key}`]: timeStamp,
+        [`groupChats/${groupChatRef.key}/messages/${newMessageRef.key}`]: {
+          members,
+          isNewMembers: true,
+          timeStamp
+        }
+      };
+      return database.ref().update(updateData);
+    } catch (error) {
+      throw new functions.https.HttpsError("unknown", error.message, error);
+    }
+  }
+);
+
 export const newContactRequest = functions.https.onCall(async (data, context) => {
   const authUid = context?.auth?.uid;
   const {contactUid, contactName, resendRequest = false} = data;
@@ -166,7 +228,6 @@ export const newContactRequest = functions.https.onCall(async (data, context) =>
 
   try {
     const authUserName = await database.ref(`users/${authUid}/userName`).once("value");
-
     const updateData: ContactRequestDataInterface = {
       ...contactInfoData,
       [`${contactsDatabaseRef(contactUid)}/newContactsRequests/${authUid}`]: true,

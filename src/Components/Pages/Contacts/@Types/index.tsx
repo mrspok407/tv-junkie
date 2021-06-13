@@ -12,6 +12,8 @@ export interface ContactInfoInterface {
   lastMessage: MessageInterface
   unreadMessages: string[]
   unreadMessagesContact: string[]
+  isGroupChat: boolean
+  role: string
 }
 
 export const CONTACT_INFO_INITIAL_DATA = {
@@ -62,6 +64,8 @@ export interface ActiveChatInterface {
 
 export interface GroupCreationInterface {
   isActive: boolean
+  selectNameActive: boolean
+  error: string
   members: { key: string; username: string }[]
 }
 

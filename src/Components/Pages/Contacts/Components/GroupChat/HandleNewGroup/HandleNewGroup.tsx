@@ -1,26 +1,38 @@
+import classNames from "classnames"
+import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
 import React, { useState, useEffect, useContext } from "react"
 import { ContactsContext } from "../../@Context/ContactsContext"
+import useCreateNewGroup from "../Hooks/UseCreateNewGroup"
 import "./HandleNewGroup.scss"
 
-type Props = {
-  createNewGroup?: boolean
-  createNewGroupFun?: () => void
-}
+// type Props = {
+//   createNewGroup?: boolean
+//   createNewGroupFun?: () => void
+// }
 
-const HandleNewGroup: React.FC<Props> = ({ createNewGroup = false, createNewGroupFun }) => {
-  const context = useContext(ContactsContext)
-  const openGroupCreation = () => {
-    context?.dispatch({ type: "toggleIsActiveGroupCreation", payload: { isActive: true } })
-  }
+const HandleNewGroup: React.FC = () => {
+  const { contactsContext, contactsState } = useFrequentVariables()
+  const { groupCreation } = contactsState
+
+  const { createNewGroup } = useCreateNewGroup()
+
   return (
-    <div className="handle-new-group">
+    <div
+      className={classNames("handle-new-group", {
+        "handle-new-group--create": groupCreation.isActive
+      })}
+    >
       <button
         type="button"
         onClick={() => {
-          if (createNewGroup && createNewGroupFun) {
-            createNewGroupFun()
+          if (!groupCreation.isActive) {
+            contactsContext?.dispatch({ type: "updateGroupCreation", payload: { isActive: true } })
           } else {
-            openGroupCreation()
+            if (!groupCreation.selectNameActive) {
+              contactsContext?.dispatch({ type: "updateGroupCreation", payload: { selectNameActive: true } })
+            } else {
+              createNewGroup()
+            }
           }
         }}
       ></button>

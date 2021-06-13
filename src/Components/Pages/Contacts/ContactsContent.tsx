@@ -184,7 +184,13 @@ const ContactsContent: React.FC<Props> = () => {
           <ContactList contactListWrapperRef={contactListWrapperRef.current} />
           {groupCreation.isActive && <GroupCreation contactListWrapperRef={contactListWrapperRef.current} />}
         </div>
-        <HandleNewGroup />
+        {!groupCreation.isActive ? (
+          <HandleNewGroup />
+        ) : groupCreation.members.length && !groupCreation.error ? (
+          <HandleNewGroup />
+        ) : (
+          ""
+        )}
         {activeChat.chatKey === "" || !contacts[activeChat.contactKey] ? (
           !Object.keys(contacts)?.length ? (
             ""

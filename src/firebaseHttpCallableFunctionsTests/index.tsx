@@ -19,11 +19,78 @@ interface ContactInfoInterface {
   timeStamp: unknown
 }
 
+interface GroupChatInfoInterface {
+  [key: string]: string | boolean
+}
+
+interface GroupChatMemberStatusInterface {
+  [key: string]: string | boolean
+}
+
 interface ContactRequestDataInterface {
   [key: string]: ContactInfoInterface | boolean
 }
 
 const contactsDatabaseRef = (uid: string) => `${uid}/contactsDatabase`
+
+export const _createNewGroup = async ({
+  data,
+  context,
+  database
+}: {
+  data: { members: { key: string; username: string }[]; timeStamp?: number }
+  context: ContextInterface
+  database: any
+}) => {
+  const authUid = context?.auth?.uid
+  const { members, timeStamp } = data
+
+  if (!authUid) {
+    throw new Error("The function must be called while authenticated.")
+  }
+  const membersUpdateData: any = {}
+  const groupChatRef = database.ref("groupChats").push()
+  const newMessageRef = database.ref(`groupChats/${groupChatRef.key}/messages`).push()
+  console.log(groupChatRef.key)
+  console.log(newMessageRef.key)
+  members.forEach((member) => {
+    membersUpdateData[`groupChats/${groupChatRef.key}/members/${member.key}/status`] = {
+      isOnline: false,
+      role: "USER"
+    }
+    membersUpdateData[`users/${member.key}/contactsDatabase/contactsList/${groupChatRef.key}`] = {
+      pinned_lastActivityTS: "false",
+      isGroupChat: true,
+      role: "USER"
+    }
+    membersUpdateData[`users/${member.key}/contactsDatabase/contactsLastActivity/${groupChatRef.key}`] = timeStamp
+    membersUpdateData[`users/${member.key}/contactsDatabase/newContactsActivity/${groupChatRef.key}`] = true
+  })
+
+  try {
+    const updateData: { [key: string]: GroupChatInfoInterface | GroupChatMemberStatusInterface } = {
+      ...membersUpdateData,
+      [`groupChats/${groupChatRef.key}/members/${authUid}/status`]: {
+        isOnline: false,
+        role: "ADMIN"
+      },
+      [`users/${authUid}/contactsDatabase/contactsList/${groupChatRef.key}`]: {
+        pinned_lastActivityTS: "false",
+        isGroupChat: true,
+        role: "ADMIN"
+      },
+      [`users/${authUid}/contactsDatabase/contactsLastActivity/${groupChatRef.key}`]: timeStamp,
+      [`groupChats/${groupChatRef.key}/messages/${newMessageRef.key}`]: {
+        members,
+        isNewMembers: true,
+        timeStamp
+      }
+    }
+    return database.ref().update(updateData)
+  } catch (error) {
+    throw new Error(`There has been some error updating database: ${error}`)
+  }
+}
 
 export const _newContactRequest = async ({
   data,

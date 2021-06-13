@@ -129,22 +129,22 @@ class Profile extends Component {
       }
     })
     console.log("test")
-    // firebase
-    //   .database()
-    //   .ref("privateChats")
-    //   .once("value", (snapshot) => {
-    //     // console.log(snapshot.val())
-    //     console.log(JSON.stringify(snapshot.val()))
-    //   })
-
-    firebase.contactsList({ uid: authUid }).once("value", (snapshot) => {
-      snapshot.forEach((contact) => {
-        firebase
-          .contactsList({ uid: authUid })
-          .child(contact.key)
-          .update({ userNameLowerCase: contact.val().userName.toLowerCase() })
+    firebase
+      .database()
+      .ref("privateChats")
+      .once("value", (snapshot) => {
+        // console.log(snapshot.val())
+        console.log(JSON.stringify(snapshot.val()))
       })
-    })
+
+    // firebase.contactsList({ uid: authUid }).once("value", (snapshot) => {
+    //   snapshot.forEach((contact) => {
+    //     firebase
+    //       .contactsList({ uid: authUid })
+    //       .child(contact.key)
+    //       .update({ userNameLowerCase: contact.val().userName.toLowerCase() })
+    //   })
+    // })
 
     // const userKey = "-MY_TPe9EW9TqCibVSop"
     const userKey = "-MY_R8wzzvABzB8OWakb"

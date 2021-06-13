@@ -19,17 +19,13 @@ import useShowFloatDate from "./Hooks/UseShowFloatDate"
 import usePageFocusHandler from "./Hooks/UsePageFocusHandler"
 import useTimestampFormater from "../../Hooks/UseTimestampFormater"
 import MessageInput from "./Components/Input/MessageInput"
-import "./ChatWindow.scss"
 import Loader from "Components/UI/Placeholders/Loader"
-import useHandleMessageOptions from "./Components/MessageInfo/FirebaseHelpers/UseHandleMessageOptions"
-import SelectOptions from "./Components/SelectOptions/SelectOptions"
 import useContactListeners from "./Hooks/UseContactListeners"
+import useFrequentVariables from "../../Hooks/UseFrequentVariables"
+import "./ChatWindow.scss"
 
 const ChatWindow: React.FC = () => {
-  const { authUser, newContactsActivity, errors } = useContext(AppContext)
-  const firebase = useContext(FirebaseContext)
-  const context = useContext(ContactsContext)
-
+  const { firebase, authUser, newContactsActivity, contactsContext, contactsState } = useFrequentVariables()
   const {
     activeChat,
     messages,
@@ -39,9 +35,8 @@ const ChatWindow: React.FC = () => {
     lastScrollPosition,
     authUserUnreadMessages,
     contactsStatus,
-    optionsPopupChatWindow,
-    contactsUnreadMessages
-  } = context?.state!
+    optionsPopupChatWindow
+  } = contactsState
   const messagesData = messages[activeChat.chatKey]
   const renderedMessages = renderedMessagesList[activeChat.chatKey] || []
   const unreadMessagesAuth = authUserUnreadMessages[activeChat.chatKey] || []
@@ -133,7 +128,7 @@ const ChatWindow: React.FC = () => {
 
       if (scrollHeight <= scrollTop + height) {
         isScrollBottomRef.current = true
-        context?.dispatch({
+        contactsContext?.dispatch({
           type: "updateAuthUserUnreadMessages",
           payload: { chatKey: activeChat.chatKey, unreadMessages: [] }
         })
@@ -149,7 +144,10 @@ const ChatWindow: React.FC = () => {
           .update({ chatBottom: false })
       }
 
-      context?.dispatch({ type: "updateLastScrollPosition", payload: { scrollTop, chatKey: activeChat.chatKey } })
+      contactsContext?.dispatch({
+        type: "updateLastScrollPosition",
+        payload: { scrollTop, chatKey: activeChat.chatKey }
+      })
     }, 150),
     [activeChat, chatContainerRef]
   )
@@ -166,7 +164,7 @@ const ChatWindow: React.FC = () => {
       if (scrollTop < prevScrollTop || prevScrollTop === undefined) {
         if (scrollTop <= thresholdTopRender) {
           console.log("renderTopMessages")
-          context?.dispatch({ type: "renderTopMessages" })
+          contactsContext?.dispatch({ type: "renderTopMessages" })
         }
         if (scrollTop <= thresholdTopLoad) {
           if (loading) return
@@ -174,7 +172,7 @@ const ChatWindow: React.FC = () => {
         }
       } else {
         if (scrollHeight <= scrollTop + height + thresholdBottomRender) {
-          context?.dispatch({ type: "renderBottomMessages" })
+          contactsContext?.dispatch({ type: "renderBottomMessages" })
         }
       }
       prevScrollTop = scrollTop
@@ -191,7 +189,7 @@ const ChatWindow: React.FC = () => {
       })
     return () => {
       firebase.unreadMessages({ uid: authUser?.uid!, chatKey: activeChat.chatKey }).off("value", unreadMessagesListener)
-      context?.dispatch({
+      contactsContext?.dispatch({
         type: "updateAuthUserUnreadMessages",
         payload: { chatKey: activeChat.chatKey, unreadMessages: unreadMessagesAuthRef.current }
       })
@@ -315,7 +313,9 @@ const ChatWindow: React.FC = () => {
           <button
             className="contact-info__close-chat-btn"
             type="button"
-            onClick={() => context?.dispatch({ type: "updateActiveChat", payload: { chatKey: "", contactKey: "" } })}
+            onClick={() =>
+              contactsContext?.dispatch({ type: "updateActiveChat", payload: { chatKey: "", contactKey: "" } })
+            }
           ></button>
         </div>
         <div className="contact-info__username">{contactInfo.userName}</div>
@@ -325,7 +325,9 @@ const ChatWindow: React.FC = () => {
             className={classNames("contact-item__open-popup-btn", {
               "contact-item__open-popup-btn--open": optionsPopupChatWindow
             })}
-            onClick={() => context?.dispatch({ type: "updateOptionsPopupChatWindow", payload: activeChat.contactKey })}
+            onClick={() =>
+              contactsContext?.dispatch({ type: "updateOptionsPopupChatWindow", payload: activeChat.contactKey })
+            }
           >
             <span></span>
             <span></span>
@@ -400,7 +402,7 @@ const ChatWindow: React.FC = () => {
                       })}
                       onClick={() => {
                         if (!selectedMessagesData.length) return
-                        context?.dispatch({
+                        contactsContext?.dispatch({
                           type: "updateSelectedMessages",
                           payload: { messageKey: renderedMessage.key, chatKey: activeChat.chatKey }
                         })
@@ -448,7 +450,7 @@ const ChatWindow: React.FC = () => {
                   className="button"
                   onClick={() => {
                     handleContactRequest({ status: "rejected" })
-                    context?.dispatch({ type: "updateActiveChat", payload: { chatKey: "", contactKey: "" } })
+                    contactsContext?.dispatch({ type: "updateActiveChat", payload: { chatKey: "", contactKey: "" } })
                   }}
                 >
                   Reject

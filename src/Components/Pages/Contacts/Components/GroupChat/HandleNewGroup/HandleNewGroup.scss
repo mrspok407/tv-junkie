@@ -38,5 +38,22 @@
     width: calc(var(--dimm) * 0.7);
     height: calc(var(--dimm) * 0.7);
     cursor: pointer;
+    will-change: transform;
+  }
+
+  &--create {
+    transform: scale(0);
+    will-change: transform;
+    animation: groupCreateArrowFadeIn 150ms forwards;
+    @keyframes groupCreateArrowFadeIn {
+      to {
+        transform: scale(1);
+      }
+    }
+    button {
+      background-image: url("../../../../../../assets/images/icons/back-arrow.svg");
+      transition: 150ms;
+      transform: rotate(180deg);
+    }
   }
 }

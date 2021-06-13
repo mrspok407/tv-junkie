@@ -1,4 +1,5 @@
 import { ConfirmFunctionsInterface } from "Components/Pages/Contacts/@Types"
+import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
 import React, { useState, useEffect, useContext, useRef } from "react"
 import { ContactsContext } from "../../../@Context/ContactsContext"
 import "./ConfirmModal.scss"
@@ -8,8 +9,8 @@ type Props = {
 }
 
 const ConfirmModal: React.FC<Props> = ({ confirmFunctions }) => {
-  const context = useContext(ContactsContext)
-  const { confirmModal, contacts } = context?.state!
+  const { contactsContext, contactsState } = useFrequentVariables()
+  const { confirmModal, contacts } = contactsState
 
   const confirmRef = useRef<HTMLDivElement>(null!)
 
@@ -27,7 +28,7 @@ const ConfirmModal: React.FC<Props> = ({ confirmFunctions }) => {
   }
 
   const handleCancel = () => {
-    context?.dispatch({
+    contactsContext?.dispatch({
       type: "updateConfirmModal",
       payload: { isActive: false, function: "", contactKey: "" }
     })
@@ -36,14 +37,14 @@ const ConfirmModal: React.FC<Props> = ({ confirmFunctions }) => {
   const handleAprove = () => {
     confirmFunctions[confirmModal.function]({ contactInfo: contacts[confirmModal.contactKey!] })
 
-    context?.dispatch({
+    contactsContext?.dispatch({
       type: "updateConfirmModal",
       payload: { isActive: false, function: "", contactKey: "" }
     })
   }
 
   useEffect(() => {
-    context?.dispatch({ type: "closePopups", payload: "" })
+    contactsContext?.dispatch({ type: "closePopups", payload: "" })
   }, [])
 
   const messageMap: { [key: string]: string } = {

@@ -21,8 +21,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
   const firebase = useContext(FirebaseContext)
   const { authUser } = useContext(AppContext)
   const context = useContext(ContactsContext)
-  const { optionsPopupContactList, activeChat, messages, contactsStatus, contacts, initialMsgLoadedFinished } =
-    context?.state!
+  const { optionsPopupContactList, activeChat, messages, contactsStatus, contacts } = context?.state!
   const messagesData = messages[contactInfo.chatKey] || []
 
   const [newActivity, setNewActivity] = useState<boolean | null | undefined>(contactInfo.newContactsActivity)
@@ -92,7 +91,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const isPinned = !!(contactInfo.pinned_lastActivityTS?.slice(0, 4) === "true")
-  const userNameCutLength = contactInfo.userName
+  const userNameCutLength = contactInfo.userName || ""
   const userNameFormated =
     userNameCutLength[userNameCutLength?.length - 1] === " " ? userNameCutLength?.slice(0, -1) : userNameCutLength
 

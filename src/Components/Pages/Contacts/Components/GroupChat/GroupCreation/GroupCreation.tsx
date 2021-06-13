@@ -1,12 +1,15 @@
+import classNames from "classnames"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
 import { ContactInfoInterface, CONTACT_INFO_INITIAL_DATA } from "Components/Pages/Contacts/@Types"
+import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
 import useElementScrolledDown from "Components/Pages/Movies/useElementScrolledDown"
 import React, { useState, useEffect, useContext, useRef, useLayoutEffect, useCallback } from "react"
 import { isUnexpectedObject } from "Utils"
 import { ContactsContext } from "../../@Context/ContactsContext"
 import Contact from "./Components/Contact/Contact"
 import SearchInput from "./Components/SearchInput/SearchInput"
+import SelectName from "./Components/SelectName/SelectName"
 import "./GroupCreation.scss"
 
 type Props = {
@@ -16,10 +19,8 @@ type Props = {
 const CONTACTS_TO_LOAD = 20
 
 const GroupCreation: React.FC<Props> = ({ contactListWrapperRef }) => {
-  const firebase = useContext(FirebaseContext)
-  const { authUser, errors } = useContext(AppContext)
-  const context = useContext(ContactsContext)
-  const { groupCreation } = context?.state!
+  const { firebase, authUser, errors, contactsContext, contactsState } = useFrequentVariables()
+  const { groupCreation } = contactsState
 
   const [contactsList, setContactsList] = useState<ContactInfoInterface[]>([])
   const [searchedContacts, setSearchedContacts] = useState<ContactInfoInterface[] | null>([])
@@ -39,6 +40,7 @@ const GroupCreation: React.FC<Props> = ({ contactListWrapperRef }) => {
   const getContactsData = ({ snapshot, isSearchedData = false }: { snapshot: any; isSearchedData?: boolean }) => {
     let contacts: ContactInfoInterface[] = []
     snapshot.forEach((contact: { val: () => ContactInfoInterface; key: string }) => {
+      if (contact.val().isGroupChat) return
       if (isUnexpectedObject({ exampleObject: CONTACT_INFO_INITIAL_DATA, targetObject: contact.val() })) {
         errors.handleError({
           message: "Some of your contacts were not loaded correctly. Try to reload the page."
@@ -143,11 +145,14 @@ const GroupCreation: React.FC<Props> = ({ contactListWrapperRef }) => {
   const contactsToRender = !searchedContacts?.length ? contactsList : searchedContacts
   return (
     <div className="group-creation" ref={createGroupWrapperRef}>
+      {groupCreation.selectNameActive && <SelectName contactsList={contactsList} />}
       <div className="group-creation__heading">
         <div className="group-creation__heading-go-back">
           <button
             type="button"
-            onClick={() => context?.dispatch({ type: "toggleIsActiveGroupCreation", payload: { isActive: false } })}
+            onClick={() =>
+              contactsContext?.dispatch({ type: "updateGroupCreation", payload: { isActive: false, error: "" } })
+            }
           ></button>
         </div>
         <div className="group-creation__heading-text">Add members</div>
@@ -158,7 +163,7 @@ const GroupCreation: React.FC<Props> = ({ contactListWrapperRef }) => {
             key={member.key}
             className="group-creation__selected-contact"
             onClick={() =>
-              context?.dispatch({
+              contactsContext?.dispatch({
                 type: "updateCreateNewGroup",
                 payload: { isActive: null, newMember: { key: member.key, username: member.username } }
               })
@@ -172,24 +177,26 @@ const GroupCreation: React.FC<Props> = ({ contactListWrapperRef }) => {
         ))}
       </div>
       <SearchInput onSearch={handleSearch} isSearching={isSearching} contactsList={contactsList} />
-      <div className="contact-list">
-        {initialLoading ? (
-          <div className="contact-list__loader-wrapper">
-            <span className="contact-list__loader"></span>
-          </div>
-        ) : !contactsList.length ? (
-          <div className="contact-list--no-contacts-text">You don't have any contacts</div>
-        ) : searchedContacts === null ? (
-          <div className="contact-list--no-contacts-text">No contacts found</div>
-        ) : (
-          contactsToRender.map((contact) => <Contact key={contact.key} contact={contact} />)
-        )}
-        {loading && (
-          <div className="contact-list__loader-wrapper">
-            <span className="contact-list__loader"></span>
-          </div>
-        )}
-      </div>
+      {!groupCreation.selectNameActive && (
+        <div className="contact-list">
+          {initialLoading ? (
+            <div className="contact-list__loader-wrapper">
+              <span className="contact-list__loader"></span>
+            </div>
+          ) : !contactsList.length ? (
+            <div className="contact-list--no-contacts-text">You don't have any contacts</div>
+          ) : searchedContacts === null ? (
+            <div className="contact-list--no-contacts-text">No contacts found</div>
+          ) : (
+            contactsToRender.map((contact) => <Contact key={contact.key} contact={contact} />)
+          )}
+          {loading && (
+            <div className="contact-list__loader-wrapper">
+              <span className="contact-list__loader"></span>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }

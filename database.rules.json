@@ -40,6 +40,10 @@
         }
       }
     },
+    "groupChats": {
+      ".read": true,
+      ".write": true
+    },
     "allShowsList": {
       ".read": "root.child('users').child(auth.uid).child('role').val() === 'ADMIN'",
       ".write": false,
