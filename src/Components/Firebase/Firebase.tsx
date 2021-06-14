@@ -140,12 +140,47 @@ class Firebase {
   /// Private Chats API ///
   privateChats = () => this.db.ref("privateChats")
   messages = ({ chatKey }: { chatKey: string }) => this.db.ref(`privateChats/${chatKey}/messages`)
-  message = ({ chatKey, messageKey }: { chatKey: string; messageKey: string }) =>
-    this.db.ref(`privateChats/${chatKey}/messages/${messageKey}`)
-  unreadMessages = ({ uid, chatKey }: { uid: string | undefined; chatKey: string }) =>
-    this.db.ref(`privateChats/${chatKey}/members/${uid}/unreadMessages`)
-  chatMemberStatus = ({ chatKey, memberKey }: { chatKey: string; memberKey: string }) =>
-    this.db.ref(`privateChats/${chatKey}/members/${memberKey}/status`)
+  message = ({ chatKey, messageKey, isGroupChat }: { chatKey: string; messageKey: string; isGroupChat: boolean }) => {
+    if (isGroupChat) {
+      return this.db.ref(`groupChats/${chatKey}/messages/${messageKey}`)
+    } else {
+      return this.db.ref(`privateChats/${chatKey}/messages/${messageKey}`)
+    }
+  }
+
+  unreadMessages = ({
+    uid,
+    chatKey,
+    isGroupChat = false
+  }: {
+    uid: string | undefined
+    chatKey: string
+    isGroupChat: boolean
+  }) => {
+    if (isGroupChat) {
+      return this.db.ref(`groupChats/${chatKey}/members/unreadMessages/${uid}`)
+    } else {
+      return this.db.ref(`privateChats/${chatKey}/members/${uid}/unreadMessages`)
+    }
+  }
+
+  chatMemberStatus = ({
+    chatKey,
+    memberKey,
+    isGroupChat
+  }: {
+    chatKey: string
+    memberKey: string
+    isGroupChat: boolean
+  }) => {
+    if (isGroupChat) {
+      return this.db.ref(`groupChats/${chatKey}/members/status/${memberKey}`)
+    } else {
+      return this.db.ref(`privateChats/${chatKey}/members/${memberKey}/status`)
+    }
+  }
+
+  groupChatMembersStatus = ({ chatKey }: { chatKey: string }) => this.db.ref(`groupChats/${chatKey}/members/status`)
 
   /// User Content API ///
   userAllShows = (uid: string) => this.db.ref(`users/${uid}/content/shows`)

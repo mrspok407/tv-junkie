@@ -5,18 +5,20 @@ import { MESSAGES_TO_LOAD } from "../../@Context/Constants"
 
 export const setMessagesSnapshot = async ({
   chatKey,
+  isGroupChat,
   authUser,
   messagesRef,
   firebase
 }: {
   chatKey: string
+  isGroupChat: boolean
   authUser: AuthUserInterface | null
   messagesRef: any
   firebase: FirebaseInterface
 }) => {
   try {
     const authUserUnreadMessages: SnapshotStringBooleanInterface = await firebase
-      .unreadMessages({ chatKey, uid: authUser?.uid })
+      .unreadMessages({ chatKey, uid: authUser?.uid, isGroupChat })
       .limitToFirst(1)
       .once("value")
 

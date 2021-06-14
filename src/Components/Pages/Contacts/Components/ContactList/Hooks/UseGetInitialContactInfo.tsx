@@ -23,8 +23,13 @@ const useGetInitialContactInfo = () => {
           }
         }
 
-        const chatKey =
-          contact.key < authUser?.uid! ? `${contact.key}_${authUser?.uid}` : `${authUser?.uid}_${contact.key}`
+        let chatKey: string = ""
+        if (contact.isGroupChat) {
+          chatKey = contact.key
+        } else {
+          chatKey = contact.key < authUser?.uid! ? `${contact.key}_${authUser?.uid}` : `${authUser?.uid}_${contact.key}`
+        }
+
         const [
           newContactsActivity,
           newContactsRequests,
@@ -40,9 +45,13 @@ const useGetInitialContactInfo = () => {
         ] = await Promise.all([
           firebase.newContactsActivity({ uid: authUser?.uid! }).child(`${contact.key}`).once("value"),
           firebase.newContactsRequests({ uid: authUser?.uid! }).child(`${contact.key}`).once("value"),
-          firebase.unreadMessages({ uid: authUser?.uid!, chatKey }).once("value"),
-          firebase.unreadMessages({ uid: contact.key, chatKey }).once("value"),
-          firebase.messages({ chatKey }).orderByChild("timeStamp").limitToLast(1).once("value")
+          firebase.unreadMessages({ uid: authUser?.uid!, chatKey, isGroupChat: contact.isGroupChat }).once("value"),
+          firebase.unreadMessages({ uid: contact.key, chatKey, isGroupChat: contact.isGroupChat }).once("value"),
+          firebase
+            .messages({ chatKey, isGroupChat: contact.isGroupChat })
+            .orderByChild("timeStamp")
+            .limitToLast(1)
+            .once("value")
         ])
 
         const unreadMessages = !unreadMessagesAuthData.val() ? [] : Object.keys(unreadMessagesAuthData.val())

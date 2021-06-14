@@ -1,12 +1,14 @@
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
+import { ContactInfoInterface } from "Components/Pages/Contacts/@Types"
 import { useState, useEffect, useCallback, useRef, useContext } from "react"
 
 type Props = {
   activeChat: { chatKey: string }
+  contactInfo: ContactInfoInterface
 }
 
-const usePageFocusHandler = ({ activeChat }: Props) => {
+const usePageFocusHandler = ({ activeChat, contactInfo }: Props) => {
   const firebase = useContext(FirebaseContext)
   const { authUser } = useContext(AppContext)
   const [pageInFocus, setPageInFocus] = useState(true)
@@ -15,7 +17,11 @@ const usePageFocusHandler = ({ activeChat }: Props) => {
   const focusHandler = useCallback(() => {
     focusInterval.current = window.setInterval(() => {
       firebase
-        .chatMemberStatus({ chatKey: activeChat.chatKey, memberKey: authUser?.uid! })
+        .chatMemberStatus({
+          chatKey: activeChat.chatKey,
+          memberKey: authUser?.uid!,
+          isGroupChat: contactInfo.isGroupChat
+        })
         .update({ pageInFocus: document.hasFocus() })
       setPageInFocus(document.hasFocus())
     }, 250)

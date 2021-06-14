@@ -3,6 +3,7 @@ import {
   ContactsInterface,
   ContactsStateInterface,
   ContactStatusInterface,
+  MembersStatusGroupChatInterface,
   MessageInputInterface,
   MessageInterface
 } from "../../@Types"
@@ -31,11 +32,16 @@ export type ACTIONTYPES =
       payload: { messageDeletionProcess: boolean; deletedMessages: MessageInterface[] }
     }
   | {
-      type: "updateCreateNewGroup"
-      payload: { isActive: boolean | null; newMember: { key: string; username: string } }
+      type: "updateGroupMembers"
+      payload: {
+        removeMember: boolean
+        newMember: { key: string; username?: string; lastSeen?: number | string | null; chatKey?: string }
+      }
     }
-  | { type: "updateGroupCreation"; payload: { isActive?: boolean; selectNameActive?: boolean; error?: string } }
-  // | { type: "updateGroupCreationSelectName"; payload: { selectNameActive: boolean } }
+  | {
+      type: "updateGroupCreation"
+      payload: { isActive?: boolean; selectNameActive?: boolean; groupName?: string; error?: string }
+    }
   | { type: "updateMsgDeletionProcessLoading"; payload: { messageDeletionProcess: boolean } }
   | { type: "changeMessage"; payload: { changedMessage: MessageInterface; chatKey: string } }
   | { type: "updateSelectedMessages"; payload: { messageKey: string; chatKey: string } }
@@ -58,6 +64,10 @@ export type ACTIONTYPES =
   | { type: "closePopups"; payload: string }
   | { type: "updateConfirmModal"; payload: { isActive: boolean; function: string; contactKey?: string } }
   | { type: "updateContactsStatus"; payload: { status: ContactStatusInterface; chatKey: string } }
+  | {
+      type: "updateGroupChatMembersStatus"
+      payload: { membersStatus: MembersStatusGroupChatInterface[]; chatKey: string }
+    }
   | { type: "updateContactsPageIsOpen"; payload: { isPageOpen: boolean | null; chatKey: string } }
 
 const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
@@ -75,23 +85,32 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
     optionsPopupChatWindow,
     lastScrollPosition,
     contactsStatus,
+    chatMembersStatus,
     contacts,
     messageDeletionProcess,
     initialMsgLoadedFinished
   } = state
 
   switch (action.type) {
-    case "updateCreateNewGroup": {
+    case "updateGroupMembers": {
       const newMember = action.payload.newMember
       const currentMembers = groupCreation.members
-      return {
-        ...state,
-        groupCreation: {
-          ...groupCreation,
-          isActive: action.payload.isActive === null ? groupCreation.isActive : action.payload.isActive,
-          members: currentMembers.find((member) => member.key === newMember.key)
-            ? currentMembers.filter((member) => member.key !== newMember.key)
-            : [...currentMembers, newMember]
+
+      if (action.payload.removeMember) {
+        return {
+          ...state,
+          groupCreation: {
+            ...groupCreation,
+            members: currentMembers.filter((member) => member.key !== newMember.key)
+          }
+        }
+      } else {
+        return {
+          ...state,
+          groupCreation: {
+            ...groupCreation,
+            members: [...currentMembers, newMember]
+          }
         }
       }
     }
@@ -690,6 +709,15 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         }
       }
 
+    case "updateGroupChatMembersStatus":
+      return {
+        ...state,
+        chatMembersStatus: {
+          ...chatMembersStatus,
+          [action.payload.chatKey]: action.payload.membersStatus
+        }
+      }
+
     case "updateContactsPageIsOpen":
       return {
         ...state,
@@ -727,6 +755,7 @@ export const INITIAL_STATE = {
   groupCreation: {
     isActive: false,
     selectNameActive: false,
+    groupName: "",
     error: "",
     members: []
   },
@@ -742,6 +771,7 @@ export const INITIAL_STATE = {
   optionsPopupChatWindow: "",
   messagesListRef: "",
   contactsStatus: {},
+  chatMembersStatus: {},
   confirmModal: {
     isActive: false,
     function: "",

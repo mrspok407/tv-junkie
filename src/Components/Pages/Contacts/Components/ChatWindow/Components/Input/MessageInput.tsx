@@ -29,6 +29,7 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
   const context = useContext(ContactsContext)
   const { authUser, errors } = useContext(AppContext)
   const { activeChat, messagesInput, contactsStatus, messages, selectedMessages, contacts } = context?.state!
+  const contactInfo = contacts[activeChat.chatKey]
   const selectedMessagesData = selectedMessages[activeChat.chatKey]
   const messageInputData = messagesInput[activeChat.chatKey] || {}
   const messagesData = messages[activeChat.chatKey]
@@ -193,11 +194,11 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
       console.log("onChangeEmpty: all to zero")
       e.currentTarget.innerHTML = ""
       updateInputDeb({ message: "", anchorOffset: 0, scrollTop: 0, editingMsgKey: null })
-      updateTyping({ activeChat, authUser, firebase, setTypingNull: true })
+      updateTyping({ activeChat, authUser, firebase, setTypingNull: true, isGroupChat: contactInfo?.isGroupChat })
     } else {
       console.log("onChangeNotEmpty: all")
       updateInputDeb({ message: innerHTML, anchorOffset, scrollTop })
-      updateTyping({ activeChat, authUser, firebase })
+      updateTyping({ activeChat, authUser, firebase, isGroupChat: contactInfo?.isGroupChat })
     }
   }
 

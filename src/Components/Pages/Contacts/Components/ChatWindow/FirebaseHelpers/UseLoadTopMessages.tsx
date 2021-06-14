@@ -11,10 +11,11 @@ const useLoadTopMessages = () => {
   const { errors } = useContext(AppContext)
   const firebase = useContext(FirebaseContext)
   const context = useContext(ContactsContext)
-  const { messages, renderedMessagesList, activeChat } = context?.state!
+  const { messages, renderedMessagesList, activeChat, contacts } = context?.state!
+  const contactInfo = contacts[activeChat.contactKey] || {}
   const messagesData = messages[activeChat.chatKey] || []
   const renderedMessages = renderedMessagesList[activeChat.chatKey] || []
-  const messagesRef = firebase.messages({ chatKey: activeChat.chatKey })
+  const messagesRef = firebase.messages({ chatKey: activeChat.chatKey, isGroupChat: contactInfo.isGroupChat })
 
   const [loading, setLoading] = useState(false)
   const loadedMessageGroups = useRef<number[]>([])

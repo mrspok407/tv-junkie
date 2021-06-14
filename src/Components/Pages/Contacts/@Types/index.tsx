@@ -2,6 +2,7 @@ export interface ContactInfoInterface {
   status: boolean | string
   receiver: boolean
   userName: string
+  groupName: string
   timeStamp: number
   pinned_lastActivityTS: string
   key: string
@@ -9,6 +10,8 @@ export interface ContactInfoInterface {
   newContactsActivity: boolean | null
   lastContactActivity: number | null
   newContactsRequests: boolean | null
+  isOnline: boolean | null
+  lastSeen: number | null
   lastMessage: MessageInterface
   unreadMessages: string[]
   unreadMessagesContact: string[]
@@ -44,6 +47,15 @@ export interface ContactStatusInterface {
   isTyping: boolean | null
 }
 
+export interface MembersStatusGroupChatInterface {
+  isOnline: boolean
+  lastSeen: number | undefined
+  chatBottom: boolean | undefined
+  pageInFocus: boolean | undefined
+  isTyping: boolean | null
+  key: string
+}
+
 export const MESSAGE_INITIAL_DATA = {
   message: "",
   sender: "",
@@ -62,11 +74,19 @@ export interface ActiveChatInterface {
   contactKey: string
 }
 
+export interface GroupCreationNewMemberInterface {
+  key: string
+  username?: string
+  lastSeen?: number | string | null
+  isOnline?: boolean | null
+  chatKey?: string
+}
 export interface GroupCreationInterface {
   isActive: boolean
   selectNameActive: boolean
+  groupName: string
   error: string
-  members: { key: string; username: string }[]
+  members: GroupCreationNewMemberInterface[]
 }
 
 export interface ContactsStateInterface {
@@ -99,6 +119,9 @@ export interface ContactsStateInterface {
   }
   contactsStatus: {
     [key: string]: ContactStatusInterface
+  }
+  chatMembersStatus: {
+    [key: string]: MembersStatusGroupChatInterface[]
   }
   messagesListRef: any
   messagePopup: string

@@ -1,6 +1,7 @@
 @import "../../../../../styles/globalsContacts";
 
 .group-creation {
+  --isOnlineColor: #4ee2b2;
   .contact-item {
     display: flex;
     flex-direction: row;
@@ -65,6 +66,10 @@
     &__status {
       font-size: 0.9rem;
       color: #b5b5b5;
+
+      &--online {
+        color: var(--isOnlineColor);
+      }
     }
   }
 }

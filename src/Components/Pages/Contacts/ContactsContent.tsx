@@ -43,10 +43,12 @@ const ContactsContent: React.FC<Props> = () => {
           otherMemberKey = chatKey.slice(0, -authUser?.uid.length! - 1)
         }
 
-        firebase.messages({ chatKey }).off()
-        firebase.unreadMessages({ uid: otherMemberKey, chatKey }).off()
+        firebase.messages({ chatKey, isGroupChat: contacts[chatKey].isGroupChat }).off()
+        firebase.unreadMessages({ uid: otherMemberKey, chatKey, isGroupChat: false }).off()
         firebase.contactsDatabase({ uid: otherMemberKey }).child("pageIsOpen").off()
-        firebase.chatMemberStatus({ chatKey, memberKey: otherMemberKey }).off()
+        firebase
+          .chatMemberStatus({ chatKey, memberKey: otherMemberKey, isGroupChat: contacts[chatKey].isGroupChat })
+          .off()
       })
     }
   }, [authUser, firebase])
@@ -91,7 +93,9 @@ const ContactsContent: React.FC<Props> = () => {
       const randomMessage = lorem.generateSentences(1)
       const timeStampEpoch = new Date().getTime()
 
-      const contactStatus = await firebase.chatMemberStatus({ chatKey, memberKey: userKey }).once("value")
+      const contactStatus = await firebase
+        .chatMemberStatus({ chatKey, memberKey: userKey, isGroupChat: contacts[chatKey].isGroupChat })
+        .once("value")
 
       const messageRef = firebase.privateChats().child(`${chatKey}/messages`).push()
       const messageKey = messageRef.key
@@ -144,7 +148,9 @@ const ContactsContent: React.FC<Props> = () => {
           timeStamp: timeStampEpoch * 2
         })
 
-      const contactStatus = await firebase.chatMemberStatus({ chatKey, memberKey: authUser?.uid! }).once("value")
+      const contactStatus = await firebase
+        .chatMemberStatus({ chatKey, memberKey: authUser?.uid!, isGroupChat: contacts[chatKey].isGroupChat })
+        .once("value")
 
       console.log(contactStatus.val())
 

@@ -17,9 +17,10 @@ type Props = {
 
 const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuthRef, getContainerRect }: Props) => {
   const { firebase, authUser, contactsContext, contactsState } = useFrequentVariables()
-  const { renderedMessagesList, messages } = contactsState
+  const { activeChat, renderedMessagesList, messages, contacts } = contactsState
   const messagesData = messages[chatKey]
   const renderedMessages = renderedMessagesList[chatKey]
+  const contactInfo = contacts[activeChat.contactKey] || {}
 
   const [fadeInButton, setFadeInButton] = useState(false)
   const [unreadMessages, setUnreadMessages] = useState<string[]>([])
@@ -37,14 +38,16 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
 
   useEffect(() => {
     const unreadMessagesListener = firebase
-      .unreadMessages({ uid: authUser?.uid!, chatKey })
+      .unreadMessages({ uid: authUser?.uid!, chatKey, isGroupChat: contactInfo.isGroupChat })
       .on("value", (snapshot: any) => {
         const unreadMessagesData = !snapshot.val() ? [] : Object.keys(snapshot.val())
         setUnreadMessages(unreadMessagesData)
       })
 
     return () => {
-      firebase.unreadMessages({ uid: authUser?.uid!, chatKey }).off("value", unreadMessagesListener)
+      firebase
+        .unreadMessages({ uid: authUser?.uid!, chatKey, isGroupChat: contactInfo.isGroupChat })
+        .off("value", unreadMessagesListener)
     }
   }, [firebase, chatKey])
 
@@ -58,7 +61,7 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
       setWentToLastMessage(true)
     } else {
       if (unreadMessages.some((message) => renderedMessagesArray.includes(message))) {
-        firebase.unreadMessages({ uid: authUser?.uid!, chatKey }).set(null)
+        firebase.unreadMessages({ uid: authUser?.uid!, chatKey, isGroupChat: contactInfo.isGroupChat }).set(null)
         setUnreadMessages([])
         unreadMessagesAuthRef = []
         setWentToLastMessage(true)

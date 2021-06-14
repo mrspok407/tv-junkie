@@ -13,13 +13,13 @@ import { MESSAGES_TO_RENDER, UNREAD_MESSAGES_TO_RENDER } from "../../@Context/Co
 import { throttle } from "throttle-debounce"
 import debounce from "debounce"
 
-const useGetInitialMessages = ({ chatKey }: { chatKey: string }) => {
+const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGroupChat: boolean }) => {
   const { authUser, errors } = useContext(AppContext)
   const firebase = useContext(FirebaseContext)
   const context = useContext(ContactsContext)
   const [loading, setLoading] = useState(false)
 
-  const messagesRef = firebase.messages({ chatKey })
+  const messagesRef = firebase.messages({ chatKey, isGroupChat })
 
   const messagesToDelete = useRef<MessageInterface[]>([])
   const removeMessagesDebounce = useCallback(
@@ -44,6 +44,7 @@ const useGetInitialMessages = ({ chatKey }: { chatKey: string }) => {
       try {
         ;[messagesSnapshot, firstUnreadMessageKey] = await setMessagesSnapshot({
           chatKey,
+          isGroupChat,
           authUser,
           messagesRef,
           firebase

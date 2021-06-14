@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react"
 
 type Props = {
-  timeStamp: number | null
+  timeStamp: number | string | null
 }
 
 const useTimestampFormater = ({ timeStamp }: Props) => {

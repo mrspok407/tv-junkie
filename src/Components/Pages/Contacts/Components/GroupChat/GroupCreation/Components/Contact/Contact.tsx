@@ -11,21 +11,29 @@ type Props = {
 
 const Contact: React.FC<Props> = ({ contact }) => {
   const context = useContext(ContactsContext)
-  const { contactsStatus, groupCreation } = context?.state!
-  const membersData = groupCreation.members.map((member) => member.key)
+  const { groupCreation } = context?.state!
+  const membersKeys = groupCreation.members.map((member) => member.key)
 
-  const formatedDate = useTimestampFormater({ timeStamp: contactsStatus[contact.chatKey]?.lastSeen! })
+  const formatedDate = useTimestampFormater({ timeStamp: contact.lastSeen! })
 
   return (
     <div
       className={classNames("contact-item", {
-        "contact-item--selected": membersData.includes(contact.key)
+        "contact-item--selected": membersKeys.includes(contact.key)
       })}
       key={contact.key}
       onClick={() =>
         context?.dispatch({
-          type: "updateCreateNewGroup",
-          payload: { isActive: null, newMember: { key: contact.key, username: contact.userName } }
+          type: "updateGroupMembers",
+          payload: {
+            removeMember: membersKeys.includes(contact.key),
+            newMember: {
+              key: contact.key,
+              username: contact.userName,
+              lastSeen: formatedDate,
+              chatKey: contact.chatKey
+            }
+          }
         })
       }
     >
@@ -34,12 +42,12 @@ const Contact: React.FC<Props> = ({ contact }) => {
       </div>
       <div className="contact-item__info">
         <div className="contact-item__username">{contact.userName}</div>
-        <div className="contact-item__status">
-          {contactsStatus[contact.chatKey]?.isOnline
-            ? "Online"
-            : formatedDate
-            ? `Last seen: ${formatedDate}`
-            : "Long time ago"}
+        <div
+          className={classNames("contact-item__status", {
+            "contact-item__status--online": contact.isOnline
+          })}
+        >
+          {contact.isOnline ? "Online" : formatedDate ? `Last seen: ${formatedDate}` : "Long time ago"}
         </div>
       </div>
     </div>

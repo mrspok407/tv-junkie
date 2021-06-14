@@ -1,14 +1,16 @@
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
+import { ContactInfoInterface } from "Components/Pages/Contacts/@Types"
 import React, { useState, useEffect, useLayoutEffect, useCallback, useContext } from "react"
 import { ContactsContext } from "../../@Context/ContactsContext"
 
 type Props = {
   chatContainerRef: HTMLDivElement
   isScrollBottomRef: boolean
+  contactInfo: ContactInfoInterface
 }
 
-const useResizeObserver = ({ chatContainerRef, isScrollBottomRef }: Props) => {
+const useResizeObserver = ({ chatContainerRef, isScrollBottomRef, contactInfo }: Props) => {
   const { authUser } = useContext(AppContext)
   const firebase = useContext(FirebaseContext)
   const context = useContext(ContactsContext)
@@ -21,7 +23,13 @@ const useResizeObserver = ({ chatContainerRef, isScrollBottomRef }: Props) => {
 
     if (scrollHeight <= height) {
       isScrollBottomRef = true
-      firebase.chatMemberStatus({ chatKey: activeChat.chatKey, memberKey: authUser?.uid! }).update({ chatBottom: true })
+      firebase
+        .chatMemberStatus({
+          chatKey: activeChat.chatKey,
+          memberKey: authUser?.uid!,
+          isGroupChat: contactInfo.isGroupChat
+        })
+        .update({ chatBottom: true })
     }
   }, [chatContainerRef, activeChat])
 

@@ -10,11 +10,11 @@ const useCreateNewGroup = () => {
     const timeStampData = firebase.timeStamp()
 
     // const newCreateGroupCloud = firebase.httpsCallable("newCreateGroup")
-    // newCreateGroupCloud({ members })
+    // newCreateGroupCloud({ members, groupName })
 
     try {
       await _createNewGroup({
-        data: { members: groupCreation.members, timeStamp: timeStampData },
+        data: { members: groupCreation.members, groupName: groupCreation.groupName, timeStamp: timeStampData },
         context: { auth: { uid: authUser?.uid } },
         database: firebase.database()
       })

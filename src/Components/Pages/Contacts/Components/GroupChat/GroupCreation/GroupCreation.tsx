@@ -37,7 +37,7 @@ const GroupCreation: React.FC<Props> = ({ contactListWrapperRef }) => {
     contactListWrapperRef.scrollTop = 0
   }, [])
 
-  const getContactsData = ({ snapshot, isSearchedData = false }: { snapshot: any; isSearchedData?: boolean }) => {
+  const getContactsData = async ({ snapshot, isSearchedData = false }: { snapshot: any; isSearchedData?: boolean }) => {
     let contacts: ContactInfoInterface[] = []
     snapshot.forEach((contact: { val: () => ContactInfoInterface; key: string }) => {
       if (contact.val().isGroupChat) return
@@ -52,11 +52,24 @@ const GroupCreation: React.FC<Props> = ({ contactListWrapperRef }) => {
       contacts.push({ ...contact.val(), key: contact.key, chatKey })
     })
 
+    const contactWithStatus = await Promise.all(
+      contacts.map(async (contact) => {
+        const contactStatus = await Promise.all([
+          firebase.contactsDatabase({ uid: contact.key }).child("pageIsOpen").once("value"),
+          firebase
+            .chatMemberStatus({ chatKey: contact.chatKey, memberKey: contact.key, isGroupChat: false })
+            .child("lastSeen")
+            .once("value")
+        ])
+        return { ...contact, isOnline: contactStatus[0].val(), lastSeen: contactStatus[1].val() }
+      })
+    )
+
     if (isSearchedData) {
-      setSearchedContacts(contacts)
+      setSearchedContacts(contactWithStatus)
       setIsSearching(false)
     } else {
-      setContactsList((prevState) => [...prevState, ...contacts])
+      setContactsList((prevState) => [...prevState, ...contactWithStatus])
       setInitialLoading(false)
       setLoading(false)
     }
@@ -145,7 +158,7 @@ const GroupCreation: React.FC<Props> = ({ contactListWrapperRef }) => {
   const contactsToRender = !searchedContacts?.length ? contactsList : searchedContacts
   return (
     <div className="group-creation" ref={createGroupWrapperRef}>
-      {groupCreation.selectNameActive && <SelectName contactsList={contactsList} />}
+      {groupCreation.selectNameActive && <SelectName />}
       <div className="group-creation__heading">
         <div className="group-creation__heading-go-back">
           <button
@@ -164,8 +177,8 @@ const GroupCreation: React.FC<Props> = ({ contactListWrapperRef }) => {
             className="group-creation__selected-contact"
             onClick={() =>
               contactsContext?.dispatch({
-                type: "updateCreateNewGroup",
-                payload: { isActive: null, newMember: { key: member.key, username: member.username } }
+                type: "updateGroupMembers",
+                payload: { removeMember: true, newMember: { key: member.key } }
               })
             }
           >

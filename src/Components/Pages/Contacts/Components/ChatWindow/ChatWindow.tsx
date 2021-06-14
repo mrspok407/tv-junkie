@@ -51,7 +51,7 @@ const ChatWindow: React.FC = () => {
 
   const isScrolledFirstRenderRef = useRef(false)
   const isScrollBottomRef = useRef(false)
-  const { pageInFocus } = usePageFocusHandler({ activeChat })
+  const { pageInFocus } = usePageFocusHandler({ activeChat, contactInfo })
 
   const { floatDate, isScrollingTop } = useShowFloatDate({ activeChat, chatContainerRef, renderedMessages })
 
@@ -68,7 +68,7 @@ const ChatWindow: React.FC = () => {
     unreadMessagesAuth: unreadMessagesAuthRef.current,
     pageInFocus
   })
-  useResizeObserver({ chatContainerRef: chatContainerRef, isScrollBottomRef: isScrollBottomRef.current })
+  useResizeObserver({ chatContainerRef: chatContainerRef, isScrollBottomRef: isScrollBottomRef.current, contactInfo })
   useFirstRenderMessages({
     messages: messagesData,
     renderedMessages: renderedMessages,
@@ -134,13 +134,21 @@ const ChatWindow: React.FC = () => {
         })
         console.log("bottom")
         firebase
-          .chatMemberStatus({ chatKey: activeChat.chatKey, memberKey: authUser?.uid! })
+          .chatMemberStatus({
+            chatKey: activeChat.chatKey,
+            memberKey: authUser?.uid!,
+            isGroupChat: contactInfo.isGroupChat
+          })
           .update({ chatBottom: true })
       } else {
         console.log("not bottom")
         isScrollBottomRef.current = false
         firebase
-          .chatMemberStatus({ chatKey: activeChat.chatKey, memberKey: authUser?.uid! })
+          .chatMemberStatus({
+            chatKey: activeChat.chatKey,
+            memberKey: authUser?.uid!,
+            isGroupChat: contactInfo.isGroupChat
+          })
           .update({ chatBottom: false })
       }
 
@@ -182,13 +190,15 @@ const ChatWindow: React.FC = () => {
 
   useEffect(() => {
     const unreadMessagesListener = firebase
-      .unreadMessages({ uid: authUser?.uid!, chatKey: activeChat.chatKey })
+      .unreadMessages({ uid: authUser?.uid!, chatKey: activeChat.chatKey, isGroupChat: contactInfo.isGroupChat })
       .on("value", (snapshot: any) => {
         const unreadMessagesData = !snapshot.val() ? [] : Object.keys(snapshot.val())
         unreadMessagesAuthRef.current = unreadMessagesData
       })
     return () => {
-      firebase.unreadMessages({ uid: authUser?.uid!, chatKey: activeChat.chatKey }).off("value", unreadMessagesListener)
+      firebase
+        .unreadMessages({ uid: authUser?.uid!, chatKey: activeChat.chatKey, isGroupChat: contactInfo.isGroupChat })
+        .off("value", unreadMessagesListener)
       contactsContext?.dispatch({
         type: "updateAuthUserUnreadMessages",
         payload: { chatKey: activeChat.chatKey, unreadMessages: unreadMessagesAuthRef.current }
@@ -241,7 +251,11 @@ const ChatWindow: React.FC = () => {
         // lastMessageRef?.scrollIntoView({ block: "start", inline: "start" })
         isScrollBottomRef.current = true
         firebase
-          .chatMemberStatus({ chatKey: activeChat.chatKey, memberKey: authUser?.uid! })
+          .chatMemberStatus({
+            chatKey: activeChat.chatKey,
+            memberKey: authUser?.uid!,
+            isGroupChat: contactInfo.isGroupChat
+          })
           .update({ chatBottom: true })
       } else {
         console.log("scroll previous no unread")
@@ -257,7 +271,13 @@ const ChatWindow: React.FC = () => {
     const { scrollHeight, height } = getContainerRect()
     if (scrollHeight <= height) {
       isScrollBottomRef.current = true
-      firebase.chatMemberStatus({ chatKey: activeChat.chatKey, memberKey: authUser?.uid! }).update({ chatBottom: true })
+      firebase
+        .chatMemberStatus({
+          chatKey: activeChat.chatKey,
+          memberKey: authUser?.uid!,
+          isGroupChat: contactInfo.isGroupChat
+        })
+        .update({ chatBottom: true })
     }
     return () => {
       isScrollBottomRef.current = false
@@ -283,9 +303,21 @@ const ChatWindow: React.FC = () => {
   }, [activeChat, chatContainerRef])
 
   useEffect(() => {
-    firebase.chatMemberStatus({ chatKey: activeChat.chatKey, memberKey: authUser?.uid! }).update({ isOnline: true })
+    firebase
+      .chatMemberStatus({
+        chatKey: activeChat.chatKey,
+        memberKey: authUser?.uid!,
+        isGroupChat: contactInfo.isGroupChat
+      })
+      .update({ isOnline: true })
     return () => {
-      firebase.chatMemberStatus({ chatKey: activeChat.chatKey, memberKey: authUser?.uid! }).update({ isOnline: null })
+      firebase
+        .chatMemberStatus({
+          chatKey: activeChat.chatKey,
+          memberKey: authUser?.uid!,
+          isGroupChat: contactInfo.isGroupChat
+        })
+        .update({ isOnline: null })
     }
   }, [activeChat])
 

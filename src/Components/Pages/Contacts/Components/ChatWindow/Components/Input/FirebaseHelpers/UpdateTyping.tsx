@@ -9,26 +9,28 @@ export const updateTyping = async ({
   activeChat,
   authUser,
   firebase,
-  setTypingNull = null
+  setTypingNull = null,
+  isGroupChat
 }: {
   activeChat: ActiveChatInterface
   authUser: AuthUserInterface | null
   firebase: FirebaseInterface
   setTypingNull?: boolean | null
+  isGroupChat: boolean
 }) => {
   if (setTypingNull) {
-    firebase.chatMemberStatus({ chatKey: activeChat.chatKey, memberKey: authUser?.uid! }).update({
+    firebase.chatMemberStatus({ chatKey: activeChat.chatKey, memberKey: authUser?.uid!, isGroupChat }).update({
       isTyping: null
     })
     return
   }
 
-  firebase.chatMemberStatus({ chatKey: activeChat.chatKey, memberKey: authUser?.uid! }).update({
+  firebase.chatMemberStatus({ chatKey: activeChat.chatKey, memberKey: authUser?.uid!, isGroupChat }).update({
     isTyping: true
   })
   if (typingTimer) window.clearTimeout(typingTimer)
   typingTimer = window.setTimeout(() => {
-    firebase.chatMemberStatus({ chatKey: activeChat.chatKey, memberKey: authUser?.uid! }).update({
+    firebase.chatMemberStatus({ chatKey: activeChat.chatKey, memberKey: authUser?.uid!, isGroupChat }).update({
       isTyping: null
     })
   }, TIMEOUT)

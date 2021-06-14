@@ -29,14 +29,21 @@ const useIntersectionObserver = ({ chatContainerRef, unreadMessagesAuth, pageInF
         observedMessages.current = [...observedMessages.current.filter((message) => message !== messageKey)]
 
         firebase
-          .unreadMessages({ uid: authUser?.uid!, chatKey: activeChat.chatKey })
+          .unreadMessages({ uid: authUser?.uid!, chatKey: activeChat.chatKey, isGroupChat: contactInfo.isGroupChat })
           .orderByKey()
           .endAt(`${messageKey}`)
           .once("value", (snapshot: any) => {
             if (snapshot.val() === null) return
             Object.keys(snapshot.val()).forEach(async (key: string) => {
               try {
-                await firebase.unreadMessages({ uid: authUser?.uid!, chatKey: activeChat.chatKey }).child(key).set(null)
+                await firebase
+                  .unreadMessages({
+                    uid: authUser?.uid!,
+                    chatKey: activeChat.chatKey,
+                    isGroupChat: contactInfo.isGroupChat
+                  })
+                  .child(key)
+                  .set(null)
               } catch (error) {
                 errors.handleError({
                   errorData: error,

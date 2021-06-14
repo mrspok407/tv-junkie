@@ -8,9 +8,9 @@ import { ContactsContext } from "../../@Context/ContactsContext"
 import ContactPopup from "../../OptionsPopup/OptionsPopup"
 import useGetInitialMessages from "../../ChatWindow/FirebaseHelpers/UseGetInitialMessages"
 import useHandleContactsStatus from "../../ChatWindow/Hooks/UseHandleContactsStatus"
-import "./Contact.scss"
 import Loader from "Components/UI/Placeholders/Loader"
 import striptags from "striptags"
+import "./Contact.scss"
 
 type Props = {
   contactInfo: ContactInfoInterface
@@ -35,14 +35,12 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
       : messagesData[messagesData?.length - 1]
 
   const formatedDate = useTimestampFormater({ timeStamp: lastMessage?.timeStamp! })
-
   const contactOptionsRef = useRef<HTMLDivElement>(null!)
 
-  const chatKey =
-    contactInfo.key < authUser?.uid! ? `${contactInfo.key}_${authUser?.uid}` : `${authUser?.uid}_${contactInfo.key}`
+  const chatKey = contactInfo.chatKey
 
-  useGetInitialMessages({ chatKey })
-  useHandleContactsStatus({ chatKey, contactKey: contactInfo.key })
+  useGetInitialMessages({ chatKey, isGroupChat: contactInfo.isGroupChat })
+  useHandleContactsStatus({ chatKey, isGroupChat: contactInfo.isGroupChat, contactKey: contactInfo.key })
 
   const setContactActive = () => {
     if (activeChat.chatKey === chatKey) return
@@ -60,13 +58,15 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
       .child(`${contactInfo.key}`)
       .on("value", (snapshot: any) => setNewContactRequest(snapshot.val()))
 
-    firebase.unreadMessages({ uid: authUser?.uid!, chatKey }).on("value", (snapshot: any) => {
-      const unreadMessagesAuth = !snapshot.val() ? [] : Object.keys(snapshot.val())
-      setAuthUnreadMessages(unreadMessagesAuth)
-    })
+    firebase
+      .unreadMessages({ uid: authUser?.uid!, chatKey, isGroupChat: contactInfo.isGroupChat })
+      .on("value", (snapshot: any) => {
+        const unreadMessagesAuth = !snapshot.val() ? [] : Object.keys(snapshot.val())
+        setAuthUnreadMessages(unreadMessagesAuth)
+      })
 
     const unreadMessagesListenerContact = firebase
-      .unreadMessages({ uid: contactInfo.key, chatKey })
+      .unreadMessages({ uid: contactInfo.key, chatKey, isGroupChat: contactInfo.isGroupChat })
       .limitToFirst(1)
       .on("value", (snapshot: any) => {
         const unreadMessagesContact = !snapshot.val() ? [] : Object.keys(snapshot.val())
@@ -85,15 +85,19 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
     return () => {
       firebase.newContactsActivity({ uid: authUser?.uid }).child(`${contactInfo.key}`).off()
       firebase.newContactsRequests({ uid: authUser?.uid! }).child(`${contactInfo.key}`).off()
-      firebase.unreadMessages({ uid: authUser?.uid!, chatKey }).off()
-      firebase.unreadMessages({ uid: contactInfo.key, chatKey }).off("value", unreadMessagesListenerContact)
+      firebase.unreadMessages({ uid: authUser?.uid!, chatKey, isGroupChat: contactInfo.isGroupChat }).off()
+      firebase
+        .unreadMessages({ uid: contactInfo.key, chatKey, isGroupChat: contactInfo.isGroupChat })
+        .off("value", unreadMessagesListenerContact)
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const isPinned = !!(contactInfo.pinned_lastActivityTS?.slice(0, 4) === "true")
-  const userNameCutLength = contactInfo.userName || ""
-  const userNameFormated =
-    userNameCutLength[userNameCutLength?.length - 1] === " " ? userNameCutLength?.slice(0, -1) : userNameCutLength
+  const contactNameCutLength = contactInfo.userName || contactInfo.groupName || ""
+  const contactNameFormated =
+    contactNameCutLength[contactNameCutLength?.length - 1] === " "
+      ? contactNameCutLength?.slice(0, -1)
+      : contactNameCutLength
 
   const chatActive = context?.state.activeChat.contactKey === contactInfo.key
   const unreadMessagesAmount = authUnreadMessages?.length === 0 ? null : authUnreadMessages?.length
@@ -113,9 +117,15 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
     >
       <div className="contact-item__row contact-item__row--top">
         <div className="contact-item__username">
-          {contactInfo.userName?.length > 25 ? `${userNameFormated}...` : contactInfo.userName}
+          {contactInfo.isGroupChat
+            ? contactInfo.groupName?.length > 25
+              ? `${contactNameFormated}...`
+              : contactInfo.groupName
+            : contactInfo.userName?.length > 25
+            ? `${contactNameFormated}...`
+            : contactInfo.userName}
         </div>
-        {lastMessage?.sender === authUser?.uid && (
+        {lastMessage?.sender === authUser?.uid && !contactInfo.isGroupChat && (
           <div
             className={classNames("contact-item__last-message-status", {
               "contact-item__last-message-status--unread": contactUnreadMessages?.length

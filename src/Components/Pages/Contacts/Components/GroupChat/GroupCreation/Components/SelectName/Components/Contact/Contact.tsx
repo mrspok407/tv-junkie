@@ -1,31 +1,25 @@
 import classNames from "classnames"
-import { ContactInfoInterface } from "Components/Pages/Contacts/@Types"
-import { ContactsContext } from "Components/Pages/Contacts/Components/@Context/ContactsContext"
+import { GroupCreationNewMemberInterface } from "Components/Pages/Contacts/@Types"
 import useTimestampFormater from "Components/Pages/Contacts/Hooks/UseTimestampFormater"
-import React, { useState, useEffect, useContext } from "react"
+import React from "react"
 import "./Contact.scss"
 
 type Props = {
-  contact: ContactInfoInterface
+  member: GroupCreationNewMemberInterface
 }
 
-const Contact: React.FC<Props> = ({ contact }) => {
-  const context = useContext(ContactsContext)
-  const { contactsStatus, groupCreation } = context?.state!
-  const membersData = groupCreation.members.map((member) => member.key)
-
-  const formatedDate = useTimestampFormater({ timeStamp: contactsStatus[contact.chatKey]?.lastSeen! })
-
+const Contact: React.FC<Props> = ({ member }) => {
+  const formatedDate = useTimestampFormater({ timeStamp: member.lastSeen! })
   return (
-    <div className="contact-item" key={contact.key}>
+    <div className="contact-item" key={member.key}>
       <div className="contact-item__info">
-        <div className="contact-item__username">{contact.userName}</div>
-        <div className="contact-item__status">
-          {contactsStatus[contact.chatKey]?.isOnline
-            ? "Online"
-            : formatedDate
-            ? `Last seen: ${formatedDate}`
-            : "Long time ago"}
+        <div className="contact-item__username">{member.username}</div>
+        <div
+          className={classNames("contact-item__status", {
+            "contact-item__status--online": member.isOnline
+          })}
+        >
+          {member.isOnline ? "Online" : formatedDate ? `Last seen: ${formatedDate}` : "Long time ago"}
         </div>
       </div>
     </div>
