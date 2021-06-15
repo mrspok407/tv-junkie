@@ -40,8 +40,9 @@ export type ACTIONTYPES =
     }
   | {
       type: "updateGroupCreation"
-      payload: { isActive?: boolean; selectNameActive?: boolean; groupName?: string; error?: string }
+      payload: { isActive?: boolean; selectNameActive?: boolean; groupName?: string; error?: string; loading?: boolean }
     }
+  | { type: "finishGroupCreation"; payload: { newGroupChatKey: string } }
   | { type: "updateMsgDeletionProcessLoading"; payload: { messageDeletionProcess: boolean } }
   | { type: "changeMessage"; payload: { changedMessage: MessageInterface; chatKey: string } }
   | { type: "updateSelectedMessages"; payload: { messageKey: string; chatKey: string } }
@@ -125,15 +126,18 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
       }
     }
 
-    // case "updateGroupCreationSelectName": {
-    //   return {
-    //     ...state,
-    //     groupCreation: {
-    //       ...groupCreation,
-    //       selectNameActive: action.payload.selectNameActive
-    //     }
-    //   }
-    // }
+    case "finishGroupCreation": {
+      return {
+        ...state,
+        groupCreation: {
+          ...INITIAL_STATE.groupCreation
+        },
+        activeChat: {
+          chatKey: action.payload.newGroupChatKey,
+          contactKey: action.payload.newGroupChatKey
+        }
+      }
+    }
 
     case "setInitialMessages":
       const { startIndex, endIndex } = action.payload
@@ -757,6 +761,7 @@ export const INITIAL_STATE = {
     selectNameActive: false,
     groupName: "",
     error: "",
+    loading: false,
     members: []
   },
   messages: {},

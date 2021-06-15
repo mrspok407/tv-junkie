@@ -139,7 +139,13 @@ class Firebase {
 
   /// Private Chats API ///
   privateChats = () => this.db.ref("privateChats")
-  messages = ({ chatKey }: { chatKey: string }) => this.db.ref(`privateChats/${chatKey}/messages`)
+  messages = ({ chatKey, isGroupChat }: { chatKey: string; isGroupChat: boolean }) => {
+    if (isGroupChat) {
+      return this.db.ref(`groupChats/${chatKey}/messages`)
+    } else {
+      return this.db.ref(`privateChats/${chatKey}/messages`)
+    }
+  }
   message = ({ chatKey, messageKey, isGroupChat }: { chatKey: string; messageKey: string; isGroupChat: boolean }) => {
     if (isGroupChat) {
       return this.db.ref(`groupChats/${chatKey}/messages/${messageKey}`)

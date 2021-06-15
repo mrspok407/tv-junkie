@@ -24,8 +24,8 @@ export interface FirebaseInterface {
   sendEmailVerification?: any
   passwordReset?: any
   httpsCallable?: any
-  messages: ({ chatKey }: { chatKey: string; isGroupChat: boolean }) => any
-  message: ({ chatKey, messageKey }: { chatKey: string; messageKey: string }) => any
+  messages: ({ chatKey, isGroupChat }: { chatKey: string; isGroupChat: boolean }) => any
+  message: ({ chatKey, messageKey, isGroupChat }: { chatKey: string; messageKey: string; isGroupChat: boolean }) => any
   privateChat: () => any
   unreadMessages: ({ uid, chatKey }: { uid: string | undefined; chatKey: string; isGroupChat: boolean }) => any
   newContactsRequests: ({ uid }: { uid: string | undefined }) => any

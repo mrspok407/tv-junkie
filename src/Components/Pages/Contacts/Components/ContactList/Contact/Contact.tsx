@@ -21,7 +21,8 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
   const firebase = useContext(FirebaseContext)
   const { authUser } = useContext(AppContext)
   const context = useContext(ContactsContext)
-  const { optionsPopupContactList, activeChat, messages, contactsStatus, contacts } = context?.state!
+  const { optionsPopupContactList, activeChat, messages, contactsStatus, chatMembersStatus, contacts } = context?.state!
+  const chatMembersStatusData = chatMembersStatus[contactInfo.chatKey] || []
   const messagesData = messages[contactInfo.chatKey] || []
 
   const [newActivity, setNewActivity] = useState<boolean | null | undefined>(contactInfo.newContactsActivity)
@@ -103,6 +104,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
   const unreadMessagesAmount = authUnreadMessages?.length === 0 ? null : authUnreadMessages?.length
 
   const lastMessageText = striptags(lastMessage?.message).slice(0, 30)
+  const chatMembersTyping = chatMembersStatusData?.filter((member) => member.isTyping)
 
   return (
     <div
@@ -136,7 +138,25 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
       </div>
 
       <div className="contact-item__row contact-item__row--bottom">
-        {contactsStatus[contactInfo.chatKey]?.isTyping ? (
+        {contactInfo.isGroupChat ? (
+          chatMembersTyping.length ? (
+            <div className="contact-item__typing">
+              {chatMembersTyping.length === 1 ? (
+                <>
+                  <div>Someone typing</div> <Loader className="loader--typing" />
+                </>
+              ) : (
+                <>
+                  <div>{chatMembersTyping.length} people typing</div> <Loader className="loader--typing" />
+                </>
+              )}
+            </div>
+          ) : (
+            <div className="contact-item__last-message-text">
+              {lastMessage?.sender === authUser?.uid && <span>You: </span>} {lastMessageText}
+            </div>
+          )
+        ) : contactsStatus[contactInfo.chatKey]?.isTyping ? (
           <div className="contact-item__typing">
             <div>Typing</div> <Loader className="loader--typing" />
           </div>
@@ -178,7 +198,11 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
               "contact-item__unread-messages--active": chatActive
             })}
           >
-            <span>{unreadMessagesAmount && contactInfo.status === true ? unreadMessagesAmount : null}</span>
+            {contactInfo.isGroupChat ? (
+              <span>{unreadMessagesAmount}</span>
+            ) : (
+              <span>{unreadMessagesAmount && contactInfo.status === true ? unreadMessagesAmount : null}</span>
+            )}
           </div>
         ) : (
           isPinned && <div className="contact-item__pinned"></div>

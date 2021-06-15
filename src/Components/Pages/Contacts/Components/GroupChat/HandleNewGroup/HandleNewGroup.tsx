@@ -31,6 +31,7 @@ const HandleNewGroup: React.FC = () => {
             if (!groupCreation.selectNameActive) {
               contactsContext?.dispatch({ type: "updateGroupCreation", payload: { selectNameActive: true } })
             } else {
+              if (groupCreation.loading) return
               createNewGroup()
             }
           }

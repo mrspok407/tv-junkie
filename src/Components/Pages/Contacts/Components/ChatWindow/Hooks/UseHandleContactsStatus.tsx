@@ -3,7 +3,6 @@ import { FirebaseContext } from "Components/Firebase"
 import { MembersStatusGroupChatInterface } from "Components/Pages/Contacts/@Types"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
 import React, { useState, useEffect, useContext } from "react"
-import { ContactsContext } from "../../@Context/ContactsContext"
 
 type Props = {
   chatKey: string
@@ -19,6 +18,7 @@ const useHandleContactsStatus = ({ chatKey, contactKey, isGroupChat }: Props) =>
       firebase.groupChatMembersStatus({ chatKey }).on("value", (snapshot: any) => {
         let membersStatus: MembersStatusGroupChatInterface[] = []
         snapshot.forEach((member: { val: () => MembersStatusGroupChatInterface; key: string }) => {
+          if (member.key === authUser?.uid) return
           membersStatus.push({ ...member.val(), key: member.key })
         })
         contactsContext?.dispatch({ type: "updateGroupChatMembersStatus", payload: { membersStatus, chatKey } })

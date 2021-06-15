@@ -24,8 +24,6 @@ const useHandleMessage = () => {
     const updateContactLastActivityInAuth = Math.max(firstUnpinnedContactIndex, 0) < activeContactIndex
     const updateAuthLastActivityInContact = contactLastActivity?.key !== authUser?.uid
 
-    console.log({ contactLastActivity })
-
     const timeStampEpoch = new Date().getTime()
     const messageRef = firebase.privateChats().child(`${activeChat.chatKey}/messages`).push()
     const messageKey = messageRef.key

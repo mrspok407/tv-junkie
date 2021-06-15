@@ -55,39 +55,45 @@ const ContactPopup: React.FC<Props> = ({ contactOptionsRef, contactInfo }) => {
           </button>
         )}
       </div>
-      <div className="popup__option">
-        <a
-          onClick={(e) => {
-            e.stopPropagation()
-            context?.dispatch({ type: "closePopups", payload: "" })
-          }}
-          className="popup__option-btn"
-          href={`${
-            process.env.NODE_ENV === "production"
-              ? `https://www.tv-junkie.com/user/${contactInfo.key}`
-              : `http://localhost:3000/user/${contactInfo.key}`
-          }`}
-          rel="noopener noreferrer"
-          target="_blank"
-        >
-          View profile
-        </a>
-      </div>
-      <div className="popup__option">
-        <button
-          className="popup__option-btn"
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation()
-            context?.dispatch({
-              type: "updateConfirmModal",
-              payload: { isActive: true, function: "handleClearHistory", contactKey: contactInfo.key }
-            })
-          }}
-        >
-          Clear history
-        </button>
-      </div>
+      {!contactInfo.isGroupChat && (
+        <>
+          <div className="popup__option">
+            <a
+              onClick={(e) => {
+                e.stopPropagation()
+                context?.dispatch({ type: "closePopups", payload: "" })
+              }}
+              className="popup__option-btn"
+              href={`${
+                process.env.NODE_ENV === "production"
+                  ? `https://www.tv-junkie.com/user/${contactInfo.key}`
+                  : `http://localhost:3000/user/${contactInfo.key}`
+              }`}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              View profile
+            </a>
+          </div>
+
+          <div className="popup__option">
+            <button
+              className="popup__option-btn"
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation()
+                context?.dispatch({
+                  type: "updateConfirmModal",
+                  payload: { isActive: true, function: "handleClearHistory", contactKey: contactInfo.key }
+                })
+              }}
+            >
+              Clear history
+            </button>
+          </div>
+        </>
+      )}
+
       <div className="popup__option">
         <button
           className="popup__option-btn"
@@ -108,11 +114,15 @@ const ContactPopup: React.FC<Props> = ({ contactOptionsRef, contactInfo }) => {
             e.stopPropagation()
             context?.dispatch({
               type: "updateConfirmModal",
-              payload: { isActive: true, function: "handleRemoveContact", contactKey: contactInfo.key }
+              payload: {
+                isActive: true,
+                function: `${contactInfo.isGroupChat ? "handleLeaveChat" : "handleRemoveContact"}`,
+                contactKey: contactInfo.key
+              }
             })
           }}
         >
-          Remove from contacts
+          {contactInfo.isGroupChat ? "Leave chat" : "Remove from contacts"}
         </button>
       </div>
     </div>

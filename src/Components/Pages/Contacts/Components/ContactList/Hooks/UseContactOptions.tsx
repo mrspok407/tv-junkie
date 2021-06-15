@@ -37,16 +37,63 @@ const useContactOptions = ({ contactInfo }: Props) => {
     context?.dispatch({ type: "closePopups", payload: "" })
 
     try {
-      const updateData = {
-        [`privateChats/${contactInfo?.chatKey}/members/${authUser?.uid}/unreadMessages`]: null,
-        [`users/${authUser?.uid}/contactsDatabase/newContactsActivity/${contactInfo?.key}`]: null,
-        [`users/${authUser?.uid}/contactsDatabase/newContactsRequests/${contactInfo?.key}`]: null
+      let updateData = {}
+      if (contactInfo?.isGroupChat) {
+        updateData = {
+          [`groupChats/${contactInfo?.chatKey}/members/unreadMessages/${authUser?.uid}`]: null,
+          [`users/${authUser?.uid}/contactsDatabase/newContactsActivity/${contactInfo?.key}`]: null,
+          [`users/${authUser?.uid}/contactsDatabase/newContactsRequests/${contactInfo?.key}`]: null
+        }
+      } else {
+        updateData = {
+          [`privateChats/${contactInfo?.chatKey}/members/${authUser?.uid}/unreadMessages`]: null,
+          [`users/${authUser?.uid}/contactsDatabase/newContactsActivity/${contactInfo?.key}`]: null,
+          [`users/${authUser?.uid}/contactsDatabase/newContactsRequests/${contactInfo?.key}`]: null
+        }
       }
       await firebase.database().ref().update(updateData)
       context?.dispatch({
         type: "updateAuthUserUnreadMessages",
         payload: { chatKey: activeChat.chatKey, unreadMessages: [] }
       })
+    } catch (error) {
+      errors.handleError({
+        errorData: error,
+        message: "There has been some error updating database. Please try again."
+      })
+
+      throw new Error(`There has been some error updating database: ${error}`)
+    }
+  }
+
+  const handleLeaveChat = async ({ contactInfo }: { contactInfo: ContactInfoInterface }) => {
+    const timeStamp = new Date().getTime()
+    const newMessageRef = firebase.messages({ chatKey: contactInfo.chatKey, isGroupChat: true }).push()
+    try {
+      const updateData = {
+        [`users/${authUser?.uid}/contactsDatabase/contactsList/${contactInfo.key}`]: null,
+        [`users/${authUser?.uid}/contactsDatabase/newContactsRequests/${contactInfo.key}`]: null,
+        [`users/${authUser?.uid}/contactsDatabase/newContactsActivity/${contactInfo.key}`]: null,
+        [`groupChats/${contactInfo.chatKey}/members/status/${authUser?.uid}`]: null,
+        [`groupChats/${contactInfo.chatKey}/members/unreadMessages/${authUser?.uid}`]: null,
+        [`groupChats/${contactInfo.chatKey}/messages/${newMessageRef.key}`]: {
+          message: `${authUser?.username} left the chat`,
+          timeStamp,
+          isUserLeft: true
+        }
+      }
+      await firebase
+        .database()
+        .ref()
+        .update(updateData, () =>
+          context?.dispatch({
+            type: "updateActiveChat",
+            payload: {
+              chatKey: activeChat.chatKey === contactInfo.chatKey ? "" : activeChat.chatKey,
+              contactKey: activeChat.contactKey === contactInfo.key ? "" : activeChat.contactKey
+            }
+          })
+        )
     } catch (error) {
       errors.handleError({
         errorData: error,
@@ -119,6 +166,7 @@ const useContactOptions = ({ contactInfo }: Props) => {
     updateIsPinned,
     handleMarkRead,
     handleRemoveContact,
+    handleLeaveChat,
     handleClearHistory
   }
 }

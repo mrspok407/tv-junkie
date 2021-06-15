@@ -118,7 +118,7 @@ exports.updateLastSeen = functions.database
 exports.createNewGroup = functions.https.onCall(async (data, context) => {
     var _a;
     const authUid = (_a = context === null || context === void 0 ? void 0 : context.auth) === null || _a === void 0 ? void 0 : _a.uid;
-    const { members } = data;
+    const { members, groupName } = data;
     if (!authUid) {
         throw new functions.https.HttpsError("failed-precondition", "The function must be called while authenticated.");
     }
@@ -134,6 +134,7 @@ exports.createNewGroup = functions.https.onCall(async (data, context) => {
         membersUpdateData[`users/${member.key}/contactsDatabase/contactsList/${groupChatRef.key}`] = {
             pinned_lastActivityTS: "false",
             isGroupChat: true,
+            groupName: groupName || "Nameless group wow",
             role: "USER"
         };
         membersUpdateData[`users/${member.key}/contactsDatabase/contactsLastActivity/${groupChatRef.key}`] = timeStamp;

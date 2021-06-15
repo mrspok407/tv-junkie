@@ -43,11 +43,11 @@ const ContactsContent: React.FC<Props> = () => {
           otherMemberKey = chatKey.slice(0, -authUser?.uid.length! - 1)
         }
 
-        firebase.messages({ chatKey, isGroupChat: contacts[chatKey].isGroupChat }).off()
+        firebase.messages({ chatKey, isGroupChat: contacts[chatKey]?.isGroupChat }).off()
         firebase.unreadMessages({ uid: otherMemberKey, chatKey, isGroupChat: false }).off()
         firebase.contactsDatabase({ uid: otherMemberKey }).child("pageIsOpen").off()
         firebase
-          .chatMemberStatus({ chatKey, memberKey: otherMemberKey, isGroupChat: contacts[chatKey].isGroupChat })
+          .chatMemberStatus({ chatKey, memberKey: otherMemberKey, isGroupChat: contacts[chatKey]?.isGroupChat })
           .off()
       })
     }

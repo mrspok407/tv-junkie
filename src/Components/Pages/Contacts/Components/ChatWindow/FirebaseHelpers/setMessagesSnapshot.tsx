@@ -30,7 +30,7 @@ export const setMessagesSnapshot = async ({
     }
 
     const firstUnreadMessageTimeStamp: any = await firebase
-      .message({ chatKey, messageKey: Object.keys(authUserUnreadMessages.val()!)[0] })
+      .message({ chatKey, messageKey: Object.keys(authUserUnreadMessages.val()!)[0], isGroupChat })
       .child("timeStamp")
       .once("value")
 

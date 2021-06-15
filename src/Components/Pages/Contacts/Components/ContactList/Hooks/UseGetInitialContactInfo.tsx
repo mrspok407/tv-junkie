@@ -2,11 +2,6 @@ import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext, FirebaseInterface } from "Components/Firebase/FirebaseContext"
 import { ContactInfoInterface, ContactsInterface, MessageInterface } from "Components/Pages/Contacts/@Types"
 import { useContext, useEffect, useRef, useState } from "react"
-import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
-import { ContactsContext, ContextInterface } from "../../@Context/ContactsContext"
-import useGetInitialMessages from "../../ChatWindow/FirebaseHelpers/UseGetInitialMessages"
-
-// let loadedContactsRef: { [key: string]: ContactInfoInterface } = {}
 
 const useGetInitialContactInfo = () => {
   const { authUser } = useContext(AppContext)

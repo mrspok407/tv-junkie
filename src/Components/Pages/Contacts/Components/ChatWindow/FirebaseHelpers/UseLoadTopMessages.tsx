@@ -6,12 +6,11 @@ import { MessageInterface, MESSAGE_INITIAL_DATA } from "Components/Pages/Contact
 import { isUnexpectedObject } from "Utils"
 import { MESSAGES_TO_LOAD } from "../../@Context/Constants"
 import debounce from "debounce"
+import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
 
 const useLoadTopMessages = () => {
-  const { errors } = useContext(AppContext)
-  const firebase = useContext(FirebaseContext)
-  const context = useContext(ContactsContext)
-  const { messages, renderedMessagesList, activeChat, contacts } = context?.state!
+  const { firebase, authUser, errors, contactsContext, contactsState } = useFrequentVariables()
+  const { messages, renderedMessagesList, activeChat, contacts } = contactsState
   const contactInfo = contacts[activeChat.contactKey] || {}
   const messagesData = messages[activeChat.chatKey] || []
   const renderedMessages = renderedMessagesList[activeChat.chatKey] || []
@@ -23,7 +22,7 @@ const useLoadTopMessages = () => {
   const messagesToDelete = useRef<MessageInterface[]>([])
   const removeMessagesDebounce = useCallback(
     debounce((removedMessages: any) => {
-      context?.dispatch({ type: "removeMessages", payload: { removedMessages, chatKey: activeChat.chatKey } })
+      contactsContext?.dispatch({ type: "removeMessages", payload: { removedMessages, chatKey: activeChat.chatKey } })
       console.log(activeChat.chatKey)
       messagesToDelete.current = []
     }, 100),
@@ -57,7 +56,10 @@ const useLoadTopMessages = () => {
 
     let newTopMessages: MessageInterface[] = []
     topMessagesSnapshot.forEach((message: any) => {
-      if (isUnexpectedObject({ exampleObject: MESSAGE_INITIAL_DATA, targetObject: message.val() })) {
+      if (
+        isUnexpectedObject({ exampleObject: MESSAGE_INITIAL_DATA, targetObject: message.val() }) &&
+        !contactInfo.isGroupChat
+      ) {
         errors.handleError({
           message: "Some of the messages were hidden, because of the unexpected error."
         })
@@ -65,14 +67,17 @@ const useLoadTopMessages = () => {
       }
       newTopMessages.push({ ...message.val(), key: message.key })
     })
-    context?.dispatch({ type: "loadTopMessages", payload: { newTopMessages } })
+    contactsContext?.dispatch({ type: "loadTopMessages", payload: { newTopMessages } })
 
     messagesRef
       .orderByChild("timeStamp")
       .endBefore(messagesData[0].timeStamp)
       .limitToLast(MESSAGES_TO_LOAD)
       .on("child_changed", (snapshot: { val: () => MessageInterface; key: string }) => {
-        if (isUnexpectedObject({ exampleObject: MESSAGE_INITIAL_DATA, targetObject: snapshot.val() })) {
+        if (
+          isUnexpectedObject({ exampleObject: MESSAGE_INITIAL_DATA, targetObject: snapshot.val() }) &&
+          !contactInfo.isGroupChat
+        ) {
           errors.handleError({
             message: "Message hasn't been changed, because of the unexpected error. Please reload the page."
           })
@@ -80,7 +85,7 @@ const useLoadTopMessages = () => {
         }
 
         const changedMessage = { ...snapshot.val(), key: snapshot.key }
-        context?.dispatch({ type: "changeMessage", payload: { changedMessage, chatKey: activeChat.chatKey } })
+        contactsContext?.dispatch({ type: "changeMessage", payload: { changedMessage, chatKey: activeChat.chatKey } })
         console.log({ changedChild: changedMessage })
       })
 
@@ -89,7 +94,10 @@ const useLoadTopMessages = () => {
       .endBefore(messagesData[0].timeStamp)
       .limitToLast(MESSAGES_TO_LOAD)
       .on("child_removed", (snapshot: { val: () => MessageInterface; key: string }) => {
-        if (isUnexpectedObject({ exampleObject: MESSAGE_INITIAL_DATA, targetObject: snapshot.val() })) {
+        if (
+          isUnexpectedObject({ exampleObject: MESSAGE_INITIAL_DATA, targetObject: snapshot.val() }) &&
+          !contactInfo.isGroupChat
+        ) {
           errors.handleError({
             message: "Message hasn't been deleted, because of the unexpected error. Please reload the page."
           })

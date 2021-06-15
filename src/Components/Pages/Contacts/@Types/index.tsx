@@ -86,6 +86,7 @@ export interface GroupCreationInterface {
   selectNameActive: boolean
   groupName: string
   error: string
+  loading: boolean
   members: GroupCreationNewMemberInterface[]
 }
 

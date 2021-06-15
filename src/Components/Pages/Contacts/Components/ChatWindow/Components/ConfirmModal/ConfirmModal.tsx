@@ -56,7 +56,8 @@ const ConfirmModal: React.FC<Props> = ({ confirmFunctions }) => {
     }</span>.`,
     deleteSelectedMessages: `Are you sure you want to delete selected messages? This will also delete them for <span>${
       contacts[confirmModal.contactKey!]?.userName
-    }</span>.`
+    }</span>.`,
+    handleLeaveChat: "Are you sure you want to leave this chat?"
   }
 
   return (

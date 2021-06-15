@@ -162,7 +162,7 @@ export const createNewGroup = functions.https.onCall(
     const groupChatRef = database.ref("groupChats").push();
     const newMessageRef = database.ref(`groupChats/${groupChatRef.key}/messages`).push();
     members.forEach((member) => {
-      membersUpdateData[`groupChats/${groupChatRef.key}/members/${member.key}/status`] = {
+      membersUpdateData[`groupChats/${groupChatRef.key}/members/status/${member.key}`] = {
         isOnline: false,
         role: "USER"
       };
@@ -179,13 +179,14 @@ export const createNewGroup = functions.https.onCall(
     try {
       const updateData: {[key: string]: GroupChatInfoInterface | GroupChatMemberStatusInterface} = {
         ...membersUpdateData,
-        [`groupChats/${groupChatRef.key}/members/${authUid}/status`]: {
+        [`groupChats/${groupChatRef.key}/members/status${authUid}`]: {
           isOnline: false,
           role: "ADMIN"
         },
         [`users/${authUid}/contactsDatabase/contactsList/${groupChatRef.key}`]: {
           pinned_lastActivityTS: "false",
           isGroupChat: true,
+          groupName: groupName || "Nameless group wow",
           role: "ADMIN"
         },
         [`users/${authUid}/contactsDatabase/contactsLastActivity/${groupChatRef.key}`]: timeStamp,
@@ -195,7 +196,13 @@ export const createNewGroup = functions.https.onCall(
           timeStamp
         }
       };
-      return database.ref().update(updateData);
+      return database
+        .ref()
+        .update(updateData)
+        .then(() => {
+          console.log({newGroupChatKey: groupChatRef.key});
+          return {newGroupChatKey: groupChatRef.key};
+        });
     } catch (error) {
       throw new functions.https.HttpsError("unknown", error.message, error);
     }

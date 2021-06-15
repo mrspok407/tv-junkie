@@ -11,28 +11,24 @@ import CreatePortal from "Components/UI/Modal/CreatePortal"
 import ModalContent from "Components/UI/Modal/ModalContent"
 import { CONTACTS_TO_LOAD } from "../@Context/Constants"
 import useGetInitialContactInfo from "./Hooks/UseGetInitialContactInfo"
+import useFrequentVariables from "../../Hooks/UseFrequentVariables"
 
 type Props = {
   contactListWrapperRef: HTMLDivElement
 }
 
 const ContactList: React.FC<Props> = ({ contactListWrapperRef }) => {
-  const firebase = useContext(FirebaseContext)
-  const { authUser, errors } = useContext(AppContext)
-  const context = useContext(ContactsContext)
-  const { contacts, groupCreation } = context?.state!
+  const { firebase, authUser, errors, contactsContext, contactsState } = useFrequentVariables()
+  const { contacts, groupCreation } = contactsState
   const contactsData = Object.values(contacts)?.map((contact) => contact)
-  // const [contacts, setContacts] = useState<ContactInfoInterface[]>()
-  const [allContactsAmount, setAllContactsAmount] = useState<number | null>(null)
-  const loadedContacts = context?.state?.contacts ? Object.keys(context.state.contacts).length : 0
 
-  // const [initialLoading, setInitialLoading] = useState(true)
+  const [allContactsAmount, setAllContactsAmount] = useState<number | null>(null)
+  const loadedContacts = contactsContext?.state?.contacts ? Object.keys(contactsContext.state.contacts).length : 0
+
   const [initialLoading, setInitialLoading] = useState(true)
   const initialLoadingRef = useRef(true)
   const newLoad = useRef(true)
 
-  // const contactListRef = useRef<HTMLDivElement>(null!)
-  // const contactListWrapperRef = useRef<HTMLDivElement>(null!)
   const isScrolledDown = useElementScrolledDown({ element: contactListWrapperRef, threshold: 650 })
 
   const { getContactsInfo } = useGetInitialContactInfo()
@@ -49,11 +45,10 @@ const ContactList: React.FC<Props> = ({ contactListWrapperRef }) => {
   const getContactsList = async (snapshot: any) => {
     if (snapshot.val() === null) {
       setInitialLoading(false)
-      context?.dispatch({
+      contactsContext?.dispatch({
         type: "updateContactsInitial",
         payload: { contacts: {}, unreadMessages: {}, unreadMessagesContacts: {} }
       })
-      // setContacts([])
       return
     }
 
@@ -68,12 +63,16 @@ const ContactList: React.FC<Props> = ({ contactListWrapperRef }) => {
         })
         return
       }
-
       contactsData.push({ ...contact.val(), key: contact.key })
     })
 
     if (initialLoadingRef.current || newLoad.current) {
+      console.log({ contactsData })
+
       const contacts = await getContactsInfo({ contactsData })
+
+      console.log({ contacts })
+
       const unreadMessages = contacts.reduce((acc, contact) => {
         acc = { ...acc, [contact.chatKey]: contact.unreadMessages }
         return acc
@@ -93,14 +92,14 @@ const ContactList: React.FC<Props> = ({ contactListWrapperRef }) => {
       // initialLoadingRef.current = false
       // newLoad.current = false
 
-      context?.dispatch({
+      contactsContext?.dispatch({
         type: "updateContactsInitial",
         payload: { contacts: contactsDispatch, unreadMessages, unreadMessagesContacts }
       })
 
       setInitialLoading(false)
     } else {
-      context?.dispatch({
+      contactsContext?.dispatch({
         type: "updateContacts",
         payload: { contacts: contactsData }
       })

@@ -55,7 +55,7 @@ export const _createNewGroup = async ({
   const newMessageRef = database.ref(`groupChats/${groupChatRef.key}/messages`).push()
 
   members.forEach((member) => {
-    membersUpdateData[`groupChats/${groupChatRef.key}/members/${member.key}/status`] = {
+    membersUpdateData[`groupChats/${groupChatRef.key}/members/status/${member.key}`] = {
       isOnline: false,
       role: "USER"
     }
@@ -72,7 +72,7 @@ export const _createNewGroup = async ({
   try {
     const updateData: { [key: string]: GroupChatInfoInterface | GroupChatMemberStatusInterface } = {
       ...membersUpdateData,
-      [`groupChats/${groupChatRef.key}/members/${authUid}/status`]: {
+      [`groupChats/${groupChatRef.key}/members/status/${authUid}`]: {
         isOnline: false,
         role: "ADMIN"
       },
@@ -87,9 +87,18 @@ export const _createNewGroup = async ({
         members,
         isNewMembers: true,
         timeStamp
+      },
+      [`groupChats/${groupChatRef.key}/info`]: {
+        groupName: groupName || "Nameless group wow"
       }
     }
-    return database.ref().update(updateData)
+    return database
+      .ref()
+      .update(updateData)
+      .then(() => {
+        console.log({ newGroupChatKey: groupChatRef.key })
+        return { newGroupChatKey: groupChatRef.key }
+      })
   } catch (error) {
     throw new Error(`There has been some error updating database: ${error}`)
   }

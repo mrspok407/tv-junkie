@@ -13,17 +13,22 @@ const useCreateNewGroup = () => {
     // newCreateGroupCloud({ members, groupName })
 
     try {
-      await _createNewGroup({
+      contactsContext?.dispatch({ type: "updateGroupCreation", payload: { loading: true } })
+      const { newGroupChatKey } = await _createNewGroup({
         data: { members: groupCreation.members, groupName: groupCreation.groupName, timeStamp: timeStampData },
         context: { auth: { uid: authUser?.uid } },
         database: firebase.database()
       })
+      contactsContext?.dispatch({ type: "finishGroupCreation", payload: { newGroupChatKey } })
     } catch (error) {
       errors.handleError({
         errorData: error,
         message: "There has been some error creating a group. Please reload the page."
       })
-
+      contactsContext?.dispatch({
+        type: "updateGroupCreation",
+        payload: { isActive: false, selectNameActive: false, groupName: "", error: "", loading: false }
+      })
       throw new Error(`There has been some error updating database: ${error}`)
     }
   }

@@ -12,11 +12,10 @@ import { setMessagesSnapshot } from "./setMessagesSnapshot"
 import { MESSAGES_TO_RENDER, UNREAD_MESSAGES_TO_RENDER } from "../../@Context/Constants"
 import { throttle } from "throttle-debounce"
 import debounce from "debounce"
+import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
 
 const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGroupChat: boolean }) => {
-  const { authUser, errors } = useContext(AppContext)
-  const firebase = useContext(FirebaseContext)
-  const context = useContext(ContactsContext)
+  const { firebase, authUser, errors, contactsContext } = useFrequentVariables()
   const [loading, setLoading] = useState(false)
 
   const messagesRef = firebase.messages({ chatKey, isGroupChat })
@@ -24,7 +23,7 @@ const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGr
   const messagesToDelete = useRef<MessageInterface[]>([])
   const removeMessagesDebounce = useCallback(
     debounce((removedMessages: any) => {
-      context?.dispatch({ type: "removeMessages", payload: { removedMessages, chatKey } })
+      contactsContext?.dispatch({ type: "removeMessages", payload: { removedMessages, chatKey } })
       console.log(chatKey)
       messagesToDelete.current = []
     }, 0),
@@ -32,7 +31,7 @@ const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGr
   )
 
   useEffect(() => {
-    if (context?.state.messages[chatKey] !== undefined) return
+    if (contactsContext?.state.messages[chatKey] !== undefined) return
     if (loading) return
     setLoading(true)
 
@@ -49,19 +48,22 @@ const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGr
           messagesRef,
           firebase
         })
+
+        console.log({ messagesSnapshot: messagesSnapshot.val() })
+
         firstUnreadMessageKey =
           firstUnreadMessageKey.val() === null ? false : Object.keys(firstUnreadMessageKey.val()!)[0]
       } catch (error) {
         errors.handleError({
           message: "There were a problem loading messages. Please try to reload the page."
         })
-        context?.dispatch({ type: "setInitialMessages", payload: { messagesData: [], chatKey } })
+        contactsContext?.dispatch({ type: "setInitialMessages", payload: { messagesData: [], chatKey } })
         setLoading(false)
         throw new Error("There were a problem loading messages. Please try to reload the page.")
       }
 
       if (messagesSnapshot.val() === null) {
-        context?.dispatch({ type: "setInitialMessages", payload: { messagesData: [], chatKey } })
+        contactsContext?.dispatch({ type: "setInitialMessages", payload: { messagesData: [], chatKey } })
         setLoading(false)
       }
 
@@ -71,7 +73,10 @@ const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGr
       if (messagesSnapshot.val() !== null) {
         let messagesData: MessageInterface[] = []
         messagesSnapshot.forEach((message: any) => {
-          if (isUnexpectedObject({ exampleObject: MESSAGE_INITIAL_DATA, targetObject: message.val() })) {
+          if (
+            isUnexpectedObject({ exampleObject: MESSAGE_INITIAL_DATA, targetObject: message.val() }) &&
+            !isGroupChat
+          ) {
             errors.handleError({
               message: "Some of the messages were hidden, because of the unexpected error."
             })
@@ -79,6 +84,8 @@ const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGr
           }
           messagesData.push({ ...message.val(), key: message.key })
         })
+
+        console.log({ messagesData })
 
         const indexFirstUnreadMessage = messagesData.findIndex((message) => message.key === firstUnreadMessageKey)
         const authUnreadMessages =
@@ -103,7 +110,7 @@ const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGr
           }
         }
 
-        context?.dispatch({
+        contactsContext?.dispatch({
           type: "setInitialMessages",
           payload: {
             messagesData,
@@ -119,7 +126,10 @@ const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGr
         .orderByChild("timeStamp")
         .startAfter(lastMessageTimeStamp)
         .on("child_added", (snapshot: { val: () => MessageInterface; key: string }) => {
-          if (isUnexpectedObject({ exampleObject: MESSAGE_INITIAL_DATA, targetObject: snapshot.val() })) {
+          if (
+            isUnexpectedObject({ exampleObject: MESSAGE_INITIAL_DATA, targetObject: snapshot.val() }) &&
+            !isGroupChat
+          ) {
             errors.handleError({
               message: "New message were hidden, because of the unexpected error. Please reload the page."
             })
@@ -127,14 +137,17 @@ const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGr
           }
 
           const newMessage = { ...snapshot.val(), key: snapshot.key }
-          context?.dispatch({ type: "addNewMessage", payload: { newMessage, chatKey } })
+          contactsContext?.dispatch({ type: "addNewMessage", payload: { newMessage, chatKey } })
         })
 
       messagesRef
         .orderByChild("timeStamp")
         .startAt(firstMessageTimeStamp)
         .on("child_changed", (snapshot: { val: () => MessageInterface; key: string }) => {
-          if (isUnexpectedObject({ exampleObject: MESSAGE_INITIAL_DATA, targetObject: snapshot.val() })) {
+          if (
+            isUnexpectedObject({ exampleObject: MESSAGE_INITIAL_DATA, targetObject: snapshot.val() }) &&
+            !isGroupChat
+          ) {
             errors.handleError({
               message: "Message hasn't been changed, because of the unexpected error. Please reload the page."
             })
@@ -142,14 +155,17 @@ const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGr
           }
 
           const changedMessage = { ...snapshot.val(), key: snapshot.key }
-          context?.dispatch({ type: "changeMessage", payload: { changedMessage, chatKey } })
+          contactsContext?.dispatch({ type: "changeMessage", payload: { changedMessage, chatKey } })
         })
 
       messagesRef
         .orderByChild("timeStamp")
         .startAt(firstMessageTimeStamp)
         .on("child_removed", (snapshot: { val: () => MessageInterface; key: string }) => {
-          if (isUnexpectedObject({ exampleObject: MESSAGE_INITIAL_DATA, targetObject: snapshot.val() })) {
+          if (
+            isUnexpectedObject({ exampleObject: MESSAGE_INITIAL_DATA, targetObject: snapshot.val() }) &&
+            !isGroupChat
+          ) {
             errors.handleError({
               message: "Message hasn't been deleted, because of the unexpected error. Please reload the page."
             })
