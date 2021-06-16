@@ -21,7 +21,7 @@ const useSendContactRequest = ({ userName, userUid }: Props) => {
     try {
       await _newContactRequest({
         data: { contactUid: userUid, contactName: userName, timeStamp: timeStampData, resendRequest },
-        context: { auth: { uid: authUser?.uid } },
+        context: { authUser: authUser! },
         database: firebase.database()
       })
     } catch (error) {

@@ -30,7 +30,7 @@ const useGoogleRedirect = () => {
           .user(authUserGoogle.user.uid)
           .update({
             username: authUserGoogle.user.displayName,
-            usernameLowerCase: authUserGoogle.user.displayName.toLowerCase(),
+            userNameLowerCase: authUserGoogle.user.displayName.toLowerCase(),
             email: authUserGoogle.user.email,
             role: authUserGoogle.user.email === process.env.REACT_APP_ADMIN_EMAIL ? ROLES.ADMIN : ROLES.USER
           })

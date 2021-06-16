@@ -28,6 +28,10 @@ $messageStatusSize: 17px;
   position: relative;
   width: 15px;
 
+  &--hide {
+    display: none;
+  }
+
   .popup-container {
     left: -68px;
     z-index: 2;

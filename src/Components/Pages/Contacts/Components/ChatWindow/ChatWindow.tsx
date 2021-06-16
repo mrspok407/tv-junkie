@@ -22,6 +22,7 @@ import MessageInput from "./Components/Input/MessageInput"
 import Loader from "Components/UI/Placeholders/Loader"
 import useContactListeners from "./Hooks/UseContactListeners"
 import useFrequentVariables from "../../Hooks/UseFrequentVariables"
+import MessagesList from "./Components/MessagesList/GroupChat/MessagesListGroupChat"
 import "./ChatWindow.scss"
 
 const ChatWindow: React.FC = () => {
@@ -42,6 +43,9 @@ const ChatWindow: React.FC = () => {
   const unreadMessagesAuth = authUserUnreadMessages[activeChat.chatKey] || []
   const selectedMessagesData = selectedMessages[activeChat.chatKey] || []
   const contactInfo = contacts[activeChat.contactKey] || {}
+
+  console.log({ messagesData })
+  console.log({ renderedMessages })
 
   const [chatContainerRef, setChatContainerRef] = useState<HTMLDivElement>(null!)
   const contactOptionsRef = useRef<HTMLDivElement>(null!)
@@ -386,11 +390,15 @@ const ChatWindow: React.FC = () => {
       </div>
       <div
         className={classNames("chat-window__messages-list-container", {
-          "chat-window__messages-list-container--loading": messagesData === undefined
+          "chat-window__messages-list-container--loading": messagesData === undefined,
+          "chat-window__messages-list-container--group-chat": contactInfo.isGroupChat
         })}
         ref={chatContainerCallback}
       >
-        {contactInfo.status === true &&
+        {contactInfo.isGroupChat ? (
+          <MessagesList />
+        ) : (
+          contactInfo.status === true &&
           (messagesData === undefined ? (
             <div className="chat-window__loader-container">
               <span className="chat-window__loader"></span>
@@ -466,7 +474,8 @@ const ChatWindow: React.FC = () => {
                 )
               })}
             </div>
-          ))}
+          ))
+        )}
 
         {!contactInfo.receiver && contactInfo.status === false && (
           <div className="chat-window chat-window--request">

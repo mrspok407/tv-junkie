@@ -1,7 +1,8 @@
 import { GroupCreationNewMemberInterface } from "Components/Pages/Contacts/@Types"
+import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 
 interface ContextInterface {
-  auth: { uid: string | undefined }
+  authUser: AuthUserInterface
 }
 
 interface DataInterface {
@@ -44,7 +45,7 @@ export const _createNewGroup = async ({
   context: ContextInterface
   database: any
 }) => {
-  const authUid = context?.auth?.uid
+  const authUid = context?.authUser?.uid
   const { members, groupName, timeStamp } = data
 
   if (!authUid) {
@@ -57,6 +58,8 @@ export const _createNewGroup = async ({
   members.forEach((member) => {
     membersUpdateData[`groupChats/${groupChatRef.key}/members/status/${member.key}`] = {
       isOnline: false,
+      username: member.username,
+      usernameLowerCase: member.username?.toLowerCase(),
       role: "USER"
     }
     membersUpdateData[`users/${member.key}/contactsDatabase/contactsList/${groupChatRef.key}`] = {
@@ -74,6 +77,8 @@ export const _createNewGroup = async ({
       ...membersUpdateData,
       [`groupChats/${groupChatRef.key}/members/status/${authUid}`]: {
         isOnline: false,
+        username: context?.authUser?.username,
+        usernameLowerCase: context?.authUser?.username?.toLowerCase(),
         role: "ADMIN"
       },
       [`users/${authUid}/contactsDatabase/contactsList/${groupChatRef.key}`]: {
@@ -113,7 +118,7 @@ export const _newContactRequest = async ({
   context: ContextInterface
   database: any
 }) => {
-  const authUid = context?.auth?.uid
+  const authUid = context?.authUser?.uid
   const { contactUid, contactName, timeStamp, resendRequest = false } = data
 
   if (!authUid) {
@@ -169,7 +174,7 @@ export const _handleContactRequest = async ({
   database: any
   timeStamp?: any
 }) => {
-  const authUid = context?.auth?.uid
+  const authUid = context?.authUser?.uid
   const { contactUid, status } = data
 
   if (!authUid) {

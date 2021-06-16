@@ -33,6 +33,7 @@ export interface ContactsInterface {
 export interface MessageInterface {
   message: string
   sender: string
+  username?: string
   timeStamp: number
   key: string
   isDelivered?: boolean

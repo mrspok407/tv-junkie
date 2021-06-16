@@ -35,7 +35,6 @@ const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGr
     if (loading) return
     setLoading(true)
 
-    console.log("useGetInitialMessages")
     const getMessages = async () => {
       let messagesSnapshot: any
       let firstUnreadMessageKey: any
@@ -48,8 +47,6 @@ const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGr
           messagesRef,
           firebase
         })
-
-        console.log({ messagesSnapshot: messagesSnapshot.val() })
 
         firstUnreadMessageKey =
           firstUnreadMessageKey.val() === null ? false : Object.keys(firstUnreadMessageKey.val()!)[0]
@@ -84,8 +81,6 @@ const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGr
           }
           messagesData.push({ ...message.val(), key: message.key })
         })
-
-        console.log({ messagesData })
 
         const indexFirstUnreadMessage = messagesData.findIndex((message) => message.key === firstUnreadMessageKey)
         const authUnreadMessages =
@@ -137,6 +132,7 @@ const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGr
           }
 
           const newMessage = { ...snapshot.val(), key: snapshot.key }
+          console.log({ newMessage })
           contactsContext?.dispatch({ type: "addNewMessage", payload: { newMessage, chatKey } })
         })
 

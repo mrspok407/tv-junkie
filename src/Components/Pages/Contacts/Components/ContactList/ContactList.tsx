@@ -63,7 +63,7 @@ const ContactList: React.FC<Props> = ({ contactListWrapperRef }) => {
         })
         return
       }
-      contactsData.push({ ...contact.val(), key: contact.key })
+      contactsData.push({ ...contact.val(), isGroupChat: contact.val().isGroupChat || false, key: contact.key })
     })
 
     if (initialLoadingRef.current || newLoad.current) {

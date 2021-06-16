@@ -139,6 +139,7 @@ class Firebase {
 
   /// Private Chats API ///
   privateChats = () => this.db.ref("privateChats")
+  groupChats = () => this.db.ref("groupChats")
   messages = ({ chatKey, isGroupChat }: { chatKey: string; isGroupChat: boolean }) => {
     if (isGroupChat) {
       return this.db.ref(`groupChats/${chatKey}/messages`)

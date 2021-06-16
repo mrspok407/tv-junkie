@@ -148,9 +148,12 @@ export const updateLastSeen = functions.database
   });
 
 export const createNewGroup = functions.https.onCall(
-  async (data: {members: {key: string; username: string}[]; groupName: string}, context) => {
+  async (
+    data: {members: {key: string; username: string}[]; groupName: string; authUser: {username: string}},
+    context
+  ) => {
     const authUid = context?.auth?.uid;
-    const {members, groupName} = data;
+    const {members, groupName, authUser} = data;
 
     if (!authUid) {
       throw new functions.https.HttpsError("failed-precondition", "The function must be called while authenticated.");
@@ -164,6 +167,8 @@ export const createNewGroup = functions.https.onCall(
     members.forEach((member) => {
       membersUpdateData[`groupChats/${groupChatRef.key}/members/status/${member.key}`] = {
         isOnline: false,
+        username: member.username,
+        usernameLowerCase: member.username?.toLowerCase(),
         role: "USER"
       };
       membersUpdateData[`users/${member.key}/contactsDatabase/contactsList/${groupChatRef.key}`] = {
@@ -181,6 +186,8 @@ export const createNewGroup = functions.https.onCall(
         ...membersUpdateData,
         [`groupChats/${groupChatRef.key}/members/status${authUid}`]: {
           isOnline: false,
+          username: authUser?.username,
+          usernameLowerCase: authUser?.username?.toLowerCase(),
           role: "ADMIN"
         },
         [`users/${authUid}/contactsDatabase/contactsList/${groupChatRef.key}`]: {

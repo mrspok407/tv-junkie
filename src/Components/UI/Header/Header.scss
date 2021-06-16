@@ -66,6 +66,7 @@ $navBackground: #352424;
   position: relative;
   display: flex;
   justify-content: center;
+  z-index: 9999;
 
   &:after {
     content: "";

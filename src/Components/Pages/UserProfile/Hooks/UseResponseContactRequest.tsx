@@ -17,7 +17,7 @@ const useResponseContactRequest = ({ userUid }: Props) => {
     try {
       await _handleContactRequest({
         data: { contactUid: userUid, status },
-        context: { auth: { uid: authUser?.uid } },
+        context: { authUser: authUser! },
         database: firebase.database(),
         timeStamp
       })

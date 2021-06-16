@@ -152,9 +152,12 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
               )}
             </div>
           ) : (
-            <div className="contact-item__last-message-text">
-              {lastMessage?.sender === authUser?.uid && <span>You: </span>} {lastMessageText}
-            </div>
+            lastMessage.sender && (
+              <div className="contact-item__last-message-text">
+                {<span>{lastMessage?.sender === authUser?.uid ? "You" : lastMessage?.username}:</span>}{" "}
+                {lastMessageText}
+              </div>
+            )
           )
         ) : contactsStatus[contactInfo.chatKey]?.isTyping ? (
           <div className="contact-item__typing">

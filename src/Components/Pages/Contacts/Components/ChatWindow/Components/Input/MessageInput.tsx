@@ -14,6 +14,7 @@ import useInputResizeObserver from "./Hooks/UseInputResizeObserver"
 import striptags from "striptags"
 import "./MessageInput.scss"
 import { textToUrl } from "Utils"
+import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
 
 type Props = {
   unreadMessagesAuthRef: string[]
@@ -25,10 +26,8 @@ const arrowKeys = ["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown"]
 const debounceTimeout = 100
 
 const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unreadMessagesAuthRef }) => {
-  const firebase = useContext(FirebaseContext)
-  const context = useContext(ContactsContext)
-  const { authUser, errors } = useContext(AppContext)
-  const { activeChat, messagesInput, contactsStatus, messages, selectedMessages, contacts } = context?.state!
+  const { firebase, authUser, errors, contactsContext, contactsState } = useFrequentVariables()
+  const { activeChat, messagesInput, messages, selectedMessages, contacts } = contactsState
   const contactInfo = contacts[activeChat.chatKey]
   const selectedMessagesData = selectedMessages[activeChat.chatKey]
   const messageInputData = messagesInput[activeChat.chatKey] || {}
@@ -39,7 +38,7 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
 
   const windowWidth = window.innerWidth
 
-  const { sendMessage, editMessage } = useHandleMessage()
+  const { sendMessage, sendMessageGroupChat, editMessage } = useHandleMessage()
   useInputResizeObserver({ inputRef: inputRef.current, chatContainerRef: chatContainerRef, getContainerRect })
 
   const getSelection = () => {
@@ -85,7 +84,7 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
   const updateInputDeb = useCallback(
     debounce((payload: MessageInputInterface) => {
       console.log(activeChat.chatKey)
-      context?.dispatch({ type: "updateMessageInput", payload })
+      contactsContext?.dispatch({ type: "updateMessageInput", payload })
     }, debounceTimeout),
     [activeChat]
   )
@@ -130,13 +129,18 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
     inputRef.current.innerHTML = ""
 
     updateInputDeb.clear()
-    context?.dispatch({
+    contactsContext?.dispatch({
       type: "updateMessageInput",
       payload: { message: "", anchorOffset: 0, scrollTop: 0, editingMsgKey: null }
     })
 
     try {
-      const messageKey = await sendMessage({ message: newMessageText })
+      let messageKey: string
+      if (!contactInfo?.isGroupChat) {
+        messageKey = await sendMessage({ message: newMessageText })
+      } else {
+        messageKey = await sendMessageGroupChat({ message: newMessageText })
+      }
       const newMessageRef = document.querySelector(`.chat-window__message--${messageKey}`)
       newMessageRef?.scrollIntoView({ block: "start", inline: "start" })
     } catch (error) {
@@ -144,11 +148,12 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
       const newMessage: MessageInterface = {
         message: newMessageText,
         sender: authUser?.uid!,
+        username: contactInfo?.isGroupChat ? authUser?.username : "",
         timeStamp: timeStampEpoch,
         key: timeStampEpoch.toString(),
         isDelivered: false
       }
-      context?.dispatch({ type: "addNewMessage", payload: { newMessage, chatKey: activeChat.chatKey } })
+      contactsContext?.dispatch({ type: "addNewMessage", payload: { newMessage, chatKey: activeChat.chatKey } })
 
       const newMessageRef = document.querySelector(`.chat-window__message--${timeStampEpoch.toString()}`)
       newMessageRef?.scrollIntoView({ block: "start", inline: "start" })
@@ -170,7 +175,7 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
     inputRef.current.innerHTML = ""
 
     updateInputDeb.clear()
-    context?.dispatch({
+    contactsContext?.dispatch({
       type: "updateMessageInput",
       payload: { message: "", anchorOffset: 0, scrollTop: 0, editingMsgKey: null }
     })
@@ -310,10 +315,10 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
           className="chat-window__send-message-btn"
           type="button"
           onClick={() => {
-            if (messageInputData.editingMsgKey !== null) {
-              handleEditMessage()
-            } else {
+            if (!messageInputData.editingMsgKey) {
               handleSendMessage()
+            } else {
+              handleEditMessage()
             }
           }}
         ></button>

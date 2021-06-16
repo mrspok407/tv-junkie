@@ -4,21 +4,27 @@ import React, { useContext, useRef } from "react"
 import { MessageInterface } from "../../../../@Types"
 import { ContactsContext } from "../../../@Context/ContactsContext"
 import MessagePopup from "./MessagePopup"
-import "./MessageInfo.scss"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
+import "./MessageInfo.scss"
 
 type Props = { messageData: MessageInterface }
 
 const MessageInfo: React.FC<Props> = ({ messageData }) => {
   const { authUser, contactsContext, contactsState } = useFrequentVariables()
-  const { activeChat, messagePopup, contactsUnreadMessages } = contactsState
+  const { activeChat, messagePopup, contactsUnreadMessages, contacts } = contactsState
+  const contactInfo = contacts[activeChat.chatKey] || {}
   const contactsUnreadMessagesData = contactsUnreadMessages[activeChat.chatKey]
 
   const messageOptionsRef = useRef<HTMLDivElement>(null!)
 
   return (
     <div className="chat-window__message-info">
-      <div ref={messageOptionsRef} className="chat-window__message-options">
+      <div
+        ref={messageOptionsRef}
+        className={classNames("chat-window__message-options", {
+          "chat-window__message-options--hide": contactInfo.isGroupChat && messageData.sender !== authUser?.uid
+        })}
+      >
         <button
           type="button"
           className={classNames("chat-window__open-popup-btn", {
@@ -39,7 +45,7 @@ const MessageInfo: React.FC<Props> = ({ messageData }) => {
         )}
       </div>
 
-      {messageData.sender === authUser?.uid && (
+      {messageData.sender === authUser?.uid && !contactInfo.isGroupChat && (
         <div
           className={classNames("chat-window__message-status", {
             "chat-window__message-status--read": !contactsUnreadMessagesData?.includes(messageData.key),
