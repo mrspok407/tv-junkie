@@ -116,9 +116,9 @@ exports.updateLastSeen = functions.database
     (_a = snapshot.ref.parent) === null || _a === void 0 ? void 0 : _a.update({ lastSeen: timeStamp });
 });
 exports.createNewGroup = functions.https.onCall(async (data, context) => {
-    var _a;
+    var _a, _b;
     const authUid = (_a = context === null || context === void 0 ? void 0 : context.auth) === null || _a === void 0 ? void 0 : _a.uid;
-    const { members, groupName } = data;
+    const { members, groupName, authUser } = data;
     if (!authUid) {
         throw new functions.https.HttpsError("failed-precondition", "The function must be called while authenticated.");
     }
@@ -127,8 +127,11 @@ exports.createNewGroup = functions.https.onCall(async (data, context) => {
     const groupChatRef = database.ref("groupChats").push();
     const newMessageRef = database.ref(`groupChats/${groupChatRef.key}/messages`).push();
     members.forEach((member) => {
+        var _a;
         membersUpdateData[`groupChats/${groupChatRef.key}/members/status/${member.key}`] = {
             isOnline: false,
+            username: member.username,
+            usernameLowerCase: (_a = member.username) === null || _a === void 0 ? void 0 : _a.toLowerCase(),
             role: "USER"
         };
         membersUpdateData[`users/${member.key}/contactsDatabase/contactsList/${groupChatRef.key}`] = {
@@ -143,6 +146,8 @@ exports.createNewGroup = functions.https.onCall(async (data, context) => {
     try {
         const updateData = Object.assign(Object.assign({}, membersUpdateData), { [`groupChats/${groupChatRef.key}/members/status${authUid}`]: {
                 isOnline: false,
+                username: authUser === null || authUser === void 0 ? void 0 : authUser.username,
+                usernameLowerCase: (_b = authUser === null || authUser === void 0 ? void 0 : authUser.username) === null || _b === void 0 ? void 0 : _b.toLowerCase(),
                 role: "ADMIN"
             }, [`users/${authUid}/contactsDatabase/contactsList/${groupChatRef.key}`]: {
                 pinned_lastActivityTS: "false",

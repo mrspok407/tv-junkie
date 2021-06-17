@@ -129,13 +129,33 @@ class Profile extends Component {
       }
     })
     console.log("test")
-    firebase
-      .database()
-      .ref("privateChats")
-      .once("value", (snapshot) => {
-        // console.log(snapshot.val())
-        console.log(JSON.stringify(snapshot.val()))
-      })
+    // firebase
+    //   .database()
+    //   .ref("privateChats")
+    //   .once("value", (snapshot) => {
+    //     // console.log(snapshot.val())
+    //     console.log(JSON.stringify(snapshot.val()))
+    //   })
+
+    let ts = 0
+
+    for (let i = 1; i <= 300; i++) {
+      const randomMessage = lorem.generateSentences(Math.ceil(Math.random() * 2))
+      const timeStamp = new Date().getTime() - 94608000000
+      const sender = Math.random() > 0.5 ? "0iSDFz7cfEWR0XVc3QLsysPfXOb2" : authUid
+
+      firebase
+        .database()
+        .ref("groupChats")
+        .child("-McQ3opYpWop9K54ihUg/messages")
+        .push({
+          sender,
+          message: randomMessage,
+          timeStamp: ts || timeStamp,
+          username: sender === authUid ? "Johnny" : "Kekich"
+        })
+      ts = timeStamp + 21600000 * i
+    }
 
     // firebase.contactsList({ uid: authUid }).once("value", (snapshot) => {
     //   snapshot.forEach((contact) => {

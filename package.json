@@ -33,6 +33,7 @@
     "formik": "^2.2.9",
     "formik-persist": "^1.1.0",
     "is-plain-object": "^5.0.0",
+    "lodash.assign": "^4.2.0",
     "lodash.get": "^4.4.2",
     "lodash.isequal": "^4.5.0",
     "lodash.isfunction": "^3.0.9",

@@ -27,7 +27,7 @@ const ContactList: React.FC<Props> = ({ contactListWrapperRef }) => {
 
   const [initialLoading, setInitialLoading] = useState(true)
   const initialLoadingRef = useRef(true)
-  const newLoad = useRef(true)
+  const newLoad = useRef(false)
 
   const isScrolledDown = useElementScrolledDown({ element: contactListWrapperRef, threshold: 650 })
 
@@ -37,8 +37,10 @@ const ContactList: React.FC<Props> = ({ contactListWrapperRef }) => {
   const contactsDatabaseRef = firebase.contactsDatabase({ uid: authUser?.uid })
 
   useEffect(() => {
+    console.log({ initialLoading })
     if (!initialLoading) {
       initialLoadingRef.current = false
+      console.log({ initialLoadingRef: initialLoadingRef.current })
     }
   }, [initialLoading])
 
@@ -66,6 +68,7 @@ const ContactList: React.FC<Props> = ({ contactListWrapperRef }) => {
       contactsData.push({ ...contact.val(), isGroupChat: contact.val().isGroupChat || false, key: contact.key })
     })
 
+    console.log({ initialLoadingRef: initialLoadingRef.current })
     if (initialLoadingRef.current || newLoad.current) {
       console.log({ contactsData })
 
@@ -89,14 +92,22 @@ const ContactList: React.FC<Props> = ({ contactListWrapperRef }) => {
 
       console.log({ contactsDispatch })
 
-      // initialLoadingRef.current = false
-      // newLoad.current = false
+      console.log({ newLoad: newLoad.current })
 
+      // initialLoadingRef.current = false
+      // if (!newLoad.current) {
       contactsContext?.dispatch({
         type: "updateContactsInitial",
         payload: { contacts: contactsDispatch, unreadMessages, unreadMessagesContacts }
       })
+      // } else {
+      //   contactsContext?.dispatch({
+      //     type: "updateContactsNewLoad",
+      //     payload: { contacts: contactsDispatch,  unreadMessages, unreadMessagesContacts }
+      //   })
+      // }
 
+      newLoad.current = false
       setInitialLoading(false)
     } else {
       contactsContext?.dispatch({

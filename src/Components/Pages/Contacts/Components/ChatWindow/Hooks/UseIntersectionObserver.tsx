@@ -1,5 +1,6 @@
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
+import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
 import { useEffect, useContext, useCallback, useRef } from "react"
 import { ContactsContext } from "../../@Context/ContactsContext"
 
@@ -10,10 +11,8 @@ type Props = {
 }
 
 const useIntersectionObserver = ({ chatContainerRef, unreadMessagesAuth, pageInFocus }: Props) => {
-  const { authUser, errors } = useContext(AppContext)
-  const firebase = useContext(FirebaseContext)
-  const context = useContext(ContactsContext)
-  const { activeChat, renderedMessagesList, contacts } = context?.state!
+  const { firebase, authUser, errors, contactsContext, contactsState } = useFrequentVariables()
+  const { activeChat, renderedMessagesList, contacts } = contactsState
   const renderedMessages = renderedMessagesList[activeChat.chatKey]
   const contactInfo = contacts[activeChat.contactKey] || {}
 
@@ -68,7 +67,7 @@ const useIntersectionObserver = ({ chatContainerRef, unreadMessagesAuth, pageInF
   useEffect(() => {
     if (!renderedMessages?.length) return
     if (!unreadMessagesAuth?.length) return
-    if (contactInfo.status !== true) return
+    if (contactInfo.status !== true && !contactInfo.isGroupChat) return
     if (!observerRef) return
     if (!pageInFocus) return
 
@@ -84,7 +83,7 @@ const useIntersectionObserver = ({ chatContainerRef, unreadMessagesAuth, pageInF
   const onMouseEnter = () => {
     if (!renderedMessages?.length) return
     if (!unreadMessagesAuth?.length) return
-    if (contactInfo.status !== true) return
+    if (contactInfo.status !== true && !contactInfo.isGroupChat) return
     if (!observerRef) return
     if (pageInFocus) return
 

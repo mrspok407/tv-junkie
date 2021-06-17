@@ -26,6 +26,7 @@ const useContactListeners = () => {
     const unreadMessagesListener = firebase
       .unreadMessages({ uid: activeChat.contactKey, chatKey: activeChat.chatKey, isGroupChat: false })
       .on("value", (snapshot: any) => {
+        console.log(snapshot.val())
         const unreadMessagesContact = !snapshot.val() ? [] : Object.keys(snapshot.val())
         context?.dispatch({
           type: "updateContactUnreadMessages",
@@ -46,9 +47,9 @@ const useContactListeners = () => {
       })
 
     return () => {
-      firebase
-        .unreadMessages({ uid: activeChat.contactKey, chatKey: activeChat.chatKey, isGroupChat: false })
-        .off("value", unreadMessagesListener)
+      // firebase
+      //   .unreadMessages({ uid: activeChat.contactKey, chatKey: activeChat.chatKey, isGroupChat: false })
+      //   .off("value", unreadMessagesListener)
       firebase.contactsDatabase({ uid: activeChat.contactKey }).child("pageIsOpen").off()
       firebase.contactsLastActivity({ uid: activeChat.contactKey }).off()
     }

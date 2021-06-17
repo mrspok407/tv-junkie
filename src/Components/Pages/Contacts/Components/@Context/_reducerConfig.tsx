@@ -9,6 +9,8 @@ import {
 } from "../../@Types"
 import { MESSAGES_TO_RENDER, UNREAD_MESSAGES_TO_RENDER } from "./Constants"
 import * as _isEqual from "lodash.isequal"
+import * as _merge from "lodash.merge"
+import * as _assign from "lodash.assign"
 
 export type ACTIONTYPES =
   | { type: "updateContactUnreadMessages"; payload: { unreadMessages: string[]; chatKey: string } }
@@ -57,6 +59,7 @@ export type ACTIONTYPES =
         unreadMessagesContacts: { [key: string]: string[] }
       }
     }
+  | { type: "updateContactsNewLoad"; payload: { contacts: ContactsInterface } }
   | { type: "updateContacts"; payload: { contacts: ContactInfoInterface[] } }
   | { type: "updateLastScrollPosition"; payload: { scrollTop: number; chatKey: string } }
   | { type: "updateMessagePopup"; payload: string }
@@ -398,6 +401,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
             }
           }
         } else {
+          console.log({ authUserUnreadMessages })
           if (authUserUnreadMessages[action.payload.chatKey].length <= UNREAD_MESSAGES_TO_RENDER) {
             return {
               ...state,
@@ -601,13 +605,32 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
       }
 
     case "updateContactsInitial": {
+      const authUnreadMerged = _assign({}, action.payload.unreadMessages, authUserUnreadMessages)
+      const contactsUnreadMerged = _assign({}, action.payload.unreadMessagesContacts, contactsUnreadMessages)
+      console.log({ unreadMessages: action.payload.unreadMessages })
+      console.log({ authUnreadMerged })
+      console.log({ unreadMessagesContacts: action.payload.unreadMessagesContacts })
+      console.log({ contactsUnreadMerged })
       return {
         ...state,
         contacts: action.payload.contacts,
-        authUserUnreadMessages: action.payload.unreadMessages,
-        contactsUnreadMessages: action.payload.unreadMessagesContacts
+        authUserUnreadMessages: authUnreadMerged,
+        contactsUnreadMessages: contactsUnreadMerged
+        // authUserUnreadMessages: !!Object.keys(authUserUnreadMessages).length
+        //   ? authUserUnreadMessages
+        //   : action.payload.unreadMessages,
+        // contactsUnreadMessages: !!Object.keys(contactsUnreadMessages).length
+        //   ? contactsUnreadMessages
+        //   : action.payload.unreadMessagesContacts
       }
     }
+
+    // case "updateContactsNewLoad": {
+    //   return {
+    //     ...state,
+    //     contacts: action.payload.contacts
+    //   }
+    // }
 
     case "updateContacts": {
       console.log("updateContacts")

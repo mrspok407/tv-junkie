@@ -22,7 +22,6 @@ const useHandleMessage = () => {
     )
     const activeContactIndex = contactsData.findIndex((contact) => contact.key === activeChat.contactKey)
     const updateContactLastActivityInAuth = Math.max(firstUnpinnedContactIndex, 0) < activeContactIndex
-    const updateAuthLastActivityInContact = contactLastActivity?.key !== activeChat.chatKey
 
     const timeStampEpoch = new Date().getTime()
     const messageRef = firebase.groupChats().child(`${activeChat.chatKey}/messages`).push()

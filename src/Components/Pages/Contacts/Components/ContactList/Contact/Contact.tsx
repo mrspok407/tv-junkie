@@ -31,9 +31,9 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
   const [authUnreadMessages, setAuthUnreadMessages] = useState<string[]>(contactInfo.unreadMessages)
   const [contactUnreadMessages, setContactUnreadMessages] = useState<string[]>(contactInfo.unreadMessagesContact)
   const lastMessage =
-    Object.keys(messages).length !== Object.keys(contacts).length
+    (Object.keys(messages).length !== Object.keys(contacts).length
       ? contactInfo.lastMessage
-      : messagesData[messagesData?.length - 1]
+      : messagesData[messagesData?.length - 1]) || {}
 
   const formatedDate = useTimestampFormater({ timeStamp: lastMessage?.timeStamp! })
   const contactOptionsRef = useRef<HTMLDivElement>(null!)
@@ -152,7 +152,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
               )}
             </div>
           ) : (
-            lastMessage.sender && (
+            lastMessage?.sender && (
               <div className="contact-item__last-message-text">
                 {<span>{lastMessage?.sender === authUser?.uid ? "You" : lastMessage?.username}:</span>}{" "}
                 {lastMessageText}

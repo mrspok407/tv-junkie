@@ -11,7 +11,6 @@ import debounce from "debounce"
 import useLoadTopMessages from "./FirebaseHelpers/UseLoadTopMessages"
 import useIntersectionObserver from "./Hooks/UseIntersectionObserver"
 import useFirstRenderMessages from "./Hooks/UseFirstRenderMessages"
-import GoDown from "./Components/GoDown/GoDown"
 import useResizeObserver from "./Hooks/UseResizeObserver"
 import { MessageInterface } from "../../@Types"
 import { convertTimeStampToDate } from "Utils"
@@ -36,7 +35,8 @@ const ChatWindow: React.FC = () => {
     lastScrollPosition,
     authUserUnreadMessages,
     contactsStatus,
-    optionsPopupChatWindow
+    optionsPopupChatWindow,
+    contactsUnreadMessages
   } = contactsState
   const messagesData = messages[activeChat.chatKey]
   const renderedMessages = renderedMessagesList[activeChat.chatKey] || []
@@ -44,8 +44,9 @@ const ChatWindow: React.FC = () => {
   const selectedMessagesData = selectedMessages[activeChat.chatKey] || []
   const contactInfo = contacts[activeChat.contactKey] || {}
 
-  console.log({ messagesData })
-  console.log({ renderedMessages })
+  const contactsUnreadMessagesData = contactsUnreadMessages[activeChat.chatKey]
+  console.log({ activeChat: activeChat.chatKey })
+  console.log({ contactsUnreadMessagesData })
 
   const [chatContainerRef, setChatContainerRef] = useState<HTMLDivElement>(null!)
   const contactOptionsRef = useRef<HTMLDivElement>(null!)
@@ -228,12 +229,12 @@ const ChatWindow: React.FC = () => {
   useLayoutEffect(() => {
     if (!chatContainerRef) return
     if (!messagesData?.length || !unreadMessagesAuth) return
-    if (contactInfo.status !== true) return
+    if (contactInfo.status !== true && !contactInfo.isGroupChat) return
     if (isScrolledFirstRenderRef.current) return
 
     const { scrollHeight, height } = getContainerRect()
     const firstUnreadMessageRef = document.querySelector(`.chat-window__message--${unreadMessagesAuth[0]}`)
-    const lastMessageRef = document.querySelector(`.chat-window__message--${messagesData[messagesData.length - 1].key}`)
+    // const lastMessageRef = document.querySelector(`.chat-window__message--${messagesData[messagesData.length - 1].key}`)
 
     const isScrollBottom = !!(
       lastScrollPosition[activeChat.chatKey] === undefined ||
