@@ -38,6 +38,8 @@ export interface MessageInterface {
   key: string
   isDelivered?: boolean
   isEdited?: boolean
+  isNewMembers?: boolean
+  members?: { username: string }[]
 }
 
 export interface ContactStatusInterface {
@@ -134,6 +136,9 @@ export interface ContactsStateInterface {
     isActive: boolean
     function: string
     contactKey?: string
+  }
+  firebaseListeners: {
+    contactUnreadMessages: boolean
   }
 }
 

@@ -1,0 +1,25 @@
+@import "../../../../../../../styles/globalsContacts";
+
+.chat-window__message-wrapper.chat-window__message-wrapper--new-members {
+  .chat-window__message {
+    width: 70%;
+    margin: auto;
+
+    .chat-window__message-inner-wrapper {
+      background-color: getColor(newMembersBG, $chatWindowPalette);
+      border-radius: 25px;
+      margin: auto;
+    }
+
+    .chat-window__message-text {
+      text-align: center;
+      line-height: 22px;
+
+      span {
+        color: #47a763;
+        font-size: 1.08rem;
+        padding-left: 3px;
+      }
+    }
+  }
+}

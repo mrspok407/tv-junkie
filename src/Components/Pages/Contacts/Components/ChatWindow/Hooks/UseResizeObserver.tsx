@@ -1,6 +1,7 @@
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
 import { ContactInfoInterface } from "Components/Pages/Contacts/@Types"
+import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
 import React, { useState, useEffect, useLayoutEffect, useCallback, useContext } from "react"
 import { ContactsContext } from "../../@Context/ContactsContext"
 
@@ -11,10 +12,8 @@ type Props = {
 }
 
 const useResizeObserver = ({ chatContainerRef, isScrollBottomRef, contactInfo }: Props) => {
-  const { authUser } = useContext(AppContext)
-  const firebase = useContext(FirebaseContext)
-  const context = useContext(ContactsContext)
-  const { activeChat } = context?.state!
+  const { firebase, authUser, contactsContext, contactsState } = useFrequentVariables()
+  const { activeChat } = contactsState
 
   const handleResize = useCallback(() => {
     if (!chatContainerRef) return

@@ -30,7 +30,11 @@ const useContactListeners = () => {
         const unreadMessagesContact = !snapshot.val() ? [] : Object.keys(snapshot.val())
         context?.dispatch({
           type: "updateContactUnreadMessages",
-          payload: { unreadMessages: unreadMessagesContact, chatKey: activeChat.chatKey }
+          payload: {
+            unreadMessages: unreadMessagesContact,
+            chatKey: activeChat.chatKey,
+            contactUnreadMessagesListener: true
+          }
         })
       })
 

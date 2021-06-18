@@ -8,9 +8,10 @@ type Props = {
   chatContainerRef: HTMLDivElement
   unreadMessagesAuth: string[]
   pageInFocus: boolean
+  chatWindowLoading: boolean
 }
 
-const useIntersectionObserver = ({ chatContainerRef, unreadMessagesAuth, pageInFocus }: Props) => {
+const useIntersectionObserver = ({ chatContainerRef, unreadMessagesAuth, pageInFocus, chatWindowLoading }: Props) => {
   const { firebase, authUser, errors, contactsContext, contactsState } = useFrequentVariables()
   const { activeChat, renderedMessagesList, contacts } = contactsState
   const renderedMessages = renderedMessagesList[activeChat.chatKey]
@@ -65,11 +66,10 @@ const useIntersectionObserver = ({ chatContainerRef, unreadMessagesAuth, pageInF
   observerRef = new IntersectionObserver(observerCallback, observerOptions)
 
   useEffect(() => {
-    if (!renderedMessages?.length) return
-    if (!unreadMessagesAuth?.length) return
+    console.log({ chatWindowLoading })
+    if (!renderedMessages?.length || !unreadMessagesAuth?.length) return
     if (contactInfo.status !== true && !contactInfo.isGroupChat) return
-    if (!observerRef) return
-    if (!pageInFocus) return
+    if (!observerRef || !pageInFocus || chatWindowLoading) return
 
     renderedMessages.forEach((message) => {
       if (!unreadMessagesAuth.includes(message.key)) return
@@ -78,14 +78,12 @@ const useIntersectionObserver = ({ chatContainerRef, unreadMessagesAuth, pageInF
       observedMessages.current = [...observedMessages.current, message.key]
       observerRef?.observe(unreadMessage)
     })
-  }, [activeChat, renderedMessages, unreadMessagesAuth, contactInfo.status, pageInFocus])
+  }, [activeChat, renderedMessages, contactInfo.status, pageInFocus, chatWindowLoading])
 
   const onMouseEnter = () => {
-    if (!renderedMessages?.length) return
-    if (!unreadMessagesAuth?.length) return
+    if (!renderedMessages?.length || !unreadMessagesAuth?.length) return
     if (contactInfo.status !== true && !contactInfo.isGroupChat) return
-    if (!observerRef) return
-    if (pageInFocus) return
+    if (!observerRef || pageInFocus || chatWindowLoading) return
 
     renderedMessages.forEach((message) => {
       if (!unreadMessagesAuth.includes(message.key)) return

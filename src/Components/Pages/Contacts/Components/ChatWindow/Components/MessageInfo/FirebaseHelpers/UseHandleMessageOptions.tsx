@@ -36,6 +36,7 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
       }
       return deletedMessagesData
     }, [])
+
     const failedDeliverMessages = deletedMessagesData.filter((message) => message.isDelivered === false)
     const successDeliverMessages = deletedMessagesData.filter((message) => message.isDelivered !== false)
 
@@ -53,23 +54,36 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
       const unreadMsgsDataAfterDeletion = contactsUnreadMessagesData.filter(
         (message) => !deleteMessagesKeys.includes(message)
       )
+
+      console.log({ unreadMsgsDataAfterDeletion })
+
       const lastUnreadMsgAfterDeletion = messagesData.find(
         (message) => message.key === unreadMsgsDataAfterDeletion[unreadMsgsDataAfterDeletion.length - 1]
       )
+
       const lastUnreadMsgBeforeDeletion = contactsUnreadMessagesData[contactsUnreadMessagesData.length - 1]
       const lastReadMessage = messagesData[Math.max(messagesData.length - 1 - contactsUnreadMessagesData.length, 0)]
 
+      console.log({ lastReadMessage })
+
       successDeliverMessages.forEach((messageData) => {
-        const unreadMessage = contactsUnreadMessagesData?.includes(messageData.key)
-        if (!unreadMessage) {
-          updateData[`privateChats/${activeChat.chatKey}/messages/${messageData.key}`] = null
-        } else {
-          updateData[`privateChats/${activeChat.chatKey}/messages/${messageData.key}`] = null
-          updateData[
-            `privateChats/${activeChat.chatKey}/members/${activeChat.contactKey}/unreadMessages/${messageData.key}`
-          ] = null
-        }
+        updateData[`privateChats/${activeChat.chatKey}/messages/${messageData.key}`] = null
+        updateData[
+          `privateChats/${activeChat.chatKey}/members/${activeChat.contactKey}/unreadMessages/${messageData.key}`
+        ] = null
+        // const unreadMessage = contactsUnreadMessagesData?.includes(messageData.key)
+        // if (!unreadMessage) {
+        //   updateData[`privateChats/${activeChat.chatKey}/messages/${messageData.key}`] = null
+        // } else {
+        //   updateData[`privateChats/${activeChat.chatKey}/messages/${messageData.key}`] = null
+        //   updateData[
+        //     `privateChats/${activeChat.chatKey}/members/${activeChat.contactKey}/unreadMessages/${messageData.key}`
+        //   ] = null
+        // }
       })
+
+      console.log({ lastUnreadMsgAfterDeletion })
+      console.log({ lastUnreadMsgBeforeDeletion })
 
       if (lastUnreadMsgAfterDeletion && lastUnreadMsgBeforeDeletion !== lastUnreadMsgAfterDeletion.key) {
         updateData[`users/${activeChat.contactKey}/contactsDatabase/contactsLastActivity/${authUser?.uid}`] =

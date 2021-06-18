@@ -65,7 +65,13 @@ const ContactList: React.FC<Props> = ({ contactListWrapperRef }) => {
         })
         return
       }
-      contactsData.push({ ...contact.val(), isGroupChat: contact.val().isGroupChat || false, key: contact.key })
+      let chatKey: string = ""
+      if (contact.val().isGroupChat) {
+        chatKey = contact.key
+      } else {
+        chatKey = contact.key < authUser?.uid! ? `${contact.key}_${authUser?.uid}` : `${authUser?.uid}_${contact.key}`
+      }
+      contactsData.push({ ...contact.val(), isGroupChat: !!contact.val().isGroupChat, key: contact.key, chatKey })
     })
 
     console.log({ initialLoadingRef: initialLoadingRef.current })

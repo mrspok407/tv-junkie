@@ -11,6 +11,7 @@ import useHandleContactsStatus from "../../ChatWindow/Hooks/UseHandleContactsSta
 import Loader from "Components/UI/Placeholders/Loader"
 import striptags from "striptags"
 import "./Contact.scss"
+import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
 
 type Props = {
   contactInfo: ContactInfoInterface
@@ -18,22 +19,22 @@ type Props = {
 }
 
 const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount }) => {
-  const firebase = useContext(FirebaseContext)
-  const { authUser } = useContext(AppContext)
-  const context = useContext(ContactsContext)
-  const { optionsPopupContactList, activeChat, messages, contactsStatus, chatMembersStatus, contacts } = context?.state!
+  const { firebase, authUser, contactsContext, contactsState } = useFrequentVariables()
+  const { optionsPopupContactList, activeChat, messages, contactsStatus, chatMembersStatus, contacts } = contactsState
   const chatMembersStatusData = chatMembersStatus[contactInfo.chatKey] || []
-  const messagesData = messages[contactInfo.chatKey] || []
+  const messagesData = messages[contactInfo.chatKey]
 
   const [newActivity, setNewActivity] = useState<boolean | null | undefined>(contactInfo.newContactsActivity)
   const [newContactsRequest, setNewContactRequest] = useState<boolean | null>(contactInfo.newContactsRequests)
 
   const [authUnreadMessages, setAuthUnreadMessages] = useState<string[]>(contactInfo.unreadMessages)
   const [contactUnreadMessages, setContactUnreadMessages] = useState<string[]>(contactInfo.unreadMessagesContact)
+  // const lastMessage =
+  //   (Object.keys(messages).length !== Object.keys(contacts).length
+  //     ? contactInfo.lastMessage
+  //     : messagesData[messagesData?.length - 1]) || {}
   const lastMessage =
-    (Object.keys(messages).length !== Object.keys(contacts).length
-      ? contactInfo.lastMessage
-      : messagesData[messagesData?.length - 1]) || {}
+    messagesData === undefined ? contactInfo.lastMessage : messagesData[messagesData?.length - 1] || {}
 
   const formatedDate = useTimestampFormater({ timeStamp: lastMessage?.timeStamp! })
   const contactOptionsRef = useRef<HTMLDivElement>(null!)
@@ -45,7 +46,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
 
   const setContactActive = () => {
     if (activeChat.chatKey === chatKey) return
-    context?.dispatch({ type: "updateActiveChat", payload: { chatKey, contactKey: contactInfo.key } })
+    contactsContext?.dispatch({ type: "updateActiveChat", payload: { chatKey, contactKey: contactInfo.key } })
   }
 
   useEffect(() => {
@@ -79,7 +80,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
       .child(`${chatKey}/historyDeleted`)
       .on("value", (snapshot: any) => {
         if (snapshot.val() === null) return
-        context?.dispatch({ type: "removeAllMessages", payload: { chatKey } })
+        contactsContext?.dispatch({ type: "removeAllMessages", payload: { chatKey } })
         firebase.privateChats().child(`${chatKey}/historyDeleted`).set(null)
       })
 
@@ -100,7 +101,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
       ? contactNameCutLength?.slice(0, -1)
       : contactNameCutLength
 
-  const chatActive = context?.state.activeChat.contactKey === contactInfo.key
+  const chatActive = contactsContext?.state.activeChat.contactKey === contactInfo.key
   const unreadMessagesAmount = authUnreadMessages?.length === 0 ? null : authUnreadMessages?.length
 
   const lastMessageText = striptags(lastMessage?.message).slice(0, 30)
@@ -183,7 +184,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
             })}
             onClick={(e) => {
               e.stopPropagation()
-              context?.dispatch({ type: "updateOptionsPopupContactList", payload: contactInfo.key })
+              contactsContext?.dispatch({ type: "updateOptionsPopupContactList", payload: contactInfo.key })
             }}
           >
             <span></span>

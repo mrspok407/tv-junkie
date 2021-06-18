@@ -3,6 +3,7 @@ import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVar
 import React, { useState, useEffect } from "react"
 import { convertTimeStampToDate } from "Utils"
 import MessageInfo from "../../MessageInfo/MessageInfo"
+import NewMembersMessages from "./Components/NewMembersMessages/NewMembersMessages"
 import "./MessagesListGroupChat.scss"
 
 type Props = {}
@@ -14,6 +15,8 @@ const MessagesList: React.FC<Props> = ({}) => {
   const renderedMessages = renderedMessagesList[activeChat.chatKey] || []
   const selectedMessagesData = selectedMessages[activeChat.chatKey] || []
   const contactInfo = contacts[activeChat.contactKey] || {}
+
+  console.log({ messagesData })
 
   return (
     <>
@@ -55,58 +58,60 @@ const MessagesList: React.FC<Props> = ({}) => {
                 ) : (
                   ""
                 )}
-                <div
-                  className={classNames("chat-window__message-wrapper", {
-                    "chat-window__message-wrapper--new-bunch": renderedMessage.sender !== prevMessage.sender,
-                    "chat-window__message-wrapper--last-in-bunch": renderedMessage.sender !== nextMessage?.sender,
-                    // "chat-window__message-wrapper--send": renderedMessage.sender === authUser?.uid,
-                    // "chat-window__message-wrapper--receive": renderedMessage.sender === activeChat.contactKey,
-                    "chat-window__message-wrapper--selected": selectedMessagesData.includes(renderedMessage.key),
-                    "chat-window__message-wrapper--selection-active": selectedMessagesData.length
-                  })}
-                  onClick={() => {
-                    if (!selectedMessagesData.length || renderedMessage.sender !== authUser?.uid) return
-                    contactsContext?.dispatch({
-                      type: "updateSelectedMessages",
-                      payload: { messageKey: renderedMessage.key, chatKey: activeChat.chatKey }
-                    })
-                  }}
-                >
-                  {renderedMessage.sender !== nextMessage?.sender && renderedMessage.sender !== authUser?.uid && (
-                    <div className="chat-window__message-avatar">{renderedMessage.username?.slice(0, 1)}</div>
-                  )}
+                {renderedMessage.isNewMembers ? (
+                  <NewMembersMessages renderedMessage={renderedMessage} />
+                ) : (
                   <div
-                    className={classNames(`chat-window__message chat-window__message--${renderedMessage.key}`, {
-                      "chat-window__message--auth-sender": renderedMessage.sender === authUser?.uid,
-                      "chat-window__message--not-auth-sender": renderedMessage.sender !== authUser?.uid,
-                      // "chat-window__message--send": renderedMessage.sender === authUser?.uid,
-                      // "chat-window__message--receive": renderedMessage.sender !== authUser?.uid,
-                      "chat-window__message--last-in-bunch": renderedMessage.sender !== nextMessage?.sender,
-                      "chat-window__message--deliver-failed": renderedMessage.isDelivered === false,
-                      "chat-window__message--selected": selectedMessagesData.includes(renderedMessage.key)
+                    className={classNames("chat-window__message-wrapper", {
+                      "chat-window__message-wrapper--new-bunch": renderedMessage.sender !== prevMessage.sender,
+                      "chat-window__message-wrapper--last-in-bunch": renderedMessage.sender !== nextMessage?.sender,
+                      // "chat-window__message-wrapper--send": renderedMessage.sender === authUser?.uid,
+                      // "chat-window__message-wrapper--receive": renderedMessage.sender === activeChat.contactKey,
+                      "chat-window__message-wrapper--selected": selectedMessagesData.includes(renderedMessage.key),
+                      "chat-window__message-wrapper--selection-active": selectedMessagesData.length
                     })}
-                    data-key={renderedMessage.key}
+                    onClick={() => {
+                      if (!selectedMessagesData.length || renderedMessage.sender !== authUser?.uid) return
+                      contactsContext?.dispatch({
+                        type: "updateSelectedMessages",
+                        payload: { messageKey: renderedMessage.key, chatKey: activeChat.chatKey }
+                      })
+                    }}
                   >
-                    <div className="chat-window__message-inner-wrapper">
-                      {renderedMessage.sender !== authUser?.uid && renderedMessage.sender !== prevMessage.sender && (
-                        <div className="chat-window__message-username">{renderedMessage.username}</div>
-                      )}
+                    {renderedMessage.sender !== nextMessage?.sender && renderedMessage.sender !== authUser?.uid && (
+                      <div className="chat-window__message-avatar">{renderedMessage.username?.slice(0, 1)}</div>
+                    )}
+                    <div
+                      className={classNames(`chat-window__message chat-window__message--${renderedMessage.key}`, {
+                        "chat-window__message--auth-sender": renderedMessage.sender === authUser?.uid,
+                        "chat-window__message--not-auth-sender": renderedMessage.sender !== authUser?.uid,
+                        "chat-window__message--last-in-bunch": renderedMessage.sender !== nextMessage?.sender,
+                        "chat-window__message--deliver-failed": renderedMessage.isDelivered === false,
+                        "chat-window__message--selected": selectedMessagesData.includes(renderedMessage.key)
+                      })}
+                      data-key={renderedMessage.key}
+                    >
+                      <div className="chat-window__message-inner-wrapper">
+                        {renderedMessage.sender !== authUser?.uid && renderedMessage.sender !== prevMessage.sender && (
+                          <div className="chat-window__message-username">{renderedMessage.username}</div>
+                        )}
 
-                      <div className="chat-window__message-inner">
-                        <div
-                          className="chat-window__message-text"
-                          dangerouslySetInnerHTML={{
-                            __html: `${renderedMessage.message}`
-                          }}
-                        ></div>
-                        <MessageInfo messageData={renderedMessage} />
+                        <div className="chat-window__message-inner">
+                          <div
+                            className="chat-window__message-text"
+                            dangerouslySetInnerHTML={{
+                              __html: `${renderedMessage.message}`
+                            }}
+                          ></div>
+                          <MessageInfo messageData={renderedMessage} />
+                        </div>
                       </div>
                     </div>
+                    {renderedMessage.sender === authUser?.uid && (
+                      <button type="button" className="chat-window__select-btn"></button>
+                    )}
                   </div>
-                  {renderedMessage.sender === authUser?.uid && (
-                    <button type="button" className="chat-window__select-btn"></button>
-                  )}
-                </div>
+                )}
               </React.Fragment>
             )
           })}

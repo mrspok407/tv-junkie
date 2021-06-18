@@ -13,7 +13,10 @@ import * as _merge from "lodash.merge"
 import * as _assign from "lodash.assign"
 
 export type ACTIONTYPES =
-  | { type: "updateContactUnreadMessages"; payload: { unreadMessages: string[]; chatKey: string } }
+  | {
+      type: "updateContactUnreadMessages"
+      payload: { unreadMessages: string[]; chatKey: string; contactUnreadMessagesListener: boolean }
+    }
   | { type: "updateAuthUserUnreadMessages"; payload: { chatKey: string; unreadMessages: string[] } }
   | { type: "updateActiveChat"; payload: { chatKey: string; contactKey: string } }
   | { type: "updateMessagesListRef"; payload: { ref: any } }
@@ -92,7 +95,8 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
     chatMembersStatus,
     contacts,
     messageDeletionProcess,
-    initialMsgLoadedFinished
+    initialMsgLoadedFinished,
+    firebaseListeners
   } = state
 
   switch (action.type) {
@@ -635,14 +639,26 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
     case "updateContacts": {
       console.log("updateContacts")
       action.payload.contacts.reverse()
-      const contactsData = action.payload.contacts.reduce((acc: any, contact: any) => {
+      const contactsData = action.payload.contacts.reduce((acc: ContactsInterface, contact: ContactInfoInterface) => {
         acc[contact.key] = { ...contacts[contact.key], ...contact }
         return acc
       }, {})
+
+      const authUserUnreadMessages: { [key: string]: string[] } = {}
+      const contactsUnreadMessages: { [key: string]: string[] } = {}
+      Object.values(contactsData || {}).forEach((contact) => {
+        authUserUnreadMessages[contact.chatKey] = authUserUnreadMessages[contact.chatKey] || []
+        contactsUnreadMessages[contact.chatKey] = contactsUnreadMessages[contact.chatKey] || []
+      })
+
       console.log({ contactsData })
+      console.log({ authUserUnreadMessages })
+      console.log({ contactsUnreadMessages })
       return {
         ...state,
-        contacts: contactsData
+        contacts: contactsData,
+        authUserUnreadMessages,
+        contactsUnreadMessages
       }
     }
 
@@ -674,6 +690,10 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         contactsUnreadMessages: {
           ...contactsUnreadMessages,
           [action.payload.chatKey]: action.payload.unreadMessages
+        },
+        firebaseListeners: {
+          ...firebaseListeners,
+          contactUnreadMessages: action.payload.contactUnreadMessagesListener
         }
       }
 
@@ -805,7 +825,10 @@ export const INITIAL_STATE = {
     function: "",
     contactKey: ""
   },
-  messageDeletionProcess: false
+  messageDeletionProcess: false,
+  firebaseListeners: {
+    contactUnreadMessages: false
+  }
 }
 
 export default reducer
