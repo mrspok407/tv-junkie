@@ -8,7 +8,6 @@ type Props = {
 }
 
 const NewMembersMessages: React.FC<Props> = ({ renderedMessage }) => {
-  console.log({ renderedMessage })
   const newMembers = Object.values(renderedMessage.members || {})
     .map((member) => member.username)
     .join(", ")

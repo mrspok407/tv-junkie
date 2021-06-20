@@ -105,8 +105,8 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
   const unreadMessagesAmount = authUnreadMessages?.length === 0 ? null : authUnreadMessages?.length
 
   const lastMessageText = striptags(lastMessage?.message).slice(0, 30)
-  const chatMembersTyping = chatMembersStatusData?.filter((member) => member.isTyping)
 
+  const chatMembersTyping = chatMembersStatusData?.filter((member) => member.isTyping)
   return (
     <div
       className={classNames("contact-item", {

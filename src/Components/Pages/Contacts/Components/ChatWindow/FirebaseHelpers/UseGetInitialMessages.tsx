@@ -48,8 +48,6 @@ const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGr
           firebase
         })
 
-        console.log(messagesSnapshot.val())
-
         firstUnreadMessageKey =
           firstUnreadMessageKey.val() === null ? false : Object.keys(firstUnreadMessageKey.val()!)[0]
       } catch (error) {
@@ -106,8 +104,6 @@ const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGr
             startIndexRender = Math.max(endIndexRender - MESSAGES_TO_RENDER, 0)
           }
         }
-
-        console.log({ messagesData })
 
         contactsContext?.dispatch({
           type: "setInitialMessages",

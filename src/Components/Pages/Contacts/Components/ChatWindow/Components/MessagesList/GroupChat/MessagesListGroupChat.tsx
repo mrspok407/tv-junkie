@@ -16,8 +16,6 @@ const MessagesList: React.FC<Props> = ({}) => {
   const selectedMessagesData = selectedMessages[activeChat.chatKey] || []
   const contactInfo = contacts[activeChat.contactKey] || {}
 
-  console.log({ messagesData })
-
   return (
     <>
       {messagesData === undefined ? (

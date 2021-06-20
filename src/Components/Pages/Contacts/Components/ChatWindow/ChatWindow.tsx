@@ -23,6 +23,7 @@ import useContactListeners from "./Hooks/UseContactListeners"
 import useFrequentVariables from "../../Hooks/UseFrequentVariables"
 import MessagesList from "./Components/MessagesList/GroupChat/MessagesListGroupChat"
 import "./ChatWindow.scss"
+import ContactInfo from "./Components/ContactInfo/ContactInfo"
 
 const ChatWindow: React.FC = () => {
   const { firebase, authUser, newContactsActivity, contactsContext, contactsState } = useFrequentVariables()
@@ -51,11 +52,8 @@ const ChatWindow: React.FC = () => {
     messagesData === undefined || (!firebaseListeners.contactUnreadMessages && !contactInfo.isGroupChat)
 
   const [chatContainerRef, setChatContainerRef] = useState<HTMLDivElement>(null!)
-  const contactOptionsRef = useRef<HTMLDivElement>(null!)
+
   const unreadMessagesAuthRef = useRef<string[]>([])
-
-  const formatedDate = useTimestampFormater({ timeStamp: contactsStatus[activeChat.chatKey]?.lastSeen! })
-
   const isScrolledFirstRenderRef = useRef(false)
   const isScrollBottomRef = useRef(false)
   const { pageInFocus } = usePageFocusHandler({ activeChat, contactInfo })
@@ -343,54 +341,7 @@ const ChatWindow: React.FC = () => {
       >
         {convertTimeStampToDate({ timeStamp: floatDate })}
       </div>
-      <div className="chat-window__contact-info">
-        <div
-          className={classNames("contact-info__close-chat", {
-            "contact-info__close-chat--new-activity": newContactsActivity
-          })}
-        >
-          <button
-            className="contact-info__close-chat-btn"
-            type="button"
-            onClick={() =>
-              contactsContext?.dispatch({ type: "updateActiveChat", payload: { chatKey: "", contactKey: "" } })
-            }
-          ></button>
-        </div>
-        <div className="contact-info__username">{contactInfo.userName}</div>
-        <div ref={contactOptionsRef} className="contact-item__options contact-info__options">
-          <button
-            type="button"
-            className={classNames("contact-item__open-popup-btn", {
-              "contact-item__open-popup-btn--open": optionsPopupChatWindow
-            })}
-            onClick={() =>
-              contactsContext?.dispatch({ type: "updateOptionsPopupChatWindow", payload: activeChat.contactKey })
-            }
-          >
-            <span></span>
-            <span></span>
-            <span></span>
-          </button>
-
-          {optionsPopupChatWindow && (
-            <ContactPopup contactOptionsRef={contactOptionsRef.current} contactInfo={contactInfo} />
-          )}
-        </div>
-        <div className="contact-info__status">
-          {contactsStatus[activeChat.chatKey]?.isTyping ? (
-            <>
-              <div>Typing</div> <Loader className="loader--typing" />
-            </>
-          ) : contactsStatus[activeChat.chatKey]?.isOnline ? (
-            "Online"
-          ) : formatedDate ? (
-            `Last seen ${formatedDate}`
-          ) : (
-            ""
-          )}
-        </div>
-      </div>
+      <ContactInfo />
       <div
         className={classNames("chat-window__messages-list-container", {
           "chat-window__messages-list-container--loading": messagesData === undefined,
