@@ -6,20 +6,16 @@ import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVar
 import useElementScrolledDown from "Components/Pages/Movies/useElementScrolledDown"
 import React, { useState, useEffect, useContext, useRef, useLayoutEffect, useCallback } from "react"
 import { isUnexpectedObject } from "Utils"
-import Contact from "./Components/Contact/Contact"
-import SearchInput from "./Components/SearchInput/SearchInput"
-import SelectName from "./Components/SelectName/SelectName"
+import Contact from "../../../GroupCreation/Components/Contact/Contact"
+import SearchInput from "../../../GroupCreation/Components/SearchInput/SearchInput"
+import SelectName from "../../../GroupCreation/Components/SelectName/SelectName"
 import "./GroupCreation.scss"
-
-type Props = {
-  contactListWrapperRef: HTMLDivElement
-}
 
 const CONTACTS_TO_LOAD = 20
 
-const GroupCreation: React.FC<Props> = ({ contactListWrapperRef }) => {
+const GroupCreation: React.FC = () => {
   const { firebase, authUser, errors, contactsContext, contactsState } = useFrequentVariables()
-  const { groupCreation } = contactsState
+  const { activeChat, groupCreation } = contactsState
 
   const [contactsList, setContactsList] = useState<ContactInfoInterface[]>([])
   const [searchedContacts, setSearchedContacts] = useState<ContactInfoInterface[] | null>([])
@@ -29,23 +25,13 @@ const GroupCreation: React.FC<Props> = ({ contactListWrapperRef }) => {
   const [initialLoading, setInitialLoading] = useState(true)
 
   const createGroupWrapperRef = useRef<HTMLDivElement>(null!)
-  const contactsListRef = firebase.contactsList({ uid: authUser?.uid })
+  const contactsListRef = firebase.groupChatMembersStatus({ chatKey: activeChat.chatKey })
   const isScrolledDown = useElementScrolledDown({ element: createGroupWrapperRef.current, threshold: 650 })
-
-  useLayoutEffect(() => {
-    contactListWrapperRef.scrollTop = 0
-  }, [])
 
   const getContactsData = async ({ snapshot, isSearchedData = false }: { snapshot: any; isSearchedData?: boolean }) => {
     let contacts: ContactInfoInterface[] = []
     snapshot.forEach((contact: { val: () => ContactInfoInterface; key: string }) => {
-      if (contact.val().isGroupChat) return
-      if (isUnexpectedObject({ exampleObject: CONTACT_INFO_INITIAL_DATA, targetObject: contact.val() })) {
-        errors.handleError({
-          message: "Some of your contacts were not loaded correctly. Try to reload the page."
-        })
-        return
-      }
+      // if (contact.val().isGroupChat) return
       const chatKey =
         contact.key < authUser?.uid! ? `${contact.key}_${authUser?.uid}` : `${authUser?.uid}_${contact.key}`
       contacts.push({ ...contact.val(), key: contact.key, chatKey })
@@ -87,8 +73,8 @@ const GroupCreation: React.FC<Props> = ({ contactListWrapperRef }) => {
       try {
         const contactsData = await contactsListRef
           .orderByChild("userNameLowerCase")
-          .startAt(query.toLowerCase())
-          .endAt(query.toLowerCase() + "\uf8ff")
+          .startAt(query)
+          .endAt(query + "\uf8ff")
           .once("value")
         if (contactsData.val() === null) {
           setSearchedContacts(null)
@@ -111,7 +97,7 @@ const GroupCreation: React.FC<Props> = ({ contactListWrapperRef }) => {
     ;(async () => {
       setInitialLoading(true)
       try {
-        const contactsData = await contactsListRef.orderByChild("userName").limitToFirst(CONTACTS_TO_LOAD).once("value")
+        const contactsData = await contactsListRef.orderByChild("username").limitToFirst(CONTACTS_TO_LOAD).once("value")
         getContactsData({ snapshot: contactsData })
       } catch (error) {
         errors.handleError({

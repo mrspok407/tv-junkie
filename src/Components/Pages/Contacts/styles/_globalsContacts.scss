@@ -8,6 +8,10 @@ $contactListPalette: (
   borderRight: #25252561
 );
 
+.chat-container {
+  --contactInfoHeight: 54px;
+}
+
 // ContactItem
 $contactItemPalette: (
   activeItemBG: #0e5e92,
@@ -45,6 +49,11 @@ $chatWindowDimm: (
   messageMaxWidth: 70%,
   messageMaxWidthMobile: 85%,
   contactInfoFont: 0.95rem
+);
+
+// GroupInfo
+$groupInfoPalette: (
+  groupInfoBG: #131313
 );
 
 // SelectOptions

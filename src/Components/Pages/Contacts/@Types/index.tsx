@@ -57,6 +57,8 @@ export interface MembersStatusGroupChatInterface {
   pageInFocus: boolean | undefined
   isTyping: boolean | null
   key: string
+  username: string
+  usernameLowerCase: string
 }
 
 export const MESSAGE_INITIAL_DATA = {
@@ -140,6 +142,7 @@ export interface ContactsStateInterface {
   firebaseListeners: {
     contactUnreadMessages: boolean
   }
+  groupInfoSettingsActive: boolean
 }
 
 export interface SnapshotStringBooleanInterface {

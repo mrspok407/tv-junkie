@@ -1,0 +1,56 @@
+@import "../../../../../styles/globalsContacts";
+
+.members-menu {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-right: 1px solid #25252561;
+  background-color: #131313;
+  z-index: 20;
+
+  &__heading {
+    display: flex;
+    align-items: center;
+    column-gap: 30px;
+    padding: 12px;
+
+    &-text {
+      font-size: 1.2rem;
+      color: #fff;
+      user-select: none;
+    }
+  }
+}
+
+.members-list-wrapper {
+  @include scrollbar(5px, getColor(blueClr, $mainPalette), #c5bbb1);
+  height: calc(100vh - 262px);
+  overflow-y: auto;
+}
+
+.member-item {
+  --isOnlineColor: #4ee2b2;
+  display: flex;
+  flex-direction: row;
+
+  .member-item__info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    grid-row-gap: 5px;
+    row-gap: 5px;
+    width: 80%;
+    user-select: none;
+  }
+  .member-item__status {
+    font-size: 0.9rem;
+    color: #b5b5b5;
+
+    .member-item__status--online {
+      color: var(--isOnlineColor);
+    }
+  }
+}

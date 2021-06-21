@@ -27,6 +27,9 @@
           ".write": true,
           "contactsList": {
             ".indexOn": ["pinned_lastActivityTS", "userName", "userNameLowerCase"]
+          },
+          "contactsLastActivity": {
+            ".indexOn": [".value"]
           }
         }
       }

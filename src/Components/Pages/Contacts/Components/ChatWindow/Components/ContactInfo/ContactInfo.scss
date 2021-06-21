@@ -2,7 +2,7 @@
 
 .chat-window__contact-info {
   display: grid;
-  height: 54px;
+  height: var(--contactInfoHeight);
   grid-template-columns: 50px 1fr 30px;
   grid-template-rows: 22px 22px;
   column-gap: 5px;
@@ -12,7 +12,11 @@
   align-items: center;
   font-size: getDimm(contactInfoFont, $chatWindowDimm);
   background-color: #083b5f;
-  z-index: 15;
+  z-index: 30;
+
+  &--group-chat {
+    cursor: pointer;
+  }
 
   .contact-item__options {
     margin-right: 5px;

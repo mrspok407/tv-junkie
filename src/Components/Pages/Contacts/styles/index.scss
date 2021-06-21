@@ -5,8 +5,6 @@
   display: grid;
   grid-template-columns: 30% 70%;
   height: calc(100% - 85px);
-  // height: $chatHeight;
-  // max-height: $chatHeight;
   max-width: 100%;
   width: 1100px;
   border: 1px solid getColor(borderRight, $contactListPalette);

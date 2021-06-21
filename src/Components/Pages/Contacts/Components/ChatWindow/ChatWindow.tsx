@@ -24,6 +24,7 @@ import useFrequentVariables from "../../Hooks/UseFrequentVariables"
 import MessagesList from "./Components/MessagesList/GroupChat/MessagesListGroupChat"
 import "./ChatWindow.scss"
 import ContactInfo from "./Components/ContactInfo/ContactInfo"
+import GroupInfoSettings from "../GroupChat/GroupInfoSettings/GroupInfoSettings"
 
 const ChatWindow: React.FC = () => {
   const { firebase, authUser, newContactsActivity, contactsContext, contactsState } = useFrequentVariables()
@@ -35,10 +36,8 @@ const ChatWindow: React.FC = () => {
     selectedMessages,
     lastScrollPosition,
     authUserUnreadMessages,
-    contactsStatus,
-    optionsPopupChatWindow,
-    contactsUnreadMessages,
-    firebaseListeners
+    firebaseListeners,
+    groupInfoSettingsActive
   } = contactsState
   const messagesData = messages[activeChat.chatKey]
   const renderedMessages = renderedMessagesList[activeChat.chatKey] || []
@@ -341,6 +340,8 @@ const ChatWindow: React.FC = () => {
       >
         {convertTimeStampToDate({ timeStamp: floatDate })}
       </div>
+
+      {groupInfoSettingsActive && <GroupInfoSettings />}
       <ContactInfo />
       <div
         className={classNames("chat-window__messages-list-container", {

@@ -54,6 +54,7 @@ export type ACTIONTYPES =
   | { type: "clearSelectedMessages"; payload: { chatKey: string } }
   | { type: "updateMessageInput"; payload: MessageInputInterface }
   | { type: "updateContactInfo"; payload: { changedInfo: ContactInfoInterface } }
+  | { type: "updateGroupInfoSettings"; payload?: { isActive: boolean } }
   | {
       type: "updateContactsInitial"
       payload: {
@@ -96,7 +97,8 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
     contacts,
     messageDeletionProcess,
     initialMsgLoadedFinished,
-    firebaseListeners
+    firebaseListeners,
+    groupInfoSettingsActive
   } = state
 
   switch (action.type) {
@@ -671,6 +673,13 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
       return { ...state, contacts: contactsData }
     }
 
+    case "updateGroupInfoSettings": {
+      return {
+        ...state,
+        groupInfoSettingsActive: !groupInfoSettingsActive
+      }
+    }
+
     case "updateLastScrollPosition":
       if (activeChat.chatKey !== action.payload.chatKey) {
         return { ...state }
@@ -713,7 +722,8 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
     case "updateActiveChat":
       return {
         ...state,
-        activeChat: action.payload
+        activeChat: action.payload,
+        groupInfoSettingsActive: false
       }
 
     case "updateMessagesListRef":
@@ -828,7 +838,8 @@ export const INITIAL_STATE = {
   messageDeletionProcess: false,
   firebaseListeners: {
     contactUnreadMessages: false
-  }
+  },
+  groupInfoSettingsActive: false
 }
 
 export default reducer

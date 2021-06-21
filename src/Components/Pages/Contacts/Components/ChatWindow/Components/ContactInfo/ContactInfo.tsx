@@ -9,17 +9,25 @@ import "./ContactInfo.scss"
 type Props = {}
 
 const ContactInfo: React.FC<Props> = ({}) => {
-  const { newContactsActivity, contactsContext, contactsState } = useFrequentVariables()
+  const { authUser, newContactsActivity, contactsContext, contactsState } = useFrequentVariables()
   const { activeChat, contacts, contactsStatus, optionsPopupChatWindow, chatMembersStatus } = contactsState
   const contactInfo = contacts[activeChat.contactKey] || {}
   const chatMembersStatusData = chatMembersStatus[contactInfo.chatKey] || []
   const contactOptionsRef = useRef<HTMLDivElement>(null!)
 
   const formatedLastSeen = useTimestampFormater({ timeStamp: contactsStatus[activeChat.chatKey]?.lastSeen! })
-  const chatMembersTyping = chatMembersStatusData?.filter((member) => member.isTyping)
+  const chatMembersTyping = chatMembersStatusData?.filter((member) => member.isTyping && member.key !== authUser?.uid)
 
   return (
-    <div className="chat-window__contact-info">
+    <div
+      className={classNames("chat-window__contact-info", {
+        "chat-window__contact-info--group-chat": contactInfo.isGroupChat
+      })}
+      onClick={() => {
+        if (!contactInfo.isGroupChat) return
+        contactsContext?.dispatch({ type: "updateGroupInfoSettings" })
+      }}
+    >
       <div
         className={classNames("contact-info__close-chat", {
           "contact-info__close-chat--new-activity": newContactsActivity
@@ -28,9 +36,10 @@ const ContactInfo: React.FC<Props> = ({}) => {
         <button
           className="contact-info__close-chat-btn"
           type="button"
-          onClick={() =>
+          onClick={(e) => {
+            e.stopPropagation()
             contactsContext?.dispatch({ type: "updateActiveChat", payload: { chatKey: "", contactKey: "" } })
-          }
+          }}
         ></button>
       </div>
       <div className="contact-info__name">{contactInfo.userName || contactInfo.groupName}</div>
@@ -40,9 +49,10 @@ const ContactInfo: React.FC<Props> = ({}) => {
           className={classNames("contact-item__open-popup-btn", {
             "contact-item__open-popup-btn--open": optionsPopupChatWindow
           })}
-          onClick={() =>
+          onClick={(e) => {
+            e.stopPropagation()
             contactsContext?.dispatch({ type: "updateOptionsPopupChatWindow", payload: activeChat.contactKey })
-          }
+          }}
         >
           <span></span>
           <span></span>
