@@ -17,6 +17,8 @@ export interface ContactInfoInterface {
   unreadMessagesContact: string[]
   isGroupChat: boolean
   role: string
+  removedFromGroup: boolean
+  lastAvailableMessageTS: number
 }
 
 export const CONTACT_INFO_INITIAL_DATA = {
@@ -39,6 +41,11 @@ export interface MessageInterface {
   isDelivered?: boolean
   isEdited?: boolean
   isNewMembers?: boolean
+  isRemovedMember?: boolean
+  removedMember?: {
+    key: string
+    username: string
+  }
   members?: { username: string }[]
 }
 
@@ -59,6 +66,7 @@ export interface MembersStatusGroupChatInterface {
   key: string
   username: string
   usernameLowerCase: string
+  role: string
 }
 
 export const MESSAGE_INITIAL_DATA = {

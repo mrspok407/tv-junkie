@@ -15,7 +15,7 @@
   height: var(--dimm);
   background-color: var(--bgColor);
   border-radius: 50%;
-  z-index: 30;
+  z-index: 20;
 
   &:after {
     @include hoverBoxShadow(50%, 150ms);

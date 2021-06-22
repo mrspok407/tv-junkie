@@ -471,7 +471,7 @@ const ChatWindow: React.FC = () => {
           ))}
       </div>
       {!chatWindowLoading ? (
-        contactInfo.isGroupChat ? (
+        contactInfo.isGroupChat && !contactInfo.removedFromGroup ? (
           <MessageInput
             chatContainerRef={chatContainerRef}
             getContainerRect={getContainerRect}

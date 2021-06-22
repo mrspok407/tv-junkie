@@ -1,4 +1,4 @@
-import { GroupCreationNewMemberInterface } from "Components/Pages/Contacts/@Types"
+import { GroupCreationNewMemberInterface, MembersStatusGroupChatInterface } from "Components/Pages/Contacts/@Types"
 import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 
 interface ContextInterface {
@@ -35,6 +35,50 @@ interface ContactRequestDataInterface {
 }
 
 const contactsDatabaseRef = (uid: string) => `${uid}/contactsDatabase`
+
+export const _removeMemberFromGroup = async ({
+  data,
+  context,
+  database
+}: {
+  data: {
+    member: any
+    groupChatKey: string
+    timeStampData: number
+  }
+  context: ContextInterface
+  database: any
+}) => {
+  const authUid = context?.authUser?.uid
+  const { member, groupChatKey, timeStampData } = data
+
+  if (!authUid) {
+    throw new Error("The function must be called while authenticated.")
+  }
+
+  const newMessageRef = database.ref(`groupChats/${groupChatKey}/messages`).push()
+
+  try {
+    const updateData = {
+      [`groupChats/${groupChatKey}/messages/${newMessageRef.key}`]: {
+        removedMember: {
+          key: member.key,
+          username: member.username
+        },
+        isRemovedMember: true,
+        timeStamp: timeStampData
+      },
+      [`groupChats/${groupChatKey}/members/status/${member.key}`]: null,
+      [`users/${member.key}/contactsDatabase/contactsList/${groupChatKey}/removedFromGroup`]: true,
+      [`users/${member.key}/contactsDatabase/contactsList/${groupChatKey}/lastAvailableMessageTS`]: timeStampData,
+      [`users/${member.key}/contactsDatabase/newContactsActivity/${groupChatKey}`]: true,
+      [`users/${member.key}/contactsDatabase/contactsLastActivity/${groupChatKey}`]: timeStampData
+    }
+    return database.ref().update(updateData)
+  } catch (error) {
+    throw new Error(`There has been some error updating database: ${error}`)
+  }
+}
 
 export const _createNewGroup = async ({
   data,

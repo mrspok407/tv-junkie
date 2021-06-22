@@ -33,9 +33,9 @@ const GroupCreation: React.FC = () => {
   const [loading, setLoading] = useState(false)
   const [initialLoading, setInitialLoading] = useState(true)
 
-  const createGroupWrapperRef = useRef<HTMLDivElement>(null!)
-  const membersListRef = firebase.groupChatMembersStatus({ chatKey: activeChat.chatKey })
-  const isScrolledDown = useElementScrolledDown({ element: createGroupWrapperRef.current, threshold: 650 })
+  const membersListWrapperRef = useRef<HTMLDivElement>(null!)
+  const membersListFireRef = firebase.groupChatMembersStatus({ chatKey: activeChat.chatKey })
+  const isScrolledDown = useElementScrolledDown({ element: membersListWrapperRef.current, threshold: 650 })
 
   const getContactsData = async ({ snapshot }: { snapshot: any }) => {
     let members: MembersStatusGroupChatInterface[] = []
@@ -57,7 +57,7 @@ const GroupCreation: React.FC = () => {
       setIsSearching(true)
 
       try {
-        const membersData = await membersListRef
+        const membersData = await membersListFireRef
           .orderByChild("usernameLowerCase")
           .startAt(query.toLowerCase())
           .endAt(query.toLowerCase() + "\uf8ff")
@@ -91,14 +91,16 @@ const GroupCreation: React.FC = () => {
         .slice(0, renderedMembers)
     : searchedMembers
   return (
-    <div className="members-menu" ref={createGroupWrapperRef}>
+    <div className="members-menu">
       {groupCreation.selectNameActive && <SelectName />}
       <SearchInput onSearch={handleSearch} isSearching={isSearching} />
-      <div className="members-list-wrapper">
+      <div className="members-list-wrapper" ref={membersListWrapperRef}>
         <div className="members-list">
-          {contactsToRender.map((member) => (
-            <Member key={member.key} member={member} />
-          ))}
+          {searchedMembers === null ? (
+            <div className="contact-list--no-contacts-text">No members found</div>
+          ) : (
+            contactsToRender.map((member) => <Member key={member.key} contactInfo={contactInfo} member={member} />)
+          )}
         </div>
       </div>
     </div>

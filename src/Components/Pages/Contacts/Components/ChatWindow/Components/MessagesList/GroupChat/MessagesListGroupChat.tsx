@@ -56,7 +56,7 @@ const MessagesList: React.FC<Props> = ({}) => {
                 ) : (
                   ""
                 )}
-                {renderedMessage.isNewMembers ? (
+                {renderedMessage.isNewMembers || renderedMessage.isRemovedMember ? (
                   <NewMembersMessages renderedMessage={renderedMessage} />
                 ) : (
                   <div

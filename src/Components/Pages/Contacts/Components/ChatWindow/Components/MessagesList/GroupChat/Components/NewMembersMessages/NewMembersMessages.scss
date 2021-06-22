@@ -4,6 +4,9 @@
   .chat-window__message {
     width: 70%;
     margin: auto;
+    @include mediaMaxW(#{$mobileViewPort}) {
+      width: 100%;
+    }
 
     .chat-window__message-inner-wrapper {
       background-color: getColor(newMembersBG, $chatWindowPalette);

@@ -140,12 +140,53 @@ export const decrementContacts = functions.database
     });
   });
 
-export const updateLastSeen = functions.database
+export const updateLastSeenPrivateChats = functions.database
   .ref("privateChats/{chatKey}/members/{memberKey}/status/isOnline")
   .onDelete(async (snapshot) => {
     const timeStamp = admin.database.ServerValue.TIMESTAMP;
     snapshot.ref.parent?.update({lastSeen: timeStamp});
   });
+
+export const updateLastSeenGroupChats = functions.database
+  .ref("groupChats/{chatKey}/members/status/{memberKey}/isOnline")
+  .onDelete(async (snapshot) => {
+    const timeStamp = admin.database.ServerValue.TIMESTAMP;
+    snapshot.ref.parent?.update({lastSeen: timeStamp});
+  });
+
+export const removeMemberFromGroup = functions.https.onCall(async (data, context) => {
+  const authUid = context?.auth?.uid;
+  const {member, groupChatKey} = data;
+
+  if (!authUid) {
+    throw new functions.https.HttpsError("failed-precondition", "The function must be called while authenticated.");
+  }
+
+  const timeStamp = admin.database.ServerValue.TIMESTAMP;
+  const newMessageRef = database.ref(`groupChats/${groupChatKey}/messages`).push();
+
+  try {
+    const updateData = {
+      [`groupChats/${groupChatKey}/messages/${newMessageRef.key}`]: {
+        removedMember: {
+          key: member.key,
+          username: member.username
+        },
+        isRemovedMember: true,
+        timeStamp
+      },
+      [`groupChats/${groupChatKey}/members/status/${member.key}`]: null,
+      [`users/${member.key}/contactsDatabase/contactsList/${groupChatKey}/removedFromGroup`]: true,
+      [`users/${member.key}/contactsDatabase/contactsList/${groupChatKey}/lastAvailableMessageTS`]: timeStamp,
+      [`users/${member.key}/contactsDatabase/newContactsActivity/${groupChatKey}`]: true,
+      [`users/${member.key}/contactsDatabase/contactsLastActivity/${groupChatKey}`]: timeStamp
+    };
+
+    return database.ref().update(updateData);
+  } catch (error) {
+    throw new functions.https.HttpsError("unknown", error.message, error);
+  }
+});
 
 export const createNewGroup = functions.https.onCall(
   async (

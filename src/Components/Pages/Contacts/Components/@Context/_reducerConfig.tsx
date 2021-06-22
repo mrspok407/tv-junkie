@@ -131,7 +131,8 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         groupCreation: {
           ...groupCreation,
           ...action.payload
-        }
+        },
+        groupInfoSettingsActive: false
       }
     }
 

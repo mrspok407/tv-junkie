@@ -56,11 +56,6 @@
       }
     }
 
-    &:hover .group-creation__selected-contact-remove {
-      opacity: 1;
-      transform: rotate(90deg);
-    }
-
     &-name {
       font-size: 1.1rem;
       text-overflow: ellipsis;
@@ -77,6 +72,9 @@
       opacity: 0;
       transition: opacity 75ms, transform 150ms;
       will-change: opacity, transform;
+      @include mediaMaxW(#{$mobileViewPort}) {
+        opacity: 1;
+      }
 
       button {
         @include buttonRemoveDefaults;
@@ -90,6 +88,11 @@
         background-position: center;
         background-repeat: no-repeat;
       }
+    }
+
+    &:hover .group-creation__selected-contact-remove {
+      opacity: 1;
+      transform: rotate(90deg);
     }
   }
 

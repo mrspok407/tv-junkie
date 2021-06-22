@@ -12,6 +12,8 @@ const NewMembersMessages: React.FC<Props> = ({ renderedMessage }) => {
     .map((member) => member.username)
     .join(", ")
 
+  const removedMember = renderedMessage.removedMember
+
   return (
     <div
       className={classNames("chat-window__message-wrapper", {
@@ -24,9 +26,15 @@ const NewMembersMessages: React.FC<Props> = ({ renderedMessage }) => {
       >
         <div className="chat-window__message-inner-wrapper">
           <div className="chat-window__message-inner">
-            <div className="chat-window__message-text">
-              {newMembers} <span>joined the group</span>
-            </div>
+            {removedMember ? (
+              <div className="chat-window__message-text">
+                {removedMember.username}` <span>removed from this group</span>
+              </div>
+            ) : (
+              <div className="chat-window__message-text">
+                {newMembers}` <span>joined the group</span>
+              </div>
+            )}
           </div>
         </div>
       </div>

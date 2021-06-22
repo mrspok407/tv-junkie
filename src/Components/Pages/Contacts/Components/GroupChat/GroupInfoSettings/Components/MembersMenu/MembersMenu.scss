@@ -29,28 +29,89 @@
   @include scrollbar(5px, getColor(blueClr, $mainPalette), #c5bbb1);
   height: calc(100vh - 262px);
   overflow-y: auto;
+  @include mediaMaxW(#{$mobileViewPort}) {
+    height: 394px;
+  }
 }
 
-.member-item {
-  --isOnlineColor: #4ee2b2;
-  display: flex;
-  flex-direction: row;
-
-  .member-item__info {
+.members-list {
+  .member-item {
+    --isOnlineColor: #4ee2b2;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    grid-row-gap: 5px;
-    row-gap: 5px;
-    width: 80%;
-    user-select: none;
-  }
-  .member-item__status {
-    font-size: 0.9rem;
-    color: #b5b5b5;
+    flex-direction: row;
+    cursor: initial;
+    &:after {
+      z-index: 1;
+    }
 
-    .member-item__status--online {
+    &__remove {
+      display: flex;
+      align-items: center;
+      width: 20%;
+      z-index: 5;
+      &-btn {
+        @include buttonRemoveDefaults;
+        position: relative;
+        width: 100%;
+        height: 35px;
+        background-color: getColor(membersMenuBtn, $groupInfoPalette);
+        color: #fff;
+        cursor: pointer;
+
+        &:after {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          box-shadow: 0px 0px 3px 1px getColor(membersMenuBtn, $groupInfoPalette);
+          opacity: 0;
+          transition: 150ms;
+          will-change: opacity;
+        }
+        &:hover:after {
+          opacity: 1;
+        }
+      }
+    }
+
+    .contact-item__username {
+      width: 100%;
+      &--admin {
+        position: relative;
+        line-height: 35px;
+        &:after {
+          content: "Admin";
+          position: absolute;
+          top: -13px;
+          left: 0px;
+          color: brown;
+          font-size: 0.65rem;
+        }
+      }
+    }
+
+    .contact-item__info {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      grid-row-gap: 5px;
+      row-gap: 5px;
+      width: 80%;
+      user-select: none;
+    }
+    .contact-item__status {
+      font-size: 0.9rem;
+      color: #b5b5b5;
+    }
+    .contact-item__status--online {
       color: var(--isOnlineColor);
     }
+  }
+
+  .contact-list--no-contacts-text {
+    margin-right: auto;
+    margin-left: auto;
   }
 }

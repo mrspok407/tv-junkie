@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.handleContactRequest = exports.newContactRequest = exports.createNewGroup = exports.updateLastSeen = exports.decrementContacts = exports.incrementContacts = exports.removeNewContactsActivity = exports.addNewContactsActivity = exports.updatePinnedTimeStamp = void 0;
+exports.handleContactRequest = exports.newContactRequest = exports.createNewGroup = exports.updateLastSeenGroupChats = exports.updateLastSeenPrivateChats = exports.decrementContacts = exports.incrementContacts = exports.removeNewContactsActivity = exports.addNewContactsActivity = exports.updatePinnedTimeStamp = void 0;
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 // Cloud Functions interesting points:
@@ -108,8 +108,15 @@ exports.decrementContacts = functions.database
         }
     });
 });
-exports.updateLastSeen = functions.database
+exports.updateLastSeenPrivateChats = functions.database
     .ref("privateChats/{chatKey}/members/{memberKey}/status/isOnline")
+    .onDelete(async (snapshot) => {
+    var _a;
+    const timeStamp = admin.database.ServerValue.TIMESTAMP;
+    (_a = snapshot.ref.parent) === null || _a === void 0 ? void 0 : _a.update({ lastSeen: timeStamp });
+});
+exports.updateLastSeenGroupChats = functions.database
+    .ref("groupChats/{chatKey}/members/status/{memberKey}/isOnline")
     .onDelete(async (snapshot) => {
     var _a;
     const timeStamp = admin.database.ServerValue.TIMESTAMP;

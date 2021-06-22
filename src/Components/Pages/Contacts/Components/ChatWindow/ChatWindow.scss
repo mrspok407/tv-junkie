@@ -6,7 +6,8 @@
   flex-direction: column;
   color: #fff;
   overflow: hidden;
-  // background-color: getColor(backG, $chatWindowPalette);
+  background-color: getColor(backG, $chatWindowPalette);
+  z-index: 30;
 
   &--no-active-chat {
     display: flex;
