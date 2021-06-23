@@ -24,78 +24,6 @@
     }
   }
 
-  &__selected-members {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(calc(100% / 3 - 20px), 1fr));
-    grid-column-gap: 10px;
-    column-gap: 10px;
-    grid-row-gap: 12px;
-    row-gap: 12px;
-    align-items: start;
-    padding: 10px;
-    user-select: none;
-  }
-  &__selected-contact {
-    position: relative;
-    display: flex;
-    grid-column-gap: 5px;
-    min-width: 85px;
-    grid-column-gap: 5px;
-    column-gap: 5px;
-    align-items: center;
-    color: #fff;
-    background-color: #173446;
-    border-radius: 15px;
-    padding: 4px;
-    cursor: pointer;
-    opacity: 0;
-    animation: selectedContentFadeIn 100ms forwards;
-    @keyframes selectedContentFadeIn {
-      to {
-        opacity: 1;
-      }
-    }
-
-    &-name {
-      font-size: 1.1rem;
-      text-overflow: ellipsis;
-      overflow: hidden;
-      margin-left: 3px;
-    }
-
-    &-remove {
-      position: absolute;
-      right: 5px;
-      min-width: 20px;
-      margin-left: auto;
-      height: 20px;
-      opacity: 0;
-      transition: opacity 75ms, transform 150ms;
-      will-change: opacity, transform;
-      @include mediaMaxW(#{$mobileViewPort}) {
-        opacity: 1;
-      }
-
-      button {
-        @include buttonRemoveDefaults;
-        width: 100%;
-        height: 100%;
-        background-color: brown;
-        border-radius: 50%;
-        cursor: pointer;
-        background-image: url("../../../../../../assets/images/icons/cross-icon.svg");
-        background-size: 16px;
-        background-position: center;
-        background-repeat: no-repeat;
-      }
-    }
-
-    &:hover .group-creation__selected-contact-remove {
-      opacity: 1;
-      transform: rotate(90deg);
-    }
-  }
-
   &__heading {
     display: flex;
     align-items: center;
@@ -142,10 +70,5 @@
       color: #fff;
       user-select: none;
     }
-  }
-
-  .contact-list--no-contacts-text {
-    margin-right: auto;
-    margin-left: auto;
   }
 }

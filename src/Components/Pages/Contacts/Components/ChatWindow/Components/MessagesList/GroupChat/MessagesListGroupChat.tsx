@@ -3,7 +3,7 @@ import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVar
 import React, { useState, useEffect } from "react"
 import { convertTimeStampToDate } from "Utils"
 import MessageInfo from "../../MessageInfo/MessageInfo"
-import NewMembersMessages from "./Components/NewMembersMessages/NewMembersMessages"
+import InfoMessage from "./Components/NewMembersMessages/InfoMessage"
 import "./MessagesListGroupChat.scss"
 
 type Props = {}
@@ -57,7 +57,7 @@ const MessagesList: React.FC<Props> = ({}) => {
                   ""
                 )}
                 {renderedMessage.isNewMembers || renderedMessage.isRemovedMember ? (
-                  <NewMembersMessages renderedMessage={renderedMessage} />
+                  <InfoMessage renderedMessage={renderedMessage} />
                 ) : (
                   <div
                     className={classNames("chat-window__message-wrapper", {

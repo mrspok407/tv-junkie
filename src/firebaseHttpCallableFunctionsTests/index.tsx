@@ -57,7 +57,6 @@ export const _removeMemberFromGroup = async ({
   }
 
   const newMessageRef = database.ref(`groupChats/${groupChatKey}/messages`).push()
-
   try {
     const updateData = {
       [`groupChats/${groupChatKey}/messages/${newMessageRef.key}`]: {
@@ -69,6 +68,7 @@ export const _removeMemberFromGroup = async ({
         timeStamp: timeStampData
       },
       [`groupChats/${groupChatKey}/members/status/${member.key}`]: null,
+      [`groupChats/${groupChatKey}/members/unreadMessages/${member.key}`]: null,
       [`users/${member.key}/contactsDatabase/contactsList/${groupChatKey}/removedFromGroup`]: true,
       [`users/${member.key}/contactsDatabase/contactsList/${groupChatKey}/lastAvailableMessageTS`]: timeStampData,
       [`users/${member.key}/contactsDatabase/newContactsActivity/${groupChatKey}`]: true,
@@ -133,7 +133,7 @@ export const _createNewGroup = async ({
       },
       [`users/${authUid}/contactsDatabase/contactsLastActivity/${groupChatRef.key}`]: timeStamp,
       [`groupChats/${groupChatRef.key}/messages/${newMessageRef.key}`]: {
-        members,
+        newMembers: members,
         isNewMembers: true,
         timeStamp
       },

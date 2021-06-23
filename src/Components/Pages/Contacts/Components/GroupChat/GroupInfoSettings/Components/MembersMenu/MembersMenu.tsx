@@ -92,7 +92,6 @@ const GroupCreation: React.FC = () => {
     : searchedMembers
   return (
     <div className="members-menu">
-      {groupCreation.selectNameActive && <SelectName />}
       <SearchInput onSearch={handleSearch} isSearching={isSearching} />
       <div className="members-list-wrapper" ref={membersListWrapperRef}>
         <div className="members-list">

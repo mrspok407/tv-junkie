@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext, useRef } from "react"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
 import Contact from "./Contact/Contact"
+import ContactRemovedFromGroup from "./ContactRemovedFromGroup/ContactRemovedFromGroup"
 import useElementScrolledDown from "Components/Pages/Movies/useElementScrolledDown"
 import { ContactInfoInterface, CONTACT_INFO_INITIAL_DATA, MessageInterface } from "../../@Types"
 import classNames from "classnames"
@@ -167,9 +168,13 @@ const ContactList: React.FC<Props> = ({ contactListWrapperRef }) => {
       ) : !contactsData?.length ? (
         <div className="contact-list--no-contacts-text">You don't have any contacts</div>
       ) : (
-        contactsData?.map((contact) => (
-          <Contact key={contact.key} contactInfo={contact} allContactsAmount={allContactsAmount} />
-        ))
+        contactsData?.map((contact) =>
+          contact.removedFromGroup ? (
+            <ContactRemovedFromGroup key={contact.key} contactInfo={contact} allContactsAmount={allContactsAmount} />
+          ) : (
+            <Contact key={contact.key} contactInfo={contact} allContactsAmount={allContactsAmount} />
+          )
+        )
       )}
 
       {errors.error && <CreatePortal element={<ModalContent message={errors.error.message} />}></CreatePortal>}

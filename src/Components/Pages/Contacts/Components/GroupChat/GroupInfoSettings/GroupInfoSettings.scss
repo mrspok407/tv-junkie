@@ -7,13 +7,12 @@
   width: 100%;
   height: calc(100% - var(--contactInfoHeight));
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.88);
+  background-color: getColor(groupInfoBG, $groupInfoPalette);
   z-index: 25;
 }
 
 .group-info {
   width: 100%;
-  background-color: getColor(groupInfoBG, $groupInfoPalette);
 
   &__options {
     display: grid;

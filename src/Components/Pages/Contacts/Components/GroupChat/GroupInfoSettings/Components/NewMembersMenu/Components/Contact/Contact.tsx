@@ -7,37 +7,20 @@ import "./Contact.scss"
 
 type Props = {
   contact: ContactInfoInterface
-  isGroupInfoSearch?: boolean
+  membersKeys: string[]
+  handleNewMembers: (memberKey: string) => void
 }
 
-const Contact: React.FC<Props> = ({ contact, isGroupInfoSearch = false }) => {
-  const context = useContext(ContactsContext)
-  const { groupCreation } = context?.state!
-  const membersKeys = groupCreation.members.map((member) => member.key)
-
+const Contact: React.FC<Props> = ({ contact, membersKeys, handleNewMembers }) => {
   const formatedDate = useTimestampFormater({ timeStamp: contact.lastSeen! })
 
   return (
     <div
       className={classNames("contact-item", {
-        "contact-item--selected": membersKeys.includes(contact.key),
-        "member-item": isGroupInfoSearch
+        "contact-item--selected": membersKeys.includes(contact.key)
       })}
       key={contact.key}
-      onClick={() =>
-        context?.dispatch({
-          type: "updateGroupMembers",
-          payload: {
-            removeMember: membersKeys.includes(contact.key),
-            newMember: {
-              key: contact.key,
-              username: contact.userName,
-              lastSeen: formatedDate,
-              chatKey: contact.chatKey
-            }
-          }
-        })
-      }
+      onClick={() => handleNewMembers(contact.key)}
     >
       <div className="contact-item__select">
         <button type="button"></button>

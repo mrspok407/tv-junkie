@@ -94,18 +94,21 @@ const ContactPopup: React.FC<Props> = ({ contactOptionsRef, contactInfo }) => {
         </>
       )}
 
-      <div className="popup__option">
-        <button
-          className="popup__option-btn"
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation()
-            optionsHandler.handleMarkRead()
-          }}
-        >
-          Mark as read
-        </button>
-      </div>
+      {!contactInfo.removedFromGroup && (
+        <div className="popup__option">
+          <button
+            className="popup__option-btn"
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              optionsHandler.handleMarkRead()
+            }}
+          >
+            Mark as read
+          </button>
+        </div>
+      )}
+
       <div className="popup__option">
         <button
           className="popup__option-btn"

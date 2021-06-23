@@ -1,6 +1,7 @@
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
 import { ContactInfoInterface } from "Components/Pages/Contacts/@Types"
+import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
 import React, { useState, useEffect, useContext } from "react"
 import { ContactsContext } from "../../@Context/ContactsContext"
 
@@ -9,13 +10,11 @@ type Props = {
 }
 
 const useContactOptions = ({ contactInfo }: Props) => {
-  const { authUser, errors } = useContext(AppContext)
-  const firebase = useContext(FirebaseContext)
-  const context = useContext(ContactsContext)
-  const { activeChat, renderedMessagesList, contacts } = context?.state!
+  const { firebase, authUser, errors, contactsContext, contactsState } = useFrequentVariables()
+  const { activeChat, renderedMessagesList, contacts } = contactsState
 
   const updateIsPinned = async () => {
-    context?.dispatch({ type: "closePopups", payload: "" })
+    contactsContext?.dispatch({ type: "closePopups", payload: "" })
 
     try {
       const timeStamp = new Date().getTime()
@@ -34,7 +33,7 @@ const useContactOptions = ({ contactInfo }: Props) => {
   }
 
   const handleMarkRead = async () => {
-    context?.dispatch({ type: "closePopups", payload: "" })
+    contactsContext?.dispatch({ type: "closePopups", payload: "" })
 
     try {
       let updateData = {}
@@ -52,7 +51,7 @@ const useContactOptions = ({ contactInfo }: Props) => {
         }
       }
       await firebase.database().ref().update(updateData)
-      context?.dispatch({
+      contactsContext?.dispatch({
         type: "updateAuthUserUnreadMessages",
         payload: { chatKey: activeChat.chatKey, unreadMessages: [] }
       })
@@ -67,26 +66,32 @@ const useContactOptions = ({ contactInfo }: Props) => {
   }
 
   const handleLeaveChat = async ({ contactInfo }: { contactInfo: ContactInfoInterface }) => {
-    const timeStamp = new Date().getTime()
+    const timeStamp = firebase.timeStamp()
     const newMessageRef = firebase.messages({ chatKey: contactInfo.chatKey, isGroupChat: true }).push()
     try {
-      const updateData = {
+      const updateData: any = {
         [`users/${authUser?.uid}/contactsDatabase/contactsList/${contactInfo.key}`]: null,
         [`users/${authUser?.uid}/contactsDatabase/newContactsRequests/${contactInfo.key}`]: null,
         [`users/${authUser?.uid}/contactsDatabase/newContactsActivity/${contactInfo.key}`]: null,
-        [`groupChats/${contactInfo.chatKey}/members/status/${authUser?.uid}`]: null,
-        [`groupChats/${contactInfo.chatKey}/members/unreadMessages/${authUser?.uid}`]: null,
-        [`groupChats/${contactInfo.chatKey}/messages/${newMessageRef.key}`]: {
-          message: `${authUser?.username} left the chat`,
+        [`users/${authUser?.uid}/contactsDatabase/contactsLastActivity/${contactInfo.key}`]: null
+      }
+      if (!contactInfo.removedFromGroup) {
+        updateData[`groupChats/${contactInfo.chatKey}/members/status/${authUser?.uid}`] = null
+        updateData[`groupChats/${contactInfo.chatKey}/members/unreadMessages/${authUser?.uid}`] = null
+        updateData[`groupChats/${contactInfo.chatKey}/messages/${newMessageRef.key}`] = {
+          leftMember: {
+            key: authUser?.uid,
+            username: authUser?.username
+          },
           timeStamp,
-          isUserLeft: true
+          isMemberLeft: true
         }
       }
       await firebase
         .database()
         .ref()
         .update(updateData, () =>
-          context?.dispatch({
+          contactsContext?.dispatch({
             type: "updateActiveChat",
             payload: {
               chatKey: activeChat.chatKey === contactInfo.chatKey ? "" : activeChat.chatKey,
@@ -119,7 +124,7 @@ const useContactOptions = ({ contactInfo }: Props) => {
         .database()
         .ref()
         .update(updateData, () =>
-          context?.dispatch({
+          contactsContext?.dispatch({
             type: "updateActiveChat",
             payload: {
               chatKey: activeChat.chatKey === contactInfo.chatKey ? "" : activeChat.chatKey,
@@ -149,7 +154,7 @@ const useContactOptions = ({ contactInfo }: Props) => {
         [`users/${contactInfo.key}/contactsDatabase/newContactsRequests/${authUser?.uid}`]: null,
         [`users/${contactInfo.key}/contactsDatabase/newContactsActivity/${authUser?.uid}`]: null
       }
-      context?.dispatch({ type: "removeAllMessages", payload: { chatKey: contactInfo.chatKey } })
+      contactsContext?.dispatch({ type: "removeAllMessages", payload: { chatKey: contactInfo.chatKey } })
       await firebase.database().ref().update(updateData)
     } catch (error) {
       errors.handleError({

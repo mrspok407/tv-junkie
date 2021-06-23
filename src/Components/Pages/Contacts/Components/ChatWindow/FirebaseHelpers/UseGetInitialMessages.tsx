@@ -15,9 +15,11 @@ import debounce from "debounce"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
 
 const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGroupChat: boolean }) => {
-  const { firebase, authUser, errors, contactsContext } = useFrequentVariables()
-  const [loading, setLoading] = useState(false)
+  const { firebase, authUser, errors, contactsContext, contactsState } = useFrequentVariables()
+  const {messages} = contactsState
+  const messagesData = messages[chatKey]
 
+  const [loading, setLoading] = useState(false)
   const messagesRef = firebase.messages({ chatKey, isGroupChat })
 
   const messagesToDelete = useRef<MessageInterface[]>([])
@@ -31,7 +33,7 @@ const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGr
   )
 
   useEffect(() => {
-    if (contactsContext?.state.messages[chatKey] !== undefined) return
+    if (messagesData !== undefined) return
     if (loading) return
     setLoading(true)
 

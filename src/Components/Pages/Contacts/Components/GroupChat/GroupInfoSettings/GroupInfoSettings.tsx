@@ -3,6 +3,7 @@ import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVar
 import React, { useState, useEffect, useRef } from "react"
 import GroupCreation from "../GroupCreation/GroupCreation"
 import MembersMenu from "./Components/MembersMenu/MembersMenu"
+import NewMembersMenu from "./Components/NewMembersMenu/NewMembersMenu"
 import "./GroupInfoSettings.scss"
 
 type Props = {}
@@ -22,7 +23,7 @@ const GroupInfoSettings: React.FC<Props> = ({}) => {
       }
 
       case "addNewMembers": {
-        return ""
+        return <NewMembersMenu />
       }
     }
   }

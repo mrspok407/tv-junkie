@@ -3,12 +3,7 @@ import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVar
 import React, { useState, useEffect, useContext } from "react"
 import { ContactsContext } from "../../@Context/ContactsContext"
 import useCreateNewGroup from "../Hooks/UseCreateNewGroup"
-import "./HandleNewGroup.scss"
-
-// type Props = {
-//   createNewGroup?: boolean
-//   createNewGroupFun?: () => void
-// }
+import "./HandleNewMembers.scss"
 
 const HandleNewGroup: React.FC = () => {
   const { contactsContext, contactsState } = useFrequentVariables()
@@ -18,8 +13,8 @@ const HandleNewGroup: React.FC = () => {
 
   return (
     <div
-      className={classNames("handle-new-group", {
-        "handle-new-group--create": groupCreation.isActive
+      className={classNames("handle-new-members", {
+        "handle-new-members--arrow": groupCreation.isActive
       })}
     >
       <button

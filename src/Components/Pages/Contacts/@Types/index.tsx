@@ -46,7 +46,11 @@ export interface MessageInterface {
     key: string
     username: string
   }
-  members?: { username: string }[]
+  leftMember?: {
+    key: string
+    username: string
+  }
+  newMembers?: { username: string }[]
 }
 
 export interface ContactStatusInterface {

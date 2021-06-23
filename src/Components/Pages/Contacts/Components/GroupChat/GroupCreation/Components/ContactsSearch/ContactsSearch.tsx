@@ -6,38 +6,29 @@ import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVar
 import useElementScrolledDown from "Components/Pages/Movies/useElementScrolledDown"
 import React, { useState, useEffect, useContext, useRef, useLayoutEffect, useCallback } from "react"
 import { isUnexpectedObject } from "Utils"
-import Contact from "./Components/Contact/Contact"
-import SearchInput from "../../../GroupCreation/Components/SearchInput/SearchInput"
-import "../../../GroupCreation/Components/ContactsSearch/ContactsSearch.scss"
-import "./NewMembersMenu.scss"
+import Contact from "../Contact/Contact"
+import SearchInput from "../SearchInput/SearchInput"
+import "./ContactsSearch.scss"
+
+type Props = {
+  wrapperRef: HTMLDivElement
+}
 
 const CONTACTS_TO_LOAD = 20
 
-const NewMembersMenu: React.FC = () => {
+const ContactsSearch: React.FC<Props> = ({ wrapperRef }) => {
   const { firebase, authUser, errors, contactsContext, contactsState } = useFrequentVariables()
   const { groupCreation } = contactsState
 
   const [contactsList, setContactsList] = useState<ContactInfoInterface[]>([])
   const [searchedContacts, setSearchedContacts] = useState<ContactInfoInterface[] | null>([])
-  const [membersToAdd, setMembersToAdd] = useState<string[]>([])
   const [isSearching, setIsSearching] = useState(false)
   const [allContactsAmount, setAllContactsAmount] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
   const [initialLoading, setInitialLoading] = useState(true)
 
-  const membersListWrapperRef = useRef<HTMLDivElement>(null!)
   const contactsListRef = firebase.contactsList({ uid: authUser?.uid })
-  const isScrolledDown = useElementScrolledDown({ element: membersListWrapperRef.current, threshold: 650 })
-
-  const handleNewMembers = (memberKey: string) => {
-    setMembersToAdd((prevState) => {
-      if (prevState.includes(memberKey)) {
-        return [...prevState.filter((member) => member !== memberKey)]
-      } else {
-        return [...prevState, memberKey]
-      }
-    })
-  }
+  const isScrolledDown = useElementScrolledDown({ element: wrapperRef, threshold: 650 })
 
   const getContactsData = async ({ snapshot, isSearchedData = false }: { snapshot: any; isSearchedData?: boolean }) => {
     let contacts: ContactInfoInterface[] = []
@@ -168,51 +159,50 @@ const NewMembersMenu: React.FC = () => {
   const contactsToRender = !searchedContacts?.length ? contactsList : searchedContacts
   return (
     <>
-      <div className="members-menu members-menu--new-members">
-        <div className="contacts-search">
-          <SearchInput onSearch={handleSearch} isSearching={isSearching} contactsList={contactsList} />
-          <div className="members-list-wrapper" ref={membersListWrapperRef}>
-            <div className="members-list">
-              {initialLoading ? (
-                <div className="contact-list__loader-wrapper">
-                  <span className="contact-list__loader"></span>
-                </div>
-              ) : !contactsList.length ? (
-                <div className="contact-list--no-contacts-text">You don't have any contacts</div>
-              ) : searchedContacts === null ? (
-                <div className="contact-list--no-contacts-text">No contacts found</div>
-              ) : (
-                contactsToRender.map((contact) => (
-                  <Contact
-                    key={contact.key}
-                    contact={contact}
-                    handleNewMembers={handleNewMembers}
-                    membersKeys={membersToAdd}
-                  />
-                ))
-              )}
-              {loading && (
-                <div className="contact-list__loader-wrapper">
-                  <span className="contact-list__loader"></span>
-                </div>
-              )}
+      <div className="contacts-search">
+        <div className="contacts-search__selected-members">
+          {groupCreation.members.map((member) => (
+            <div
+              key={member.key}
+              className="contacts-search__selected-contact"
+              onClick={() =>
+                contactsContext?.dispatch({
+                  type: "updateGroupMembers",
+                  payload: { removeMember: true, newMember: { key: member.key } }
+                })
+              }
+            >
+              <div className="contacts-search__selected-contact-name">{member.username}</div>
+              <div className="contacts-search__selected-contact-remove">
+                <button type="button"></button>
+              </div>
             </div>
-          </div>
+          ))}
         </div>
-        {membersToAdd.length ? (
-          <div
-            className={classNames("handle-new-members", {
-              "handle-new-members--arrow": true
-            })}
-          >
-            <button type="button" onClick={() => {}}></button>
+        <SearchInput onSearch={handleSearch} isSearching={isSearching} contactsList={contactsList} />
+        {!groupCreation.selectNameActive && (
+          <div className="contact-list">
+            {initialLoading ? (
+              <div className="contact-list__loader-wrapper">
+                <span className="contact-list__loader"></span>
+              </div>
+            ) : !contactsList.length ? (
+              <div className="contact-list--no-contacts-text">You don't have any contacts</div>
+            ) : searchedContacts === null ? (
+              <div className="contact-list--no-contacts-text">No contacts found</div>
+            ) : (
+              contactsToRender.map((contact) => <Contact key={contact.key} contact={contact} />)
+            )}
+            {loading && (
+              <div className="contact-list__loader-wrapper">
+                <span className="contact-list__loader"></span>
+              </div>
+            )}
           </div>
-        ) : (
-          ""
         )}
       </div>
     </>
   )
 }
 
-export default NewMembersMenu
+export default ContactsSearch

@@ -1,6 +1,7 @@
 @import "../../../../../styles/globalsContacts";
 
 .members-menu {
+  position: relative;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -8,7 +9,6 @@
   overflow-y: auto;
   overflow-x: hidden;
   border-right: 1px solid #25252561;
-  background-color: #131313;
   z-index: 20;
 
   &__heading {
@@ -26,9 +26,9 @@
 }
 
 .members-list-wrapper {
-  @include scrollbar(5px, getColor(blueClr, $mainPalette), #c5bbb1);
   height: calc(100vh - 262px);
   overflow-y: auto;
+  @include scrollbar(5px, getColor(blueClr, $mainPalette), #c5bbb1);
   @include mediaMaxW(#{$mobileViewPort}) {
     height: 394px;
   }

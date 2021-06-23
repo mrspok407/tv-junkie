@@ -39,7 +39,7 @@ const SearchInput: React.FC<Props> = ({ onSearch, isSearching, contactsList }) =
   }
 
   return (
-    <div className="group-creation__search">
+    <div className="contacts-search__search">
       <input
         type="text"
         placeholder="Search for contact"

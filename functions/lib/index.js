@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.handleContactRequest = exports.newContactRequest = exports.createNewGroup = exports.updateLastSeenGroupChats = exports.updateLastSeenPrivateChats = exports.decrementContacts = exports.incrementContacts = exports.removeNewContactsActivity = exports.addNewContactsActivity = exports.updatePinnedTimeStamp = void 0;
+exports.handleContactRequest = exports.newContactRequest = exports.createNewGroup = exports.removeMemberFromGroup = exports.updateLastSeenGroupChats = exports.updateLastSeenPrivateChats = exports.decrementContacts = exports.incrementContacts = exports.removeNewContactsActivity = exports.addNewContactsActivity = exports.updatePinnedTimeStamp = void 0;
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 // Cloud Functions interesting points:
@@ -113,14 +113,48 @@ exports.updateLastSeenPrivateChats = functions.database
     .onDelete(async (snapshot) => {
     var _a;
     const timeStamp = admin.database.ServerValue.TIMESTAMP;
-    (_a = snapshot.ref.parent) === null || _a === void 0 ? void 0 : _a.update({ lastSeen: timeStamp });
+    return (_a = snapshot.ref.parent) === null || _a === void 0 ? void 0 : _a.update({ lastSeen: timeStamp });
 });
 exports.updateLastSeenGroupChats = functions.database
     .ref("groupChats/{chatKey}/members/status/{memberKey}/isOnline")
     .onDelete(async (snapshot) => {
-    var _a;
+    var _a, _b;
     const timeStamp = admin.database.ServerValue.TIMESTAMP;
-    (_a = snapshot.ref.parent) === null || _a === void 0 ? void 0 : _a.update({ lastSeen: timeStamp });
+    const isMemberExists = await ((_a = snapshot.ref.parent) === null || _a === void 0 ? void 0 : _a.child("role").once("value"));
+    if ((isMemberExists === null || isMemberExists === void 0 ? void 0 : isMemberExists.val()) === null)
+        return;
+    return (_b = snapshot.ref.parent) === null || _b === void 0 ? void 0 : _b.update({ lastSeen: timeStamp });
+});
+exports.removeMemberFromGroup = functions.https.onCall(async (data, context) => {
+    var _a;
+    const authUid = (_a = context === null || context === void 0 ? void 0 : context.auth) === null || _a === void 0 ? void 0 : _a.uid;
+    const { member, groupChatKey } = data;
+    if (!authUid) {
+        throw new functions.https.HttpsError("failed-precondition", "The function must be called while authenticated.");
+    }
+    const timeStamp = admin.database.ServerValue.TIMESTAMP;
+    const newMessageRef = database.ref(`groupChats/${groupChatKey}/messages`).push();
+    try {
+        const updateData = {
+            [`groupChats/${groupChatKey}/messages/${newMessageRef.key}`]: {
+                removedMember: {
+                    key: member.key,
+                    username: member.username
+                },
+                isRemovedMember: true,
+                timeStamp
+            },
+            [`groupChats/${groupChatKey}/members/status/${member.key}`]: null,
+            [`users/${member.key}/contactsDatabase/contactsList/${groupChatKey}/removedFromGroup`]: true,
+            [`users/${member.key}/contactsDatabase/contactsList/${groupChatKey}/lastAvailableMessageTS`]: timeStamp,
+            [`users/${member.key}/contactsDatabase/newContactsActivity/${groupChatKey}`]: true,
+            [`users/${member.key}/contactsDatabase/contactsLastActivity/${groupChatKey}`]: timeStamp
+        };
+        return database.ref().update(updateData);
+    }
+    catch (error) {
+        throw new functions.https.HttpsError("unknown", error.message, error);
+    }
 });
 exports.createNewGroup = functions.https.onCall(async (data, context) => {
     var _a, _b;
@@ -162,7 +196,7 @@ exports.createNewGroup = functions.https.onCall(async (data, context) => {
                 groupName: groupName || "Nameless group wow",
                 role: "ADMIN"
             }, [`users/${authUid}/contactsDatabase/contactsLastActivity/${groupChatRef.key}`]: timeStamp, [`groupChats/${groupChatRef.key}/messages/${newMessageRef.key}`]: {
-                members,
+                newMembers: members,
                 isNewMembers: true,
                 timeStamp
             } });

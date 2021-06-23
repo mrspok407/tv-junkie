@@ -1,6 +1,7 @@
 @import "../../../../../styles/globalsContacts";
 
-.group-creation {
+.contacts-search,
+.group-creation--select-name {
   --isOnlineColor: #4ee2b2;
   .contact-item {
     display: flex;

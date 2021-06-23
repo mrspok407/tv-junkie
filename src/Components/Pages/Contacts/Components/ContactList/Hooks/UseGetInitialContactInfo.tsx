@@ -17,14 +17,7 @@ const useGetInitialContactInfo = () => {
             ...contact
           }
         }
-
-        // let chatKey: string = ""
-        // if (contact.isGroupChat) {
-        //   chatKey = contact.key
-        // } else {
-        //   chatKey = contact.key < authUser?.uid! ? `${contact.key}_${authUser?.uid}` : `${authUser?.uid}_${contact.key}`
-        // }
-
+        
         const [
           newContactsActivity,
           newContactsRequests,

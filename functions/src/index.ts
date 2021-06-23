@@ -144,14 +144,16 @@ export const updateLastSeenPrivateChats = functions.database
   .ref("privateChats/{chatKey}/members/{memberKey}/status/isOnline")
   .onDelete(async (snapshot) => {
     const timeStamp = admin.database.ServerValue.TIMESTAMP;
-    snapshot.ref.parent?.update({lastSeen: timeStamp});
+    return snapshot.ref.parent?.update({lastSeen: timeStamp});
   });
 
 export const updateLastSeenGroupChats = functions.database
   .ref("groupChats/{chatKey}/members/status/{memberKey}/isOnline")
   .onDelete(async (snapshot) => {
     const timeStamp = admin.database.ServerValue.TIMESTAMP;
-    snapshot.ref.parent?.update({lastSeen: timeStamp});
+    const isMemberExists = await snapshot.ref.parent?.child("role").once("value");
+    if (isMemberExists?.val() === null) return;
+    return snapshot.ref.parent?.update({lastSeen: timeStamp});
   });
 
 export const removeMemberFromGroup = functions.https.onCall(async (data, context) => {
@@ -176,6 +178,7 @@ export const removeMemberFromGroup = functions.https.onCall(async (data, context
         timeStamp
       },
       [`groupChats/${groupChatKey}/members/status/${member.key}`]: null,
+      [`groupChats/${groupChatKey}/members/unreadMessages/${member.key}`]: null,
       [`users/${member.key}/contactsDatabase/contactsList/${groupChatKey}/removedFromGroup`]: true,
       [`users/${member.key}/contactsDatabase/contactsList/${groupChatKey}/lastAvailableMessageTS`]: timeStamp,
       [`users/${member.key}/contactsDatabase/newContactsActivity/${groupChatKey}`]: true,
@@ -239,7 +242,7 @@ export const createNewGroup = functions.https.onCall(
         },
         [`users/${authUid}/contactsDatabase/contactsLastActivity/${groupChatRef.key}`]: timeStamp,
         [`groupChats/${groupChatRef.key}/messages/${newMessageRef.key}`]: {
-          members,
+          newMembers: members,
           isNewMembers: true,
           timeStamp
         }
