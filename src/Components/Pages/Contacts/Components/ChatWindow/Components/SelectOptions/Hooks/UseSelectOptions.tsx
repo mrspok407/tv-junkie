@@ -6,21 +6,25 @@ import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVar
 import React, { useState, useEffect, useContext } from "react"
 import useHandleMessageOptions from "../../MessageInfo/FirebaseHelpers/UseHandleMessageOptions"
 
-type Props = {}
-
 const useSelectOptions = () => {
-  const { firebase, authUser, contactsContext, contactsState } = useFrequentVariables()
-  const { activeChat, renderedMessagesList, contacts, selectedMessages } = contactsContext?.state!
+  const { contactsContext, contactsState } = useFrequentVariables()
+  const { activeChat, selectedMessages } = contactsState
+
   const selectedMessagesData = selectedMessages[activeChat.chatKey]
 
-  const { deleteMessage } = useHandleMessageOptions({})
+  const { deleteMessagePrivateChat, deleteMessageGroupChat } = useHandleMessageOptions({})
 
   const deleteSelectedMessages = async () => {
-    await deleteMessage({ deleteMessagesKeys: selectedMessagesData })
+    await deleteMessagePrivateChat({ deleteMessagesKeys: selectedMessagesData })
     contactsContext?.dispatch({ type: "clearSelectedMessages", payload: { chatKey: activeChat.chatKey } })
   }
 
-  return { deleteSelectedMessages }
+  const deleteSelectedMessagesGroupChat = async () => {
+    await deleteMessageGroupChat({ deleteMessagesKeys: selectedMessagesData })
+    contactsContext?.dispatch({ type: "clearSelectedMessages", payload: { chatKey: activeChat.chatKey } })
+  }
+
+  return { deleteSelectedMessages, deleteSelectedMessagesGroupChat }
 }
 
 export default useSelectOptions

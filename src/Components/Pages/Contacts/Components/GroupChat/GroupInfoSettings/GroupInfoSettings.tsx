@@ -10,7 +10,8 @@ type Props = {}
 
 const GroupInfoSettings: React.FC<Props> = ({}) => {
   const { contactsContext, contactsState } = useFrequentVariables()
-  const { activeChat } = contactsState
+  const { activeChat, contacts } = contactsState
+  const contactInfo = contacts[activeChat.chatKey] || {}
 
   const [currentMenu, setCurrentMenu] = useState("members")
 
@@ -31,7 +32,11 @@ const GroupInfoSettings: React.FC<Props> = ({}) => {
   return (
     <div ref={groupInfoRef} className="group-info-wrapper">
       <div className="group-info">
-        <div className="group-info__options">
+        <div
+          className={classNames("group-info__options", {
+            "group-info__options--admin": contactInfo.role === "ADMIN"
+          })}
+        >
           <div
             className={classNames("group-info__options-menu", {
               "group-info__options-menu--active": currentMenu === "members"
@@ -40,14 +45,16 @@ const GroupInfoSettings: React.FC<Props> = ({}) => {
           >
             Members
           </div>
-          <div
-            className={classNames("group-info__options-menu", {
-              "group-info__options-menu--active": currentMenu === "addNewMembers"
-            })}
-            onClick={() => setCurrentMenu("addNewMembers")}
-          >
-            Add new members
-          </div>
+          {contactInfo.role === "ADMIN" && (
+            <div
+              className={classNames("group-info__options-menu", {
+                "group-info__options-menu--active": currentMenu === "addNewMembers"
+              })}
+              onClick={() => setCurrentMenu("addNewMembers")}
+            >
+              Add new members
+            </div>
+          )}
         </div>
         <div className="group-info__menu">{renderMenu()}</div>
       </div>

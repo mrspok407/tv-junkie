@@ -1,40 +1,60 @@
 import classNames from "classnames"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
-import { ContactInfoInterface, CONTACT_INFO_INITIAL_DATA } from "Components/Pages/Contacts/@Types"
+import {
+  ContactInfoInterface,
+  CONTACT_INFO_INITIAL_DATA,
+  GroupCreationNewMemberInterface
+} from "Components/Pages/Contacts/@Types"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
 import useElementScrolledDown from "Components/Pages/Movies/useElementScrolledDown"
 import React, { useState, useEffect, useContext, useRef, useLayoutEffect, useCallback } from "react"
 import { isUnexpectedObject } from "Utils"
 import Contact from "./Components/Contact/Contact"
 import SearchInput from "../../../GroupCreation/Components/SearchInput/SearchInput"
+import useAddNewMembers from "../../../Hooks/UseAddNewMembers"
 import "../../../GroupCreation/Components/ContactsSearch/ContactsSearch.scss"
 import "./NewMembersMenu.scss"
 
 const CONTACTS_TO_LOAD = 20
 
 const NewMembersMenu: React.FC = () => {
-  const { firebase, authUser, errors, contactsContext, contactsState } = useFrequentVariables()
-  const { groupCreation } = contactsState
+  const { firebase, authUser, errors, contactsState } = useFrequentVariables()
+  const { activeChat, contacts } = contactsState
+  const contactInfo = contacts[activeChat.contactKey] || {}
 
   const [contactsList, setContactsList] = useState<ContactInfoInterface[]>([])
   const [searchedContacts, setSearchedContacts] = useState<ContactInfoInterface[] | null>([])
-  const [membersToAdd, setMembersToAdd] = useState<string[]>([])
+  const [selectedMembers, setSelectedMembers] = useState<GroupCreationNewMemberInterface[]>([])
   const [isSearching, setIsSearching] = useState(false)
   const [allContactsAmount, setAllContactsAmount] = useState<number | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [loadingNewContacts, setLoadingNewcontacts] = useState(false)
   const [initialLoading, setInitialLoading] = useState(true)
+
+  const { newMembersLoading, addNewMembers } = useAddNewMembers()
 
   const membersListWrapperRef = useRef<HTMLDivElement>(null!)
   const contactsListRef = firebase.contactsList({ uid: authUser?.uid })
   const isScrolledDown = useElementScrolledDown({ element: membersListWrapperRef.current, threshold: 650 })
 
-  const handleNewMembers = (memberKey: string) => {
-    setMembersToAdd((prevState) => {
-      if (prevState.includes(memberKey)) {
-        return [...prevState.filter((member) => member !== memberKey)]
+  const handleNewMembers = ({
+    contact,
+    formatedDate
+  }: {
+    contact: ContactInfoInterface
+    formatedDate: string | number | null
+  }) => {
+    const newMember = {
+      key: contact.key,
+      username: contact.userName,
+      lastSeen: formatedDate,
+      chatKey: contact.chatKey
+    }
+    setSelectedMembers((prevState) => {
+      if (prevState.map((member) => member.key).includes(newMember.key)) {
+        return [...prevState.filter((item) => item.key !== newMember.key)]
       } else {
-        return [...prevState, memberKey]
+        return [...prevState, newMember]
       }
     })
   }
@@ -78,7 +98,7 @@ const NewMembersMenu: React.FC = () => {
         ...contactWithStatus.filter((contact) => contact.status === true && !contact.isGroupChat)
       ])
       setInitialLoading(false)
-      setLoading(false)
+      setLoadingNewcontacts(false)
     }
   }
 
@@ -145,11 +165,11 @@ const NewMembersMenu: React.FC = () => {
 
   useEffect(() => {
     if (!isScrolledDown) return
-    if (loading) return
+    if (loadingNewContacts) return
     if (contactsList.length >= allContactsAmount!) return
     ;(async () => {
       try {
-        setLoading(true)
+        setLoadingNewcontacts(true)
         const contactsData = await contactsListRef
           .orderByChild("userName")
           .startAfter(contactsList[contactsList.length - 1].userName)
@@ -160,7 +180,7 @@ const NewMembersMenu: React.FC = () => {
         errors.handleError({
           message: "Some of your contacts were not loaded correctly. Try to reload the page."
         })
-        setLoading(false)
+        setLoadingNewcontacts(false)
       }
     })()
   }, [isScrolledDown, contactsList])
@@ -187,11 +207,11 @@ const NewMembersMenu: React.FC = () => {
                     key={contact.key}
                     contact={contact}
                     handleNewMembers={handleNewMembers}
-                    membersKeys={membersToAdd}
+                    selectedMembers={selectedMembers}
                   />
                 ))
               )}
-              {loading && (
+              {loadingNewContacts && (
                 <div className="contact-list__loader-wrapper">
                   <span className="contact-list__loader"></span>
                 </div>
@@ -199,13 +219,22 @@ const NewMembersMenu: React.FC = () => {
             </div>
           </div>
         </div>
-        {membersToAdd.length ? (
+        {selectedMembers.length ? (
           <div
             className={classNames("handle-new-members", {
-              "handle-new-members--arrow": true
+              "handle-new-members--arrow": true,
+              "handle-new-members--loading": newMembersLoading
             })}
           >
-            <button type="button" onClick={() => {}}></button>
+            <button
+              type="button"
+              onClick={() =>
+                addNewMembers({
+                  members: selectedMembers,
+                  groupInfo: { groupName: contactInfo.groupName, key: contactInfo.chatKey }
+                })
+              }
+            ></button>
           </div>
         ) : (
           ""

@@ -35,7 +35,7 @@ const useHandleContactsStatus = ({ chatKey, contactKey, isGroupChat }: Props) =>
     firebase
       .chatMemberStatus({ chatKey, memberKey: authUser?.uid!, isGroupChat: false })
       .onDisconnect()
-      .update({ isOnline: null, pageInFocus: false })
+      .update({ isOnline: null, pageInFocus: null })
   }, [chatKey, contactKey, isGroupChat])
 }
 

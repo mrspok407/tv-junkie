@@ -10,7 +10,7 @@ const useCreateNewGroup = () => {
     const timeStampData = firebase.timeStamp()
 
     // const newCreateGroupCloud = firebase.httpsCallable("newCreateGroup")
-    // newCreateGroupCloud({ members, groupName, authUser })
+    // newCreateGroupCloud({ members: groupCreation.members, groupName: groupCreation.groupName, authUser })
 
     try {
       contactsContext?.dispatch({ type: "updateGroupCreation", payload: { loading: true } })

@@ -70,9 +70,63 @@ export const _removeMemberFromGroup = async ({
       [`groupChats/${groupChatKey}/members/status/${member.key}`]: null,
       [`groupChats/${groupChatKey}/members/unreadMessages/${member.key}`]: null,
       [`users/${member.key}/contactsDatabase/contactsList/${groupChatKey}/removedFromGroup`]: true,
-      [`users/${member.key}/contactsDatabase/contactsList/${groupChatKey}/lastAvailableMessageTS`]: timeStampData,
       [`users/${member.key}/contactsDatabase/newContactsActivity/${groupChatKey}`]: true,
       [`users/${member.key}/contactsDatabase/contactsLastActivity/${groupChatKey}`]: timeStampData
+    }
+    return database.ref().update(updateData)
+  } catch (error) {
+    throw new Error(`There has been some error updating database: ${error}`)
+  }
+}
+
+export const _addNewGroupMembers = async ({
+  data,
+  context,
+  database
+}: {
+  data: {
+    members: GroupCreationNewMemberInterface[]
+    groupInfo: { groupName: string; key: string }
+    timeStamp?: number
+  }
+  context: ContextInterface
+  database: any
+}) => {
+  const authUid = context?.authUser?.uid
+  const { members, groupInfo, timeStamp } = data
+
+  if (!authUid) {
+    throw new Error("The function must be called while authenticated.")
+  }
+  const membersUpdateData: any = {}
+  const newMessageRef = database.ref(`groupChats/${groupInfo.key}/messages`).push()
+
+  members.forEach((member) => {
+    membersUpdateData[`groupChats/${groupInfo.key}/members/status/${member.key}`] = {
+      isOnline: false,
+      username: member.username,
+      usernameLowerCase: member.username?.toLowerCase(),
+      role: "USER"
+    }
+    membersUpdateData[`users/${member.key}/contactsDatabase/contactsList/${groupInfo.key}`] = {
+      pinned_lastActivityTS: "false",
+      isGroupChat: true,
+      groupName: groupInfo.groupName,
+      role: "USER",
+      removedFromGroup: false
+    }
+    membersUpdateData[`users/${member.key}/contactsDatabase/contactsLastActivity/${groupInfo.key}`] = timeStamp
+    membersUpdateData[`users/${member.key}/contactsDatabase/newContactsActivity/${groupInfo.key}`] = true
+  })
+
+  try {
+    const updateData: { [key: string]: GroupChatInfoInterface | GroupChatMemberStatusInterface } = {
+      ...membersUpdateData,
+      [`groupChats/${groupInfo.key}/messages/${newMessageRef.key}`]: {
+        newMembers: members,
+        isNewMembers: true,
+        timeStamp
+      }
     }
     return database.ref().update(updateData)
   } catch (error) {

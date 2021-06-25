@@ -51,7 +51,7 @@ $avatarDimm: 36px;
     }
 
     &-options {
-      margin-top: auto;
+      // margin-top: auto;
     }
 
     &-username {
@@ -113,6 +113,26 @@ $avatarDimm: 36px;
 
     .chat-window__message-username {
       color: getColor(usernameColorAuth, $chatWindowPalette);
+    }
+  }
+
+  .chat-window__message--deliver-failed {
+    .chat-window__message-inner-wrapper {
+      background-color: getColor(deliverFailedBG, $chatWindowPalette);
+    }
+  }
+
+  .chat-window__message--deliver-failed.chat-window__message--last-in-bunch {
+    .chat-window__message-inner-wrapper {
+      &:before {
+        background-color: getColor(deliverFailedBG, $chatWindowPalette);
+      }
+    }
+    .chat-window__message-inner {
+      &:after,
+      &:before {
+        display: none;
+      }
     }
   }
 

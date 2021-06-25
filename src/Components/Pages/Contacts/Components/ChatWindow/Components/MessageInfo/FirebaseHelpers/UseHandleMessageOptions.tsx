@@ -1,6 +1,7 @@
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
 import { MessageInterface } from "Components/Pages/Contacts/@Types"
+import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
 import React, { useState, useEffect, useContext } from "react"
 import striptags from "striptags"
 import { MESSAGE_LINE_HEIGHT } from "../../../../@Context/Constants"
@@ -11,24 +12,24 @@ type Props = {
 }
 
 const useHandleMessageOptions = ({ messageData }: Props) => {
-  const firebase = useContext(FirebaseContext)
-  const { authUser, errors } = useContext(AppContext)
-  const context = useContext(ContactsContext)
-  const { activeChat, messages, contactsStatus, contactsUnreadMessages, messagesInput } = context?.state!
+  const { firebase, authUser, errors, contactsContext, contactsState } = useFrequentVariables()
+  const { activeChat, messages, contactsStatus, chatMembersStatus, contactsUnreadMessages, messagesInput } =
+    contactsState
   const messagesInputData = messagesInput[activeChat.chatKey]
   const contactsUnreadMessagesData = contactsUnreadMessages[activeChat.chatKey]
+  const chatMembersStatusData = chatMembersStatus[activeChat.chatKey]
   const contactsStatusData = contactsStatus[activeChat.chatKey]
   const messagesData = messages[activeChat.chatKey]
 
   const selectMessage = async () => {
-    context?.dispatch({
+    contactsContext?.dispatch({
       type: "updateSelectedMessages",
       payload: { messageKey: messageData?.key!, chatKey: activeChat.chatKey }
     })
   }
 
-  const deleteMessage = async ({ deleteMessagesKeys }: { deleteMessagesKeys: string[] }) => {
-    context?.dispatch({ type: "updateMsgDeletionProcessLoading", payload: { messageDeletionProcess: true } })
+  const deleteMessageGroupChat = async ({ deleteMessagesKeys }: { deleteMessagesKeys: string[] }) => {
+    contactsContext?.dispatch({ type: "updateMsgDeletionProcessLoading", payload: { messageDeletionProcess: true } })
 
     const deletedMessagesData = messagesData.reduce((deletedMessagesData: MessageInterface[], message) => {
       if (deleteMessagesKeys.includes(message.key)) {
@@ -41,21 +42,62 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
     const successDeliverMessages = deletedMessagesData.filter((message) => message.isDelivered !== false)
 
     if (failedDeliverMessages.length) {
-      context?.dispatch({
+      contactsContext?.dispatch({
         type: "removeMessages",
         payload: { removedMessages: failedDeliverMessages, chatKey: activeChat.chatKey }
       })
     }
 
-    console.log({ deletedMessagesData })
+    try {
+      let updateData: { [key: string]: any } = {}
+
+      successDeliverMessages.forEach((messageData) => {
+        updateData[`groupChats/${activeChat.chatKey}/messages/${messageData.key}`] = null
+        chatMembersStatusData.forEach((member) => {
+          updateData[`groupChats/${activeChat.chatKey}/members/unreadMessages/${member.key}/${messageData.key}`] = null
+        })
+      })
+
+      await firebase.database().ref().update(updateData)
+    } catch (error) {
+      errors.handleError({
+        errorData: error,
+        message: "Message hasn't been deleted, because of the unexpected error."
+      })
+      throw new Error(`There has been some error updating database: ${error}`)
+    } finally {
+      contactsContext?.dispatch({
+        type: "updateMsgDeletionProcess",
+        payload: { messageDeletionProcess: false, deletedMessages: deletedMessagesData }
+      })
+    }
+  }
+
+  const deleteMessagePrivateChat = async ({ deleteMessagesKeys }: { deleteMessagesKeys: string[] }) => {
+    contactsContext?.dispatch({ type: "updateMsgDeletionProcessLoading", payload: { messageDeletionProcess: true } })
+
+    const deletedMessagesData = messagesData.reduce((deletedMessagesData: MessageInterface[], message) => {
+      if (deleteMessagesKeys.includes(message.key)) {
+        deletedMessagesData.push(message)
+      }
+      return deletedMessagesData
+    }, [])
+
+    const failedDeliverMessages = deletedMessagesData.filter((message) => message.isDelivered === false)
+    const successDeliverMessages = deletedMessagesData.filter((message) => message.isDelivered !== false)
+
+    if (failedDeliverMessages.length) {
+      contactsContext?.dispatch({
+        type: "removeMessages",
+        payload: { removedMessages: failedDeliverMessages, chatKey: activeChat.chatKey }
+      })
+    }
 
     try {
       let updateData: { [key: string]: any } = {}
       const unreadMsgsDataAfterDeletion = contactsUnreadMessagesData.filter(
         (message) => !deleteMessagesKeys.includes(message)
       )
-
-      console.log({ unreadMsgsDataAfterDeletion })
 
       const lastUnreadMsgAfterDeletion = messagesData.find(
         (message) => message.key === unreadMsgsDataAfterDeletion[unreadMsgsDataAfterDeletion.length - 1]
@@ -64,26 +106,12 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
       const lastUnreadMsgBeforeDeletion = contactsUnreadMessagesData[contactsUnreadMessagesData.length - 1]
       const lastReadMessage = messagesData[Math.max(messagesData.length - 1 - contactsUnreadMessagesData.length, 0)]
 
-      console.log({ lastReadMessage })
-
       successDeliverMessages.forEach((messageData) => {
         updateData[`privateChats/${activeChat.chatKey}/messages/${messageData.key}`] = null
         updateData[
           `privateChats/${activeChat.chatKey}/members/${activeChat.contactKey}/unreadMessages/${messageData.key}`
         ] = null
-        // const unreadMessage = contactsUnreadMessagesData?.includes(messageData.key)
-        // if (!unreadMessage) {
-        //   updateData[`privateChats/${activeChat.chatKey}/messages/${messageData.key}`] = null
-        // } else {
-        //   updateData[`privateChats/${activeChat.chatKey}/messages/${messageData.key}`] = null
-        //   updateData[
-        //     `privateChats/${activeChat.chatKey}/members/${activeChat.contactKey}/unreadMessages/${messageData.key}`
-        //   ] = null
-        // }
       })
-
-      console.log({ lastUnreadMsgAfterDeletion })
-      console.log({ lastUnreadMsgBeforeDeletion })
 
       if (lastUnreadMsgAfterDeletion && lastUnreadMsgBeforeDeletion !== lastUnreadMsgAfterDeletion.key) {
         updateData[`users/${activeChat.contactKey}/contactsDatabase/contactsLastActivity/${authUser?.uid}`] =
@@ -94,8 +122,6 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
           lastReadMessage?.timeStamp
       }
 
-      console.log({ updateData })
-
       await firebase.database().ref().update(updateData)
     } catch (error) {
       errors.handleError({
@@ -104,7 +130,7 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
       })
       throw new Error(`There has been some error updating database: ${error}`)
     } finally {
-      context?.dispatch({
+      contactsContext?.dispatch({
         type: "updateMsgDeletionProcess",
         payload: { messageDeletionProcess: false, deletedMessages: deletedMessagesData }
       })
@@ -122,13 +148,13 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
     inputRef.focus()
     chatContainerRef.scrollTop = chatContainerRef?.scrollTop! + (inputHeight - MESSAGE_LINE_HEIGHT)!
 
-    context?.dispatch({
+    contactsContext?.dispatch({
       type: "updateMessageInput",
       payload: { message: message?.message!, editingMsgKey: messageData?.key }
     })
   }
 
-  return { selectMessage, deleteMessage, editMessage }
+  return { selectMessage, deleteMessagePrivateChat, deleteMessageGroupChat, editMessage }
 }
 
 export default useHandleMessageOptions

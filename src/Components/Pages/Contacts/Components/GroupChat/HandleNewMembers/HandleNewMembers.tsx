@@ -14,7 +14,8 @@ const HandleNewGroup: React.FC = () => {
   return (
     <div
       className={classNames("handle-new-members", {
-        "handle-new-members--arrow": groupCreation.isActive
+        "handle-new-members--arrow": groupCreation.isActive,
+        "handle-new-members--loading": groupCreation.loading
       })}
     >
       <button

@@ -32,7 +32,7 @@ const Contact: React.FC<Props> = ({ member, contactInfo }) => {
             "contact-item__status--online": member.isOnline
           })}
         >
-          {member.isOnline ? "Online" : formatedDate ? `Last seen: ${formatedDate}` : "Long time ago"}
+          {member.isOnline ? "Online in chat" : formatedDate ? `Last seen: ${formatedDate}` : "Long time ago"}
         </div>
       </div>
       {contactInfo.role === "ADMIN" && member.key !== authUser?.uid && (

@@ -16,7 +16,6 @@
 
   &__options {
     display: grid;
-    grid-template-columns: 1fr 1fr;
     height: 50px;
     font-size: 1.2rem;
     user-select: none;
@@ -24,36 +23,42 @@
       font-size: 0.9rem;
     }
 
+    &--admin {
+      grid-template-columns: 1fr 1fr;
+
+      .group-info__options-menu {
+        cursor: pointer;
+        &:after {
+          content: "";
+          position: absolute;
+          left: 0;
+          bottom: -3px;
+          width: 100%;
+          height: 3px;
+          background-color: getColor(orangeClr, $mainPalette);
+          opacity: 0;
+          transition: 150ms;
+          will-change: opacity;
+        }
+
+        &:not(.group-info__options-menu--active):hover:after {
+          opacity: 0.5;
+        }
+
+        &--active {
+          &:after {
+            opacity: 1;
+          }
+        }
+      }
+    }
+
     &-menu {
       position: relative;
       display: flex;
       justify-content: center;
       align-items: flex-end;
-      cursor: pointer;
       padding-bottom: 3px;
-
-      &:after {
-        content: "";
-        position: absolute;
-        left: 0;
-        bottom: -3px;
-        width: 100%;
-        height: 3px;
-        background-color: getColor(orangeClr, $mainPalette);
-        opacity: 0;
-        transition: 150ms;
-        will-change: opacity;
-      }
-
-      &:not(.group-info__options-menu--active):hover:after {
-        opacity: 0.5;
-      }
-
-      &--active {
-        &:after {
-          opacity: 1;
-        }
-      }
     }
   }
 

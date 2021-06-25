@@ -58,6 +58,13 @@ const MessageInfo: React.FC<Props> = ({ messageData }) => {
           })}
         ></div>
       )}
+      {messageData.isDelivered === false && contactInfo.isGroupChat && (
+        <div
+          className={classNames("chat-window__message-status", {
+            "chat-window__message-status--deliver-failed": messageData.isDelivered === false
+          })}
+        ></div>
+      )}
       <div className="chat-window__message-timestamp">
         <div> {new Date(Number(messageData.timeStamp)).toLocaleTimeString().slice(0, -3)}</div>
         <div className="chat-window__message-edited">{messageData.isEdited && "edited"}</div>

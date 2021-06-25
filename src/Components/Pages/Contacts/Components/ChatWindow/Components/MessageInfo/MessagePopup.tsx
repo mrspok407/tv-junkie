@@ -2,6 +2,7 @@ import classNames from "classnames"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
 import { MessageInterface } from "Components/Pages/Contacts/@Types"
+import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
 import React, { useEffect, useContext } from "react"
 import { MESSAGE_LINE_HEIGHT } from "../../../@Context/Constants"
 import { ContactsContext } from "../../../@Context/ContactsContext"
@@ -13,12 +14,14 @@ type Props = {
 }
 
 const MessagePopup: React.FC<Props> = ({ messageOptionsRef, messageData }) => {
-  const { authUser } = useContext(AppContext)
-  const context = useContext(ContactsContext)
-  const { activeChat, messages } = context?.state!
+  const { authUser, contactsContext, contactsState } = useFrequentVariables()
+  const { activeChat, messages, contacts } = contactsState
+  const contactInfo = contacts[activeChat.chatKey] || {}
   const messagesData = messages[activeChat.chatKey] || []
 
-  const { selectMessage, deleteMessage, editMessage } = useHandleMessageOptions({ messageData })
+  const { selectMessage, deleteMessagePrivateChat, deleteMessageGroupChat, editMessage } = useHandleMessageOptions({
+    messageData
+  })
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside as EventListener)
@@ -29,7 +32,7 @@ const MessagePopup: React.FC<Props> = ({ messageOptionsRef, messageData }) => {
 
   const handleClickOutside = (e: CustomEvent) => {
     if (!messageOptionsRef?.contains(e.target as Node)) {
-      context?.dispatch({ type: "updateMessagePopup", payload: "" })
+      contactsContext?.dispatch({ type: "updateMessagePopup", payload: "" })
     }
   }
 
@@ -43,7 +46,7 @@ const MessagePopup: React.FC<Props> = ({ messageOptionsRef, messageData }) => {
       })}
       onClick={(e) => {
         e.stopPropagation()
-        context?.dispatch({ type: "updateMessagePopup", payload: "" })
+        contactsContext?.dispatch({ type: "updateMessagePopup", payload: "" })
       }}
     >
       {messageData.sender === authUser?.uid && messageData.isDelivered !== false && (
@@ -58,7 +61,13 @@ const MessagePopup: React.FC<Props> = ({ messageOptionsRef, messageData }) => {
         <button
           className="popup__option-btn"
           type="button"
-          onClick={() => deleteMessage({ deleteMessagesKeys: [messageData.key] })}
+          onClick={() => {
+            if (contactInfo.isGroupChat) {
+              deleteMessageGroupChat({ deleteMessagesKeys: [messageData.key] })
+            } else {
+              deleteMessagePrivateChat({ deleteMessagesKeys: [messageData.key] })
+            }
+          }}
         >
           Delete
         </button>

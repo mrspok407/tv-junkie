@@ -9,4 +9,30 @@
     left: initial;
     right: 20px;
   }
+
+  .contact-item--new-member {
+    &:after {
+      opacity: 1;
+      background-color: #173446;
+    }
+  }
+
+  .contact-item--selected {
+    &:after {
+      opacity: 0 !important;
+    }
+  }
+  .contact-item--new-member {
+    &:after {
+      opacity: 1 !important;
+    }
+    .contact-item__select {
+      button {
+        &:after {
+          transform: scale(1) !important;
+          opacity: 1 !important;
+        }
+      }
+    }
+  }
 }

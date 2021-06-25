@@ -145,6 +145,7 @@ exports.removeMemberFromGroup = functions.https.onCall(async (data, context) => 
                 timeStamp
             },
             [`groupChats/${groupChatKey}/members/status/${member.key}`]: null,
+            [`groupChats/${groupChatKey}/members/unreadMessages/${member.key}`]: null,
             [`users/${member.key}/contactsDatabase/contactsList/${groupChatKey}/removedFromGroup`]: true,
             [`users/${member.key}/contactsDatabase/contactsList/${groupChatKey}/lastAvailableMessageTS`]: timeStamp,
             [`users/${member.key}/contactsDatabase/newContactsActivity/${groupChatKey}`]: true,

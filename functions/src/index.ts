@@ -156,6 +156,61 @@ export const updateLastSeenGroupChats = functions.database
     return snapshot.ref.parent?.update({lastSeen: timeStamp});
   });
 
+export const addNewGroupMembers = functions.https.onCall(
+  async (
+    data: {
+      members: {key: string; username: string}[];
+      groupInfo: {groupName: string; key: string};
+      authUser: {username: string};
+    },
+    context
+  ) => {
+    const authUid = context?.auth?.uid;
+    const {members, groupInfo} = data;
+
+    if (!authUid) {
+      throw new functions.https.HttpsError("failed-precondition", "The function must be called while authenticated.");
+    }
+
+    const timeStamp = admin.database.ServerValue.TIMESTAMP;
+
+    const membersUpdateData: any = {};
+    const newMessageRef = database.ref(`groupChats/${groupInfo.key}/messages`).push();
+
+    members.forEach((member) => {
+      membersUpdateData[`groupChats/${groupInfo.key}/members/status/${member.key}`] = {
+        isOnline: false,
+        username: member.username,
+        usernameLowerCase: member.username?.toLowerCase(),
+        role: "USER"
+      };
+      membersUpdateData[`users/${member.key}/contactsDatabase/contactsList/${groupInfo.key}`] = {
+        pinned_lastActivityTS: "false",
+        isGroupChat: true,
+        groupName: groupInfo.groupName,
+        role: "USER",
+        removedFromGroup: false
+      };
+      membersUpdateData[`users/${member.key}/contactsDatabase/contactsLastActivity/${groupInfo.key}`] = timeStamp;
+      membersUpdateData[`users/${member.key}/contactsDatabase/newContactsActivity/${groupInfo.key}`] = true;
+    });
+
+    try {
+      const updateData: {[key: string]: GroupChatInfoInterface | GroupChatMemberStatusInterface} = {
+        ...membersUpdateData,
+        [`groupChats/${groupInfo.key}/messages/${newMessageRef.key}`]: {
+          newMembers: members,
+          isNewMembers: true,
+          timeStamp
+        }
+      };
+      return database.ref().update(updateData);
+    } catch (error) {
+      throw new functions.https.HttpsError("unknown", error.message, error);
+    }
+  }
+);
+
 export const removeMemberFromGroup = functions.https.onCall(async (data, context) => {
   const authUid = context?.auth?.uid;
   const {member, groupChatKey} = data;
@@ -180,7 +235,6 @@ export const removeMemberFromGroup = functions.https.onCall(async (data, context
       [`groupChats/${groupChatKey}/members/status/${member.key}`]: null,
       [`groupChats/${groupChatKey}/members/unreadMessages/${member.key}`]: null,
       [`users/${member.key}/contactsDatabase/contactsList/${groupChatKey}/removedFromGroup`]: true,
-      [`users/${member.key}/contactsDatabase/contactsList/${groupChatKey}/lastAvailableMessageTS`]: timeStamp,
       [`users/${member.key}/contactsDatabase/newContactsActivity/${groupChatKey}`]: true,
       [`users/${member.key}/contactsDatabase/contactsLastActivity/${groupChatKey}`]: timeStamp
     };
