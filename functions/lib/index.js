@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.handleContactRequest = exports.newContactRequest = exports.createNewGroup = exports.removeMemberFromGroup = exports.updateLastSeenGroupChats = exports.updateLastSeenPrivateChats = exports.decrementContacts = exports.incrementContacts = exports.removeNewContactsActivity = exports.addNewContactsActivity = exports.updatePinnedTimeStamp = void 0;
+exports.handleContactRequest = exports.newContactRequest = exports.createNewGroup = exports.removeMemberFromGroup = exports.addNewGroupMembers = exports.updateLastSeenGroupChats = exports.updateLastSeenPrivateChats = exports.decrementContacts = exports.incrementContacts = exports.removeNewContactsActivity = exports.addNewContactsActivity = exports.updatePinnedTimeStamp = void 0;
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 // Cloud Functions interesting points:
@@ -125,6 +125,46 @@ exports.updateLastSeenGroupChats = functions.database
         return;
     return (_b = snapshot.ref.parent) === null || _b === void 0 ? void 0 : _b.update({ lastSeen: timeStamp });
 });
+exports.addNewGroupMembers = functions.https.onCall(async (data, context) => {
+    var _a;
+    const authUid = (_a = context === null || context === void 0 ? void 0 : context.auth) === null || _a === void 0 ? void 0 : _a.uid;
+    const { members, groupInfo } = data;
+    if (!authUid) {
+        throw new functions.https.HttpsError("failed-precondition", "The function must be called while authenticated.");
+    }
+    const timeStamp = admin.database.ServerValue.TIMESTAMP;
+    const membersUpdateData = {};
+    const newMessageRef = database.ref(`groupChats/${groupInfo.key}/messages`).push();
+    members.forEach((member) => {
+        var _a;
+        membersUpdateData[`groupChats/${groupInfo.key}/members/status/${member.key}`] = {
+            isOnline: false,
+            username: member.username,
+            usernameLowerCase: (_a = member.username) === null || _a === void 0 ? void 0 : _a.toLowerCase(),
+            role: "USER"
+        };
+        membersUpdateData[`users/${member.key}/contactsDatabase/contactsList/${groupInfo.key}`] = {
+            pinned_lastActivityTS: "false",
+            isGroupChat: true,
+            groupName: groupInfo.groupName,
+            role: "USER",
+            removedFromGroup: false
+        };
+        membersUpdateData[`users/${member.key}/contactsDatabase/contactsLastActivity/${groupInfo.key}`] = timeStamp;
+        membersUpdateData[`users/${member.key}/contactsDatabase/newContactsActivity/${groupInfo.key}`] = true;
+    });
+    try {
+        const updateData = Object.assign(Object.assign({}, membersUpdateData), { [`groupChats/${groupInfo.key}/messages/${newMessageRef.key}`]: {
+                newMembers: members,
+                isNewMembers: true,
+                timeStamp
+            } });
+        return database.ref().update(updateData);
+    }
+    catch (error) {
+        throw new functions.https.HttpsError("unknown", error.message, error);
+    }
+});
 exports.removeMemberFromGroup = functions.https.onCall(async (data, context) => {
     var _a;
     const authUid = (_a = context === null || context === void 0 ? void 0 : context.auth) === null || _a === void 0 ? void 0 : _a.uid;
@@ -147,7 +187,6 @@ exports.removeMemberFromGroup = functions.https.onCall(async (data, context) => 
             [`groupChats/${groupChatKey}/members/status/${member.key}`]: null,
             [`groupChats/${groupChatKey}/members/unreadMessages/${member.key}`]: null,
             [`users/${member.key}/contactsDatabase/contactsList/${groupChatKey}/removedFromGroup`]: true,
-            [`users/${member.key}/contactsDatabase/contactsList/${groupChatKey}/lastAvailableMessageTS`]: timeStamp,
             [`users/${member.key}/contactsDatabase/newContactsActivity/${groupChatKey}`]: true,
             [`users/${member.key}/contactsDatabase/contactsLastActivity/${groupChatKey}`]: timeStamp
         };

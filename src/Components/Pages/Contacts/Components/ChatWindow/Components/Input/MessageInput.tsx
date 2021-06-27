@@ -38,7 +38,7 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
 
   const windowWidth = window.innerWidth
 
-  const { sendMessage, sendMessageGroupChat, editMessage } = useHandleMessage()
+  const { sendMessage, sendMessageGroupChat, editMessagePrivateChat, editMessageGroupChat } = useHandleMessage()
   useInputResizeObserver({ inputRef: inputRef.current, chatContainerRef: chatContainerRef, getContainerRect })
 
   const getSelection = () => {
@@ -182,7 +182,11 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
 
     try {
       console.log(editedMessageText)
-      await editMessage({ message: editedMessageText, originalMessage })
+      if (contactInfo.isGroupChat) {
+        await editMessageGroupChat({ message: editedMessageText, originalMessage })
+      } else {
+        await editMessagePrivateChat({ message: editedMessageText, originalMessage })
+      }
     } catch (error) {
       errors.handleError({
         message: "Message hasn't been edited, because of the unexpected error. Please reload the page."

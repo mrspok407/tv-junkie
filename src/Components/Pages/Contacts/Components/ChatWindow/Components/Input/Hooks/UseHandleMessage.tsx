@@ -113,7 +113,13 @@ const useHandleMessage = () => {
     return messageKey
   }
 
-  const editMessage = async ({ message, originalMessage }: { message: string; originalMessage: MessageInterface }) => {
+  const editMessagePrivateChat = async ({
+    message,
+    originalMessage
+  }: {
+    message: string
+    originalMessage: MessageInterface
+  }) => {
     if (originalMessage.message === message) return
     const updateData = {
       [`messages/${originalMessage.key}`]: {
@@ -127,7 +133,28 @@ const useHandleMessage = () => {
     return await firebase.privateChats().child(activeChat.chatKey).update(updateData)
   }
 
-  return { sendMessage, sendMessageGroupChat, editMessage }
+  const editMessageGroupChat = async ({
+    message,
+    originalMessage
+  }: {
+    message: string
+    originalMessage: MessageInterface
+  }) => {
+    if (originalMessage.message === message) return
+    const updateData = {
+      [`messages/${originalMessage.key}`]: {
+        sender: originalMessage.sender,
+        timeStamp: originalMessage.timeStamp,
+        username: originalMessage.username,
+        message,
+        isEdited: true
+      },
+      [`members/status/${authUser?.uid}/isTyping`]: null
+    }
+    return await firebase.groupChats().child(activeChat.chatKey).update(updateData)
+  }
+
+  return { sendMessage, sendMessageGroupChat, editMessagePrivateChat, editMessageGroupChat }
 }
 
 export default useHandleMessage

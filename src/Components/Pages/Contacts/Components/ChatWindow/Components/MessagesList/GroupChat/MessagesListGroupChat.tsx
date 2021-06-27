@@ -22,7 +22,7 @@ const MessagesList: React.FC<Props> = ({}) => {
         <div className="chat-window__loader-container">
           <span className="chat-window__loader"></span>
         </div>
-      ) : !messagesData.length ? (
+      ) : !messagesData?.length ? (
         <div className="chat-window__no-messages">
           The chat is very empty, <span>so sad</span>.
         </div>

@@ -5,7 +5,7 @@ import { ContactsContext } from "../../@Context/ContactsContext"
 import useCreateNewGroup from "../Hooks/UseCreateNewGroup"
 import "./HandleNewMembers.scss"
 
-const HandleNewGroup: React.FC = () => {
+const HandleNewMembers: React.FC = () => {
   const { contactsContext, contactsState } = useFrequentVariables()
   const { groupCreation } = contactsState
 
@@ -37,4 +37,4 @@ const HandleNewGroup: React.FC = () => {
   )
 }
 
-export default HandleNewGroup
+export default HandleNewMembers

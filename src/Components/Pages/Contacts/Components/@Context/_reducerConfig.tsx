@@ -144,7 +144,8 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         activeChat: {
           chatKey: action.payload.newGroupChatKey,
           contactKey: action.payload.newGroupChatKey
-        }
+        },
+        groupInfoSettingsActive: false
       }
     }
 

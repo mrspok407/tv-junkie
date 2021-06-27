@@ -128,6 +128,9 @@ export const _addNewGroupMembers = async ({
         timeStamp
       }
     }
+
+    const timeOut = await new Promise((resolve) => setTimeout(resolve, 2000))
+
     return database.ref().update(updateData)
   } catch (error) {
     throw new Error(`There has been some error updating database: ${error}`)
@@ -195,6 +198,7 @@ export const _createNewGroup = async ({
         groupName: groupName || "Nameless group wow"
       }
     }
+
     return database
       .ref()
       .update(updateData)

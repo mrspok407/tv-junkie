@@ -1,6 +1,7 @@
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
 import { _createNewGroup } from "firebaseHttpCallableFunctionsTests"
 import React, { useState, useEffect } from "react"
+import { INITIAL_STATE } from "../../@Context/_reducerConfig"
 
 const useCreateNewGroup = () => {
   const { firebase, authUser, errors, contactsContext, contactsState } = useFrequentVariables()
@@ -27,7 +28,7 @@ const useCreateNewGroup = () => {
       })
       contactsContext?.dispatch({
         type: "updateGroupCreation",
-        payload: { isActive: false, selectNameActive: false, groupName: "", error: "", loading: false }
+        payload: { ...INITIAL_STATE.groupCreation }
       })
       throw new Error(`There has been some error updating database: ${error}`)
     }

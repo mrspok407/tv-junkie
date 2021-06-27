@@ -88,7 +88,7 @@
       align-self: center;
       margin: 20px auto auto auto;
       opacity: 0;
-      animation: chatWindowLoaderContainerShow 0s 400ms forwards;
+      animation: chatWindowLoaderContainerShow 0s 0ms forwards;
       @keyframes chatWindowLoaderContainerShow {
         to {
           opacity: 1;
