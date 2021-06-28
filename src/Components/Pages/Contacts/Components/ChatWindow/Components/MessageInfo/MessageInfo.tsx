@@ -17,10 +17,6 @@ const MessageInfo: React.FC<Props> = ({ messageData }) => {
 
   const messageOptionsRef = useRef<HTMLDivElement>(null!)
 
-  // if (activeChat.contactKey === "0iSDFz7cfEWR0XVc3QLsysPfXOb2") {
-  //   console.log({ contactsUnreadMessagesData })
-  // }
-
   return (
     <div className="chat-window__message-info">
       <div

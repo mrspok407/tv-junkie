@@ -6,15 +6,18 @@ import "./InfoMessage.scss"
 
 type Props = {
   renderedMessage: MessageInterface
+  privateChat?: boolean
 }
 
-const InfoMessage: React.FC<Props> = ({ renderedMessage }) => {
-  const { authUser } = useFrequentVariables()
+const InfoMessage: React.FC<Props> = ({ renderedMessage, privateChat = false }) => {
+  const { authUser, contactsState } = useFrequentVariables()
+  const { activeChat, contacts } = contactsState
+  const contactInfo = contacts[activeChat.contactKey]
   const newMembers = Object.values(renderedMessage.newMembers || {})
     .map((member) => member.username)
     .join(", ")
 
-  const { removedMember, leftMember } = renderedMessage
+  const { removedMember, leftMember, isRemovedFromContacts, isNowContacts } = renderedMessage
   const isAuthUser = removedMember?.key === authUser?.uid
 
   return (
@@ -24,22 +27,46 @@ const InfoMessage: React.FC<Props> = ({ renderedMessage }) => {
         data-key={renderedMessage.key}
       >
         <div className="chat-window__message-inner-wrapper">
-          <div className="chat-window__message-inner">
-            {removedMember ? (
+          {!privateChat ? (
+            <div className="chat-window__message-inner">
+              {removedMember ? (
+                <div className="chat-window__message-text">
+                  {isAuthUser ? "You" : `${removedMember.username}`}{" "}
+                  <span>{isAuthUser ? "were" : "was"} removed from this group</span>
+                </div>
+              ) : leftMember ? (
+                <div className="chat-window__message-text">
+                  {leftMember.username} <span>left the group</span>
+                </div>
+              ) : (
+                <div className="chat-window__message-text">
+                  {newMembers} <span>joined the group</span>
+                </div>
+              )}
+            </div>
+          ) : isRemovedFromContacts ? (
+            <div className="chat-window__message-inner">
               <div className="chat-window__message-text">
-                {isAuthUser ? "You" : `${removedMember.username}`}{" "}
-                <span>{isAuthUser ? "were" : "was"} removed from this group</span>
+                {renderedMessage.sender !== authUser?.uid ? (
+                  <>
+                    {contactInfo.userName} <span>removed you from contacts</span>
+                  </>
+                ) : (
+                  <>
+                    <span>You remove</span> {contactInfo.userName} <span>from contacts</span>
+                  </>
+                )}
               </div>
-            ) : leftMember ? (
-              <div className="chat-window__message-text">
-                {leftMember.username} <span>left the group</span>
+            </div>
+          ) : (
+            isNowContacts && (
+              <div className="chat-window__message-inner">
+                <div className="chat-window__message-text">
+                  <span>You are now have connection with</span> {contactInfo.userName}
+                </div>
               </div>
-            ) : (
-              <div className="chat-window__message-text">
-                {newMembers} <span>joined the group</span>
-              </div>
-            )}
-          </div>
+            )
+          )}
         </div>
       </div>
     </div>

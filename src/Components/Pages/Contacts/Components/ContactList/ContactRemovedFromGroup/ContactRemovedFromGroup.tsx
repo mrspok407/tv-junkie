@@ -5,7 +5,7 @@ import React, { useContext, useEffect, useRef, useState } from "react"
 import useTimestampFormater from "../../../Hooks/UseTimestampFormater"
 import { ContactInfoInterface, MessageInterface } from "../../../@Types"
 import { ContactsContext } from "../../@Context/ContactsContext"
-import ContactPopup from "../../OptionsPopup/OptionsPopup"
+import ContactOptionsPopup from "../../ContactOptionsPopup/ContactOptionsPopup"
 import useGetInitialMessages from "../../ChatWindow/FirebaseHelpers/UseGetInitialMessages"
 import useHandleContactsStatus from "../../ChatWindow/Hooks/UseHandleContactsStatus"
 import Loader from "Components/UI/Placeholders/Loader"
@@ -139,7 +139,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
           </button>
 
           {optionsPopupContactList === contactInfo.key && (
-            <ContactPopup contactOptionsRef={contactOptionsRef.current} contactInfo={contactInfo} />
+            <ContactOptionsPopup contactOptionsRef={contactOptionsRef.current} contactInfo={contactInfo} />
           )}
         </div>
         {contactInfo.isGroupChat && <div className="contact-item__group-chat-icon"></div>}

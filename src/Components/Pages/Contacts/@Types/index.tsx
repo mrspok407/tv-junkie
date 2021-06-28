@@ -23,7 +23,6 @@ export interface ContactInfoInterface {
 
 export const CONTACT_INFO_INITIAL_DATA = {
   status: [false, ""],
-  receiver: false,
   userName: "",
   pinned_lastActivityTS: ""
 }
@@ -42,6 +41,8 @@ export interface MessageInterface {
   isEdited?: boolean
   isNewMembers?: boolean
   isRemovedMember?: boolean
+  isRemovedFromContacts?: boolean
+  isNowContacts?: boolean
   removedMember?: {
     key: string
     username: string
@@ -74,7 +75,6 @@ export interface MembersStatusGroupChatInterface {
 }
 
 export const MESSAGE_INITIAL_DATA = {
-  message: "",
   sender: "",
   timeStamp: 0
 }

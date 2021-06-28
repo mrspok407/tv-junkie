@@ -1,0 +1,24 @@
+.chat-window--request {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+
+  .new-request {
+    display: grid;
+    width: 100%;
+    max-width: 400px;
+    row-gap: 10px;
+    margin-top: 30px;
+    font-size: 1.2rem;
+
+    &__name {
+      color: #66b4e6;
+    }
+
+    &__actions--receiver {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: 5px;
+    }
+  }
+}

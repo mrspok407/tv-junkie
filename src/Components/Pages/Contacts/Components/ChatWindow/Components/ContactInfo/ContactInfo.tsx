@@ -2,7 +2,7 @@ import classNames from "classnames"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
 import useTimestampFormater from "Components/Pages/Contacts/Hooks/UseTimestampFormater"
 import React, { useState, useEffect, useRef } from "react"
-import ContactPopup from "../../../OptionsPopup/OptionsPopup"
+import ContactOptionsPopup from "../../../ContactOptionsPopup/ContactOptionsPopup"
 import Loader from "Components/UI/Placeholders/Loader"
 import "./ContactInfo.scss"
 
@@ -60,7 +60,7 @@ const ContactInfo: React.FC<Props> = ({}) => {
         </button>
 
         {optionsPopupChatWindow && (
-          <ContactPopup contactOptionsRef={contactOptionsRef.current} contactInfo={contactInfo} />
+          <ContactOptionsPopup contactOptionsRef={contactOptionsRef.current} contactInfo={contactInfo} />
         )}
       </div>
       <div className="contact-info__status">

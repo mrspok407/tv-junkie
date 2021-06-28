@@ -1,10 +1,6 @@
-import classNames from "classnames"
-import { AppContext } from "Components/AppContext/AppContextHOC"
-import { FirebaseContext } from "Components/Firebase"
-import { ContactsContext } from "../@Context/ContactsContext"
+import React, { useEffect, useState, useRef, useCallback, useLayoutEffect } from "react"
 import useResponseContactRequest from "Components/Pages/UserProfile/Hooks/UseResponseContactRequest"
-import React, { useEffect, useContext, useState, useRef, useCallback, useLayoutEffect } from "react"
-import ContactPopup from "../OptionsPopup/OptionsPopup"
+import classNames from "classnames"
 import MessageInfo from "./Components/MessageInfo/MessageInfo"
 import { throttle } from "throttle-debounce"
 import debounce from "debounce"
@@ -16,15 +12,15 @@ import { MessageInterface } from "../../@Types"
 import { convertTimeStampToDate } from "Utils"
 import useShowFloatDate from "./Hooks/UseShowFloatDate"
 import usePageFocusHandler from "./Hooks/UsePageFocusHandler"
-import useTimestampFormater from "../../Hooks/UseTimestampFormater"
 import MessageInput from "./Components/Input/MessageInput"
-import Loader from "Components/UI/Placeholders/Loader"
 import useContactListeners from "./Hooks/UseContactListeners"
 import useFrequentVariables from "../../Hooks/UseFrequentVariables"
 import MessagesList from "./Components/MessagesList/GroupChat/MessagesListGroupChat"
-import "./ChatWindow.scss"
 import ContactInfo from "./Components/ContactInfo/ContactInfo"
 import GroupInfoSettings from "../GroupChat/GroupInfoSettings/GroupInfoSettings"
+import "./ChatWindow.scss"
+import NewRequestOptions from "./Components/NewRequestOptions/NewRequestOptions"
+import InfoMessage from "./Components/MessagesList/GroupChat/Components/NewMembersMessages/InfoMessage"
 
 const ChatWindow: React.FC = () => {
   const { firebase, authUser, newContactsActivity, contactsContext, contactsState } = useFrequentVariables()
@@ -66,7 +62,6 @@ const ChatWindow: React.FC = () => {
   }, [])
 
   const { loadTopMessages, loadingTopMessages } = useLoadTopMessages()
-  const { handleContactRequest } = useResponseContactRequest({ userUid: activeChat.contactKey })
   const { onMouseEnter } = useIntersectionObserver({
     chatContainerRef: chatContainerRef,
     unreadMessagesAuth: unreadMessagesAuthRef.current,
@@ -227,7 +222,7 @@ const ChatWindow: React.FC = () => {
   useLayoutEffect(() => {
     if (!chatContainerRef) return
     if (!messagesData?.length || !unreadMessagesAuth) return
-    if (contactInfo.status !== true && !contactInfo.isGroupChat) return
+    if (![true, "removed"].includes(contactInfo.status) && !contactInfo.isGroupChat) return
     if (isScrolledFirstRenderRef.current) return
     if (chatWindowLoading) return
 
@@ -327,9 +322,10 @@ const ChatWindow: React.FC = () => {
 
   useEffect(() => {
     if (!chatContainerRef) return
-    // if (contactInfo.status !== "rejected") return
     firebase.newContactsActivity({ uid: authUser?.uid }).child(`${contactInfo.key}`).set(null)
   }, [activeChat, contactInfo, chatContainerRef])
+
+  console.log({ contactInfo })
 
   return (
     <div className="chat-window-container" onMouseEnter={onMouseEnter}>
@@ -353,7 +349,7 @@ const ChatWindow: React.FC = () => {
         {contactInfo.isGroupChat ? (
           <MessagesList />
         ) : (
-          contactInfo.status === true &&
+          [true, "removed"].includes(contactInfo.status) &&
           (chatWindowLoading ? (
             <div className="chat-window__loader-container">
               <span className="chat-window__loader"></span>
@@ -388,43 +384,48 @@ const ChatWindow: React.FC = () => {
                     ) : (
                       ""
                     )}
-                    <div
-                      className={classNames("chat-window__message-wrapper", {
-                        "chat-window__message-wrapper--send": renderedMessage.sender === authUser?.uid,
-                        "chat-window__message-wrapper--receive": renderedMessage.sender === activeChat.contactKey,
-                        "chat-window__message-wrapper--selected": selectedMessagesData.includes(renderedMessage.key),
-                        "chat-window__message-wrapper--selection-active": selectedMessagesData.length
-                      })}
-                      onClick={() => {
-                        if (!selectedMessagesData.length) return
-                        contactsContext?.dispatch({
-                          type: "updateSelectedMessages",
-                          payload: { messageKey: renderedMessage.key, chatKey: activeChat.chatKey }
-                        })
-                      }}
-                    >
+
+                    {renderedMessage.isRemovedFromContacts || renderedMessage.isNowContacts ? (
+                      <InfoMessage renderedMessage={renderedMessage} privateChat={true} />
+                    ) : (
                       <div
-                        className={classNames(`chat-window__message chat-window__message--${renderedMessage.key}`, {
-                          "chat-window__message--send": renderedMessage.sender === authUser?.uid,
-                          "chat-window__message--receive": renderedMessage.sender === activeChat.contactKey,
-                          "chat-window__message--last-in-bunch": renderedMessage.sender !== nextMessage?.sender,
-                          "chat-window__message--deliver-failed": renderedMessage.isDelivered === false,
-                          "chat-window__message--selected": selectedMessagesData.includes(renderedMessage.key)
+                        className={classNames("chat-window__message-wrapper", {
+                          "chat-window__message-wrapper--send": renderedMessage.sender === authUser?.uid,
+                          "chat-window__message-wrapper--receive": renderedMessage.sender === activeChat.contactKey,
+                          "chat-window__message-wrapper--selected": selectedMessagesData.includes(renderedMessage.key),
+                          "chat-window__message-wrapper--selection-active": selectedMessagesData.length
                         })}
-                        data-key={renderedMessage.key}
+                        onClick={() => {
+                          if (!selectedMessagesData.length) return
+                          contactsContext?.dispatch({
+                            type: "updateSelectedMessages",
+                            payload: { messageKey: renderedMessage.key, chatKey: activeChat.chatKey }
+                          })
+                        }}
                       >
-                        <div className="chat-window__message-inner">
-                          <div
-                            className="chat-window__message-text"
-                            dangerouslySetInnerHTML={{
-                              __html: `${renderedMessage.message}`
-                            }}
-                          ></div>
-                          <MessageInfo messageData={renderedMessage} />
+                        <div
+                          className={classNames(`chat-window__message chat-window__message--${renderedMessage.key}`, {
+                            "chat-window__message--send": renderedMessage.sender === authUser?.uid,
+                            "chat-window__message--receive": renderedMessage.sender === activeChat.contactKey,
+                            "chat-window__message--last-in-bunch": renderedMessage.sender !== nextMessage?.sender,
+                            "chat-window__message--deliver-failed": renderedMessage.isDelivered === false,
+                            "chat-window__message--selected": selectedMessagesData.includes(renderedMessage.key)
+                          })}
+                          data-key={renderedMessage.key}
+                        >
+                          <div className="chat-window__message-inner">
+                            <div
+                              className="chat-window__message-text"
+                              dangerouslySetInnerHTML={{
+                                __html: `${renderedMessage.message}`
+                              }}
+                            ></div>
+                            <MessageInfo messageData={renderedMessage} />
+                          </div>
                         </div>
+                        <button type="button" className="chat-window__select-btn"></button>
                       </div>
-                      <button type="button" className="chat-window__select-btn"></button>
-                    </div>
+                    )}
                   </React.Fragment>
                 )
               })}
@@ -432,43 +433,7 @@ const ChatWindow: React.FC = () => {
           ))
         )}
 
-        {!contactInfo.receiver && contactInfo.status === false && (
-          <div className="chat-window chat-window--request">
-            <div className="new-request">
-              <div className="new-request__message">
-                {<span className="new-request__name">{contactInfo.userName}</span>} wants to connect
-              </div>
-              <div className="new-request__actions--receiver">
-                <button className="button" onClick={() => handleContactRequest({ status: "accept" })}>
-                  Accept
-                </button>
-                <button
-                  className="button"
-                  onClick={() => {
-                    handleContactRequest({ status: "rejected" })
-                    contactsContext?.dispatch({ type: "updateActiveChat", payload: { chatKey: "", contactKey: "" } })
-                  }}
-                >
-                  Reject
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {contactInfo.receiver &&
-          (contactInfo.status === false ? (
-            <div className="new-request__message">
-              The invitation to connect has been sent to{" "}
-              {<span className="new-request__name">{contactInfo.userName}</span>}
-            </div>
-          ) : (
-            contactInfo.status === "rejected" && (
-              <div className="new-request__message">
-                {<span className="new-request__name">{contactInfo.userName}</span>} rejected you connect request{" "}
-              </div>
-            )
-          ))}
+        {[false, "rejected"].includes(contactInfo.status) && <NewRequestOptions />}
       </div>
       {!chatWindowLoading ? (
         contactInfo.isGroupChat && !contactInfo.removedFromGroup ? (

@@ -9,6 +9,8 @@
     }
 
     .chat-window__message-inner-wrapper {
+      display: flex;
+      justify-content: center;
       background-color: getColor(newMembersBG, $chatWindowPalette);
       border-radius: 25px;
       margin: auto;

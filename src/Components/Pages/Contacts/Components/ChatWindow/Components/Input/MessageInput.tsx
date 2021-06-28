@@ -28,7 +28,7 @@ const debounceTimeout = 100
 const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unreadMessagesAuthRef }) => {
   const { firebase, authUser, errors, contactsContext, contactsState } = useFrequentVariables()
   const { activeChat, messagesInput, messages, selectedMessages, contacts } = contactsState
-  const contactInfo = contacts[activeChat.chatKey]
+  const contactInfo = contacts[activeChat.contactKey]
   const selectedMessagesData = selectedMessages[activeChat.chatKey]
   const messageInputData = messagesInput[activeChat.chatKey] || {}
   const messagesData = messages[activeChat.chatKey]
@@ -135,6 +135,7 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
     })
 
     try {
+      console.log({ contactInfo })
       let messageKey: string
       if (!contactInfo?.isGroupChat) {
         messageKey = await sendMessage({ message: newMessageText })
@@ -182,9 +183,11 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
 
     try {
       console.log(editedMessageText)
+      console.log({ contactInfo })
       if (contactInfo.isGroupChat) {
         await editMessageGroupChat({ message: editedMessageText, originalMessage })
       } else {
+        console.log("test")
         await editMessagePrivateChat({ message: editedMessageText, originalMessage })
       }
     } catch (error) {

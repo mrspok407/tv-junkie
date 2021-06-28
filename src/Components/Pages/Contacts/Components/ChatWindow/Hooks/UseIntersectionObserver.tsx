@@ -68,7 +68,7 @@ const useIntersectionObserver = ({ chatContainerRef, unreadMessagesAuth, pageInF
   useEffect(() => {
     console.log({ chatWindowLoading })
     if (!renderedMessages?.length || !unreadMessagesAuth?.length) return
-    if (contactInfo.status !== true && !contactInfo.isGroupChat) return
+    if (![true, "removed"].includes(contactInfo.status) && !contactInfo.isGroupChat) return
     if (!observerRef || !pageInFocus || chatWindowLoading) return
 
     renderedMessages.forEach((message) => {
@@ -82,7 +82,7 @@ const useIntersectionObserver = ({ chatContainerRef, unreadMessagesAuth, pageInF
 
   const onMouseEnter = () => {
     if (!renderedMessages?.length || !unreadMessagesAuth?.length) return
-    if (contactInfo.status !== true && !contactInfo.isGroupChat) return
+    if (![true, "removed"].includes(contactInfo.status) && !contactInfo.isGroupChat) return
     if (!observerRef || pageInFocus || chatWindowLoading) return
 
     renderedMessages.forEach((message) => {

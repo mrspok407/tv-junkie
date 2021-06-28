@@ -127,17 +127,17 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
             {<span className="user-profile__name">{userName}</span>} rejected you connect request{" "}
           </div>
           <div className="user-profile__actions">
-            <button className="button" onClick={() => sendContactRequest({ resendRequest: true })}>
+            <button className="button" onClick={() => sendContactRequest()}>
               Send again
             </button>
           </div>
         </>
       ) : (
-        contactInfo === null && (
+        (contactInfo === null || contactInfo.status === "removed") && (
           <>
             <div className="user-profile__username">{<span className="user-profile__name">{userName}</span>}</div>
             <div className="user-profile__actions">
-              <button className="button" onClick={() => sendContactRequest({ resendRequest: false })}>
+              <button className="button" onClick={() => sendContactRequest()}>
                 Add to contacts
               </button>
             </div>

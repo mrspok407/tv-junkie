@@ -56,15 +56,15 @@ const useLoadTopMessages = () => {
 
     let newTopMessages: MessageInterface[] = []
     topMessagesSnapshot.forEach((message: any) => {
-      if (
-        isUnexpectedObject({ exampleObject: MESSAGE_INITIAL_DATA, targetObject: message.val() }) &&
-        !contactInfo.isGroupChat
-      ) {
-        errors.handleError({
-          message: "Some of the messages were hidden, because of the unexpected error."
-        })
-        return
-      }
+      // if (
+      //   isUnexpectedObject({ exampleObject: MESSAGE_INITIAL_DATA, targetObject: message.val() }) &&
+      //   !contactInfo.isGroupChat
+      // ) {
+      //   errors.handleError({
+      //     message: "Some of the messages were hidden, because of the unexpected error."
+      //   })
+      //   return
+      // }
       newTopMessages.push({ ...message.val(), key: message.key })
     })
     contactsContext?.dispatch({ type: "loadTopMessages", payload: { newTopMessages } })
@@ -74,15 +74,15 @@ const useLoadTopMessages = () => {
       .endBefore(messagesData[0].timeStamp)
       .limitToLast(MESSAGES_TO_LOAD)
       .on("child_changed", (snapshot: { val: () => MessageInterface; key: string }) => {
-        if (
-          isUnexpectedObject({ exampleObject: MESSAGE_INITIAL_DATA, targetObject: snapshot.val() }) &&
-          !contactInfo.isGroupChat
-        ) {
-          errors.handleError({
-            message: "Message hasn't been changed, because of the unexpected error. Please reload the page."
-          })
-          return
-        }
+        // if (
+        //   isUnexpectedObject({ exampleObject: MESSAGE_INITIAL_DATA, targetObject: snapshot.val() }) &&
+        //   !contactInfo.isGroupChat
+        // ) {
+        //   errors.handleError({
+        //     message: "Message hasn't been changed, because of the unexpected error. Please reload the page."
+        //   })
+        //   return
+        // }
 
         const changedMessage = { ...snapshot.val(), key: snapshot.key }
         contactsContext?.dispatch({ type: "changeMessage", payload: { changedMessage, chatKey: activeChat.chatKey } })
@@ -94,15 +94,15 @@ const useLoadTopMessages = () => {
       .endBefore(messagesData[0].timeStamp)
       .limitToLast(MESSAGES_TO_LOAD)
       .on("child_removed", (snapshot: { val: () => MessageInterface; key: string }) => {
-        if (
-          isUnexpectedObject({ exampleObject: MESSAGE_INITIAL_DATA, targetObject: snapshot.val() }) &&
-          !contactInfo.isGroupChat
-        ) {
-          errors.handleError({
-            message: "Message hasn't been deleted, because of the unexpected error. Please reload the page."
-          })
-          return
-        }
+        // if (
+        //   isUnexpectedObject({ exampleObject: MESSAGE_INITIAL_DATA, targetObject: snapshot.val() }) &&
+        //   !contactInfo.isGroupChat
+        // ) {
+        //   errors.handleError({
+        //     message: "Message hasn't been deleted, because of the unexpected error. Please reload the page."
+        //   })
+        //   return
+        // }
         const removedMessage = { ...snapshot.val(), key: snapshot.key }
         console.log({ removedMessage })
         messagesToDelete.current.push(removedMessage)

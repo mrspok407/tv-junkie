@@ -8,7 +8,7 @@ import { MessageInterface } from "./@Types"
 import { LoremIpsum } from "lorem-ipsum"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import ConfirmModal from "./Components/ChatWindow/Components/ConfirmModal/ConfirmModal"
-import useContactOptions from "./Components/ContactList/Hooks/UseContactOptions"
+import useContactOptions from "./Components/ContactOptionsPopup/Hooks/UseContactOptions"
 import useSelectOptions from "./Components/ChatWindow/Components/SelectOptions/Hooks/UseSelectOptions"
 import HandleNewMembers from "./Components/GroupChat/HandleNewMembers/HandleNewMembers"
 import GroupCreation from "./Components/GroupChat/GroupCreation/GroupCreation"
@@ -69,7 +69,7 @@ const ContactsContent: React.FC = () => {
           <ContactList contactListWrapperRef={contactListWrapperRef.current} />
           {groupCreation.isActive && <GroupCreation contactListWrapperRef={contactListWrapperRef.current} />}
         </div>
-        {!groupCreation.isActive ? (
+        {!groupCreation.isActive && Object.values(contacts).filter((contact) => contact.status === true).length ? (
           <HandleNewMembers />
         ) : groupCreation.members.length && !groupCreation.error ? (
           <HandleNewMembers />

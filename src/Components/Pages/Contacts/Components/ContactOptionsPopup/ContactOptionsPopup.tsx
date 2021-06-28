@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useRef, useLayoutEffect, useCallback, useContext } from "react"
 import { ContactInfoInterface } from "../../@Types"
 import { ContactsContext } from "../@Context/ContactsContext"
-import useContactOptions from "../ContactList/Hooks/UseContactOptions"
-import "./OptionsPopup.scss"
+import useContactOptions from "./Hooks/UseContactOptions"
+import "./ContactOptionsPopup.scss"
 
 type Props = {
   contactOptionsRef: HTMLDivElement
   contactInfo: ContactInfoInterface
 }
 
-const ContactPopup: React.FC<Props> = ({ contactOptionsRef, contactInfo }) => {
+const ContactOptionsPopup: React.FC<Props> = ({ contactOptionsRef, contactInfo }) => {
   const context = useContext(ContactsContext)
   const optionsHandler = useContactOptions({ contactInfo })
 
@@ -132,4 +132,4 @@ const ContactPopup: React.FC<Props> = ({ contactOptionsRef, contactInfo }) => {
   )
 }
 
-export default ContactPopup
+export default ContactOptionsPopup

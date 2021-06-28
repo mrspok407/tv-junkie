@@ -221,45 +221,44 @@ export const _newContactRequest = async ({
   database: any
 }) => {
   const authUid = context?.authUser?.uid
-  const { contactUid, contactName, timeStamp, resendRequest = false } = data
+  const { contactUid, contactName, timeStamp } = data
 
   if (!authUid) {
     throw new Error("The function must be called while authenticated.")
   }
 
-  const contactInfoData: any = !resendRequest
-    ? {
-        [`${contactsDatabaseRef(authUid)}/contactsList/${contactUid}`]: {
-          status: false,
-          receiver: true,
-          userName: contactName,
-          userNameLowerCase: contactName?.toLowerCase(),
-          pinned_lastActivityTS: "false"
-        },
-        [`${contactsDatabaseRef(authUid)}/contactsLastActivity/${contactUid}`]: timeStamp
-      }
-    : {
-        [`${contactsDatabaseRef(authUid)}/contactsList/${contactUid}/status`]: false,
-        [`${contactsDatabaseRef(authUid)}/contactsLastActivity/${contactUid}`]: timeStamp
-      }
+  const chatKey = contactUid < authUid ? `${contactUid}_${authUid}` : `${authUid}_${contactUid}`
+  const newMessageRef = database.ref(`privateChats/${chatKey}/messages`).push()
+
+  console.log(chatKey)
+  console.log(newMessageRef.key)
 
   try {
-    const authUserName = await database.ref(`users/${authUid}/username`).once("value")
-
-    const updateData: ContactRequestDataInterface = {
-      ...contactInfoData,
-      [`${contactsDatabaseRef(contactUid)}/newContactsRequests/${authUid}`]: true,
-      [`${contactsDatabaseRef(contactUid)}/contactsLastActivity/${authUid}`]: timeStamp,
-      [`${contactsDatabaseRef(contactUid)}/contactsList/${authUid}`]: {
+    const updateData: any = {
+      [`users/${contactsDatabaseRef(authUid)}/contactsList/${contactUid}`]: {
+        status: false,
+        receiver: true,
+        userName: contactName,
+        userNameLowerCase: contactName?.toLowerCase(),
+        pinned_lastActivityTS: "false"
+      },
+      [`users/${contactsDatabaseRef(authUid)}/contactsLastActivity/${contactUid}`]: timeStamp,
+      [`users/${contactsDatabaseRef(contactUid)}/newContactsRequests/${authUid}`]: true,
+      [`users/${contactsDatabaseRef(contactUid)}/contactsLastActivity/${authUid}`]: timeStamp,
+      [`users/${contactsDatabaseRef(contactUid)}/contactsList/${authUid}`]: {
         status: false,
         receiver: false,
-        userName: authUserName.val(),
-        userNameLoserCase: authUserName.val().toLowerCase(),
+        userName: context?.authUser?.username,
+        userNameLowerCase: context?.authUser?.username?.toLowerCase(),
         pinned_lastActivityTS: "false"
+      },
+      [`privateChats/${chatKey}/messages/${newMessageRef.key}`]: {
+        isNowContacts: true,
+        timeStamp
       }
     }
 
-    return database.ref("users").update(updateData)
+    return database.ref().update(updateData)
   } catch (error) {
     throw new Error(`There has been some error updating database: ${error}`)
   }
@@ -289,7 +288,7 @@ export const _handleContactRequest = async ({
     const updateData = {
       [`${contactsDatabaseRef(authUid)}/contactsList/${authPathToUpdate}`]: status === "accept" ? true : null,
       [`${contactsDatabaseRef(authUid)}/newContactsRequests/${contactUid}`]: null,
-      [`${contactsDatabaseRef(authUid)}/contactsLastActivity/${contactUid}`]: timeStamp,
+      [`${contactsDatabaseRef(authUid)}/contactsLastActivity/${contactUid}`]: status === "accept" ? timeStamp : null,
       [`${contactsDatabaseRef(contactUid)}/contactsList/${authUid}/status`]: status === "accept" ? true : "rejected",
       [`${contactsDatabaseRef(contactUid)}/newContactsActivity/${authUid}`]: true,
       [`${contactsDatabaseRef(contactUid)}/contactsLastActivity/${authUid}`]: timeStamp

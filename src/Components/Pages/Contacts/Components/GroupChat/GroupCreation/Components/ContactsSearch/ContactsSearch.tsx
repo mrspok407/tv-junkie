@@ -89,6 +89,7 @@ const ContactsSearch: React.FC<Props> = ({ wrapperRef }) => {
           .startAt(query.toLowerCase())
           .endAt(query.toLowerCase() + "\uf8ff")
           .once("value")
+        console.log(contactsData.val())
         if (
           !Object.values(contactsData.val() || {}).filter((item: any) => item.status === true && !item.isGroupChat)
             .length

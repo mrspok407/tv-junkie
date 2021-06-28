@@ -5,7 +5,7 @@ import React, { useContext, useEffect, useRef, useState } from "react"
 import useTimestampFormater from "../../../Hooks/UseTimestampFormater"
 import { ContactInfoInterface, MessageInterface } from "../../../@Types"
 import { ContactsContext } from "../../@Context/ContactsContext"
-import ContactPopup from "../../OptionsPopup/OptionsPopup"
+import ContactOptionsPopup from "../../ContactOptionsPopup/ContactOptionsPopup"
 import useGetInitialMessages from "../../ChatWindow/FirebaseHelpers/UseGetInitialMessages"
 import useHandleContactsStatus from "../../ChatWindow/Hooks/UseHandleContactsStatus"
 import Loader from "Components/UI/Placeholders/Loader"
@@ -162,13 +162,18 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
           </div>
         ) : (
           <div className="contact-item__last-message-text">
-            {newContactsRequest ? (
-              "Wants to connect"
-            ) : (
-              <>
-                {lastMessage?.sender === authUser?.uid && <span>You: </span>} {lastMessageText}
-              </>
-            )}
+            {newContactsRequest
+              ? "Wants to connect"
+              : contactInfo.receiver === true &&
+                ([true, "removed"].includes(contactInfo.status) ? (
+                  <>
+                    {lastMessage?.sender === authUser?.uid && <span>You: </span>} {lastMessageText}
+                  </>
+                ) : contactInfo.status === "rejected" ? (
+                  `${contactInfo.userName} rejected you connect request`
+                ) : (
+                  "The invitation to connect has been sent"
+                ))}
           </div>
         )}
 
@@ -189,12 +194,10 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
           </button>
 
           {optionsPopupContactList === contactInfo.key && (
-            <ContactPopup contactOptionsRef={contactOptionsRef.current} contactInfo={contactInfo} />
+            <ContactOptionsPopup contactOptionsRef={contactOptionsRef.current} contactInfo={contactInfo} />
           )}
         </div>
-        {contactInfo.isGroupChat && (
-          <div className="contact-item__group-chat-icon"></div>
-        )}
+        {contactInfo.isGroupChat && <div className="contact-item__group-chat-icon"></div>}
         {newActivity || newContactsRequest || unreadMessagesAmount ? (
           <div
             className={classNames("contact-item__unread-messages", {
@@ -204,7 +207,9 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
             {contactInfo.isGroupChat ? (
               <span>{unreadMessagesAmount}</span>
             ) : (
-              <span>{unreadMessagesAmount && contactInfo.status === true ? unreadMessagesAmount : null}</span>
+              <span>
+                {unreadMessagesAmount && [true, "removed"].includes(contactInfo.status) ? unreadMessagesAmount : null}
+              </span>
             )}
           </div>
         ) : (

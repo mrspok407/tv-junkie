@@ -12,15 +12,15 @@ const useSendContactRequest = ({ userName, userUid }: Props) => {
   const { authUser, errors } = useContext(AppContext)
   const firebase = useContext(FirebaseContext)
 
-  const sendContactRequest = async ({ resendRequest = false }) => {
+  const sendContactRequest = async () => {
     const timeStampData = firebase.timeStamp()
 
     // const newContactRequestCloud = firebase.httpsCallable("newContactRequest")
-    // newContactRequestCloud({ contactUid: userUid, contactName: userName, resendRequest })
+    // newContactRequestCloud({ contactUid: userUid, contactName: userName, authUser })
 
     try {
       await _newContactRequest({
-        data: { contactUid: userUid, contactName: userName, timeStamp: timeStampData, resendRequest },
+        data: { contactUid: userUid, contactName: userName, timeStamp: timeStampData },
         context: { authUser: authUser! },
         database: firebase.database()
       })

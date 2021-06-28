@@ -7,7 +7,7 @@ import "./HandleNewMembers.scss"
 
 const HandleNewMembers: React.FC = () => {
   const { contactsContext, contactsState } = useFrequentVariables()
-  const { groupCreation } = contactsState
+  const { groupCreation, contacts } = contactsState
 
   const { createNewGroup } = useCreateNewGroup()
 

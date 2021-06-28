@@ -31,20 +31,3 @@
     display: none;
   }
 }
-
-.new-request {
-  display: grid;
-  row-gap: 5px;
-  width: 100%;
-  max-width: 400px;
-
-  &__name {
-    color: #66b4e6;
-  }
-
-  &__actions--receiver {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    column-gap: 5px;
-  }
-}
