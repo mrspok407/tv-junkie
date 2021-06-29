@@ -145,6 +145,13 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
           chatKey: action.payload.newGroupChatKey,
           contactKey: action.payload.newGroupChatKey
         },
+        contacts: {
+          ...contacts,
+          [action.payload.newGroupChatKey]: {
+            key: action.payload.newGroupChatKey,
+            isGroupChat: true
+          } as ContactInfoInterface
+        },
         groupInfoSettingsActive: false
       }
     }
@@ -351,8 +358,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
           }
         } else {
           const endIndexRender =
-            [...messagesData, action.payload.newMessage].length -
-            (authUserUnreadMessages[action.payload.chatKey].length! - UNREAD_MESSAGES_TO_RENDER)
+            [...messagesData, action.payload.newMessage].length - (unreadMessages.length - UNREAD_MESSAGES_TO_RENDER)
           const startIndexRender = Math.max(endIndexRender - MESSAGES_TO_RENDER, 0)
           return {
             ...state,
@@ -409,7 +415,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
           }
         } else {
           console.log({ authUserUnreadMessages })
-          if (authUserUnreadMessages[action.payload.chatKey].length <= UNREAD_MESSAGES_TO_RENDER) {
+          if (unreadMessages.length <= UNREAD_MESSAGES_TO_RENDER) {
             return {
               ...state,
               messages: {
@@ -427,8 +433,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
             }
           } else {
             const endIndexRender =
-              [...messagesData, action.payload.newMessage].length -
-              (authUserUnreadMessages[action.payload.chatKey].length! - UNREAD_MESSAGES_TO_RENDER)
+              [...messagesData, action.payload.newMessage].length - (unreadMessages.length! - UNREAD_MESSAGES_TO_RENDER)
             const startIndexRender = Math.max(endIndexRender - MESSAGES_TO_RENDER, 0)
             return {
               ...state,

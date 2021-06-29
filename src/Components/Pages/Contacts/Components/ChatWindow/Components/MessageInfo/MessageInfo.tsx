@@ -12,38 +12,66 @@ type Props = { messageData: MessageInterface }
 const MessageInfo: React.FC<Props> = ({ messageData }) => {
   const { authUser, contactsContext, contactsState } = useFrequentVariables()
   const { activeChat, messagePopup, contactsUnreadMessages, contacts } = contactsState
-  const contactInfo = contacts[activeChat.chatKey] || {}
+  const contactInfo = contacts[activeChat.contactKey] || {}
   const contactsUnreadMessagesData = contactsUnreadMessages[activeChat.chatKey]
 
   const messageOptionsRef = useRef<HTMLDivElement>(null!)
 
   return (
     <div className="chat-window__message-info">
-      <div
-        ref={messageOptionsRef}
-        className={classNames("chat-window__message-options", {
-          "chat-window__message-options--hide": contactInfo.isGroupChat && messageData.sender !== authUser?.uid
-        })}
-      >
-        <button
-          type="button"
-          className={classNames("chat-window__open-popup-btn", {
-            "chat-window__open-popup-btn--open": messagePopup === messageData.key
+      {contactInfo.isGroupChat ? (
+        <div
+          ref={messageOptionsRef}
+          className={classNames("chat-window__message-options", {
+            "chat-window__message-options--hide": messageData.sender !== authUser?.uid || contactInfo.removedFromGroup
           })}
-          onClick={(e) => {
-            e.stopPropagation()
-            contactsContext?.dispatch({ type: "updateMessagePopup", payload: messageData.key })
-          }}
         >
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
+          <button
+            type="button"
+            className={classNames("chat-window__open-popup-btn", {
+              "chat-window__open-popup-btn--open": messagePopup === messageData.key
+            })}
+            onClick={(e) => {
+              e.stopPropagation()
+              contactsContext?.dispatch({ type: "updateMessagePopup", payload: messageData.key })
+            }}
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
 
-        {messagePopup === messageData.key && (
-          <MessagePopup messageOptionsRef={messageOptionsRef.current} messageData={messageData} />
-        )}
-      </div>
+          {messagePopup === messageData.key && (
+            <MessagePopup messageOptionsRef={messageOptionsRef.current} messageData={messageData} />
+          )}
+        </div>
+      ) : (
+        <div
+          ref={messageOptionsRef}
+          className={classNames("chat-window__message-options", {
+            "chat-window__message-options--hide": contactInfo.status !== true
+          })}
+        >
+          <button
+            type="button"
+            className={classNames("chat-window__open-popup-btn", {
+              "chat-window__open-popup-btn--open": messagePopup === messageData.key
+            })}
+            onClick={(e) => {
+              e.stopPropagation()
+              contactsContext?.dispatch({ type: "updateMessagePopup", payload: messageData.key })
+            }}
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+
+          {messagePopup === messageData.key && (
+            <MessagePopup messageOptionsRef={messageOptionsRef.current} messageData={messageData} />
+          )}
+        </div>
+      )}
 
       {messageData.sender === authUser?.uid && !contactInfo.isGroupChat && (
         <div

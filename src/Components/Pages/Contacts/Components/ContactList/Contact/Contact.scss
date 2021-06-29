@@ -14,7 +14,7 @@
   &--popup-open-top {
     &:nth-last-child(-n + 3) {
       .contact-item__options .popup-container {
-        top: -182px;
+        transform: translateY(-100%);
         border-radius: 5px 5px 0px 5px;
 
         .popup__option-btn:after {

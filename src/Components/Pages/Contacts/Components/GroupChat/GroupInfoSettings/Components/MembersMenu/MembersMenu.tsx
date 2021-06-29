@@ -1,18 +1,8 @@
-import classNames from "classnames"
-import { AppContext } from "Components/AppContext/AppContextHOC"
-import { FirebaseContext } from "Components/Firebase"
-import {
-  ContactInfoInterface,
-  CONTACT_INFO_INITIAL_DATA,
-  MembersStatusGroupChatInterface
-} from "Components/Pages/Contacts/@Types"
+import { ContactInfoInterface, MembersStatusGroupChatInterface } from "Components/Pages/Contacts/@Types"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
 import useElementScrolledDown from "Components/Pages/Movies/useElementScrolledDown"
 import React, { useState, useEffect, useContext, useRef, useLayoutEffect, useCallback } from "react"
-import { isUnexpectedObject } from "Utils"
-import Contact from "../../../GroupCreation/Components/Contact/Contact"
 import SearchInput from "./SearchInput/SearchInput"
-import SelectName from "../../../GroupCreation/Components/SelectName/SelectName"
 import Member from "./Member"
 import "./MembersMenu.scss"
 
@@ -36,6 +26,15 @@ const GroupCreation: React.FC = () => {
   const membersListWrapperRef = useRef<HTMLDivElement>(null!)
   const membersListFireRef = firebase.groupChatMembersStatus({ chatKey: activeChat.chatKey })
   const isScrolledDown = useElementScrolledDown({ element: membersListWrapperRef.current, threshold: 650 })
+
+  useEffect(() => {
+    if (!searchedMembers?.length) return
+    setSearchedMembers((prevState) => {
+      const newState =
+        prevState?.filter((member) => chatMembersStatusData.map((item) => item.key).includes(member.key)) || []
+      return newState.length ? newState : null
+    })
+  }, [chatMembersStatusData])
 
   const getContactsData = async ({ snapshot }: { snapshot: any }) => {
     let members: MembersStatusGroupChatInterface[] = []

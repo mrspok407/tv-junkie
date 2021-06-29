@@ -3,6 +3,7 @@ import { ContactInfoInterface } from "../../@Types"
 import { ContactsContext } from "../@Context/ContactsContext"
 import useContactOptions from "./Hooks/UseContactOptions"
 import "./ContactOptionsPopup.scss"
+import classNames from "classnames"
 
 type Props = {
   contactOptionsRef: HTMLDivElement
@@ -75,22 +76,23 @@ const ContactOptionsPopup: React.FC<Props> = ({ contactOptionsRef, contactInfo }
               View profile
             </a>
           </div>
-
-          <div className="popup__option">
-            <button
-              className="popup__option-btn"
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation()
-                context?.dispatch({
-                  type: "updateConfirmModal",
-                  payload: { isActive: true, function: "handleClearHistory", contactKey: contactInfo.key }
-                })
-              }}
-            >
-              Clear history
-            </button>
-          </div>
+          {contactInfo.status === true && (
+            <div className="popup__option">
+              <button
+                className="popup__option-btn"
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  context?.dispatch({
+                    type: "updateConfirmModal",
+                    payload: { isActive: true, function: "handleClearHistory", contactKey: contactInfo.key }
+                  })
+                }}
+              >
+                Clear history
+              </button>
+            </div>
+          )}
         </>
       )}
 

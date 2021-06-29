@@ -255,34 +255,36 @@ exports.createNewGroup = functions.https.onCall(async (data, context) => {
 exports.newContactRequest = functions.https.onCall(async (data, context) => {
     var _a;
     const authUid = (_a = context === null || context === void 0 ? void 0 : context.auth) === null || _a === void 0 ? void 0 : _a.uid;
-    const { contactUid, contactName, resendRequest = false } = data;
+    const { contactUid, contactName, authUser } = data;
     if (!authUid) {
         throw new functions.https.HttpsError("failed-precondition", "The function must be called while authenticated.");
     }
     const timeStamp = admin.database.ServerValue.TIMESTAMP;
-    const contactInfoData = !resendRequest
-        ? {
+    const chatKey = contactUid < authUid ? `${contactUid}_${authUid}` : `${authUid}_${contactUid}`;
+    const newMessageRef = database.ref(`privateChats/${chatKey}/messages`).push();
+    try {
+        const updateData = {
             [`${contactsDatabaseRef(authUid)}/contactsList/${contactUid}`]: {
                 status: false,
                 receiver: true,
                 userName: contactName,
                 userNameLowerCase: contactName.toLowerCase(),
                 pinned_lastActivityTS: "false"
-            }
-        }
-        : {
-            [`${contactsDatabaseRef(authUid)}/contactsList/${contactUid}/status`]: false,
-            [`${contactsDatabaseRef(authUid)}/contactsLastActivity/${contactUid}`]: timeStamp
-        };
-    try {
-        const authUserName = await database.ref(`users/${authUid}/userName`).once("value");
-        const updateData = Object.assign(Object.assign({}, contactInfoData), { [`${contactsDatabaseRef(contactUid)}/newContactsRequests/${authUid}`]: true, [`${contactsDatabaseRef(contactUid)}/contactsList/${authUid}`]: {
+            },
+            [`${contactsDatabaseRef(authUid)}/contactsLastActivity/${contactUid}`]: timeStamp,
+            [`${contactsDatabaseRef(contactUid)}/newContactsRequests/${authUid}`]: true,
+            [`${contactsDatabaseRef(contactUid)}/contactsList/${authUid}`]: {
                 status: false,
                 receiver: false,
-                userName: authUserName.val(),
-                userNameLowerCase: authUserName.val().toLowerCase(),
+                userName: authUser.username.val(),
+                userNameLowerCase: authUser.username.toLowerCase(),
                 pinned_lastActivityTS: "false"
-            } });
+            },
+            [`privateChats/${chatKey}/messages/${newMessageRef.key}`]: {
+                isNowContacts: true,
+                timeStamp
+            }
+        };
         return database.ref("users").update(updateData);
     }
     catch (error) {
@@ -302,7 +304,7 @@ exports.handleContactRequest = functions.https.onCall(async (data, context) => {
         const updateData = {
             [`${contactsDatabaseRef(authUid)}/contactsList/${authPathToUpdate}`]: status === "accept" ? true : null,
             [`${contactsDatabaseRef(authUid)}/newContactsRequests/${contactUid}`]: null,
-            [`${contactsDatabaseRef(authUid)}/contactsLastActivity/${contactUid}`]: timeStamp,
+            [`${contactsDatabaseRef(authUid)}/contactsLastActivity/${contactUid}`]: status === "accept" ? timeStamp : null,
             [`${contactsDatabaseRef(contactUid)}/contactsList/${authUid}/status`]: status === "accept" ? true : "rejected",
             [`${contactsDatabaseRef(contactUid)}/newContactsActivity/${authUid}`]: true,
             [`${contactsDatabaseRef(contactUid)}/contactsLastActivity/${authUid}`]: timeStamp

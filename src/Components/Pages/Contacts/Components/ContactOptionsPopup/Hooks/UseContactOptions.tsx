@@ -152,6 +152,7 @@ const useContactOptions = ({ contactInfo }: Props) => {
   }
 
   const handleClearHistory = async ({ contactInfo }: { contactInfo: ContactInfoInterface }) => {
+    if (contactInfo.status !== true) return
     try {
       const updateData = {
         [`privateChats/${contactInfo.chatKey}/messages`]: null,

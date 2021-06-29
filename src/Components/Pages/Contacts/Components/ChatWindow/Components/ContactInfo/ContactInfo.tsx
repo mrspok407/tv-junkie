@@ -18,6 +18,8 @@ const ContactInfo: React.FC<Props> = ({}) => {
   const formatedLastSeen = useTimestampFormater({ timeStamp: contactsStatus[activeChat.chatKey]?.lastSeen! })
   const chatMembersTyping = chatMembersStatusData?.filter((member) => member.isTyping && member.key !== authUser?.uid)
 
+  const chatMembersOnline = chatMembersStatusData.filter((member) => member.isOnline).length
+
   return (
     <div
       className={classNames("chat-window__contact-info", {
@@ -75,8 +77,12 @@ const ContactInfo: React.FC<Props> = ({}) => {
                 <div>{chatMembersTyping.length} people typing</div> <Loader className="loader--typing" />
               </>
             )
+          ) : !chatMembersStatusData.length ? (
+            ""
+          ) : chatMembersStatusData.length === 1 ? (
+            "1 member"
           ) : (
-            `${chatMembersStatusData.length} members`
+            `${chatMembersStatusData.length} members${chatMembersOnline ? `, ${chatMembersOnline} online` : ""}`
           )
         ) : contactsStatus[activeChat.chatKey]?.isTyping ? (
           <>

@@ -25,18 +25,18 @@ admin.initializeApp();
 
 const database = admin.database();
 
-interface ContactInfoInterface {
-  [key: string]: string | boolean | number | unknown;
-  status: boolean;
-  receiver?: boolean;
-  userName?: string;
-  userNameLowerCase?: string;
-  timeStamp: unknown;
-}
+// interface ContactInfoInterface {
+//   [key: string]: string | boolean | number | unknown;
+//   status: boolean;
+//   receiver?: boolean;
+//   userName?: string;
+//   userNameLowerCase?: string;
+//   timeStamp: unknown;
+// }
 
-interface ContactRequestDataInterface {
-  [key: string]: ContactInfoInterface | boolean;
-}
+// interface ContactRequestDataInterface {
+//   [key: string]: ContactInfoInterface | boolean;
+// }
 
 interface GroupChatInfoInterface {
   [key: string]: string | boolean;
@@ -323,8 +323,6 @@ export const newContactRequest = functions.https.onCall(async (data, context) =>
   }
 
   const timeStamp = admin.database.ServerValue.TIMESTAMP;
-  const chatKey = contactUid < authUid ? `${contactUid}_${authUid}` : `${authUid}_${contactUid}`;
-  const newMessageRef = database.ref(`privateChats/${chatKey}/messages`).push();
 
   try {
     const updateData: any = {
@@ -343,10 +341,6 @@ export const newContactRequest = functions.https.onCall(async (data, context) =>
         userName: authUser.username.val(),
         userNameLowerCase: authUser.username.toLowerCase(),
         pinned_lastActivityTS: "false"
-      },
-      [`privateChats/${chatKey}/messages/${newMessageRef.key}`]: {
-        isNowContacts: true,
-        timeStamp
       }
     };
 
@@ -367,17 +361,29 @@ export const handleContactRequest = functions.https.onCall(async (data, context)
   const timeStamp = admin.database.ServerValue.TIMESTAMP;
   const authPathToUpdate = status === "accept" ? `${contactUid}/status` : contactUid;
 
+  const chatKey = contactUid < authUid ? `${contactUid}_${authUid}` : `${authUid}_${contactUid}`;
+  const newMessageRef = database.ref(`privateChats/${chatKey}/messages`).push();
+
   try {
     const updateData = {
-      [`${contactsDatabaseRef(authUid)}/contactsList/${authPathToUpdate}`]: status === "accept" ? true : null,
-      [`${contactsDatabaseRef(authUid)}/newContactsRequests/${contactUid}`]: null,
-      [`${contactsDatabaseRef(authUid)}/contactsLastActivity/${contactUid}`]: status === "accept" ? timeStamp : null,
-      [`${contactsDatabaseRef(contactUid)}/contactsList/${authUid}/status`]: status === "accept" ? true : "rejected",
-      [`${contactsDatabaseRef(contactUid)}/newContactsActivity/${authUid}`]: true,
-      [`${contactsDatabaseRef(contactUid)}/contactsLastActivity/${authUid}`]: timeStamp
+      [`users/${contactsDatabaseRef(authUid)}/contactsList/${authPathToUpdate}`]: status === "accept" ? true : null,
+      [`users/${contactsDatabaseRef(authUid)}/newContactsRequests/${contactUid}`]: null,
+      [`users/${contactsDatabaseRef(authUid)}/contactsLastActivity/${contactUid}`]:
+        status === "accept" ? timeStamp : null,
+      [`users/${contactsDatabaseRef(contactUid)}/contactsList/${authUid}/status`]:
+        status === "accept" ? true : "rejected",
+      [`users/${contactsDatabaseRef(contactUid)}/newContactsActivity/${authUid}`]: true,
+      [`users/${contactsDatabaseRef(contactUid)}/contactsLastActivity/${authUid}`]: timeStamp,
+      [`privateChats/${chatKey}/messages/${newMessageRef.key}`]:
+        status === "accept"
+          ? {
+              isNowContacts: true,
+              timeStamp
+            }
+          : null
     };
 
-    return database.ref("users").update(updateData);
+    return database.ref().update(updateData);
   } catch (error) {
     throw new functions.https.HttpsError("unknown", error.message, error);
   }

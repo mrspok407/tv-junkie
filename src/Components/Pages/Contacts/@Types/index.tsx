@@ -41,6 +41,7 @@ export interface MessageInterface {
   isEdited?: boolean
   isNewMembers?: boolean
   isRemovedMember?: boolean
+  isMemberLeft?: boolean
   isRemovedFromContacts?: boolean
   isNowContacts?: boolean
   removedMember?: {

@@ -1,11 +1,7 @@
-import { AppContext } from "Components/AppContext/AppContextHOC"
-import { FirebaseContext } from "Components/Firebase"
 import { MessageInterface } from "Components/Pages/Contacts/@Types"
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
-import React, { useState, useEffect, useContext } from "react"
-import striptags from "striptags"
 import { MESSAGE_LINE_HEIGHT } from "../../../../@Context/Constants"
-import { ContactsContext } from "../../../../@Context/ContactsContext"
+import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
+import striptags from "striptags"
 
 type Props = {
   messageData?: MessageInterface
@@ -13,15 +9,15 @@ type Props = {
 
 const useHandleMessageOptions = ({ messageData }: Props) => {
   const { firebase, authUser, errors, contactsContext, contactsState } = useFrequentVariables()
-  const { activeChat, messages, contactsStatus, chatMembersStatus, contactsUnreadMessages, messagesInput } =
+  const { activeChat, messages, contacts, contactsStatus, chatMembersStatus, contactsUnreadMessages, messagesInput } =
     contactsState
-  const messagesInputData = messagesInput[activeChat.chatKey]
+  const contactInfo = contacts[activeChat.contactKey]
   const contactsUnreadMessagesData = contactsUnreadMessages[activeChat.chatKey]
   const chatMembersStatusData = chatMembersStatus[activeChat.chatKey]
-  const contactsStatusData = contactsStatus[activeChat.chatKey]
   const messagesData = messages[activeChat.chatKey]
 
   const selectMessage = async () => {
+    if ((contactInfo.status !== undefined && contactInfo.status !== true) || contactInfo.removedFromGroup) return
     contactsContext?.dispatch({
       type: "updateSelectedMessages",
       payload: { messageKey: messageData?.key!, chatKey: activeChat.chatKey }
@@ -29,8 +25,9 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
   }
 
   const deleteMessageGroupChat = async ({ deleteMessagesKeys }: { deleteMessagesKeys: string[] }) => {
-    contactsContext?.dispatch({ type: "updateMsgDeletionProcessLoading", payload: { messageDeletionProcess: true } })
+    if (contactInfo.removedFromGroup) return
 
+    contactsContext?.dispatch({ type: "updateMsgDeletionProcessLoading", payload: { messageDeletionProcess: true } })
     const deletedMessagesData = messagesData.reduce((deletedMessagesData: MessageInterface[], message) => {
       if (deleteMessagesKeys.includes(message.key)) {
         deletedMessagesData.push(message)
@@ -74,6 +71,7 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
   }
 
   const deleteMessagePrivateChat = async ({ deleteMessagesKeys }: { deleteMessagesKeys: string[] }) => {
+    if (contactInfo.status !== true) return
     contactsContext?.dispatch({ type: "updateMsgDeletionProcessLoading", payload: { messageDeletionProcess: true } })
 
     const deletedMessagesData = messagesData.reduce((deletedMessagesData: MessageInterface[], message) => {
@@ -138,6 +136,7 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
   }
 
   const editMessage = async () => {
+    if (contactInfo.status !== true || contactInfo.removedFromGroup) return
     const inputRef = document.querySelector(".chat-window__input-message") as HTMLElement
     const chatContainerRef = document.querySelector(".chat-window__messages-list-container") as HTMLElement
     const message = messagesData.find((message) => message.key === messageData?.key)

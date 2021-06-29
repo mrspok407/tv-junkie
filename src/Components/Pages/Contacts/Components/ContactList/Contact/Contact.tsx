@@ -162,18 +162,24 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
           </div>
         ) : (
           <div className="contact-item__last-message-text">
-            {newContactsRequest
-              ? "Wants to connect"
-              : contactInfo.receiver === true &&
-                ([true, "removed"].includes(contactInfo.status) ? (
-                  <>
-                    {lastMessage?.sender === authUser?.uid && <span>You: </span>} {lastMessageText}
-                  </>
-                ) : contactInfo.status === "rejected" ? (
-                  `${contactInfo.userName} rejected you connect request`
-                ) : (
-                  "The invitation to connect has been sent"
-                ))}
+            {contactInfo.receiver === true &&
+              ([true, "removed"].includes(contactInfo.status) ? (
+                <>
+                  {lastMessage?.sender === authUser?.uid && <span>You: </span>} {lastMessageText}
+                </>
+              ) : contactInfo.status === "rejected" ? (
+                `${contactInfo.userName} rejected you connect request`
+              ) : (
+                "The invitation to connect has been sent"
+              ))}
+            {contactInfo.receiver === false &&
+              (newContactsRequest
+                ? "Wants to connect"
+                : [true, "removed"].includes(contactInfo.status) && (
+                    <>
+                      {lastMessage?.sender === authUser?.uid && <span>You: </span>} {lastMessageText}
+                    </>
+                  ))}
           </div>
         )}
 

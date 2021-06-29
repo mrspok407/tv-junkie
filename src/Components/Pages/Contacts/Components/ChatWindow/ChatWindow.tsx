@@ -102,6 +102,7 @@ const ChatWindow: React.FC = () => {
 
   const scrollPositionHandler = useCallback(
     debounce(() => {
+      console.log({ activeChat })
       if (!chatContainerRef) return
       const { scrollTop, scrollHeight, height } = getContainerRect()
       if (scrollHeight <= height) return
@@ -139,7 +140,7 @@ const ChatWindow: React.FC = () => {
             memberKey: authUser?.uid!,
             isGroupChat: contactInfo.isGroupChat
           })
-          .update({ chatBottom: true })
+          .update({ chatBottom: true }, () => console.log("chatBottomUpdate"))
       } else {
         console.log("not bottom")
         isScrollBottomRef.current = false
@@ -255,7 +256,7 @@ const ChatWindow: React.FC = () => {
             memberKey: authUser?.uid!,
             isGroupChat: contactInfo.isGroupChat
           })
-          .update({ chatBottom: true })
+          .update({ chatBottom: true }, () => console.log("chatBottomUpdate"))
       } else {
         console.log("scroll previous no unread")
         console.log(lastScrollPosition[activeChat.chatKey])
@@ -276,7 +277,7 @@ const ChatWindow: React.FC = () => {
           memberKey: authUser?.uid!,
           isGroupChat: contactInfo.isGroupChat
         })
-        .update({ chatBottom: true })
+        .update({ chatBottom: true }, () => console.log("chatBottomUpdate"))
     }
     return () => {
       isScrollBottomRef.current = false
@@ -324,8 +325,6 @@ const ChatWindow: React.FC = () => {
     if (!chatContainerRef) return
     firebase.newContactsActivity({ uid: authUser?.uid }).child(`${contactInfo.key}`).set(null)
   }, [activeChat, contactInfo, chatContainerRef])
-
-  console.log({ contactInfo })
 
   return (
     <div className="chat-window-container" onMouseEnter={onMouseEnter}>
