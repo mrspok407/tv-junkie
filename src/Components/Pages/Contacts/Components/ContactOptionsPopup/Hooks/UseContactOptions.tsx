@@ -11,7 +11,7 @@ type Props = {
 
 const useContactOptions = ({ contactInfo }: Props) => {
   const { firebase, authUser, errors, contactsContext, contactsState } = useFrequentVariables()
-  const { activeChat, renderedMessagesList, contacts } = contactsState
+  const { activeChat, renderedMessagesList, contacts, chatParticipants } = contactsState
 
   const updateIsPinned = async () => {
     contactsContext?.dispatch({ type: "closePopups", payload: "" })
@@ -75,7 +75,8 @@ const useContactOptions = ({ contactInfo }: Props) => {
         [`users/${authUser?.uid}/contactsDatabase/newContactsActivity/${contactInfo.key}`]: null,
         [`users/${authUser?.uid}/contactsDatabase/contactsLastActivity/${contactInfo.key}`]: null
       }
-      if (!contactInfo.removedFromGroup) {
+      if (!contactInfo.removedFromGroup && !contactInfo.chatDeleted) {
+        updateData[`groupChats/${contactInfo.chatKey}/members/participants/${authUser?.uid}`] = null
         updateData[`groupChats/${contactInfo.chatKey}/members/status/${authUser?.uid}`] = null
         updateData[`groupChats/${contactInfo.chatKey}/members/unreadMessages/${authUser?.uid}`] = null
         updateData[`groupChats/${contactInfo.chatKey}/messages/${newMessageRef.key}`] = {
@@ -87,6 +88,47 @@ const useContactOptions = ({ contactInfo }: Props) => {
           isMemberLeft: true
         }
       }
+      await firebase
+        .database()
+        .ref()
+        .update(updateData, () =>
+          contactsContext?.dispatch({
+            type: "updateActiveChat",
+            payload: {
+              chatKey: activeChat.chatKey === contactInfo.chatKey ? "" : activeChat.chatKey,
+              contactKey: activeChat.contactKey === contactInfo.key ? "" : activeChat.contactKey
+            }
+          })
+        )
+    } catch (error) {
+      errors.handleError({
+        errorData: error,
+        message: "There has been some error updating database. Please try again."
+      })
+
+      throw new Error(`There has been some error updating database: ${error}`)
+    }
+  }
+
+  const handleDeleteChat = async ({ contactInfo }: { contactInfo: ContactInfoInterface }) => {
+    const timeStamp = firebase.timeStamp()
+    const chatParticipantsData = chatParticipants[contactInfo.chatKey]
+    try {
+      const updateData: any = {
+        [`users/${authUser?.uid}/contactsDatabase/contactsList/${contactInfo.chatKey}`]: null,
+        [`users/${authUser?.uid}/contactsDatabase/newContactsRequests/${contactInfo.chatKey}`]: null,
+        [`users/${authUser?.uid}/contactsDatabase/newContactsActivity/${contactInfo.chatKey}`]: null,
+        [`users/${authUser?.uid}/contactsDatabase/contactsLastActivity/${contactInfo.chatKey}`]: null
+      }
+      chatParticipantsData.forEach((participantKey) => {
+        if (participantKey === authUser?.uid) return
+        updateData[`users/${participantKey}/contactsDatabase/contactsList/${contactInfo.chatKey}/chatDeleted`] = true
+        updateData[`users/${participantKey}/contactsDatabase/newContactsRequests/${contactInfo.chatKey}`] = null
+        updateData[`users/${participantKey}/contactsDatabase/newContactsActivity/${contactInfo.chatKey}`] = true
+        updateData[`users/${participantKey}/contactsDatabase/contactsLastActivity/${contactInfo.chatKey}`] = timeStamp
+      })
+      updateData[`groupChats/${contactInfo.chatKey}`] = null
+
       await firebase
         .database()
         .ref()
@@ -182,7 +224,8 @@ const useContactOptions = ({ contactInfo }: Props) => {
     handleMarkRead,
     handleRemoveContact,
     handleLeaveChat,
-    handleClearHistory
+    handleClearHistory,
+    handleDeleteChat
   }
 }
 

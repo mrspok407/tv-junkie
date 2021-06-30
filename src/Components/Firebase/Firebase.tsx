@@ -188,6 +188,8 @@ class Firebase {
   }
 
   groupChatMembersStatus = ({ chatKey }: { chatKey: string }) => this.db.ref(`groupChats/${chatKey}/members/status`)
+  groupChatParticipants = ({ chatKey }: { chatKey: string }) =>
+    this.db.ref(`groupChats/${chatKey}/members/participants`)
 
   /// User Content API ///
   userAllShows = (uid: string) => this.db.ref(`users/${uid}/content/shows`)

@@ -136,7 +136,7 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
   }
 
   const editMessage = async () => {
-    if (contactInfo.status !== true || contactInfo.removedFromGroup) return
+    if ((!contactInfo.isGroupChat && contactInfo.status !== true) || contactInfo.removedFromGroup) return
     const inputRef = document.querySelector(".chat-window__input-message") as HTMLElement
     const chatContainerRef = document.querySelector(".chat-window__messages-list-container") as HTMLElement
     const message = messagesData.find((message) => message.key === messageData?.key)

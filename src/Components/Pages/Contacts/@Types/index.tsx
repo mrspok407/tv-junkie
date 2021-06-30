@@ -18,6 +18,7 @@ export interface ContactInfoInterface {
   isGroupChat: boolean
   role: string
   removedFromGroup: boolean
+  chatDeleted: boolean | null
   lastAvailableMessageTS: number
 }
 
@@ -141,6 +142,9 @@ export interface ContactsStateInterface {
   }
   chatMembersStatus: {
     [key: string]: MembersStatusGroupChatInterface[]
+  }
+  chatParticipants: {
+    [key: string]: string[]
   }
   messagesListRef: any
   messagePopup: string

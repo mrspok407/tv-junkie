@@ -58,7 +58,8 @@ const ConfirmModal: React.FC<Props> = ({ confirmFunctions }) => {
       contacts[confirmModal.contactKey!]?.userName
     }</span>.`,
     deleteSelectedMessagesGroupChat: `Are you sure you want to delete selected messages? This will also delete them for everyone in the chat.`,
-    handleLeaveChat: "Are you sure you want to leave this chat?"
+    handleLeaveChat: "Are you sure you want to leave this chat?",
+    handleDeleteChat: "Are you sure you want to delete this chat? This can not be undone. Every message will be erased."
   }
 
   return (

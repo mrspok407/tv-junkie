@@ -23,6 +23,14 @@ const useHandleContactsStatus = ({ chatKey, contactKey, isGroupChat }: Props) =>
         })
         contactsContext?.dispatch({ type: "updateGroupChatMembersStatus", payload: { membersStatus, chatKey } })
       })
+
+      firebase.groupChatParticipants({ chatKey }).on("value", (snapshot: any) => {
+        let participants: string[] = []
+        snapshot.forEach((participant: { key: string }) => {
+          participants.push(participant.key)
+        })
+        contactsContext?.dispatch({ type: "updateGroupChatParticipants", payload: { participants, chatKey } })
+      })
     } else {
       firebase.chatMemberStatus({ chatKey, memberKey: contactKey, isGroupChat: false }).on("value", (snapshot: any) => {
         contactsContext?.dispatch({

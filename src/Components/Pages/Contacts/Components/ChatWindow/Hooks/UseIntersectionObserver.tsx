@@ -78,7 +78,7 @@ const useIntersectionObserver = ({ chatContainerRef, unreadMessagesAuth, pageInF
       observedMessages.current = [...observedMessages.current, message.key]
       observerRef?.observe(unreadMessage)
     })
-  }, [activeChat, renderedMessages, contactInfo.status, pageInFocus, chatWindowLoading])
+  }, [activeChat, renderedMessages, contactInfo, pageInFocus, chatWindowLoading])
 
   const onMouseEnter = () => {
     if (!renderedMessages?.length || !unreadMessagesAuth?.length) return

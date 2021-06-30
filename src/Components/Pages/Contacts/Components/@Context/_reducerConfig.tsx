@@ -76,6 +76,10 @@ export type ACTIONTYPES =
       type: "updateGroupChatMembersStatus"
       payload: { membersStatus: MembersStatusGroupChatInterface[]; chatKey: string }
     }
+  | {
+      type: "updateGroupChatParticipants"
+      payload: { participants: string[]; chatKey: string }
+    }
   | { type: "updateContactsPageIsOpen"; payload: { isPageOpen: boolean | null; chatKey: string } }
 
 const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
@@ -94,6 +98,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
     lastScrollPosition,
     contactsStatus,
     chatMembersStatus,
+    chatParticipants,
     contacts,
     messageDeletionProcess,
     initialMsgLoadedFinished,
@@ -652,21 +657,21 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         return acc
       }, {})
 
-      const authUserUnreadMessages: { [key: string]: string[] } = {}
-      const contactsUnreadMessages: { [key: string]: string[] } = {}
+      const authUserUnreadMessagesData: { [key: string]: string[] } = {}
+      const contactsUnreadMessagesData: { [key: string]: string[] } = {}
       Object.values(contactsData || {}).forEach((contact) => {
-        authUserUnreadMessages[contact.chatKey] = authUserUnreadMessages[contact.chatKey] || []
-        contactsUnreadMessages[contact.chatKey] = contactsUnreadMessages[contact.chatKey] || []
+        authUserUnreadMessagesData[contact.chatKey] = authUserUnreadMessages[contact.chatKey] || []
+        contactsUnreadMessagesData[contact.chatKey] = contactsUnreadMessages[contact.chatKey] || []
       })
 
       console.log({ contactsData })
-      console.log({ authUserUnreadMessages })
-      console.log({ contactsUnreadMessages })
+      console.log({ authUserUnreadMessagesData })
+      console.log({ contactsUnreadMessagesData })
       return {
         ...state,
         contacts: contactsData,
-        authUserUnreadMessages,
-        contactsUnreadMessages
+        authUserUnreadMessages: authUserUnreadMessagesData,
+        contactsUnreadMessages: contactsUnreadMessagesData
       }
     }
 
@@ -781,6 +786,15 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         }
       }
 
+    case "updateGroupChatParticipants":
+      return {
+        ...state,
+        chatParticipants: {
+          ...chatParticipants,
+          [action.payload.chatKey]: action.payload.participants
+        }
+      }
+
     case "updateContactsPageIsOpen":
       return {
         ...state,
@@ -836,6 +850,7 @@ export const INITIAL_STATE = {
   messagesListRef: "",
   contactsStatus: {},
   chatMembersStatus: {},
+  chatParticipants: {},
   confirmModal: {
     isActive: false,
     function: "",

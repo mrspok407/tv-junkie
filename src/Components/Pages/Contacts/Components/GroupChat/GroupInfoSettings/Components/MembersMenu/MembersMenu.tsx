@@ -10,18 +10,16 @@ const MEMBERS_TO_RENDER = 20
 
 const GroupCreation: React.FC = () => {
   const { firebase, authUser, errors, contactsContext, contactsState } = useFrequentVariables()
-  const { activeChat, groupCreation, chatMembersStatus, contacts } = contactsState
+  const { activeChat, groupCreation, chatMembersStatus, chatParticipants, contacts } = contactsState
   const contactInfo = contacts[activeChat.contactKey] || {}
   const chatMembersStatusData = chatMembersStatus[contactInfo.chatKey] || []
+  const chatParticipantsData = chatParticipants[contactInfo.chatKey] || []
 
   const [renderedMembers, setRenderedMembers] = useState(MEMBERS_TO_RENDER)
 
   const [contactsList, setContactsList] = useState<ContactInfoInterface[]>([])
   const [searchedMembers, setSearchedMembers] = useState<MembersStatusGroupChatInterface[] | null>([])
   const [isSearching, setIsSearching] = useState(false)
-  const [allContactsAmount, setAllContactsAmount] = useState<number | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [initialLoading, setInitialLoading] = useState(true)
 
   const membersListWrapperRef = useRef<HTMLDivElement>(null!)
   const membersListFireRef = firebase.groupChatMembersStatus({ chatKey: activeChat.chatKey })
@@ -30,15 +28,15 @@ const GroupCreation: React.FC = () => {
   useEffect(() => {
     if (!searchedMembers?.length) return
     setSearchedMembers((prevState) => {
-      const newState =
-        prevState?.filter((member) => chatMembersStatusData.map((item) => item.key).includes(member.key)) || []
+      const newState = prevState?.filter((member) => chatParticipantsData.includes(member.key)) || []
       return newState.length ? newState : null
     })
-  }, [chatMembersStatusData])
+  }, [chatParticipantsData])
 
   const getContactsData = async ({ snapshot }: { snapshot: any }) => {
     let members: MembersStatusGroupChatInterface[] = []
     snapshot.forEach((member: { val: () => MembersStatusGroupChatInterface; key: string }) => {
+      if (!chatParticipantsData.includes(member.key)) return
       members.push({ ...member.val(), key: member.key })
     })
     setSearchedMembers(members)
@@ -47,7 +45,7 @@ const GroupCreation: React.FC = () => {
 
   const handleSearch = useCallback(
     async (query: string) => {
-      if (!chatMembersStatusData.length) return
+      if (!chatParticipantsData.length) return
       if (!query || !query.trim()) {
         setSearchedMembers([])
         setIsSearching(false)
@@ -86,6 +84,7 @@ const GroupCreation: React.FC = () => {
 
   const contactsToRender = !searchedMembers?.length
     ? chatMembersStatusData
+        .filter((member) => chatParticipantsData.includes(member.key))
         .sort((a, b) => (a.usernameLowerCase < b.usernameLowerCase ? -1 : 1))
         .slice(0, renderedMembers)
     : searchedMembers

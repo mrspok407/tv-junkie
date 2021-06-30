@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef, useCallback, useLayoutEffect } from "react"
-import useResponseContactRequest from "Components/Pages/UserProfile/Hooks/UseResponseContactRequest"
 import classNames from "classnames"
 import MessageInfo from "./Components/MessageInfo/MessageInfo"
 import { throttle } from "throttle-debounce"
@@ -18,12 +17,12 @@ import useFrequentVariables from "../../Hooks/UseFrequentVariables"
 import MessagesList from "./Components/MessagesList/GroupChat/MessagesListGroupChat"
 import ContactInfo from "./Components/ContactInfo/ContactInfo"
 import GroupInfoSettings from "../GroupChat/GroupInfoSettings/GroupInfoSettings"
-import "./ChatWindow.scss"
 import NewRequestOptions from "./Components/NewRequestOptions/NewRequestOptions"
 import InfoMessage from "./Components/MessagesList/GroupChat/Components/NewMembersMessages/InfoMessage"
+import "./ChatWindow.scss"
 
 const ChatWindow: React.FC = () => {
-  const { firebase, authUser, newContactsActivity, contactsContext, contactsState } = useFrequentVariables()
+  const { firebase, authUser, contactsContext, contactsState } = useFrequentVariables()
   const {
     activeChat,
     messages,
@@ -33,13 +32,15 @@ const ChatWindow: React.FC = () => {
     lastScrollPosition,
     authUserUnreadMessages,
     firebaseListeners,
-    groupInfoSettingsActive
+    groupInfoSettingsActive,
+    chatMembersStatus
   } = contactsState
   const messagesData = messages[activeChat.chatKey]
   const renderedMessages = renderedMessagesList[activeChat.chatKey] || []
   const unreadMessagesAuth = authUserUnreadMessages[activeChat.chatKey] || []
   const selectedMessagesData = selectedMessages[activeChat.chatKey] || []
   const contactInfo = contacts[activeChat.contactKey] || {}
+  const chatMembersStatusData = chatMembersStatus[activeChat.chatKey] || []
 
   // const contactsUnreadMessagesData = contactsUnreadMessages[activeChat.chatKey]
 
@@ -103,6 +104,7 @@ const ChatWindow: React.FC = () => {
   const scrollPositionHandler = useCallback(
     debounce(() => {
       console.log({ activeChat })
+      console.log({ chatMembersStatusData })
       if (!chatContainerRef) return
       const { scrollTop, scrollHeight, height } = getContainerRect()
       if (scrollHeight <= height) return
@@ -321,10 +323,10 @@ const ChatWindow: React.FC = () => {
     }
   }, [activeChat])
 
-  useEffect(() => {
-    if (!chatContainerRef) return
-    firebase.newContactsActivity({ uid: authUser?.uid }).child(`${contactInfo.key}`).set(null)
-  }, [activeChat, contactInfo, chatContainerRef])
+  // useEffect(() => {
+  //   if (!chatContainerRef) return
+  //   firebase.newContactsActivity({ uid: authUser?.uid }).child(`${contactInfo.key}`).set(null)
+  // }, [activeChat, contactInfo, chatContainerRef])
 
   return (
     <div className="chat-window-container" onMouseEnter={onMouseEnter}>

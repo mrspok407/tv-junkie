@@ -44,6 +44,7 @@ export interface FirebaseInterface {
     isGroupChat: boolean
   }) => any
   groupChatMembersStatus: ({ chatKey }: { chatKey: string }) => any
+  groupChatParticipants: ({ chatKey }: { chatKey: string }) => any
 }
 
 export const FIREBASE_INITIAL_STATE = {
@@ -58,7 +59,8 @@ export const FIREBASE_INITIAL_STATE = {
   privateChat: () => {},
   unreadMessages: () => {},
   chatMemberStatus: () => {},
-  groupChatMembersStatus: () => {}
+  groupChatMembersStatus: () => {},
+  groupChatParticipants: () => {}
 }
 
 export const FirebaseContext = createContext<FirebaseInterface>(FIREBASE_INITIAL_STATE)

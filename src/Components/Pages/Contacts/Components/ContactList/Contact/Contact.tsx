@@ -43,6 +43,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
   const setContactActive = () => {
     if (activeChat.chatKey === chatKey) return
     contactsContext?.dispatch({ type: "updateActiveChat", payload: { chatKey, contactKey: contactInfo.key } })
+    firebase.newContactsActivity({ uid: authUser?.uid }).child(`${contactInfo.key}`).set(null)
   }
 
   useEffect(() => {
@@ -124,13 +125,15 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
             ? `${contactNameFormated}...`
             : contactInfo.userName}
         </div>
-        {lastMessage?.sender === authUser?.uid && !contactInfo.isGroupChat && (
-          <div
-            className={classNames("contact-item__last-message-status", {
-              "contact-item__last-message-status--unread": contactUnreadMessages?.length
-            })}
-          ></div>
-        )}
+        {lastMessage?.sender === authUser?.uid &&
+          !contactInfo.isGroupChat &&
+          [true, "removed"].includes(contactInfo.status) && (
+            <div
+              className={classNames("contact-item__last-message-status", {
+                "contact-item__last-message-status--unread": contactUnreadMessages?.length
+              })}
+            ></div>
+          )}
         {lastMessage?.timeStamp && <div className="contact-item__timestamp">{formatedDate}</div>}
       </div>
 

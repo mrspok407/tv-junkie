@@ -178,6 +178,7 @@ export const addNewGroupMembers = functions.https.onCall(
     const newMessageRef = database.ref(`groupChats/${groupInfo.key}/messages`).push();
 
     members.forEach((member) => {
+      membersUpdateData[`groupChats/${groupInfo.key}/members/participants/${member.key}`] = true;
       membersUpdateData[`groupChats/${groupInfo.key}/members/status/${member.key}`] = {
         isOnline: false,
         username: member.username,
@@ -232,6 +233,7 @@ export const removeMemberFromGroup = functions.https.onCall(async (data, context
         isRemovedMember: true,
         timeStamp
       },
+      [`groupChats/${groupChatKey}/members/participants/${member.key}`]: null,
       [`groupChats/${groupChatKey}/members/status/${member.key}`]: null,
       [`groupChats/${groupChatKey}/members/unreadMessages/${member.key}`]: null,
       [`users/${member.key}/contactsDatabase/contactsList/${groupChatKey}/removedFromGroup`]: true,
@@ -263,12 +265,13 @@ export const createNewGroup = functions.https.onCall(
     const groupChatRef = database.ref("groupChats").push();
     const newMessageRef = database.ref(`groupChats/${groupChatRef.key}/messages`).push();
     members.forEach((member) => {
-      membersUpdateData[`groupChats/${groupChatRef.key}/members/status/${member.key}`] = {
-        isOnline: false,
-        username: member.username,
-        usernameLowerCase: member.username?.toLowerCase(),
-        role: "USER"
-      };
+      (membersUpdateData[`groupChats/${groupChatRef.key}/members/participants/${member.key}`] = true),
+        (membersUpdateData[`groupChats/${groupChatRef.key}/members/status/${member.key}`] = {
+          isOnline: false,
+          username: member.username,
+          usernameLowerCase: member.username?.toLowerCase(),
+          role: "USER"
+        });
       membersUpdateData[`users/${member.key}/contactsDatabase/contactsList/${groupChatRef.key}`] = {
         pinned_lastActivityTS: "false",
         isGroupChat: true,
@@ -282,6 +285,7 @@ export const createNewGroup = functions.https.onCall(
     try {
       const updateData: {[key: string]: GroupChatInfoInterface | GroupChatMemberStatusInterface} = {
         ...membersUpdateData,
+        [`groupChats/${groupChatRef.key}/members/participants/${authUid}`]: true,
         [`groupChats/${groupChatRef.key}/members/status${authUid}`]: {
           isOnline: false,
           username: authUser?.username,

@@ -67,6 +67,7 @@ export const _removeMemberFromGroup = async ({
         isRemovedMember: true,
         timeStamp: timeStampData
       },
+      [`groupChats/${groupChatKey}/members/participants/${member.key}`]: null,
       [`groupChats/${groupChatKey}/members/status/${member.key}`]: null,
       [`groupChats/${groupChatKey}/members/unreadMessages/${member.key}`]: null,
       [`users/${member.key}/contactsDatabase/contactsList/${groupChatKey}/removedFromGroup`]: true,
@@ -102,6 +103,7 @@ export const _addNewGroupMembers = async ({
   const newMessageRef = database.ref(`groupChats/${groupInfo.key}/messages`).push()
 
   members.forEach((member) => {
+    membersUpdateData[`groupChats/${groupInfo.key}/members/participants/${member.key}`] = true
     membersUpdateData[`groupChats/${groupInfo.key}/members/status/${member.key}`] = {
       isOnline: false,
       username: member.username,
@@ -155,6 +157,7 @@ export const _createNewGroup = async ({
   const newMessageRef = database.ref(`groupChats/${groupChatRef.key}/messages`).push()
 
   members.forEach((member) => {
+    membersUpdateData[`groupChats/${groupChatRef.key}/members/participants/${member.key}`] = true
     membersUpdateData[`groupChats/${groupChatRef.key}/members/status/${member.key}`] = {
       isOnline: false,
       username: member.username,
@@ -174,6 +177,7 @@ export const _createNewGroup = async ({
   try {
     const updateData: { [key: string]: GroupChatInfoInterface | GroupChatMemberStatusInterface } = {
       ...membersUpdateData,
+      [`groupChats/${groupChatRef.key}/members/participants/${authUid}`]: true,
       [`groupChats/${groupChatRef.key}/members/status/${authUid}`]: {
         isOnline: false,
         username: context?.authUser?.username,

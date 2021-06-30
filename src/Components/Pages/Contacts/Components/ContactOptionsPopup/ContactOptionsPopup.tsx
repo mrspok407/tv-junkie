@@ -3,7 +3,6 @@ import { ContactInfoInterface } from "../../@Types"
 import { ContactsContext } from "../@Context/ContactsContext"
 import useContactOptions from "./Hooks/UseContactOptions"
 import "./ContactOptionsPopup.scss"
-import classNames from "classnames"
 
 type Props = {
   contactOptionsRef: HTMLDivElement
@@ -96,7 +95,7 @@ const ContactOptionsPopup: React.FC<Props> = ({ contactOptionsRef, contactInfo }
         </>
       )}
 
-      {!contactInfo.removedFromGroup && (
+      {!contactInfo.removedFromGroup && !contactInfo.chatDeleted && (
         <div className="popup__option">
           <button
             className="popup__option-btn"
@@ -111,25 +110,47 @@ const ContactOptionsPopup: React.FC<Props> = ({ contactOptionsRef, contactInfo }
         </div>
       )}
 
-      <div className="popup__option">
-        <button
-          className="popup__option-btn"
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation()
-            context?.dispatch({
-              type: "updateConfirmModal",
-              payload: {
-                isActive: true,
-                function: `${contactInfo.isGroupChat ? "handleLeaveChat" : "handleRemoveContact"}`,
-                contactKey: contactInfo.key
-              }
-            })
-          }}
-        >
-          {contactInfo.isGroupChat ? "Leave chat" : "Remove from contacts"}
-        </button>
-      </div>
+      {contactInfo.isGroupChat ? (
+        <div className="popup__option">
+          <button
+            className="popup__option-btn"
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              context?.dispatch({
+                type: "updateConfirmModal",
+                payload: {
+                  isActive: true,
+                  function: `${contactInfo.role === "ADMIN" ? "handleDeleteChat" : "handleLeaveChat"}`,
+                  contactKey: contactInfo.key
+                }
+              })
+            }}
+          >
+            {contactInfo.role === "ADMIN" ? "Delete chat" : "Leave chat"}
+          </button>
+        </div>
+      ) : (
+        <div className="popup__option">
+          <button
+            className="popup__option-btn"
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              context?.dispatch({
+                type: "updateConfirmModal",
+                payload: {
+                  isActive: true,
+                  function: "handleRemoveContact",
+                  contactKey: contactInfo.key
+                }
+              })
+            }}
+          >
+            Remove from contacts
+          </button>
+        </div>
+      )}
     </div>
   )
 }

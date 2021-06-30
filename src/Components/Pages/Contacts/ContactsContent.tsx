@@ -4,7 +4,7 @@ import React, { useContext, useEffect, useRef } from "react"
 import ChatWindow from "./Components/ChatWindow/ChatWindow"
 import ContactList from "./Components/ContactList/ContactList"
 import ContactsContextHOC, { ContactsContext } from "./Components/@Context/ContactsContext"
-import { MessageInterface } from "./@Types"
+import { ContactInfoInterface, MessageInterface } from "./@Types"
 import { LoremIpsum } from "lorem-ipsum"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import ConfirmModal from "./Components/ChatWindow/Components/ConfirmModal/ConfirmModal"
@@ -20,30 +20,30 @@ const ContactsContent: React.FC = () => {
   const { activeChat, contacts, messages, confirmModal, groupCreation } = contactsState
 
   const contactListWrapperRef = useRef<HTMLDivElement>(null!)
-  const messagesRef = useRef<{ [key: string]: MessageInterface[] }>()
+  // const messagesRef = useRef<{ [key: string]: MessageInterface[] }>()
+  const contactsRef = useRef<{ [key: string]: ContactInfoInterface }>()
   const confirmModalFunctions = { ...useContactOptions({}), ...useSelectOptions() }
 
   useEffect(() => {
-    messagesRef.current = messages
-  }, [messages])
+    // messagesRef.current = messages
+    contactsRef.current = contacts
+  }, [messages, contacts])
 
   useEffect(() => {
     return () => {
-      if (!messagesRef.current) return
-      Object.keys(messagesRef.current).forEach((chatKey) => {
-        let otherMemberKey: string
-        if (authUser?.uid === chatKey.slice(0, authUser?.uid.length)) {
-          otherMemberKey = chatKey.slice(authUser?.uid.length + 1)
-        } else {
-          otherMemberKey = chatKey.slice(0, -authUser?.uid.length! - 1)
-        }
-
-        firebase.messages({ chatKey, isGroupChat: contacts[chatKey]?.isGroupChat }).off()
-        firebase.unreadMessages({ uid: otherMemberKey, chatKey, isGroupChat: false }).off()
-        firebase.contactsDatabase({ uid: otherMemberKey }).child("pageIsOpen").off()
+      console.log({ contactsRef: contactsRef.current })
+      if (!contactsRef.current) return
+      Object.values(contactsRef.current).forEach((contact) => {
+        firebase.messages({ chatKey: contact.chatKey, isGroupChat: contact.isGroupChat }).off()
+        firebase.unreadMessages({ uid: contact.key, chatKey: contact.chatKey, isGroupChat: false }).off()
+        firebase.contactsDatabase({ uid: contact.key }).child("pageIsOpen").off()
         firebase
-          .chatMemberStatus({ chatKey, memberKey: otherMemberKey, isGroupChat: contacts[chatKey]?.isGroupChat })
+          .chatMemberStatus({ chatKey: contact.chatKey, memberKey: contact.key, isGroupChat: contact.isGroupChat })
           .off()
+        if (contact.isGroupChat) {
+          firebase.groupChatMembersStatus({ chatKey: contact.chatKey }).off()
+          firebase.groupChatParticipants({ chatKey: contact.chatKey }).off()
+        }
       })
     }
   }, [authUser, firebase])
@@ -76,6 +76,7 @@ const ContactsContent: React.FC = () => {
         ) : (
           ""
         )}
+
         {activeChat.chatKey === "" || !contacts[activeChat.contactKey] ? (
           !Object.keys(contacts)?.length ? (
             ""
@@ -84,6 +85,10 @@ const ContactsContent: React.FC = () => {
               <div className="chat-window">Select a chat to start messaging</div>
             </div>
           )
+        ) : contacts[activeChat.contactKey].chatDeleted ? (
+          <div className="chat-window-container chat-window-container--no-active-chat">
+            <div className="chat-window">This chat was deleted by it's admin</div>
+          </div>
         ) : contacts[activeChat.contactKey].removedFromGroup ? (
           <div className="chat-window-container chat-window-container--no-active-chat">
             <div className="chat-window">You were removed from this group</div>
