@@ -41,7 +41,6 @@ const ContactList: React.FC<Props> = ({ contactListWrapperRef }) => {
     console.log({ initialLoading })
     if (!initialLoading) {
       initialLoadingRef.current = false
-      console.log({ initialLoadingRef: initialLoadingRef.current })
     }
   }, [initialLoading])
 
@@ -77,11 +76,7 @@ const ContactList: React.FC<Props> = ({ contactListWrapperRef }) => {
 
     console.log({ initialLoadingRef: initialLoadingRef.current })
     if (initialLoadingRef.current || newLoad.current) {
-      console.log({ contactsData })
-
       const contacts = await getContactsInfo({ contactsData })
-
-      console.log({ contacts })
 
       const unreadMessages = contacts.reduce((acc, contact) => {
         acc = { ...acc, [contact.chatKey]: contact.unreadMessages }

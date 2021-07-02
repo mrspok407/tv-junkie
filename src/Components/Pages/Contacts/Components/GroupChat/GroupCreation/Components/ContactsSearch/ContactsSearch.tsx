@@ -114,8 +114,32 @@ const ContactsSearch: React.FC<Props> = ({ wrapperRef }) => {
     ;(async () => {
       setInitialLoading(true)
       try {
-        const contactsData = await contactsListRef.orderByChild("userName").limitToFirst(CONTACTS_TO_LOAD).once("value")
-        getContactsData({ snapshot: contactsData })
+        let ff = 0
+        let aaa: any = []
+        const test: any = async () => {
+          const contactsData = await contactsListRef
+            .orderByChild("userName")
+            .limitToFirst(CONTACTS_TO_LOAD + ff)
+            .once("value")
+
+          console.log(CONTACTS_TO_LOAD + ff)
+
+          const contactsLength = Object.keys(contactsData.val() || {}).length
+
+          console.log({ contactsLength })
+
+          if (contactsLength <= CONTACTS_TO_LOAD) {
+            ff = ff + CONTACTS_TO_LOAD
+            test()
+          }
+
+          aaa = contactsData.val()
+        }
+
+        await test()
+        console.log(aaa)
+
+        getContactsData({ snapshot: [] })
       } catch (error) {
         errors.handleError({
           message: "Some of your contacts were not loaded correctly. Try to reload the page."

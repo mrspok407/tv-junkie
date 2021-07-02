@@ -6,10 +6,12 @@ import ContactOptionsPopup from "../../../ContactOptionsPopup/ContactOptionsPopu
 import Loader from "Components/UI/Placeholders/Loader"
 import "./ContactInfo.scss"
 
-type Props = {}
+type Props = {
+  isScrollBottomRef: any
+}
 
-const ContactInfo: React.FC<Props> = ({}) => {
-  const { authUser, newContactsActivity, contactsContext, contactsState } = useFrequentVariables()
+const ContactInfo: React.FC<Props> = ({ isScrollBottomRef }) => {
+  const { firebase, authUser, newContactsActivity, contactsContext, contactsState } = useFrequentVariables()
   const { activeChat, contacts, contactsStatus, optionsPopupChatWindow, chatMembersStatus } = contactsState
   const contactInfo = contacts[activeChat.contactKey] || {}
   const chatMembersStatusData = chatMembersStatus[contactInfo.chatKey] || []
@@ -19,6 +21,26 @@ const ContactInfo: React.FC<Props> = ({}) => {
   const chatMembersTyping = chatMembersStatusData?.filter((member) => member.isTyping && member.key !== authUser?.uid)
 
   const chatMembersOnline = chatMembersStatusData.filter((member) => member.isOnline).length
+
+  const sendMessageCurrentContact = async () => {
+    const timeStampEpoch = new Date().getTime()
+    const messageRef = firebase.privateChats().child(`${activeChat.chatKey}/messages`).push()
+    const messageKey = messageRef.key
+    const updateData: any = {
+      [`privateChats/${activeChat.chatKey}/messages/${messageKey}`]: {
+        // sender: authUser?.uid,
+        sender: contactInfo.key,
+        message: "test message very testy message yeah",
+        timeStamp: timeStampEpoch
+      },
+      [`privateChats/${activeChat.chatKey}/members/${authUser?.uid}/unreadMessages/${messageKey}`]: !isScrollBottomRef
+        ? true
+        : null
+    }
+    await firebase.database().ref().update(updateData)
+
+    return messageKey
+  }
 
   return (
     <div
@@ -95,6 +117,11 @@ const ContactInfo: React.FC<Props> = ({}) => {
         ) : (
           ""
         )}
+      </div>
+      <div className="contact-info__send-message-current">
+        <button type="button" className="button" onClick={() => sendMessageCurrentContact()}>
+          Send msg
+        </button>
       </div>
     </div>
   )

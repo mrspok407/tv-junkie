@@ -7,11 +7,18 @@ import { ContactsContext } from "../../@Context/ContactsContext"
 type Props = {
   chatContainerRef: HTMLDivElement
   unreadMessagesAuth: string[]
+  unreadMsgsListenerChatKey: string
   pageInFocus: boolean
   chatWindowLoading: boolean
 }
 
-const useIntersectionObserver = ({ chatContainerRef, unreadMessagesAuth, pageInFocus, chatWindowLoading }: Props) => {
+const useIntersectionObserver = ({
+  chatContainerRef,
+  unreadMessagesAuth,
+  unreadMsgsListenerChatKey,
+  pageInFocus,
+  chatWindowLoading
+}: Props) => {
   const { firebase, authUser, errors, contactsContext, contactsState } = useFrequentVariables()
   const { activeChat, renderedMessagesList, contacts } = contactsState
   const renderedMessages = renderedMessagesList[activeChat.chatKey]
@@ -66,10 +73,15 @@ const useIntersectionObserver = ({ chatContainerRef, unreadMessagesAuth, pageInF
   observerRef = new IntersectionObserver(observerCallback, observerOptions)
 
   useEffect(() => {
-    console.log({ chatWindowLoading })
+    console.log({ unreadMessagesAuth })
+    console.log({ unreadMsgsListenerChatKey })
+    if (!unreadMsgsListenerChatKey) return
     if (!renderedMessages?.length || !unreadMessagesAuth?.length) return
     if (![true, "removed"].includes(contactInfo.status) && !contactInfo.isGroupChat) return
     if (!observerRef || !pageInFocus || chatWindowLoading) return
+
+    console.log({ unreadMessagesAuth })
+    console.log({ observedMessages: observedMessages.current })
 
     renderedMessages.forEach((message) => {
       if (!unreadMessagesAuth.includes(message.key)) return
@@ -78,7 +90,7 @@ const useIntersectionObserver = ({ chatContainerRef, unreadMessagesAuth, pageInF
       observedMessages.current = [...observedMessages.current, message.key]
       observerRef?.observe(unreadMessage)
     })
-  }, [activeChat, renderedMessages, contactInfo, pageInFocus, chatWindowLoading])
+  }, [activeChat, renderedMessages, unreadMsgsListenerChatKey, contactInfo, pageInFocus, chatWindowLoading])
 
   const onMouseEnter = () => {
     if (!renderedMessages?.length || !unreadMessagesAuth?.length) return

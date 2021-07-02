@@ -61,6 +61,10 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
       .unreadMessages({ uid: authUser?.uid!, chatKey, isGroupChat: contactInfo.isGroupChat })
       .on("value", (snapshot: any) => {
         const unreadMessagesAuth = !snapshot.val() ? [] : Object.keys(snapshot.val())
+        if (contactInfo.isGroupChat) {
+          console.log({ contactInfo })
+          console.log({ unreadMessagesAuth })
+        }
         setAuthUnreadMessages(unreadMessagesAuth)
       })
 
@@ -82,6 +86,11 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
       })
 
     return () => {
+      if (contactInfo.isGroupChat) {
+        console.log("unmount contact")
+        console.log({ chatKey: contactInfo.chatKey })
+      }
+
       firebase.newContactsActivity({ uid: authUser?.uid }).child(`${contactInfo.key}`).off()
       firebase.newContactsRequests({ uid: authUser?.uid! }).child(`${contactInfo.key}`).off()
       firebase.unreadMessages({ uid: authUser?.uid!, chatKey, isGroupChat: contactInfo.isGroupChat }).off()

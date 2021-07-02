@@ -16,7 +16,6 @@ const useContactListeners = () => {
       .contactsDatabase({ uid: activeChat.contactKey })
       .child("pageIsOpen")
       .on("value", (snapshot: any) => {
-        console.log("pageIsOpen")
         context?.dispatch({
           type: "updateContactsPageIsOpen",
           payload: { isPageOpen: snapshot.val(), chatKey: activeChat.chatKey }
@@ -26,7 +25,6 @@ const useContactListeners = () => {
     const unreadMessagesListener = firebase
       .unreadMessages({ uid: activeChat.contactKey, chatKey: activeChat.chatKey, isGroupChat: false })
       .on("value", (snapshot: any) => {
-        console.log(snapshot.val())
         const unreadMessagesContact = !snapshot.val() ? [] : Object.keys(snapshot.val())
         context?.dispatch({
           type: "updateContactUnreadMessages",

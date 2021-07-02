@@ -153,6 +153,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         contacts: {
           ...contacts,
           [action.payload.newGroupChatKey]: {
+            chatKey: action.payload.newGroupChatKey,
             key: action.payload.newGroupChatKey,
             isGroupChat: true
           } as ContactInfoInterface
@@ -219,8 +220,6 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
       }
 
     case "renderTopMessages": {
-      console.log(messages[activeChat.chatKey])
-      console.log(renderedMessagesList[activeChat.chatKey][0])
       if (messages[activeChat.chatKey][0]?.key === renderedMessagesList[activeChat.chatKey][0]?.key) {
         return { ...state }
       }
@@ -419,7 +418,6 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
             }
           }
         } else {
-          console.log({ authUserUnreadMessages })
           if (unreadMessages.length <= UNREAD_MESSAGES_TO_RENDER) {
             return {
               ...state,
@@ -624,10 +622,6 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
     case "updateContactsInitial": {
       const authUnreadMerged = _assign({}, action.payload.unreadMessages, authUserUnreadMessages)
       const contactsUnreadMerged = _assign({}, action.payload.unreadMessagesContacts, contactsUnreadMessages)
-      console.log({ unreadMessages: action.payload.unreadMessages })
-      console.log({ authUnreadMerged })
-      console.log({ unreadMessagesContacts: action.payload.unreadMessagesContacts })
-      console.log({ contactsUnreadMerged })
       return {
         ...state,
         contacts: action.payload.contacts,
@@ -650,7 +644,6 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
     // }
 
     case "updateContacts": {
-      console.log("updateContacts")
       action.payload.contacts.reverse()
       const contactsData = action.payload.contacts.reduce((acc: ContactsInterface, contact: ContactInfoInterface) => {
         acc[contact.key] = { ...contacts[contact.key], ...contact }
@@ -664,9 +657,6 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         contactsUnreadMessagesData[contact.chatKey] = contactsUnreadMessages[contact.chatKey] || []
       })
 
-      console.log({ contactsData })
-      console.log({ authUserUnreadMessagesData })
-      console.log({ contactsUnreadMessagesData })
       return {
         ...state,
         contacts: contactsData,

@@ -19,7 +19,6 @@ const usePageFocusHandler = ({ activeChat, contactInfo }: Props) => {
       .contact({ authUid: authUser?.uid, contactUid: contactInfo.chatKey })
       .child("removedFromGroup")
       .on("value", (snapshot: any) => {
-        console.log(snapshot.val())
         if (snapshot.val() === true) {
           firebase
             .chatMemberStatus({

@@ -53,7 +53,7 @@ const useContactOptions = ({ contactInfo }: Props) => {
       await firebase.database().ref().update(updateData)
       contactsContext?.dispatch({
         type: "updateAuthUserUnreadMessages",
-        payload: { chatKey: activeChat.chatKey, unreadMessages: [] }
+        payload: { chatKey: contactInfo?.chatKey!, unreadMessages: [] }
       })
     } catch (error) {
       errors.handleError({

@@ -137,6 +137,7 @@ exports.addNewGroupMembers = functions.https.onCall(async (data, context) => {
     const newMessageRef = database.ref(`groupChats/${groupInfo.key}/messages`).push();
     members.forEach((member) => {
         var _a;
+        membersUpdateData[`groupChats/${groupInfo.key}/members/participants/${member.key}`] = true;
         membersUpdateData[`groupChats/${groupInfo.key}/members/status/${member.key}`] = {
             isOnline: false,
             username: member.username,
@@ -184,6 +185,7 @@ exports.removeMemberFromGroup = functions.https.onCall(async (data, context) => 
                 isRemovedMember: true,
                 timeStamp
             },
+            [`groupChats/${groupChatKey}/members/participants/${member.key}`]: null,
             [`groupChats/${groupChatKey}/members/status/${member.key}`]: null,
             [`groupChats/${groupChatKey}/members/unreadMessages/${member.key}`]: null,
             [`users/${member.key}/contactsDatabase/contactsList/${groupChatKey}/removedFromGroup`]: true,
@@ -209,12 +211,13 @@ exports.createNewGroup = functions.https.onCall(async (data, context) => {
     const newMessageRef = database.ref(`groupChats/${groupChatRef.key}/messages`).push();
     members.forEach((member) => {
         var _a;
-        membersUpdateData[`groupChats/${groupChatRef.key}/members/status/${member.key}`] = {
-            isOnline: false,
-            username: member.username,
-            usernameLowerCase: (_a = member.username) === null || _a === void 0 ? void 0 : _a.toLowerCase(),
-            role: "USER"
-        };
+        (membersUpdateData[`groupChats/${groupChatRef.key}/members/participants/${member.key}`] = true),
+            (membersUpdateData[`groupChats/${groupChatRef.key}/members/status/${member.key}`] = {
+                isOnline: false,
+                username: member.username,
+                usernameLowerCase: (_a = member.username) === null || _a === void 0 ? void 0 : _a.toLowerCase(),
+                role: "USER"
+            });
         membersUpdateData[`users/${member.key}/contactsDatabase/contactsList/${groupChatRef.key}`] = {
             pinned_lastActivityTS: "false",
             isGroupChat: true,
@@ -225,7 +228,7 @@ exports.createNewGroup = functions.https.onCall(async (data, context) => {
         membersUpdateData[`users/${member.key}/contactsDatabase/newContactsActivity/${groupChatRef.key}`] = true;
     });
     try {
-        const updateData = Object.assign(Object.assign({}, membersUpdateData), { [`groupChats/${groupChatRef.key}/members/status${authUid}`]: {
+        const updateData = Object.assign(Object.assign({}, membersUpdateData), { [`groupChats/${groupChatRef.key}/members/participants/${authUid}`]: true, [`groupChats/${groupChatRef.key}/members/status${authUid}`]: {
                 isOnline: false,
                 username: authUser === null || authUser === void 0 ? void 0 : authUser.username,
                 usernameLowerCase: (_b = authUser === null || authUser === void 0 ? void 0 : authUser.username) === null || _b === void 0 ? void 0 : _b.toLowerCase(),
