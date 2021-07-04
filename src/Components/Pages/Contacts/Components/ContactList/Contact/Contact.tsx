@@ -124,7 +124,11 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
       })}
       onClick={() => setContactActive()}
     >
-      <div className="contact-item__row contact-item__row--top">
+      <div
+        className={classNames("contact-item__row contact-item__row--top", {
+          "contact-item__row--online": contactsStatus[contactInfo.chatKey]?.isOnline
+        })}
+      >
         <div className="contact-item__username">
           {contactInfo.isGroupChat
             ? contactInfo.groupName?.length > 25

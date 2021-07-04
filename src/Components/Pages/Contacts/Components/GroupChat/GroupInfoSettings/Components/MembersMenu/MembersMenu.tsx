@@ -1,6 +1,6 @@
 import { ContactInfoInterface, MembersStatusGroupChatInterface } from "Components/Pages/Contacts/@Types"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
-import useElementScrolledDown from "Components/Pages/Movies/useElementScrolledDown"
+import useElementScrolledDown from "Components/Pages/Contacts/Hooks/useElementScrolledDown"
 import React, { useState, useEffect, useContext, useRef, useLayoutEffect, useCallback } from "react"
 import SearchInput from "./SearchInput/SearchInput"
 import Member from "./Member"

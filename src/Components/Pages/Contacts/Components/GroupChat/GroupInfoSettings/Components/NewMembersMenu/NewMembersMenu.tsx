@@ -7,7 +7,7 @@ import {
   GroupCreationNewMemberInterface
 } from "Components/Pages/Contacts/@Types"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
-import useElementScrolledDown from "Components/Pages/Movies/useElementScrolledDown"
+import useElementScrolledDown from "Components/Pages/Contacts/Hooks/useElementScrolledDown"
 import React, { useState, useEffect, useContext, useRef, useLayoutEffect, useCallback } from "react"
 import { isUnexpectedObject } from "Utils"
 import Contact from "./Components/Contact/Contact"
@@ -27,7 +27,7 @@ const NewMembersMenu: React.FC = () => {
   const [searchedContacts, setSearchedContacts] = useState<ContactInfoInterface[] | null>([])
   const [selectedMembers, setSelectedMembers] = useState<GroupCreationNewMemberInterface[]>([])
   const [isSearching, setIsSearching] = useState(false)
-  const [allContactsAmount, setAllContactsAmount] = useState<number | null>(null)
+  const [allContactsLoaded, setAllContactsLoaded] = useState(false)
   const [loadingNewContacts, setLoadingNewcontacts] = useState(false)
   const [initialLoading, setInitialLoading] = useState(true)
 
@@ -60,6 +60,12 @@ const NewMembersMenu: React.FC = () => {
   }
 
   const getContactsData = async ({ snapshot, isSearchedData = false }: { snapshot: any; isSearchedData?: boolean }) => {
+    if (snapshot.val() === null) {
+      setAllContactsLoaded(true)
+      setLoadingNewcontacts(false)
+      return
+    }
+
     let contacts: ContactInfoInterface[] = []
     snapshot.forEach((contact: { val: () => ContactInfoInterface; key: string }) => {
       if (
@@ -142,8 +148,32 @@ const NewMembersMenu: React.FC = () => {
     ;(async () => {
       setInitialLoading(true)
       try {
-        const contactsData = await contactsListRef.orderByChild("userName").limitToFirst(CONTACTS_TO_LOAD).once("value")
-        getContactsData({ snapshot: contactsData })
+        let additionalContactsToLoad = 0
+        let contacts: any = []
+        const getInitialContacts = async () => {
+          const contactsData = await contactsListRef
+            .orderByChild("userName")
+            .limitToFirst(CONTACTS_TO_LOAD + additionalContactsToLoad)
+            .once("value")
+          const contactsLength = Object.keys(contactsData.val() || {}).length
+          const contactsDataFiltered = Object.values(contactsData.val() || {}).filter(
+            (contact: any) => contact.status === true && !contact.isGroupChat
+          )
+
+          if (contactsLength < 20 || contactsDataFiltered.length >= 20) {
+            contacts = contactsData
+            return
+          }
+
+          if (contactsLength >= 20 && contactsLength !== contactsDataFiltered.length) {
+            additionalContactsToLoad = additionalContactsToLoad + CONTACTS_TO_LOAD
+            await getInitialContacts()
+          } else {
+            contacts = contactsData
+          }
+        }
+        await getInitialContacts()
+        getContactsData({ snapshot: contacts })
       } catch (error) {
         errors.handleError({
           message: "Some of your contacts were not loaded correctly. Try to reload the page."
@@ -151,22 +181,12 @@ const NewMembersMenu: React.FC = () => {
         setInitialLoading(false)
       }
     })()
-
-    const contactsAmountListener = firebase
-      .contactsDatabase({ uid: authUser?.uid })
-      .child("contactsAmount")
-      .on("value", (snapshot: any) => {
-        setAllContactsAmount(snapshot.val())
-      })
-    return () => {
-      firebase.contactsDatabase({ uid: authUser?.uid }).child("contactsAmount").off("value", contactsAmountListener)
-    }
   }, [firebase, authUser])
 
   useEffect(() => {
     if (!isScrolledDown) return
     if (loadingNewContacts) return
-    if (contactsList.length >= allContactsAmount!) return
+    if (allContactsLoaded) return
     ;(async () => {
       try {
         setLoadingNewcontacts(true)
@@ -183,7 +203,7 @@ const NewMembersMenu: React.FC = () => {
         setLoadingNewcontacts(false)
       }
     })()
-  }, [isScrolledDown, contactsList])
+  }, [isScrolledDown, contactsList, allContactsLoaded])
 
   const contactsToRender = !searchedContacts?.length ? contactsList : searchedContacts
   return (

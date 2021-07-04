@@ -246,7 +246,6 @@ const ChatWindow: React.FC = () => {
       if (isScrollBottom) {
         console.log("scroll, no unread, scrollAtBottom")
         chatContainerRef.scrollTop = getContainerRect().scrollHeight + getContainerRect().height
-        // lastMessageRef?.scrollIntoView({ block: "start", inline: "start" })
         isScrollBottomRef.current = true
         firebase
           .chatMemberStatus({
@@ -318,6 +317,10 @@ const ChatWindow: React.FC = () => {
         .update({ isOnline: null })
     }
   }, [activeChat])
+
+  useEffect(() => {
+    firebase.newContactsActivity({ uid: authUser?.uid }).child(`${contactInfo.key}`).set(null)
+  }, [contactInfo])
 
   return (
     <div className="chat-window-container" onMouseEnter={onMouseEnter}>

@@ -3,7 +3,6 @@ import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
 import { ContactInfoInterface, CONTACT_INFO_INITIAL_DATA } from "Components/Pages/Contacts/@Types"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
-import useElementScrolledDown from "Components/Pages/Movies/useElementScrolledDown"
 import React, { useState, useEffect, useContext, useRef, useLayoutEffect, useCallback } from "react"
 import { isUnexpectedObject } from "Utils"
 import Contact from "./Components/Contact/Contact"
@@ -20,7 +19,15 @@ const GroupCreation: React.FC<Props> = ({ contactListWrapperRef }) => {
   const { firebase, authUser, errors, contactsContext, contactsState } = useFrequentVariables()
   const { groupCreation } = contactsState
 
-  const createGroupWrapperRef = useRef<HTMLDivElement>(null!)
+  const [createGroupWrapperNode, setCreateGroupWrapperNode] = useState<HTMLDivElement>(null!)
+
+  // const createGroupWrapperRef = useRef<HTMLDivElement>(null!)
+
+  const createGroupWrapperRef = useCallback((node) => {
+    if (node !== null) {
+      setCreateGroupWrapperNode(node)
+    }
+  }, [])
 
   useLayoutEffect(() => {
     contactListWrapperRef.scrollTop = 0
@@ -40,7 +47,7 @@ const GroupCreation: React.FC<Props> = ({ contactListWrapperRef }) => {
         </div>
         <div className="group-creation__heading-text">Add members</div>
       </div>
-      <ContactsSearch wrapperRef={createGroupWrapperRef.current} />
+      <ContactsSearch wrapperRef={createGroupWrapperNode} />
     </div>
   )
 }

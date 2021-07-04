@@ -3,7 +3,7 @@ import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
 import { ContactInfoInterface, CONTACT_INFO_INITIAL_DATA } from "Components/Pages/Contacts/@Types"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
-import useElementScrolledDown from "Components/Pages/Movies/useElementScrolledDown"
+import useElementScrolledDown from "Components/Pages/Contacts/Hooks/useElementScrolledDown"
 import React, { useState, useEffect, useContext, useRef, useLayoutEffect, useCallback } from "react"
 import { isUnexpectedObject } from "Utils"
 import Contact from "../Contact/Contact"
@@ -23,7 +23,7 @@ const ContactsSearch: React.FC<Props> = ({ wrapperRef }) => {
   const [contactsList, setContactsList] = useState<ContactInfoInterface[]>([])
   const [searchedContacts, setSearchedContacts] = useState<ContactInfoInterface[] | null>([])
   const [isSearching, setIsSearching] = useState(false)
-  const [allContactsAmount, setAllContactsAmount] = useState<number | null>(null)
+  const [allContactsLoaded, setAllContactsLoaded] = useState(false)
   const [loading, setLoading] = useState(false)
   const [initialLoading, setInitialLoading] = useState(true)
 
@@ -31,6 +31,12 @@ const ContactsSearch: React.FC<Props> = ({ wrapperRef }) => {
   const isScrolledDown = useElementScrolledDown({ element: wrapperRef, threshold: 650 })
 
   const getContactsData = async ({ snapshot, isSearchedData = false }: { snapshot: any; isSearchedData?: boolean }) => {
+    if (snapshot.val() === null) {
+      setAllContactsLoaded(true)
+      setLoading(false)
+      return
+    }
+
     let contacts: ContactInfoInterface[] = []
     snapshot.forEach((contact: { val: () => ContactInfoInterface; key: string }) => {
       if (
@@ -114,32 +120,32 @@ const ContactsSearch: React.FC<Props> = ({ wrapperRef }) => {
     ;(async () => {
       setInitialLoading(true)
       try {
-        let ff = 0
-        let aaa: any = []
-        const test: any = async () => {
+        let additionalContactsToLoad = 0
+        let contacts: any = []
+        const getInitialContacts = async () => {
           const contactsData = await contactsListRef
             .orderByChild("userName")
-            .limitToFirst(CONTACTS_TO_LOAD + ff)
+            .limitToFirst(CONTACTS_TO_LOAD + additionalContactsToLoad)
             .once("value")
-
-          console.log(CONTACTS_TO_LOAD + ff)
-
           const contactsLength = Object.keys(contactsData.val() || {}).length
+          const contactsDataFiltered = Object.values(contactsData.val() || {}).filter(
+            (contact: any) => contact.status === true && !contact.isGroupChat
+          )
 
-          console.log({ contactsLength })
-
-          if (contactsLength <= CONTACTS_TO_LOAD) {
-            ff = ff + CONTACTS_TO_LOAD
-            test()
+          if (contactsLength < 20 || contactsDataFiltered.length >= 20) {
+            contacts = contactsData
+            return
           }
 
-          aaa = contactsData.val()
+          if (contactsLength >= 20 && contactsLength !== contactsDataFiltered.length) {
+            additionalContactsToLoad = additionalContactsToLoad + CONTACTS_TO_LOAD
+            await getInitialContacts()
+          } else {
+            contacts = contactsData
+          }
         }
-
-        await test()
-        console.log(aaa)
-
-        getContactsData({ snapshot: [] })
+        await getInitialContacts()
+        getContactsData({ snapshot: contacts })
       } catch (error) {
         errors.handleError({
           message: "Some of your contacts were not loaded correctly. Try to reload the page."
@@ -147,22 +153,12 @@ const ContactsSearch: React.FC<Props> = ({ wrapperRef }) => {
         setInitialLoading(false)
       }
     })()
-
-    const contactsAmountListener = firebase
-      .contactsDatabase({ uid: authUser?.uid })
-      .child("contactsAmount")
-      .on("value", (snapshot: any) => {
-        setAllContactsAmount(snapshot.val())
-      })
-    return () => {
-      firebase.contactsDatabase({ uid: authUser?.uid }).child("contactsAmount").off("value", contactsAmountListener)
-    }
   }, [firebase, authUser])
 
   useEffect(() => {
     if (!isScrolledDown) return
     if (loading) return
-    if (contactsList.length >= allContactsAmount!) return
+    if (allContactsLoaded) return
     ;(async () => {
       try {
         setLoading(true)
@@ -179,7 +175,7 @@ const ContactsSearch: React.FC<Props> = ({ wrapperRef }) => {
         setLoading(false)
       }
     })()
-  }, [isScrolledDown, contactsList])
+  }, [isScrolledDown, allContactsLoaded])
 
   const contactsToRender = !searchedContacts?.length ? contactsList : searchedContacts
   return (

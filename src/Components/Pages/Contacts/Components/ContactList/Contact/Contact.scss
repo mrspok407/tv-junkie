@@ -25,10 +25,25 @@
   }
 
   &__row {
+    position: relative;
     display: flex;
     height: 23px;
     column-gap: 5px;
     align-items: center;
+
+    &--online {
+      &:after {
+        content: "";
+        position: absolute;
+        top: -10px;
+        left: -7px;
+        width: 13px;
+        height: 13px;
+        border-radius: 50%;
+        background-color: #00ff9c;
+        border: 2px solid #fff;
+      }
+    }
   }
 
   &--auth-last-message-not-pinned {
@@ -83,6 +98,7 @@
   }
 
   &__username {
+    position: relative;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

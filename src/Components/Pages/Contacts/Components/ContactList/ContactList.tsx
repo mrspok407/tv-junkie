@@ -3,7 +3,7 @@ import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
 import Contact from "./Contact/Contact"
 import ContactRemovedFromGroup from "./ContactRemovedFromGroup/ContactRemovedFromGroup"
-import useElementScrolledDown from "Components/Pages/Movies/useElementScrolledDown"
+import useElementScrolledDown from "Components/Pages/Contacts/Hooks/useElementScrolledDown"
 import { ContactInfoInterface, CONTACT_INFO_INITIAL_DATA, MessageInterface } from "../../@Types"
 import classNames from "classnames"
 import { ContactsContext } from "../@Context/ContactsContext"
@@ -20,9 +20,10 @@ type Props = {
 
 const ContactList: React.FC<Props> = ({ contactListWrapperRef }) => {
   const { firebase, authUser, errors, contactsContext, contactsState } = useFrequentVariables()
-  const { contacts, groupCreation } = contactsState
+  const { contacts, groupCreation, contactsStatus } = contactsState
   const contactsData = Object.values(contacts)?.map((contact) => contact)
 
+  console.log({ contactsStatus })
   const [allContactsAmount, setAllContactsAmount] = useState<number | null>(null)
   const loadedContacts = contactsContext?.state?.contacts ? Object.keys(contactsContext.state.contacts).length : 0
 
