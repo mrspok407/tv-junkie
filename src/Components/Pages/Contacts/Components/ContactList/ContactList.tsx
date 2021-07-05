@@ -23,7 +23,6 @@ const ContactList: React.FC<Props> = ({ contactListWrapperRef }) => {
   const { contacts, groupCreation, contactsStatus } = contactsState
   const contactsData = Object.values(contacts)?.map((contact) => contact)
 
-  console.log({ contactsStatus })
   const [allContactsAmount, setAllContactsAmount] = useState<number | null>(null)
   const loadedContacts = contactsContext?.state?.contacts ? Object.keys(contactsContext.state.contacts).length : 0
 

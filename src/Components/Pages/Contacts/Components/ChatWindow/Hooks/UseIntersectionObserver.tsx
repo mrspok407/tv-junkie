@@ -73,8 +73,6 @@ const useIntersectionObserver = ({
   observerRef = new IntersectionObserver(observerCallback, observerOptions)
 
   useEffect(() => {
-    console.log({ unreadMessagesAuth })
-    console.log({ unreadMsgsListenerChatKey })
     if (!unreadMsgsListenerChatKey) return
     if (!renderedMessages?.length || !unreadMessagesAuth?.length) return
     if (![true, "removed"].includes(contactInfo.status) && !contactInfo.isGroupChat) return

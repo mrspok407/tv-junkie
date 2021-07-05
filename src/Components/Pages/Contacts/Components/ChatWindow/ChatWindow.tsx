@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback, useLayoutEffect } from "react"
+import React, { useEffect, useState, useRef, useCallback, useLayoutEffect, useMemo } from "react"
 import classNames from "classnames"
 import MessageInfo from "./Components/MessageInfo/MessageInfo"
 import { throttle } from "throttle-debounce"
@@ -33,7 +33,8 @@ const ChatWindow: React.FC = () => {
     authUserUnreadMessages,
     firebaseListeners,
     groupInfoSettingsActive,
-    chatMembersStatus
+    chatMembersStatus,
+    messagesRenderedOnScroll
   } = contactsState
   const messagesData = messages[activeChat.chatKey]
   const renderedMessages = renderedMessagesList[activeChat.chatKey] || []
@@ -218,7 +219,6 @@ const ChatWindow: React.FC = () => {
   }, [activeChat, renderedMessages, messagesData, chatContainerRef, chatWindowLoading])
 
   useLayoutEffect(() => {
-    console.log({ unreadMessagesAuth })
     if (!chatContainerRef) return
     if (!messagesData?.length || !unreadMessagesAuth) return
     if (![true, "removed"].includes(contactInfo.status) && !contactInfo.isGroupChat) return
@@ -237,7 +237,7 @@ const ChatWindow: React.FC = () => {
     if (firstUnreadMessageRef) {
       if (isScrollBottom) {
         console.log("to first unread ChatWindow")
-        firstUnreadMessageRef?.scrollIntoView({ block: "start", inline: "start" })
+        firstUnreadMessageRef?.parentElement?.scrollIntoView({ block: "start", inline: "start" })
       } else {
         console.log("scroll previous")
         chatContainerRef.scrollTop = lastScrollPosition[activeChat.chatKey]!
@@ -322,6 +322,10 @@ const ChatWindow: React.FC = () => {
     firebase.newContactsActivity({ uid: authUser?.uid }).child(`${contactInfo.key}`).set(null)
   }, [contactInfo])
 
+  const firstUnreadMessage = useMemo(() => {
+    return messagesData?.find((message) => message.key === unreadMessagesAuth[0])
+  }, [unreadMsgsListenerChatKey, messagesRenderedOnScroll, chatWindowLoading])
+
   return (
     <div className="chat-window-container" onMouseEnter={onMouseEnter}>
       <div
@@ -359,6 +363,8 @@ const ChatWindow: React.FC = () => {
                 const nextMessage = array[index + 1]
                 const prevMessage = array[Math.max(index - 1, 0)]
 
+                const isFirstUnreadMessage = renderedMessage.key === firstUnreadMessage?.key
+
                 const date = convertTimeStampToDate({ timeStamp: renderedMessage?.timeStamp })
 
                 const currentMessageDate = new Date(renderedMessage?.timeStamp).toDateString()
@@ -388,7 +394,8 @@ const ChatWindow: React.FC = () => {
                           "chat-window__message-wrapper--send": renderedMessage.sender === authUser?.uid,
                           "chat-window__message-wrapper--receive": renderedMessage.sender === activeChat.contactKey,
                           "chat-window__message-wrapper--selected": selectedMessagesData.includes(renderedMessage.key),
-                          "chat-window__message-wrapper--selection-active": selectedMessagesData.length
+                          "chat-window__message-wrapper--selection-active": selectedMessagesData.length,
+                          "chat-window__message-wrapper--first-unread": isFirstUnreadMessage
                         })}
                         onClick={() => {
                           if (!selectedMessagesData.length) return
@@ -398,6 +405,11 @@ const ChatWindow: React.FC = () => {
                           })
                         }}
                       >
+                        {isFirstUnreadMessage && (
+                          <div className="chat-window__message-first-unread">
+                            <span>Unread messages</span>
+                          </div>
+                        )}
                         <div
                           className={classNames(`chat-window__message chat-window__message--${renderedMessage.key}`, {
                             "chat-window__message--send": renderedMessage.sender === authUser?.uid,

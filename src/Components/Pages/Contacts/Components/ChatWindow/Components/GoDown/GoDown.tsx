@@ -106,7 +106,7 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
     if (!wentToFirstUnread) return
     const firstUnreadMessage = unreadMessages[0]
     const firstUnreadMessageRef = document.querySelector(`.chat-window__message--${firstUnreadMessage}`)
-    firstUnreadMessageRef?.scrollIntoView({ block: "start", inline: "start" })
+    firstUnreadMessageRef?.parentElement?.scrollIntoView({ block: "start", inline: "start" })
     setWentToFirstUnread(false)
   }, [renderedMessages, wentToFirstUnread])
 

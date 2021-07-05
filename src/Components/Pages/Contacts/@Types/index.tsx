@@ -146,6 +146,7 @@ export interface ContactsStateInterface {
   chatParticipants: {
     [key: string]: string[]
   }
+  messagesRenderedOnScroll: string
   messagesListRef: any
   messagePopup: string
   optionsPopupContactList: string

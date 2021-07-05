@@ -135,7 +135,7 @@ const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGr
 
           const newMessage = { ...snapshot.val(), key: snapshot.key }
           console.log({ newMessage })
-          contactsContext?.dispatch({ type: "addNewMessage", payload: { newMessage, chatKey } })
+          contactsContext?.dispatch({ type: "addNewMessage", payload: { newMessage, chatKey, authUser } })
         })
 
       messagesRef

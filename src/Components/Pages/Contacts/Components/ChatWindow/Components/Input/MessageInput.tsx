@@ -154,7 +154,10 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
         key: timeStampEpoch.toString(),
         isDelivered: false
       }
-      contactsContext?.dispatch({ type: "addNewMessage", payload: { newMessage, chatKey: activeChat.chatKey } })
+      contactsContext?.dispatch({
+        type: "addNewMessage",
+        payload: { newMessage, chatKey: activeChat.chatKey, authUser }
+      })
 
       const newMessageRef = document.querySelector(`.chat-window__message--${timeStampEpoch.toString()}`)
       newMessageRef?.scrollIntoView({ block: "start", inline: "start" })

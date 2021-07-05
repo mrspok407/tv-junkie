@@ -168,6 +168,11 @@
       }
     }
 
+    &--first-unread {
+      .chat-window__select-btn {
+        top: calc(50% + 20px);
+      }
+    }
     &--receive {
       .chat-window__select-btn {
         left: calc(var(--msgWidth) + var(--selectBtnSize));
@@ -219,6 +224,35 @@
 
     &:hover .chat-window__message-options .chat-window__open-popup-btn {
       opacity: 1;
+    }
+
+    &-first-unread {
+      text-align: center;
+      margin: 10px 0 5px 0;
+      padding: 8px;
+      background-color: getColor(firstUnreadBG, $chatWindowPalette);
+      user-select: none;
+
+      span {
+        position: relative;
+        &:after,
+        &:before {
+          content: "";
+          position: absolute;
+          width: 15px;
+          height: 15px;
+          bottom: 3px;
+          left: -20px;
+          background-image: url("../../../../../assets/images/icons/back-arrow.svg");
+          background-size: contain;
+          background-repeat: no-repeat;
+          transform: rotate(-90deg);
+        }
+        &:before {
+          left: initial;
+          right: -20px;
+        }
+      }
     }
 
     &-inner {
