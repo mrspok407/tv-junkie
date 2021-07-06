@@ -152,8 +152,8 @@ const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGr
           //   return
           // }
 
-          const changedMessage = { ...snapshot.val(), key: snapshot.key }
-          contactsContext?.dispatch({ type: "changeMessage", payload: { changedMessage, chatKey } })
+          const editedMessage = { ...snapshot.val(), key: snapshot.key }
+          contactsContext?.dispatch({ type: "editMessage", payload: { editedMessage, chatKey } })
         })
 
       messagesRef

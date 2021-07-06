@@ -102,12 +102,6 @@ const ContactList: React.FC<Props> = ({ contactListWrapperRef }) => {
         type: "updateContactsInitial",
         payload: { contacts: contactsDispatch, unreadMessages, unreadMessagesContacts }
       })
-      // } else {
-      //   contactsContext?.dispatch({
-      //     type: "updateContactsNewLoad",
-      //     payload: { contacts: contactsDispatch,  unreadMessages, unreadMessagesContacts }
-      //   })
-      // }
 
       newLoad.current = false
       setInitialLoading(false)

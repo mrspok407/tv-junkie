@@ -84,9 +84,9 @@ const useLoadTopMessages = () => {
         //   return
         // }
 
-        const changedMessage = { ...snapshot.val(), key: snapshot.key }
-        contactsContext?.dispatch({ type: "changeMessage", payload: { changedMessage, chatKey: activeChat.chatKey } })
-        console.log({ changedChild: changedMessage })
+        const editedMessage = { ...snapshot.val(), key: snapshot.key }
+        contactsContext?.dispatch({ type: "editMessage", payload: { editedMessage, chatKey: activeChat.chatKey } })
+        console.log({ changedChild: editedMessage })
       })
 
     messagesRef
