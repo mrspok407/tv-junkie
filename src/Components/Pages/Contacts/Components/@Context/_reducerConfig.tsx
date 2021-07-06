@@ -11,7 +11,6 @@ import { MESSAGES_TO_RENDER, UNREAD_MESSAGES_TO_RENDER } from "./Constants"
 import * as _isEqual from "lodash.isequal"
 import * as _merge from "lodash.merge"
 import * as _assign from "lodash.assign"
-import useFrequentVariables from "../../Hooks/UseFrequentVariables"
 import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 
 export type ACTIONTYPES =
@@ -21,7 +20,6 @@ export type ACTIONTYPES =
     }
   | { type: "updateAuthUserUnreadMessages"; payload: { chatKey: string; unreadMessages: string[] } }
   | { type: "updateActiveChat"; payload: { chatKey: string; contactKey: string } }
-  | { type: "updateMessagesListRef"; payload: { ref: any } }
   | {
       type: "setInitialMessages"
       payload: { messagesData: MessageInterface[]; startIndex?: number; endIndex?: number; chatKey: string }
@@ -86,6 +84,7 @@ export type ACTIONTYPES =
       payload: { participants: string[]; chatKey: string }
     }
   | { type: "updateContactsPageIsOpen"; payload: { isPageOpen: boolean | null; chatKey: string } }
+  | { type: "updateRerenderUnreadMessagesStart"; payload: { messageKey: string } }
 
 const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
   const {
@@ -242,7 +241,14 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
           ...renderedMessagesList,
           [activeChat.chatKey]: messages[activeChat.chatKey].slice(indexStart, indexEnd)
         },
-        messagesRenderedOnScroll: messages[activeChat.chatKey][indexStart].key
+        rerenderUnreadMessagesStart: messages[activeChat.chatKey][indexStart].key
+      }
+    }
+
+    case "updateRerenderUnreadMessagesStart": {
+      return {
+        ...state,
+        rerenderUnreadMessagesStart: action.payload.messageKey
       }
     }
 
@@ -270,7 +276,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
           ...renderedMessagesList,
           [activeChat.chatKey]: messages[activeChat.chatKey].slice(indexStart, indexEnd)
         },
-        messagesRenderedOnScroll: messages[activeChat.chatKey][indexStart].key
+        rerenderUnreadMessagesStart: messages[activeChat.chatKey][indexStart].key
       }
     }
 
@@ -303,7 +309,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
               ...authUserUnreadMessages,
               [activeChat.chatKey]: []
             },
-            messagesRenderedOnScroll: messages[activeChat.chatKey][0].key
+            rerenderUnreadMessagesStart: messages[activeChat.chatKey][0].key
           }
         } else {
           const endIndex = messagesData.length - Math.max(unreadMessages.length! - UNREAD_MESSAGES_TO_RENDER, 0)
@@ -314,7 +320,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
               ...renderedMessagesList,
               [activeChat.chatKey]: messagesData.slice(startIndex, endIndex)
             },
-            messagesRenderedOnScroll: messages[activeChat.chatKey][startIndex].key
+            rerenderUnreadMessagesStart: messages[activeChat.chatKey][startIndex].key
           }
         }
       }
@@ -658,21 +664,8 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         contacts: action.payload.contacts,
         authUserUnreadMessages: authUnreadMerged,
         contactsUnreadMessages: contactsUnreadMerged
-        // authUserUnreadMessages: !!Object.keys(authUserUnreadMessages).length
-        //   ? authUserUnreadMessages
-        //   : action.payload.unreadMessages,
-        // contactsUnreadMessages: !!Object.keys(contactsUnreadMessages).length
-        //   ? contactsUnreadMessages
-        //   : action.payload.unreadMessagesContacts
       }
     }
-
-    // case "updateContactsNewLoad": {
-    //   return {
-    //     ...state,
-    //     contacts: action.payload.contacts
-    //   }
-    // }
 
     case "updateContacts": {
       action.payload.contacts.reverse()
@@ -756,12 +749,6 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         ...state,
         activeChat: action.payload,
         groupInfoSettingsActive: false
-      }
-
-    case "updateMessagesListRef":
-      return {
-        ...state,
-        messagesListRef: action.payload.ref
       }
 
     case "updateMessagePopup":
@@ -863,7 +850,7 @@ export const INITIAL_STATE = {
   selectedMessages: {},
   messagesInput: {},
   renderedMessagesList: {},
-  messagesRenderedOnScroll: "",
+  rerenderUnreadMessagesStart: "",
   contacts: {},
   lastScrollPosition: {},
   messagePopup: "",

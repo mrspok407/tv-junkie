@@ -142,6 +142,7 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
       } else {
         messageKey = await sendMessageGroupChat({ message: newMessageText })
       }
+
       const newMessageRef = document.querySelector(`.chat-window__message--${messageKey}`)
       newMessageRef?.scrollIntoView({ block: "start", inline: "start" })
     } catch (error) {

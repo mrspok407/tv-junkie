@@ -44,6 +44,7 @@ const useHandleMessage = () => {
       }
     })
 
+    contactsContext?.dispatch({ type: "updateRerenderUnreadMessagesStart", payload: { messageKey } })
     await firebase
       .database()
       .ref()
@@ -108,6 +109,8 @@ const useHandleMessage = () => {
       updateData[`users/${activeChat.contactKey}/contactsDatabase/contactsLastActivity/${authUser?.uid}`] =
         timeStampEpoch
     }
+
+    contactsContext?.dispatch({ type: "updateRerenderUnreadMessagesStart", payload: { messageKey } })
     await firebase.database().ref().update(updateData)
 
     return messageKey

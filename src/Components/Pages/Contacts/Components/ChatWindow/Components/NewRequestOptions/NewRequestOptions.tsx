@@ -10,7 +10,9 @@ const NewRequestOptions: React.FC<Props> = ({}) => {
   const { activeChat, contacts } = contactsState
   const contactInfo = contacts[activeChat.contactKey]
 
-  const { handleContactRequest } = useResponseContactRequest({ userUid: activeChat.contactKey })
+  const { handleContactRequest, responseContactRequestLoading } = useResponseContactRequest({
+    userUid: activeChat.contactKey
+  })
 
   const renderMarkup = () => {
     switch (contactInfo.receiver) {
@@ -24,16 +26,17 @@ const NewRequestOptions: React.FC<Props> = ({}) => {
 
               <div className="new-request__actions--receiver">
                 <button className="button" onClick={() => handleContactRequest({ status: "accept" })}>
-                  Accept
+                  {responseContactRequestLoading.accept ? <span className="button-loader-circle"></span> : "Accept"}
                 </button>
                 <button
                   className="button"
                   onClick={() => {
+                    if (Object.values(responseContactRequestLoading).some((item) => item)) return
                     handleContactRequest({ status: "rejected" })
                     contactsContext?.dispatch({ type: "updateActiveChat", payload: { chatKey: "", contactKey: "" } })
                   }}
                 >
-                  Reject
+                  {responseContactRequestLoading.rejected ? <span className="button-loader-circle"></span> : "Reject"}
                 </button>
               </div>
             </>

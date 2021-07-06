@@ -74,6 +74,10 @@ export const _removeMemberFromGroup = async ({
       [`users/${member.key}/contactsDatabase/newContactsActivity/${groupChatKey}`]: true,
       [`users/${member.key}/contactsDatabase/contactsLastActivity/${groupChatKey}`]: timeStampData
     }
+
+    console.log("boi")
+    const timeOut = await new Promise((resolve) => setTimeout(resolve, 1500))
+
     return database.ref().update(updateData)
   } catch (error) {
     throw new Error(`There has been some error updating database: ${error}`)
@@ -130,7 +134,7 @@ export const _addNewGroupMembers = async ({
         timeStamp
       }
     }
-
+    const timeOut = await new Promise((resolve) => setTimeout(resolve, 1500))
     return database.ref().update(updateData)
   } catch (error) {
     throw new Error(`There has been some error updating database: ${error}`)

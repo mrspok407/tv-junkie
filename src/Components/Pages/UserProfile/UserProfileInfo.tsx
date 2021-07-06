@@ -37,8 +37,8 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
   // const [isRecipientNotified, setIsRecipientNotified] = useState<boolean | null>(null)
   // const [isReceiver, setIsReceiver] = useState<boolean | null>(null)
 
-  const { sendContactRequest } = useSendContactRequest({ userName, userUid })
-  const { handleContactRequest } = useResponseContactRequest({ userUid })
+  const { sendContactRequest, contactRequestLoading } = useSendContactRequest({ userName, userUid })
+  const { handleContactRequest, responseContactRequestLoading } = useResponseContactRequest({ userUid })
   // const { updateRecipientNotified } = useRecipientNotified({ userUid })
 
   const contactRef = firebase.contact({ authUid: authUser?.uid, contactUid: userUid })
@@ -58,32 +58,15 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
   }, [getUserName])
 
   useEffect(() => {
-    // const attachFirebaseListeners = async () => {
-
-    // contactRef.child("recipientNotified").on("value", (snapshot: { val: () => boolean | null }) => {
-    //   setIsRecipientNotified(snapshot.val())
-    // })
-    // contactRef.child("receiver").on("value", (snapshot: { val: () => boolean | null }) => {
-    //   setIsReceiver(snapshot.val())
-    // })
-    // }
     contactRef.on("value", (snapshot: { val: () => ContactInfo }) => {
       setContactInfo(snapshot.val())
       setLoadingContactInfo(false)
     })
-    // attachFirebaseListeners()
     return () => {
       contactRef.off()
-      // contactRef.child("recipientNotified").off()
       contactRef.child("receiver").off()
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
-
-  // useEffect(() => {
-  //   if (isRecipientNotified === null || isReceiver === null) return
-  //   if (isRecipientNotified === true || isReceiver === true) return
-  //   updateRecipientNotified()
-  // }, [isRecipientNotified, isReceiver]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (contactInfo === null) return
@@ -104,7 +87,7 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
             </div>
             <div className="new-request__actions--receiver">
               <button className="button" onClick={() => handleContactRequest({ status: "accept" })}>
-                Accept
+                {responseContactRequestLoading.accept ? <span className="button-loader-circle"></span> : "Accept"}
               </button>
               <button
                 className="button"
@@ -112,7 +95,7 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
                   handleContactRequest({ status: "rejected" })
                 }}
               >
-                Reject
+                {responseContactRequestLoading.rejected ? <span className="button-loader-circle"></span> : "Reject"}
               </button>
             </div>
           </div>
@@ -128,7 +111,7 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
           </div>
           <div className="user-profile__actions">
             <button className="button" onClick={() => sendContactRequest()}>
-              Send again
+              {contactRequestLoading ? <span className="button-loader-circle"></span> : "Send again"}
             </button>
           </div>
         </>
@@ -138,7 +121,7 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
             <div className="user-profile__username">{<span className="user-profile__name">{userName}</span>}</div>
             <div className="user-profile__actions">
               <button className="button" onClick={() => sendContactRequest()}>
-                Add to contacts
+                {contactRequestLoading ? <span className="button-loader-circle"></span> : "Add to contacts"}
               </button>
             </div>
           </>

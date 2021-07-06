@@ -1,4 +1,5 @@
 import classNames from "classnames"
+import { MessageInterface } from "Components/Pages/Contacts/@Types"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
 import React, { useState, useEffect } from "react"
 import { convertTimeStampToDate } from "Utils"
@@ -6,9 +7,11 @@ import MessageInfo from "../../MessageInfo/MessageInfo"
 import InfoMessage from "./Components/NewMembersMessages/InfoMessage"
 import "./MessagesListGroupChat.scss"
 
-type Props = {}
+type Props = {
+  firstUnreadMessage: MessageInterface | undefined
+}
 
-const MessagesList: React.FC<Props> = ({}) => {
+const MessagesList: React.FC<Props> = ({ firstUnreadMessage }) => {
   const { authUser, contactsContext, contactsState } = useFrequentVariables()
   const { activeChat, messages, renderedMessagesList, selectedMessages, contacts } = contactsState
   const messagesData = messages[activeChat.chatKey]
@@ -35,6 +38,8 @@ const MessagesList: React.FC<Props> = ({}) => {
           {renderedMessages?.map((renderedMessage, index, array) => {
             const nextMessage = array[index + 1]
             const prevMessage = array[Math.max(index - 1, 0)]
+
+            const isFirstUnreadMessage = renderedMessage.key === firstUnreadMessage?.key
 
             const date = convertTimeStampToDate({ timeStamp: renderedMessage?.timeStamp })
 
@@ -63,10 +68,9 @@ const MessagesList: React.FC<Props> = ({}) => {
                     className={classNames("chat-window__message-wrapper", {
                       "chat-window__message-wrapper--new-bunch": renderedMessage.sender !== prevMessage.sender,
                       "chat-window__message-wrapper--last-in-bunch": renderedMessage.sender !== nextMessage?.sender,
-                      // "chat-window__message-wrapper--send": renderedMessage.sender === authUser?.uid,
-                      // "chat-window__message-wrapper--receive": renderedMessage.sender === activeChat.contactKey,
                       "chat-window__message-wrapper--selected": selectedMessagesData.includes(renderedMessage.key),
-                      "chat-window__message-wrapper--selection-active": selectedMessagesData.length
+                      "chat-window__message-wrapper--selection-active": selectedMessagesData.length,
+                      "chat-window__message-wrapper--first-unread": isFirstUnreadMessage
                     })}
                     onClick={() => {
                       if (!selectedMessagesData.length || renderedMessage.sender !== authUser?.uid) return
@@ -76,6 +80,11 @@ const MessagesList: React.FC<Props> = ({}) => {
                       })
                     }}
                   >
+                    {isFirstUnreadMessage && (
+                      <div className="chat-window__message-first-unread">
+                        <span>Unread messages</span>
+                      </div>
+                    )}
                     {renderedMessage.sender !== nextMessage?.sender && renderedMessage.sender !== authUser?.uid && (
                       <div className="chat-window__message-avatar">{renderedMessage.username?.slice(0, 1)}</div>
                     )}

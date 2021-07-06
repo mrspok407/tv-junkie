@@ -1,4 +1,4 @@
-import { useContext } from "react"
+import { useContext, useState } from "react"
 import { FirebaseContext } from "Components/Firebase"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { _handleContactRequest } from "firebaseHttpCallableFunctionsTests"
@@ -7,14 +7,20 @@ type Props = {
   userUid: string
 }
 
+const INITIAL_LOADING_STATE = { accept: false, rejected: false }
+
 const useResponseContactRequest = ({ userUid }: Props) => {
   const { authUser, errors } = useContext(AppContext)
   const firebase = useContext(FirebaseContext)
 
+  const [responseContactRequestLoading, setResponseContactRequestLoading] = useState(INITIAL_LOADING_STATE)
+
   const handleContactRequest = async ({ status }: { status: string }) => {
+    if (responseContactRequestLoading.accept || responseContactRequestLoading.rejected) return
     const timeStamp = firebase.timeStamp()
 
     try {
+      setResponseContactRequestLoading((prevState) => ({ ...prevState, [status]: true }))
       await _handleContactRequest({
         data: { contactUid: userUid, status },
         context: { authUser: authUser! },
@@ -31,10 +37,12 @@ const useResponseContactRequest = ({ userUid }: Props) => {
       })
 
       throw new Error(`There has been some error handling contact request: ${error}`)
+    } finally {
+      setResponseContactRequestLoading(INITIAL_LOADING_STATE)
     }
   }
 
-  return { handleContactRequest }
+  return { handleContactRequest, responseContactRequestLoading }
 }
 
 export default useResponseContactRequest

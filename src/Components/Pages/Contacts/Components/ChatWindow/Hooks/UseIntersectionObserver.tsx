@@ -34,7 +34,6 @@ const useIntersectionObserver = ({
         const messageRef: any = document.querySelector(`.chat-window__message--${messageKey}`)
         observerRef.unobserve(messageRef)
         observedMessages.current = [...observedMessages.current.filter((message) => message !== messageKey)]
-
         firebase
           .unreadMessages({ uid: authUser?.uid!, chatKey: activeChat.chatKey, isGroupChat: contactInfo.isGroupChat })
           .orderByKey()

@@ -15,7 +15,7 @@ const Contact: React.FC<Props> = ({ member, contactInfo }) => {
   const { authUser, contactsState } = useFrequentVariables()
   const formatedDate = useTimestampFormater({ timeStamp: member.lastSeen! })
 
-  const { removeMember } = useRemoveMember()
+  const { removeMember, removeMemberLoading } = useRemoveMember()
 
   return (
     <div className={classNames("contact-item member-item", {})} key={member.key}>
@@ -38,7 +38,7 @@ const Contact: React.FC<Props> = ({ member, contactInfo }) => {
       {contactInfo.role === "ADMIN" && member.key !== authUser?.uid && (
         <div className="member-item__remove">
           <button type="button" className="member-item__remove-btn" onClick={() => removeMember({ member })}>
-            Remove
+            {removeMemberLoading ? <span className="button-loader-circle"></span> : "Remove"}
           </button>
         </div>
       )}

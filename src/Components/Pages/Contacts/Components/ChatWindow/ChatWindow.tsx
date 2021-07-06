@@ -34,7 +34,7 @@ const ChatWindow: React.FC = () => {
     firebaseListeners,
     groupInfoSettingsActive,
     chatMembersStatus,
-    messagesRenderedOnScroll
+    rerenderUnreadMessagesStart
   } = contactsState
   const messagesData = messages[activeChat.chatKey]
   const renderedMessages = renderedMessagesList[activeChat.chatKey] || []
@@ -42,7 +42,6 @@ const ChatWindow: React.FC = () => {
   const selectedMessagesData = selectedMessages[activeChat.chatKey] || []
   const contactInfo = contacts[activeChat.contactKey] || {}
   const chatMembersStatusData = chatMembersStatus[activeChat.chatKey] || []
-
   // const contactsUnreadMessagesData = contactsUnreadMessages[activeChat.chatKey]
 
   const chatWindowLoading =
@@ -136,6 +135,9 @@ const ChatWindow: React.FC = () => {
           type: "updateAuthUserUnreadMessages",
           payload: { chatKey: activeChat.chatKey, unreadMessages: [] }
         })
+        firebase
+          .unreadMessages({ uid: authUser?.uid!, chatKey: activeChat.chatKey, isGroupChat: contactInfo.isGroupChat })
+          .set(null)
         firebase
           .chatMemberStatus({
             chatKey: activeChat.chatKey,
@@ -234,6 +236,8 @@ const ChatWindow: React.FC = () => {
       scrollHeight <= lastScrollPosition[activeChat.chatKey]! + height
     )
 
+    console.log({ firstUnreadMessageRef })
+
     if (firstUnreadMessageRef) {
       if (isScrollBottom) {
         console.log("to first unread ChatWindow")
@@ -324,7 +328,7 @@ const ChatWindow: React.FC = () => {
 
   const firstUnreadMessage = useMemo(() => {
     return messagesData?.find((message) => message.key === unreadMessagesAuth[0])
-  }, [unreadMsgsListenerChatKey, messagesRenderedOnScroll, chatWindowLoading])
+  }, [unreadMsgsListenerChatKey, rerenderUnreadMessagesStart, chatWindowLoading])
 
   return (
     <div className="chat-window-container" onMouseEnter={onMouseEnter}>
@@ -346,7 +350,7 @@ const ChatWindow: React.FC = () => {
         ref={chatContainerCallback}
       >
         {contactInfo.isGroupChat ? (
-          <MessagesList />
+          <MessagesList firstUnreadMessage={firstUnreadMessage} />
         ) : (
           [true, "removed"].includes(contactInfo.status) &&
           (chatWindowLoading ? (

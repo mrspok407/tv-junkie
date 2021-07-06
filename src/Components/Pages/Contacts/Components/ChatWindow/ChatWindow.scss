@@ -169,6 +169,7 @@
     }
 
     &--first-unread {
+      flex-wrap: wrap;
       .chat-window__select-btn {
         top: calc(50% + 20px);
       }
@@ -227,6 +228,7 @@
     }
 
     &-first-unread {
+      width: 100%;
       text-align: center;
       margin: 10px 0 5px 0;
       padding: 8px;
