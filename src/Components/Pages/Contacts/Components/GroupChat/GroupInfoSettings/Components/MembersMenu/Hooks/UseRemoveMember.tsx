@@ -1,7 +1,7 @@
-import { ContactInfoInterface, MembersStatusGroupChatInterface } from "Components/Pages/Contacts/@Types"
+import { MembersStatusGroupChatInterface } from "Components/Pages/Contacts/@Types"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
 import { _removeMemberFromGroup } from "firebaseHttpCallableFunctionsTests"
-import React, { useState, useEffect } from "react"
+import { useState } from "react"
 
 const useRemoveMember = () => {
   const { firebase, authUser, errors, contactsState } = useFrequentVariables()
@@ -10,8 +10,6 @@ const useRemoveMember = () => {
 
   const removeMember = async ({ member }: { member: MembersStatusGroupChatInterface }) => {
     if (removeMemberLoading) return
-    // const removeMemberFromGroupCloud = firebase.httpsCallable("_removeMemberFromGroup")
-    // removeMemberFromGroupCloud({ member, groupChatKey: activeChat.chatKey, memberStatus })
     const timeStampData = firebase.timeStamp()
     try {
       setRemoveMemberLoading(true)

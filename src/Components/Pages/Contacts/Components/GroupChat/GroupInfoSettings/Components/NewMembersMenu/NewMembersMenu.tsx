@@ -1,6 +1,4 @@
 import classNames from "classnames"
-import { AppContext } from "Components/AppContext/AppContextHOC"
-import { FirebaseContext } from "Components/Firebase"
 import {
   ContactInfoInterface,
   CONTACT_INFO_INITIAL_DATA,
@@ -8,7 +6,7 @@ import {
 } from "Components/Pages/Contacts/@Types"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
 import useElementScrolledDown from "Components/Pages/Contacts/Hooks/useElementScrolledDown"
-import React, { useState, useEffect, useContext, useRef, useLayoutEffect, useCallback } from "react"
+import React, { useState, useEffect, useRef, useCallback } from "react"
 import { isUnexpectedObject } from "Utils"
 import Contact from "./Components/Contact/Contact"
 import SearchInput from "../../../GroupCreation/Components/SearchInput/SearchInput"
@@ -141,7 +139,7 @@ const NewMembersMenu: React.FC = () => {
         setIsSearching(false)
       }
     },
-    [contactsList]
+    [contactsList, errors] // eslint-disable-line react-hooks/exhaustive-deps
   )
 
   useEffect(() => {
@@ -181,7 +179,7 @@ const NewMembersMenu: React.FC = () => {
         setInitialLoading(false)
       }
     })()
-  }, [firebase, authUser])
+  }, [firebase, authUser, errors]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!isScrolledDown) return
@@ -203,7 +201,7 @@ const NewMembersMenu: React.FC = () => {
         setLoadingNewcontacts(false)
       }
     })()
-  }, [isScrolledDown, contactsList, allContactsLoaded])
+  }, [isScrolledDown, contactsList, allContactsLoaded, loadingNewContacts, errors]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const contactsToRender = !searchedContacts?.length ? contactsList : searchedContacts
   return (

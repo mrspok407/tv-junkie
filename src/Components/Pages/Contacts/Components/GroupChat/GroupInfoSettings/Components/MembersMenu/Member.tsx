@@ -1,9 +1,8 @@
 import classNames from "classnames"
 import { ContactInfoInterface, MembersStatusGroupChatInterface } from "Components/Pages/Contacts/@Types"
-import { ContactsContext } from "Components/Pages/Contacts/Components/@Context/ContactsContext"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
 import useTimestampFormater from "Components/Pages/Contacts/Hooks/UseTimestampFormater"
-import React, { useState, useEffect, useContext } from "react"
+import React from "react"
 import useRemoveMember from "./Hooks/UseRemoveMember"
 
 type Props = {
@@ -12,7 +11,7 @@ type Props = {
 }
 
 const Contact: React.FC<Props> = ({ member, contactInfo }) => {
-  const { authUser, contactsState } = useFrequentVariables()
+  const { authUser } = useFrequentVariables()
   const formatedDate = useTimestampFormater({ timeStamp: member.lastSeen! })
 
   const { removeMember, removeMemberLoading } = useRemoveMember()

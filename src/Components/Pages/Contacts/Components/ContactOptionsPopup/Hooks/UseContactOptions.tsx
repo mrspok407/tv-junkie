@@ -1,20 +1,16 @@
-import { AppContext } from "Components/AppContext/AppContextHOC"
-import { FirebaseContext } from "Components/Firebase"
 import { ContactInfoInterface } from "Components/Pages/Contacts/@Types"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
-import React, { useState, useEffect, useContext } from "react"
-import { ContactsContext } from "../../@Context/ContactsContext"
 
 type Props = {
   contactInfo?: ContactInfoInterface
 }
 
 const useContactOptions = ({ contactInfo }: Props) => {
-  const { firebase, authUser, errors, contactsContext, contactsState } = useFrequentVariables()
-  const { activeChat, renderedMessagesList, contacts, chatParticipants } = contactsState
+  const { firebase, authUser, errors, contactsState, contactsDispatch } = useFrequentVariables()
+  const { activeChat, chatParticipants } = contactsState
 
   const updateIsPinned = async () => {
-    contactsContext?.dispatch({ type: "closePopups", payload: "" })
+    contactsDispatch({ type: "closePopups", payload: "" })
 
     try {
       const timeStamp = new Date().getTime()
@@ -33,7 +29,7 @@ const useContactOptions = ({ contactInfo }: Props) => {
   }
 
   const handleMarkRead = async () => {
-    contactsContext?.dispatch({ type: "closePopups", payload: "" })
+    contactsDispatch({ type: "closePopups", payload: "" })
 
     try {
       let updateData = {}
@@ -51,7 +47,7 @@ const useContactOptions = ({ contactInfo }: Props) => {
         }
       }
       await firebase.database().ref().update(updateData)
-      contactsContext?.dispatch({
+      contactsDispatch({
         type: "updateAuthUserUnreadMessages",
         payload: { chatKey: contactInfo?.chatKey!, unreadMessages: [] }
       })
@@ -92,7 +88,7 @@ const useContactOptions = ({ contactInfo }: Props) => {
         .database()
         .ref()
         .update(updateData, () =>
-          contactsContext?.dispatch({
+          contactsDispatch({
             type: "updateActiveChat",
             payload: {
               chatKey: activeChat.chatKey === contactInfo.chatKey ? "" : activeChat.chatKey,
@@ -133,7 +129,7 @@ const useContactOptions = ({ contactInfo }: Props) => {
         .database()
         .ref()
         .update(updateData, () =>
-          contactsContext?.dispatch({
+          contactsDispatch({
             type: "updateActiveChat",
             payload: {
               chatKey: activeChat.chatKey === contactInfo.chatKey ? "" : activeChat.chatKey,
@@ -175,7 +171,7 @@ const useContactOptions = ({ contactInfo }: Props) => {
         .database()
         .ref()
         .update(updateData, () =>
-          contactsContext?.dispatch({
+          contactsDispatch({
             type: "updateActiveChat",
             payload: {
               chatKey: activeChat.chatKey === contactInfo.chatKey ? "" : activeChat.chatKey,
@@ -206,7 +202,7 @@ const useContactOptions = ({ contactInfo }: Props) => {
         [`users/${contactInfo.key}/contactsDatabase/newContactsRequests/${authUser?.uid}`]: null,
         [`users/${contactInfo.key}/contactsDatabase/newContactsActivity/${authUser?.uid}`]: null
       }
-      contactsContext?.dispatch({ type: "removeAllMessages", payload: { chatKey: contactInfo.chatKey } })
+      contactsDispatch({ type: "removeAllMessages", payload: { chatKey: contactInfo.chatKey } })
       await firebase.database().ref().update(updateData)
     } catch (error) {
       errors.handleError({

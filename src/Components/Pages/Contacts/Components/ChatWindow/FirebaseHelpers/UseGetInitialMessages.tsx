@@ -1,21 +1,12 @@
-import React, { useState, useEffect, useContext, useRef, useCallback } from "react"
-import { AppContext } from "Components/AppContext/AppContextHOC"
-import { FirebaseContext } from "Components/Firebase"
-import { ContactsContext } from "../../@Context/ContactsContext"
-import {
-  MessageInterface,
-  MESSAGE_INITIAL_DATA,
-  SnapshotStringBooleanInterface
-} from "Components/Pages/Contacts/@Types"
-import { isUnexpectedObject } from "Utils"
+import { useState, useEffect, useRef, useCallback } from "react"
+import { MessageInterface } from "Components/Pages/Contacts/@Types"
 import { setMessagesSnapshot } from "./setMessagesSnapshot"
 import { MESSAGES_TO_RENDER, UNREAD_MESSAGES_TO_RENDER } from "../../@Context/Constants"
-import { throttle } from "throttle-debounce"
 import debounce from "debounce"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
 
 const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGroupChat: boolean }) => {
-  const { firebase, authUser, errors, contactsContext, contactsState } = useFrequentVariables()
+  const { firebase, authUser, errors, contactsState, contactsDispatch } = useFrequentVariables()
   const { messages } = contactsState
   const messagesData = messages[chatKey]
 
@@ -25,7 +16,7 @@ const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGr
   const messagesToDelete = useRef<MessageInterface[]>([])
   const removeMessagesDebounce = useCallback(
     debounce((removedMessages: any) => {
-      contactsContext?.dispatch({ type: "removeMessages", payload: { removedMessages, chatKey } })
+      contactsDispatch({ type: "removeMessages", payload: { removedMessages, chatKey } })
       console.log(chatKey)
       messagesToDelete.current = []
     }, 0),
@@ -56,13 +47,13 @@ const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGr
         errors.handleError({
           message: "There were a problem loading messages. Please try to reload the page."
         })
-        contactsContext?.dispatch({ type: "setInitialMessages", payload: { messagesData: [], chatKey } })
+        contactsDispatch({ type: "setInitialMessages", payload: { messagesData: [], chatKey } })
         setLoading(false)
         throw new Error("There were a problem loading messages. Please try to reload the page.")
       }
 
       if (messagesSnapshot.val() === null) {
-        contactsContext?.dispatch({ type: "setInitialMessages", payload: { messagesData: [], chatKey } })
+        contactsDispatch({ type: "setInitialMessages", payload: { messagesData: [], chatKey } })
         setLoading(false)
       }
 
@@ -72,15 +63,6 @@ const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGr
       if (messagesSnapshot.val() !== null) {
         let messagesData: MessageInterface[] = []
         messagesSnapshot.forEach((message: any) => {
-          // if (
-          //   isUnexpectedObject({ exampleObject: MESSAGE_INITIAL_DATA, targetObject: message.val() }) &&
-          //   !isGroupChat
-          // ) {
-          //   errors.handleError({
-          //     message: "Some of the messages were hidden, because of the unexpected error."
-          //   })
-          //   return
-          // }
           messagesData.push({ ...message.val(), key: message.key })
         })
 
@@ -107,7 +89,7 @@ const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGr
           }
         }
 
-        contactsContext?.dispatch({
+        contactsDispatch({
           type: "setInitialMessages",
           payload: {
             messagesData,
@@ -123,52 +105,23 @@ const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGr
         .orderByChild("timeStamp")
         .startAfter(lastMessageTimeStamp)
         .on("child_added", (snapshot: { val: () => MessageInterface; key: string }) => {
-          // if (
-          //   isUnexpectedObject({ exampleObject: MESSAGE_INITIAL_DATA, targetObject: snapshot.val() }) &&
-          //   !isGroupChat
-          // ) {
-          //   errors.handleError({
-          //     message: "New message were hidden, because of the unexpected error. Please reload the page."
-          //   })
-          //   return
-          // }
-
           const newMessage = { ...snapshot.val(), key: snapshot.key }
           console.log({ newMessage })
-          contactsContext?.dispatch({ type: "addNewMessage", payload: { newMessage, chatKey, authUser } })
+          contactsDispatch({ type: "addNewMessage", payload: { newMessage, chatKey, authUser } })
         })
 
       messagesRef
         .orderByChild("timeStamp")
         .startAt(firstMessageTimeStamp)
         .on("child_changed", (snapshot: { val: () => MessageInterface; key: string }) => {
-          // if (
-          //   isUnexpectedObject({ exampleObject: MESSAGE_INITIAL_DATA, targetObject: snapshot.val() }) &&
-          //   !isGroupChat
-          // ) {
-          //   errors.handleError({
-          //     message: "Message hasn't been changed, because of the unexpected error. Please reload the page."
-          //   })
-          //   return
-          // }
-
           const editedMessage = { ...snapshot.val(), key: snapshot.key }
-          contactsContext?.dispatch({ type: "editMessage", payload: { editedMessage, chatKey } })
+          contactsDispatch({ type: "editMessage", payload: { editedMessage, chatKey } })
         })
 
       messagesRef
         .orderByChild("timeStamp")
         .startAt(firstMessageTimeStamp)
         .on("child_removed", (snapshot: { val: () => MessageInterface; key: string }) => {
-          // if (
-          //   isUnexpectedObject({ exampleObject: MESSAGE_INITIAL_DATA, targetObject: snapshot.val() }) &&
-          //   !isGroupChat
-          // ) {
-          //   errors.handleError({
-          //     message: "Message hasn't been deleted, because of the unexpected error. Please reload the page."
-          //   })
-          //   return
-          // }
           const removedMessage = { ...snapshot.val(), key: snapshot.key }
           messagesToDelete.current.push(removedMessage)
           removeMessagesDebounce(messagesToDelete.current)
@@ -176,7 +129,7 @@ const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGr
     }
 
     getMessages()
-  }, [chatKey, messagesRef, loading])
+  }, [chatKey, messagesRef, loading]) // eslint-disable-line react-hooks/exhaustive-deps
 }
 
 export default useGetInitialMessages

@@ -1,7 +1,7 @@
 import classNames from "classnames"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
 import useTimestampFormater from "Components/Pages/Contacts/Hooks/UseTimestampFormater"
-import React, { useState, useEffect, useRef } from "react"
+import React, { useRef } from "react"
 import ContactOptionsPopup from "../../../ContactOptionsPopup/ContactOptionsPopup"
 import Loader from "Components/UI/Placeholders/Loader"
 import "./ContactInfo.scss"
@@ -11,7 +11,7 @@ type Props = {
 }
 
 const ContactInfo: React.FC<Props> = ({ isScrollBottomRef }) => {
-  const { firebase, authUser, newContactsActivity, contactsContext, contactsState } = useFrequentVariables()
+  const { firebase, authUser, newContactsActivity, contactsState, contactsDispatch } = useFrequentVariables()
   const { activeChat, contacts, contactsStatus, optionsPopupChatWindow, chatMembersStatus } = contactsState
   const contactInfo = contacts[activeChat.contactKey] || {}
   const chatMembersStatusData = chatMembersStatus[contactInfo.chatKey] || []
@@ -28,7 +28,6 @@ const ContactInfo: React.FC<Props> = ({ isScrollBottomRef }) => {
     const messageKey = messageRef.key
     const updateData: any = {
       [`privateChats/${activeChat.chatKey}/messages/${messageKey}`]: {
-        // sender: authUser?.uid,
         sender: contactInfo.key,
         message: "test message very testy message yeah",
         timeStamp: timeStampEpoch
@@ -49,7 +48,7 @@ const ContactInfo: React.FC<Props> = ({ isScrollBottomRef }) => {
       })}
       onClick={() => {
         if (!contactInfo.isGroupChat) return
-        contactsContext?.dispatch({ type: "updateGroupInfoSettings" })
+        contactsDispatch({ type: "updateGroupInfoSettings" })
       }}
     >
       <div
@@ -62,7 +61,7 @@ const ContactInfo: React.FC<Props> = ({ isScrollBottomRef }) => {
           type="button"
           onClick={(e) => {
             e.stopPropagation()
-            contactsContext?.dispatch({ type: "updateActiveChat", payload: { chatKey: "", contactKey: "" } })
+            contactsDispatch({ type: "updateActiveChat", payload: { chatKey: "", contactKey: "" } })
           }}
         ></button>
       </div>
@@ -75,7 +74,7 @@ const ContactInfo: React.FC<Props> = ({ isScrollBottomRef }) => {
           })}
           onClick={(e) => {
             e.stopPropagation()
-            contactsContext?.dispatch({ type: "updateOptionsPopupChatWindow", payload: activeChat.contactKey })
+            contactsDispatch({ type: "updateOptionsPopupChatWindow", payload: activeChat.contactKey })
           }}
         >
           <span></span>

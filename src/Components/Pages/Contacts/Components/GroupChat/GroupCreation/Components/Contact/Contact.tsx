@@ -2,7 +2,7 @@ import classNames from "classnames"
 import { ContactInfoInterface } from "Components/Pages/Contacts/@Types"
 import { ContactsContext } from "Components/Pages/Contacts/Components/@Context/ContactsContext"
 import useTimestampFormater from "Components/Pages/Contacts/Hooks/UseTimestampFormater"
-import React, { useState, useEffect, useContext } from "react"
+import React, { useContext } from "react"
 import "./Contact.scss"
 
 type Props = {

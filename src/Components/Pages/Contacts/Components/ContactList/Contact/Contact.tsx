@@ -1,17 +1,14 @@
 import classNames from "classnames"
-import { AppContext } from "Components/AppContext/AppContextHOC"
-import { FirebaseContext } from "Components/Firebase"
-import React, { useContext, useEffect, useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import useTimestampFormater from "../../../Hooks/UseTimestampFormater"
-import { ContactInfoInterface, MessageInterface } from "../../../@Types"
-import { ContactsContext } from "../../@Context/ContactsContext"
+import { ContactInfoInterface } from "../../../@Types"
 import ContactOptionsPopup from "../../ContactOptionsPopup/ContactOptionsPopup"
 import useGetInitialMessages from "../../ChatWindow/FirebaseHelpers/UseGetInitialMessages"
 import useHandleContactsStatus from "../../ChatWindow/Hooks/UseHandleContactsStatus"
 import Loader from "Components/UI/Placeholders/Loader"
 import striptags from "striptags"
-import "./Contact.scss"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
+import "./Contact.scss"
 
 type Props = {
   contactInfo: ContactInfoInterface
@@ -19,8 +16,9 @@ type Props = {
 }
 
 const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount }) => {
-  const { firebase, authUser, contactsContext, contactsState } = useFrequentVariables()
-  const { optionsPopupContactList, activeChat, messages, contactsStatus, chatMembersStatus, contacts } = contactsState
+  const { firebase, authUser, contactsState, contactsDispatch } = useFrequentVariables()
+  const { optionsPopupContactList, activeChat, messages, contactsStatus, chatMembersStatus, messageDeletionProcess } =
+    contactsState
   const chatMembersStatusData = chatMembersStatus[contactInfo.chatKey] || []
   const messagesData = messages[contactInfo.chatKey]
 
@@ -29,6 +27,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
 
   const [authUnreadMessages, setAuthUnreadMessages] = useState<string[]>(contactInfo.unreadMessages)
   const [contactUnreadMessages, setContactUnreadMessages] = useState<string[]>(contactInfo.unreadMessagesContact)
+  const [contactUnreadMessageData, setContactUnreadMessageData] = useState<string[] | null>(null)
   const lastMessage =
     messagesData === undefined ? contactInfo.lastMessage : messagesData[messagesData?.length - 1] || {}
 
@@ -42,9 +41,14 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
 
   const setContactActive = () => {
     if (activeChat.chatKey === chatKey) return
-    contactsContext?.dispatch({ type: "updateActiveChat", payload: { chatKey, contactKey: contactInfo.key } })
+    contactsDispatch({ type: "updateActiveChat", payload: { chatKey, contactKey: contactInfo.key } })
     firebase.newContactsActivity({ uid: authUser?.uid }).child(`${contactInfo.key}`).set(null)
   }
+
+  useEffect(() => {
+    if (messageDeletionProcess) return
+    setContactUnreadMessageData(contactUnreadMessages)
+  }, [contactUnreadMessages, messageDeletionProcess])
 
   useEffect(() => {
     firebase
@@ -61,10 +65,6 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
       .unreadMessages({ uid: authUser?.uid!, chatKey, isGroupChat: contactInfo.isGroupChat })
       .on("value", (snapshot: any) => {
         const unreadMessagesAuth = !snapshot.val() ? [] : Object.keys(snapshot.val())
-        if (contactInfo.isGroupChat) {
-          console.log({ contactInfo })
-          console.log({ unreadMessagesAuth })
-        }
         setAuthUnreadMessages(unreadMessagesAuth)
       })
 
@@ -81,16 +81,11 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
       .child(`${chatKey}/historyDeleted`)
       .on("value", (snapshot: any) => {
         if (snapshot.val() === null) return
-        contactsContext?.dispatch({ type: "removeAllMessages", payload: { chatKey } })
+        contactsDispatch({ type: "removeAllMessages", payload: { chatKey } })
         firebase.privateChats().child(`${chatKey}/historyDeleted`).set(null)
       })
 
     return () => {
-      if (contactInfo.isGroupChat) {
-        console.log("unmount contact")
-        console.log({ chatKey: contactInfo.chatKey })
-      }
-
       firebase.newContactsActivity({ uid: authUser?.uid }).child(`${contactInfo.key}`).off()
       firebase.newContactsRequests({ uid: authUser?.uid! }).child(`${contactInfo.key}`).off()
       firebase.unreadMessages({ uid: authUser?.uid!, chatKey, isGroupChat: contactInfo.isGroupChat }).off()
@@ -107,12 +102,12 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
       ? contactNameCutLength?.slice(0, -1)
       : contactNameCutLength
 
-  const chatActive = contactsContext?.state.activeChat.contactKey === contactInfo.key
+  const chatActive = contactsState.activeChat.contactKey === contactInfo.key
   const unreadMessagesAmount = authUnreadMessages?.length === 0 ? null : authUnreadMessages?.length
 
   const lastMessageText = striptags(lastMessage?.message).slice(0, 30)
-
   const chatMembersTyping = chatMembersStatusData?.filter((member) => member.isTyping && member.key !== authUser?.uid)
+
   return (
     <div
       className={classNames("contact-item", {
@@ -143,7 +138,10 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
           [true, "removed"].includes(contactInfo.status) && (
             <div
               className={classNames("contact-item__last-message-status", {
-                "contact-item__last-message-status--unread": contactUnreadMessages?.length
+                "contact-item__last-message-status--unread":
+                  contactUnreadMessageData === null
+                    ? !!contactInfo.unreadMessagesContact.length
+                    : !!contactUnreadMessageData.length
               })}
             ></div>
           )}
@@ -207,7 +205,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
             })}
             onClick={(e) => {
               e.stopPropagation()
-              contactsContext?.dispatch({ type: "updateOptionsPopupContactList", payload: contactInfo.key })
+              contactsDispatch({ type: "updateOptionsPopupContactList", payload: contactInfo.key })
             }}
           >
             <span></span>

@@ -1,20 +1,12 @@
-import { AppContext } from "Components/AppContext/AppContextHOC"
-import { FirebaseContext } from "Components/Firebase"
 import { MessageInterface } from "Components/Pages/Contacts/@Types"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
-import React, { useState, useEffect, useContext } from "react"
-import striptags from "striptags"
-import { ContactsContext } from "../../../../@Context/ContactsContext"
-import useContactListeners from "../../../Hooks/UseContactListeners"
 
-const useHandleMessage = () => {
-  const { firebase, authUser, contactsContext, contactsState } = useFrequentVariables()
+const useHandleMessage = ({ contactLastActivity }: { contactLastActivity: { timeStamp: number; key: string } }) => {
+  const { firebase, authUser, contactsState, contactsDispatch } = useFrequentVariables()
   const { activeChat, contactsStatus, contacts, chatMembersStatus } = contactsState
   const contactStatusData = contactsStatus[activeChat.chatKey]
   const chatMembersStatusData = chatMembersStatus[activeChat.chatKey]
   const contactsData = Object.values(contacts || {})
-
-  const { contactLastActivity } = useContactListeners()
 
   const sendMessageGroupChat = async ({ message }: { message: string }) => {
     const firstUnpinnedContactIndex = contactsData.findIndex(
@@ -39,12 +31,13 @@ const useHandleMessage = () => {
       updateData[`users/${authUser?.uid}/contactsDatabase/contactsLastActivity/${activeChat.chatKey}`] = timeStampEpoch
     }
     chatMembersStatusData.forEach((member) => {
+      if (member.key === authUser?.uid) return
       if (!member.isOnline || !member.chatBottom || !member.pageInFocus) {
         updateData[`groupChats/${activeChat.chatKey}/members/unreadMessages/${member.key}/${messageKey}`] = true
       }
     })
 
-    contactsContext?.dispatch({ type: "updateRerenderUnreadMessagesStart", payload: { messageKey } })
+    contactsDispatch({ type: "updateRerenderUnreadMessagesStart", payload: { messageKey } })
     await firebase
       .database()
       .ref()
@@ -110,7 +103,7 @@ const useHandleMessage = () => {
         timeStampEpoch
     }
 
-    contactsContext?.dispatch({ type: "updateRerenderUnreadMessagesStart", payload: { messageKey } })
+    contactsDispatch({ type: "updateRerenderUnreadMessagesStart", payload: { messageKey } })
     await firebase.database().ref().update(updateData)
 
     return messageKey

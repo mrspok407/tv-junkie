@@ -1,10 +1,10 @@
-import { ContactInfoInterface, GroupCreationNewMemberInterface } from "Components/Pages/Contacts/@Types"
+import { GroupCreationNewMemberInterface } from "Components/Pages/Contacts/@Types"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
-import { _addNewGroupMembers, _createNewGroup } from "firebaseHttpCallableFunctionsTests"
-import React, { useState, useEffect } from "react"
+import { _addNewGroupMembers } from "firebaseHttpCallableFunctionsTests"
+import { useState } from "react"
 
 const useAddNewMembers = () => {
-  const { firebase, authUser, errors, contactsContext } = useFrequentVariables()
+  const { firebase, authUser, errors, contactsDispatch } = useFrequentVariables()
   const [newMembersLoading, setNewMembersLoading] = useState(false)
 
   const addNewMembers = async ({
@@ -26,7 +26,7 @@ const useAddNewMembers = () => {
         database: firebase.database()
       })
       setNewMembersLoading(false)
-      contactsContext?.dispatch({ type: "updateGroupInfoSettings", payload: { isActive: false } })
+      contactsDispatch({ type: "updateGroupInfoSettings", payload: { isActive: false } })
     } catch (error) {
       errors.handleError({
         errorData: error,

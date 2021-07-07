@@ -1,5 +1,4 @@
-import { ContactInfoInterface } from "Components/Pages/Contacts/@Types"
-import React, { useState, useEffect, useCallback } from "react"
+import React, { useState, useCallback } from "react"
 import debounce from "debounce"
 import Loader from "Components/UI/Placeholders/Loader"
 import "./SearchInput.scss"

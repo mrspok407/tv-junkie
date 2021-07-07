@@ -1,11 +1,8 @@
 import classNames from "classnames"
-import { AppContext } from "Components/AppContext/AppContextHOC"
-import { FirebaseContext } from "Components/Firebase"
 import { ContainerRectInterface, MessageInterface } from "Components/Pages/Contacts/@Types"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
-import React, { useState, useEffect, useCallback, useLayoutEffect, useContext, useRef } from "react"
+import React, { useState, useEffect, useCallback, useLayoutEffect, useRef } from "react"
 import { throttle } from "throttle-debounce"
-import { ContactsContext } from "../../../@Context/ContactsContext"
 import "./GoDown.scss"
 
 type Props = {
@@ -16,7 +13,7 @@ type Props = {
 }
 
 const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuthRef, getContainerRect }: Props) => {
-  const { firebase, authUser, contactsContext, contactsState } = useFrequentVariables()
+  const { firebase, authUser, contactsState, contactsDispatch } = useFrequentVariables()
   const { activeChat, renderedMessagesList, messages, contacts } = contactsState
   const messagesData = messages[chatKey]
   const renderedMessages = renderedMessagesList[chatKey]
@@ -49,12 +46,12 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
         .unreadMessages({ uid: authUser?.uid!, chatKey, isGroupChat: contactInfo.isGroupChat })
         .off("value", unreadMessagesListener)
     }
-  }, [firebase, chatKey])
+  }, [chatKey, authUser, firebase]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const onGoDown = () => {
     const renderedMessagesArray = renderedMessages.map((message) => message.key)
     if (!unreadMessages?.length) {
-      contactsContext?.dispatch({
+      contactsDispatch({
         type: "handleGoDown",
         payload: { unreadMessages }
       })
@@ -68,7 +65,7 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
       } else {
         setWentToFirstUnread(true)
       }
-      contactsContext?.dispatch({
+      contactsDispatch({
         type: "handleGoDown",
         payload: { unreadMessages }
       })
@@ -108,22 +105,19 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
     const firstUnreadMessageRef = document.querySelector(`.chat-window__message--${firstUnreadMessage}`)
     firstUnreadMessageRef?.parentElement?.scrollIntoView({ block: "start", inline: "start" })
     setWentToFirstUnread(false)
-  }, [renderedMessages, wentToFirstUnread])
+  }, [renderedMessages, wentToFirstUnread, unreadMessages])
 
   useLayoutEffect(() => {
     if (!renderedMessages?.length) return
     if (!wentToLastMessage) return
     chatContainerRef.scrollTop = getContainerRect().scrollHeight + getContainerRect().height
-    // const lastMessage = renderedMessages[renderedMessages.length - 1]
-    // const lastMessageRef = document.querySelector(`.chat-window__message--${lastMessage.key}`)
-    // lastMessageRef?.scrollIntoView({ block: "start", inline: "start" })
     setWentToLastMessage(false)
-  }, [renderedMessages, wentToLastMessage])
+  }, [renderedMessages, wentToLastMessage]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useLayoutEffect(() => {
     if (!chatContainerRef) return
     handleFadeIn()
-  }, [chatContainerRef, chatKey])
+  }, [chatContainerRef, chatKey]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useLayoutEffect(() => {
     if (!chatContainerRef) return
@@ -134,17 +128,16 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
     if (messagesData?.length <= 75) {
       handleFadeIn()
     }
-  }, [chatContainerRef, chatKey, messagesData, renderedMessages])
+  }, [chatContainerRef, chatKey, messagesData, renderedMessages]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!chatContainerRef) return
     const chatContainer = chatContainerRef
     chatContainer.addEventListener("scroll", handleScroll)
     return () => {
-      console.log("scroll GoDown remove")
       chatContainer.removeEventListener("scroll", handleScroll)
     }
-  }, [handleScroll])
+  }, [handleScroll, chatContainerRef])
 
   return (
     <>

@@ -1,7 +1,5 @@
-import { ContactInfoInterface } from "Components/Pages/Contacts/@Types"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
 import React, { useState, useEffect } from "react"
-import SearchInput from "../SearchInput/SearchInput"
 import Contact from "./Components/Contact/Contact"
 import "./SelectName.scss"
 
@@ -10,7 +8,7 @@ type Props = {}
 const NAME_LENGTH_LIMIT = 45
 
 const SelectName: React.FC<Props> = () => {
-  const { firebase, authUser, errors, contactsContext, contactsState } = useFrequentVariables()
+  const { firebase, contactsState, contactsDispatch } = useFrequentVariables()
   const { groupCreation } = contactsState
   const selectedMembersData = groupCreation.members
 
@@ -30,13 +28,12 @@ const SelectName: React.FC<Props> = () => {
           return { ...member, isOnline: contactStatus[0].val(), lastSeen: contactStatus[1].val() }
         })
       )
-      console.log({ membersStatus })
       setMembersWithStatus(membersStatus)
     })()
-  }, [selectedMembersData])
+  }, [selectedMembersData, firebase])
 
   const handleChange = (e: any) => {
-    contactsContext?.dispatch({
+    contactsDispatch({
       type: "updateGroupCreation",
       payload: {
         groupName: e.target.value,
@@ -46,7 +43,7 @@ const SelectName: React.FC<Props> = () => {
   }
 
   const resetSearch = () => {
-    contactsContext?.dispatch({ type: "updateGroupCreation", payload: { groupName: "", error: "" } })
+    contactsDispatch({ type: "updateGroupCreation", payload: { groupName: "", error: "" } })
   }
 
   const handleKeyDown = (e: any) => {
@@ -60,7 +57,7 @@ const SelectName: React.FC<Props> = () => {
           <button
             type="button"
             onClick={() =>
-              contactsContext?.dispatch({
+              contactsDispatch({
                 type: "updateGroupCreation",
                 payload: { selectNameActive: false, error: "" }
               })

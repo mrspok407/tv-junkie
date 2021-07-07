@@ -1,25 +1,21 @@
-import classNames from "classnames"
-import { AppContext } from "Components/AppContext/AppContextHOC"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
-import React, { useContext, useRef } from "react"
-import { MessageInterface } from "../../../../@Types"
-import { ContactsContext } from "../../../@Context/ContactsContext"
+import React from "react"
 import "./SelectOptions.scss"
 
 type Props = {}
 
 const SelectOptions: React.FC<Props> = () => {
-  const { contactsContext, contactsState } = useFrequentVariables()
+  const { contactsState, contactsDispatch } = useFrequentVariables()
   const { activeChat, selectedMessages, contacts } = contactsState
   const contactInfo = contacts[activeChat.chatKey] || {}
   const selectedMessagesData = selectedMessages[activeChat.chatKey] || []
 
   const handleCancel = () => {
-    contactsContext?.dispatch({ type: "clearSelectedMessages", payload: { chatKey: activeChat.chatKey } })
+    contactsDispatch({ type: "clearSelectedMessages", payload: { chatKey: activeChat.chatKey } })
   }
 
   const handleDelete = () => {
-    contactsContext?.dispatch({
+    contactsDispatch({
       type: "updateConfirmModal",
       payload: {
         isActive: true,

@@ -8,9 +8,8 @@ type Props = {
 }
 
 const useHandleMessageOptions = ({ messageData }: Props) => {
-  const { firebase, authUser, errors, contactsContext, contactsState } = useFrequentVariables()
-  const { activeChat, messages, contacts, contactsStatus, chatMembersStatus, contactsUnreadMessages, messagesInput } =
-    contactsState
+  const { firebase, authUser, errors, contactsState, contactsDispatch } = useFrequentVariables()
+  const { activeChat, messages, contacts, chatMembersStatus, contactsUnreadMessages } = contactsState
   const contactInfo = contacts[activeChat.contactKey]
   const contactsUnreadMessagesData = contactsUnreadMessages[activeChat.chatKey]
   const chatMembersStatusData = chatMembersStatus[activeChat.chatKey]
@@ -18,7 +17,7 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
 
   const selectMessage = async () => {
     if ((contactInfo.status !== undefined && contactInfo.status !== true) || contactInfo.removedFromGroup) return
-    contactsContext?.dispatch({
+    contactsDispatch({
       type: "updateSelectedMessages",
       payload: { messageKey: messageData?.key!, chatKey: activeChat.chatKey }
     })
@@ -27,7 +26,7 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
   const deleteMessageGroupChat = async ({ deleteMessagesKeys }: { deleteMessagesKeys: string[] }) => {
     if (contactInfo.removedFromGroup) return
 
-    contactsContext?.dispatch({ type: "updateMsgDeletionProcessLoading", payload: { messageDeletionProcess: true } })
+    contactsDispatch({ type: "updateMsgDeletionProcessLoading", payload: { messageDeletionProcess: true } })
     const deletedMessagesData = messagesData.reduce((deletedMessagesData: MessageInterface[], message) => {
       if (deleteMessagesKeys.includes(message.key)) {
         deletedMessagesData.push(message)
@@ -39,7 +38,7 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
     const successDeliverMessages = deletedMessagesData.filter((message) => message.isDelivered !== false)
 
     if (failedDeliverMessages.length) {
-      contactsContext?.dispatch({
+      contactsDispatch({
         type: "removeMessages",
         payload: { removedMessages: failedDeliverMessages, chatKey: activeChat.chatKey }
       })
@@ -63,7 +62,7 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
       })
       throw new Error(`There has been some error updating database: ${error}`)
     } finally {
-      contactsContext?.dispatch({
+      contactsDispatch({
         type: "updateMsgDeletionProcess",
         payload: { messageDeletionProcess: false, deletedMessages: deletedMessagesData }
       })
@@ -72,7 +71,7 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
 
   const deleteMessagePrivateChat = async ({ deleteMessagesKeys }: { deleteMessagesKeys: string[] }) => {
     if (contactInfo.status !== true) return
-    contactsContext?.dispatch({ type: "updateMsgDeletionProcessLoading", payload: { messageDeletionProcess: true } })
+    contactsDispatch({ type: "updateMsgDeletionProcessLoading", payload: { messageDeletionProcess: true } })
 
     const deletedMessagesData = messagesData.reduce((deletedMessagesData: MessageInterface[], message) => {
       if (deleteMessagesKeys.includes(message.key)) {
@@ -85,7 +84,7 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
     const successDeliverMessages = deletedMessagesData.filter((message) => message.isDelivered !== false)
 
     if (failedDeliverMessages.length) {
-      contactsContext?.dispatch({
+      contactsDispatch({
         type: "removeMessages",
         payload: { removedMessages: failedDeliverMessages, chatKey: activeChat.chatKey }
       })
@@ -128,7 +127,7 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
       })
       throw new Error(`There has been some error updating database: ${error}`)
     } finally {
-      contactsContext?.dispatch({
+      contactsDispatch({
         type: "updateMsgDeletionProcess",
         payload: { messageDeletionProcess: false, deletedMessages: deletedMessagesData }
       })
@@ -147,7 +146,7 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
     inputRef.focus()
     chatContainerRef.scrollTop = chatContainerRef?.scrollTop! + (inputHeight - MESSAGE_LINE_HEIGHT)!
 
-    contactsContext?.dispatch({
+    contactsDispatch({
       type: "updateMessageInput",
       payload: { message: message?.message!, editingMsgKey: messageData?.key }
     })

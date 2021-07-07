@@ -1,13 +1,12 @@
 import classNames from "classnames"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
-import React, { useState, useEffect, useContext } from "react"
-import { ContactsContext } from "../../@Context/ContactsContext"
+import React from "react"
 import useCreateNewGroup from "../Hooks/UseCreateNewGroup"
 import "./HandleNewMembers.scss"
 
 const HandleNewMembers: React.FC = () => {
-  const { contactsContext, contactsState } = useFrequentVariables()
-  const { groupCreation, contacts } = contactsState
+  const { contactsState, contactsDispatch } = useFrequentVariables()
+  const { groupCreation } = contactsState
 
   const { createNewGroup } = useCreateNewGroup()
 
@@ -22,10 +21,10 @@ const HandleNewMembers: React.FC = () => {
         type="button"
         onClick={() => {
           if (!groupCreation.isActive) {
-            contactsContext?.dispatch({ type: "updateGroupCreation", payload: { isActive: true } })
+            contactsDispatch({ type: "updateGroupCreation", payload: { isActive: true } })
           } else {
             if (!groupCreation.selectNameActive) {
-              contactsContext?.dispatch({ type: "updateGroupCreation", payload: { selectNameActive: true } })
+              contactsDispatch({ type: "updateGroupCreation", payload: { selectNameActive: true } })
             } else {
               if (groupCreation.loading) return
               createNewGroup()

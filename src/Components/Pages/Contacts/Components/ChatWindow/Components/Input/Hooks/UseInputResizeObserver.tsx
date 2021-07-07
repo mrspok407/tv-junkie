@@ -22,7 +22,7 @@ const useInputResizeObserver = ({ inputRef, chatContainerRef, getContainerRect }
 
     chatContainerRef.scrollTop = getContainerRect().scrollTop + Math.max(heightDiff, 0)
     prevHeight.current = height
-  }, [inputRef, activeChat])
+  }, [inputRef, activeChat]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useLayoutEffect(() => {
     if (!inputRef) return
@@ -42,7 +42,7 @@ const useInputResizeObserver = ({ inputRef, chatContainerRef, getContainerRect }
         window.removeEventListener("resize", handleResize)
       }
     }
-  }, [inputRef, handleResize])
+  }, [inputRef, handleResize]) // eslint-disable-line react-hooks/exhaustive-deps
 }
 
 export default useInputResizeObserver

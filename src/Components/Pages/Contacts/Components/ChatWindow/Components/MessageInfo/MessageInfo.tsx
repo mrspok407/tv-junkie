@@ -1,8 +1,6 @@
 import classNames from "classnames"
-import { AppContext } from "Components/AppContext/AppContextHOC"
-import React, { useContext, useRef } from "react"
+import React, { useRef } from "react"
 import { MessageInterface } from "../../../../@Types"
-import { ContactsContext } from "../../../@Context/ContactsContext"
 import MessagePopup from "./MessagePopup"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
 import "./MessageInfo.scss"
@@ -10,7 +8,7 @@ import "./MessageInfo.scss"
 type Props = { messageData: MessageInterface }
 
 const MessageInfo: React.FC<Props> = ({ messageData }) => {
-  const { authUser, contactsContext, contactsState } = useFrequentVariables()
+  const { authUser, contactsState, contactsDispatch } = useFrequentVariables()
   const { activeChat, messagePopup, contactsUnreadMessages, contacts } = contactsState
   const contactInfo = contacts[activeChat.contactKey] || {}
   const contactsUnreadMessagesData = contactsUnreadMessages[activeChat.chatKey]
@@ -33,7 +31,7 @@ const MessageInfo: React.FC<Props> = ({ messageData }) => {
             })}
             onClick={(e) => {
               e.stopPropagation()
-              contactsContext?.dispatch({ type: "updateMessagePopup", payload: messageData.key })
+              contactsDispatch({ type: "updateMessagePopup", payload: messageData.key })
             }}
           >
             <span></span>
@@ -59,7 +57,7 @@ const MessageInfo: React.FC<Props> = ({ messageData }) => {
             })}
             onClick={(e) => {
               e.stopPropagation()
-              contactsContext?.dispatch({ type: "updateMessagePopup", payload: messageData.key })
+              contactsDispatch({ type: "updateMessagePopup", payload: messageData.key })
             }}
           >
             <span></span>

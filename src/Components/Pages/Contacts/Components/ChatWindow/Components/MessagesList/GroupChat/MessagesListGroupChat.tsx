@@ -1,7 +1,7 @@
 import classNames from "classnames"
 import { MessageInterface } from "Components/Pages/Contacts/@Types"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
-import React, { useState, useEffect } from "react"
+import React from "react"
 import { convertTimeStampToDate } from "Utils"
 import MessageInfo from "../../MessageInfo/MessageInfo"
 import InfoMessage from "./Components/NewMembersMessages/InfoMessage"
@@ -12,7 +12,7 @@ type Props = {
 }
 
 const MessagesList: React.FC<Props> = ({ firstUnreadMessage }) => {
-  const { authUser, contactsContext, contactsState } = useFrequentVariables()
+  const { authUser, contactsState, contactsDispatch } = useFrequentVariables()
   const { activeChat, messages, renderedMessagesList, selectedMessages, contacts } = contactsState
   const messagesData = messages[activeChat.chatKey]
   const renderedMessages = renderedMessagesList[activeChat.chatKey] || []
@@ -74,7 +74,7 @@ const MessagesList: React.FC<Props> = ({ firstUnreadMessage }) => {
                     })}
                     onClick={() => {
                       if (!selectedMessagesData.length || renderedMessage.sender !== authUser?.uid) return
-                      contactsContext?.dispatch({
+                      contactsDispatch({
                         type: "updateSelectedMessages",
                         payload: { messageKey: renderedMessage.key, chatKey: activeChat.chatKey }
                       })

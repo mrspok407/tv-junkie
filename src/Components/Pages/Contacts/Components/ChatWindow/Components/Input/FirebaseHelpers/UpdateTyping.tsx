@@ -1,6 +1,5 @@
-import { ErrorsInterface } from "Components/AppContext/AppContextHOC"
 import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
-import { ActiveChatInterface, ContactStatusInterface, MessageInterface } from "Components/Pages/Contacts/@Types"
+import { ActiveChatInterface } from "Components/Pages/Contacts/@Types"
 import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 
 let typingTimer: number | null = null

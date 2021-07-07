@@ -1,18 +1,15 @@
-import { AppContext } from "Components/AppContext/AppContextHOC"
-import { FirebaseContext } from "Components/Firebase"
 import { ContactInfoInterface } from "Components/Pages/Contacts/@Types"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
-import React, { useState, useEffect, useLayoutEffect, useCallback, useContext } from "react"
-import { ContactsContext } from "../../@Context/ContactsContext"
+import { useLayoutEffect, useCallback } from "react"
 
 type Props = {
   chatContainerRef: HTMLDivElement
-  isScrollBottomRef: boolean
+  isScrollBottomRef: React.MutableRefObject<boolean>
   contactInfo: ContactInfoInterface
 }
 
 const useResizeObserver = ({ chatContainerRef, isScrollBottomRef, contactInfo }: Props) => {
-  const { firebase, authUser, contactsContext, contactsState } = useFrequentVariables()
+  const { firebase, authUser, contactsState } = useFrequentVariables()
   const { activeChat } = contactsState
 
   const handleResize = useCallback(() => {
@@ -21,7 +18,7 @@ const useResizeObserver = ({ chatContainerRef, isScrollBottomRef, contactInfo }:
     const scrollHeight = chatContainerRef.scrollHeight
 
     if (scrollHeight <= height) {
-      isScrollBottomRef = true
+      isScrollBottomRef.current = true
       firebase
         .chatMemberStatus({
           chatKey: activeChat.chatKey,
@@ -30,7 +27,7 @@ const useResizeObserver = ({ chatContainerRef, isScrollBottomRef, contactInfo }:
         })
         .update({ chatBottom: true })
     }
-  }, [chatContainerRef, activeChat])
+  }, [chatContainerRef, activeChat]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useLayoutEffect(() => {
     if (!chatContainerRef) return

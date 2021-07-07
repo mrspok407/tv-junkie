@@ -1,9 +1,8 @@
-import classNames from "classnames"
+import React, { useMemo } from "react"
 import { ContactInfoInterface, GroupCreationNewMemberInterface } from "Components/Pages/Contacts/@Types"
-import { ContactsContext } from "Components/Pages/Contacts/Components/@Context/ContactsContext"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
 import useTimestampFormater from "Components/Pages/Contacts/Hooks/UseTimestampFormater"
-import React, { useState, useEffect, useContext, useMemo } from "react"
+import classNames from "classnames"
 import "./Contact.scss"
 
 type Props = {
@@ -21,7 +20,7 @@ type Props = {
 const Contact: React.FC<Props> = ({ contact, selectedMembers, handleNewMembers }) => {
   const { contactsState } = useFrequentVariables()
   const { activeChat, chatParticipants } = contactsState
-  const chatParticipantsMemo = useMemo(() => chatParticipants[activeChat.chatKey] || [], [])
+  const chatParticipantsMemo = useMemo(() => chatParticipants[activeChat.chatKey] || [], []) // eslint-disable-line react-hooks/exhaustive-deps
   const formatedDate = useTimestampFormater({ timeStamp: contact.lastSeen! })
 
   return (

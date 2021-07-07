@@ -1,7 +1,7 @@
-import { ContactInfoInterface, MembersStatusGroupChatInterface } from "Components/Pages/Contacts/@Types"
+import { MembersStatusGroupChatInterface } from "Components/Pages/Contacts/@Types"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
 import useElementScrolledDown from "Components/Pages/Contacts/Hooks/useElementScrolledDown"
-import React, { useState, useEffect, useContext, useRef, useLayoutEffect, useCallback } from "react"
+import React, { useState, useEffect, useRef, useCallback } from "react"
 import SearchInput from "./SearchInput/SearchInput"
 import Member from "./Member"
 import "./MembersMenu.scss"
@@ -9,15 +9,14 @@ import "./MembersMenu.scss"
 const MEMBERS_TO_RENDER = 20
 
 const GroupCreation: React.FC = () => {
-  const { firebase, authUser, errors, contactsContext, contactsState } = useFrequentVariables()
-  const { activeChat, groupCreation, chatMembersStatus, chatParticipants, contacts } = contactsState
+  const { firebase, errors, contactsState } = useFrequentVariables()
+  const { activeChat, chatMembersStatus, chatParticipants, contacts } = contactsState
   const contactInfo = contacts[activeChat.contactKey] || {}
   const chatMembersStatusData = chatMembersStatus[contactInfo.chatKey] || []
   const chatParticipantsData = chatParticipants[contactInfo.chatKey] || []
 
   const [renderedMembers, setRenderedMembers] = useState(MEMBERS_TO_RENDER)
 
-  const [contactsList, setContactsList] = useState<ContactInfoInterface[]>([])
   const [searchedMembers, setSearchedMembers] = useState<MembersStatusGroupChatInterface[] | null>([])
   const [isSearching, setIsSearching] = useState(false)
 
@@ -31,7 +30,7 @@ const GroupCreation: React.FC = () => {
       const newState = prevState?.filter((member) => chatParticipantsData.includes(member.key)) || []
       return newState.length ? newState : null
     })
-  }, [chatParticipantsData])
+  }, [chatParticipantsData]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const getContactsData = async ({ snapshot }: { snapshot: any }) => {
     let members: MembersStatusGroupChatInterface[] = []
@@ -73,7 +72,7 @@ const GroupCreation: React.FC = () => {
         setIsSearching(false)
       }
     },
-    [contactsList]
+    [chatParticipantsData, errors] // eslint-disable-line react-hooks/exhaustive-deps
   )
 
   useEffect(() => {

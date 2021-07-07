@@ -1,7 +1,7 @@
 import { AppContext } from "Components/AppContext/AppContextHOC"
-import { FirebaseContext, FirebaseInterface } from "Components/Firebase/FirebaseContext"
-import { ContactInfoInterface, ContactsInterface, MessageInterface } from "Components/Pages/Contacts/@Types"
-import { useContext, useEffect, useRef, useState } from "react"
+import { FirebaseContext } from "Components/Firebase/FirebaseContext"
+import { ContactInfoInterface, MessageInterface } from "Components/Pages/Contacts/@Types"
+import { useContext, useRef } from "react"
 
 const useGetInitialContactInfo = () => {
   const { authUser } = useContext(AppContext)
@@ -17,7 +17,7 @@ const useGetInitialContactInfo = () => {
             ...contact
           }
         }
-        
+
         const [
           newContactsActivity,
           newContactsRequests,

@@ -1,5 +1,5 @@
 import { MessageInterface } from "Components/Pages/Contacts/@Types"
-import React, { useState, useEffect, useRef, useCallback } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { throttle } from "throttle-debounce"
 
 type Props = {
@@ -57,7 +57,7 @@ const useShowFloatDate = ({ activeChat, chatContainerRef, renderedMessages }: Pr
     return () => {
       chatContainerRef.removeEventListener("scroll", handleScroll)
     }
-  }, [activeChat, handleScroll])
+  }, [activeChat, chatContainerRef, handleScroll])
 
   useEffect(() => {
     return () => {

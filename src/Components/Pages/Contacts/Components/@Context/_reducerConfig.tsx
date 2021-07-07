@@ -9,16 +9,14 @@ import {
 } from "../../@Types"
 import { MESSAGES_TO_RENDER, UNREAD_MESSAGES_TO_RENDER } from "./Constants"
 import * as _isEqual from "lodash.isequal"
-import * as _merge from "lodash.merge"
 import * as _assign from "lodash.assign"
 import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
-
 export type ACTIONTYPES =
   | { type: "updateActiveChat"; payload: { chatKey: string; contactKey: string } }
   // Unread Messages //
   | {
       type: "updateContactUnreadMessages"
-      payload: { unreadMessages: string[]; chatKey: string; contactUnreadMessagesListener: boolean }
+      payload: { unreadMessages: string[]; chatKey: string }
     }
   | { type: "updateAuthUserUnreadMessages"; payload: { chatKey: string; unreadMessages: string[] } }
   | { type: "handleGoDown"; payload: { unreadMessages: string[] } }
@@ -149,7 +147,10 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         },
         firebaseListeners: {
           ...firebaseListeners,
-          contactUnreadMessages: action.payload.contactUnreadMessagesListener
+          contactUnreadMessages: {
+            ...firebaseListeners.contactUnreadMessages,
+            [action.payload.chatKey]: true
+          }
         }
       }
     }
@@ -894,7 +895,7 @@ export const INITIAL_STATE = {
   },
   messageDeletionProcess: false,
   firebaseListeners: {
-    contactUnreadMessages: false
+    contactUnreadMessages: {}
   },
   groupInfoSettingsActive: false
 }

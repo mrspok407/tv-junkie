@@ -1,11 +1,7 @@
 import classNames from "classnames"
-import { AppContext } from "Components/AppContext/AppContextHOC"
-import { FirebaseContext } from "Components/Firebase"
 import { MessageInterface } from "Components/Pages/Contacts/@Types"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
-import React, { useEffect, useContext } from "react"
-import { MESSAGE_LINE_HEIGHT } from "../../../@Context/Constants"
-import { ContactsContext } from "../../../@Context/ContactsContext"
+import React, { useEffect } from "react"
 import useHandleMessageOptions from "./FirebaseHelpers/UseHandleMessageOptions"
 
 type Props = {
@@ -14,7 +10,7 @@ type Props = {
 }
 
 const MessagePopup: React.FC<Props> = ({ messageOptionsRef, messageData }) => {
-  const { authUser, contactsContext, contactsState } = useFrequentVariables()
+  const { authUser, contactsState, contactsDispatch } = useFrequentVariables()
   const { activeChat, messages, contacts } = contactsState
   const contactInfo = contacts[activeChat.chatKey] || {}
   const messagesData = messages[activeChat.chatKey] || []
@@ -32,7 +28,7 @@ const MessagePopup: React.FC<Props> = ({ messageOptionsRef, messageData }) => {
 
   const handleClickOutside = (e: CustomEvent) => {
     if (!messageOptionsRef?.contains(e.target as Node)) {
-      contactsContext?.dispatch({ type: "updateMessagePopup", payload: "" })
+      contactsDispatch({ type: "updateMessagePopup", payload: "" })
     }
   }
 
@@ -46,7 +42,7 @@ const MessagePopup: React.FC<Props> = ({ messageOptionsRef, messageData }) => {
       })}
       onClick={(e) => {
         e.stopPropagation()
-        contactsContext?.dispatch({ type: "updateMessagePopup", payload: "" })
+        contactsDispatch({ type: "updateMessagePopup", payload: "" })
       }}
     >
       {messageData.sender === authUser?.uid && messageData.isDelivered !== false && (

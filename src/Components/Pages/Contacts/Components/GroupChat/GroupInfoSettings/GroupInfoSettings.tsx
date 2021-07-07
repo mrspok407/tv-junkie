@@ -1,15 +1,12 @@
 import classNames from "classnames"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
-import React, { useState, useEffect, useRef } from "react"
-import GroupCreation from "../GroupCreation/GroupCreation"
+import React, { useState, useRef } from "react"
 import MembersMenu from "./Components/MembersMenu/MembersMenu"
 import NewMembersMenu from "./Components/NewMembersMenu/NewMembersMenu"
 import "./GroupInfoSettings.scss"
 
-type Props = {}
-
-const GroupInfoSettings: React.FC<Props> = ({}) => {
-  const { contactsContext, contactsState } = useFrequentVariables()
+const GroupInfoSettings: React.FC = () => {
+  const { contactsState, contactsDispatch } = useFrequentVariables()
   const { activeChat, contacts } = contactsState
   const contactInfo = contacts[activeChat.chatKey] || {}
 
@@ -62,7 +59,7 @@ const GroupInfoSettings: React.FC<Props> = ({}) => {
         <button
           type="button"
           className="group-info__close-btn"
-          onClick={() => contactsContext?.dispatch({ type: "updateGroupInfoSettings", payload: { isActive: false } })}
+          onClick={() => contactsDispatch({ type: "updateGroupInfoSettings", payload: { isActive: false } })}
         ></button>
       </div>
     </div>

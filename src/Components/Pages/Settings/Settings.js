@@ -10,7 +10,6 @@ import { todayDate } from "Utils"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import PasswordUpdate from "Components/UserAuth/PasswordUpdate/PasswordUpdate"
 import classNames from "classnames"
-import { uniqueNamesGenerator, adjectives, colors, animals } from "unique-names-generator"
 import { LoremIpsum } from "lorem-ipsum"
 import "./Settings.scss"
 
@@ -114,7 +113,6 @@ class Profile extends Component {
 
   test = async () => {
     const firebase = this.context.firebase
-    const CONTACTS_TO_ADD = 3
 
     const authUid = "drv5lG97VxVBLgkdn8bMhdxmqQT2"
 
@@ -167,10 +165,10 @@ class Profile extends Component {
     // })
 
     // const userKey = "-MY_TPe9EW9TqCibVSop"
-    const userKey = "-MY_R8wzzvABzB8OWakb"
+    // const userKey = "-MY_R8wzzvABzB8OWakb"
     // const userKey = "-MY_R8pjpBQGf6RDAMTt"
 
-    const chatKey = userKey < authUid ? `${userKey}_${authUid}` : `${authUid}_${userKey}`
+    // const chatKey = userKey < authUid ? `${userKey}_${authUid}` : `${authUid}_${userKey}`
 
     // firebase
     //   .contactsDatabase({ uid: "drv5lG97VxVBLgkdn8bMhdxmqQT2" })

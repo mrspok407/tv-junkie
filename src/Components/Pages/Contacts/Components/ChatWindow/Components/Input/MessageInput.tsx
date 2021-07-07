@@ -1,10 +1,7 @@
 import { ContainerRectInterface, MessageInputInterface, MessageInterface } from "Components/Pages/Contacts/@Types"
-import React, { useEffect, useRef, useContext, useCallback, useLayoutEffect } from "react"
+import React, { useEffect, useRef, useCallback, useLayoutEffect } from "react"
 import debounce from "debounce"
-import { ContactsContext } from "../../../@Context/ContactsContext"
-import { INPUT_MESSAGE_MAX_HEIGHT, MESSAGE_LINE_HEIGHT, MOBILE_LAYOUT_THRESHOLD } from "../../../@Context/Constants"
-import { FirebaseContext } from "Components/Firebase"
-import { AppContext } from "Components/AppContext/AppContextHOC"
+import { MESSAGE_LINE_HEIGHT, MOBILE_LAYOUT_THRESHOLD } from "../../../@Context/Constants"
 import classNames from "classnames"
 import GoDown from "../GoDown/GoDown"
 import { updateTyping } from "./FirebaseHelpers/UpdateTyping"
@@ -12,21 +9,27 @@ import SelectOptions from "../SelectOptions/SelectOptions"
 import useHandleMessage from "./Hooks/UseHandleMessage"
 import useInputResizeObserver from "./Hooks/UseInputResizeObserver"
 import striptags from "striptags"
-import "./MessageInput.scss"
 import { textToUrl } from "Utils"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
+import "./MessageInput.scss"
 
 type Props = {
   unreadMessagesAuthRef: string[]
   chatContainerRef: HTMLDivElement
   getContainerRect: () => ContainerRectInterface
+  contactLastActivity: { timeStamp: number; key: string }
 }
 
 const arrowKeys = ["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown"]
 const debounceTimeout = 100
 
-const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unreadMessagesAuthRef }) => {
-  const { firebase, authUser, errors, contactsContext, contactsState } = useFrequentVariables()
+const MessageInput: React.FC<Props> = ({
+  chatContainerRef,
+  getContainerRect,
+  unreadMessagesAuthRef,
+  contactLastActivity
+}) => {
+  const { firebase, authUser, errors, contactsState, contactsDispatch } = useFrequentVariables()
   const { activeChat, messagesInput, messages, selectedMessages, contacts } = contactsState
   const contactInfo = contacts[activeChat.contactKey]
   const selectedMessagesData = selectedMessages[activeChat.chatKey]
@@ -38,7 +41,9 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
 
   const windowWidth = window.innerWidth
 
-  const { sendMessage, sendMessageGroupChat, editMessagePrivateChat, editMessageGroupChat } = useHandleMessage()
+  const { sendMessage, sendMessageGroupChat, editMessagePrivateChat, editMessageGroupChat } = useHandleMessage({
+    contactLastActivity
+  })
   useInputResizeObserver({ inputRef: inputRef.current, chatContainerRef: chatContainerRef, getContainerRect })
 
   const getSelection = () => {
@@ -79,12 +84,12 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
     return () => {
       updateInputDeb.flush()
     }
-  }, [activeChat])
+  }, [activeChat]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const updateInputDeb = useCallback(
     debounce((payload: MessageInputInterface) => {
       console.log(activeChat.chatKey)
-      contactsContext?.dispatch({ type: "updateMessageInput", payload })
+      contactsDispatch({ type: "updateMessageInput", payload })
     }, debounceTimeout),
     [activeChat]
   )
@@ -129,7 +134,7 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
     inputRef.current.innerHTML = ""
 
     updateInputDeb.clear()
-    contactsContext?.dispatch({
+    contactsDispatch({
       type: "updateMessageInput",
       payload: { message: "", anchorOffset: 0, scrollTop: 0, editingMsgKey: null }
     })
@@ -155,7 +160,7 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
         key: timeStampEpoch.toString(),
         isDelivered: false
       }
-      contactsContext?.dispatch({
+      contactsDispatch({
         type: "addNewMessage",
         payload: { newMessage, chatKey: activeChat.chatKey, authUser }
       })
@@ -180,7 +185,7 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
     inputRef.current.innerHTML = ""
 
     updateInputDeb.clear()
-    contactsContext?.dispatch({
+    contactsDispatch({
       type: "updateMessageInput",
       payload: { message: "", anchorOffset: 0, scrollTop: 0, editingMsgKey: null }
     })
@@ -291,11 +296,12 @@ const MessageInput: React.FC<Props> = ({ chatContainerRef, getContainerRect, unr
   }
 
   useEffect(() => {
-    inputRef.current.addEventListener("scroll", scrollPositionHandler)
+    const inputNode = inputRef.current
+    inputNode.addEventListener("scroll", scrollPositionHandler)
     return () => {
-      inputRef.current.removeEventListener("scroll", scrollPositionHandler)
+      inputNode.removeEventListener("scroll", scrollPositionHandler)
     }
-  }, [activeChat])
+  }, [activeChat]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="chat-window__input-wrapper">

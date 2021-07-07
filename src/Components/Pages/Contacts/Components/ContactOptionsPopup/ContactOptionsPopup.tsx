@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useLayoutEffect, useCallback, useContext } from "react"
+import React, { useEffect, useContext } from "react"
 import { ContactInfoInterface } from "../../@Types"
 import { ContactsContext } from "../@Context/ContactsContext"
 import useContactOptions from "./Hooks/UseContactOptions"
@@ -18,7 +18,7 @@ const ContactOptionsPopup: React.FC<Props> = ({ contactOptionsRef, contactInfo }
     return () => {
       document.removeEventListener("mousedown", handleClickOutside as EventListener)
     }
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleClickOutside = (e: CustomEvent) => {
     if (!contactOptionsRef?.contains(e.target as Node)) {

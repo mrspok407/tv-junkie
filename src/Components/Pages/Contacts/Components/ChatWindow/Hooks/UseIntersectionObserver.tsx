@@ -1,8 +1,5 @@
-import { AppContext } from "Components/AppContext/AppContextHOC"
-import { FirebaseContext } from "Components/Firebase"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
-import { useEffect, useContext, useCallback, useRef } from "react"
-import { ContactsContext } from "../../@Context/ContactsContext"
+import { useEffect, useRef } from "react"
 
 type Props = {
   chatContainerRef: HTMLDivElement
@@ -19,7 +16,7 @@ const useIntersectionObserver = ({
   pageInFocus,
   chatWindowLoading
 }: Props) => {
-  const { firebase, authUser, errors, contactsContext, contactsState } = useFrequentVariables()
+  const { firebase, authUser, errors, contactsState } = useFrequentVariables()
   const { activeChat, renderedMessagesList, contacts } = contactsState
   const renderedMessages = renderedMessagesList[activeChat.chatKey]
   const contactInfo = contacts[activeChat.contactKey] || {}
@@ -77,9 +74,6 @@ const useIntersectionObserver = ({
     if (![true, "removed"].includes(contactInfo.status) && !contactInfo.isGroupChat) return
     if (!observerRef || !pageInFocus || chatWindowLoading) return
 
-    console.log({ unreadMessagesAuth })
-    console.log({ observedMessages: observedMessages.current })
-
     renderedMessages.forEach((message) => {
       if (!unreadMessagesAuth.includes(message.key)) return
       if (observedMessages.current.includes(message.key)) return
@@ -87,7 +81,7 @@ const useIntersectionObserver = ({
       observedMessages.current = [...observedMessages.current, message.key]
       observerRef?.observe(unreadMessage)
     })
-  }, [activeChat, renderedMessages, unreadMsgsListenerChatKey, contactInfo, pageInFocus, chatWindowLoading])
+  }, [activeChat, renderedMessages, unreadMsgsListenerChatKey, contactInfo, pageInFocus, chatWindowLoading]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const onMouseEnter = () => {
     if (!renderedMessages?.length || !unreadMessagesAuth?.length) return
@@ -108,14 +102,14 @@ const useIntersectionObserver = ({
     observedMessages.current = [
       ...observedMessages.current.filter((message) => renderedMessages.map((message) => message.key).includes(message))
     ]
-  }, [renderedMessages])
+  }, [renderedMessages]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     return () => {
       observerRef.disconnect()
       observedMessages.current = []
     }
-  }, [activeChat])
+  }, [activeChat]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return { onMouseEnter }
 }

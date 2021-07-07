@@ -1,10 +1,7 @@
-import classNames from "classnames"
-import { AppContext } from "Components/AppContext/AppContextHOC"
-import { FirebaseContext } from "Components/Firebase"
 import { ContactInfoInterface, CONTACT_INFO_INITIAL_DATA } from "Components/Pages/Contacts/@Types"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
 import useElementScrolledDown from "Components/Pages/Contacts/Hooks/useElementScrolledDown"
-import React, { useState, useEffect, useContext, useRef, useLayoutEffect, useCallback } from "react"
+import React, { useState, useEffect, useCallback } from "react"
 import { isUnexpectedObject } from "Utils"
 import Contact from "../Contact/Contact"
 import SearchInput from "../SearchInput/SearchInput"
@@ -17,7 +14,7 @@ type Props = {
 const CONTACTS_TO_LOAD = 20
 
 const ContactsSearch: React.FC<Props> = ({ wrapperRef }) => {
-  const { firebase, authUser, errors, contactsContext, contactsState } = useFrequentVariables()
+  const { firebase, authUser, errors, contactsState, contactsDispatch } = useFrequentVariables()
   const { groupCreation } = contactsState
 
   const [contactsList, setContactsList] = useState<ContactInfoInterface[]>([])
@@ -95,7 +92,6 @@ const ContactsSearch: React.FC<Props> = ({ wrapperRef }) => {
           .startAt(query.toLowerCase())
           .endAt(query.toLowerCase() + "\uf8ff")
           .once("value")
-        console.log(contactsData.val())
         if (
           !Object.values(contactsData.val() || {}).filter((item: any) => item.status === true && !item.isGroupChat)
             .length
@@ -113,7 +109,7 @@ const ContactsSearch: React.FC<Props> = ({ wrapperRef }) => {
         setIsSearching(false)
       }
     },
-    [contactsList]
+    [contactsList, errors] // eslint-disable-line react-hooks/exhaustive-deps
   )
 
   useEffect(() => {
@@ -153,7 +149,7 @@ const ContactsSearch: React.FC<Props> = ({ wrapperRef }) => {
         setInitialLoading(false)
       }
     })()
-  }, [firebase, authUser])
+  }, [firebase, authUser, errors]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!isScrolledDown) return
@@ -175,7 +171,7 @@ const ContactsSearch: React.FC<Props> = ({ wrapperRef }) => {
         setLoading(false)
       }
     })()
-  }, [isScrolledDown, allContactsLoaded])
+  }, [isScrolledDown, allContactsLoaded, errors, loading, contactsList]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const contactsToRender = !searchedContacts?.length ? contactsList : searchedContacts
   return (
@@ -187,7 +183,7 @@ const ContactsSearch: React.FC<Props> = ({ wrapperRef }) => {
               key={member.key}
               className="contacts-search__selected-contact"
               onClick={() =>
-                contactsContext?.dispatch({
+                contactsDispatch({
                   type: "updateGroupMembers",
                   payload: { removeMember: true, newMember: { key: member.key } }
                 })

@@ -1,4 +1,4 @@
-import { GroupCreationNewMemberInterface, MembersStatusGroupChatInterface } from "Components/Pages/Contacts/@Types"
+import { GroupCreationNewMemberInterface } from "Components/Pages/Contacts/@Types"
 import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 
 interface ContextInterface {
@@ -28,10 +28,6 @@ interface GroupChatInfoInterface {
 
 interface GroupChatMemberStatusInterface {
   [key: string]: string | boolean
-}
-
-interface ContactRequestDataInterface {
-  [key: string]: ContactInfoInterface | boolean
 }
 
 const contactsDatabaseRef = (uid: string) => `${uid}/contactsDatabase`
@@ -76,7 +72,7 @@ export const _removeMemberFromGroup = async ({
     }
 
     console.log("boi")
-    const timeOut = await new Promise((resolve) => setTimeout(resolve, 1500))
+    await new Promise((resolve) => setTimeout(resolve, 1500))
 
     return database.ref().update(updateData)
   } catch (error) {
@@ -134,7 +130,7 @@ export const _addNewGroupMembers = async ({
         timeStamp
       }
     }
-    const timeOut = await new Promise((resolve) => setTimeout(resolve, 1500))
+    await new Promise((resolve) => setTimeout(resolve, 1500))
     return database.ref().update(updateData)
   } catch (error) {
     throw new Error(`There has been some error updating database: ${error}`)

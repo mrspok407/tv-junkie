@@ -1,15 +1,28 @@
-import { AppContext } from "Components/AppContext/AppContextHOC"
-import { FirebaseContext } from "Components/Firebase"
-import React, { useState, useEffect, useContext } from "react"
-import { ContactsContext } from "../../@Context/ContactsContext"
+import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
+import { useState, useEffect } from "react"
 
 const useContactListeners = () => {
-  const firebase = useContext(FirebaseContext)
-  const context = useContext(ContactsContext)
-  const { authUser } = useContext(AppContext)
-  const { activeChat, contactsUnreadMessages } = context?.state!
+  const { firebase, contactsState, contactsDispatch } = useFrequentVariables()
+  const { activeChat, firebaseListeners } = contactsState
+  const isUnreadMessagesListenerOn = firebaseListeners.contactUnreadMessages[activeChat.chatKey]
 
   const [contactLastActivity, setContactLastActivity] = useState<{ timeStamp: number; key: string }>()
+
+  useEffect(() => {
+    if (isUnreadMessagesListenerOn) return
+    firebase
+      .unreadMessages({ uid: activeChat.contactKey, chatKey: activeChat.chatKey, isGroupChat: false })
+      .on("value", (snapshot: any) => {
+        const unreadMessagesContact = !snapshot.val() ? [] : Object.keys(snapshot.val())
+        contactsDispatch({
+          type: "updateContactUnreadMessages",
+          payload: {
+            unreadMessages: unreadMessagesContact,
+            chatKey: activeChat.chatKey
+          }
+        })
+      })
+  }, [activeChat, firebase, contactsDispatch, isUnreadMessagesListenerOn])
 
   useEffect(() => {
     firebase
@@ -17,23 +30,9 @@ const useContactListeners = () => {
       .child("pageIsOpen")
       .on("value", (snapshot: any) => {
         console.log(snapshot.val())
-        context?.dispatch({
+        contactsDispatch({
           type: "updateContactsPageIsOpen",
           payload: { isPageOpen: snapshot.val(), chatKey: activeChat.chatKey }
-        })
-      })
-
-    const unreadMessagesListener = firebase
-      .unreadMessages({ uid: activeChat.contactKey, chatKey: activeChat.chatKey, isGroupChat: false })
-      .on("value", (snapshot: any) => {
-        const unreadMessagesContact = !snapshot.val() ? [] : Object.keys(snapshot.val())
-        context?.dispatch({
-          type: "updateContactUnreadMessages",
-          payload: {
-            unreadMessages: unreadMessagesContact,
-            chatKey: activeChat.chatKey,
-            contactUnreadMessagesListener: true
-          }
         })
       })
 
@@ -50,13 +49,10 @@ const useContactListeners = () => {
       })
 
     return () => {
-      // firebase
-      //   .unreadMessages({ uid: activeChat.contactKey, chatKey: activeChat.chatKey, isGroupChat: false })
-      //   .off("value", unreadMessagesListener)
       firebase.contactsDatabase({ uid: activeChat.contactKey }).child("pageIsOpen").off()
       firebase.contactsLastActivity({ uid: activeChat.contactKey }).off()
     }
-  }, [activeChat, firebase])
+  }, [activeChat, firebase, contactsDispatch])
   return { contactLastActivity }
 }
 

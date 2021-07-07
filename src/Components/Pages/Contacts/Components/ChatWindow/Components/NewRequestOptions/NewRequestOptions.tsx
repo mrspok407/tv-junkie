@@ -1,12 +1,10 @@
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
 import useResponseContactRequest from "Components/Pages/UserProfile/Hooks/UseResponseContactRequest"
-import React, { useState, useEffect } from "react"
+import React from "react"
 import "./NewRequestOptions.scss"
 
-type Props = {}
-
-const NewRequestOptions: React.FC<Props> = ({}) => {
-  const { authUser, contactsContext, contactsState } = useFrequentVariables()
+const NewRequestOptions: React.FC = () => {
+  const { contactsState, contactsDispatch } = useFrequentVariables()
   const { activeChat, contacts } = contactsState
   const contactInfo = contacts[activeChat.contactKey]
 
@@ -33,7 +31,7 @@ const NewRequestOptions: React.FC<Props> = ({}) => {
                   onClick={() => {
                     if (Object.values(responseContactRequestLoading).some((item) => item)) return
                     handleContactRequest({ status: "rejected" })
-                    contactsContext?.dispatch({ type: "updateActiveChat", payload: { chatKey: "", contactKey: "" } })
+                    contactsDispatch({ type: "updateActiveChat", payload: { chatKey: "", contactKey: "" } })
                   }}
                 >
                   {responseContactRequestLoading.rejected ? <span className="button-loader-circle"></span> : "Reject"}

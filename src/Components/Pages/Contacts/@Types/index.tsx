@@ -158,7 +158,9 @@ export interface ContactsStateInterface {
     contactKey?: string
   }
   firebaseListeners: {
-    contactUnreadMessages: boolean
+    contactUnreadMessages: {
+      [key: string]: boolean
+    }
   }
   groupInfoSettingsActive: boolean
 }

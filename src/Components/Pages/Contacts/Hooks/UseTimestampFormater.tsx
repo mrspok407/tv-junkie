@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react"
+import { useState, useMemo } from "react"
 
 type Props = {
   timeStamp: number | string | null
@@ -14,9 +14,6 @@ const useTimestampFormater = ({ timeStamp }: Props) => {
     }
     const todayDate = new Date()
     const timeStampDate = new Date(timeStamp!)
-    // const todayDateEpoch = todayDate.getTime()
-    // const timeStampDateEpoch = timeStampDate.getTime()
-    // const oneDayInMilliseconds = 60 * 1000 * 60 * 24
 
     const timeStampDay = timeStampDate.toLocaleDateString()
     const todayDay = todayDate.toLocaleDateString()

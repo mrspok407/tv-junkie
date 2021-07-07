@@ -1,12 +1,9 @@
-import React, { useState, useEffect, useContext, useRef } from "react"
-import { AppContext } from "Components/AppContext/AppContextHOC"
-import { FirebaseContext } from "Components/Firebase"
+import React, { useState, useEffect, useRef } from "react"
 import Contact from "./Contact/Contact"
 import ContactRemovedFromGroup from "./ContactRemovedFromGroup/ContactRemovedFromGroup"
 import useElementScrolledDown from "Components/Pages/Contacts/Hooks/useElementScrolledDown"
-import { ContactInfoInterface, CONTACT_INFO_INITIAL_DATA, MessageInterface } from "../../@Types"
+import { ContactInfoInterface, CONTACT_INFO_INITIAL_DATA } from "../../@Types"
 import classNames from "classnames"
-import { ContactsContext } from "../@Context/ContactsContext"
 import { isUnexpectedObject } from "Utils"
 import CreatePortal from "Components/UI/Modal/CreatePortal"
 import ModalContent from "Components/UI/Modal/ModalContent"
@@ -19,12 +16,12 @@ type Props = {
 }
 
 const ContactList: React.FC<Props> = ({ contactListWrapperRef }) => {
-  const { firebase, authUser, errors, contactsContext, contactsState } = useFrequentVariables()
-  const { contacts, groupCreation, contactsStatus } = contactsState
+  const { firebase, authUser, errors, contactsState, contactsDispatch } = useFrequentVariables()
+  const { contacts, groupCreation } = contactsState
   const contactsData = Object.values(contacts)?.map((contact) => contact)
 
   const [allContactsAmount, setAllContactsAmount] = useState<number | null>(null)
-  const loadedContacts = contactsContext?.state?.contacts ? Object.keys(contactsContext.state.contacts).length : 0
+  const loadedContacts = contactsState.contacts ? Object.keys(contactsState.contacts).length : 0
 
   const [initialLoading, setInitialLoading] = useState(true)
   const initialLoadingRef = useRef(true)
@@ -47,7 +44,7 @@ const ContactList: React.FC<Props> = ({ contactListWrapperRef }) => {
   const getContactsList = async (snapshot: any) => {
     if (snapshot.val() === null) {
       setInitialLoading(false)
-      contactsContext?.dispatch({
+      contactsDispatch({
         type: "updateContactsInitial",
         payload: { contacts: {}, unreadMessages: {}, unreadMessagesContacts: {} }
       })
@@ -74,7 +71,6 @@ const ContactList: React.FC<Props> = ({ contactListWrapperRef }) => {
       contactsData.push({ ...contact.val(), isGroupChat: !!contact.val().isGroupChat, key: contact.key, chatKey })
     })
 
-    console.log({ initialLoadingRef: initialLoadingRef.current })
     if (initialLoadingRef.current || newLoad.current) {
       const contacts = await getContactsInfo({ contactsData })
 
@@ -87,26 +83,20 @@ const ContactList: React.FC<Props> = ({ contactListWrapperRef }) => {
         return acc
       }, {})
 
-      const contactsDispatch = contacts.reduce((acc: { [key: string]: ContactInfoInterface }, contact) => {
+      const contactsToDispatch = contacts.reduce((acc: { [key: string]: ContactInfoInterface }, contact) => {
         acc = { [contact.key]: { ...contact }, ...acc }
         return acc
       }, {})
 
-      console.log({ contactsDispatch })
-
-      console.log({ newLoad: newLoad.current })
-
-      // initialLoadingRef.current = false
-      // if (!newLoad.current) {
-      contactsContext?.dispatch({
+      contactsDispatch({
         type: "updateContactsInitial",
-        payload: { contacts: contactsDispatch, unreadMessages, unreadMessagesContacts }
+        payload: { contacts: contactsToDispatch, unreadMessages, unreadMessagesContacts }
       })
 
       newLoad.current = false
       setInitialLoading(false)
     } else {
-      contactsContext?.dispatch({
+      contactsDispatch({
         type: "updateContacts",
         payload: { contacts: contactsData }
       })
@@ -145,7 +135,6 @@ const ContactList: React.FC<Props> = ({ contactListWrapperRef }) => {
   return (
     <div
       className={classNames("contact-list", {
-        // "contact-list--hide-mobile": context?.state.activeChat.chatKey,
         "contact-list--no-contacts": !initialLoadingRef.current && !contactsData?.length,
         "contact-list--group-creation-active": groupCreation.isActive
       })}

@@ -1,4 +1,3 @@
-import Footer from "Components/UI/Footer/Footer"
 import Header from "Components/UI/Header/Header"
 import withAuthorization from "Components/UserAuth/Session/WithAuthorization/WithAuthorization"
 import React from "react"
@@ -17,7 +16,6 @@ const Contacts: React.FC<Props> = () => {
       </Helmet>
       <Header contactsPage={true} isLogoVisible={false} />
       <ContactsContent />
-      {/* <Footer /> */}
     </>
   )
 }

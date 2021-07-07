@@ -1,7 +1,6 @@
-import { AppContext } from "Components/AppContext/AppContextHOC"
-import { FirebaseContext } from "Components/Firebase"
 import { ContactInfoInterface } from "Components/Pages/Contacts/@Types"
-import { useState, useEffect, useCallback, useRef, useContext } from "react"
+import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
+import { useState, useEffect, useCallback, useRef } from "react"
 
 type Props = {
   activeChat: { chatKey: string }
@@ -9,8 +8,7 @@ type Props = {
 }
 
 const usePageFocusHandler = ({ activeChat, contactInfo }: Props) => {
-  const firebase = useContext(FirebaseContext)
-  const { authUser } = useContext(AppContext)
+  const { authUser, firebase } = useFrequentVariables()
   const [pageInFocus, setPageInFocus] = useState(true)
   const focusInterval = useRef<number | null>(null)
 
@@ -30,7 +28,7 @@ const usePageFocusHandler = ({ activeChat, contactInfo }: Props) => {
           window.clearInterval(focusInterval.current || 0)
         }
       })
-  }, [activeChat])
+  }, [activeChat, authUser, firebase]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const focusHandler = useCallback(() => {
     focusInterval.current = window.setInterval(() => {
@@ -43,7 +41,7 @@ const usePageFocusHandler = ({ activeChat, contactInfo }: Props) => {
         .update({ pageInFocus: document.hasFocus() })
       setPageInFocus(document.hasFocus())
     }, 250)
-  }, [activeChat])
+  }, [activeChat, firebase, authUser]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     focusHandler()

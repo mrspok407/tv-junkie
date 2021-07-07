@@ -31,7 +31,7 @@ const useElementScrolledDown = ({ element, threshold = 0 }: Props) => {
     return () => {
       element.removeEventListener("scroll", handleScroll)
     }
-  }, [handleScroll])
+  }, [handleScroll, element])
 
   return isScrolledDown
 }

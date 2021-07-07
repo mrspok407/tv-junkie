@@ -8,10 +8,12 @@ const useFrequentVariables = () => {
   const { authUser, newContactsActivity, errors } = useContext(AppContext)
   const contactsContext = useContext(ContactsContext)
   const contactsState = contactsContext?.state!
+  const contactsDispatch = contactsContext?.dispatch!
 
   return {
     contactsContext,
     contactsState,
+    contactsDispatch,
     firebase,
     authUser,
     newContactsActivity,

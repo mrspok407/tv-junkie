@@ -31,7 +31,7 @@ const ShowsButtons: React.FC<Props> = ({
     return () => {
       document.removeEventListener("mousedown", handleClickOutside as EventListener)
     }
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleClickOutside = (e: CustomEvent) => {
     if (authUser) return

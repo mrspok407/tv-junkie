@@ -1,12 +1,9 @@
 import classNames from "classnames"
-import { FirebaseContext } from "Components/Firebase"
-import React, { useContext, useEffect, useRef } from "react"
+import React, { useEffect, useRef } from "react"
 import ChatWindow from "./Components/ChatWindow/ChatWindow"
 import ContactList from "./Components/ContactList/ContactList"
-import ContactsContextHOC, { ContactsContext } from "./Components/@Context/ContactsContext"
-import { ContactInfoInterface, MessageInterface } from "./@Types"
-import { LoremIpsum } from "lorem-ipsum"
-import { AppContext } from "Components/AppContext/AppContextHOC"
+import ContactsContextHOC from "./Components/@Context/ContactsContext"
+import { ContactInfoInterface } from "./@Types"
 import ConfirmModal from "./Components/ChatWindow/Components/ConfirmModal/ConfirmModal"
 import useContactOptions from "./Components/ContactOptionsPopup/Hooks/UseContactOptions"
 import useSelectOptions from "./Components/ChatWindow/Components/SelectOptions/Hooks/UseSelectOptions"
@@ -20,12 +17,10 @@ const ContactsContent: React.FC = () => {
   const { activeChat, contacts, messages, confirmModal, groupCreation } = contactsState
 
   const contactListWrapperRef = useRef<HTMLDivElement>(null!)
-  // const messagesRef = useRef<{ [key: string]: MessageInterface[] }>()
   const contactsRef = useRef<{ [key: string]: ContactInfoInterface }>()
   const confirmModalFunctions = { ...useContactOptions({}), ...useSelectOptions() }
 
   useEffect(() => {
-    // messagesRef.current = messages
     contactsRef.current = contacts
   }, [messages, contacts])
 
@@ -54,7 +49,7 @@ const ContactsContent: React.FC = () => {
     return () => {
       firebase.contactsDatabase({ uid: authUser?.uid }).update({ pageIsOpen: null })
     }
-  }, [])
+  }, [authUser, firebase])
 
   return (
     <>

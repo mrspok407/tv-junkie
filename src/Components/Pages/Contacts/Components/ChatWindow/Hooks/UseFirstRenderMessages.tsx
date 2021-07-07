@@ -45,7 +45,7 @@ const useFirstRenderMessages = ({ messages, renderedMessages, unreadMessages, ch
         chatKey
       }
     })
-  }, [messages, chatKey]) // esline-disable-line react-hooks/exhaustive-deps
+  }, [messages, chatKey]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     isRenderedRef.current = true

@@ -1,7 +1,6 @@
 import { ConfirmFunctionsInterface } from "Components/Pages/Contacts/@Types"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
-import React, { useState, useEffect, useContext, useRef } from "react"
-import { ContactsContext } from "../../../@Context/ContactsContext"
+import React, { useEffect, useRef } from "react"
 import "./ConfirmModal.scss"
 
 type Props = {
@@ -9,7 +8,7 @@ type Props = {
 }
 
 const ConfirmModal: React.FC<Props> = ({ confirmFunctions }) => {
-  const { contactsContext, contactsState } = useFrequentVariables()
+  const { contactsState, contactsDispatch } = useFrequentVariables()
   const { confirmModal, contacts } = contactsState
 
   const confirmRef = useRef<HTMLDivElement>(null!)
@@ -19,7 +18,7 @@ const ConfirmModal: React.FC<Props> = ({ confirmFunctions }) => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside as EventListener)
     }
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleClickOutside = (e: CustomEvent) => {
     if (!confirmRef.current?.contains(e.target as Node)) {
@@ -28,7 +27,7 @@ const ConfirmModal: React.FC<Props> = ({ confirmFunctions }) => {
   }
 
   const handleCancel = () => {
-    contactsContext?.dispatch({
+    contactsDispatch({
       type: "updateConfirmModal",
       payload: { isActive: false, function: "", contactKey: "" }
     })
@@ -37,15 +36,15 @@ const ConfirmModal: React.FC<Props> = ({ confirmFunctions }) => {
   const handleAprove = () => {
     confirmFunctions[confirmModal.function]({ contactInfo: contacts[confirmModal.contactKey!] })
 
-    contactsContext?.dispatch({
+    contactsDispatch({
       type: "updateConfirmModal",
       payload: { isActive: false, function: "", contactKey: "" }
     })
   }
 
   useEffect(() => {
-    contactsContext?.dispatch({ type: "closePopups", payload: "" })
-  }, [])
+    contactsDispatch({ type: "closePopups", payload: "" })
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const messageMap: { [key: string]: string } = {
     handleRemoveContact: `Are you sure you want to remove <span>${
