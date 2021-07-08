@@ -2,7 +2,7 @@
 @import "./Contact/Contact.scss";
 
 .contact-list {
-  transition: 100ms;
+  transition: transform 250ms, opacity 200ms;
   &-wrapper {
     position: relative;
     overflow-y: auto;
@@ -29,6 +29,7 @@
 
   &--group-creation-active {
     transform: translateX(-100%);
+    opacity: 0;
   }
 
   &--no-contacts {
@@ -54,10 +55,15 @@
     border-radius: 50%;
     border: 4px solid #fff;
     border-left-color: transparent;
-    animation: contactListLoading 0.5s linear infinite;
+    opacity: 0;
+    animation: contactListLoading 0.3s 0.5s linear infinite;
     @keyframes contactListLoading {
+      from {
+        opacity: 1;
+      }
       to {
         transform: rotate(360deg);
+        opacity: 1;
       }
     }
 

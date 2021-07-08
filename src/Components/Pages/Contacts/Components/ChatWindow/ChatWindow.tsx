@@ -52,7 +52,6 @@ const ChatWindow: React.FC = () => {
   const [unreadMsgsListenerChatKey, setUnreadMsgsListenerChatKey] = useState("")
   const isScrolledFirstRenderRef = useRef(false)
   const isScrollBottomRef = useRef(false)
-  const { pageInFocus } = usePageFocusHandler({ activeChat, contactInfo })
 
   const { floatDate, isScrollingTop } = useShowFloatDate({ activeChat, chatContainerRef, renderedMessages })
 
@@ -63,6 +62,7 @@ const ChatWindow: React.FC = () => {
   }, [])
 
   const { loadTopMessages, loadingTopMessages } = useLoadTopMessages()
+  const { pageInFocus } = usePageFocusHandler({ activeChat, contactInfo })
   const { onMouseEnter } = useIntersectionObserver({
     chatContainerRef: chatContainerRef,
     unreadMessagesAuth: unreadMessagesAuthRef.current,
@@ -166,8 +166,7 @@ const ChatWindow: React.FC = () => {
   let prevScrollTop: any
   const handleScroll = useCallback(
     throttle(150, () => {
-      if (messagesData === undefined) return
-      if (!chatContainerRef) return
+      if (chatWindowLoading || !chatContainerRef) return
       const { height, scrollHeight, scrollTop, thresholdTopRender, thresholdTopLoad, thresholdBottomRender } =
         getContainerRect()
 
@@ -187,7 +186,7 @@ const ChatWindow: React.FC = () => {
       }
       prevScrollTop = scrollTop
     }),
-    [chatContainerRef, activeChat, loadTopMessages, loadingTopMessages]
+    [chatContainerRef, activeChat, loadTopMessages, loadingTopMessages, chatWindowLoading]
   )
 
   useEffect(() => {
@@ -210,18 +209,26 @@ const ChatWindow: React.FC = () => {
   }, [activeChat])
 
   useLayoutEffect(() => {
-    if (!chatContainerRef) return
-    if (!renderedMessages?.length || !messagesData?.length) return
+    if (!chatContainerRef || !renderedMessages?.length || !messagesData?.length) return
     if (messagesData[messagesData.length - 1].key !== renderedMessages[renderedMessages.length - 1].key) return
     if (!isScrolledFirstRenderRef.current || !isScrollBottomRef.current || !pageInFocus) return
     if (chatWindowLoading && !contactInfo.isGroupChat) return
+
+    contactsDispatch({
+      type: "updateAuthUserUnreadMessages",
+      payload: { chatKey: activeChat.chatKey, unreadMessages: [] }
+    })
+    contactsDispatch({ type: "updateRerenderUnreadMessagesStart", payload: { messageKey: Math.random().toString() } })
+    firebase
+      .unreadMessages({ uid: authUser?.uid!, chatKey: activeChat.chatKey, isGroupChat: contactInfo.isGroupChat })
+      .set(null)
 
     chatContainerRef.scrollTop = getContainerRect().scrollHeight + getContainerRect().height
   }, [activeChat, renderedMessages, messagesData, chatContainerRef, chatWindowLoading])
 
   useLayoutEffect(() => {
-    if (!chatContainerRef) return
-    if (!messagesData?.length || !unreadMessagesAuth) return
+    // UseEffect for first ChatWindow render or when activeChat changes
+    if (!chatContainerRef || !messagesData?.length) return
     if (![true, "removed"].includes(contactInfo.status) && !contactInfo.isGroupChat) return
     if (isScrolledFirstRenderRef.current) return
     if (chatWindowLoading) return
@@ -234,14 +241,25 @@ const ChatWindow: React.FC = () => {
       scrollHeight <= lastScrollPosition[activeChat.chatKey]! + height
     )
 
+    const isFirstBunch = messagesData[messagesData.length - 1].key === renderedMessages[renderedMessages.length - 1].key
+
     if (firstUnreadMessageRef) {
       if (isScrollBottom) {
+        console.log("firstUnreadMessageRef isScrollBottom: true")
         firstUnreadMessageRef?.parentElement?.scrollIntoView({ block: "start", inline: "start" })
       } else {
-        chatContainerRef.scrollTop = lastScrollPosition[activeChat.chatKey]!
+        if (isFirstBunch) {
+          console.log("firstUnreadMessageRef isScrollBottom: false FIRST BUNCH")
+          firstUnreadMessageRef?.parentElement?.scrollIntoView({ block: "start", inline: "start" })
+        } else {
+          console.log("firstUnreadMessageRef isScrollBottom: false NOT FIRST BUNCH")
+
+          chatContainerRef.scrollTop = lastScrollPosition[activeChat.chatKey]!
+        }
       }
     } else {
       if (isScrollBottom) {
+        console.log("NOT firstUnreadMessageRef isScrollBottom: true")
         chatContainerRef.scrollTop = getContainerRect().scrollHeight + getContainerRect().height
         isScrollBottomRef.current = true
         firebase
@@ -252,6 +270,8 @@ const ChatWindow: React.FC = () => {
           })
           .update({ chatBottom: true })
       } else {
+        console.log("NOT firstUnreadMessageRef isScrollBottom: false")
+
         chatContainerRef.scrollTop = lastScrollPosition[activeChat.chatKey]!
       }
     }
@@ -259,6 +279,7 @@ const ChatWindow: React.FC = () => {
   }, [
     activeChat,
     messagesData,
+    renderedMessages,
     unreadMessagesAuth,
     chatContainerRef,
     contactInfo,
@@ -283,7 +304,8 @@ const ChatWindow: React.FC = () => {
       isScrollBottomRef.current = false
       isScrolledFirstRenderRef.current = false
     }
-  }, [activeChat, chatContainerRef, contactInfo])
+  }, [activeChat, chatContainerRef])
+
   useEffect(() => {
     if (!chatContainerRef) return
     chatContainerRef.addEventListener("scroll", handleScroll)
@@ -323,6 +345,10 @@ const ChatWindow: React.FC = () => {
   useEffect(() => {
     firebase.newContactsActivity({ uid: authUser?.uid }).child(`${contactInfo.key}`).set(null)
   }, [contactInfo])
+
+  useEffect(() => {
+    console.log({ unreadMessagesAuth })
+  }, [unreadMessagesAuth])
 
   const firstUnreadMessage = useMemo(() => {
     return messagesData?.find((message) => message.key === unreadMessagesAuth[0])

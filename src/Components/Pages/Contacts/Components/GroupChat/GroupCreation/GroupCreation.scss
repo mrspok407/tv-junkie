@@ -14,9 +14,10 @@
   background-color: #131313;
   transform: translateX(100%);
   transition: 150ms;
-  will-change: transform;
+  will-change: transform, opacity;
   z-index: 20;
-  animation: groupCreationShow 150ms forwards;
+  opacity: 1;
+  animation: groupCreationShow 250ms forwards cubic-bezier(0.1, 0.74, 0.25, 1);
   @include scrollbar(5px, getColor(blueClr, $mainPalette), #c5bbb1);
   @keyframes groupCreationShow {
     to {

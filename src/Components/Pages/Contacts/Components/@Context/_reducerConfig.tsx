@@ -219,6 +219,10 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
       return {
         ...state,
         rerenderUnreadMessagesStart: action.payload.messageKey
+        // authUserUnreadMessages: {
+        //   ...authUserUnreadMessages,
+        //   [activeChat.chatKey]: []
+        // }
       }
     }
 
@@ -438,7 +442,8 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
                 [action.payload.chatKey]:
                   authUser?.uid !== action.payload.newMessage.sender
                     ? [...unreadMessages, action.payload.newMessage.key]
-                    : unreadMessages
+                    : // : unreadMessages
+                      []
               }
             }
           } else {
@@ -821,6 +826,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
       if (activeChat.chatKey !== action.payload.chatKey) {
         return { ...state }
       }
+      console.log({ lastScrollReducer: action.payload.scrollTop })
       return {
         ...state,
         lastScrollPosition: {

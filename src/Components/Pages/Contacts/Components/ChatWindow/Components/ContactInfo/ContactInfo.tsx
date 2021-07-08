@@ -6,6 +6,8 @@ import ContactOptionsPopup from "../../../ContactOptionsPopup/ContactOptionsPopu
 import Loader from "Components/UI/Placeholders/Loader"
 import "./ContactInfo.scss"
 
+import { LoremIpsum } from "lorem-ipsum"
+
 type Props = {
   isScrollBottomRef: any
 }
@@ -26,10 +28,22 @@ const ContactInfo: React.FC<Props> = ({ isScrollBottomRef }) => {
     const timeStampEpoch = new Date().getTime()
     const messageRef = firebase.privateChats().child(`${activeChat.chatKey}/messages`).push()
     const messageKey = messageRef.key
+
+    const lorem = new LoremIpsum({
+      sentencesPerParagraph: {
+        max: 8,
+        min: 4
+      },
+      wordsPerSentence: {
+        max: 8,
+        min: 4
+      }
+    })
+
     const updateData: any = {
       [`privateChats/${activeChat.chatKey}/messages/${messageKey}`]: {
         sender: contactInfo.key,
-        message: "test message very testy message yeah",
+        message: lorem.generateSentences(2),
         timeStamp: timeStampEpoch
       },
       [`privateChats/${activeChat.chatKey}/members/${authUser?.uid}/unreadMessages/${messageKey}`]: !isScrollBottomRef
