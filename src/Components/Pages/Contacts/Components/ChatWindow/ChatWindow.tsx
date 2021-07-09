@@ -173,7 +173,10 @@ const ChatWindow: React.FC = () => {
       if (scrollHeight <= height) return
       if (scrollTop < prevScrollTop || prevScrollTop === undefined) {
         if (scrollTop <= thresholdTopRender) {
-          contactsDispatch({ type: "renderTopMessages" })
+          contactsDispatch({
+            type: "renderTopMessages",
+            payload: { unreadMessagesAuthRef: unreadMessagesAuthRef.current, chatKey: activeChat.chatKey }
+          })
         }
         if (scrollTop <= thresholdTopLoad) {
           if (loadingTopMessages) return
@@ -181,7 +184,10 @@ const ChatWindow: React.FC = () => {
         }
       } else {
         if (scrollHeight <= scrollTop + height + thresholdBottomRender) {
-          contactsDispatch({ type: "renderBottomMessages" })
+          contactsDispatch({
+            type: "renderBottomMessages",
+            payload: { unreadMessagesAuthRef: unreadMessagesAuthRef.current, chatKey: activeChat.chatKey }
+          })
         }
       }
       prevScrollTop = scrollTop
@@ -216,9 +222,8 @@ const ChatWindow: React.FC = () => {
 
     contactsDispatch({
       type: "updateAuthUserUnreadMessages",
-      payload: { chatKey: activeChat.chatKey, unreadMessages: [] }
+      payload: { chatKey: activeChat.chatKey, unreadMessages: [], rerenderUnreadMessagesStart: true }
     })
-    contactsDispatch({ type: "updateRerenderUnreadMessagesStart", payload: { messageKey: Math.random().toString() } })
     firebase
       .unreadMessages({ uid: authUser?.uid!, chatKey: activeChat.chatKey, isGroupChat: contactInfo.isGroupChat })
       .set(null)
@@ -345,10 +350,6 @@ const ChatWindow: React.FC = () => {
   useEffect(() => {
     firebase.newContactsActivity({ uid: authUser?.uid }).child(`${contactInfo.key}`).set(null)
   }, [contactInfo])
-
-  useEffect(() => {
-    console.log({ unreadMessagesAuth })
-  }, [unreadMessagesAuth])
 
   const firstUnreadMessage = useMemo(() => {
     return messagesData?.find((message) => message.key === unreadMessagesAuth[0])

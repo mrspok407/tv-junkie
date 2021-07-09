@@ -29,7 +29,7 @@ a {
   max-width: $mainContainerMaxWidth;
   margin: auto;
 
-  @include mediaMaxW(#{$mobileViewPort + 80px}) {
+  @include mediaMaxW(#{$mobileViewPort}) {
     height: 100%;
     min-height: 700px;
   }

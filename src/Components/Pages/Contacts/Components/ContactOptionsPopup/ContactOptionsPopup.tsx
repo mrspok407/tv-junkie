@@ -130,7 +130,7 @@ const ContactOptionsPopup: React.FC<Props> = ({ contactOptionsRef, contactInfo }
             {contactInfo.role === "ADMIN" ? "Delete chat" : "Leave chat"}
           </button>
         </div>
-      ) : (
+      ) : contactInfo.receiver === true ? (
         <div className="popup__option">
           <button
             className="popup__option-btn"
@@ -150,6 +150,28 @@ const ContactOptionsPopup: React.FC<Props> = ({ contactOptionsRef, contactInfo }
             Remove from contacts
           </button>
         </div>
+      ) : (
+        ["removed", "rejected", true].includes(contactInfo.status) && (
+          <div className="popup__option">
+            <button
+              className="popup__option-btn"
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation()
+                context?.dispatch({
+                  type: "updateConfirmModal",
+                  payload: {
+                    isActive: true,
+                    function: "handleRemoveContact",
+                    contactKey: contactInfo.key
+                  }
+                })
+              }}
+            >
+              Remove from contacts
+            </button>
+          </div>
+        )
       )}
     </div>
   )

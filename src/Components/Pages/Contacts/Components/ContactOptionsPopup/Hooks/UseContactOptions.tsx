@@ -151,22 +151,38 @@ const useContactOptions = ({ contactInfo }: Props) => {
     const timeStamp = new Date().getTime()
     const newMessageRef = firebase.privateChats().child("messages").push()
     try {
-      const updateData = {
+      let updateData: any = {
         [`users/${authUser?.uid}/contactsDatabase/contactsList/${contactInfo.key}`]: null,
         [`users/${authUser?.uid}/contactsDatabase/newContactsRequests/${contactInfo.key}`]: null,
         [`users/${authUser?.uid}/contactsDatabase/newContactsActivity/${contactInfo.key}`]: null,
-        [`users/${authUser?.uid}/contactsDatabase/contactsLastActivity/${contactInfo.key}`]: null,
-        [`users/${contactInfo.key}/contactsDatabase/contactsList/${authUser?.uid}/status`]: "removed",
-        [`users/${contactInfo.key}/contactsDatabase/contactsList/${authUser?.uid}/receiver`]: null,
-        [`users/${contactInfo.key}/contactsDatabase/newContactsActivity/${authUser?.uid}`]: true,
-        [`users/${contactInfo.key}/contactsDatabase/newContactsRequests/${authUser?.uid}`]: null,
-        [`users/${contactInfo.key}/contactsDatabase/contactsLastActivity/${authUser?.uid}`]: timeStamp,
-        [`privateChats/${contactInfo.chatKey}/messages/${newMessageRef.key}`]: {
-          sender: authUser?.uid,
-          isRemovedFromContacts: true,
-          timeStamp
+        [`users/${authUser?.uid}/contactsDatabase/contactsLastActivity/${contactInfo.key}`]: null
+      }
+
+      if (["removed", "rejected", false].includes(contactInfo.status as string)) {
+        updateData = {
+          ...updateData,
+          [`users/${contactInfo.key}/contactsDatabase/contactsList/${authUser?.uid}`]: null,
+          [`users/${contactInfo.key}/contactsDatabase/newContactsRequests/${authUser?.uid}`]: null,
+          [`users/${contactInfo.key}/contactsDatabase/newContactsActivity/${authUser?.uid}`]: null,
+          [`users/${contactInfo.key}/contactsDatabase/contactsLastActivity/${authUser?.uid}`]: null
         }
       }
+      if (contactInfo.status === true) {
+        updateData = {
+          ...updateData,
+          [`users/${contactInfo.key}/contactsDatabase/contactsList/${authUser?.uid}/status`]: "removed",
+          [`users/${contactInfo.key}/contactsDatabase/contactsList/${authUser?.uid}/receiver`]: null,
+          [`users/${contactInfo.key}/contactsDatabase/newContactsActivity/${authUser?.uid}`]: true,
+          [`users/${contactInfo.key}/contactsDatabase/newContactsRequests/${authUser?.uid}`]: null,
+          [`users/${contactInfo.key}/contactsDatabase/contactsLastActivity/${authUser?.uid}`]: timeStamp,
+          [`privateChats/${contactInfo.chatKey}/messages/${newMessageRef.key}`]: {
+            sender: authUser?.uid,
+            isRemovedFromContacts: true,
+            timeStamp
+          }
+        }
+      }
+
       await firebase
         .database()
         .ref()
