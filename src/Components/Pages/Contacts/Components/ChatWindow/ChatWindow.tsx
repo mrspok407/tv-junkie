@@ -258,7 +258,6 @@ const ChatWindow: React.FC = () => {
           firstUnreadMessageRef?.parentElement?.scrollIntoView({ block: "start", inline: "start" })
         } else {
           console.log("firstUnreadMessageRef isScrollBottom: false NOT FIRST BUNCH")
-
           chatContainerRef.scrollTop = lastScrollPosition[activeChat.chatKey]!
         }
       }

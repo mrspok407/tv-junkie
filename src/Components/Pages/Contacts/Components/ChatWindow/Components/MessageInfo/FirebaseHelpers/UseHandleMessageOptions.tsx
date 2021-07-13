@@ -92,6 +92,7 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
 
     try {
       let updateData: { [key: string]: any } = {}
+      console.log({ contactsUnreadMessagesData })
       const unreadMsgsDataAfterDeletion = contactsUnreadMessagesData.filter(
         (message) => !deleteMessagesKeys.includes(message)
       )
@@ -109,6 +110,11 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
           `privateChats/${activeChat.chatKey}/members/${activeChat.contactKey}/unreadMessages/${messageData.key}`
         ] = null
       })
+
+      console.log({ lastReadMessage })
+      console.log({ lastUnreadMsgAfterDeletion })
+      console.log({ lastUnreadMsgBeforeDeletion })
+      console.log({ unreadMsgsDataAfterDeletion })
 
       if (lastUnreadMsgAfterDeletion && lastUnreadMsgBeforeDeletion !== lastUnreadMsgAfterDeletion.key) {
         updateData[`users/${activeChat.contactKey}/contactsDatabase/contactsLastActivity/${authUser?.uid}`] =

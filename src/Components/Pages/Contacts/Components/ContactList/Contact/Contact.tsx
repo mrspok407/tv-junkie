@@ -140,8 +140,8 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
               className={classNames("contact-item__last-message-status", {
                 "contact-item__last-message-status--unread":
                   contactUnreadMessageData === null
-                    ? !!contactInfo.unreadMessagesContact.length
-                    : !!contactUnreadMessageData.length
+                    ? !!contactInfo.unreadMessagesContact?.length
+                    : !!contactUnreadMessageData?.length
               })}
             ></div>
           )}
@@ -150,15 +150,15 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
 
       <div className="contact-item__row contact-item__row--bottom">
         {contactInfo.isGroupChat ? (
-          chatMembersTyping.length ? (
+          chatMembersTyping?.length ? (
             <div className="contact-item__typing">
-              {chatMembersTyping.length === 1 ? (
+              {chatMembersTyping?.length === 1 ? (
                 <>
                   <div>Someone typing</div> <Loader className="loader--typing" />
                 </>
               ) : (
                 <>
-                  <div>{chatMembersTyping.length} people typing</div> <Loader className="loader--typing" />
+                  <div>{chatMembersTyping?.length} people typing</div> <Loader className="loader--typing" />
                 </>
               )}
             </div>

@@ -13,6 +13,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    row-gap: 5px;
 
     @include mediaMaxW(#{$mobileViewPort}) {
       display: none;
@@ -22,6 +23,28 @@
       padding: 5px 15px 5px 15px;
       border-radius: 14px;
       background-color: getColor(placeholderBg, $chatWindowPalette);
+    }
+  }
+
+  &--removed-from-group {
+    .chat-window__go-back-btn {
+      @include buttonRemoveDefaults;
+      display: none;
+      padding: 7px 10px 7px 10px;
+      background-color: peru;
+      color: #fff;
+      font-size: 1.1rem;
+      border-radius: 15px;
+      cursor: pointer;
+      user-select: none;
+
+      @include mediaMaxW(#{$mobileViewPort}) {
+        display: initial;
+      }
+    }
+
+    @include mediaMaxW(#{$mobileViewPort}) {
+      display: flex;
     }
   }
 }

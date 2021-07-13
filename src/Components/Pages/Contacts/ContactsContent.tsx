@@ -13,7 +13,7 @@ import useFrequentVariables from "./Hooks/UseFrequentVariables"
 import "./Components/ContactList/ContactList.scss"
 
 const ContactsContent: React.FC = () => {
-  const { firebase, authUser, contactsContext, contactsState } = useFrequentVariables()
+  const { firebase, authUser, contactsContext, contactsState, contactsDispatch } = useFrequentVariables()
   const { activeChat, contacts, messages, confirmModal, groupCreation } = contactsState
 
   const contactListWrapperRef = useRef<HTMLDivElement>(null!)
@@ -85,8 +85,20 @@ const ContactsContent: React.FC = () => {
             <div className="chat-window">This chat was deleted by it's admin</div>
           </div>
         ) : contacts[activeChat.contactKey].removedFromGroup ? (
-          <div className="chat-window-container chat-window-container--no-active-chat">
+          <div className="chat-window-container chat-window-container--no-active-chat chat-window-container--removed-from-group">
             <div className="chat-window">You were removed from this group</div>
+            <div className="chat-window__go-back">
+              <button
+                className="chat-window__go-back-btn"
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  contactsDispatch({ type: "updateActiveChat", payload: { chatKey: "", contactKey: "" } })
+                }}
+              >
+                Go back
+              </button>
+            </div>
           </div>
         ) : (
           <ChatWindow />

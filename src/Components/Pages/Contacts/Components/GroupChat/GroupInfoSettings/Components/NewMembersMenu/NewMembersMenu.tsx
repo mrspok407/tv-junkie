@@ -150,7 +150,7 @@ const NewMembersMenu: React.FC = () => {
         let contacts: any = []
         const getInitialContacts = async () => {
           const contactsData = await contactsListRef
-            .orderByChild("userName")
+            .orderByChild("userNameLowerCase")
             .limitToFirst(CONTACTS_TO_LOAD + additionalContactsToLoad)
             .once("value")
           const contactsLength = Object.keys(contactsData.val() || {}).length
@@ -189,8 +189,8 @@ const NewMembersMenu: React.FC = () => {
       try {
         setLoadingNewcontacts(true)
         const contactsData = await contactsListRef
-          .orderByChild("userName")
-          .startAfter(contactsList[contactsList.length - 1].userName)
+          .orderByChild("userNameLowerCase")
+          .startAfter(contactsList[contactsList.length - 1].userNameLowerCase)
           .limitToFirst(CONTACTS_TO_LOAD)
           .once("value")
         getContactsData({ snapshot: contactsData })

@@ -2,6 +2,7 @@ export interface ContactInfoInterface {
   status: boolean | string
   receiver: boolean
   userName: string
+  userNameLowerCase: string
   groupName: string
   timeStamp: number
   pinned_lastActivityTS: string

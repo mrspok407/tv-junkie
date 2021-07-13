@@ -1,6 +1,6 @@
 import { ContainerRectInterface } from "Components/Pages/Contacts/@Types"
-import { useLayoutEffect, useCallback, useContext, useRef } from "react"
-import { ContactsContext } from "../../../../@Context/ContactsContext"
+import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
+import { useCallback, useRef, useEffect } from "react"
 
 type Props = {
   inputRef: HTMLDivElement
@@ -9,8 +9,8 @@ type Props = {
 }
 
 const useInputResizeObserver = ({ inputRef, chatContainerRef, getContainerRect }: Props) => {
-  const context = useContext(ContactsContext)
-  const { activeChat } = context?.state!
+  const { contactsState } = useFrequentVariables()
+  const { activeChat } = contactsState
 
   const prevHeight = useRef(0)
 
@@ -24,7 +24,7 @@ const useInputResizeObserver = ({ inputRef, chatContainerRef, getContainerRect }
     prevHeight.current = height
   }, [inputRef, activeChat]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (!inputRef) return
     prevHeight.current = inputRef.getBoundingClientRect().height
     if (window.ResizeObserver) {

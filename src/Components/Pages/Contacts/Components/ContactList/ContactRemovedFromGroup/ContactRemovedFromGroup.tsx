@@ -1,5 +1,5 @@
 import classNames from "classnames"
-import React, { useRef } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { ContactInfoInterface } from "../../../@Types"
 import ContactOptionsPopup from "../../ContactOptionsPopup/ContactOptionsPopup"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
@@ -11,16 +11,30 @@ type Props = {
 }
 
 const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
-  const { contactsState, contactsDispatch } = useFrequentVariables()
+  const { firebase, authUser, contactsState, contactsDispatch } = useFrequentVariables()
   const { optionsPopupContactList, activeChat } = contactsState
 
   const contactOptionsRef = useRef<HTMLDivElement>(null!)
   const chatKey = contactInfo.chatKey
 
+  const [newActivity, setNewActivity] = useState<boolean | null | undefined>(contactInfo.newContactsActivity)
+
   const setContactActive = () => {
     if (activeChat.chatKey === chatKey) return
     contactsDispatch({ type: "updateActiveChat", payload: { chatKey, contactKey: contactInfo.key } })
+    firebase.newContactsActivity({ uid: authUser?.uid }).child(`${contactInfo.key}`).set(null)
   }
+
+  useEffect(() => {
+    firebase
+      .newContactsActivity({ uid: authUser?.uid! })
+      .child(`${contactInfo.key}`)
+      .on("value", (snapshot: any) => setNewActivity(snapshot.val()))
+
+    return () => {
+      firebase.newContactsActivity({ uid: authUser?.uid }).child(`${contactInfo.key}`).off()
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const isPinned = !!(contactInfo.pinned_lastActivityTS?.slice(0, 4) === "true")
   const contactNameCutLength = contactInfo.userName || contactInfo.groupName || ""
@@ -71,7 +85,15 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
           )}
         </div>
         {contactInfo.isGroupChat && <div className="contact-item__group-chat-icon"></div>}
-        {isPinned && <div className="contact-item__pinned"></div>}
+        {newActivity ? (
+          <div
+            className={classNames("contact-item__unread-messages", {
+              "contact-item__unread-messages--active": chatActive
+            })}
+          ></div>
+        ) : (
+          isPinned && <div className="contact-item__pinned"></div>
+        )}
       </div>
     </div>
   )

@@ -533,7 +533,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
       const endIndex = messagesData.findIndex(
         (message: MessageInterface) => message.key === renderedMessages[renderedMessages.length - 1].key
       )
-      const startIndex = Math.max(endIndex + 1 - MESSAGES_TO_RENDER, 0)
+      const startIndex = Math.max(endIndex + 1 - (MESSAGES_TO_RENDER + removedMessagesKeys.length), 0)
 
       const inputRef = document.querySelector(".chat-window__input-message") as HTMLElement
       let messageInput = {}
@@ -547,11 +547,18 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         }
         if (inputRef) inputRef.innerHTML = ""
       }
+
       return {
         ...state,
         messages: {
           ...messages,
           [action.payload.chatKey]: [...messagesData.filter((message) => !removedMessagesKeys.includes(message.key))]
+        },
+        contactsUnreadMessages: {
+          ...contactsUnreadMessages,
+          [action.payload.chatKey]: contactsUnreadMessages[action.payload.chatKey].filter(
+            (message) => !removedMessagesKeys.includes(message)
+          )
         },
         renderedMessagesList: {
           ...renderedMessagesList,
