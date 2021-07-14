@@ -10,10 +10,11 @@ import useSelectOptions from "./Components/ChatWindow/Components/SelectOptions/H
 import HandleNewMembers from "./Components/GroupChat/HandleNewMembers/HandleNewMembers"
 import GroupCreation from "./Components/GroupChat/GroupCreation/GroupCreation"
 import useFrequentVariables from "./Hooks/UseFrequentVariables"
+import ChatWindowPlaceHolder from "./Components/ChatWindow/Placeholders/ChatWindowPlaceHolder"
 import "./Components/ContactList/ContactList.scss"
 
 const ContactsContent: React.FC = () => {
-  const { firebase, authUser, contactsContext, contactsState, contactsDispatch } = useFrequentVariables()
+  const { firebase, authUser, contactsContext, contactsState } = useFrequentVariables()
   const { activeChat, contacts, messages, confirmModal, groupCreation } = contactsState
 
   const contactListWrapperRef = useRef<HTMLDivElement>(null!)
@@ -26,7 +27,6 @@ const ContactsContent: React.FC = () => {
 
   useEffect(() => {
     return () => {
-      console.log({ contactsRef: contactsRef.current })
       if (!contactsRef.current) return
       Object.values(contactsRef.current).forEach((contact) => {
         firebase.messages({ chatKey: contact.chatKey, isGroupChat: contact.isGroupChat }).off()
@@ -81,25 +81,15 @@ const ContactsContent: React.FC = () => {
             </div>
           )
         ) : contacts[activeChat.contactKey].chatDeleted ? (
-          <div className="chat-window-container chat-window-container--no-active-chat">
-            <div className="chat-window">This chat was deleted by it's admin</div>
-          </div>
+          <ChatWindowPlaceHolder
+            contactKey={contacts[activeChat.contactKey].key}
+            text="This chat was deleted by it's admin"
+          />
         ) : contacts[activeChat.contactKey].removedFromGroup ? (
-          <div className="chat-window-container chat-window-container--no-active-chat chat-window-container--removed-from-group">
-            <div className="chat-window">You were removed from this group</div>
-            <div className="chat-window__go-back">
-              <button
-                className="chat-window__go-back-btn"
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  contactsDispatch({ type: "updateActiveChat", payload: { chatKey: "", contactKey: "" } })
-                }}
-              >
-                Go back
-              </button>
-            </div>
-          </div>
+          <ChatWindowPlaceHolder
+            contactKey={contacts[activeChat.contactKey].key}
+            text="You were removed from this group"
+          />
         ) : (
           <ChatWindow />
         )}
