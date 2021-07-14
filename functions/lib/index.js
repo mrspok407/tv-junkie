@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.handleContactRequest = exports.newContactRequest = exports.createNewGroup = exports.removeMemberFromGroup = exports.addNewGroupMembers = exports.updateLastSeenGroupChats = exports.updateLastSeenPrivateChats = exports.decrementContacts = exports.incrementContacts = exports.removeNewContactsActivity = exports.addNewContactsActivity = exports.updatePinnedTimeStamp = void 0;
+exports.handleContactRequest = exports.newContactRequest = exports.createNewGroup = exports.removeMemberFromGroup = exports.addNewGroupMembers = exports.updateLastSeenGroupChats = exports.updateLastSeenPrivateChats = exports.decrementContacts = exports.incrementContacts = exports.removeNewContactsActivityGroupChat = exports.removeNewContactsActivity = exports.addNewContactsActivityGroupChat = exports.addNewContactsActivity = exports.updatePinnedTimeStamp = void 0;
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 // Cloud Functions interesting points:
@@ -67,6 +67,17 @@ exports.addNewContactsActivity = functions.database
     };
     return database.ref("users").update(updateData);
 });
+exports.addNewContactsActivityGroupChat = functions.database
+    .ref("groupChats/{chatKey}/members/unreadMessages/{memberKey}")
+    .onCreate((snapshot, context) => {
+    const { chatKey, memberKey } = context.params;
+    const timeStamp = admin.database.ServerValue.TIMESTAMP;
+    const updateData = {
+        [`${contactsDatabaseRef(memberKey)}/newContactsActivity/${chatKey}`]: true,
+        [`${contactsDatabaseRef(memberKey)}/contactsLastActivity/${chatKey}`]: timeStamp
+    };
+    return database.ref("users").update(updateData);
+});
 exports.removeNewContactsActivity = functions.database
     .ref("privateChats/{chatKey}/members/{memberKey}/unreadMessages")
     .onDelete((snapshot, context) => {
@@ -79,6 +90,12 @@ exports.removeNewContactsActivity = functions.database
         otherMemberKey = chatKey.slice(0, -memberKey.length - 1);
     }
     return database.ref(`users/${memberKey}/contactsDatabase/newContactsActivity/${otherMemberKey}`).set(null);
+});
+exports.removeNewContactsActivityGroupChat = functions.database
+    .ref("groupChats/{chatKey}/members/unreadMessages/{memberKey}")
+    .onDelete((snapshot, context) => {
+    const { chatKey, memberKey } = context.params;
+    return database.ref(`users/${memberKey}/contactsDatabase/newContactsActivity/${chatKey}`).set(null);
 });
 exports.incrementContacts = functions.database
     .ref("users/{authUid}/contactsDatabase/contactsList/{contactUid}")

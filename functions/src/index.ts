@@ -97,6 +97,20 @@ export const addNewContactsActivity = functions.database
     return database.ref("users").update(updateData);
   });
 
+export const addNewContactsActivityGroupChat = functions.database
+  .ref("groupChats/{chatKey}/members/unreadMessages/{memberKey}")
+  .onCreate((snapshot, context) => {
+    const {chatKey, memberKey} = context.params;
+
+    const timeStamp = admin.database.ServerValue.TIMESTAMP;
+    const updateData = {
+      [`${contactsDatabaseRef(memberKey)}/newContactsActivity/${chatKey}`]: true,
+      [`${contactsDatabaseRef(memberKey)}/contactsLastActivity/${chatKey}`]: timeStamp
+    };
+
+    return database.ref("users").update(updateData);
+  });
+
 export const removeNewContactsActivity = functions.database
   .ref("privateChats/{chatKey}/members/{memberKey}/unreadMessages")
   .onDelete((snapshot, context) => {
@@ -110,6 +124,13 @@ export const removeNewContactsActivity = functions.database
     }
 
     return database.ref(`users/${memberKey}/contactsDatabase/newContactsActivity/${otherMemberKey}`).set(null);
+  });
+
+export const removeNewContactsActivityGroupChat = functions.database
+  .ref("groupChats/{chatKey}/members/unreadMessages/{memberKey}")
+  .onDelete((snapshot, context) => {
+    const {chatKey, memberKey} = context.params;
+    return database.ref(`users/${memberKey}/contactsDatabase/newContactsActivity/${chatKey}`).set(null);
   });
 
 export const incrementContacts = functions.database

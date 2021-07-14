@@ -110,13 +110,11 @@ export const _addNewGroupMembers = async ({
       usernameLowerCase: member.username?.toLowerCase(),
       role: "USER"
     }
-    membersUpdateData[`users/${member.key}/contactsDatabase/contactsList/${groupInfo.key}`] = {
-      pinned_lastActivityTS: "false",
-      isGroupChat: true,
-      groupName: groupInfo.groupName,
-      role: "USER",
-      removedFromGroup: false
-    }
+    membersUpdateData[`users/${member.key}/contactsDatabase/contactsList/${groupInfo.key}/isGroupChat`] = true
+    membersUpdateData[`users/${member.key}/contactsDatabase/contactsList/${groupInfo.key}/groupName`] =
+      groupInfo.groupName
+    membersUpdateData[`users/${member.key}/contactsDatabase/contactsList/${groupInfo.key}/role`] = "USER"
+    membersUpdateData[`users/${member.key}/contactsDatabase/contactsList/${groupInfo.key}/removedFromGroup`] = false
     membersUpdateData[`users/${member.key}/contactsDatabase/contactsLastActivity/${groupInfo.key}`] = timeStamp
     membersUpdateData[`users/${member.key}/contactsDatabase/newContactsActivity/${groupInfo.key}`] = true
   })

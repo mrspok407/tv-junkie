@@ -2,8 +2,8 @@
 import React, { useEffect, useState, useRef, useCallback, useLayoutEffect, useMemo } from "react"
 import classNames from "classnames"
 import MessageInfo from "./Components/MessageInfo/MessageInfo"
-import { throttle } from "throttle-debounce"
-import debounce from "debounce"
+import { throttle, debounce } from "throttle-debounce"
+import { debounce as debounceWithFlush } from "debounce"
 import useLoadTopMessages from "./FirebaseHelpers/UseLoadTopMessages"
 import useIntersectionObserver from "./Hooks/UseIntersectionObserver"
 import useFirstRenderMessages from "./Hooks/UseFirstRenderMessages"
@@ -20,7 +20,16 @@ import ContactInfo from "./Components/ContactInfo/ContactInfo"
 import GroupInfoSettings from "../GroupChat/GroupInfoSettings/GroupInfoSettings"
 import NewRequestOptions from "./Components/NewRequestOptions/NewRequestOptions"
 import InfoMessage from "./Components/MessagesList/GroupChat/Components/NewMembersMessages/InfoMessage"
+import * as Bowser from "bowser"
 import "./ChatWindow.scss"
+
+const browser = Bowser.getParser(window.navigator.userAgent)
+const DEBOUNCE_THROTTLE_DELAY = browser.getBrowserName() === "Firefox" ? 500 : 150
+
+const throttleDebounceMap: any = {
+  throttle,
+  debounce
+}
 
 const ChatWindow: React.FC = () => {
   const { firebase, authUser, contactsState, contactsDispatch } = useFrequentVariables()
@@ -103,7 +112,7 @@ const ChatWindow: React.FC = () => {
   }, [messagesData, renderedMessages, activeChat, loadingTopMessages])
 
   const scrollPositionHandler = useCallback(
-    debounce(() => {
+    debounceWithFlush(() => {
       if (!chatContainerRef) return
       const { scrollTop, scrollHeight, height } = getContainerRect()
       if (scrollHeight <= height) return
@@ -165,33 +174,36 @@ const ChatWindow: React.FC = () => {
 
   let prevScrollTop: any
   const handleScroll = useCallback(
-    throttle(150, () => {
-      if (chatWindowLoading || !chatContainerRef) return
-      const { height, scrollHeight, scrollTop, thresholdTopRender, thresholdTopLoad, thresholdBottomRender } =
-        getContainerRect()
+    throttleDebounceMap[`${browser.getBrowserName() === "Firefox" ? "debounce" : "throttle"}`](
+      DEBOUNCE_THROTTLE_DELAY,
+      () => {
+        if (chatWindowLoading || !chatContainerRef) return
+        const { height, scrollHeight, scrollTop, thresholdTopRender, thresholdTopLoad, thresholdBottomRender } =
+          getContainerRect()
 
-      if (scrollHeight <= height) return
-      if (scrollTop < prevScrollTop || prevScrollTop === undefined) {
-        if (scrollTop <= thresholdTopRender) {
-          contactsDispatch({
-            type: "renderTopMessages",
-            payload: { unreadMessagesAuthRef: unreadMessagesAuthRef.current, chatKey: activeChat.chatKey }
-          })
+        if (scrollHeight <= height) return
+        if (scrollTop < prevScrollTop || prevScrollTop === undefined) {
+          if (scrollTop <= thresholdTopRender) {
+            contactsDispatch({
+              type: "renderTopMessages",
+              payload: { unreadMessagesAuthRef: unreadMessagesAuthRef.current, chatKey: activeChat.chatKey }
+            })
+          }
+          if (scrollTop <= thresholdTopLoad) {
+            if (loadingTopMessages) return
+            loadTopMessages()
+          }
+        } else {
+          if (scrollHeight <= scrollTop + height + thresholdBottomRender) {
+            contactsDispatch({
+              type: "renderBottomMessages",
+              payload: { unreadMessagesAuthRef: unreadMessagesAuthRef.current, chatKey: activeChat.chatKey }
+            })
+          }
         }
-        if (scrollTop <= thresholdTopLoad) {
-          if (loadingTopMessages) return
-          loadTopMessages()
-        }
-      } else {
-        if (scrollHeight <= scrollTop + height + thresholdBottomRender) {
-          contactsDispatch({
-            type: "renderBottomMessages",
-            payload: { unreadMessagesAuthRef: unreadMessagesAuthRef.current, chatKey: activeChat.chatKey }
-          })
-        }
+        prevScrollTop = scrollTop
       }
-      prevScrollTop = scrollTop
-    }),
+    ),
     [chatContainerRef, activeChat, loadTopMessages, loadingTopMessages, chatWindowLoading]
   )
 

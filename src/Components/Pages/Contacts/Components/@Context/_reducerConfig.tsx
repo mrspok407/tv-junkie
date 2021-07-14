@@ -556,7 +556,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         },
         contactsUnreadMessages: {
           ...contactsUnreadMessages,
-          [action.payload.chatKey]: contactsUnreadMessages[action.payload.chatKey].filter(
+          [action.payload.chatKey]: contactsUnreadMessages[action.payload.chatKey]?.filter(
             (message) => !removedMessagesKeys.includes(message)
           )
         },

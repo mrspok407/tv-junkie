@@ -26,7 +26,7 @@
     }
   }
 
-  &--removed-from-group {
+  &--placeholder {
     .chat-window__go-back-btn {
       @include buttonRemoveDefaults;
       display: none;
