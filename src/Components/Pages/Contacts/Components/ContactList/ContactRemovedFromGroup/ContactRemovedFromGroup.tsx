@@ -31,6 +31,14 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
       .child(`${contactInfo.key}`)
       .on("value", (snapshot: any) => setNewActivity(snapshot.val()))
 
+    firebase
+      .chatMemberStatus({
+        chatKey: activeChat.chatKey,
+        memberKey: authUser?.uid!,
+        isGroupChat: true
+      })
+      .set(null)
+
     return () => {
       firebase.newContactsActivity({ uid: authUser?.uid }).child(`${contactInfo.key}`).off()
     }

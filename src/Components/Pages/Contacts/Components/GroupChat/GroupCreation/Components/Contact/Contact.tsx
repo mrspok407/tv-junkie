@@ -31,7 +31,7 @@ const Contact: React.FC<Props> = ({ contact, isGroupInfoSearch = false }) => {
             removeMember: membersKeys.includes(contact.key),
             newMember: {
               key: contact.key,
-              username: contact.userName,
+              userName: contact.userName,
               lastSeen: formatedDate,
               chatKey: contact.chatKey
             }

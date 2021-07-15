@@ -83,7 +83,7 @@ export type ACTIONTYPES =
       type: "updateGroupMembers"
       payload: {
         removeMember: boolean
-        newMember: { key: string; username?: string; lastSeen?: number | string | null; chatKey?: string }
+        newMember: { key: string; userName?: string; lastSeen?: number | string | null; chatKey?: string }
       }
     }
   | {

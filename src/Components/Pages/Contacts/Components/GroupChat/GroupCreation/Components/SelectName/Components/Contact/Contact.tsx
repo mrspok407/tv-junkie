@@ -13,7 +13,7 @@ const Contact: React.FC<Props> = ({ member }) => {
   return (
     <div className="contact-item" key={member.key}>
       <div className="contact-item__info">
-        <div className="contact-item__username">{member.username}</div>
+        <div className="contact-item__username">{member.userName}</div>
         <div
           className={classNames("contact-item__status", {
             "contact-item__status--online": member.isOnline

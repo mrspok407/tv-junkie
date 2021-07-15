@@ -25,19 +25,6 @@ admin.initializeApp();
 
 const database = admin.database();
 
-// interface ContactInfoInterface {
-//   [key: string]: string | boolean | number | unknown;
-//   status: boolean;
-//   receiver?: boolean;
-//   userName?: string;
-//   userNameLowerCase?: string;
-//   timeStamp: unknown;
-// }
-
-// interface ContactRequestDataInterface {
-//   [key: string]: ContactInfoInterface | boolean;
-// }
-
 interface GroupChatInfoInterface {
   [key: string]: string | boolean;
 }
@@ -180,9 +167,8 @@ export const updateLastSeenGroupChats = functions.database
 export const addNewGroupMembers = functions.https.onCall(
   async (
     data: {
-      members: {key: string; username: string}[];
+      members: {key: string; userName: string}[];
       groupInfo: {groupName: string; key: string};
-      authUser: {username: string};
     },
     context
   ) => {
@@ -202,17 +188,15 @@ export const addNewGroupMembers = functions.https.onCall(
       membersUpdateData[`groupChats/${groupInfo.key}/members/participants/${member.key}`] = true;
       membersUpdateData[`groupChats/${groupInfo.key}/members/status/${member.key}`] = {
         isOnline: false,
-        username: member.username,
-        usernameLowerCase: member.username?.toLowerCase(),
+        userName: member.userName,
+        userNameLowerCase: member.userName?.toLowerCase(),
         role: "USER"
       };
-      membersUpdateData[`users/${member.key}/contactsDatabase/contactsList/${groupInfo.key}`] = {
-        pinned_lastActivityTS: "false",
-        isGroupChat: true,
-        groupName: groupInfo.groupName,
-        role: "USER",
-        removedFromGroup: false
-      };
+      membersUpdateData[`users/${member.key}/contactsDatabase/contactsList/${groupInfo.key}/isGroupChat`] = true;
+      membersUpdateData[`users/${member.key}/contactsDatabase/contactsList/${groupInfo.key}/groupName`] =
+        groupInfo.groupName;
+      membersUpdateData[`users/${member.key}/contactsDatabase/contactsList/${groupInfo.key}/role`] = "USER";
+      membersUpdateData[`users/${member.key}/contactsDatabase/contactsList/${groupInfo.key}/removedFromGroup`] = false;
       membersUpdateData[`users/${member.key}/contactsDatabase/contactsLastActivity/${groupInfo.key}`] = timeStamp;
       membersUpdateData[`users/${member.key}/contactsDatabase/newContactsActivity/${groupInfo.key}`] = true;
     });
@@ -249,7 +233,7 @@ export const removeMemberFromGroup = functions.https.onCall(async (data, context
       [`groupChats/${groupChatKey}/messages/${newMessageRef.key}`]: {
         removedMember: {
           key: member.key,
-          username: member.username
+          userName: member.userName
         },
         isRemovedMember: true,
         timeStamp
@@ -262,6 +246,9 @@ export const removeMemberFromGroup = functions.https.onCall(async (data, context
       [`users/${member.key}/contactsDatabase/contactsLastActivity/${groupChatKey}`]: timeStamp
     };
 
+    console.log({removedMember: member.userName, data: updateData});
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+
     return database.ref().update(updateData);
   } catch (error) {
     throw new functions.https.HttpsError("unknown", error.message, error);
@@ -269,12 +256,9 @@ export const removeMemberFromGroup = functions.https.onCall(async (data, context
 });
 
 export const createNewGroup = functions.https.onCall(
-  async (
-    data: {members: {key: string; username: string}[]; groupName: string; authUser: {username: string}},
-    context
-  ) => {
+  async (data: {members: {key: string; userName: string}[]; groupName: string; authUserName: string}, context) => {
     const authUid = context?.auth?.uid;
-    const {members, groupName, authUser} = data;
+    const {members, groupName, authUserName} = data;
 
     if (!authUid) {
       throw new functions.https.HttpsError("failed-precondition", "The function must be called while authenticated.");
@@ -286,13 +270,13 @@ export const createNewGroup = functions.https.onCall(
     const groupChatRef = database.ref("groupChats").push();
     const newMessageRef = database.ref(`groupChats/${groupChatRef.key}/messages`).push();
     members.forEach((member) => {
-      (membersUpdateData[`groupChats/${groupChatRef.key}/members/participants/${member.key}`] = true),
-        (membersUpdateData[`groupChats/${groupChatRef.key}/members/status/${member.key}`] = {
-          isOnline: false,
-          username: member.username,
-          usernameLowerCase: member.username?.toLowerCase(),
-          role: "USER"
-        });
+      membersUpdateData[`groupChats/${groupChatRef.key}/members/participants/${member.key}`] = true;
+      membersUpdateData[`groupChats/${groupChatRef.key}/members/status/${member.key}`] = {
+        isOnline: false,
+        userName: member.userName,
+        userNameLowerCase: member.userName?.toLowerCase(),
+        role: "USER"
+      };
       membersUpdateData[`users/${member.key}/contactsDatabase/contactsList/${groupChatRef.key}`] = {
         pinned_lastActivityTS: "false",
         isGroupChat: true,
@@ -309,8 +293,8 @@ export const createNewGroup = functions.https.onCall(
         [`groupChats/${groupChatRef.key}/members/participants/${authUid}`]: true,
         [`groupChats/${groupChatRef.key}/members/status${authUid}`]: {
           isOnline: false,
-          username: authUser?.username,
-          usernameLowerCase: authUser?.username?.toLowerCase(),
+          userName: authUserName,
+          userNameLowerCase: authUserName?.toLowerCase(),
           role: "ADMIN"
         },
         [`users/${authUid}/contactsDatabase/contactsList/${groupChatRef.key}`]: {
@@ -324,6 +308,9 @@ export const createNewGroup = functions.https.onCall(
           newMembers: members,
           isNewMembers: true,
           timeStamp
+        },
+        [`groupChats/${groupChatRef.key}/info`]: {
+          groupName: groupName || "Nameless group wow"
         }
       };
       return database
@@ -341,7 +328,7 @@ export const createNewGroup = functions.https.onCall(
 
 export const newContactRequest = functions.https.onCall(async (data, context) => {
   const authUid = context?.auth?.uid;
-  const {contactUid, contactName, authUser} = data;
+  const {contactUid, contactName, authUserName} = data;
 
   if (!authUid) {
     throw new functions.https.HttpsError("failed-precondition", "The function must be called while authenticated.");
@@ -360,11 +347,12 @@ export const newContactRequest = functions.https.onCall(async (data, context) =>
       },
       [`${contactsDatabaseRef(authUid)}/contactsLastActivity/${contactUid}`]: timeStamp,
       [`${contactsDatabaseRef(contactUid)}/newContactsRequests/${authUid}`]: true,
+      [`${contactsDatabaseRef(contactUid)}/contactsLastActivity/${authUid}`]: timeStamp,
       [`${contactsDatabaseRef(contactUid)}/contactsList/${authUid}`]: {
         status: false,
         receiver: false,
-        userName: authUser.username.val(),
-        userNameLowerCase: authUser.username.toLowerCase(),
+        userName: authUserName,
+        userNameLowerCase: authUserName?.toLowerCase(),
         pinned_lastActivityTS: "false"
       }
     };

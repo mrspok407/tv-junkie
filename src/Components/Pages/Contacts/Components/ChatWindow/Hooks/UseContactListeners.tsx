@@ -29,7 +29,6 @@ const useContactListeners = () => {
       .contactsDatabase({ uid: activeChat.contactKey })
       .child("pageIsOpen")
       .on("value", (snapshot: any) => {
-        console.log(snapshot.val())
         contactsDispatch({
           type: "updateContactsPageIsOpen",
           payload: { isPageOpen: snapshot.val(), chatKey: activeChat.chatKey }

@@ -19,7 +19,6 @@ const useLoadTopMessages = () => {
   const removeMessagesDebounce = useCallback(
     debounce((removedMessages: any) => {
       contactsDispatch({ type: "removeMessages", payload: { removedMessages, chatKey: activeChat.chatKey } })
-      console.log(activeChat.chatKey)
       messagesToDelete.current = []
     }, 100),
     [activeChat]
@@ -30,12 +29,10 @@ const useLoadTopMessages = () => {
     if (loadedMessageGroups.current.includes(messagesData[0].timeStamp)) return
 
     const firstRenderedMessageIndex = messagesData.findIndex((item) => item.key === renderedMessages[0].key)
-
     if (!(firstRenderedMessageIndex <= 100 && firstRenderedMessageIndex !== 0)) return
 
     loadedMessageGroups.current = [...loadedMessageGroups.current, messagesData[0].timeStamp]
 
-    console.log("load top messages")
     setLoadingTopMessages(true)
     const topMessagesSnapshot = await messagesRef
       .orderByChild("timeStamp")
@@ -61,7 +58,6 @@ const useLoadTopMessages = () => {
       .on("child_changed", (snapshot: { val: () => MessageInterface; key: string }) => {
         const editedMessage = { ...snapshot.val(), key: snapshot.key }
         contactsDispatch({ type: "editMessage", payload: { editedMessage, chatKey: activeChat.chatKey } })
-        console.log({ changedChild: editedMessage })
       })
 
     messagesRef
@@ -70,7 +66,6 @@ const useLoadTopMessages = () => {
       .limitToLast(MESSAGES_TO_LOAD)
       .on("child_removed", (snapshot: { val: () => MessageInterface; key: string }) => {
         const removedMessage = { ...snapshot.val(), key: snapshot.key }
-        console.log({ removedMessage })
         messagesToDelete.current.push(removedMessage)
         removeMessagesDebounce(messagesToDelete.current)
       })

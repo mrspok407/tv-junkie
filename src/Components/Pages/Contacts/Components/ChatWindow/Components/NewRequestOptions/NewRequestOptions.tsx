@@ -9,7 +9,7 @@ const NewRequestOptions: React.FC = () => {
   const contactInfo = contacts[activeChat.contactKey]
 
   const { handleContactRequest, responseContactRequestLoading } = useResponseContactRequest({
-    userUid: activeChat.contactKey
+    contactUid: activeChat.contactKey
   })
 
   const renderMarkup = () => {

@@ -106,7 +106,6 @@ const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGr
         .startAfter(lastMessageTimeStamp)
         .on("child_added", (snapshot: { val: () => MessageInterface; key: string }) => {
           const newMessage = { ...snapshot.val(), key: snapshot.key }
-          console.log({ newMessage })
           contactsDispatch({ type: "addNewMessage", payload: { newMessage, chatKey, authUser } })
         })
 

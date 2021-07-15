@@ -78,7 +78,7 @@ const useContactOptions = ({ contactInfo }: Props) => {
         updateData[`groupChats/${contactInfo.chatKey}/messages/${newMessageRef.key}`] = {
           leftMember: {
             key: authUser?.uid,
-            username: authUser?.username
+            userName: authUser?.username
           },
           timeStamp,
           isMemberLeft: true

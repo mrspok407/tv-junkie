@@ -14,7 +14,7 @@ const InfoMessage: React.FC<Props> = ({ renderedMessage, privateChat = false }) 
   const { activeChat, contacts } = contactsState
   const contactInfo = contacts[activeChat.contactKey]
   const newMembers = Object.values(renderedMessage.newMembers || {})
-    .map((member) => member.username)
+    .map((member) => member.userName)
     .join(", ")
 
   const { removedMember, leftMember, isRemovedFromContacts, isNowContacts } = renderedMessage
@@ -31,12 +31,12 @@ const InfoMessage: React.FC<Props> = ({ renderedMessage, privateChat = false }) 
             <div className="chat-window__message-inner">
               {removedMember ? (
                 <div className="chat-window__message-text">
-                  {isAuthUser ? "You" : `${removedMember.username}`}{" "}
+                  {isAuthUser ? "You" : `${removedMember.userName}`}{" "}
                   <span>{isAuthUser ? "were" : "was"} removed from this group</span>
                 </div>
               ) : leftMember ? (
                 <div className="chat-window__message-text">
-                  {leftMember.username} <span>left the group</span>
+                  {leftMember.userName} <span>left the group</span>
                 </div>
               ) : (
                 <div className="chat-window__message-text">

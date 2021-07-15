@@ -1,4 +1,5 @@
 import { useRef, useState } from "react"
+import { ERROR_MODAL_DURATION } from "Utils/Constants"
 
 const useErrors = () => {
   const [error, setError] = useState<any>()
@@ -18,10 +19,10 @@ const useErrors = () => {
       const modalContainer = document.querySelector(".modal-container") as HTMLDivElement
       modalContainerRef.current = modalContainer
       modalContainer?.classList.add("modal-fade-out")
-    }, 9700)
+    }, ERROR_MODAL_DURATION - 300)
     timeoutRef.current = window.setTimeout(() => {
       setError(null)
-    }, 10000)
+    }, ERROR_MODAL_DURATION)
   }
 
   return { error, handleError }

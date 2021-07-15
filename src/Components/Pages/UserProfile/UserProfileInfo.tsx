@@ -8,7 +8,6 @@ import useSendContactRequest from "./Hooks/UseSendContactRequest"
 import useResponseContactRequest from "./Hooks/UseResponseContactRequest"
 import CreatePortal from "Components/UI/Modal/CreatePortal"
 import ModalContent from "Components/UI/Modal/ModalContent"
-// import useRecipientNotified from "./Hooks/UseRecipientNotified"
 
 type Props = {
   userUid: string
@@ -20,7 +19,6 @@ interface ContactInfo {
   userName: string
   pinned_lastActivityTS: string
   timeStamp: number
-  // recipientNotified: boolean
   newActivity: boolean
 }
 
@@ -34,12 +32,11 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
   const [contactInfo, setContactInfo] = useState<ContactInfo | null>(null)
   const [loadingContactInfo, setLoadingContactInfo] = useState(true)
 
-  // const [isRecipientNotified, setIsRecipientNotified] = useState<boolean | null>(null)
-  // const [isReceiver, setIsReceiver] = useState<boolean | null>(null)
-
-  const { sendContactRequest, contactRequestLoading } = useSendContactRequest({ userName, userUid })
-  const { handleContactRequest, responseContactRequestLoading } = useResponseContactRequest({ userUid })
-  // const { updateRecipientNotified } = useRecipientNotified({ userUid })
+  const { sendContactRequest, contactRequestLoading } = useSendContactRequest({
+    contactName: userName,
+    contactUid: userUid
+  })
+  const { handleContactRequest, responseContactRequestLoading } = useResponseContactRequest({ contactUid: userUid })
 
   const contactRef = firebase.contact({ authUid: authUser?.uid, contactUid: userUid })
 

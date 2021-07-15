@@ -54,7 +54,7 @@ const GroupCreation: React.FC = () => {
 
       try {
         const membersData = await membersListFireRef
-          .orderByChild("usernameLowerCase")
+          .orderByChild("userNameLowerCase")
           .startAt(query.toLowerCase())
           .endAt(query.toLowerCase() + "\uf8ff")
           .once("value")
@@ -84,7 +84,7 @@ const GroupCreation: React.FC = () => {
   const contactsToRender = !searchedMembers?.length
     ? chatMembersStatusData
         .filter((member) => chatParticipantsData.includes(member.key))
-        .sort((a, b) => (a.usernameLowerCase < b.usernameLowerCase ? -1 : 1))
+        .sort((a, b) => (a.userNameLowerCase < b.userNameLowerCase ? -1 : 1))
         .slice(0, renderedMembers)
     : searchedMembers
   return (

@@ -44,7 +44,7 @@ const NewMembersMenu: React.FC = () => {
   }) => {
     const newMember = {
       key: contact.key,
-      username: contact.userName,
+      userName: contact.userName,
       lastSeen: formatedDate,
       chatKey: contact.chatKey
     }

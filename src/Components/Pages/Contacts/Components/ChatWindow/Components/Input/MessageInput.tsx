@@ -140,7 +140,6 @@ const MessageInput: React.FC<Props> = ({
     })
 
     try {
-      console.log({ contactInfo })
       let messageKey: string
       if (!contactInfo?.isGroupChat) {
         messageKey = await sendMessage({ message: newMessageText })
@@ -155,7 +154,7 @@ const MessageInput: React.FC<Props> = ({
       const newMessage: MessageInterface = {
         message: newMessageText,
         sender: authUser?.uid!,
-        username: contactInfo?.isGroupChat ? authUser?.username : "",
+        userName: contactInfo?.isGroupChat ? authUser?.username : "",
         timeStamp: timeStampEpoch,
         key: timeStampEpoch.toString(),
         isDelivered: false

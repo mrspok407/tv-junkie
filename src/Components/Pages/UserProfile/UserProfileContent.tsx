@@ -14,7 +14,6 @@ import { Link } from "react-router-dom"
 import Loader from "Components/UI/Placeholders/Loader"
 import PlaceholderNoShowsUser from "Components/UI/Placeholders/PlaceholderNoShowsUser"
 import UserRating from "Components/UI/UserRating/UserRating"
-// import { Helmet } from "react-helmet"
 
 const SCROLL_THRESHOLD = 800
 
@@ -23,12 +22,9 @@ type Props = {
 }
 
 const UserProfileContent: React.FC<Props> = ({ userUid }) => {
-  // const { authUser } = useContext(AppContext)
   const firebase = useContext(FirebaseContext)
   const history = useHistory()
 
-  // const [userName, setUserName] = useState("")
-  // const [loadingUserName, setLoadingUserName] = useState(true)
   const [loadingContent, setLoadingContent] = useState(true)
   const [sortByState, setSortByState] = useState("name")
 
@@ -38,17 +34,13 @@ const UserProfileContent: React.FC<Props> = ({ userUid }) => {
     const user = await firebase.user(userUid).child("username").once("value")
     if (user.val() === null) {
       setLoadingContent(false)
-      // setLoadingUserName(false)
       history.push(ROUTES.PAGE_DOESNT_EXISTS)
       return
     }
-    // setUserName(user.val())
-    // setLoadingUserName(false)
 
     const userShowsData = await firebase.userAllShows(userUid).once("value")
     if (userShowsData.val() === null) {
       setLoadingContent(false)
-      // setLoadingUserName(false)
       return
     }
     const userShows: UserShowsInterface[] = Object.values(userShowsData.val()).map((show: any) => show)

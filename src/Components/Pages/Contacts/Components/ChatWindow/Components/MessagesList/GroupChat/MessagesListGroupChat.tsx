@@ -86,7 +86,7 @@ const MessagesList: React.FC<Props> = ({ firstUnreadMessage }) => {
                       </div>
                     )}
                     {renderedMessage.sender !== nextMessage?.sender && renderedMessage.sender !== authUser?.uid && (
-                      <div className="chat-window__message-avatar">{renderedMessage.username?.slice(0, 1)}</div>
+                      <div className="chat-window__message-avatar">{renderedMessage.userName?.slice(0, 1)}</div>
                     )}
                     <div
                       className={classNames(`chat-window__message chat-window__message--${renderedMessage.key}`, {
@@ -100,7 +100,7 @@ const MessagesList: React.FC<Props> = ({ firstUnreadMessage }) => {
                     >
                       <div className="chat-window__message-inner-wrapper">
                         {renderedMessage.sender !== authUser?.uid && renderedMessage.sender !== prevMessage.sender && (
-                          <div className="chat-window__message-username">{renderedMessage.username}</div>
+                          <div className="chat-window__message-username">{renderedMessage.userName}</div>
                         )}
 
                         <div className="chat-window__message-inner">

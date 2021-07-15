@@ -1,5 +1,5 @@
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
-import { useEffect, useRef } from "react"
+import { useEffect, useLayoutEffect, useRef } from "react"
 
 type Props = {
   chatContainerRef: HTMLDivElement
@@ -29,6 +29,7 @@ const useIntersectionObserver = ({
       if (entry.isIntersecting) {
         const messageKey = entry.target.dataset.key
         const messageRef: any = document.querySelector(`.chat-window__message--${messageKey}`)
+        if (!messageRef) return
         observerRef.unobserve(messageRef)
         observedMessages.current = [...observedMessages.current.filter((message) => message !== messageKey)]
         firebase
@@ -68,7 +69,7 @@ const useIntersectionObserver = ({
   }
   observerRef = new IntersectionObserver(observerCallback, observerOptions)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!unreadMsgsListenerChatKey) return
     if (!renderedMessages?.length || !unreadMessagesAuth?.length) return
     if (![true, "removed"].includes(contactInfo.status) && !contactInfo.isGroupChat) return

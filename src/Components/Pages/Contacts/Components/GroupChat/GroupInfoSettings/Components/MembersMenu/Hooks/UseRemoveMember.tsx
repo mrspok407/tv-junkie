@@ -13,11 +13,20 @@ const useRemoveMember = () => {
     const timeStampData = firebase.timeStamp()
     try {
       setRemoveMemberLoading(true)
+
+      console.time("removeMember")
+
+      // const removeMemberFromGroupCloud = firebase.httpsCallable("removeMemberFromGroup")
+      // await removeMemberFromGroupCloud({ member, groupChatKey: activeChat.chatKey })
+
       await _removeMemberFromGroup({
         data: { member, groupChatKey: activeChat.chatKey, timeStampData },
         context: { authUser: authUser! },
         database: firebase.database()
       })
+
+      console.timeEnd("removeMember")
+      console.log("removeMemberAfterAwaitCloud")
     } catch (error) {
       errors.handleError({
         errorData: error,

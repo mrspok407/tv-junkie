@@ -1,32 +1,31 @@
 import { useContext, useState } from "react"
 import { FirebaseContext } from "Components/Firebase"
 import { AppContext } from "Components/AppContext/AppContextHOC"
-import { _newContactRequest } from "firebaseHttpCallableFunctionsTests"
+// import { _newContactRequest } from "firebaseHttpCallableFunctionsTests"
 
 type Props = {
-  userName: string
-  userUid: string
+  contactName: string
+  contactUid: string
 }
 
-const useSendContactRequest = ({ userName, userUid }: Props) => {
+const useSendContactRequest = ({ contactName, contactUid }: Props) => {
   const { authUser, errors } = useContext(AppContext)
   const firebase = useContext(FirebaseContext)
   const [contactRequestLoading, setContactRequestLoading] = useState(false)
 
   const sendContactRequest = async () => {
     if (contactRequestLoading) return
-    const timeStampData = firebase.timeStamp()
-
-    // const newContactRequestCloud = firebase.httpsCallable("newContactRequest")
-    // newContactRequestCloud({ contactUid: userUid, contactName: userName, authUser })
+    // const timeStampData = firebase.timeStamp()
 
     try {
       setContactRequestLoading(true)
-      await _newContactRequest({
-        data: { contactUid: userUid, contactName: userName, timeStamp: timeStampData },
-        context: { authUser: authUser! },
-        database: firebase.database()
-      })
+      const newContactRequestCloud = firebase.httpsCallable("newContactRequest")
+      await newContactRequestCloud({ contactUid, contactName, authUserName: authUser?.username })
+      // await _newContactRequest({
+      //   data: { contactUid, contactName, timeStamp: timeStampData },
+      //   context: { authUser: authUser! },
+      //   database: firebase.database()
+      // })
     } catch (error) {
       errors.handleError({
         errorData: error,

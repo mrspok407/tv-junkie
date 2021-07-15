@@ -76,14 +76,16 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
         setContactUnreadMessages(unreadMessagesContact)
       })
 
-    firebase
-      .privateChats()
-      .child(`${chatKey}/historyDeleted`)
-      .on("value", (snapshot: any) => {
-        if (snapshot.val() === null) return
-        contactsDispatch({ type: "removeAllMessages", payload: { chatKey } })
-        firebase.privateChats().child(`${chatKey}/historyDeleted`).set(null)
-      })
+    if (!contactInfo.isGroupChat) {
+      firebase
+        .privateChats()
+        .child(`${chatKey}/historyDeleted`)
+        .on("value", (snapshot: any) => {
+          if (snapshot.val() === null) return
+          contactsDispatch({ type: "removeAllMessages", payload: { chatKey } })
+          firebase.privateChats().child(`${chatKey}/historyDeleted`).set(null)
+        })
+    }
 
     return () => {
       firebase.newContactsActivity({ uid: authUser?.uid }).child(`${contactInfo.key}`).off()
@@ -92,6 +94,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
       firebase
         .unreadMessages({ uid: contactInfo.key, chatKey, isGroupChat: contactInfo.isGroupChat })
         .off("value", unreadMessagesListenerContact)
+      firebase.privateChats().child(`${chatKey}/historyDeleted`).off()
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -165,7 +168,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
           ) : (
             lastMessage?.sender && (
               <div className="contact-item__last-message-text">
-                {<span>{lastMessage?.sender === authUser?.uid ? "You" : lastMessage?.username}:</span>}{" "}
+                {<span>{lastMessage?.sender === authUser?.uid ? "You" : lastMessage?.userName}:</span>}{" "}
                 {lastMessageText}
               </div>
             )

@@ -21,7 +21,7 @@ const useHandleMessage = ({ contactLastActivity }: { contactLastActivity: { time
     const updateData: any = {
       [`groupChats/${activeChat.chatKey}/messages/${messageKey}`]: {
         sender: authUser?.uid,
-        username: authUser?.username,
+        userName: authUser?.username,
         message,
         timeStamp: timeStampEpoch
       },
@@ -141,7 +141,7 @@ const useHandleMessage = ({ contactLastActivity }: { contactLastActivity: { time
       [`messages/${originalMessage.key}`]: {
         sender: originalMessage.sender,
         timeStamp: originalMessage.timeStamp,
-        username: originalMessage.username,
+        userName: originalMessage.userName,
         message,
         isEdited: true
       },

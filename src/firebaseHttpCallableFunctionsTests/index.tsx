@@ -13,15 +13,6 @@ interface DataInterface {
   resendRequest?: boolean
 }
 
-interface ContactInfoInterface {
-  [key: string]: string | boolean | number | unknown
-  status: boolean
-  receiver?: boolean
-  userName?: string
-  userNameLowerCase?: string
-  timeStamp: unknown
-}
-
 interface GroupChatInfoInterface {
   [key: string]: string | boolean
 }
@@ -58,7 +49,7 @@ export const _removeMemberFromGroup = async ({
       [`groupChats/${groupChatKey}/messages/${newMessageRef.key}`]: {
         removedMember: {
           key: member.key,
-          username: member.username
+          userName: member.userName
         },
         isRemovedMember: true,
         timeStamp: timeStampData
@@ -106,8 +97,8 @@ export const _addNewGroupMembers = async ({
     membersUpdateData[`groupChats/${groupInfo.key}/members/participants/${member.key}`] = true
     membersUpdateData[`groupChats/${groupInfo.key}/members/status/${member.key}`] = {
       isOnline: false,
-      username: member.username,
-      usernameLowerCase: member.username?.toLowerCase(),
+      userName: member.userName,
+      userNameLowerCase: member.userName?.toLowerCase(),
       role: "USER"
     }
     membersUpdateData[`users/${member.key}/contactsDatabase/contactsList/${groupInfo.key}/isGroupChat`] = true
@@ -158,8 +149,8 @@ export const _createNewGroup = async ({
     membersUpdateData[`groupChats/${groupChatRef.key}/members/participants/${member.key}`] = true
     membersUpdateData[`groupChats/${groupChatRef.key}/members/status/${member.key}`] = {
       isOnline: false,
-      username: member.username,
-      usernameLowerCase: member.username?.toLowerCase(),
+      userName: member.userName,
+      userNameLowerCase: member.userName?.toLowerCase(),
       role: "USER"
     }
     membersUpdateData[`users/${member.key}/contactsDatabase/contactsList/${groupChatRef.key}`] = {
@@ -178,8 +169,8 @@ export const _createNewGroup = async ({
       [`groupChats/${groupChatRef.key}/members/participants/${authUid}`]: true,
       [`groupChats/${groupChatRef.key}/members/status/${authUid}`]: {
         isOnline: false,
-        username: context?.authUser?.username,
-        usernameLowerCase: context?.authUser?.username?.toLowerCase(),
+        userName: context?.authUser?.username,
+        userNameLowerCase: context?.authUser?.username?.toLowerCase(),
         role: "ADMIN"
       },
       [`users/${authUid}/contactsDatabase/contactsList/${groupChatRef.key}`]: {

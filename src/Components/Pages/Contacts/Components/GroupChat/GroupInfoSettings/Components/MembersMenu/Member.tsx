@@ -24,7 +24,7 @@ const Contact: React.FC<Props> = ({ member, contactInfo }) => {
             "contact-item__username--admin": member.role === "ADMIN"
           })}
         >
-          {member.username}
+          {member.userName}
         </div>
         <div
           className={classNames("contact-item__status", {

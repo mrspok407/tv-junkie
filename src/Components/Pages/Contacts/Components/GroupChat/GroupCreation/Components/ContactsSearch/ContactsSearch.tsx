@@ -189,7 +189,7 @@ const ContactsSearch: React.FC<Props> = ({ wrapperRef }) => {
                 })
               }
             >
-              <div className="contacts-search__selected-contact-name">{member.username}</div>
+              <div className="contacts-search__selected-contact-name">{member.userName}</div>
               <div className="contacts-search__selected-contact-remove">
                 <button type="button"></button>
               </div>

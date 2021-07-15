@@ -36,7 +36,7 @@ export interface ContactsInterface {
 export interface MessageInterface {
   message: string
   sender: string
-  username?: string
+  userName?: string
   timeStamp: number
   key: string
   isDelivered?: boolean
@@ -48,13 +48,13 @@ export interface MessageInterface {
   isNowContacts?: boolean
   removedMember?: {
     key: string
-    username: string
+    userName: string
   }
   leftMember?: {
     key: string
-    username: string
+    userName: string
   }
-  newMembers?: { username: string }[]
+  newMembers?: { userName: string }[]
 }
 
 export interface ContactStatusInterface {
@@ -72,8 +72,8 @@ export interface MembersStatusGroupChatInterface {
   pageInFocus: boolean | undefined
   isTyping: boolean | null
   key: string
-  username: string
-  usernameLowerCase: string
+  userName: string
+  userNameLowerCase: string
   role: string
 }
 
@@ -96,7 +96,7 @@ export interface ActiveChatInterface {
 
 export interface GroupCreationNewMemberInterface {
   key: string
-  username?: string
+  userName?: string
   lastSeen?: number | string | null
   isOnline?: boolean | null
   chatKey?: string

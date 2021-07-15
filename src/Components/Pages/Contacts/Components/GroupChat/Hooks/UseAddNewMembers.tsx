@@ -16,10 +16,10 @@ const useAddNewMembers = () => {
   }) => {
     setNewMembersLoading(true)
     const timeStampData = firebase.timeStamp()
-    // const addNewGroupMembersCloud = firebase.httpsCallable("addNewGroupMembers")
-    // addNewGroupMembersCloud({ members, groupInfo })
 
     try {
+      // const addNewGroupMembersCloud = firebase.httpsCallable("addNewGroupMembers")
+      // await addNewGroupMembersCloud({ members, groupInfo })
       await _addNewGroupMembers({
         data: { members, groupInfo, timeStamp: timeStampData },
         context: { authUser: authUser! },
