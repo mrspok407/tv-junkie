@@ -71,16 +71,16 @@ class Profile extends Component {
   test = async () => {
     const firebase = this.context.firebase
     // const authUid = "drv5lG97VxVBLgkdn8bMhdxmqQT2"
-    // const lorem = new LoremIpsum({
-    //   sentencesPerParagraph: {
-    //     max: 8,
-    //     min: 4
-    //   },
-    //   wordsPerSentence: {
-    //     max: 8,
-    //     min: 4
-    //   }
-    // })
+    const lorem = new LoremIpsum({
+      sentencesPerParagraph: {
+        max: 8,
+        min: 4
+      },
+      wordsPerSentence: {
+        max: 8,
+        min: 4
+      }
+    })
 
     // firebase
     //   .database()
