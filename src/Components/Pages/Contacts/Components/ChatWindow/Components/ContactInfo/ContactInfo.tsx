@@ -24,21 +24,21 @@ const ContactInfo: React.FC<Props> = ({ isScrollBottomRef }) => {
 
   const chatMembersOnline = chatMembersStatusData.filter((member) => member.isOnline).length
 
-  const sendMessageCurrentContact = async () => {
+  const lorem = new LoremIpsum({
+    sentencesPerParagraph: {
+      max: 8,
+      min: 4
+    },
+    wordsPerSentence: {
+      max: 8,
+      min: 4
+    }
+  })
+
+  const sendMessageCurrentContactPrivate = async () => {
     const timeStampEpoch = new Date().getTime()
     const messageRef = firebase.privateChats().child(`${activeChat.chatKey}/messages`).push()
     const messageKey = messageRef.key
-
-    const lorem = new LoremIpsum({
-      sentencesPerParagraph: {
-        max: 8,
-        min: 4
-      },
-      wordsPerSentence: {
-        max: 8,
-        min: 4
-      }
-    })
 
     const updateData: any = {
       [`privateChats/${activeChat.chatKey}/messages/${messageKey}`]: {
@@ -50,15 +50,36 @@ const ContactInfo: React.FC<Props> = ({ isScrollBottomRef }) => {
         ? true
         : null
     }
-    await firebase.database().ref().update(updateData)
+    return firebase.database().ref().update(updateData)
+  }
 
-    return messageKey
+  const sendMessageCurrentContactGroup = () => {
+    const timeStampEpoch = new Date().getTime()
+    const messageRef = firebase.messages({ chatKey: activeChat.chatKey, isGroupChat: true }).push()
+    const messageKey = messageRef.key
+
+    const members = chatMembersStatusData.filter((member) => member.key !== authUser?.uid)
+    const sender = members[Math.floor(Math.random() * members.length)]
+
+    const updateData: any = {
+      [`groupChats/${activeChat.chatKey}/messages/${messageKey}`]: {
+        sender: sender.key,
+        userName: sender.userName,
+        message: lorem.generateSentences(2),
+        timeStamp: timeStampEpoch
+      },
+      [`groupChats/${activeChat.chatKey}/members/unreadMessages/${authUser?.uid}/${messageKey}`]: !isScrollBottomRef
+        ? true
+        : null
+    }
+    return firebase.database().ref().update(updateData)
   }
 
   return (
     <div
       className={classNames("chat-window__contact-info", {
-        "chat-window__contact-info--group-chat": contactInfo.isGroupChat
+        "chat-window__contact-info--group-chat": contactInfo.isGroupChat,
+        "chat-window__contact-info--test-msg": ["testchat@gmail.com", "test2@test.com"].includes(authUser?.email!)
       })}
       onClick={() => {
         if (!contactInfo.isGroupChat) return
@@ -131,11 +152,24 @@ const ContactInfo: React.FC<Props> = ({ isScrollBottomRef }) => {
           ""
         )}
       </div>
-      <div className="contact-info__send-message-current">
-        <button type="button" className="button" onClick={() => sendMessageCurrentContact()}>
-          Send msg
-        </button>
-      </div>
+      {["testchat@gmail.com", "test2@test.com"].includes(authUser?.email!) && (
+        <div className="contact-info__send-message-current">
+          <button
+            type="button"
+            className="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              if (contactInfo.isGroupChat) {
+                sendMessageCurrentContactGroup()
+              } else {
+                sendMessageCurrentContactPrivate()
+              }
+            }}
+          >
+            Test msg
+          </button>
+        </div>
+      )}
     </div>
   )
 }

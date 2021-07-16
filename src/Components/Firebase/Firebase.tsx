@@ -137,7 +137,7 @@ class Firebase {
   contact = ({ authUid, contactUid }: { authUid: string | undefined; contactUid: string }) =>
     this.db.ref(`users/${authUid}/contactsDatabase/contactsList/${contactUid}`)
 
-  /// Private Chats API ///
+  /// Chats API ///
   privateChats = () => this.db.ref("privateChats")
   groupChats = () => this.db.ref("groupChats")
   messages = ({ chatKey, isGroupChat }: { chatKey: string; isGroupChat: boolean }) => {

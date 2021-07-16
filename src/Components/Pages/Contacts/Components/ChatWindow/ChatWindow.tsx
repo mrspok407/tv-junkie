@@ -31,8 +31,6 @@ const throttleDebounceMap: any = {
   debounce
 }
 
-console.log("change for redeployment")
-
 const ChatWindow: React.FC = () => {
   const { firebase, authUser, contactsState, contactsDispatch } = useFrequentVariables()
   const {

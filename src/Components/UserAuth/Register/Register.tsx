@@ -19,6 +19,8 @@ type Props = {
 }
 
 interface ErrorsInterface {
+  loginError: string
+  loginOnBlur: boolean
   emailError: string
   emailOnBlur: boolean
   passwordError: string
@@ -30,6 +32,7 @@ interface ErrorsInterface {
 }
 
 interface RequiredInputsInterface {
+  login: string
   email: string
   password: string
   passwordConfirm: string
@@ -40,6 +43,8 @@ interface InputsInterface {
 }
 
 const ERROR_DEFAULT_VALUES = {
+  loginError: "",
+  loginOnBlur: false,
   emailError: "",
   emailOnBlur: false,
   passwordError: "",
@@ -51,11 +56,12 @@ const ERROR_DEFAULT_VALUES = {
 
 const Register: React.FC<Props> = ({ closeNavMobile }) => {
   const [requiredInputs, setRequiredInputs] = useState<RequiredInputsInterface>({
+    login: "",
     email: "",
     password: "",
     passwordConfirm: ""
   })
-  const [inputs, setInputs] = useState<InputsInterface>({ login: "" })
+  // const [inputs, setInputs] = useState<InputsInterface>({ login: "" })
   const [errors, setErrors] = useState<ErrorsInterface>(ERROR_DEFAULT_VALUES)
   const [submitClicked, setSubmitClicked] = useState(false)
   const [submitRequestLoading, setSubmitRequestLoading] = useState(false)
@@ -92,8 +98,8 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
         firebase
           .user(authUser.user.uid)
           .set({
-            username: inputs.login,
-            userNameLowerCase: inputs.login.toLowerCase(),
+            username: requiredInputs.login,
+            userNameLowerCase: requiredInputs.login.toLowerCase(),
             email,
             role: ROLES.USER
           })
@@ -145,6 +151,10 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
     let errorsOnChange = { ...errors }
 
     if (errorsOnChange[`${name}OnBlur`] || submitClicked) {
+      if (name === "login") {
+        errorsOnChange[`${name}Error`] = value.length >= 15 ? "Login should be less than 15 characters" : ""
+      }
+
       if (name === "email") {
         errorsOnChange[`${name}Error`] = validEmailRegex.test(value) ? "" : "Invalid email"
       }
@@ -171,7 +181,7 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
 
     setErrors(errorsOnChange)
     setRequiredInputs({ ...requiredInputs, [name]: value })
-    setInputs({ ...inputs, [name]: value })
+    // setInputs({ ...inputs, [name]: value })
   }
 
   const handleValidationOnblur = (event: React.FocusEvent<HTMLInputElement>) => {
@@ -179,12 +189,16 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
     const { value } = event.target
     const name = event.target.name === "new-password" ? "password" : event.target.name
 
-    const { email, password, passwordConfirm } = requiredInputs
+    const { login, email, password, passwordConfirm } = requiredInputs
     const errorsOnBlur = { ...errors }
 
     errorsOnBlur[`${name}OnBlur`] = true
 
     if (!submitClicked) {
+      if (name === "login") {
+        errorsOnBlur[`${name}Error`] = login.length >= 15 ? "Login should be less than 15 characters" : ""
+      }
+
       if (name === "email") {
         errorsOnBlur[`${name}Error`] = validEmailRegex.test(email) ? "" : "Invalid email"
       }
@@ -210,7 +224,7 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
 
   const resetInput = (name: string) => {
     setRequiredInputs({ ...requiredInputs, [`${name}`]: "" })
-    setInputs({ ...inputs, [`${name}`]: "" })
+    // setInputs({ ...inputs, [`${name}`]: "" })
     setErrors({ ...errors, [`${name}Error`]: "" })
   }
 
@@ -240,17 +254,21 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
   return (
     <form className="auth__form" onSubmit={onSubmit}>
       <Input
-        classNameInput="auth__form-input"
+        classNameInput={classNames("auth__form-input", {
+          "auth__form-input--error": errors.loginError
+        })}
         classNameLabel="auth__form-label"
         name="login"
-        value={inputs.login}
+        value={requiredInputs.login}
         handleOnChange={handleOnChange}
+        handleValidation={handleValidationOnblur}
         handleKeyDown={handleKeyDown}
         type="text"
         placeholder="Login"
         labelText="Login"
         withLabel
       />
+      <div className="auth__form-error">{errors.loginError}</div>
 
       <Input
         classNameInput={classNames("auth__form-input", {

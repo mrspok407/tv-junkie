@@ -3,7 +3,7 @@
 .chat-window__contact-info {
   display: grid;
   height: var(--contactInfoHeight);
-  grid-template-columns: 50px 1fr 30px max-content;
+  grid-template-columns: 50px 1fr 30px;
   grid-template-rows: 22px 22px;
   column-gap: 5px;
   padding-top: 5px;
@@ -13,6 +13,22 @@
   font-size: getDimm(contactInfoFont, $chatWindowDimm);
   background-color: #083b5f;
   z-index: 30;
+
+  &--test-msg {
+    grid-template-columns: 50px 1fr 30px max-content;
+    .contact-info__status {
+      grid-column: 2 / span 1;
+    }
+    .contact-info__send-message-current {
+      grid-column: 4 / span 2;
+      grid-row: 1 / span 2;
+      padding: 5px;
+      button {
+        padding: 3px;
+        background-color: brown;
+      }
+    }
+  }
 
   &--group-chat {
     cursor: pointer;

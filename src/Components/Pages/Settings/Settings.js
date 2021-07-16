@@ -12,7 +12,7 @@ import PasswordUpdate from "Components/UserAuth/PasswordUpdate/PasswordUpdate"
 import classNames from "classnames"
 import { LoremIpsum } from "lorem-ipsum"
 import "./Settings.scss"
-
+let startTimeStamp = 1596379566000
 class Profile extends Component {
   constructor(props) {
     super(props)
@@ -38,7 +38,6 @@ class Profile extends Component {
 
   componentDidMount() {
     this.authUserListener()
-    this.chatBottomListener()
   }
 
   componentWillUnmount() {
@@ -69,64 +68,20 @@ class Profile extends Component {
     )
   }
 
-  addNewMessageTopContact = async () => {
-    const firebase = this.context.firebase
-    const lorem = new LoremIpsum({
-      sentencesPerParagraph: {
-        max: 8,
-        min: 4
-      },
-      wordsPerSentence: {
-        max: 8,
-        min: 4
-      }
-    })
-
-    const authUid = "drv5lG97VxVBLgkdn8bMhdxmqQT2"
-
-    for (let i = 1; i <= 10; i++) {
-      const userKey = "-M_RA1TH89UezfmnVMzX"
-      const chatKey = userKey < authUid ? `${userKey}_${authUid}` : `${authUid}_${userKey}`
-
-      const randomMessage = lorem.generateSentences(1)
-      const timeStampEpoch = new Date().getTime()
-
-      const pushNewMessage = await firebase
-        .privateChats()
-        .child(`${chatKey}/messages`)
-        .push({
-          sender: userKey,
-          // sender: Math.random() > 0.5 ? userKey : authUser?.uid,
-          message: randomMessage,
-          timeStamp: timeStampEpoch * 2
-        })
-
-      const contactStatus = await firebase.chatMemberStatus({ chatKey, memberKey: authUid }).once("value")
-
-      console.log(contactStatus.val())
-
-      if (!contactStatus.val().isOnline || !contactStatus.val().chatBottom || !contactStatus.val().pageInFocus) {
-        firebase.privateChats().child(`${chatKey}/members/${authUid}/unreadMessages/${pushNewMessage.key}`).set(true)
-      }
-    }
-  }
-
   test = async () => {
     const firebase = this.context.firebase
+    // const authUid = "drv5lG97VxVBLgkdn8bMhdxmqQT2"
+    // const lorem = new LoremIpsum({
+    //   sentencesPerParagraph: {
+    //     max: 8,
+    //     min: 4
+    //   },
+    //   wordsPerSentence: {
+    //     max: 8,
+    //     min: 4
+    //   }
+    // })
 
-    const authUid = "drv5lG97VxVBLgkdn8bMhdxmqQT2"
-
-    const lorem = new LoremIpsum({
-      sentencesPerParagraph: {
-        max: 8,
-        min: 4
-      },
-      wordsPerSentence: {
-        max: 8,
-        min: 4
-      }
-    })
-    console.log("test")
     // firebase
     //   .database()
     //   .ref("privateChats")
@@ -135,172 +90,25 @@ class Profile extends Component {
     //     console.log(JSON.stringify(snapshot.val()))
     //   })
 
-    let ts = 0
+    const fourHoursInMS = 14400000
 
-    for (let i = 1; i <= 300; i++) {
-      const randomMessage = lorem.generateSentences(Math.ceil(Math.random() * 2))
-      const timeStamp = new Date().getTime() - 94608000000
-      const sender = Math.random() > 0.5 ? "0iSDFz7cfEWR0XVc3QLsysPfXOb2" : authUid
-
-      firebase
-        .database()
-        .ref("groupChats")
-        .child("-McQ3opYpWop9K54ihUg/messages")
-        .push({
-          sender,
-          message: randomMessage,
-          timeStamp: ts || timeStamp,
-          username: sender === authUid ? "Johnny" : "Kekich"
-        })
-      ts = timeStamp + 21600000 * i
-    }
-
-    // firebase.contactsList({ uid: authUid }).once("value", (snapshot) => {
-    //   snapshot.forEach((contact) => {
-    //     firebase
-    //       .contactsList({ uid: authUid })
-    //       .child(contact.key)
-    //       .update({ userNameLowerCase: contact.val().userName.toLowerCase() })
-    //   })
-    // })
-
-    // const userKey = "-MY_TPe9EW9TqCibVSop"
-    // const userKey = "-MY_R8wzzvABzB8OWakb"
-    // const userKey = "-MY_R8pjpBQGf6RDAMTt"
-
-    // const chatKey = userKey < authUid ? `${userKey}_${authUid}` : `${authUid}_${userKey}`
-
-    // firebase
-    //   .contactsDatabase({ uid: "drv5lG97VxVBLgkdn8bMhdxmqQT2" })
-    //   .child("contactsList")
-    //   .once("value", (snapshot) => {
-    //     const keysList = Object.entries(snapshot.val())
-    //     const authUid = "drv5lG97VxVBLgkdn8bMhdxmqQT2"
-
-    //     const timeStamp = new Date().getTime()
-
-    //     keysList.forEach(([key, value], index) => {
-    //       // const chatKey = key < authUid ? `${key}_${authUid}` : `${authUid}_${key}`
-
-    //       const ts = value.pinned_lastActivityTS.slice(-13)
-
-    //       firebase
-    //         .contactsDatabase({ uid: "drv5lG97VxVBLgkdn8bMhdxmqQT2" })
-    //         .child(`contactsList/${key}/pinned_lastActivityTS`)
-    //         .set(`false_${ts}`)
-    //     })
-    //   })
-
-    // for (let i = 1; i <= 2; i++) {
-    //   const randomName = uniqueNamesGenerator({
-    //     dictionaries: [animals],
-    //     // separator: " ",
-    //     style: "capital"
-    //   })
-
-    //   const timeStamp = firebase.timeStamp()
-    //   const userKey = await firebase.users().push({ username: randomName }).key
-
-    //   await Promise.all([
-    //     firebase.contact({ authUid: userKey, contactUid: authUid }).set({
-    //       receiver: true,
-    //       status: true,
-    //       pinned_lastActivityTS: "false",
-    //       timeStamp,
-    //       userName: "Johnny"
-    //     }),
-    //     firebase.contact({ authUid, contactUid: userKey }).set({
-    //       status: true,
-    //       receiver: false,
-    //       userName: randomName,
-    //       timeStamp,
-    //       pinned_lastActivityTS: "true"
-    //     })
-    //     // firebase.contactsDatabase({ uid: authUid }).child(`newContactsRequests/${userKey}`).set(true)
-    //   ])
-
-    //   const timeStampEpoch = new Date().getTime()
-
-    //   const chatKey = userKey < authUid ? `${userKey}_${authUid}` : `${authUid}_${userKey}`
-
-    //   for (let i = 1; i <= 500; i++) {
-    //     const randomMessage = lorem.generateSentences(Math.ceil(Math.random() * 2))
-
-    //     const pushNewMessage = await firebase
-    //       .privateChats()
-    //       .child(`${chatKey}/messages`)
-    //       .push({
-    //         sender: Math.random() > 0.5 ? userKey : authUid,
-    //         // sender: userKey,
-    //         // sender: authUid,
-    //         message: randomMessage,
-    //         timeStamp: timeStampEpoch + i * 1800000
-    //       })
-
-    //     // if (i >= 25) {
-    //     // firebase.privateChats().child(`${chatKey}/members/${userKey}/unreadMessages/${pushNewMessage.key}`).set(true)
-    //     // }
-    //   }
-    // firebase
-    //   .privateChats()
-    //   .child(`${chatKey}`)
-    //   .update({
-    //     [`members/${userKey}/isOnline`]: true,
-    //     [`members/${authUid}/isOnline`]: true
-    //   })
-    // }
-  }
-
-  chatBottomListener = () => {
-    this.context.firebase
-      .user(this.context.authUser?.uid)
-      .child("content/chatAtTheBottom")
-      .on("value", (snapshot) => {
-        this.setState({ chatBottomFire: snapshot.val() })
-      })
-  }
-
-  focusListener = () => {
-    this.context.firebase
-      .user(this.context.authUser?.uid)
-      .child("content/pageInFocus")
-      .on("value", (snapshot) => {
-        this.setState({ pageInFocus: snapshot.val() })
-      })
-  }
-
-  addNewMessage = () => {
-    const messagesRef = this.context.firebase.user(this.state.authUser?.uid).child("content/messages")
-    const newMessageRef = messagesRef.push()
-    const randomNumber = Math.floor(Math.random() * Math.floor(201))
-    newMessageRef.set(
-      {
-        timeStamp: this.context.firebase.timeStamp(),
-        message: "some text",
-        number: randomNumber
-        // read: !chatBottomFire ? false : true
-      },
-      () => {
-        // if (this.state.chatBottomFire) return
-
-        if (!this.state.chatBottomFire || !this.state.pageInFocus) {
-          this.context.firebase
-            .user(this.state.authUser?.uid)
-            .child(`content/unreadMessages_uid1/${newMessageRef.key}`)
-            .set(true, () => {
-              if (this.state.pageInFocus) return
-              this.context.firebase.user(this.state.authUser?.uid).child(`content/chatAtTheBottom`).set(false)
+    firebase.groupChats().once("value", (snapshot) => {
+      Object.entries(snapshot.val()).forEach(([chatKey, chatValue]) => {
+        if (chatKey !== "-MekuREO0_D7la2iL4ZI") return
+        Object.entries(chatValue.members.status).forEach(([memberKey, memberValue]) => {
+          // if (memberKey !== "-M_R4bHfhAxUbqUe05-4") return
+          const numberOfMessages = Math.floor(Math.random() * (10 - 1 + 1)) + 1
+          for (let i = 1; i <= numberOfMessages; i++) {
+            firebase.messages({ chatKey, isGroupChat: true }).push({
+              sender: memberKey,
+              userName: memberValue.userName,
+              message: lorem.generateSentences(Math.ceil(Math.random() * 3)),
+              timeStamp: startTimeStamp
             })
-        }
-      }
-    )
-  }
-
-  incr = () => {
-    // this.context.firebase.userAllShows(this.state.authUser.uid).off()
-    this.context.firebase.userEpisodes(this.state.authUser.uid).off()
-    this.setState({ limitTo: this.state.limitTo + 1 }, () => {
-      this.test()
+            startTimeStamp = startTimeStamp + fourHoursInMS
+          }
+        })
+      })
     })
   }
 
@@ -538,17 +346,8 @@ class Profile extends Component {
               )}
             </div>
           </div>
-          <button className="button" onClick={() => this.addNewMessageTopContact()}>
-            topContact
-          </button>
           <button className="button" onClick={() => this.test()}>
             test
-          </button>
-          <button className="button" onClick={() => this.incr()}>
-            increase number {this.state.limitTo}
-          </button>
-          <button className="button" onClick={() => this.addNewMessage()}>
-            Add new message
           </button>
           <div className="user-settings__signout">
             <SignOutButton />
