@@ -1,8 +1,9 @@
 import classNames from "classnames"
 import { MessageInterface } from "Components/Pages/Contacts/@Types"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
-import React from "react"
+import React, { useMemo } from "react"
 import { convertTimeStampToDate } from "Utils"
+import randomColor from "randomcolor"
 import MessageInfo from "../../MessageInfo/MessageInfo"
 import InfoMessage from "./Components/NewMembersMessages/InfoMessage"
 import "./MessagesListGroupChat.scss"
@@ -86,7 +87,7 @@ const MessagesList: React.FC<Props> = ({ firstUnreadMessage }) => {
                       </div>
                     )}
                     {renderedMessage.sender !== nextMessage?.sender && renderedMessage.sender !== authUser?.uid && (
-                      <div className="chat-window__message-avatar">{renderedMessage.userName?.slice(0, 1)}</div>
+                      <Avatar renderedMessage={renderedMessage} />
                     )}
                     <div
                       className={classNames(`chat-window__message chat-window__message--${renderedMessage.key}`, {
@@ -125,6 +126,15 @@ const MessagesList: React.FC<Props> = ({ firstUnreadMessage }) => {
         </div>
       )}
     </>
+  )
+}
+
+const Avatar = ({ renderedMessage }: { renderedMessage: MessageInterface }) => {
+  const randomColorMemo = useMemo(() => randomColor(), [])
+  return (
+    <div className="chat-window__message-avatar" style={{ backgroundColor: randomColorMemo }}>
+      {renderedMessage.userName?.slice(0, 1)}
+    </div>
   )
 }
 

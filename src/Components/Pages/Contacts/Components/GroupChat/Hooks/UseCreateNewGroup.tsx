@@ -1,5 +1,5 @@
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
-import { _createNewGroup } from "firebaseHttpCallableFunctionsTests"
+// import { _createNewGroup } from "firebaseHttpCallableFunctionsTests"
 import { INITIAL_STATE } from "../../@Context/_reducerConfig"
 
 const useCreateNewGroup = () => {
@@ -7,23 +7,23 @@ const useCreateNewGroup = () => {
   const { groupCreation } = contactsState
 
   const createNewGroup = async () => {
-    const timeStampData = firebase.timeStamp()
+    // const timeStampData = firebase.timeStamp()
 
     try {
       contactsDispatch({ type: "updateGroupCreation", payload: { loading: true } })
-      // const newCreateGroupCloud = firebase.httpsCallable("newCreateGroup")
-      // const { newGroupChatKey } = await newCreateGroupCloud({
-      //   members: groupCreation.members,
-      //   groupName: groupCreation.groupName,
-      //   authUserName: authUser?.username
-      // })
-
-      // console.log({ newGroupChatKey })
-      const { newGroupChatKey } = await _createNewGroup({
-        data: { members: groupCreation.members, groupName: groupCreation.groupName, timeStamp: timeStampData },
-        context: { authUser: authUser! },
-        database: firebase.database()
+      const newCreateGroupCloud = firebase.httpsCallable("newCreateGroup")
+      const { newGroupChatKey } = await newCreateGroupCloud({
+        members: groupCreation.members,
+        groupName: groupCreation.groupName,
+        authUserName: authUser?.username
       })
+
+      console.log({ newGroupChatKey })
+      // const { newGroupChatKey } = await _createNewGroup({
+      //   data: { members: groupCreation.members, groupName: groupCreation.groupName, timeStamp: timeStampData },
+      //   context: { authUser: authUser! },
+      //   database: firebase.database()
+      // })
       contactsDispatch({ type: "finishGroupCreation", payload: { newGroupChatKey } })
     } catch (error) {
       errors.handleError({

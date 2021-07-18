@@ -1,10 +1,10 @@
 import { GroupCreationNewMemberInterface } from "Components/Pages/Contacts/@Types"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
-import { _addNewGroupMembers } from "firebaseHttpCallableFunctionsTests"
+// import { _addNewGroupMembers } from "firebaseHttpCallableFunctionsTests"
 import { useState } from "react"
 
 const useAddNewMembers = () => {
-  const { firebase, authUser, errors, contactsDispatch } = useFrequentVariables()
+  const { firebase, errors, contactsDispatch } = useFrequentVariables()
   const [newMembersLoading, setNewMembersLoading] = useState(false)
 
   const addNewMembers = async ({
@@ -15,16 +15,16 @@ const useAddNewMembers = () => {
     groupInfo: { groupName: string; key: string }
   }) => {
     setNewMembersLoading(true)
-    const timeStampData = firebase.timeStamp()
+    // const timeStampData = firebase.timeStamp()
 
     try {
-      // const addNewGroupMembersCloud = firebase.httpsCallable("addNewGroupMembers")
-      // await addNewGroupMembersCloud({ members, groupInfo })
-      await _addNewGroupMembers({
-        data: { members, groupInfo, timeStamp: timeStampData },
-        context: { authUser: authUser! },
-        database: firebase.database()
-      })
+      const addNewGroupMembersCloud = firebase.httpsCallable("addNewGroupMembers")
+      await addNewGroupMembersCloud({ members, groupInfo })
+      // await _addNewGroupMembers({
+      //   data: { members, groupInfo, timeStamp: timeStampData },
+      //   context: { authUser: authUser! },
+      //   database: firebase.database()
+      // })
       setNewMembersLoading(false)
       contactsDispatch({ type: "updateGroupInfoSettings", payload: { isActive: false } })
     } catch (error) {

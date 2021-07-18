@@ -16,13 +16,13 @@ $avatarDimm: 36px;
     width: 100%;
 
     &-wrapper {
-      @for $i from 1 through 75 {
-        &:nth-child(n + #{$i}) {
-          .chat-window__message-avatar {
-            background-color: nth($avatarBgColors, random(6));
-          }
-        }
-      }
+      // @for $i from 1 through 75 {
+      //   &:nth-child(n + #{$i}) {
+      //     .chat-window__message-avatar {
+      //       background-color: nth($avatarBgColors, random(6));
+      //     }
+      //   }
+      // }
       .chat-window__message-avatar {
         display: flex;
         justify-content: center;

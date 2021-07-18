@@ -12,7 +12,8 @@ import PasswordUpdate from "Components/UserAuth/PasswordUpdate/PasswordUpdate"
 import classNames from "classnames"
 import { LoremIpsum } from "lorem-ipsum"
 import "./Settings.scss"
-let startTimeStamp = 1596379566000
+let startTimeStampGroupChats = 1311011245000
+let startTimeStampPrivateChats = 1313142446000
 class Profile extends Component {
   constructor(props) {
     super(props)
@@ -68,9 +69,16 @@ class Profile extends Component {
     )
   }
 
-  test = async () => {
+  // firebase
+  //   .database()
+  //   .ref("privateChats")
+  //   .once("value", (snapshot) => {
+  //     // console.log(snapshot.val())
+  //     console.log(JSON.stringify(snapshot.val()))
+  //   })
+
+  addMessagesToPrivateChats = async () => {
     const firebase = this.context.firebase
-    // const authUid = "drv5lG97VxVBLgkdn8bMhdxmqQT2"
     const lorem = new LoremIpsum({
       sentencesPerParagraph: {
         max: 8,
@@ -81,20 +89,43 @@ class Profile extends Component {
         min: 4
       }
     })
-
-    // firebase
-    //   .database()
-    //   .ref("privateChats")
-    //   .once("value", (snapshot) => {
-    //     // console.log(snapshot.val())
-    //     console.log(JSON.stringify(snapshot.val()))
-    //   })
-
     const fourHoursInMS = 14400000
 
+    firebase.users().once("value", (snapshot) => {
+      Object.keys(snapshot.val()).forEach((userKey) => {
+        const chatKey =
+          userKey < this.state.authUser?.uid
+            ? `${userKey}_${this.state.authUser?.uid}`
+            : `${this.state.authUser?.uid}_${userKey}`
+        const numberOfMessages = 150
+        for (let i = 1; i <= numberOfMessages; i++) {
+          firebase.messages({ chatKey, isGroupChat: false }).push({
+            sender: Math.random() > 0.5 ? userKey : this.state.authUser.uid,
+            message: lorem.generateSentences(Math.ceil(Math.random() * 3)),
+            timeStamp: startTimeStampPrivateChats
+          })
+          startTimeStampPrivateChats = startTimeStampPrivateChats + fourHoursInMS
+        }
+      })
+    })
+  }
+
+  addMessagesToGroupChats = async () => {
+    const firebase = this.context.firebase
+    const lorem = new LoremIpsum({
+      sentencesPerParagraph: {
+        max: 8,
+        min: 4
+      },
+      wordsPerSentence: {
+        max: 8,
+        min: 4
+      }
+    })
+    const fourHoursInMS = 14400000
     firebase.groupChats().once("value", (snapshot) => {
       Object.entries(snapshot.val()).forEach(([chatKey, chatValue]) => {
-        if (chatKey !== "-MekuREO0_D7la2iL4ZI") return
+        // if (chatKey !== "-MekuREO0_D7la2iL4ZI") return
         Object.entries(chatValue.members.status).forEach(([memberKey, memberValue]) => {
           // if (memberKey !== "-M_R4bHfhAxUbqUe05-4") return
           const numberOfMessages = Math.floor(Math.random() * (10 - 1 + 1)) + 1
@@ -103,9 +134,9 @@ class Profile extends Component {
               sender: memberKey,
               userName: memberValue.userName,
               message: lorem.generateSentences(Math.ceil(Math.random() * 3)),
-              timeStamp: startTimeStamp
+              timeStamp: startTimeStampGroupChats
             })
-            startTimeStamp = startTimeStamp + fourHoursInMS
+            startTimeStampGroupChats = startTimeStampGroupChats + fourHoursInMS
           }
         })
       })
@@ -346,9 +377,17 @@ class Profile extends Component {
               )}
             </div>
           </div>
-          <button className="button" onClick={() => this.test()}>
-            test
-          </button>
+          {["testchat@gmail.com", "test2@test.com"].includes(this.state.authUser?.email) && (
+            <>
+              <button className="button" onClick={() => this.addMessagesToGroupChats()}>
+                Messages to group chats
+              </button>
+              <button className="button" onClick={() => this.addMessagesToPrivateChats()}>
+                Messages to private chats
+              </button>
+            </>
+          )}
+
           <div className="user-settings__signout">
             <SignOutButton />
           </div>
