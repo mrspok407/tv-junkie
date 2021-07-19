@@ -11,8 +11,8 @@ const useCreateNewGroup = () => {
 
     try {
       contactsDispatch({ type: "updateGroupCreation", payload: { loading: true } })
-      const newCreateGroupCloud = firebase.httpsCallable("newCreateGroup")
-      const { newGroupChatKey } = await newCreateGroupCloud({
+      const createNewGroupCloud = firebase.httpsCallable("createNewGroup")
+      const { newGroupChatKey } = await createNewGroupCloud({
         members: groupCreation.members,
         groupName: groupCreation.groupName,
         authUserName: authUser?.username
