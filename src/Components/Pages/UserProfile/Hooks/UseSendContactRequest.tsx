@@ -1,6 +1,7 @@
 import { useContext, useState } from "react"
 import { FirebaseContext } from "Components/Firebase"
 import { AppContext } from "Components/AppContext/AppContextHOC"
+import { uniqueNamesGenerator, animals } from "unique-names-generator"
 // import { _newContactRequest } from "firebaseHttpCallableFunctionsTests"
 
 type Props = {
@@ -19,10 +20,18 @@ const useSendContactRequest = ({ contactName, contactUid }: Props) => {
 
     try {
       setContactRequestLoading(true)
+      const randomUserName = uniqueNamesGenerator({
+        dictionaries: [animals],
+        style: "capital"
+      })
       const newContactRequestCloud = firebase.httpsCallable("newContactRequest")
-      await newContactRequestCloud({ contactUid, contactName, authUserName: authUser?.username })
+      await newContactRequestCloud({
+        contactUid,
+        contactName: contactName || randomUserName,
+        authUserName: authUser?.username
+      })
       // await _newContactRequest({
-      //   data: { contactUid, contactName, timeStamp: timeStampData },
+      //   data: { contactUid, contactName: contactName || randomUserName, timeStamp: timeStampData },
       //   context: { authUser: authUser! },
       //   database: firebase.database()
       // })

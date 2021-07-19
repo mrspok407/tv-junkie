@@ -13,7 +13,6 @@ const useLoadTopMessages = () => {
   const messagesRef = firebase.messages({ chatKey: activeChat.chatKey, isGroupChat: contactInfo.isGroupChat })
 
   const [loadingTopMessages, setLoadingTopMessages] = useState(false)
-  const loadedMessageGroups = useRef<number[]>([])
 
   const messagesToDelete = useRef<MessageInterface[]>([])
   const removeMessagesDebounce = useCallback(
@@ -26,12 +25,8 @@ const useLoadTopMessages = () => {
 
   const loadTopMessages = useCallback(async () => {
     if (!messagesData?.length) return
-    if (loadedMessageGroups.current.includes(messagesData[0].timeStamp)) return
-
     const firstRenderedMessageIndex = messagesData.findIndex((item) => item.key === renderedMessages[0].key)
     if (!(firstRenderedMessageIndex <= 100 && firstRenderedMessageIndex !== 0)) return
-
-    loadedMessageGroups.current = [...loadedMessageGroups.current, messagesData[0].timeStamp]
 
     setLoadingTopMessages(true)
     const topMessagesSnapshot = await messagesRef
