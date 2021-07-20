@@ -60,10 +60,8 @@ exports.addNewContactsActivity = functions.database
     else {
         otherMemberKey = chatKey.slice(0, -memberKey.length - 1);
     }
-    const timeStamp = admin.database.ServerValue.TIMESTAMP;
     const updateData = {
-        [`${contactsDatabaseRef(memberKey)}/newContactsActivity/${otherMemberKey}`]: true,
-        [`${contactsDatabaseRef(memberKey)}/contactsLastActivity/${otherMemberKey}`]: timeStamp
+        [`${contactsDatabaseRef(memberKey)}/newContactsActivity/${otherMemberKey}`]: true
     };
     return database.ref("users").update(updateData);
 });
@@ -71,10 +69,8 @@ exports.addNewContactsActivityGroupChat = functions.database
     .ref("groupChats/{chatKey}/members/unreadMessages/{memberKey}")
     .onCreate((snapshot, context) => {
     const { chatKey, memberKey } = context.params;
-    const timeStamp = admin.database.ServerValue.TIMESTAMP;
     const updateData = {
-        [`${contactsDatabaseRef(memberKey)}/newContactsActivity/${chatKey}`]: true,
-        [`${contactsDatabaseRef(memberKey)}/contactsLastActivity/${chatKey}`]: timeStamp
+        [`${contactsDatabaseRef(memberKey)}/newContactsActivity/${chatKey}`]: true
     };
     return database.ref("users").update(updateData);
 });

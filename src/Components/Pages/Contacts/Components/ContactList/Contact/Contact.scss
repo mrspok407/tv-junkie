@@ -162,6 +162,10 @@
         background-color: getColor(activeUnreadMessagesBG, $contactItemPalette);
       }
     }
+
+    &--active-no-unread {
+      display: none;
+    }
   }
 
   &__last-message-text,

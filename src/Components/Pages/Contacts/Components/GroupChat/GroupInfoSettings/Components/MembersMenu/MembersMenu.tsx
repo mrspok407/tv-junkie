@@ -6,7 +6,7 @@ import SearchInput from "./SearchInput/SearchInput"
 import Member from "./Member"
 import "./MembersMenu.scss"
 
-const MEMBERS_TO_RENDER = 20
+const MEMBERS_TO_RENDER = 50
 
 const GroupCreation: React.FC = () => {
   const { firebase, errors, contactsState } = useFrequentVariables()

@@ -224,7 +224,8 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
         {newActivity || newContactsRequest || unreadMessagesAmount ? (
           <div
             className={classNames("contact-item__unread-messages", {
-              "contact-item__unread-messages--active": chatActive
+              "contact-item__unread-messages--active": chatActive,
+              "contact-item__unread-messages--active-no-unread": chatActive && !unreadMessagesAmount
             })}
           >
             {contactInfo.isGroupChat ? (
