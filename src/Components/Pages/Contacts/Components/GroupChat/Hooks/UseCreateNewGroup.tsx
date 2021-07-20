@@ -19,11 +19,18 @@ const useCreateNewGroup = () => {
       })
 
       // const { newGroupChatKey } = await _createNewGroup({
-      //   data: { members: groupCreation.members, groupName: groupCreation.groupName, timeStamp: timeStampData },
+      //   data: { members: groupCreation.members, groupName: groupCreation.groupName },
       //   context: { authUser: authUser! },
       //   database: firebase.database()
       // })
-      contactsDispatch({ type: "finishGroupCreation", payload: { newGroupChatKey: result.data.newGroupChatKey } })
+      contactsDispatch({
+        type: "finishGroupCreation",
+        payload: { newGroupChatKey: result.data.newGroupChatKey, groupName: groupCreation.groupName }
+      })
+      // contactsDispatch({
+      //   type: "finishGroupCreation",
+      //   payload: { newGroupChatKey, groupName: groupCreation.groupName }
+      // })
     } catch (error) {
       errors.handleError({
         errorData: error,

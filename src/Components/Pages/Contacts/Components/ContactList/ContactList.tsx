@@ -35,7 +35,6 @@ const ContactList: React.FC<Props> = ({ contactListWrapperRef }) => {
   const contactsDatabaseRef = firebase.contactsDatabase({ uid: authUser?.uid })
 
   useEffect(() => {
-    console.log({ initialLoading })
     if (!initialLoading) {
       initialLoadingRef.current = false
     }
@@ -70,6 +69,8 @@ const ContactList: React.FC<Props> = ({ contactListWrapperRef }) => {
       }
       contactsData.push({ ...contact.val(), isGroupChat: !!contact.val().isGroupChat, key: contact.key, chatKey })
     })
+
+    console.log({ contactsData })
 
     if (initialLoadingRef.current || newLoad.current) {
       const contacts = await getContactsInfo({ contactsData })

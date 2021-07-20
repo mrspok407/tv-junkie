@@ -90,7 +90,7 @@ export type ACTIONTYPES =
       type: "updateGroupCreation"
       payload: { isActive?: boolean; selectNameActive?: boolean; groupName?: string; error?: string; loading?: boolean }
     }
-  | { type: "finishGroupCreation"; payload: { newGroupChatKey: string } }
+  | { type: "finishGroupCreation"; payload: { newGroupChatKey: string; groupName: string } }
   | { type: "updateGroupInfoSettings"; payload?: { isActive: boolean } }
   | {
       type: "updateGroupChatParticipants"
@@ -799,7 +799,9 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
           [action.payload.newGroupChatKey]: {
             chatKey: action.payload.newGroupChatKey,
             key: action.payload.newGroupChatKey,
-            isGroupChat: true
+            isGroupChat: true,
+            groupName: action.payload.groupName,
+            role: "ADMIN"
           } as ContactInfoInterface
         },
         groupInfoSettingsActive: false

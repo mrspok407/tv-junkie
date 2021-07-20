@@ -49,7 +49,7 @@ const MessagesList: React.FC<Props> = ({ firstUnreadMessage }) => {
 
             return (
               <React.Fragment key={renderedMessage.key}>
-                {currentMessageDate !== prevMessageDate || renderedMessage.timeStamp === prevMessage.timeStamp ? (
+                {currentMessageDate !== prevMessageDate && (
                   <div
                     key={renderedMessage.timeStamp}
                     className={classNames("chat-window__date", {
@@ -59,8 +59,15 @@ const MessagesList: React.FC<Props> = ({ firstUnreadMessage }) => {
                   >
                     {date}
                   </div>
-                ) : (
-                  ""
+                )}
+                {messagesData[0].key === renderedMessage.key && (
+                  <div
+                    key={renderedMessage.timeStamp}
+                    className="chat-window__date chat-window__date--top"
+                    data-timestamp={renderedMessage.timeStamp}
+                  >
+                    {date}
+                  </div>
                 )}
                 {renderedMessage.isNewMembers || renderedMessage.isRemovedMember || renderedMessage.isMemberLeft ? (
                   <InfoMessage renderedMessage={renderedMessage} />
