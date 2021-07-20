@@ -1,6 +1,26 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 
+// Cloud Functions interesting points:
+//
+// It should always return a promise. So the function will know when it's finished (resolved or rejected).
+//
+// Beware of infinite loops in .onUpdate and .onWrite. If you updating something in the same ref as .onUpdate, it will
+// cause infinite loop. So you have to put if statement to check if data was changed.
+//
+// In Cloud Functions I can access anywhere, database rules don't apply. So it will skip validation configured in rules.
+// Be sure that you send the data in a format you intended.
+//
+// Cold start time. Import at the top will be in every instance of functions on the server,
+// even if particular function doesn't need them
+// If you need heavy library import * megaMath from "heavy-duty-math-library"
+// you should fetch in inside of the needed function: const megaMath = await import("heavy-duty-math-library")
+// More info https://youtu.be/v3eG9xpzNXM?list=PLl-K7zZEsYLm9A9rcHb1IkyQUu6QwbjdM
+//
+// context.eventId is a unique identifier for every function call
+// You can invoke cloud functions on client (by click or something) with callableFunction. See functions at the bottom
+// More info: https://firebase.google.com/docs/functions/callable#web https://youtu.be/8mL1VuiL5Kk?t=593
+
 admin.initializeApp();
 
 const database = admin.database();
@@ -225,8 +245,6 @@ export const removeMemberFromGroup = functions.https.onCall(async (data, context
       [`users/${member.key}/contactsDatabase/newContactsActivity/${groupChatKey}`]: true,
       [`users/${member.key}/contactsDatabase/contactsLastActivity/${groupChatKey}`]: timeStamp
     };
-
-    console.log({removedMember: member.userName, data: updateData});
 
     return database.ref().update(updateData);
   } catch (error) {

@@ -1,7 +1,7 @@
 import { MembersStatusGroupChatInterface } from "Components/Pages/Contacts/@Types"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
 import useElementScrolledDown from "Components/Pages/Contacts/Hooks/useElementScrolledDown"
-import React, { useState, useEffect, useRef, useCallback } from "react"
+import React, { useState, useEffect, useCallback } from "react"
 import SearchInput from "./SearchInput/SearchInput"
 import Member from "./Member"
 import "./MembersMenu.scss"
@@ -20,9 +20,15 @@ const GroupCreation: React.FC = () => {
   const [searchedMembers, setSearchedMembers] = useState<MembersStatusGroupChatInterface[] | null>([])
   const [isSearching, setIsSearching] = useState(false)
 
-  const membersListWrapperRef = useRef<HTMLDivElement>(null!)
+  const [membersListWrapperRef, setMembersListWrapperRef] = useState<HTMLDivElement>(null!)
+  const membersListWrapperCallback = useCallback((node) => {
+    if (node !== null) {
+      setMembersListWrapperRef(node)
+    }
+  }, [])
+
   const membersListFireRef = firebase.groupChatMembersStatus({ chatKey: activeChat.chatKey })
-  const isScrolledDown = useElementScrolledDown({ element: membersListWrapperRef.current, threshold: 650 })
+  const isScrolledDown = useElementScrolledDown({ element: membersListWrapperRef, threshold: 650 })
 
   useEffect(() => {
     if (!searchedMembers?.length) return
@@ -87,10 +93,11 @@ const GroupCreation: React.FC = () => {
         .sort((a, b) => (a.userNameLowerCase < b.userNameLowerCase ? -1 : 1))
         .slice(0, renderedMembers)
     : searchedMembers
+
   return (
     <div className="members-menu">
       <SearchInput onSearch={handleSearch} isSearching={isSearching} />
-      <div className="members-list-wrapper" ref={membersListWrapperRef}>
+      <div className="members-list-wrapper" ref={membersListWrapperCallback}>
         <div className="members-list">
           {searchedMembers === null ? (
             <div className="contact-list--no-contacts-text">No members found</div>
