@@ -263,6 +263,12 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
     }
 
     case "loadTopMessages": {
+      const newTopMessagesKeys = action.payload.newTopMessages.map((item) => item.key)
+      const messagesaDataKeys = messages[activeChat.chatKey].map((item) => item.key)
+      if (messagesaDataKeys.some((key) => newTopMessagesKeys.includes(key))) {
+        console.log("loadTopMessages allready messages")
+        return { ...state }
+      }
       return {
         ...state,
         messages: {

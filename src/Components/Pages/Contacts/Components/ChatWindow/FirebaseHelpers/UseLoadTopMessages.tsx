@@ -27,10 +27,7 @@ const useLoadTopMessages = () => {
     if (!messagesData?.length) return
     const firstRenderedMessageIndex = messagesData.findIndex((item) => item.key === renderedMessages[0].key)
     if (!(firstRenderedMessageIndex <= 100 && firstRenderedMessageIndex !== 0)) return
-
-    console.log({ firstRenderedMessageIndex })
     if (loadingTopMessages) return
-    console.log({ loadingTopMessages })
 
     setLoadingTopMessages(true)
     const topMessagesSnapshot = await messagesRef
@@ -38,8 +35,6 @@ const useLoadTopMessages = () => {
       .endBefore(messagesData[0].timeStamp)
       .limitToLast(MESSAGES_TO_LOAD)
       .once("value")
-
-    console.log(topMessagesSnapshot.val() && Object.keys(topMessagesSnapshot.val()))
 
     if (topMessagesSnapshot.val() === null) {
       setLoadingTopMessages(false)

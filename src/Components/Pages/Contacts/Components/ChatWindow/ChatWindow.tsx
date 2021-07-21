@@ -192,8 +192,8 @@ const ChatWindow: React.FC = () => {
             })
           }
           if (scrollTop <= thresholdTopLoad) {
-            if (loadingTopMessages) return
             console.log({ messagesData })
+            if (loadingTopMessages) return
             loadTopMessages()
           }
         } else {
