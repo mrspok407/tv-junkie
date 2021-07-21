@@ -51,6 +51,8 @@ const ChatWindow: React.FC = () => {
   const selectedMessagesData = selectedMessages[activeChat.chatKey] || []
   const contactInfo = contacts[activeChat.contactKey] || {}
 
+  // console.log({ messagesData })
+
   const chatWindowLoading =
     messagesData === undefined ||
     (!firebaseListeners.contactUnreadMessages[activeChat.chatKey] && !contactInfo.isGroupChat)
@@ -191,6 +193,7 @@ const ChatWindow: React.FC = () => {
           }
           if (scrollTop <= thresholdTopLoad) {
             if (loadingTopMessages) return
+            console.log({ messagesData })
             loadTopMessages()
           }
         } else {

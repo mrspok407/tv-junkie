@@ -8,7 +8,7 @@
   flex-direction: column;
   width: 100%;
   background-color: getColor(backgroundColor, $searchCardPalette);
-  z-index: 9999;
+  z-index: 1;
 
   &--searching {
     min-height: 100vh;

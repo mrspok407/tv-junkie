@@ -146,7 +146,7 @@ const Input: React.FC<Props> = ({
                         if (listIsOpen && inputRef.current) {
                           inputRef.current.focus()
                         }
-                        setMediaType({ type: e.target.value, icon: item.icon })
+                        setMediaType({ type: item.type, icon: item.icon })
                         setMediaTypesIsOpen(false)
                       }}
                     >

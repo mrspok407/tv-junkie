@@ -37,7 +37,7 @@ const SelectName: React.FC<Props> = () => {
       type: "updateGroupCreation",
       payload: {
         groupName: e.target.value,
-        error: `${e.target.value.length >= NAME_LENGTH_LIMIT ? "Name can't be more than 45 characters" : ""}`
+        error: `${e.target.value?.length >= NAME_LENGTH_LIMIT ? "Name can't be more than 45 characters" : ""}`
       }
     })
   }

@@ -58,9 +58,11 @@ const Search: React.FC<Props> = ({ navSearch, navRef, closeNavMobile }) => {
     setQuery(query)
     setIsSearchingList(true)
 
+    console.log({ mediatype })
+
     axios
       .get(
-        `https://api.tmdb.org/3/search/${mediatype.type.toLowerCase()}?api_key=${
+        `https://api.tmdb.org/3/search/${mediatype.type?.toLowerCase()}?api_key=${
           process.env.REACT_APP_TMDB_API
         }&query=${query}`,
         {
@@ -75,7 +77,7 @@ const Search: React.FC<Props> = ({ navSearch, navRef, closeNavMobile }) => {
 
         setSearchResults(contentSortByPopularity)
         setIsSearchingList(false)
-        setMediaTypeSearching(mediatype.type.toLowerCase())
+        setMediaTypeSearching(mediatype.type?.toLowerCase())
       })
       .catch((err) => {
         if (axios.isCancel(err)) return
