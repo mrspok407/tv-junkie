@@ -186,10 +186,13 @@ const ChatWindow: React.FC = () => {
         if (scrollHeight <= height) return
         if (scrollTop < prevScrollTop || prevScrollTop === undefined) {
           if (scrollTop <= thresholdTopRender) {
+            console.log("renderTopMessages")
+            console.time("test")
             contactsDispatch({
               type: "renderTopMessages",
               payload: { unreadMessagesAuthRef: unreadMessagesAuthRef.current, chatKey: activeChat.chatKey }
             })
+            console.timeEnd("test")
           }
           if (scrollTop <= thresholdTopLoad) {
             console.log({ messagesData })
@@ -198,6 +201,7 @@ const ChatWindow: React.FC = () => {
           }
         } else {
           if (scrollHeight <= scrollTop + height + thresholdBottomRender) {
+            console.log("renderBottomMessages")
             contactsDispatch({
               type: "renderBottomMessages",
               payload: { unreadMessagesAuthRef: unreadMessagesAuthRef.current, chatKey: activeChat.chatKey }
@@ -415,7 +419,7 @@ const ChatWindow: React.FC = () => {
 
                 return (
                   <React.Fragment key={renderedMessage.key}>
-                    {currentMessageDate !== prevMessageDate || renderedMessage.timeStamp === prevMessage.timeStamp ? (
+                    {currentMessageDate !== prevMessageDate && (
                       <div
                         key={renderedMessage.timeStamp}
                         className={classNames("chat-window__date", {
@@ -425,8 +429,16 @@ const ChatWindow: React.FC = () => {
                       >
                         {date}
                       </div>
-                    ) : (
-                      ""
+                    )}
+
+                    {messagesData[0].key === renderedMessage.key && (
+                      <div
+                        key={renderedMessage.timeStamp}
+                        className="chat-window__date chat-window__date--top"
+                        data-timestamp={renderedMessage.timeStamp}
+                      >
+                        {date}
+                      </div>
                     )}
 
                     {renderedMessage.isRemovedFromContacts || renderedMessage.isNowContacts ? (

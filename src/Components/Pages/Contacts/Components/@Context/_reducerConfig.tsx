@@ -313,6 +313,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
       const renderedMessages = renderedMessagesList[activeChat.chatKey]
 
       if (messagesData[messagesData.length - 1].key === renderedMessages[renderedMessages.length - 1].key) {
+        console.log("last msgs equal Reducer")
         return { ...state }
       }
 
@@ -447,6 +448,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
           }
         } else {
           if (unreadMessages.length <= UNREAD_MESSAGES_TO_RENDER) {
+            console.log("unrMsg.length LESS 50")
             return {
               ...state,
               messages: {
@@ -455,7 +457,9 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
               },
               renderedMessagesList: {
                 ...renderedMessagesList,
-                [action.payload.chatKey]: [...messagesData, action.payload.newMessage].slice(-MESSAGES_TO_RENDER)
+                [action.payload.chatKey]: [...messagesData, action.payload.newMessage].slice(
+                  -MESSAGES_TO_RENDER - unreadMessages.length
+                )
               },
               authUserUnreadMessages: {
                 ...authUserUnreadMessages,
@@ -466,6 +470,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
               }
             }
           } else {
+            console.log("unrMsg.length MORE 50")
             const endIndexRender =
               [...messagesData, action.payload.newMessage].length - (unreadMessages.length! - UNREAD_MESSAGES_TO_RENDER)
             const startIndexRender = Math.max(endIndexRender - MESSAGES_TO_RENDER, 0)

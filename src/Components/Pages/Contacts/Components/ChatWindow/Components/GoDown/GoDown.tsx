@@ -76,6 +76,8 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
     const { height, scrollHeight, scrollTop } = getContainerRect()
     const threshold = scrollHeight * 0.1
 
+    console.log("handleFadeIn")
+
     if (!messagesRef.current?.length || !renderedMessagesRef.current?.length || scrollHeight <= height) {
       setFadeInButton(false)
       return
@@ -117,7 +119,7 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
   useLayoutEffect(() => {
     if (!chatContainerRef) return
     handleFadeIn()
-  }, [chatContainerRef, chatKey]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [chatContainerRef, chatKey, renderedMessages]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useLayoutEffect(() => {
     if (!chatContainerRef) return
