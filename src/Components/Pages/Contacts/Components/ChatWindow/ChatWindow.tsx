@@ -96,9 +96,9 @@ const ChatWindow: React.FC = () => {
     const scrollTop = chatContainerRef.scrollTop
     const top = chatContainerRef.getBoundingClientRect().top
 
-    const thresholdTopLoad = scrollHeight * 0.35
-    const thresholdTopRender = scrollHeight * 0.3
-    const thresholdBottomRender = scrollHeight * 0.2
+    const thresholdTopLoad = scrollHeight - (scrollHeight - 1500)
+    const thresholdTopRender = scrollHeight - (scrollHeight - 1200)
+    const thresholdBottomRender = 400
 
     return { height, scrollHeight, scrollTop, thresholdTopLoad, thresholdTopRender, thresholdBottomRender, top }
   }
@@ -143,7 +143,7 @@ const ChatWindow: React.FC = () => {
         isScrollBottomRef.current = true
         contactsDispatch({
           type: "updateAuthUserUnreadMessages",
-          payload: { chatKey: activeChat.chatKey, unreadMessages: [] }
+          payload: { chatKey: activeChat.chatKey, unreadMessages: [], resetRenderedMessages: true }
         })
         firebase
           .unreadMessages({ uid: authUser?.uid!, chatKey: activeChat.chatKey, isGroupChat: contactInfo.isGroupChat })

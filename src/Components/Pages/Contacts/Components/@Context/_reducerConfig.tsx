@@ -22,7 +22,12 @@ export type ACTIONTYPES =
     }
   | {
       type: "updateAuthUserUnreadMessages"
-      payload: { chatKey: string; unreadMessages: string[]; rerenderUnreadMessagesStart?: boolean }
+      payload: {
+        chatKey: string
+        unreadMessages: string[]
+        rerenderUnreadMessagesStart?: boolean
+        resetRenderedMessages?: boolean
+      }
     }
   | { type: "handleGoDown"; payload: { unreadMessages: string[] } }
   | { type: "updateRerenderUnreadMessagesStart" }
@@ -162,6 +167,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
     }
 
     case "updateAuthUserUnreadMessages": {
+      const messagesData = messages[activeChat.chatKey]
       if (_isEqual(authUserUnreadMessages[action.payload.chatKey]?.sort(), action.payload.unreadMessages?.sort())) {
         return { ...state }
       }
@@ -171,6 +177,12 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         authUserUnreadMessages: {
           ...authUserUnreadMessages,
           [action.payload.chatKey]: action.payload.unreadMessages
+        },
+        renderedMessagesList: {
+          ...renderedMessagesList,
+          [action.payload.chatKey]: action.payload.resetRenderedMessages
+            ? messagesData.slice(-MESSAGES_TO_RENDER)
+            : renderedMessagesList[action.payload.chatKey]
         },
         rerenderUnreadMessagesStart: action.payload.rerenderUnreadMessagesStart ? uuidv4() : rerenderUnreadMessagesStart
       }
@@ -332,6 +344,10 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         renderedMessagesList: {
           ...renderedMessagesList,
           [activeChat.chatKey]: messages[activeChat.chatKey].slice(indexStart, indexEnd)
+        },
+        authUserUnreadMessages: {
+          ...authUserUnreadMessages,
+          [action.payload.chatKey]: action.payload.unreadMessagesAuthRef
         }
       }
     }
@@ -447,53 +463,24 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
             }
           }
         } else {
-          if (unreadMessages.length <= UNREAD_MESSAGES_TO_RENDER) {
-            console.log("unrMsg.length LESS 50")
-            return {
-              ...state,
-              messages: {
-                ...messages,
-                [action.payload.chatKey]: [...messagesData, action.payload.newMessage]
-              },
-              renderedMessagesList: {
-                ...renderedMessagesList,
-                [action.payload.chatKey]: [...messagesData, action.payload.newMessage].slice(
-                  -MESSAGES_TO_RENDER - unreadMessages.length
-                )
-              },
-              authUserUnreadMessages: {
-                ...authUserUnreadMessages,
-                [action.payload.chatKey]:
-                  authUser?.uid !== action.payload.newMessage.sender
-                    ? [...unreadMessages, action.payload.newMessage.key]
-                    : []
-              }
-            }
-          } else {
-            console.log("unrMsg.length MORE 50")
-            const endIndexRender =
-              [...messagesData, action.payload.newMessage].length - (unreadMessages.length! - UNREAD_MESSAGES_TO_RENDER)
-            const startIndexRender = Math.max(endIndexRender - MESSAGES_TO_RENDER, 0)
-            return {
-              ...state,
-              messages: {
-                ...messages,
-                [action.payload.chatKey]: [...messagesData, action.payload.newMessage]
-              },
-              renderedMessagesList: {
-                ...renderedMessagesList,
-                [action.payload.chatKey]: [...messagesData, action.payload.newMessage].slice(
-                  startIndexRender,
-                  endIndexRender
-                )
-              },
-              authUserUnreadMessages: {
-                ...authUserUnreadMessages,
-                [action.payload.chatKey]:
-                  authUser?.uid !== action.payload.newMessage.sender
-                    ? [...unreadMessages, action.payload.newMessage.key]
-                    : unreadMessages
-              }
+          return {
+            ...state,
+            messages: {
+              ...messages,
+              [action.payload.chatKey]: [...messagesData, action.payload.newMessage]
+            },
+            renderedMessagesList: {
+              ...renderedMessagesList,
+              [action.payload.chatKey]: [...messagesData, action.payload.newMessage].slice(
+                -MESSAGES_TO_RENDER - unreadMessages.length
+              )
+            },
+            authUserUnreadMessages: {
+              ...authUserUnreadMessages,
+              [action.payload.chatKey]:
+                authUser?.uid !== action.payload.newMessage.sender
+                  ? [...unreadMessages, action.payload.newMessage.key]
+                  : []
             }
           }
         }

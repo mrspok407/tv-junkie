@@ -58,17 +58,10 @@ $bgColorHover: #51a6de5c;
     top: -7px;
     right: -7px;
     background-color: #0ea028;
-    width: 25px;
-    height: 25px;
+    width: 27px;
+    height: 27px;
     font-size: 0.8rem;
     border-radius: 50%;
     transition: 300ms;
-
-    &--max {
-      top: -11px;
-      right: -11px;
-      width: 30px;
-      height: 30px;
-    }
   }
 }

@@ -76,8 +76,6 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
     const { height, scrollHeight, scrollTop } = getContainerRect()
     const threshold = scrollHeight * 0.1
 
-    console.log("handleFadeIn")
-
     if (!messagesRef.current?.length || !renderedMessagesRef.current?.length || scrollHeight <= height) {
       setFadeInButton(false)
       return
@@ -152,11 +150,7 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
         >
           <button type="button" onClick={() => onGoDown()}></button>
           {unreadMessages.length !== 0 && (
-            <span
-              className={classNames("unread-messages", {
-                "unread-messages--max": !!(unreadMessages.length >= 99)
-              })}
-            >
+            <span className="unread-messages">
               {unreadMessages ? (unreadMessages.length >= 99 ? "99+" : unreadMessages.length) : ""}
             </span>
           )}
