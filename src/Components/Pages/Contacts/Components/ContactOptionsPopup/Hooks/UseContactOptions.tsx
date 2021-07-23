@@ -186,15 +186,15 @@ const useContactOptions = ({ contactInfo }: Props) => {
       await firebase
         .database()
         .ref()
-        .update(updateData, () =>
+        .update(updateData, () => {
           contactsDispatch({
-            type: "updateActiveChat",
+            type: "removeContactCleanUp",
             payload: {
-              chatKey: activeChat.chatKey === contactInfo.chatKey ? "" : activeChat.chatKey,
-              contactKey: activeChat.contactKey === contactInfo.key ? "" : activeChat.contactKey
+              chatKey: contactInfo.chatKey,
+              contactKey: contactInfo.key
             }
           })
-        )
+        })
     } catch (error) {
       errors.handleError({
         errorData: error,

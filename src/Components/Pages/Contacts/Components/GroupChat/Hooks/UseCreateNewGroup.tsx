@@ -19,7 +19,7 @@ const useCreateNewGroup = () => {
       })
 
       // const { newGroupChatKey } = await _createNewGroup({
-      //   data: { members: groupCreation.members, groupName: groupCreation.groupName },
+      //   data: { members: groupCreation.members, groupName: groupCreation.groupName, timeStamp: timeStampData },
       //   context: { authUser: authUser! },
       //   database: firebase.database()
       // })

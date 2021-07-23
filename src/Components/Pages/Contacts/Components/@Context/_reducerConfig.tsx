@@ -82,6 +82,7 @@ export type ACTIONTYPES =
       }
     }
   | { type: "updateContacts"; payload: { contacts: ContactInfoInterface[] } }
+  | { type: "removeContactCleanUp"; payload: { chatKey: string; contactKey: string } }
 
   // Group Chat Handling //
   | {
@@ -749,6 +750,20 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
       }
     }
 
+    case "removeContactCleanUp": {
+      return {
+        ...state,
+        activeChat: {
+          chatKey: activeChat.chatKey === action.payload.chatKey ? "" : activeChat.chatKey,
+          contactKey: activeChat.contactKey === action.payload.contactKey ? "" : activeChat.contactKey
+        },
+        groupCreation: {
+          ...groupCreation,
+          members: groupCreation.members.filter((member) => member.key !== action.payload.contactKey)
+        }
+      }
+    }
+
     case "updateGroupMembers": {
       const newMember = action.payload.newMember
       const currentMembers = groupCreation.members
@@ -792,16 +807,16 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
           chatKey: action.payload.newGroupChatKey,
           contactKey: action.payload.newGroupChatKey
         },
-        contacts: {
-          ...contacts,
-          [action.payload.newGroupChatKey]: {
-            chatKey: action.payload.newGroupChatKey,
-            key: action.payload.newGroupChatKey,
-            isGroupChat: true,
-            groupName: action.payload.groupName,
-            role: "ADMIN"
-          } as ContactInfoInterface
-        },
+        // contacts: {
+        //   ...contacts,
+        //   [action.payload.newGroupChatKey]: {
+        //     chatKey: action.payload.newGroupChatKey,
+        //     key: action.payload.newGroupChatKey,
+        //    isGroupChat: true,
+        //     groupName: action.payload.groupName,
+        //     role: "ADMIN"
+        //   } as ContactInfoInterface
+        // },
         groupInfoSettingsActive: false
       }
     }

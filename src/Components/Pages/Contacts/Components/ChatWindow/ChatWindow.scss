@@ -163,7 +163,7 @@
       @include buttonRemoveDefaults;
       position: absolute;
       top: 50%;
-      left: calc((100% - var(--msgWidth)) - (var(--selectBtnSize) + 25px));
+      left: calc(30% - var(--selectBtnSize) - 55px);
       width: var(--selectBtnSize);
       height: var(--selectBtnSize);
       border-radius: 50%;
@@ -189,7 +189,7 @@
       }
 
       @include mediaMaxW(#{$mobileViewPort}) {
-        left: calc((100% - var(--msgWidthMobile)) - (var(--selectBtnSize) + 10px));
+        left: 15px;
       }
     }
 
