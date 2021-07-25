@@ -8,11 +8,13 @@ import useUserShows, {
 import useContentHandler, { LOADING_ADDING_TO_DATABASE_INITIAL } from "Components/UserContent/UseContentHandler"
 import useFirebase from "Components/Firebase/UseFirebase"
 import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
-import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
+import { FirebaseInterface, FIREBASE_INITIAL_STATE } from "Components/Firebase/FirebaseContext"
 import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
 import { UserToWatchShowsInterface } from "Components/UserContent/UseUserShows/Hooks/UseGetUserToWatchShows"
 import { HandleListenersArg } from "Components/Pages/Detailes/FirebaseHelpers/UseHandleListeners"
+import useNewContactsActivity from "Components/Pages/Contacts/Hooks/UseNewContactsActivity"
+import useErrors from "Utils/Hooks/UseErrors"
 
 export interface ShowInterface {
   id: number
@@ -73,6 +75,11 @@ export interface ToggleMovieLSArg {
   data: ContentDetailes[] | ContentDetailes
 }
 
+export interface ErrorsInterface {
+  error: any
+  handleError: ({ errorData, message }: { errorData?: any; message: string }) => void
+}
+
 export interface AppContextInterface {
   userContentLocalStorage: {
     watchLaterMovies: ContentDetailes[]
@@ -111,6 +118,8 @@ export interface AppContextInterface {
   }
   firebase: FirebaseInterface
   authUser: AuthUserInterface | null
+  newContactsActivity: boolean | null
+  errors: ErrorsInterface
 }
 
 export const CONTEXT_INITIAL_STATE = {
@@ -143,8 +152,10 @@ export const CONTEXT_INITIAL_STATE = {
     loadingAddShowToDatabase: LOADING_ADDING_TO_DATABASE_INITIAL,
     loadingShowsOnRegister: false
   },
-  firebase: {},
-  authUser: { uid: "", email: "", emailVerified: false }
+  firebase: FIREBASE_INITIAL_STATE,
+  authUser: { uid: "", email: "", emailVerified: false },
+  newContactsActivity: false,
+  errors: { error: {}, handleError: () => {} }
 }
 
 export const AppContext = createContext<AppContextInterface>(CONTEXT_INITIAL_STATE)
@@ -156,7 +167,9 @@ const AppContextHOC = (Component: any) =>
       userContent: useUserShows(),
       userContentHandler: useContentHandler(),
       firebase: useFirebase(),
-      authUser: useAuthUser()
+      authUser: useAuthUser(),
+      newContactsActivity: useNewContactsActivity(),
+      errors: useErrors()
     }
     return (
       <AppContext.Provider value={ContextValue}>

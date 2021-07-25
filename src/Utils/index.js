@@ -202,4 +202,41 @@ export const differenceInObjects = (object, base) => {
   return changes(object, base)
 }
 
+export const isUnexpectedObject = ({ exampleObject, targetObject }) => {
+  return Object.entries(exampleObject).some(([key, value]) => {
+    if (targetObject[key] === undefined) {
+      return true
+    }
+    if (Array.isArray(value)) {
+      return !value.some((item) => typeof item === typeof targetObject[key])
+    }
+
+    return typeof targetObject[key] !== typeof value
+  })
+}
+
+export const convertTimeStampToDate = ({ timeStamp }) => {
+  if (!timeStamp || !Number.isInteger(timeStamp)) return
+  const timeStampISO = new Date(timeStamp).toISOString()
+  const options = {
+    month: "long",
+    day: "numeric",
+    year: "numeric"
+  }
+  const formatedTimeStamp = new Date(timeStampISO)
+  return new Intl.DateTimeFormat("en-US", options).format(formatedTimeStamp)
+}
+
+export const textToUrl = ({ text }) => {
+  const urlRegex = /(((https?:\/\/)|(www\.))[^\s]+)/g
+  const textWithUrls = text.replace(urlRegex, (url) => {
+    let hyperlink = url
+    if (!hyperlink.match("^https?://")) {
+      hyperlink = "http://" + hyperlink
+    }
+    return '<a href="' + hyperlink + '" target="_blank" rel="noopener noreferrer">' + url + "</a>"
+  })
+  return textWithUrls
+}
+
 export { releasedEpisodesToOneArray }

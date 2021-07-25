@@ -6,9 +6,9 @@ import { FirebaseContext } from "Components/Firebase"
 import "./PasswordUpdate.scss"
 
 interface ErrorsInterface {
+  [key: string]: string | {}
   passwordError: string
   error: { message: string }
-  [key: string]: string | boolean | {}
 }
 
 interface RequiredInputsInterface {

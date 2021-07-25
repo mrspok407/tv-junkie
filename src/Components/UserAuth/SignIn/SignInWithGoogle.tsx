@@ -32,6 +32,7 @@ const SignInWithGoogleForm = () => {
           .user(authUser.user.uid)
           .update({
             username: authUser.user.displayName,
+            userNameLowerCase: authUser.user.displayName.toLowerCase(),
             email: authUser.user.email,
             role: authUser.user.email === process.env.REACT_APP_ADMIN_EMAIL ? ROLES.ADMIN : ROLES.USER
           })

@@ -1,0 +1,240 @@
+@import "../../../styles/globalsContacts";
+
+.contact-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  row-gap: 7px;
+  padding: 13px 10px 13px 10px;
+  height: 80px;
+  color: #fff;
+  font-size: getDimm(font, $contactItemDimm);
+  cursor: pointer;
+
+  &--popup-open-top {
+    &:nth-last-child(-n + 3) {
+      .contact-item__options .popup-container {
+        transform: translateY(-100%);
+        border-radius: 5px 5px 0px 5px;
+
+        .popup__option-btn:after {
+          background-color: #3375b5;
+        }
+      }
+    }
+  }
+
+  &__row {
+    position: relative;
+    display: flex;
+    height: 23px;
+    column-gap: 5px;
+    align-items: center;
+
+    &--online {
+      &:after {
+        content: "";
+        position: absolute;
+        top: -10px;
+        left: -7px;
+        width: 13px;
+        height: 13px;
+        border-radius: 50%;
+        background-color: #00ff9c;
+        border: 2px solid #fff;
+      }
+    }
+  }
+
+  &--auth-last-message-not-pinned {
+    .contact-item__options {
+      margin-right: 3px;
+    }
+  }
+
+  &--not-pinned-no-activity {
+    .contact-item__row {
+      .contact-item__options {
+        margin-right: -5px;
+      }
+    }
+  }
+
+  &:after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    will-change: opacity;
+    background-color: getColor(onHover, $contactItemPalette);
+    z-index: -1;
+  }
+
+  &--active {
+    background-color: getColor(activeItemBG, $contactItemPalette);
+
+    &:after {
+      display: none;
+    }
+  }
+
+  @include mediaMinW(#{$mobileViewPort}) {
+    &:hover:after {
+      opacity: 1;
+    }
+
+    &:hover .contact-item__options .contact-item__open-popup-btn {
+      opacity: 1;
+    }
+  }
+
+  @include mediaMaxW(#{$mobileViewPort}) {
+    &--active {
+      background-color: initial;
+    }
+  }
+
+  &__username {
+    position: relative;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 23px;
+    margin-right: auto;
+  }
+
+  &__last-message-status {
+    background-image: url("../../../../../../assets/images/icons/double-mark-sign.svg");
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: getDimm(lastMessageStatus, $contactItemDimm);
+    height: getDimm(lastMessageStatus, $contactItemDimm);
+    &--unread {
+      background-image: url("../../../../../../assets/images/icons/one-mark-sign.svg");
+    }
+  }
+
+  &__timestamp {
+    justify-self: end;
+    align-self: center;
+    font-size: 0.85rem;
+  }
+
+  &__group-chat-icon {
+    width: 25px;
+    height: 25px;
+    background-color: #fff;
+    border-radius: 50%;
+    background-image: url("../../../../../../assets/images/icons/group-chat-icon-contact-list.svg");
+    background-size: 20px;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  &__pinned {
+    grid-column-end: -1;
+    justify-self: end;
+    background-image: url("../../../../../../assets/images/icons/pinned-icon.svg");
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: getDimm(lastMessageStatus, $contactItemDimm) - 3px;
+    height: getDimm(lastMessageStatus, $contactItemDimm) - 3px;
+  }
+
+  &__unread-messages {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    grid-column-end: -1;
+    justify-self: end;
+    width: getDimm(unreadMessages, $contactItemDimm);
+    height: getDimm(unreadMessages, $contactItemDimm);
+    border-radius: 50%;
+    background-color: getColor(unreadMessagesBG, $contactItemPalette);
+    font-size: 0.85rem;
+
+    &--active {
+      @include mediaMinW(#{$mobileViewPort}) {
+        color: getColor(activeItemBG, $contactItemPalette);
+        background-color: getColor(activeUnreadMessagesBG, $contactItemPalette);
+      }
+    }
+
+    &--active-no-unread {
+      display: none;
+    }
+  }
+
+  &__last-message-text,
+  &__typing {
+    width: 215px;
+    white-space: nowrap;
+    overflow: hidden;
+    line-height: 23px;
+    text-overflow: ellipsis;
+    color: #c5c5c5;
+    margin-right: auto;
+
+    span {
+      color: getColor(blueClr, $mainPalette);
+    }
+  }
+
+  &__typing {
+    display: flex;
+    column-gap: 3px;
+    color: #d8d8d8;
+
+    .loader--typing {
+      margin-bottom: 4px;
+
+      .loader-dots div {
+        background-color: #d8d8d8;
+      }
+    }
+  }
+
+  &__options {
+    position: relative;
+    margin-left: auto;
+    width: 20px;
+
+    .popup-container {
+      left: -118px;
+      width: 120px;
+    }
+
+    .contact-item__open-popup-btn {
+      @include buttonRemoveDefaults;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      row-gap: 2px;
+      width: 100%;
+      height: 100%;
+      margin-top: auto;
+      cursor: pointer;
+      opacity: 0;
+      will-change: opacity;
+      transition: 200ms;
+
+      @include mediaMaxW(#{$mobileViewPort}) {
+        opacity: 1;
+      }
+
+      &--open {
+        opacity: 1;
+      }
+
+      span {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background-color: #fff;
+      }
+    }
+  }
+}

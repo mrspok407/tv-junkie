@@ -33,7 +33,6 @@ const Search: React.FC<Props> = ({ navSearch, navRef, closeNavMobile }) => {
   const [error, setError] = useState("")
 
   const searchContRef = useRef<HTMLDivElement>(null)
-
   const history = useHistory()
 
   useEffect(() => {
@@ -61,7 +60,7 @@ const Search: React.FC<Props> = ({ navSearch, navRef, closeNavMobile }) => {
 
     axios
       .get(
-        `https://api.tmdb.org/3/search/${mediatype.type.toLowerCase()}?api_key=${
+        `https://api.tmdb.org/3/search/${mediatype.type?.toLowerCase()}?api_key=${
           process.env.REACT_APP_TMDB_API
         }&query=${query}`,
         {
@@ -70,13 +69,13 @@ const Search: React.FC<Props> = ({ navSearch, navRef, closeNavMobile }) => {
           })
         }
       )
-      .then(({ data: { results, total_pages: totalPages } }) => {
+      .then(({ data: { results } }) => {
         const content = [...results]
         const contentSortByPopularity = content.sort((a, b) => (a.popularity > b.popularity ? -1 : 1)).slice(0, 5)
 
         setSearchResults(contentSortByPopularity)
         setIsSearchingList(false)
-        setMediaTypeSearching(mediatype.type.toLowerCase())
+        setMediaTypeSearching(mediatype.type?.toLowerCase())
       })
       .catch((err) => {
         if (axios.isCancel(err)) return

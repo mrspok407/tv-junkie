@@ -2,10 +2,16 @@
   @return map-get($palette, $colorName);
 }
 
+@function getDimm($value, $palette) {
+  @return map-get($palette, $value);
+}
+
 $bodyBackgroundClr: #131313;
 $mainContainerMaxWidth: 1350px;
 
 $mobileViewPort: 1000px;
+
+$newActivityClr: #ec4444;
 
 $mainPalette: (
   orangeClr: peru,

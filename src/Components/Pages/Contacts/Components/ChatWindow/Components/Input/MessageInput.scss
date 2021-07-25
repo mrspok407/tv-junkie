@@ -1,0 +1,94 @@
+@import "../../../../styles/globalsContacts";
+
+.chat-window__input-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 5px auto 13px auto;
+  column-gap: 10px;
+
+  @include mediaMaxW(#{$mobileViewPort}) {
+    padding: 0 5px 0 5px;
+  }
+}
+
+.chat-window__input-message {
+  --max-height: 200px;
+  --messages-text-size: 16px;
+  --line-height: 25px;
+  --text-color: #000;
+  background: none;
+  border: none;
+  width: 100%;
+  height: 100%;
+  max-height: var(--max-height);
+  overflow-y: auto;
+  resize: none;
+  border: none;
+  outline: none;
+  white-space: pre-wrap;
+  font-size: var(--messages-text-size);
+  line-height: var(--line-height);
+  color: var(--text-color);
+  @include scrollbar(5px, getColor(blueClr, $mainPalette), #c5bbb1);
+
+  &-container {
+    display: flex;
+    position: relative;
+    width: 100%;
+    max-width: 502px;
+    margin-left: 50px;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #fff;
+    overflow: hidden;
+
+    @include mediaMaxW(#{$mobileViewPort}) {
+      margin-left: 0;
+    }
+  }
+}
+
+.chat-window__send-message {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 3px;
+  align-self: flex-end;
+  will-change: opacity;
+  transform: scale(0);
+  transition: 150ms;
+  opacity: 0;
+  &-btn {
+    @include buttonRemoveDefaults;
+    background-image: url("../../../../../../../assets/images/icons/send-button.svg");
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+  }
+
+  &--fade-in {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  @include mediaMaxW(#{$mobileViewPort}) {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+[contenteditable="true"] {
+  user-select: text;
+  outline: none;
+  cursor: text;
+}
+
+[contenteditable][data-placeholder]:empty:before {
+  content: attr(data-placeholder);
+  color: #a2acb4;
+  display: block;
+  pointer-events: none;
+}

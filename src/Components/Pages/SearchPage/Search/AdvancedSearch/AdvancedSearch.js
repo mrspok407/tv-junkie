@@ -25,7 +25,7 @@ export default function AdvancedSearch({
 
   function toggleGenre(e) {
     const newGenres = [...genres]
-    const genre = newGenres.find((item) => item.name.toLowerCase() === e.target.value)
+    const genre = newGenres.find((item) => item.name?.toLowerCase() === e.target.value)
     const data = e.target.getAttribute("data")
 
     genre.isChecked = !genre.isChecked

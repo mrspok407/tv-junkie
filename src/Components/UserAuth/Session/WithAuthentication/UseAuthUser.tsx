@@ -10,7 +10,9 @@ const useAuthUser = () => {
     let authSubscriber: any
     const authUserListener = () => {
       authSubscriber = firebase.onAuthUserListener(
-        (authUser: AuthUserInterface) => {
+        async (authUser: AuthUserInterface) => {
+          const username = await firebase.user(authUser.uid).child("username").once("value")
+          authUser.username = username.val() || "Nameless"
           localStorage.setItem("authUser", JSON.stringify(authUser))
           setAuthUser(authUser)
         },

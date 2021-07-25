@@ -9,6 +9,10 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax($buttonSize, $buttonSize));
 
+  &--user-profile {
+    margin: auto 0 30px 15px;
+  }
+
   &__button {
     position: relative;
     width: $buttonSize;

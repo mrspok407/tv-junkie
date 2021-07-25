@@ -1,4 +1,4 @@
-import React, { createContext } from "react"
+import { createContext } from "react"
 
 export interface FirebaseInterface {
   [key: string]: any
@@ -21,12 +21,44 @@ export interface FirebaseInterface {
   createUserWithEmailAndPassword?: any
   sendEmailVerification?: any
   passwordReset?: any
+  httpsCallable?: any
+  messages: ({ chatKey, isGroupChat }: { chatKey: string; isGroupChat: boolean }) => any
+  message: ({ chatKey, messageKey, isGroupChat }: { chatKey: string; messageKey: string; isGroupChat: boolean }) => any
+  privateChat: () => any
+  unreadMessages: ({ uid, chatKey }: { uid: string | undefined; chatKey: string; isGroupChat: boolean }) => any
+  newContactsRequests: ({ uid }: { uid: string | undefined }) => any
+  newContactsActivity: ({ uid }: { uid: string | undefined }) => any
+  contactsLastActivity: ({ uid }: { uid: string | undefined }) => any
+  contactsDatabase: ({ uid }: { uid: string | undefined }) => any
+  contactsList: ({ uid }: { uid: string | undefined }) => any
+  contact: ({ authUid, contactUid }: { authUid: string | undefined; contactUid: string }) => any
+  chatMemberStatus: ({
+    chatKey,
+    memberKey,
+    isGroupChat
+  }: {
+    chatKey: string
+    memberKey: string
+    isGroupChat: boolean
+  }) => any
+  groupChatMembersStatus: ({ chatKey }: { chatKey: string }) => any
+  groupChatParticipants: ({ chatKey }: { chatKey: string }) => any
 }
 
-export const FirebaseContext = createContext<FirebaseInterface>({})
-
-export const withFirebase = (Component: any) => (props: any) => {
-  return (
-    <FirebaseContext.Consumer>{(firebase) => <Component {...props} firebase={firebase} />}</FirebaseContext.Consumer>
-  )
+export const FIREBASE_INITIAL_STATE = {
+  newContactsActivity: () => {},
+  contactsLastActivity: () => {},
+  newContactsRequests: () => {},
+  contactsDatabase: () => {},
+  contactsList: () => {},
+  contact: () => {},
+  messages: () => {},
+  message: () => {},
+  privateChat: () => {},
+  unreadMessages: () => {},
+  chatMemberStatus: () => {},
+  groupChatMembersStatus: () => {},
+  groupChatParticipants: () => {}
 }
+
+export const FirebaseContext = createContext<FirebaseInterface>(FIREBASE_INITIAL_STATE)

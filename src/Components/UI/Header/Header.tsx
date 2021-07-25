@@ -11,11 +11,12 @@ import "./Header.scss"
 type Props = {
   isLogoVisible?: boolean
   hideLogin?: boolean
+  contactsPage?: boolean
 }
 
-const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false }) => {
+const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false, contactsPage = false }) => {
   const [navMobileOpen, setNavMobileOpen] = useState(false)
-  const { authUser } = useContext(AppContext)
+  const { authUser, newContactsActivity } = useContext(AppContext)
   const navRef = useRef<HTMLElement>(null)
   const toggleNavButtonRef = useRef<HTMLButtonElement>(null)
 
@@ -41,7 +42,11 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false }) =>
   }
 
   return (
-    <header className="header">
+    <header
+      className={classNames("header", {
+        "header--contacts-page": contactsPage
+      })}
+    >
       <nav
         ref={navRef}
         className={classNames("nav", {
@@ -117,18 +122,81 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false }) =>
 
           {authUser ? (
             <>
-              <NavLink
-                exact
-                to={ROUTES.PROFILE}
-                className={classNames("nav__link", {
-                  "nav__link--non-auth": !authUser
-                })}
-                activeClassName="nav__item--active"
-              >
-                <li className="nav__item" onClick={() => closeNavMobile()}>
+              <div className="nav__link nav__link--dropdown">
+                <div className="nav__item--dropdown-mobile">
+                  <NavLink
+                    exact
+                    to={ROUTES.CONTACTS_PAGE}
+                    className={classNames("nav__link", {
+                      "nav__link--non-auth": !authUser
+                    })}
+                    activeClassName="nav__item--active"
+                    onClick={() => closeNavMobile()}
+                  >
+                    <li
+                      className={classNames("nav__item", {
+                        "nav__item--new-activity": newContactsActivity
+                      })}
+                    >
+                      Contacts
+                    </li>
+                  </NavLink>
+
+                  <NavLink
+                    exact
+                    to={ROUTES.SETTINGS}
+                    className={classNames("nav__link", {
+                      "nav__link--non-auth": !authUser
+                    })}
+                    activeClassName="nav__item--active"
+                    onClick={() => closeNavMobile()}
+                  >
+                    <li className="nav__item" onClick={() => closeNavMobile()}>
+                      Settings
+                    </li>
+                  </NavLink>
+                </div>
+
+                <li
+                  className={classNames("nav__item nav__item--dropdown", {
+                    "nav__item--new-activity": newContactsActivity
+                  })}
+                >
                   Profile
+                  <ul className="nav__list--dropdown">
+                    <NavLink
+                      exact
+                      to={ROUTES.CONTACTS_PAGE}
+                      className={classNames("nav__link", {
+                        "nav__link--non-auth": !authUser
+                      })}
+                      activeClassName="nav__item--active"
+                      onClick={() => closeNavMobile()}
+                    >
+                      <li
+                        className={classNames("nav__item", {
+                          "nav__item--contacts": newContactsActivity
+                        })}
+                      >
+                        Contacts
+                      </li>
+                    </NavLink>
+                    <NavLink
+                      exact
+                      to={ROUTES.SETTINGS}
+                      className={classNames("nav__link", {
+                        "nav__link--non-auth": !authUser
+                      })}
+                      activeClassName="nav__item--active"
+                      onClick={() => closeNavMobile()}
+                    >
+                      <li className="nav__item" onClick={() => closeNavMobile()}>
+                        Settings
+                      </li>
+                    </NavLink>
+                  </ul>
                 </li>
-              </NavLink>
+              </div>
 
               {/* {authUser.roles && !!authUser.roles[ROLES.ADMIN] && (
                 <NavLink exact to={ROUTES.ADMIN} className="nav__link">
@@ -175,7 +243,7 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false }) =>
               }
         }
       >
-        <img className="logo__img" src={logo} alt="logo" />
+        <img width="517" height="190" className="logo__img" src={logo} alt="logo" />
       </div>
     </header>
   )

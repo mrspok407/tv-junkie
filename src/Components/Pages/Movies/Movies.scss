@@ -1,0 +1,35 @@
+.messages-wrapper {
+  height: 300px;
+}
+
+.messages-container {
+  position: relative;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.message {
+  display: grid;
+  color: #fff;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: center;
+
+  &--unread {
+    background-color: lightblue;
+  }
+}
+
+.messages-date {
+  color: #fff;
+}
+
+.to-bottom-chat {
+  position: sticky;
+  left: calc(100% - 45px);
+  bottom: 5px;
+  height: 35px;
+  width: 35px;
+  border-radius: 50%;
+  background-color: peru;
+  outline: 0;
+}

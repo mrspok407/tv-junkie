@@ -1,5 +1,5 @@
 import Firebase from "./Firebase"
-import { FirebaseContext, withFirebase } from "./FirebaseContext"
+import { FirebaseContext } from "./FirebaseContext"
 
 export default Firebase
-export { FirebaseContext, withFirebase }
+export { FirebaseContext }

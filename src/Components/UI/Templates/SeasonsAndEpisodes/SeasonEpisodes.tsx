@@ -138,7 +138,7 @@ const SeasonEpisodes: React.FC<Props> = ({
           // Format Date //
           const airDateISO = episode.air_date && new Date(episode.air_date).toISOString()
 
-          const options = {
+          const options: any = {
             month: "long",
             day: "numeric",
             year: "numeric"

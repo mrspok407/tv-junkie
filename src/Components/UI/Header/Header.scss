@@ -18,7 +18,7 @@ $navBackground: #352424;
     background-color: transparent;
     border: none;
     opacity: 0;
-    z-index: 20;
+    z-index: 200;
     animation: showNavBtn 0.5s forwards;
     @keyframes showNavBtn {
       to {
@@ -66,6 +66,7 @@ $navBackground: #352424;
   position: relative;
   display: flex;
   justify-content: center;
+  z-index: 9999;
 
   &:after {
     content: "";
@@ -92,7 +93,7 @@ $navBackground: #352424;
     padding-top: 5px;
     padding-bottom: 20px;
     transform: translate(0, 0);
-    z-index: 10;
+    z-index: 100;
   }
 
   &--mobile-open {
@@ -122,6 +123,49 @@ $navBackground: #352424;
 
       @include mediaMaxW(#{$mobileViewPort}) {
         padding-left: 0;
+      }
+    }
+  }
+
+  &__list--dropdown {
+    position: absolute;
+    display: grid;
+    opacity: 0;
+    transform: translateY(-100%);
+    top: 100%;
+    left: 0;
+    list-style-type: none;
+
+    @include mediaMaxW(#{$mobileViewPort}) {
+      position: relative;
+      display: none;
+      transform: translateY(0);
+      top: 9px;
+    }
+
+    .nav__link {
+      @include mediaMaxW(#{$mobileViewPort}) {
+        width: 100%;
+      }
+    }
+
+    .nav__item {
+      background-color: #352424;
+      padding: 15px 25px 15px 25px;
+      border-top: 1px solid black;
+
+      @include mediaMaxW(#{$mobileViewPort}) {
+        background-color: initial;
+        padding: 14px 5px 14px 5px;
+        border: none;
+      }
+
+      &--contacts {
+        background-color: rgb(134, 52, 52);
+      }
+
+      &:before {
+        bottom: 0;
       }
     }
   }
@@ -162,6 +206,21 @@ $navBackground: #352424;
         transform: translateX(0);
       }
     }
+
+    &--dropdown {
+      .nav__item--dropdown-mobile {
+        display: none;
+        @include mediaMaxW(#{$mobileViewPort}) {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .nav__item--contacts {
+          background-color: #863434;
+        }
+      }
+    }
   }
 
   &__item {
@@ -172,6 +231,27 @@ $navBackground: #352424;
     cursor: pointer;
     font-size: 1.3rem;
     z-index: 1;
+
+    &--new-activity {
+      &:after {
+        content: "";
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        border-radius: 50%;
+        width: 15px;
+        height: 15px;
+        background-color: #ec4444;
+        box-shadow: 0px 0px 4px 4px #ec4444;
+
+        @include mediaMaxW(#{$mobileViewPort}) {
+          right: 0;
+          top: 8px;
+          width: 7px;
+          height: 7px;
+        }
+      }
+    }
 
     &:before {
       content: "";
@@ -195,7 +275,7 @@ $navBackground: #352424;
     }
 
     @include mediaMaxW(#{$mobileViewPort}) {
-      width: 100px;
+      // width: 100px;
       padding: 14px 5px 14px 5px;
       font-size: 0.95rem;
     }
@@ -367,6 +447,28 @@ $navBackground: #352424;
         .search__input {
           width: 100%;
         }
+      }
+    }
+  }
+
+  &__item--dropdown {
+    padding-bottom: 22px;
+
+    @include mediaMaxW(#{$mobileViewPort}) {
+      display: none;
+    }
+
+    &:before {
+      display: none;
+    }
+
+    &:hover .nav__list--dropdown {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 300ms, transform 0ms;
+
+      @include mediaMaxW(#{$mobileViewPort}) {
+        display: grid;
       }
     }
   }

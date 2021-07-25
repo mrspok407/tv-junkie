@@ -2,6 +2,7 @@ interface AuthUserInterface {
   uid: string
   email?: string
   emailVerified?: boolean
+  username?: string
 }
 
 interface AuthUserFirebaseInterface {

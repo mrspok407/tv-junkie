@@ -143,6 +143,11 @@ $font-sizes: (
           opacity: 1;
         }
       }
+
+      a {
+        display: flex;
+        flex-direction: column;
+      }
     }
   }
 

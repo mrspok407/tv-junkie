@@ -2,6 +2,7 @@
 declare module "lodash.get"
 declare module "lodash.merge"
 declare module "lodash.mergewith"
+declare module "lodash.assign"
 declare module "lodash.isfunction"
 declare module "lodash.transform"
 declare module "lodash.isequal"

@@ -1,0 +1,33 @@
+@import "./globalsContacts";
+
+.chat-container {
+  position: relative;
+  display: grid;
+  grid-template-columns: 30% 70%;
+  height: calc(100% - 85px);
+  max-width: 100%;
+  width: 1100px;
+  border: 1px solid getColor(borderRight, $contactListPalette);
+
+  @include mediaMaxW(#{$mobileViewPort}) {
+    position: relative;
+    grid-template-columns: 1fr;
+    margin-top: 50px;
+    margin-bottom: 10px;
+    height: 570px;
+    width: 750px;
+    max-width: 100%;
+    overflow: hidden;
+  }
+}
+
+.chat-window-wrapper {
+  color: #fff;
+  overflow-y: auto;
+  overflow-x: hidden;
+  @include scrollbar(5px, getColor(blueClr, $mainPalette), #c5bbb1);
+
+  &--hide {
+    display: none;
+  }
+}

@@ -2,6 +2,8 @@ import React from "react"
 import SelectInput from "../InputTemplates/SelectInput/SelectInput"
 import { range } from "Utils"
 
+const currentYear = new Date().getFullYear()
+
 export default function DatesInputs({
   setFieldValue,
   handleChange
@@ -23,7 +25,7 @@ export default function DatesInputs({
           {yearIsOpen && (
             <div className="media-type__options">
               <ul className="media-type__list">
-                {range(1900, 2020, 1)
+                {range(1900, currentYear, 1)
                   .reverse()
                   .map(item => {
                     return (
@@ -56,7 +58,7 @@ export default function DatesInputs({
         <SelectInput
           label="Year"
           name="year"
-          onChange={e => {
+          onChange={(e) => {
             handleChange(e)
             setFieldValue("decade", "")
             setFieldValue("yearFrom", "")
@@ -64,9 +66,9 @@ export default function DatesInputs({
           }}
         >
           <option />
-          {range(1900, 2020, 1)
+          {range(1900, currentYear, 1)
             .reverse()
-            .map(item => (
+            .map((item) => (
               <option key={item} value={item}>
                 {item}
               </option>
@@ -77,7 +79,7 @@ export default function DatesInputs({
         <SelectInput
           label="Decade"
           name="decade"
-          onChange={e => {
+          onChange={(e) => {
             handleChange(e)
             setFieldValue("year", "")
             setFieldValue("yearFrom", "")
@@ -85,9 +87,9 @@ export default function DatesInputs({
           }}
         >
           <option />
-          {range(1900, 2020, 10)
+          {range(1900, currentYear, 10)
             .reverse()
-            .map(item => (
+            .map((item) => (
               <option key={item} value={item}>
                 {item}
               </option>
@@ -99,16 +101,16 @@ export default function DatesInputs({
           <SelectInput
             label="From"
             name="yearFrom"
-            onChange={e => {
+            onChange={(e) => {
               handleChange(e)
               setFieldValue("decade", "")
               setFieldValue("year", "")
             }}
           >
             <option />
-            {range(1900, 2020, 1)
+            {range(1900, currentYear, 1)
               .reverse()
-              .map(item => (
+              .map((item) => (
                 <option key={item} value={item}>
                   {item}
                 </option>
@@ -119,16 +121,16 @@ export default function DatesInputs({
           <SelectInput
             label="To"
             name="yearTo"
-            onChange={e => {
+            onChange={(e) => {
               handleChange(e)
               setFieldValue("decade", "")
               setFieldValue("year", "")
             }}
           >
             <option />
-            {range(1900, 2020, 1)
+            {range(1900, currentYear, 1)
               .reverse()
-              .map(item => (
+              .map((item) => (
                 <option key={item} value={item}>
                   {item}
                 </option>

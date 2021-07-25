@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
-import Profile from "Components/Pages/Profile/Profile"
+import Settings from "Components/Pages/Settings/Settings"
 import Admin from "Components/Pages/Admin/Admin"
 import LoginPage from "Components/Pages/Login/Login"
 import SearchPage from "Components/Pages/SearchPage/SearchPage"
@@ -10,10 +10,12 @@ import ToWatchEpisodesPage from "Components/Pages/ToWatchEpisodes/ToWatchEpisode
 import CalendarPage from "Components/Pages/Calendar/Calendar"
 import MoviesPage from "Components/Pages/Movies/Movies"
 import DetailesPage from "Components/Pages/Detailes/Detailes"
+import UserProfile from "Components/Pages/UserProfile/UserProfile"
 import GridTests from "Utils/GridTests/GridTests"
 import * as ROUTES from "Utils/Constants/routes"
 import PageNotFound from "Components/Pages/PageNotFound/PageNotFound"
 import AppContextHOC from "Components/AppContext/AppContextHOC"
+import ContactsPage from "Components/Pages/Contacts/Contacts"
 
 class App extends Component {
   render() {
@@ -27,8 +29,10 @@ class App extends Component {
             <Route path={ROUTES.TO_WATCH} exact component={ToWatchEpisodesPage} />
             <Route path={ROUTES.CALENDAR} exact component={CalendarPage} />
             <Route path={ROUTES.MOVIES} exact component={MoviesPage} />
+            <Route path={ROUTES.USER_PROFILE} exact component={UserProfile} />
             <Route path={ROUTES.DETAILES_PAGE} exact component={DetailesPage} />
-            <Route path={ROUTES.PROFILE} exact component={Profile} />
+            <Route path={ROUTES.SETTINGS} exact component={Settings} />
+            <Route path={ROUTES.CONTACTS_PAGE} exact component={ContactsPage} />
             <Route path={ROUTES.LOGIN_PAGE} exact component={LoginPage} />
             <Route path={ROUTES.ADMIN} exact component={Admin} />
             <Route path={ROUTES.GRID_TESTS} exact component={GridTests} />

@@ -1,0 +1,67 @@
+@import "../../../styles/globals";
+
+.user-settings {
+  display: grid;
+  grid-template-columns: 300px;
+  row-gap: 10px;
+  justify-content: center;
+  color: #fff;
+  width: 100%;
+
+  &__email {
+    padding-bottom: 10px;
+    text-align: center;
+
+    span {
+      color: getColor(orangeClr, $mainPalette);
+    }
+  }
+
+  &__verified {
+    display: grid;
+    grid-template-columns: 1fr;
+    row-gap: 5px;
+    text-align: center;
+  }
+
+  &__sent-message {
+    font-size: 1.4rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: getColor(orangeClr, $mainPalette);
+  }
+
+  &__update-pass-input {
+    background-color: #48484826;
+  }
+
+  &__copy-user-link {
+    .clipboard-message__copied {
+      opacity: 0;
+      animation: clipboardMessageFadeInCopied 750ms forwards;
+      @keyframes clipboardMessageFadeInCopied {
+        to {
+          opacity: 1;
+        }
+      }
+    }
+
+    .clipboard-message__not-copied {
+      opacity: 0;
+      animation: clipboardMessageFadeInNotCopied 750ms forwards;
+      @keyframes clipboardMessageFadeInNotCopied {
+        to {
+          opacity: 1;
+        }
+      }
+    }
+  }
+
+  .button {
+    transition: 500ms;
+  }
+
+  .button--clipboard-copied {
+    background-color: getColor(blueClr, $mainPalette);
+  }
+}

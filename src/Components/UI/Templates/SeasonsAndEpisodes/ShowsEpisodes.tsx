@@ -319,7 +319,7 @@ const ShowsEpisodes: React.FC<Props> = ({
             <div
               key={season.id}
               className={classNames("episodes__episode-group", {
-                "episodes__episode-group--no-poster": !season.poster_path
+                "episodes__episode-group--no-poster": !season.poster_path && parentComponent === "detailesPage"
               })}
               style={!loadingEpisodesIds.includes(season.id) ? { rowGap: "10px" } : { rowGap: "0px" }}
             >

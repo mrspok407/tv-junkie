@@ -1,8 +1,8 @@
 import app from "firebase/app"
-import { database } from "firebase/app"
 import "firebase/auth"
 import "firebase/database"
 import "firebase/analytics"
+import "firebase/functions"
 import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 
 const configProduction = {
@@ -16,18 +16,26 @@ const configProduction = {
   appId: process.env.REACT_APP_APP_ID
 }
 
-const configDevelopment = {
-  apiKey: process.env.REACT_APP_DEV_FIREBASE_API_KEY,
-  authDomain: process.env.REACT_APP_DEV_AUTH_DOMAIN,
-  databaseURL: process.env.REACT_APP_DEV_DATABASE_URL,
-  projectId: process.env.REACT_APP_DEV_PROJECT_ID,
-  storageBucket: process.env.REACT_APP_DEV_STORAGE_BUCKET,
-  messagingSenderId: process.env.REACT_APP_DEV_MESSAGING_SENDER_ID,
-  measurementId: process.env.REACT_APP_DEV_MEASUREMENT_ID,
-  appId: process.env.REACT_APP_DEV_APP_ID
-}
+// const configDevelopment = {
+//   apiKey: process.env.REACT_APP_DEV_FIREBASE_API_KEY,
+//   authDomain: process.env.REACT_APP_DEV_AUTH_DOMAIN,
+//   databaseURL: process.env.REACT_APP_DEV_DATABASE_URL,
+//   projectId: process.env.REACT_APP_DEV_PROJECT_ID,
+//   storageBucket: process.env.REACT_APP_DEV_STORAGE_BUCKET,
+//   messagingSenderId: process.env.REACT_APP_DEV_MESSAGING_SENDER_ID,
+//   measurementId: process.env.REACT_APP_DEV_MEASUREMENT_ID,
+//   appId: process.env.REACT_APP_DEV_APP_ID
+// }
 
-const config = process.env.NODE_ENV === "production" ? configProduction : configDevelopment
+// let config: any = process.env.NODE_ENV === "production" ? configProduction : configDevelopment
+let config: any = configProduction
+
+if (window.location.hostname === "localhost") {
+  config = {
+    ...config,
+    databaseURL: `http://localhost:9000/?ns=pet-project-development-default-rtdb`
+  }
+}
 
 interface ReferenceInterface {
   uid: string
@@ -39,7 +47,9 @@ interface ReferenceInterface {
 class Firebase {
   auth: any
   db: any
+  dbRef: any
   analytics: any
+  functions: any
   googleProvider: any
   app: any
 
@@ -49,11 +59,22 @@ class Firebase {
     this.auth = app.auth()
     this.db = app.database()
     this.analytics = app.analytics()
+    this.functions = app.functions()
+
+    this.dbRef = app.database
 
     this.googleProvider = new app.auth.GoogleAuthProvider()
 
     this.app = app
+
+    if (window.location.hostname === "localhost") {
+      // app.functions().useEmulator("localhost", 4000)
+    }
   }
+
+  /// Cloud Functions ///
+
+  httpsCallable = (functionName: string) => this.functions.httpsCallable(functionName)
 
   /// Auth API ///
 
@@ -88,7 +109,9 @@ class Firebase {
       }
     })
 
-  timeStamp = () => database.ServerValue.TIMESTAMP
+  timeStamp = () => this.dbRef.ServerValue.TIMESTAMP
+
+  database = () => this.db
 
   /// Shows In Database ///
   allShowsList = () => this.db.ref(`allShowsList`)
@@ -101,13 +124,79 @@ class Firebase {
   users = () => this.db.ref("users")
   userOnlineStatus = (uid: string) => this.db.ref(`users/${uid}/status`)
 
+  /// Contacts API ///
+
+  newContactsRequests = ({ uid }: { uid: string | undefined }) =>
+    this.db.ref(`users/${uid}/contactsDatabase/newContactsRequests`)
+  newContactsActivity = ({ uid }: { uid: string | undefined }) =>
+    this.db.ref(`users/${uid}/contactsDatabase/newContactsActivity`)
+  contactsLastActivity = ({ uid }: { uid: string | undefined }) =>
+    this.db.ref(`users/${uid}/contactsDatabase/contactsLastActivity`)
+  contactsDatabase = ({ uid }: { uid: string | undefined }) => this.db.ref(`users/${uid}/contactsDatabase`)
+  contactsList = ({ uid }: { uid: string | undefined }) => this.db.ref(`users/${uid}/contactsDatabase/contactsList`)
+  contact = ({ authUid, contactUid }: { authUid: string | undefined; contactUid: string }) =>
+    this.db.ref(`users/${authUid}/contactsDatabase/contactsList/${contactUid}`)
+
+  /// Chats API ///
+  privateChats = () => this.db.ref("privateChats")
+  groupChats = () => this.db.ref("groupChats")
+  messages = ({ chatKey, isGroupChat }: { chatKey: string; isGroupChat: boolean }) => {
+    if (isGroupChat) {
+      return this.db.ref(`groupChats/${chatKey}/messages`)
+    } else {
+      return this.db.ref(`privateChats/${chatKey}/messages`)
+    }
+  }
+  message = ({ chatKey, messageKey, isGroupChat }: { chatKey: string; messageKey: string; isGroupChat: boolean }) => {
+    if (isGroupChat) {
+      return this.db.ref(`groupChats/${chatKey}/messages/${messageKey}`)
+    } else {
+      return this.db.ref(`privateChats/${chatKey}/messages/${messageKey}`)
+    }
+  }
+
+  unreadMessages = ({
+    uid,
+    chatKey,
+    isGroupChat = false
+  }: {
+    uid: string | undefined
+    chatKey: string
+    isGroupChat: boolean
+  }) => {
+    if (isGroupChat) {
+      return this.db.ref(`groupChats/${chatKey}/members/unreadMessages/${uid}`)
+    } else {
+      return this.db.ref(`privateChats/${chatKey}/members/${uid}/unreadMessages`)
+    }
+  }
+
+  chatMemberStatus = ({
+    chatKey,
+    memberKey,
+    isGroupChat
+  }: {
+    chatKey: string
+    memberKey: string
+    isGroupChat: boolean
+  }) => {
+    if (isGroupChat) {
+      return this.db.ref(`groupChats/${chatKey}/members/status/${memberKey}`)
+    } else {
+      return this.db.ref(`privateChats/${chatKey}/members/${memberKey}/status`)
+    }
+  }
+
+  groupChatMembersStatus = ({ chatKey }: { chatKey: string }) => this.db.ref(`groupChats/${chatKey}/members/status`)
+  groupChatParticipants = ({ chatKey }: { chatKey: string }) =>
+    this.db.ref(`groupChats/${chatKey}/members/participants`)
+
   /// User Content API ///
   userAllShows = (uid: string) => this.db.ref(`users/${uid}/content/shows`)
   userShowsLastUpdateList = (uid: string) => this.db.ref(`users/${uid}/content/showsLastUpdateList`)
   userShow = ({ uid, key }: { uid: string; key: string }) => this.db.ref(`users/${uid}/content/shows/${key}`)
 
   userEpisodes = (uid: string) => this.db.ref(`users/${uid}/content/episodes`)
-  userEpisodesNotFinished = (uid: string) => this.db.ref(`users/${uid}/content/episodes/notFinished`)
 
   userShowEpisodes = (uid: string, showKey: string) => this.db.ref(`users/${uid}/content/episodes/${showKey}`)
   userShowAllEpisodes = (uid: string, showKey: string) =>

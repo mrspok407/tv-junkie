@@ -1,0 +1,194 @@
+@import "../../../../styles/globalsContacts";
+
+$messageStatusSize: 17px;
+
+.chat-window__message-info {
+  position: relative;
+  display: flex;
+  column-gap: 5px;
+  @include mediaMaxW(#{$mobileViewPort}) {
+    margin-left: auto;
+  }
+}
+
+.chat-window__message-timestamp {
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-window__message-edited {
+  margin-top: auto;
+  font-size: 0.7rem;
+  font-style: italic;
+  text-align: right;
+  color: #1cbb2d;
+}
+
+.chat-window__message-options {
+  position: relative;
+  width: 15px;
+
+  &--hide {
+    display: none;
+  }
+
+  .popup-container {
+    left: -68px;
+    z-index: 2;
+
+    &--received-message {
+      left: 14px;
+      border-radius: 0px 5px 5px 5px;
+    }
+  }
+
+  .chat-window__open-popup-btn {
+    @include buttonRemoveDefaults;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    row-gap: 2px;
+    width: 100%;
+    cursor: pointer;
+    opacity: 0;
+    will-change: opacity;
+    transition: 200ms;
+
+    @include mediaMaxW(#{$mobileViewPort}) {
+      margin-top: 2px;
+      row-gap: 1px;
+      opacity: 1;
+    }
+
+    &--open {
+      opacity: 1;
+    }
+
+    span {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background-color: #fff;
+
+      @include mediaMaxW(#{$mobileViewPort}) {
+        width: 4px;
+        height: 4px;
+      }
+    }
+  }
+}
+
+.chat-window__message-wrapper:nth-last-child(-n + 2) {
+  .chat-window__message {
+    .chat-window__message-options .popup-container {
+      border-radius: 5px 5px 0px 5px;
+
+      .popup__option-btn:after {
+        background-color: #3375b5;
+      }
+      .popup__option:first-child {
+        .popup__option-btn:after {
+          border-radius: 5px 5px 0px 0px;
+        }
+      }
+      .popup__option:last-child {
+        .popup__option-btn:after {
+          border-radius: 0px 0px 0px 5px;
+        }
+      }
+
+      &--sended-message {
+        top: -92px;
+        border-radius: 5px 5px 0px 5px;
+      }
+      &--sended-message.popup-container--messages-less-two {
+        top: initial;
+        border-radius: 5px 0px 5px 5px;
+        .popup__option:first-child {
+          .popup__option-btn:after {
+            border-radius: 5px 0 0 0;
+          }
+        }
+        .popup__option:last-child {
+          .popup__option-btn:after {
+            border-radius: 0 0 5px 5px;
+          }
+        }
+      }
+      &--received-message {
+        top: -54px;
+        background-color: getColor(receivedMsgBg, $popupOptionsPalette);
+        border-radius: 5px 5px 5px 0;
+        .popup__option:first-child {
+          .popup__option-btn:after {
+            border-radius: 5px 5px 0px 0px;
+          }
+        }
+        .popup__option:last-child {
+          .popup__option-btn:after {
+            border-radius: 0px 0px 5px 0;
+          }
+        }
+      }
+      &--received-message.popup-container--messages-less-two {
+        top: initial;
+        border-radius: 0 5px 5px 5px;
+        .popup__option:first-child {
+          .popup__option-btn:after {
+            border-radius: 0 5px 0 0;
+          }
+        }
+        .popup__option:last-child {
+          .popup__option-btn:after {
+            border-radius: 0 0 5px 5px;
+          }
+        }
+      }
+      &--failed-deliver {
+        top: -54px;
+      }
+    }
+  }
+}
+
+.chat-window__message-status {
+  background-image: url("../../../../../../../assets/images/icons/one-mark-sign.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  width: $messageStatusSize;
+  height: $messageStatusSize;
+
+  &--read {
+    background-image: url("../../../../../../../assets/images/icons/double-mark-sign.svg");
+  }
+
+  &--loading {
+    background-image: initial;
+  }
+
+  &--deliver-failed {
+    position: relative;
+    background-image: url("../../../../../../../assets/images/icons/failed-icon.svg");
+    cursor: pointer;
+
+    &:after {
+      content: "Failed delivery";
+      position: absolute;
+      width: max-content;
+      top: -23px;
+      left: -37px;
+      color: #000;
+      font-size: 0.8rem;
+      padding: 4px;
+      border-radius: 5px;
+      background-color: #fff;
+      will-change: opacity;
+      transition: 150ms;
+      opacity: 0;
+    }
+
+    &:hover:after {
+      opacity: 1;
+    }
+  }
+}

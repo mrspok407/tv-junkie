@@ -1,0 +1,1 @@
+export const ERROR_MODAL_DURATION = 5000

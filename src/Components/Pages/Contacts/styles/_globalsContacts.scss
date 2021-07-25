@@ -1,0 +1,96 @@
+@import "../../../../styles/globals";
+
+$chatHeight: 570px;
+$typingColor: #14a21f;
+
+// ContactsList
+$contactListPalette: (
+  borderRight: #25252561
+);
+
+.chat-container {
+  --contactInfoHeight: 54px;
+}
+
+// ContactItem
+$contactItemPalette: (
+  activeItemBG: #0e5e92,
+  onHover: #93cff521,
+  unreadMessagesBG: #206ea0,
+  activeUnreadMessagesBG: #fff
+);
+
+$contactItemDimm: (
+  lastMessageStatus: 17px,
+  unreadMessages: 24px,
+  font: 0.95rem
+);
+
+// ChatWindow
+$chatWindowPalette: (
+  placeholderBg: #206ea0,
+  backG: $bodyBackgroundClr,
+  messageSentBG: #2b5278,
+  deliverFailedBG: brown,
+  messageReceivedBG: #182533,
+  messageReceiveGroupChatBG: #2b5278,
+  messageSendGroupChatBG: #2c5e65,
+  newMembersBG: #1f1e1e,
+  usernameColorAuth: #6ce4d4,
+  usernameColorNotAuth: #e67a2d,
+  messageText: #fff,
+  dateBG: #4a996099,
+  dateFloatBG: #4a9960,
+  selectBtnBG: #56d27a8a,
+  selectMsgBG: #121d1c,
+  firstUnreadBG: #272626
+);
+
+$chatWindowDimm: (
+  messageMaxWidth: 70%,
+  messageMaxWidthMobile: 85%,
+  contactInfoFont: 0.95rem
+);
+
+// GroupInfo
+$groupInfoPalette: (
+  groupInfoBG: #131313,
+  membersMenuBtn: brown
+);
+
+// SelectOptions
+$selectOptionsPalette: (
+  bgClr: #fff,
+  btnCancelBg: #78a574,
+  btnDeleteBg: #7b4b42,
+  btnCancelBgHover: #78a574d6,
+  btnDeleteBgHover: #7b4b42db
+);
+
+$selectOptionsDimm: (
+  width: 400px,
+  widthMobile: 320px
+);
+
+// PopupOptions
+$popupOptionsPalette: (
+  mainBg: #17212b,
+  mainHoverBg: #257bce,
+  receivedMsgBg: #233f5a
+);
+
+// ConfirmModal
+$confirmModalPalette: (
+  containerBG: rgba(0, 0, 0, 0.39),
+  contentBG: #487c9e,
+  warning: #fff,
+  contactName: #67c348,
+  buttonAprove: #78a574,
+  buttonAproveHover: #78a574a1,
+  buttonCancel: #7b4b42,
+  buttonCancelHover: #7b4b42a2
+);
+
+$confirmModalDimm: (
+  contentMaxWidth: 400px
+);

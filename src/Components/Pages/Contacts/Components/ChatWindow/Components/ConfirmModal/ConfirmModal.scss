@@ -1,0 +1,70 @@
+@import "../../../../styles/globalsContacts";
+
+.chat-window__confirm-container {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.39);
+  background-color: getColor(containerBG, $confirmModalPalette);
+  z-index: 9999;
+
+  .chat-window__confirm {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    row-gap: 10px;
+    column-gap: 10px;
+    max-width: getDimm(contentMaxWidth, $confirmModalDimm);
+    width: 100%;
+    height: max-content;
+    padding: 15px;
+    border-radius: 5px;
+    text-align: center;
+    background-color: getColor(contentBG, $confirmModalPalette);
+
+    @include mediaMaxW(#{$mobileViewPort}) {
+      margin: 0 10px 0 10px;
+    }
+
+    &-warning {
+      grid-column: 1 / 3;
+      padding: 5px 15px 5px 15px;
+      color: getColor(warning, $confirmModalPalette);
+      font-size: 1.05rem;
+      line-height: 22px;
+
+      span {
+        font-size: 1.2rem;
+        color: #7de674;
+      }
+    }
+
+    &-button {
+      .button {
+        border-radius: 5px;
+        background-color: getColor(buttonAprove, $confirmModalPalette);
+        transition: 150ms;
+
+        @include mediaMinW(#{$mobileViewPort}) {
+          &:hover {
+            background-color: getColor(buttonAproveHover, $confirmModalPalette);
+          }
+        }
+      }
+
+      &--cancel {
+        .button {
+          background-color: getColor(buttonCancel, $confirmModalPalette);
+
+          @include mediaMinW(#{$mobileViewPort}) {
+            &:hover {
+              background-color: getColor(buttonCancelHover, $confirmModalPalette);
+            }
+          }
+        }
+      }
+    }
+  }
+}

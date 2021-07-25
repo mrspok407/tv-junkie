@@ -46,7 +46,7 @@ const Input: React.FC<Props> = ({
 
   useEffect(() => {
     const windowWidth = window.innerWidth
-    if (history.action === "PUSH" && !navSearch && windowWidth > MOBILE_LAYOUT && inputRef && inputRef.current) {
+    if (history.action === "PUSH" && !navSearch && windowWidth > MOBILE_LAYOUT && inputRef?.current) {
       inputRef.current.focus()
     }
 
@@ -146,7 +146,7 @@ const Input: React.FC<Props> = ({
                         if (listIsOpen && inputRef.current) {
                           inputRef.current.focus()
                         }
-                        setMediaType({ type: e.target.value, icon: item.icon })
+                        setMediaType({ type: item.type, icon: item.icon })
                         setMediaTypesIsOpen(false)
                       }}
                     >

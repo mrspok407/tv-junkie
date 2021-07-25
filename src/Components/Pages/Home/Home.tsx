@@ -77,6 +77,10 @@ const HomePage: React.FC = () => {
 
       <CalendarContent homePage={true} />
 
+      {/* {showsIds.map((id: any) => (
+        <Test key={id} id={id} />
+      ))} */}
+
       <div className="home-page__sliders-wrapper">
         {!slidersLoading && (
           <div className="home-page__sliders">

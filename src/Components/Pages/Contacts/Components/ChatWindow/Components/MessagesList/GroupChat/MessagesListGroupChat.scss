@@ -1,0 +1,149 @@
+@import "../../../../../styles/globalsContacts";
+
+$avatarBgColors: #42a4f5a1, #26a699a1, #ffa927a9, #ef5350a1, #c461d6a6, #e4c252ad;
+$avatarDimm: 36px;
+
+.chat-window__messages-list-container.chat-window__messages-list-container--group-chat {
+  @include mediaMaxW(#{$mobileViewPort}) {
+    padding: 10px;
+  }
+}
+
+.chat-window__messages-list--group-chat {
+  .chat-window__message {
+    width: 100%;
+
+    &-wrapper {
+      .chat-window__message-avatar {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        align-self: flex-end;
+        width: $avatarDimm;
+        height: $avatarDimm;
+        border-radius: 50%;
+        z-index: 5;
+      }
+
+      &--last-in-bunch {
+        display: flex;
+        column-gap: 3px;
+        .chat-window__message--not-auth-sender {
+          padding-left: 0;
+        }
+      }
+      &--new-bunch {
+        margin-top: 10px;
+      }
+    }
+
+    &-timestamp {
+      margin-top: auto;
+    }
+
+    &-username {
+      color: getColor(usernameColorNotAuth, $chatWindowPalette);
+    }
+
+    .chat-window__message-inner {
+      max-width: initial;
+      border-radius: initial;
+      padding: initial;
+
+      &-wrapper {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        row-gap: 8px;
+        max-width: max-content;
+        border-radius: 5px;
+        padding: 10px;
+        background-color: getColor(messageReceiveGroupChatBG, $chatWindowPalette);
+
+        &:after,
+        &:before {
+          content: "";
+          position: absolute;
+          width: 10px;
+          height: 20px;
+          bottom: 0;
+        }
+      }
+    }
+  }
+
+  .chat-window__message--auth-sender {
+    width: 70%;
+    margin-left: auto;
+    @include mediaMaxW(#{$mobileViewPort}) {
+      width: 90%;
+    }
+
+    .chat-window__message-inner-wrapper {
+      margin-left: auto;
+      background-color: getColor(messageSendGroupChatBG, $chatWindowPalette);
+    }
+    &.chat-window__message--last-in-bunch {
+      .chat-window__message-inner-wrapper {
+        border-radius: 5px 5px 0px 5px;
+        &:before {
+          right: -10px;
+          background-color: getColor(messageSendGroupChatBG, $chatWindowPalette);
+        }
+        &:after {
+          right: -10px;
+          background-color: getColor(backG, $chatWindowPalette);
+          border-radius: 0 0 0px 10px;
+        }
+      }
+    }
+
+    .chat-window__message-username {
+      color: getColor(usernameColorAuth, $chatWindowPalette);
+    }
+  }
+
+  .chat-window__message--deliver-failed {
+    .chat-window__message-inner-wrapper {
+      background-color: getColor(deliverFailedBG, $chatWindowPalette);
+    }
+  }
+
+  .chat-window__message--deliver-failed.chat-window__message--last-in-bunch {
+    .chat-window__message-inner-wrapper {
+      &:before {
+        background-color: getColor(deliverFailedBG, $chatWindowPalette);
+      }
+    }
+    .chat-window__message-inner {
+      &:after,
+      &:before {
+        display: none;
+      }
+    }
+  }
+
+  .chat-window__message--not-auth-sender {
+    width: 80%;
+    padding-left: calc(#{$avatarDimm} + 3px);
+    margin-right: auto;
+    @include mediaMaxW(#{$mobileViewPort}) {
+      width: 90%;
+    }
+
+    &.chat-window__message--last-in-bunch {
+      .chat-window__message-inner-wrapper {
+        border-radius: 5px 5px 5px 0px;
+        &:before {
+          left: -10px;
+          background-color: getColor(messageReceiveGroupChatBG, $chatWindowPalette);
+        }
+        &:after {
+          left: -10px;
+          background-color: getColor(backG, $chatWindowPalette);
+          border-radius: 0 0 10px 0;
+        }
+      }
+    }
+  }
+}

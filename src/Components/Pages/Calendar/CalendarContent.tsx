@@ -100,7 +100,7 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
                         // Format Date //
                         const airDateISO = episode.air_date && new Date(episode.air_date).toISOString()
 
-                        const options = {
+                        const options: any = {
                           weekday: "short",
                           day: "numeric"
                         }

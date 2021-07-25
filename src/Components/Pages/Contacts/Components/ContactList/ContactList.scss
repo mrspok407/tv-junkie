@@ -1,0 +1,75 @@
+@import "../../styles/globalsContacts";
+@import "./Contact/Contact.scss";
+
+.contact-list {
+  transition: transform 250ms, opacity 200ms;
+  &-wrapper {
+    position: relative;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border-right: 1px solid getColor(borderRight, $contactListPalette);
+    @include scrollbar(5px, getColor(blueClr, $mainPalette), #c5bbb1);
+    @include mediaMaxW(#{$mobileViewPort}) {
+      position: absolute;
+      height: $chatHeight;
+      width: 100%;
+      opacity: 1;
+      transition: opacity 150ms ease, z-index 0ms 150ms;
+
+      &--hide-mobile {
+        opacity: 0;
+        z-index: -1;
+      }
+    }
+
+    &--group-creation-active {
+      overflow-y: hidden;
+    }
+  }
+
+  &--group-creation-active {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+
+  &--no-contacts {
+    display: flex;
+    justify-content: center;
+    &-text {
+      height: max-content;
+      width: max-content;
+      margin-top: 20px;
+      color: #fff;
+      padding: 5px 15px 5px 15px;
+      border-radius: 14px;
+      background-color: #206ea0;
+    }
+  }
+
+  &__loader {
+    display: block;
+    align-self: center;
+    margin-top: 20px;
+    width: 27px;
+    height: 27px;
+    border-radius: 50%;
+    border: 4px solid #fff;
+    border-left-color: transparent;
+    opacity: 0;
+    animation: contactListLoading 0.3s 0.5s linear infinite;
+    @keyframes contactListLoading {
+      from {
+        opacity: 1;
+      }
+      to {
+        transform: rotate(360deg);
+        opacity: 1;
+      }
+    }
+
+    &-wrapper {
+      display: flex;
+      justify-content: center;
+    }
+  }
+}
