@@ -16,7 +16,6 @@ import "./Components/ContactList/ContactList.scss"
 const ContactsContent: React.FC = () => {
   const { firebase, authUser, contactsContext, contactsState } = useFrequentVariables()
   const { activeChat, contacts, messages, confirmModal, groupCreation } = contactsState
-
   const contactListWrapperRef = useRef<HTMLDivElement>(null!)
   const contactsRef = useRef<{ [key: string]: ContactInfoInterface }>()
   const confirmModalFunctions = { ...useContactOptions({}), ...useSelectOptions() }
