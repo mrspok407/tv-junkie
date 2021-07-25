@@ -18,8 +18,8 @@ import Footer from "Components/UI/Footer/Footer"
 import PlaceholderLoadingFullInfo from "Components/UI/Placeholders/PlaceholderLoadingFullInfo/PlaceholderLoadingFullInfo"
 import useHandleListeners from "./FirebaseHelpers/UseHandleListeners"
 import { ContentDetailes, CONTENT_DETAILS_DEFAULT } from "Utils/Interfaces/ContentDetails"
-import "./Detailes.scss"
 import useGoogleRedirect from "Components/UserAuth/SignIn/UseGoogleRedirect"
+import "./Detailes.scss"
 
 const { CancelToken } = require("axios")
 let cancelRequest: any

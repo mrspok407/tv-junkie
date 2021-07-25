@@ -5,8 +5,8 @@ import * as ROUTES from "Utils/Constants/routes"
 import { FirebaseContext } from "Components/Firebase"
 import { SingleEpisodeInterface } from "Components/UserContent/UseUserShows/UseUserShows"
 import { AppContext } from "Components/AppContext/AppContextHOC"
-import "./UserRating.scss"
 import { HandleFadeOutInterface } from "../Templates/SeasonsAndEpisodes/SeasonEpisodes"
+import "./UserRating.scss"
 
 const STAR_AMOUNT = 5
 

@@ -48,10 +48,11 @@ const useHandleListeners = ({ id }: { id?: number }) => {
             acc.push(...item.episodes.filter((item) => item.air_date !== ""))
             return acc
           }, [])
-
-          allEpisodes.splice(releasedEpisodes.length)
+          const releasedUserEpisodes = allEpisodes.slice(0, releasedEpisodes.length)
 
           const allEpisodesWatched = !allEpisodes.some((episode) => !episode.watched)
+          const releasedEpisodesWatched = !releasedUserEpisodes.some((episode) => !episode.watched)
+
           const finished = statusDatabase === "ended" && allEpisodesWatched ? true : false
 
           firebase
@@ -59,13 +60,15 @@ const useHandleListeners = ({ id }: { id?: number }) => {
             .child("database")
             .once("value", (snapshot: { val: () => string }) => {
               firebase.userShowAllEpisodesInfo(authUser.uid, id).update({
-                allEpisodesWatched,
+                allEpisodesWatched: releasedEpisodesWatched,
                 finished,
-                isAllWatched_database: `${allEpisodesWatched}_${snapshot.val()}`
+                isAllWatched_database: `${releasedEpisodesWatched}_${snapshot.val()}`
               })
             })
 
-          firebase.userShow({ uid: authUser.uid, key: id }).update({ finished, allEpisodesWatched })
+          firebase
+            .userShow({ uid: authUser.uid, key: id })
+            .update({ finished, allEpisodesWatched: releasedEpisodesWatched })
           setEpisodesFromDatabase(userEpisodes)
           setReleasedEpisodes(releasedEpisodes)
           if (handleLoading) handleLoading(false)
