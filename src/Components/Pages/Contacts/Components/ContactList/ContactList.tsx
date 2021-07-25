@@ -70,8 +70,6 @@ const ContactList: React.FC<Props> = ({ contactListWrapperRef }) => {
       contactsData.push({ ...contact.val(), isGroupChat: !!contact.val().isGroupChat, key: contact.key, chatKey })
     })
 
-    console.log({ contactsData })
-
     if (initialLoadingRef.current || newLoad.current) {
       const contacts = await getContactsInfo({ contactsData })
 

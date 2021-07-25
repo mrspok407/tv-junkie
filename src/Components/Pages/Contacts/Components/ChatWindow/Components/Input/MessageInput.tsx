@@ -88,7 +88,6 @@ const MessageInput: React.FC<Props> = ({
 
   const updateInputDeb = useCallback(
     debounce((payload: MessageInputInterface) => {
-      console.log(activeChat.chatKey)
       contactsDispatch({ type: "updateMessageInput", payload })
     }, debounceTimeout),
     [activeChat]
@@ -96,7 +95,6 @@ const MessageInput: React.FC<Props> = ({
 
   const onClick = () => {
     const { anchorOffset } = getSelection()
-    console.log("onClick: anchorOffset")
     updateInputDeb({ anchorOffset })
   }
 
@@ -120,7 +118,6 @@ const MessageInput: React.FC<Props> = ({
 
   const scrollPositionHandler = () => {
     const { scrollTop } = inputRef.current
-    console.log("scroll: scrollTop")
     updateInputDeb({ scrollTop })
   }
 
@@ -175,9 +172,6 @@ const MessageInput: React.FC<Props> = ({
 
   const handleEditMessage = async () => {
     if (["", "\n"].includes(inputRef.current?.textContent!)) return
-    if (windowWidth < MOBILE_LAYOUT_THRESHOLD) {
-      // inputRef.current.focus()
-    }
 
     const editedMessageText = textToUrl({ text: inputRef.current.innerHTML })
     const originalMessage = messagesData.find((message) => message.key === messageInputData.editingMsgKey)!
@@ -190,12 +184,9 @@ const MessageInput: React.FC<Props> = ({
     })
 
     try {
-      console.log(editedMessageText)
-      console.log({ contactInfo })
       if (contactInfo.isGroupChat) {
         await editMessageGroupChat({ message: editedMessageText, originalMessage })
       } else {
-        console.log("test")
         await editMessagePrivateChat({ message: editedMessageText, originalMessage })
       }
     } catch (error) {
@@ -211,12 +202,10 @@ const MessageInput: React.FC<Props> = ({
     const scrollTop = inputRef.current.scrollTop
 
     if (["", "\n"].includes(textContent)) {
-      console.log("onChangeEmpty: all to zero")
       e.currentTarget.innerHTML = ""
       updateInputDeb({ message: "", anchorOffset: 0, scrollTop: 0, editingMsgKey: null })
       updateTyping({ activeChat, authUser, firebase, setTypingNull: true, isGroupChat: contactInfo?.isGroupChat })
     } else {
-      console.log("onChangeNotEmpty: all")
       updateInputDeb({ message: innerHTML, anchorOffset, scrollTop })
       updateTyping({ activeChat, authUser, firebase, isGroupChat: contactInfo?.isGroupChat })
     }
@@ -267,7 +256,6 @@ const MessageInput: React.FC<Props> = ({
       if (keysMap.current.Shift) {
         handleNextLine({ textContent, innerHTML, e })
       } else {
-        console.log(messageInputData.editingMsgKey)
         if (!messageInputData.editingMsgKey) {
           handleSendMessage()
         } else {
@@ -282,7 +270,6 @@ const MessageInput: React.FC<Props> = ({
     const { anchorOffset } = getSelection()
     const scrollTop = inputRef.current.scrollTop
     if (arrowKeys.includes(e.key)) {
-      console.log("keyUpArrows: anchorOffset")
       updateInputDeb({ anchorOffset, scrollTop })
     }
     if (e.key === "Enter") {

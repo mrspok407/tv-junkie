@@ -58,8 +58,6 @@ const Search: React.FC<Props> = ({ navSearch, navRef, closeNavMobile }) => {
     setQuery(query)
     setIsSearchingList(true)
 
-    console.log({ mediatype })
-
     axios
       .get(
         `https://api.tmdb.org/3/search/${mediatype.type?.toLowerCase()}?api_key=${

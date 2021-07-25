@@ -51,8 +51,6 @@ const ChatWindow: React.FC = () => {
   const selectedMessagesData = selectedMessages[activeChat.chatKey] || []
   const contactInfo = contacts[activeChat.contactKey] || {}
 
-  // console.log({ messagesData })
-
   const chatWindowLoading =
     messagesData === undefined ||
     (!firebaseListeners.contactUnreadMessages[activeChat.chatKey] && !contactInfo.isGroupChat)
@@ -154,7 +152,7 @@ const ChatWindow: React.FC = () => {
             memberKey: authUser?.uid!,
             isGroupChat: contactInfo.isGroupChat
           })
-          .update({ chatBottom: true }, () => console.log("chatBottomUpdate"))
+          .update({ chatBottom: true })
       } else {
         isScrollBottomRef.current = false
         firebase
@@ -186,22 +184,17 @@ const ChatWindow: React.FC = () => {
         if (scrollHeight <= height) return
         if (scrollTop < prevScrollTop || prevScrollTop === undefined) {
           if (scrollTop <= thresholdTopRender) {
-            console.log("renderTopMessages")
-            console.time("test")
             contactsDispatch({
               type: "renderTopMessages",
               payload: { unreadMessagesAuthRef: unreadMessagesAuthRef.current, chatKey: activeChat.chatKey }
             })
-            console.timeEnd("test")
           }
           if (scrollTop <= thresholdTopLoad) {
-            console.log({ messagesData })
             if (loadingTopMessages) return
             loadTopMessages()
           }
         } else {
           if (scrollHeight <= scrollTop + height + thresholdBottomRender) {
-            console.log("renderBottomMessages")
             contactsDispatch({
               type: "renderBottomMessages",
               payload: { unreadMessagesAuthRef: unreadMessagesAuthRef.current, chatKey: activeChat.chatKey }
@@ -269,20 +262,16 @@ const ChatWindow: React.FC = () => {
 
     if (firstUnreadMessageRef) {
       if (isScrollBottom) {
-        console.log("firstUnreadMessageRef isScrollBottom: true")
         firstUnreadMessageRef?.parentElement?.scrollIntoView({ block: "start", inline: "start" })
       } else {
         if (isFirstBunch) {
-          console.log("firstUnreadMessageRef isScrollBottom: false FIRST BUNCH")
           firstUnreadMessageRef?.parentElement?.scrollIntoView({ block: "start", inline: "start" })
         } else {
-          console.log("firstUnreadMessageRef isScrollBottom: false NOT FIRST BUNCH")
           chatContainerRef.scrollTop = lastScrollPosition[activeChat.chatKey]!
         }
       }
     } else {
       if (isScrollBottom) {
-        console.log("NOT firstUnreadMessageRef isScrollBottom: true")
         chatContainerRef.scrollTop = getContainerRect().scrollHeight + getContainerRect().height
         isScrollBottomRef.current = true
         firebase
@@ -293,8 +282,6 @@ const ChatWindow: React.FC = () => {
           })
           .update({ chatBottom: true })
       } else {
-        console.log("NOT firstUnreadMessageRef isScrollBottom: false")
-
         chatContainerRef.scrollTop = lastScrollPosition[activeChat.chatKey]!
       }
     }

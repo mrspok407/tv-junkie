@@ -70,6 +70,7 @@ class Profile extends Component {
   }
 
   addMessagesToPrivateChats = async () => {
+    const authUserUid = "hZK2fqeACBUqZiyj1zrbuFXZzRP2"
     const firebase = this.context.firebase
     const lorem = new LoremIpsum({
       sentencesPerParagraph: {
@@ -88,25 +89,23 @@ class Profile extends Component {
     //   console.log(JSON.stringify(snapshot.val()))
     // })
 
-    firebase.contactsList({ uid: this.state.authUser.uid }).once("value", (snapshot) => {
+    firebase.contactsList({ uid: authUserUid }).once("value", (snapshot) => {
       Object.entries(snapshot.val()).forEach(async ([contactKey, contactValue]) => {
         if (contactValue.status !== true) return
         let startTimeStampPrivateChats = 1313142446000
-        const chatKey =
-          contactKey < this.state.authUser?.uid
-            ? `${contactKey}_${this.state.authUser?.uid}`
-            : `${this.state.authUser?.uid}_${contactKey}`
+        const chatKey = contactKey < authUserUid ? `${contactKey}_${authUserUid}` : `${authUserUid}_${contactKey}`
         const numberOfMessages = 1000
         const messages = {}
         for (let i = 1; i <= numberOfMessages; i++) {
           const messageRef = await firebase.messages({ chatKey, isGroupChat: false }).push()
           messages[`${messageRef.key}`] = {
-            sender: Math.random() > 0.5 ? contactKey : this.state.authUser.uid,
+            sender: Math.random() > 0.5 ? contactKey : authUserUid,
             message: lorem.generateSentences(Math.ceil(Math.random() * 3)),
             timeStamp: startTimeStampPrivateChats
           }
           startTimeStampPrivateChats = startTimeStampPrivateChats + fourHoursInMS
         }
+        console.log(messages)
         await firebase.messages({ chatKey, isGroupChat: false }).set(messages)
       })
     })

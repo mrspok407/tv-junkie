@@ -56,14 +56,6 @@ const NewRequestOptions: React.FC = () => {
           )
         )
       }
-
-      //   case undefined: {
-      //     return (
-      //       <div className="new-request__message">
-      //         <span className="new-request__name">{contactInfo.userName}</span> removed you from contacts
-      //       </div>
-      //     )
-      //   }
     }
   }
 

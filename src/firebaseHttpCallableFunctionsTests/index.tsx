@@ -62,7 +62,6 @@ export const _removeMemberFromGroup = async ({
       [`users/${member.key}/contactsDatabase/contactsLastActivity/${groupChatKey}`]: timeStampData
     }
 
-    console.log("boi")
     await new Promise((resolve) => setTimeout(resolve, 1500))
 
     return database.ref().update(updateData)
@@ -194,7 +193,6 @@ export const _createNewGroup = async ({
       .ref()
       .update(updateData)
       .then(() => {
-        console.log({ newGroupChatKey: groupChatRef.key })
         return { newGroupChatKey: groupChatRef.key }
       })
   } catch (error) {

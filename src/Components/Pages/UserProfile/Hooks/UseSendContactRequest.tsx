@@ -2,7 +2,6 @@ import { useContext, useState } from "react"
 import { FirebaseContext } from "Components/Firebase"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { uniqueNamesGenerator, animals } from "unique-names-generator"
-// import { _newContactRequest } from "firebaseHttpCallableFunctionsTests"
 
 type Props = {
   contactName: string
@@ -16,8 +15,6 @@ const useSendContactRequest = ({ contactName, contactUid }: Props) => {
 
   const sendContactRequest = async () => {
     if (contactRequestLoading) return
-    // const timeStampData = firebase.timeStamp()
-
     try {
       setContactRequestLoading(true)
       const randomUserName = uniqueNamesGenerator({
@@ -30,11 +27,6 @@ const useSendContactRequest = ({ contactName, contactUid }: Props) => {
         contactName: contactName || randomUserName,
         authUserName: authUser?.username
       })
-      // await _newContactRequest({
-      //   data: { contactUid, contactName: contactName || randomUserName, timeStamp: timeStampData },
-      //   context: { authUser: authUser! },
-      //   database: firebase.database()
-      // })
     } catch (error) {
       errors.handleError({
         errorData: error,

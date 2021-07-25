@@ -17,7 +17,6 @@ const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGr
   const removeMessagesDebounce = useCallback(
     debounce((removedMessages: any) => {
       contactsDispatch({ type: "removeMessages", payload: { removedMessages, chatKey } })
-      console.log(chatKey)
       messagesToDelete.current = []
     }, 0),
     [chatKey]

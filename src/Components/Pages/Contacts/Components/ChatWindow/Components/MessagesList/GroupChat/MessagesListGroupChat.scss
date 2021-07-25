@@ -4,8 +4,6 @@ $avatarBgColors: #42a4f5a1, #26a699a1, #ffa927a9, #ef5350a1, #c461d6a6, #e4c252a
 $avatarDimm: 36px;
 
 .chat-window__messages-list-container.chat-window__messages-list-container--group-chat {
-  // padding: 10px 50px 10px 50px;
-
   @include mediaMaxW(#{$mobileViewPort}) {
     padding: 10px;
   }
@@ -16,13 +14,6 @@ $avatarDimm: 36px;
     width: 100%;
 
     &-wrapper {
-      // @for $i from 1 through 75 {
-      //   &:nth-child(n + #{$i}) {
-      //     .chat-window__message-avatar {
-      //       background-color: nth($avatarBgColors, random(6));
-      //     }
-      //   }
-      // }
       .chat-window__message-avatar {
         display: flex;
         justify-content: center;
@@ -48,10 +39,6 @@ $avatarDimm: 36px;
 
     &-timestamp {
       margin-top: auto;
-    }
-
-    &-options {
-      // margin-top: auto;
     }
 
     &-username {

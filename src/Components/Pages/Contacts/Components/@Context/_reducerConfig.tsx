@@ -279,7 +279,6 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
       const newTopMessagesKeys = action.payload.newTopMessages.map((item) => item.key)
       const messagesaDataKeys = messages[activeChat.chatKey].map((item) => item.key)
       if (messagesaDataKeys.some((key) => newTopMessagesKeys.includes(key))) {
-        console.log("loadTopMessages allready messages")
         return { ...state }
       }
       return {
@@ -326,7 +325,6 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
       const renderedMessages = renderedMessagesList[activeChat.chatKey]
 
       if (messagesData[messagesData.length - 1].key === renderedMessages[renderedMessages.length - 1].key) {
-        console.log("last msgs equal Reducer")
         return { ...state }
       }
 
@@ -807,16 +805,6 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
           chatKey: action.payload.newGroupChatKey,
           contactKey: action.payload.newGroupChatKey
         },
-        // contacts: {
-        //   ...contacts,
-        //   [action.payload.newGroupChatKey]: {
-        //     chatKey: action.payload.newGroupChatKey,
-        //     key: action.payload.newGroupChatKey,
-        //    isGroupChat: true,
-        //     groupName: action.payload.groupName,
-        //     role: "ADMIN"
-        //   } as ContactInfoInterface
-        // },
         groupInfoSettingsActive: false
       }
     }
