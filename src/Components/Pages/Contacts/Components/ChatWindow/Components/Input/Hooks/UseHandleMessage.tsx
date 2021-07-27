@@ -62,7 +62,7 @@ const useHandleMessage = ({ contactLastActivity }: { contactLastActivity: { time
         )
         let updateData: any = {}
         membersLastActivity.forEach((member) => {
-          if (member.lastActivityContact !== activeChat.chatKey) {
+          if (member?.lastActivityContact !== activeChat.chatKey) {
             updateData[`users/${member.memberKey}/contactsDatabase/contactsLastActivity/${activeChat.chatKey}`] =
               timeStampEpoch
           }

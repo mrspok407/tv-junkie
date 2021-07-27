@@ -13,9 +13,13 @@ const useResizeObserver = ({ chatContainerRef, isScrollBottomRef, contactInfo }:
   const { activeChat } = contactsState
 
   const handleResize = useCallback(() => {
+    console.log("handleResize")
     if (!chatContainerRef) return
     const height = chatContainerRef.getBoundingClientRect().height
     const scrollHeight = chatContainerRef.scrollHeight
+
+    console.log({ scrollHeight })
+    console.log({ height })
 
     if (scrollHeight <= height) {
       isScrollBottomRef.current = true

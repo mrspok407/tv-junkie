@@ -115,6 +115,10 @@ const ChatWindow: React.FC = () => {
     debounceWithFlush(() => {
       if (!chatContainerRef) return
       const { scrollTop, scrollHeight, height } = getContainerRect()
+      console.log({ scrollHeight })
+      console.log({ scrollTopHeight: scrollTop + height })
+      console.log({ height })
+      console.log({ clientHeight: chatContainerRef.clientHeight })
       if (scrollHeight <= height) return
 
       const firstRenderedMessageIndex = messagesRef?.current.findIndex(
@@ -137,22 +141,37 @@ const ChatWindow: React.FC = () => {
         chatContainerRef.scrollTop = scrollHeight - height - 1
       }
 
-      if (scrollHeight <= scrollTop + height) {
+      if (scrollHeight - 25 <= scrollTop + height) {
+        console.log("bottom")
         isScrollBottomRef.current = true
         contactsDispatch({
           type: "updateAuthUserUnreadMessages",
           payload: { chatKey: activeChat.chatKey, unreadMessages: [], resetRenderedMessages: true }
         })
-        firebase
-          .unreadMessages({ uid: authUser?.uid!, chatKey: activeChat.chatKey, isGroupChat: contactInfo.isGroupChat })
-          .set(null)
-        firebase
-          .chatMemberStatus({
-            chatKey: activeChat.chatKey,
-            memberKey: authUser?.uid!,
-            isGroupChat: contactInfo.isGroupChat
-          })
-          .update({ chatBottom: true })
+        let updateData: any = {}
+        if (contactInfo.isGroupChat) {
+          updateData = {
+            [`groupChats/${activeChat.chatKey}/members/unreadMessages/${authUser?.uid!}`]: null,
+            [`groupChats/${activeChat.chatKey}/members/status/${authUser?.uid!}/chatBottom`]: true
+          }
+        } else {
+          updateData = {
+            [`privateChats/${activeChat.chatKey}/members/${authUser?.uid!}/unreadMessages`]: null,
+            [`privateChats/${activeChat.chatKey}/members/${authUser?.uid!}/status/chatBottom`]: true
+          }
+        }
+        firebase.database().ref().update(updateData)
+
+        // firebase
+        //   .unreadMessages({ uid: authUser?.uid!, chatKey: activeChat.chatKey, isGroupChat: contactInfo.isGroupChat })
+        //   .set(null)
+        // firebase
+        //   .chatMemberStatus({
+        //     chatKey: activeChat.chatKey,
+        //     memberKey: authUser?.uid!,
+        //     isGroupChat: contactInfo.isGroupChat
+        //   })
+        //   .update({ chatBottom: true })
       } else {
         isScrollBottomRef.current = false
         firebase
@@ -180,6 +199,12 @@ const ChatWindow: React.FC = () => {
         if (chatWindowLoading || !chatContainerRef) return
         const { height, scrollHeight, scrollTop, thresholdTopRender, thresholdTopLoad, thresholdBottomRender } =
           getContainerRect()
+
+        console.log("HANDLE SCROLL")
+        console.log({ scrollHeight })
+        console.log({ scrollTopHeight: scrollTop + height })
+        console.log({ height })
+        console.log({ clientHeight: chatContainerRef.clientHeight })
 
         if (scrollHeight <= height) return
         if (scrollTop < prevScrollTop || prevScrollTop === undefined) {
@@ -232,6 +257,8 @@ const ChatWindow: React.FC = () => {
     if (!isScrolledFirstRenderRef.current || !isScrollBottomRef.current || !pageInFocus) return
     if (chatWindowLoading && !contactInfo.isGroupChat) return
 
+    chatContainerRef.scrollTop = 99999
+
     contactsDispatch({
       type: "updateAuthUserUnreadMessages",
       payload: { chatKey: activeChat.chatKey, unreadMessages: [], rerenderUnreadMessagesStart: true }
@@ -240,7 +267,9 @@ const ChatWindow: React.FC = () => {
       .unreadMessages({ uid: authUser?.uid!, chatKey: activeChat.chatKey, isGroupChat: contactInfo.isGroupChat })
       .set(null)
 
-    chatContainerRef.scrollTop = getContainerRect().scrollHeight + getContainerRect().height
+    console.log("new Message when bottom useLayEff")
+
+    // chatContainerRef.scrollTop = getContainerRect().scrollHeight + getContainerRect().height
   }, [activeChat, renderedMessages, messagesData, chatContainerRef, chatWindowLoading])
 
   useLayoutEffect(() => {
