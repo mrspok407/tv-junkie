@@ -145,7 +145,6 @@ const MessageInput: React.FC<Props> = ({
       }
 
       const newMessageRef = document.querySelector(`.chat-window__message--${messageKey}`)
-      console.log({ newMessageRef })
       newMessageRef?.scrollIntoView({ block: "start", inline: "start" })
     } catch (error) {
       const timeStampEpoch = new Date().getTime()

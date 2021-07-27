@@ -115,10 +115,6 @@ const ChatWindow: React.FC = () => {
     debounceWithFlush(() => {
       if (!chatContainerRef) return
       const { scrollTop, scrollHeight, height } = getContainerRect()
-      console.log({ scrollHeight })
-      console.log({ scrollTopHeight: scrollTop + height })
-      console.log({ height })
-      console.log({ clientHeight: chatContainerRef.clientHeight })
       if (scrollHeight <= height) return
 
       const firstRenderedMessageIndex = messagesRef?.current.findIndex(
@@ -142,7 +138,6 @@ const ChatWindow: React.FC = () => {
       }
 
       if (scrollHeight - 25 <= scrollTop + height) {
-        console.log("bottom")
         isScrollBottomRef.current = true
         contactsDispatch({
           type: "updateAuthUserUnreadMessages",
@@ -161,17 +156,6 @@ const ChatWindow: React.FC = () => {
           }
         }
         firebase.database().ref().update(updateData)
-
-        // firebase
-        //   .unreadMessages({ uid: authUser?.uid!, chatKey: activeChat.chatKey, isGroupChat: contactInfo.isGroupChat })
-        //   .set(null)
-        // firebase
-        //   .chatMemberStatus({
-        //     chatKey: activeChat.chatKey,
-        //     memberKey: authUser?.uid!,
-        //     isGroupChat: contactInfo.isGroupChat
-        //   })
-        //   .update({ chatBottom: true })
       } else {
         isScrollBottomRef.current = false
         firebase
@@ -199,12 +183,6 @@ const ChatWindow: React.FC = () => {
         if (chatWindowLoading || !chatContainerRef) return
         const { height, scrollHeight, scrollTop, thresholdTopRender, thresholdTopLoad, thresholdBottomRender } =
           getContainerRect()
-
-        console.log("HANDLE SCROLL")
-        console.log({ scrollHeight })
-        console.log({ scrollTopHeight: scrollTop + height })
-        console.log({ height })
-        console.log({ clientHeight: chatContainerRef.clientHeight })
 
         if (scrollHeight <= height) return
         if (scrollTop < prevScrollTop || prevScrollTop === undefined) {
@@ -266,10 +244,6 @@ const ChatWindow: React.FC = () => {
     firebase
       .unreadMessages({ uid: authUser?.uid!, chatKey: activeChat.chatKey, isGroupChat: contactInfo.isGroupChat })
       .set(null)
-
-    console.log("new Message when bottom useLayEff")
-
-    // chatContainerRef.scrollTop = getContainerRect().scrollHeight + getContainerRect().height
   }, [activeChat, renderedMessages, messagesData, chatContainerRef, chatWindowLoading])
 
   useLayoutEffect(() => {
