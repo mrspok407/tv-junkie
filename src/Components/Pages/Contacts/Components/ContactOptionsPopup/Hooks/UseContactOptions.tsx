@@ -49,7 +49,7 @@ const useContactOptions = ({ contactInfo }: Props) => {
       await firebase.database().ref().update(updateData)
       contactsDispatch({
         type: "updateAuthUserUnreadMessages",
-        payload: { chatKey: contactInfo?.chatKey!, unreadMessages: [] }
+        payload: { chatKey: contactInfo?.chatKey!, unreadMessages: [], markAsRead: true }
       })
     } catch (error) {
       errors.handleError({
