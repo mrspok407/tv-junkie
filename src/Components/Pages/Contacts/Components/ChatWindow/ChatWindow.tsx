@@ -43,7 +43,8 @@ const ChatWindow: React.FC = () => {
     authUserUnreadMessages,
     firebaseListeners,
     groupInfoSettingsActive,
-    rerenderUnreadMessagesStart
+    rerenderUnreadMessagesStart,
+    markAsRead
   } = contactsState
   const messagesData = messages[activeChat.chatKey]
   const renderedMessages = renderedMessagesList[activeChat.chatKey] || []
@@ -361,7 +362,7 @@ const ChatWindow: React.FC = () => {
 
   const firstUnreadMessage = useMemo(() => {
     return messagesData?.find((message) => message.key === unreadMessagesAuth[0])
-  }, [unreadMsgsListenerChatKey, rerenderUnreadMessagesStart, chatWindowLoading])
+  }, [unreadMsgsListenerChatKey, rerenderUnreadMessagesStart, chatWindowLoading, markAsRead])
 
   return (
     <div className="chat-window-container" onMouseEnter={onMouseEnter}>

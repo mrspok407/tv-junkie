@@ -27,6 +27,7 @@ export type ACTIONTYPES =
         unreadMessages: string[]
         rerenderUnreadMessagesStart?: boolean
         resetRenderedMessages?: boolean
+        markAsRead?: boolean
       }
     }
   | { type: "handleGoDown"; payload: { unreadMessages: string[] } }
@@ -137,7 +138,8 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
     initialMsgLoadedFinished,
     firebaseListeners,
     groupInfoSettingsActive,
-    rerenderUnreadMessagesStart
+    rerenderUnreadMessagesStart,
+    markAsRead
   } = state
 
   switch (action.type) {
@@ -185,7 +187,10 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
             ? messagesData.slice(-MESSAGES_TO_RENDER)
             : renderedMessagesList[action.payload.chatKey]
         },
-        rerenderUnreadMessagesStart: action.payload.rerenderUnreadMessagesStart ? uuidv4() : rerenderUnreadMessagesStart
+        rerenderUnreadMessagesStart: action.payload.rerenderUnreadMessagesStart
+          ? uuidv4()
+          : rerenderUnreadMessagesStart,
+        markAsRead: action.payload.markAsRead ? uuidv4() : markAsRead
       }
     }
 
@@ -812,7 +817,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
     case "updateGroupInfoSettings": {
       return {
         ...state,
-        groupInfoSettingsActive: !groupInfoSettingsActive
+        groupInfoSettingsActive: action.payload ? action.payload.isActive : !groupInfoSettingsActive
       }
     }
 
@@ -908,6 +913,7 @@ export const INITIAL_STATE = {
   messagesInput: {},
   renderedMessagesList: {},
   rerenderUnreadMessagesStart: "",
+  markAsRead: "",
   contacts: {},
   lastScrollPosition: {},
   messagePopup: "",
