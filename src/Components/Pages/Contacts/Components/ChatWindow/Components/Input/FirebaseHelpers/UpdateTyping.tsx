@@ -1,36 +1,23 @@
-import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
-import { ActiveChatInterface } from "Components/Pages/Contacts/@Types"
-import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
+import useFirebaseReferences from "Components/Pages/Contacts/Hooks/UseFirebaseReferences"
 
 let typingTimer: number | null = null
 const TIMEOUT = 1500
 export const updateTyping = async ({
-  activeChat,
-  authUser,
-  firebase,
   setTypingNull = null,
-  isGroupChat
+  firebaseRefs
 }: {
-  activeChat: ActiveChatInterface
-  authUser: AuthUserInterface | null
-  firebase: FirebaseInterface
   setTypingNull?: boolean | null
-  isGroupChat: boolean
+  firebaseRefs: ReturnType<typeof useFirebaseReferences>
 }) => {
   if (setTypingNull) {
-    firebase.chatMemberStatus({ chatKey: activeChat.chatKey, memberKey: authUser?.uid!, isGroupChat }).update({
-      isTyping: null
-    })
+    firebaseRefs.updateMemberStatus({ value: { isTyping: null } })
     return
   }
 
-  firebase.chatMemberStatus({ chatKey: activeChat.chatKey, memberKey: authUser?.uid!, isGroupChat }).update({
-    isTyping: true
-  })
+  firebaseRefs.updateMemberStatus({ value: { isTyping: true } })
   if (typingTimer) window.clearTimeout(typingTimer)
+
   typingTimer = window.setTimeout(() => {
-    firebase.chatMemberStatus({ chatKey: activeChat.chatKey, memberKey: authUser?.uid!, isGroupChat }).update({
-      isTyping: null
-    })
+    firebaseRefs.updateMemberStatus({ value: { isTyping: null } })
   }, TIMEOUT)
 }

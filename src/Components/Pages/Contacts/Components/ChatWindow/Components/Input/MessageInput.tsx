@@ -11,6 +11,7 @@ import useInputResizeObserver from "./Hooks/UseInputResizeObserver"
 import striptags from "striptags"
 import { textToUrl } from "Utils"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
+import useFirebaseReferences from "Components/Pages/Contacts/Hooks/UseFirebaseReferences"
 import "./MessageInput.scss"
 
 type Props = {
@@ -29,7 +30,8 @@ const MessageInput: React.FC<Props> = ({
   unreadMessagesAuthRef,
   contactLastActivity
 }) => {
-  const { firebase, authUser, errors, contactsState, contactsDispatch } = useFrequentVariables()
+  const { authUser, errors, contactsState, contactsDispatch } = useFrequentVariables()
+  const firebaseRefs = useFirebaseReferences()
   const { activeChat, messagesInput, messages, selectedMessages, contacts } = contactsState
   const contactInfo = contacts[activeChat.contactKey]
   const selectedMessagesData = selectedMessages[activeChat.chatKey]
@@ -204,10 +206,10 @@ const MessageInput: React.FC<Props> = ({
     if (["", "\n"].includes(textContent)) {
       e.currentTarget.innerHTML = ""
       updateInputDeb({ message: "", anchorOffset: 0, scrollTop: 0, editingMsgKey: null })
-      updateTyping({ activeChat, authUser, firebase, setTypingNull: true, isGroupChat: contactInfo?.isGroupChat })
+      updateTyping({ setTypingNull: true, firebaseRefs })
     } else {
       updateInputDeb({ message: innerHTML, anchorOffset, scrollTop })
-      updateTyping({ activeChat, authUser, firebase, isGroupChat: contactInfo?.isGroupChat })
+      updateTyping({ firebaseRefs })
     }
   }
 

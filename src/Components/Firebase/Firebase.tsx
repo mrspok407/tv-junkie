@@ -16,19 +16,19 @@ const configProduction = {
   appId: process.env.REACT_APP_APP_ID
 }
 
-// const configDevelopment = {
-//   apiKey: process.env.REACT_APP_DEV_FIREBASE_API_KEY,
-//   authDomain: process.env.REACT_APP_DEV_AUTH_DOMAIN,
-//   databaseURL: process.env.REACT_APP_DEV_DATABASE_URL,
-//   projectId: process.env.REACT_APP_DEV_PROJECT_ID,
-//   storageBucket: process.env.REACT_APP_DEV_STORAGE_BUCKET,
-//   messagingSenderId: process.env.REACT_APP_DEV_MESSAGING_SENDER_ID,
-//   measurementId: process.env.REACT_APP_DEV_MEASUREMENT_ID,
-//   appId: process.env.REACT_APP_DEV_APP_ID
-// }
+const configDevelopment = {
+  apiKey: process.env.REACT_APP_DEV_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_DEV_AUTH_DOMAIN,
+  databaseURL: process.env.REACT_APP_DEV_DATABASE_URL,
+  projectId: process.env.REACT_APP_DEV_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_DEV_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_DEV_MESSAGING_SENDER_ID,
+  measurementId: process.env.REACT_APP_DEV_MEASUREMENT_ID,
+  appId: process.env.REACT_APP_DEV_APP_ID
+}
 
-// let config: any = process.env.NODE_ENV === "production" ? configProduction : configDevelopment
-let config: any = configProduction
+let config: any = process.env.NODE_ENV === "production" ? configProduction : configDevelopment
+// let config: any = configProduction
 
 if (window.location.hostname === "localhost") {
   config = {
@@ -68,7 +68,7 @@ class Firebase {
     this.app = app
 
     if (window.location.hostname === "localhost") {
-      // app.functions().useEmulator("localhost", 4000)
+      app.functions().useEmulator("localhost", 4000)
     }
   }
 
