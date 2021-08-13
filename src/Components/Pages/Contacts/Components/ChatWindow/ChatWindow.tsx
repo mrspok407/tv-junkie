@@ -21,6 +21,7 @@ import GroupInfoSettings from "../GroupChat/GroupInfoSettings/GroupInfoSettings"
 import NewRequestOptions from "./Components/NewRequestOptions/NewRequestOptions"
 import InfoMessage from "./Components/MessagesList/GroupChat/Components/NewMembersMessages/InfoMessage"
 import * as Bowser from "bowser"
+import useFirebaseReferences from "../../Hooks/UseFirebaseReferences"
 import "./ChatWindow.scss"
 
 const browser = Bowser.getParser(window.navigator.userAgent)
@@ -33,6 +34,7 @@ const throttleDebounceMap: any = {
 
 const ChatWindow: React.FC = () => {
   const { firebase, authUser, contactsState, contactsDispatch } = useFrequentVariables()
+  const firebaseRefs = useFirebaseReferences()
   const {
     activeChat,
     messages,
@@ -80,7 +82,7 @@ const ChatWindow: React.FC = () => {
     pageInFocus,
     chatWindowLoading
   })
-  useResizeObserver({ chatContainerRef: chatContainerRef, isScrollBottomRef, contactInfo })
+  useResizeObserver({ chatContainerRef, isScrollBottomRef })
   useFirstRenderMessages({
     messages: messagesData,
     renderedMessages: renderedMessages,
@@ -144,6 +146,7 @@ const ChatWindow: React.FC = () => {
           type: "updateAuthUserUnreadMessages",
           payload: { chatKey: activeChat.chatKey, unreadMessages: [], resetRenderedMessages: true }
         })
+
         let updateData: any = {}
         if (contactInfo.isGroupChat) {
           updateData = {
@@ -159,13 +162,7 @@ const ChatWindow: React.FC = () => {
         firebase.database().ref().update(updateData)
       } else {
         isScrollBottomRef.current = false
-        firebase
-          .chatMemberStatus({
-            chatKey: activeChat.chatKey,
-            memberKey: authUser?.uid!,
-            isGroupChat: contactInfo.isGroupChat
-          })
-          .update({ chatBottom: false })
+        firebaseRefs.updateMemberStatus({ value: { chatBottom: false } })
       }
 
       contactsDispatch({
@@ -278,13 +275,7 @@ const ChatWindow: React.FC = () => {
       if (isScrollBottom) {
         chatContainerRef.scrollTop = getContainerRect().scrollHeight + getContainerRect().height
         isScrollBottomRef.current = true
-        firebase
-          .chatMemberStatus({
-            chatKey: activeChat.chatKey,
-            memberKey: authUser?.uid!,
-            isGroupChat: contactInfo.isGroupChat
-          })
-          .update({ chatBottom: true })
+        firebaseRefs.updateMemberStatus({ value: { chatBottom: true } })
       } else {
         chatContainerRef.scrollTop = lastScrollPosition[activeChat.chatKey]!
       }
@@ -306,13 +297,7 @@ const ChatWindow: React.FC = () => {
     const { scrollHeight, height } = getContainerRect()
     if (scrollHeight <= height) {
       isScrollBottomRef.current = true
-      firebase
-        .chatMemberStatus({
-          chatKey: activeChat.chatKey,
-          memberKey: authUser?.uid!,
-          isGroupChat: contactInfo.isGroupChat
-        })
-        .update({ chatBottom: true })
+      firebaseRefs.updateMemberStatus({ value: { chatBottom: true } })
     }
     return () => {
       isScrollBottomRef.current = false
@@ -338,21 +323,9 @@ const ChatWindow: React.FC = () => {
   }, [activeChat, chatContainerRef])
 
   useEffect(() => {
-    firebase
-      .chatMemberStatus({
-        chatKey: activeChat.chatKey,
-        memberKey: authUser?.uid!,
-        isGroupChat: contactInfo.isGroupChat
-      })
-      .update({ isOnline: true })
+    firebaseRefs.updateMemberStatus({ value: { isOnline: true } })
     return () => {
-      firebase
-        .chatMemberStatus({
-          chatKey: activeChat.chatKey,
-          memberKey: authUser?.uid!,
-          isGroupChat: contactInfo.isGroupChat
-        })
-        .update({ isOnline: null })
+      firebaseRefs.updateMemberStatus({ value: { isOnline: null } })
     }
   }, [activeChat])
 

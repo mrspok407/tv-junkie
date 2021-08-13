@@ -58,11 +58,11 @@ export interface MessageInterface {
 }
 
 export interface ContactStatusInterface {
-  isOnline: boolean
-  lastSeen: number | undefined
-  chatBottom: boolean | undefined
-  pageInFocus: boolean | undefined
-  isTyping: boolean | null
+  isOnline?: boolean | null
+  lastSeen?: number | undefined
+  chatBottom?: boolean | undefined
+  pageInFocus?: boolean | undefined
+  isTyping?: boolean | null
 }
 
 export interface MembersStatusGroupChatInterface {

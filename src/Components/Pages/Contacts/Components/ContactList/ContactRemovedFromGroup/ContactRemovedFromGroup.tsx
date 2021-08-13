@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from "react"
 import { ContactInfoInterface } from "../../../@Types"
 import ContactOptionsPopup from "../../ContactOptionsPopup/ContactOptionsPopup"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
+import useFirebaseReferences from "Components/Pages/Contacts/Hooks/UseFirebaseReferences"
 import "../Contact/Contact.scss"
 
 type Props = {
@@ -12,6 +13,7 @@ type Props = {
 
 const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
   const { firebase, authUser, contactsState, contactsDispatch } = useFrequentVariables()
+  const firebaseRefs = useFirebaseReferences()
   const { optionsPopupContactList, activeChat } = contactsState
 
   const contactOptionsRef = useRef<HTMLDivElement>(null!)
@@ -31,14 +33,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
       .child(`${contactInfo.key}`)
       .on("value", (snapshot: any) => setNewActivity(snapshot.val()))
 
-    firebase
-      .chatMemberStatus({
-        chatKey: activeChat.chatKey,
-        memberKey: authUser?.uid!,
-        isGroupChat: true
-      })
-      .set(null)
-
+    firebaseRefs.setMemberStatus({ value: null, isGroupChat: true })
     return () => {
       firebase.newContactsActivity({ uid: authUser?.uid }).child(`${contactInfo.key}`).off()
     }

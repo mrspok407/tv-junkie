@@ -1,4 +1,5 @@
 import { ContactInfoInterface } from "Components/Pages/Contacts/@Types"
+import useFirebaseReferences from "Components/Pages/Contacts/Hooks/UseFirebaseReferences"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
 import { useState, useEffect, useCallback, useRef } from "react"
 
@@ -9,18 +10,13 @@ type Props = {
 
 const usePageFocusHandler = ({ activeChat, contactInfo }: Props) => {
   const { authUser, firebase } = useFrequentVariables()
+  const firebaseRefs = useFirebaseReferences()
   const [pageInFocus, setPageInFocus] = useState(true)
   const focusInterval = useRef<number | null>(null)
 
   const focusHandler = useCallback(() => {
     focusInterval.current = window.setInterval(() => {
-      firebase
-        .chatMemberStatus({
-          chatKey: activeChat.chatKey,
-          memberKey: authUser?.uid!,
-          isGroupChat: contactInfo.isGroupChat
-        })
-        .update({ pageInFocus: document.hasFocus() })
+      firebaseRefs.updateMemberStatus({ value: { pageInFocus: document.hasFocus() } })
       setPageInFocus(document.hasFocus())
     }, 250)
   }, [activeChat, firebase, authUser]) // eslint-disable-line react-hooks/exhaustive-deps

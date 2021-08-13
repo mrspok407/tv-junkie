@@ -1,15 +1,15 @@
-import { ContactInfoInterface } from "Components/Pages/Contacts/@Types"
+import useFirebaseReferences from "Components/Pages/Contacts/Hooks/UseFirebaseReferences"
 import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
 import { useLayoutEffect, useCallback } from "react"
 
 type Props = {
   chatContainerRef: HTMLDivElement
   isScrollBottomRef: React.MutableRefObject<boolean>
-  contactInfo: ContactInfoInterface
 }
 
-const useResizeObserver = ({ chatContainerRef, isScrollBottomRef, contactInfo }: Props) => {
-  const { firebase, authUser, contactsState } = useFrequentVariables()
+const useResizeObserver = ({ chatContainerRef, isScrollBottomRef }: Props) => {
+  const { contactsState } = useFrequentVariables()
+  const firebaseRefs = useFirebaseReferences()
   const { activeChat } = contactsState
 
   const handleResize = useCallback(() => {
@@ -19,13 +19,7 @@ const useResizeObserver = ({ chatContainerRef, isScrollBottomRef, contactInfo }:
 
     if (scrollHeight <= height) {
       isScrollBottomRef.current = true
-      firebase
-        .chatMemberStatus({
-          chatKey: activeChat.chatKey,
-          memberKey: authUser?.uid!,
-          isGroupChat: contactInfo.isGroupChat
-        })
-        .update({ chatBottom: true })
+      firebaseRefs.updateMemberStatus({ value: { chatBottom: true } })
     }
   }, [chatContainerRef, activeChat]) // eslint-disable-line react-hooks/exhaustive-deps
 
