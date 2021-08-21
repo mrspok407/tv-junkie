@@ -148,6 +148,7 @@ export interface ContactsStateInterface {
     [key: string]: string[]
   }
   rerenderUnreadMessagesStart: string
+  markAsRead: string
   messagesListRef: any
   messagePopup: string
   optionsPopupContactList: string

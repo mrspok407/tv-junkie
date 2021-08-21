@@ -49,6 +49,14 @@ const useHandleMessage = ({ contactLastActivity }: { contactLastActivity: { time
               .orderByValue()
               .limitToLast(1)
               .once("value")
+
+            if (lastActivityContactSnapshot.val() === null) {
+              return {
+                memberKey: member.key,
+                lastActivityContact: null
+              }
+            }
+
             let lastActivityMember: { timeStamp: number; memberKey: string; lastActivityContact: string }[] = []
             lastActivityContactSnapshot.forEach((snapshot: { val: () => number; key: string }) => {
               lastActivityMember.push({
@@ -60,9 +68,10 @@ const useHandleMessage = ({ contactLastActivity }: { contactLastActivity: { time
             return lastActivityMember[0]
           })
         )
+
         let updateData: any = {}
         membersLastActivity.forEach((member) => {
-          if (member.lastActivityContact !== activeChat.chatKey) {
+          if (member?.lastActivityContact !== activeChat.chatKey) {
             updateData[`users/${member.memberKey}/contactsDatabase/contactsLastActivity/${activeChat.chatKey}`] =
               timeStampEpoch
           }

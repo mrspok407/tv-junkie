@@ -1,6 +1,5 @@
 import React, { Component } from "react"
 import { Helmet } from "react-helmet"
-import * as _get from "lodash.get"
 import axios from "axios"
 import SignOutButton from "Components/UserAuth/SignOut/SignOutButton"
 import WithAuthorization from "Components/UserAuth/Session/WithAuthorization/WithAuthorization"
@@ -333,17 +332,17 @@ class Profile extends Component {
             )}
           </div>
           <PasswordUpdate />
-          {_get(this.state.authUser, "email", "") === process.env.REACT_APP_TEST_EMAIL ||
-            _get(this.state.authUser, "email", "") === process.env.REACT_APP_ADMIN_EMAIL ||
-            (_get(this.state.authUser, "email", "") === "test2@test.com" && (
-              <>
-                <div className="update-database">
-                  <button onClick={() => this.databaseModify()} className="button button--profile" type="button">
-                    Update Database
-                  </button>
-                </div>
-              </>
-            ))}
+          {[process.env.REACT_APP_TEST_EMAIL, process.env.REACT_APP_ADMIN_EMAIL].includes(
+            this.state.authUser?.email
+          ) && (
+            <>
+              <div className="update-database">
+                <button onClick={() => this.databaseModify()} className="button button--profile" type="button">
+                  Update Database
+                </button>
+              </div>
+            </>
+          )}
           <div className="user-settings__copy-user-link">
             <div
               className={classNames("button", {
@@ -376,7 +375,7 @@ class Profile extends Component {
               )}
             </div>
           </div>
-          {["testchat@gmail.com", "test2@test.com"].includes(this.state.authUser?.email) && (
+          {["testchat@gmail.com", process.env.REACT_APP_ADMIN_EMAIL].includes(this.state.authUser?.email) && (
             <>
               <button className="button" onClick={() => this.addMessagesToGroupChats()}>
                 Messages to group chats
