@@ -19,6 +19,13 @@ const SignInWithGoogleForm = () => {
     setWindowSize(window.innerWidth)
   }, [])
 
+  const clearLocalStorage = () => {
+    localStorage.removeItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)
+    localStorage.removeItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)
+
+    context.userContentLocalStorage.clearContentState()
+  }
+
   const onSubmit = (provider: any) => {
     const signInType = windowSize < mobileLayout ? "signInWithRedirect" : "signInWithPopup"
 
@@ -60,10 +67,11 @@ const SignInWithGoogleForm = () => {
             })
           })
           .then(() => {
-            localStorage.removeItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)
-            localStorage.removeItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)
-
-            context.userContentLocalStorage.clearContentState()
+            clearLocalStorage()
+          })
+          .catch(() => {
+            clearLocalStorage()
+            context.userContentHandler.handleLoadingShowsOnRegister(false)
           })
       })
       .then(() => {

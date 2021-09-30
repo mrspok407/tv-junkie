@@ -35,19 +35,12 @@ const useGoogleRedirect = () => {
 
         firebase
           .user(authUserGoogle.user.uid)
-          .update(
-            {
-              username: authUserGoogle.user.displayName,
-              userNameLowerCase: authUserGoogle.user.displayName.toLowerCase(),
-              email: authUserGoogle.user.email,
-              role: authUserGoogle.user.email === process.env.REACT_APP_ADMIN_EMAIL ? ROLES.ADMIN : ROLES.USER
-            },
-            (err: any) => {
-              console.log({ errUpdateCallback: err })
-              clearLocalStorage()
-              context.userContentHandler.handleLoadingShowsOnRegister(false)
-            }
-          )
+          .update({
+            username: authUserGoogle.user.displayName,
+            userNameLowerCase: authUserGoogle.user.displayName.toLowerCase(),
+            email: authUserGoogle.user.email,
+            role: authUserGoogle.user.email === process.env.REACT_APP_ADMIN_EMAIL ? ROLES.ADMIN : ROLES.USER
+          })
           .then(() => {
             if (!authUserGoogle.additionalUserInfo.isNewUser) {
               context.userContentHandler.handleLoadingShowsOnRegister(false)
@@ -78,7 +71,6 @@ const useGoogleRedirect = () => {
             history.push(ROUTES.HOME_PAGE)
           })
           .catch(() => {
-            console.log("catch")
             clearLocalStorage()
             context.userContentHandler.handleLoadingShowsOnRegister(false)
           })
