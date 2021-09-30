@@ -13,6 +13,13 @@ const useGoogleRedirect = () => {
   const firebase = useContext(FirebaseContext)
   const history = useHistory()
 
+  const clearLocalStorage = () => {
+    localStorage.removeItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)
+    localStorage.removeItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)
+
+    context.userContentLocalStorage.clearContentState()
+  }
+
   useEffect(() => {
     context.userContentHandler.handleLoadingShowsOnRegister(true)
     firebase.app
@@ -58,13 +65,14 @@ const useGoogleRedirect = () => {
             })
           })
           .then(() => {
-            localStorage.removeItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)
-            localStorage.removeItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)
-
-            context.userContentLocalStorage.clearContentState()
+            clearLocalStorage()
           })
           .then(() => {
             history.push(ROUTES.HOME_PAGE)
+          })
+          .catch(() => {
+            clearLocalStorage()
+            context.userContentHandler.handleLoadingShowsOnRegister(false)
           })
       })
       .catch((error: any) => {
