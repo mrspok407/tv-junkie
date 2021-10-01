@@ -1,6 +1,6 @@
 # Tv-Junkie
 
-[English version](https://github.com/mrspok407/tv-junkie#App-for-tracking-shows)
+[English version](#English-version)
 
 ### Приложение для трэкинга сериалов
 
@@ -9,13 +9,13 @@
 ## Демо
 
 - https://www.tv-junkie.com - сайт.
-- https://youtu.be/eVpnWltTYf0 - короткая презентация функциональности с аудио комментариями
-- url - отдельная презентация функционалности друзей и чата
+- https://www.youtube.com/watch?v=euGWPi97aeg - короткий обзор функциональности с аудио комментариями
+- https://www.youtube.com/watch?v=ZsQKTjKIewI - отдельный обзор функционалности [друзей и чата](#Чат)
 
 ## Содержание
 
 - [Функционал](#Функционал)
-- [Основные технологии](#Основные технологии)
+- [Основные технологии](#Основные-технологии)
 - [Фронтэнд](#Фронтэнд)
 - [Бэкэнд](#Бэкэнд)
 - [Хостинг](#Хостинг)
@@ -41,7 +41,7 @@
 - SCSS
 - AWS Amplify хостинг
 
-## Frontend
+## Фронтэнд
 
 - React c React Router.
 - Почти все компоненты функциональные с большим использованием собственных хуков. Полностью рефакторено с классовых.
@@ -92,7 +92,7 @@ url - video presentation of functionality
 - Стэйт менеджмент достаточно сложный. Из-за динамического характера чат приложения, где стейт постоянно меняется и очень часто зависит от другого стейта. Несколько WebSocket соединений от Firebase открыты одновременно в колбэке которых асинхронно могут меняться разные части стэйта. React Context с useReducer использован для всего чат приложения.
 - В некоторых местах useRef'ы использованы в WS соединениях вместо стейта для оптимизации. Например для изменения непрочитанных сообщений при скролле данные с базы идут в ref, чтобы избежать большого кол-ва ререндеров. Глобальный стейт непрочитанных сообщений изменяется другими путями.
 - IntersectionObserver использован для определения, когда непрочитанное сообщение появляется в поле зрения.
-- Бесконечная прокрутка сообщений как вверх так и вниз. Показывается только ограниченное количество сообщений, как и происходит постепенная загрузка новых.
+- Бесконечная прокрутка сообщений как вверх так и вниз. Показывается только ограниченное количество сообщений, как и происходит постепенная загрузка новых. Реализовано с помощью правильного изменения диапазонов индексов в общем массиве сообщений.
 - Большое количество собственных хуков использовано по всему приложению для повторного использования функциональности и композиции в общем и целом.
 - useLayoutEffect хук особенно полезен для ререндеров, когда позиция скролла должна измениться, чтобы избежать "прыжка" окна. Необходимые вычисления будут произведены до ререндера.
 - Окно ввода сообщений сделано с contenteditable атрибутом и всё, что касается редактирования (переход на след. строку с shift+enter (не enter), выделение текста, удаление текста, позиция курсора и т.д.) закодено с нуля. Настройки по умолчанию при contenteditable не подходили к тому, что мне было необходимо.
@@ -109,8 +109,12 @@ url - video presentation of functionality
 
 ---
 
-Не пытайтесь запустить сайт локально. Файл с переменными окружения не загружен на Github.
+Не пытайтесь запустить сайт локально. Файл с переменными окружения не загружен на Github.\
+Пожалуйста обращайте внимание на дату последних крупных изменений в конкретном файле исходного кода. Так как там возможно требуется рефакторинг и этот старый код может не отражать корректно мой текущий уровень.
+
 Спасибо за чтение.
+
+## English version
 
 ### App for tracking shows
 
@@ -119,8 +123,8 @@ A personal pet project/portfolio created with React and Firebase.
 ## Demo
 
 - https://www.tv-junkie.com - live website.
-- https://youtu.be/eVpnWltTYf0 - a short video presentation with an audio commentary of the functionality of the app.
-- url - chat functionality
+- https://www.youtube.com/watch?v=jQvER-qlpCY - a short video review with an audio commentary of the functionality of the app.
+- https://www.youtube.com/watch?v=JrseNlKRhZo - review of [chat functionality](#Chat)
 
 ## Table of Contents
 
@@ -201,9 +205,9 @@ url - video presentation of functionality
 #### Frontend
 
 - The state management is very complex. Because of the dynamic nature of the real-time chat application, where the state is constantly changing and frequently depending on each other. Several WebSocket connections from Firebase are open simultaneously and all could change state asynchronously. So React Context with useReducer is used for state management of the whole chat application.
-- In some parts useRef's are used in WS connections instead of state for optimization purposes. For example for changing unread messages when scrolling the data from the server goes to ref to avoid rerenders. The global state of unread messages updates in different ways. In a conversation, I can explain in detail what's going on and why.
+- In some parts useRef's are used in WS connections instead of state for optimization purposes. For example for changing unread messages when scrolling the data from the server goes to ref to avoid rerenders. The global state of unread messages updates in different ways.
 - IntersectionObserver is used for detecting unread messages.
-- Infinite scrolling is implemented in both directions, up and down. Showing only a handful of messages for efficiency.
+- Infinite scrolling is implemented in both directions, up and down. Showing only a handful of messages for efficiency. Implemented by properly changing the range of indexes in the message array.
 - A lot of custom hooks are used throughout the application for functionality reusability and overall composition structure.
 - useLayoutEffect is particularly useful for rerenders when scroll position would change to avoid the "jump" of the scroll. It would do necessary calculations before rerendering dom elements.
 - Message input made with contenteditable attribute and everything related to editing messaging (go to next line with shift + enter (not enter), select text, delete text, the position of the insertion point, etc) is coded from the ground up. Because default settings of all this behavior are not suitable as I need.
@@ -215,11 +219,12 @@ url - video presentation of functionality
 
 #### Backend
 
-- Denormalization is used in many cases for efficient read operations in NoSQL-like databases.
+- Denormalization is used in many cases for efficient read operations in NoSQL-like databases (like Firebase).
 - A lot of functionality moved to Firebase Cloud Functions, which are run on the server: creating group, adding friends, last activity updates, etc. It makes the frontend much simpler. And overall automate a lot of things. Bear in mind there is a thing called "cold start" with these functions, which means the first invocation after some time would be slow. In a real production application, it shouldn't be a problem, cause these functions would run frequently.
 
 ---
 
-Please don't try to run the app locally. The file with environmental variables is not uploaded to Github.
+Don't try to run the app locally. The file with environmental variables is not uploaded to Github.\
+Please keep in mind the date of the last significant changes in the source files. Since there may be a need for refactoring and this old code may not reflect my current level truthfully.
 
 Thank you for reading.
