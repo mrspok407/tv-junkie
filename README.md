@@ -84,8 +84,7 @@ Done
 
 ## Чат
 
-Полноценный функционал друзей и сообщений в форме чата. Приватные чаты один на один и групповые чат комнаты. Быстрый, масштабируемый с богатыми UI возможностями.
-url - video presentation of functionality
+Полноценный функционал друзей и сообщений в форме чата. Приватные чаты один на один и групповые чат комнаты. Быстрый, масштабируемый с богатыми UI возможностями. [Обзор функциональности](#https://www.youtube.com/watch?v=ZsQKTjKIewI)
 
 #### Фронтэнд
 
@@ -199,8 +198,7 @@ Done
 
 ## Chat
 
-Full-fledged friends functionality and messaging in a chat form. Both private and group chat rooms. Fast, scalable, with rich UI capabilities.
-url - video presentation of functionality
+Full-fledged friends functionality and messaging in a chat form. Both private and group chat rooms. Fast, scalable, with rich UI capabilities. [Review of functionality](#https://www.youtube.com/watch?v=JrseNlKRhZo)
 
 #### Frontend
 
