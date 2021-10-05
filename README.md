@@ -2,6 +2,7 @@
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 [English version](https://github.com/mrspok407/tv-junkie#App-for-tracking-shows)
 
 ### Приложение для трэкинга сериалов
@@ -15,18 +16,24 @@
 
 ### Приложение для трэкинга сериалов
 >>>>>>> 8494a19... Readme russian + chat v1.0
+=======
+[English version](#English-version)
+
+### Приложение для трэкинга сериалов
+>>>>>>> cfa8df5d041495bdae3285d42054112f4d18d9a8
 
 Персональный проект/портфолио, создано с помощью React и Firebase.
 
 ## Демо
 
 - https://www.tv-junkie.com - сайт.
-- https://youtu.be/eVpnWltTYf0 - короткая презентация функциональности с аудио комментариями
-- url - отдельная презентация функционалности друзей и чата
+- https://www.youtube.com/watch?v=euGWPi97aeg - короткий обзор функциональности с аудио комментариями
+- https://www.youtube.com/watch?v=ZsQKTjKIewI - отдельный обзор функционалности [друзей и чата](#Чат)
 
 ## Содержание
 
 - [Функционал](#Функционал)
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 - [Основные технологии](#Основные технологии)
@@ -56,6 +63,15 @@
 - [Сложный функционал](#Сложный-функционал)
 - [Чат](#Чат)
 >>>>>>> 8494a19... Readme russian + chat v1.0
+=======
+- [Основные технологии](#Основные-технологии)
+- [Фронтэнд](#Фронтэнд)
+- [Бэкэнд](#Бэкэнд)
+- [Хостинг](#Хостинг)
+- [Лёгкий для разработки функционал](#Лёгкий-для-разработки-функционал)
+- [Сложный функционал](#Сложный-функционал)
+- [Чат](#Чат)
+>>>>>>> cfa8df5d041495bdae3285d42054112f4d18d9a8
 
 ## Функционал
 
@@ -66,6 +82,7 @@
 - Поиск конкретных сериалов и фильмов или по параметрам
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 - Функционал друзей и система личных сообщений в виде полноценного чата один на один так и групповой чат. [Подробнее](#Чат)
 =======
 - Функционал друзей и система личных сообщений в виде полноценного чата как 1 на 1 так и групповой чат. [Подробнее](#друзья-и-чат)
@@ -73,6 +90,9 @@
 =======
 - Функционал друзей и система личных сообщений в виде полноценного чата один на один так и групповой чат. [Подробнее](#Чат)
 >>>>>>> 8494a19... Readme russian + chat v1.0
+=======
+- Функционал друзей и система личных сообщений в виде полноценного чата один на один так и групповой чат. [Подробнее](#Чат)
+>>>>>>> cfa8df5d041495bdae3285d42054112f4d18d9a8
 
 ## Основные технологии
 
@@ -83,10 +103,11 @@
 - SCSS
 - AWS Amplify хостинг
 
-## Frontend
+## Фронтэнд
 
 - React c React Router.
 - Почти все компоненты функциональные с большим использованием собственных хуков. Полностью рефакторено с классовых.
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 - React Context использован для стейт менеджмента. useReducer хук используется в местах где стейт достаточно сложный, например на странице Сериалов. В чате Context + useReducer используется как замена Redux. Там очень сложный, постоянно изменяющийся, зависящий друг от друга стейт. [Подробнее про чат](#Чат).
@@ -96,6 +117,9 @@
 =======
 - React Context использован для стейт менеджмента. useReducer хук используется в местах где стейт достаточно сложный, например на странице Сериалов. В чате Context + useReducer используется как замена Redux. Там очень сложный, постоянно изменяющийся, зависящий друг от друга стейт. [Подробнее про чат](#Чат).
 >>>>>>> 8494a19... Readme russian + chat v1.0
+=======
+- React Context использован для стейт менеджмента. useReducer хук используется в местах где стейт достаточно сложный, например на странице Сериалов. В чате Context + useReducer используется как замена Redux. Там очень сложный, постоянно изменяющийся, зависящий друг от друга стейт. [Подробнее про чат](#Чат).
+>>>>>>> cfa8df5d041495bdae3285d42054112f4d18d9a8
 - Почти вся код база на TypeScript. Полностью рефактарено с JavaScript.
 - Для оптимизации частых запросов к API, как в поиске или бесконечной прокрутке, используется debounce функция. Предотвращает лишние запросы на каждое нажатие клавиши или скроллинг. В функциональных компонентах debounce и подобные методы при ререндере будут совершенно новыми функциями. Важно оборачивать их в useCallback хук, чтобы они сохранялись между рендарами.
 - SCSS препроцессор для стилей.
@@ -103,6 +127,9 @@
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> cfa8df5d041495bdae3285d42054112f4d18d9a8
 ## Бэкэнд
 
 - Firebase и их Realtime Database для хранения данных.
@@ -140,6 +167,7 @@ Done
 url - video presentation of functionality
 
 #### Фронтэнд
+<<<<<<< HEAD
 
 - Стэйт менеджмент достаточно сложный. Из-за динамического характера чат приложения, где стейт постоянно меняется и очень часто зависит от другого стейта. Несколько WebSocket соединений от Firebase открыты одновременно в колбэке которых асинхронно могут меняться разные части стэйта. React Context с useReducer использован для всего чат приложения.
 - В некоторых местах useRef'ы использованы в WS соединениях вместо стейта для оптимизации. Например для изменения непрочитанных сообщений при скролле данные с базы идут в ref, чтобы избежать большого кол-ва ререндеров. Глобальный стейт непрочитанных сообщений изменяется другими путями.
@@ -156,11 +184,30 @@ url - video presentation of functionality
 
 #### Бэкэнд
 
+=======
+
+- Стэйт менеджмент достаточно сложный. Из-за динамического характера чат приложения, где стейт постоянно меняется и очень часто зависит от другого стейта. Несколько WebSocket соединений от Firebase открыты одновременно в колбэке которых асинхронно могут меняться разные части стэйта. React Context с useReducer использован для всего чат приложения.
+- В некоторых местах useRef'ы использованы в WS соединениях вместо стейта для оптимизации. Например для изменения непрочитанных сообщений при скролле данные с базы идут в ref, чтобы избежать большого кол-ва ререндеров. Глобальный стейт непрочитанных сообщений изменяется другими путями.
+- IntersectionObserver использован для определения, когда непрочитанное сообщение появляется в поле зрения.
+- Бесконечная прокрутка сообщений как вверх так и вниз. Показывается только ограниченное количество сообщений, как и происходит постепенная загрузка новых. Реализовано с помощью правильного изменения диапазонов индексов в общем массиве сообщений.
+- Большое количество собственных хуков использовано по всему приложению для повторного использования функциональности и композиции в общем и целом.
+- useLayoutEffect хук особенно полезен для ререндеров, когда позиция скролла должна измениться, чтобы избежать "прыжка" окна. Необходимые вычисления будут произведены до ререндера.
+- Окно ввода сообщений сделано с contenteditable атрибутом и всё, что касается редактирования (переход на след. строку с shift+enter (не enter), выделение текста, удаление текста, позиция курсора и т.д.) закодено с нуля. Настройки по умолчанию при contenteditable не подходили к тому, что мне было необходимо.
+- Модал окна при удаление сообщений или друзей легко настраиваются и подойдут под любой компонент.
+- Собственный хук использован для ошибок от базы данных, который покажет всплывашку с ошибкой.
+- Для операций записи в базу данных соблюдён баланс между фронтэндом и облачными функциями бэкэнда (см. ниже). Так что воспринимаемая скорость интерфейса будет достаточно высока там, где это важно и более медленна, где не столь заметна (там использованы облачные функции).
+- Операции записи в разные места базы данных делаются с помощью одного запроса, чтобы избежать "race conditions" и других проблем.
+- Много всего другого.
+
+#### Бэкэнд
+
+>>>>>>> cfa8df5d041495bdae3285d42054112f4d18d9a8
 - Денормализация использована во многих местах для более эффективных операций чтения в NoSQL баз данных (таких как Firebase).
 - Много функций вынесены в облачные функции Firebase'а, которые запускаются на сервере: создание групп, добавление друзей, последняя активность и другие. Это снимает с фронтэнда большую ношу и в общем и целом автоматизирует много вещей. В облачных функциях Firebase'а есть "холодный старт" функции это означает, что если ее долго не использовали первый старт будет медленный. Это не должно быть проблемой в продакшане, т.к. там эти функции будут запускаться достаточно часто.
 
 ---
 
+<<<<<<< HEAD
 Не пытайтесь запустить сайт локально. Файл с переменными окружения не загружен на Github.
 Спасибо за чтение.
 =======
@@ -227,6 +274,14 @@ url - video presentation of functionality
 
 Не пытайтесь запустить сайт локально. Файл с переменными окружения не загружен на Github.
 Спасибо за чтение.
+=======
+Не пытайтесь запустить сайт локально. Файл с переменными окружения не загружен на Github.\
+Пожалуйста обращайте внимание на дату последних крупных изменений в конкретном файле исходного кода. Так как там возможно требуется рефакторинг и этот старый код может не отражать корректно мой текущий уровень.
+
+Спасибо за чтение.
+
+## English version
+>>>>>>> cfa8df5d041495bdae3285d42054112f4d18d9a8
 
 ### App for tracking shows
 
@@ -235,8 +290,8 @@ A personal pet project/portfolio created with React and Firebase.
 ## Demo
 
 - https://www.tv-junkie.com - live website.
-- https://youtu.be/eVpnWltTYf0 - a short video presentation with an audio commentary of the functionality of the app.
-- url - chat functionality
+- https://www.youtube.com/watch?v=jQvER-qlpCY - a short video review with an audio commentary of the functionality of the app.
+- https://www.youtube.com/watch?v=JrseNlKRhZo - review of [chat functionality](#Chat)
 
 ## Table of Contents
 
@@ -305,16 +360,21 @@ Things I want to do, that would be interesting and challenging
 
 Done
 <<<<<<< HEAD
+<<<<<<< HEAD
 ~~- Friends functionality with direct messages in a chat form. Requires some thought of how to structure data efficiently at the backend side. Firebase has an out of the box WebSocket real-time connection which is already used a lot throughout the app.~~
+=======
+>>>>>>> cfa8df5d041495bdae3285d42054112f4d18d9a8
 
-~~On the frontend side, I expect a lot of small things that need to be worked through, so the chat experience would be smooth as people get used to it. Functionality should be as users would expect in the chat app like edit/delete, reply to messages, etc.~~
+- ~~Friends functionality with direct messages in a chat form. Requires some thought of how to structure data efficiently at the backend side. Firebase has an out of the box WebSocket real-time connection which is already used a lot throughout the app.~~
 
-## Друзья и чат
+- ~~On the frontend side, I expect a lot of small things that need to be worked through, so the chat experience would be smooth as people get used to it. Functionality should be as users would expect in the chat app like edit/delete, reply to messages, etc.~~
 
----
+## Chat
 
-Please don't try to run the app locally. The file with environmental variables is not uploaded to Github.
+Full-fledged friends functionality and messaging in a chat form. Both private and group chat rooms. Fast, scalable, with rich UI capabilities.
+url - video presentation of functionality
 
+<<<<<<< HEAD
 Thank you for reading.
 >>>>>>> 58a80e3... test
 
@@ -408,6 +468,14 @@ url - video presentation of functionality
 - In some parts useRef's are used in WS connections instead of state for optimization purposes. For example for changing unread messages when scrolling the data from the server goes to ref to avoid rerenders. The global state of unread messages updates in different ways. In a conversation, I can explain in detail what's going on and why.
 - IntersectionObserver is used for detecting unread messages.
 - Infinite scrolling is implemented in both directions, up and down. Showing only a handful of messages for efficiency.
+=======
+#### Frontend
+
+- The state management is very complex. Because of the dynamic nature of the real-time chat application, where the state is constantly changing and frequently depending on each other. Several WebSocket connections from Firebase are open simultaneously and all could change state asynchronously. So React Context with useReducer is used for state management of the whole chat application.
+- In some parts useRef's are used in WS connections instead of state for optimization purposes. For example for changing unread messages when scrolling the data from the server goes to ref to avoid rerenders. The global state of unread messages updates in different ways.
+- IntersectionObserver is used for detecting unread messages.
+- Infinite scrolling is implemented in both directions, up and down. Showing only a handful of messages for efficiency. Implemented by properly changing the range of indexes in the message array.
+>>>>>>> cfa8df5d041495bdae3285d42054112f4d18d9a8
 - A lot of custom hooks are used throughout the application for functionality reusability and overall composition structure.
 - useLayoutEffect is particularly useful for rerenders when scroll position would change to avoid the "jump" of the scroll. It would do necessary calculations before rerendering dom elements.
 - Message input made with contenteditable attribute and everything related to editing messaging (go to next line with shift + enter (not enter), select text, delete text, the position of the insertion point, etc) is coded from the ground up. Because default settings of all this behavior are not suitable as I need.
@@ -416,6 +484,7 @@ url - video presentation of functionality
 - For write operations to the database there is a balance between frontend and backend cloud functions (see below). So the perceived speed of the UI would be sufficiently high in places where it's important, and slower where it's not noticeable (cloud functions used there).
 - Write operations to different paths of database done with one call, so there won't be any race conditions and other complications.
 - A lot of other stuff
+<<<<<<< HEAD
 
 <<<<<<< HEAD
 Done
@@ -451,10 +520,17 @@ url - video presentation of functionality
 
 >>>>>>> 8494a19... Readme russian + chat v1.0
 - Denormalization is used in many cases for efficient read operations in NoSQL-like databases.
+=======
+
+#### Backend
+
+- Denormalization is used in many cases for efficient read operations in NoSQL-like databases (like Firebase).
+>>>>>>> cfa8df5d041495bdae3285d42054112f4d18d9a8
 - A lot of functionality moved to Firebase Cloud Functions, which are run on the server: creating group, adding friends, last activity updates, etc. It makes the frontend much simpler. And overall automate a lot of things. Bear in mind there is a thing called "cold start" with these functions, which means the first invocation after some time would be slow. In a real production application, it shouldn't be a problem, cause these functions would run frequently.
 
 ---
 
-Please don't try to run the app locally. The file with environmental variables is not uploaded to Github.
+Don't try to run the app locally. The file with environmental variables is not uploaded to Github.\
+Please keep in mind the date of the last significant changes in the source files. Since there may be a need for refactoring and this old code may not reflect my current level truthfully.
 
 Thank you for reading.
