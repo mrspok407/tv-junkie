@@ -5,6 +5,7 @@ import ReactDOM from "react-dom"
 import App from "./App"
 import Firebase, { FirebaseContext } from "./Components/Firebase"
 import "normalize.css"
+import "@fontsource/open-sans"
 import "./index.scss"
 
 ReactDOM.render(
