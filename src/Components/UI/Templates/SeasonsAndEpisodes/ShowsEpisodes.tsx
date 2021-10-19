@@ -1,5 +1,4 @@
-import React, { useContext, useEffect, useState } from "react"
-import axios from "axios"
+import React, { useContext, useState } from "react"
 import { differenceBtwDatesInDays, todayDate } from "Utils"
 import * as _get from "lodash.get"
 import isAllEpisodesWatched from "./FirebaseHelpers/isAllEpisodesWatched"
@@ -14,11 +13,10 @@ import { ShowInfoInterface } from "Components/Pages/Detailes/Detailes"
 import { FirebaseContext } from "Components/Firebase"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import SeasonEpisodes from "./SeasonEpisodes"
+import useFetchSeasons from "./Hooks/UseFetchSeasons/UseFetchSeasons"
+import { tmdbTvSeasonURL } from "Utils/APIUrls"
+import useAxiosPromise from "Utils/Hooks/UseAxiosPromise"
 import "./ShowsEpisodes.scss"
-
-const { CancelToken } = require("axios")
-
-let cancelRequest: any
 
 type Props = {
   showDatabaseOnClient?: string | null
@@ -42,6 +40,11 @@ export interface EpisodesDataInterface {
   episodes: SingleEpisodeInterface[]
 }
 
+export interface currentlyOpenSeasons {
+  seasonId: number
+  seasonNum: number
+}
+
 export interface ShowEpisodesFromAPIInterface {
   seasonId: number
   id?: number
@@ -58,90 +61,48 @@ const ShowsEpisodes: React.FC<Props> = ({
   releasedEpisodes,
   parentComponent
 }) => {
-  const seasons = episodesData.filter((item) => item.name !== "Specials")
-
-  const [loadingEpisodesIds, setLoadingEpisodesIds] = useState<number[]>([])
-  const [currentlyOpenSeasons, setCurrentlyOpenSeasons] = useState<number[]>([seasons[seasons?.length - 1]?.id])
-  const [episodesDataFromAPI, setEpisodesDataFromAPI] = useState<ShowEpisodesFromAPIInterface[]>([])
-  const [detailEpisodeInfo, setDetailEpisodeInfo] = useState<number[]>([])
-  const [errorShowEpisodes, setErrorShowEpisodes] = useState("")
-
   const firebase = useContext(FirebaseContext)
   const { authUser } = useContext(AppContext)
 
-  useEffect(() => {
-    const initialFirstSeasonLoad = () => {
-      if (seasons.length === 0) return
+  const seasons = episodesData.filter((item) => item.name !== "Specials")
+  const firstSeason = seasons[seasons.length - 1]
 
-      const firstSeason = seasons[seasons.length - 1]
+  const [currentlyOpen, setCurrentlyOpen] = useState<string[]>(seasons.length ? [firstSeason?.id.toString()] : [])
 
-      if (parentComponent === "toWatchPage") {
-        setEpisodesDataFromAPI([{ seasonId: firstSeason.id, episodes: firstSeason.episodes }])
-      } else {
-        if (loadingEpisodesIds.includes(firstSeason.id)) return
-        setLoadingEpisodesIds([...loadingEpisodesIds, firstSeason.id])
-        axios
-          .get(
-            `https://api.themoviedb.org/3/tv/${id}?api_key=${process.env.REACT_APP_TMDB_API}&append_to_response=season/${firstSeason.season_number}`,
-            {
-              cancelToken: new CancelToken(function executor(c: any) {
-                cancelRequest = c
-              })
-            }
-          )
-          .then(({ data }) => {
-            const episodesReverse = data[`season/${firstSeason.season_number}`].episodes.reverse()
+  const [detailEpisodeInfo, setDetailEpisodeInfo] = useState<number[]>([])
+  const [errorShowEpisodes] = useState("")
 
-            setEpisodesDataFromAPI([{ seasonId: firstSeason.id, episodes: episodesReverse }])
-            setLoadingEpisodesIds(loadingEpisodesIds.filter((item) => item !== firstSeason.id))
-          })
-          .catch((err) => {
-            if (axios.isCancel(err)) return
-            setLoadingEpisodesIds(loadingEpisodesIds.filter((item) => item !== firstSeason.id))
-            setErrorShowEpisodes("Something went wrong, sorry")
-          })
-      }
-    }
-    initialFirstSeasonLoad()
+  const [openSeason, setOpenSeason] = useState({ seasonId: firstSeason?.id, seasonNum: firstSeason?.season_number })
 
-    return () => {
-      if (cancelRequest !== undefined) cancelRequest()
-    }
-    // eslint-disable-next-line
-  }, [])
+  const promiseData = useAxiosPromise({
+    fullRerenderDeps: id,
+    content: {
+      id: openSeason.seasonId,
+      seasonNum: openSeason.seasonNum,
+      url: tmdbTvSeasonURL({ showId: id, seasonNum: openSeason?.seasonNum })
+    },
+    disable: parentComponent === "toWatchPage"
+  })
+
+  const { state, dispatch } = useFetchSeasons({ disable: parentComponent === "toWatchPage", promiseData })
+
+  const { data: episodesDataFromAPI, loading: loadingSeasons, openData: currentlyOpenSeasons } = state
 
   const showSeasonsEpisodes = (seasonId: number, seasonNum: number) => {
-    if (currentlyOpenSeasons.includes(seasonId)) {
-      setCurrentlyOpenSeasons([...currentlyOpenSeasons.filter((item) => item !== seasonId)])
-    } else {
-      setCurrentlyOpenSeasons([...currentlyOpenSeasons, seasonId])
+    if (parentComponent === "toWatchPage") {
+      if (currentlyOpen.includes(seasonId.toString())) {
+        setCurrentlyOpen([...currentlyOpen.filter((item) => item !== seasonId.toString())])
+      } else {
+        setCurrentlyOpen([...currentlyOpen, seasonId.toString()])
+      }
+      return
     }
 
-    if (parentComponent === "toWatchPage") return
-    if (episodesDataFromAPI.some((item) => item.seasonId === seasonId)) return
-    if (loadingEpisodesIds.includes(seasonId)) return
-
-    setLoadingEpisodesIds([...loadingEpisodesIds, seasonId])
-
-    axios
-      .get(
-        `https://api.themoviedb.org/3/tv/${id}?api_key=${process.env.REACT_APP_TMDB_API}&append_to_response=season/${seasonNum}`,
-        {
-          cancelToken: new CancelToken(function executor(c: any) {
-            cancelRequest = c
-          })
-        }
-      )
-      .then(({ data }) => {
-        const episodesReverse = data[`season/${seasonNum}`].episodes.reverse()
-        setEpisodesDataFromAPI((prevState) => [...prevState, { seasonId, episodes: episodesReverse }])
-        setLoadingEpisodesIds((prevState) => [...prevState.filter((item) => item !== seasonId)])
-      })
-      .catch((err) => {
-        if (axios.isCancel(err)) return
-        setLoadingEpisodesIds((prevState) => [...prevState.filter((item) => item !== seasonId)])
-        setErrorShowEpisodes("Something went wrong, sorry")
-      })
+    if (openSeason.seasonId === seasonId) {
+      dispatch({ type: "handleOpenData", payload: { id: seasonId.toString() } })
+    } else {
+      setOpenSeason({ seasonId, seasonNum })
+    }
   }
 
   const showEpisodeInfo = (episodeId: number) => {
@@ -288,6 +249,9 @@ const ShowsEpisodes: React.FC<Props> = ({
   }
 
   const showCheckboxes = showInfo.showInUserDatabase && showDatabaseOnClient !== "notWatchingShows"
+
+  const curOpen = parentComponent === "toWatchPage" ? currentlyOpen : currentlyOpenSeasons
+
   return (
     <>
       {showCheckboxes && parentComponent === "detailesPage" && _get(releasedEpisodes, "length", 0) ? (
@@ -321,11 +285,11 @@ const ShowsEpisodes: React.FC<Props> = ({
               className={classNames("episodes__episode-group", {
                 "episodes__episode-group--no-poster": !season.poster_path && parentComponent === "detailesPage"
               })}
-              style={!loadingEpisodesIds.includes(season.id) ? { rowGap: "10px" } : { rowGap: "0px" }}
+              style={!loadingSeasons.includes(season.id.toString()) ? { rowGap: "10px" } : { rowGap: "0px" }}
             >
               <div
                 className={classNames("episodes__episode-group-info", {
-                  "episodes__episode-group-info--open": currentlyOpenSeasons.includes(season.id)
+                  "episodes__episode-group-info--open": currentlyOpenSeasons.includes(season.id.toString())
                 })}
                 style={
                   daysToNewSeason > 0
@@ -352,39 +316,67 @@ const ShowsEpisodes: React.FC<Props> = ({
                 <div className="episodes__episode-group-date">{season.air_date && season.air_date.slice(0, 4)}</div>
               </div>
 
-              {currentlyOpenSeasons.includes(season.id) &&
-                (!loadingEpisodesIds.includes(season.id) ? (
-                  <>
-                    {season.poster_path && parentComponent === "detailesPage" && (
-                      <div className="episodes__episode-group-poster-wrapper">
-                        {showInfo.showInUserDatabase && daysToNewSeason <= 0 && (
-                          <UserRating
-                            id={id}
-                            firebaseRef="userShowSeason"
-                            seasonNum={season.season_number}
-                            disableRating={!!(showDatabaseOnClient === "notWatchingShows")}
-                          />
-                        )}
+              {parentComponent === "detailesPage" &&
+                (!loadingSeasons.includes(season.id.toString()) ? (
+                  curOpen.includes(season.id.toString()) && (
+                    <>
+                      {season.poster_path && parentComponent === "detailesPage" && (
+                        <div className="episodes__episode-group-poster-wrapper">
+                          {showInfo.showInUserDatabase && daysToNewSeason <= 0 && (
+                            <UserRating
+                              id={id}
+                              firebaseRef="userShowSeason"
+                              seasonNum={season.season_number}
+                              disableRating={!!(showDatabaseOnClient === "notWatchingShows")}
+                            />
+                          )}
 
-                        <div
-                          className="episodes__episode-group-poster"
-                          style={{
-                            backgroundImage: `url(https://image.tmdb.org/t/p/w500/${season.poster_path})`
-                          }}
-                        />
-                        {showCheckboxes && daysToNewSeason <= 0 && (
-                          <div className="episodes__episode-group-check-all-episodes">
-                            <button
-                              type="button"
-                              className="button"
-                              onClick={() => checkEverySeasonEpisode(season.season_number)}
-                            >
-                              Check all
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    )}
+                          <div
+                            className="episodes__episode-group-poster"
+                            style={{
+                              backgroundImage: `url(https://image.tmdb.org/t/p/w500/${season.poster_path})`
+                            }}
+                          />
+                          {showCheckboxes && daysToNewSeason <= 0 && (
+                            <div className="episodes__episode-group-check-all-episodes">
+                              <button
+                                type="button"
+                                className="button"
+                                onClick={() => checkEverySeasonEpisode(season.season_number)}
+                              >
+                                Check all
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      <SeasonEpisodes
+                        parentComponent={parentComponent}
+                        episodesData={episodesData}
+                        episodesDataFromAPI={episodesDataFromAPI}
+                        showTitle={showTitle}
+                        detailEpisodeInfo={detailEpisodeInfo}
+                        season={season}
+                        seasonId={season.id}
+                        episodesFromDatabase={episodesFromDatabase}
+                        showInfo={showInfo}
+                        showDatabaseOnClient={showDatabaseOnClient}
+                        showEpisodeInfo={showEpisodeInfo}
+                        toggleWatchedEpisode={toggleWatchedEpisode}
+                        checkMultipleEpisodes={checkMultipleEpisodes}
+                      />
+                    </>
+                  )
+                ) : !errorShowEpisodes ? (
+                  <Loader className="loader--small-pink" />
+                ) : (
+                  <div>{errorShowEpisodes}</div>
+                ))}
+
+              {parentComponent === "toWatchPage" &&
+                curOpen.includes(season.id.toString()) &&
+                (!loadingSeasons.includes(season.id.toString()) ? (
+                  <>
                     <SeasonEpisodes
                       parentComponent={parentComponent}
                       episodesData={episodesData}
@@ -415,7 +407,8 @@ const ShowsEpisodes: React.FC<Props> = ({
                 ) : !errorShowEpisodes ? (
                   <Loader className="loader--small-pink" />
                 ) : (
-                  <div>{errorShowEpisodes}</div>
+                  // <div>{errorShowEpisodes}</div>
+                  <></>
                 ))}
             </div>
           )
