@@ -17,7 +17,7 @@ type Props = {
 
 const useAxiosPromise = ({ content, fullRerenderDeps, disable }: Props) => {
   const [promiseData, setPromiseData] = useState<{ promise: Promise<any>; id: number | string; seasonNum: number }>()
-  const memoizedCallback = useMemoized({ deps: [fullRerenderDeps] })
+  const memoizedCallback = useMemoized()
 
   const axiosGet = (url: string) => {
     return axios.get(url, {
