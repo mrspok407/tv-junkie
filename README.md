@@ -9,8 +9,8 @@
 ## Демо
 
 - https://www.tv-junkie.com - сайт.
-- https://www.youtube.com/watch?v=euGWPi97aeg - короткий обзор функциональности с аудио комментариями
-- https://www.youtube.com/watch?v=ZsQKTjKIewI - отдельный обзор функционалности [друзей и чата](#Чат)
+- https://youtu.be/cA9hOPMtqlQ - короткий обзор функциональности с аудио комментариями
+- https://youtu.be/34R8aNJ5s70 - отдельный обзор функциональности [друзей и чата](#Чат)
 
 ## Содержание
 
@@ -84,7 +84,7 @@ Done
 
 ## Чат
 
-Полноценный функционал друзей и сообщений в форме чата. Приватные чаты один на один и групповые чат комнаты. Быстрый, масштабируемый с богатыми UI возможностями. [Обзор функциональности](https://www.youtube.com/watch?v=ZsQKTjKIewI)
+Полноценный функционал друзей и сообщений в форме чата. Приватные чаты один на один и групповые чат комнаты. Быстрый, масштабируемый с богатыми UI возможностями. [Обзор функциональности](https://youtu.be/34R8aNJ5s70)
 
 #### Фронтэнд
 
@@ -122,8 +122,8 @@ A personal pet project/portfolio created with React and Firebase.
 ## Demo
 
 - https://www.tv-junkie.com - live website.
-- https://www.youtube.com/watch?v=jQvER-qlpCY - a short video review with an audio commentary of the functionality of the app.
-- https://www.youtube.com/watch?v=JrseNlKRhZo - review of [chat functionality](#Chat)
+- https://youtu.be/IYWEYEeyEvA - a short video review with an audio commentary of the functionality of the app.
+- https://youtu.be/Gbsr6AwWglg - review of [chat functionality](#Chat)
 
 ## Table of Contents
 
@@ -198,7 +198,7 @@ Done
 
 ## Chat
 
-Full-fledged friends functionality and messaging in a chat form. Both private and group chat rooms. Fast, scalable, with rich UI capabilities. [Review of functionality](https://www.youtube.com/watch?v=JrseNlKRhZo)
+Full-fledged friends functionality and messaging in a chat form. Both private and group chat rooms. Fast, scalable, with rich UI capabilities. [Review of functionality](https://youtu.be/Gbsr6AwWglg)
 
 #### Frontend
 
