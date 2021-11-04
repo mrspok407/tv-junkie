@@ -17,7 +17,6 @@ type Props = {
 
 const useAxiosPromise = ({ content, fullRerenderDeps, disable }: Props) => {
   const [promiseData, setPromiseData] = useState<{ promise: Promise<any>; id: number | string; seasonNum: number }>()
-  const memoizedCallback = useMemoized()
 
   const axiosGet = (url: string) => {
     return axios.get(url, {
@@ -27,17 +26,17 @@ const useAxiosPromise = ({ content, fullRerenderDeps, disable }: Props) => {
     })
   }
 
-  const getPromise = useCallback(memoizedCallback(axiosGet), [fullRerenderDeps])
+  const memoizedCallback = useMemoized<Promise<any>, string>({ deps: [fullRerenderDeps], callback: axiosGet })
 
   useEffect(() => {
     if (content.url === undefined || disable) return
-    const promise = getPromise(content.url)
+    const promise = memoizedCallback(content.url)
     setPromiseData({
       promise,
       id: content.id,
       seasonNum: content.seasonNum
     })
-  }, [content.id, disable, getPromise]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [content.id, disable, memoizedCallback]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     return () => {

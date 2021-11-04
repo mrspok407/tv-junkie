@@ -1,6 +1,7 @@
 import { useEffect, useCallback, useReducer } from "react"
 import axios from "axios"
 import reducer, { INITIAL_STATE, StateInterface, ACTIONTYPES } from "./_reducerConfig"
+import { EpisodesDataInterface, ShowEpisodesFromAPIInterface } from "../../ShowsEpisodes"
 
 type Props = {
   disable: boolean
@@ -13,8 +14,8 @@ type Props = {
     | undefined
 }
 
-const useFetchSeasons = ({ promiseData, disable = false }: Props) => {
-  const [state, dispatch] = useReducer<React.Reducer<StateInterface, ACTIONTYPES>>(reducer, INITIAL_STATE)
+function useFetchSeasons<DataType>({ promiseData, disable = false }: Props) {
+  const [state, dispatch] = useReducer(reducer<DataType>(), INITIAL_STATE)
 
   const handleFetch = useCallback(async () => {
     if (!promiseData || disable) return

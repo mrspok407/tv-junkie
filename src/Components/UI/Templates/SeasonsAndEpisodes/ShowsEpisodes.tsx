@@ -84,7 +84,10 @@ const ShowsEpisodes: React.FC<Props> = ({
     disable: parentComponent === "toWatchPage"
   })
 
-  const { state, dispatch } = useFetchSeasons({ disable: parentComponent === "toWatchPage", promiseData })
+  const { state, dispatch } = useFetchSeasons<ShowEpisodesFromAPIInterface>({
+    disable: parentComponent === "toWatchPage",
+    promiseData
+  })
 
   const { data: episodesDataFromAPI, loading: loadingSeasons, openData: currentlyOpenSeasons } = state
 
