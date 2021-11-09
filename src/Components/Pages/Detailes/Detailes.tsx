@@ -275,5 +275,4 @@ export const DetailesPage: React.FC<Props> = ({
     </>
   )
 }
-
 export default DetailesPage
