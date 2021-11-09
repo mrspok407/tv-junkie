@@ -277,7 +277,6 @@ export const DetailesPage: React.FC<Props> = ({
     </>
   )
 }
-
 export default withErrorBoundary(DetailesPage, {
   FallbackComponent: ErrorFallback
 })
