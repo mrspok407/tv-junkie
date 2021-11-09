@@ -57,6 +57,7 @@
     "react-chat-elements": "^10.15.0",
     "react-contenteditable": "^3.3.5",
     "react-dom": "^16.13.1",
+    "react-error-boundary": "^3.1.4",
     "react-helmet": "^6.1.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^3.4.3",

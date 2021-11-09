@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import { differenceBtwDatesInDays, todayDate } from "Utils"
 import * as _get from "lodash.get"
 import isAllEpisodesWatched from "./FirebaseHelpers/isAllEpisodesWatched"

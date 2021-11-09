@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect, useContext } from "react"
+import { withErrorBoundary } from "react-error-boundary"
 import { useHistory } from "react-router-dom"
 import axios from "axios"
 import { Helmet } from "react-helmet"
@@ -20,6 +21,7 @@ import useHandleListeners from "./FirebaseHelpers/UseHandleListeners"
 import { ContentDetailes, CONTENT_DETAILS_DEFAULT } from "Utils/Interfaces/ContentDetails"
 import useGoogleRedirect from "Components/UserAuth/SignIn/UseGoogleRedirect"
 import "./Detailes.scss"
+import { ErrorFallback } from "Utils/ErrorBoundary"
 
 const { CancelToken } = require("axios")
 let cancelRequest: any
@@ -276,4 +278,6 @@ export const DetailesPage: React.FC<Props> = ({
   )
 }
 
-export default DetailesPage
+export default withErrorBoundary(DetailesPage, {
+  FallbackComponent: ErrorFallback
+})
