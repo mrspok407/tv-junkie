@@ -30,12 +30,12 @@ const configDevelopment = {
 // let config: any = process.env.NODE_ENV === "production" ? configProduction : configDevelopment
 let config: any = configDevelopment
 
-if (window.location.hostname === "localhost") {
-  config = {
-    ...config,
-    databaseURL: `http://localhost:9000/?ns=pet-project-development-default-rtdb`
-  }
-}
+// if (window.location.hostname === "localhost") {
+//   config = {
+//     ...config,
+//     databaseURL: `http://localhost:9000/?ns=pet-project-development-default-rtdb`
+//   }
+// }
 
 interface ReferenceInterface {
   uid: string

@@ -5,6 +5,10 @@
   "dependencies": {
     "@babel/helper-builder-react-jsx-experimental": "^7.12.11",
     "@babel/plugin-transform-react-jsx": "^7.14.5",
+    "@fontsource/open-sans": "^4.5.1",
+    "@fortawesome/fontawesome-svg-core": "^1.2.36",
+    "@fortawesome/free-brands-svg-icons": "^5.15.4",
+    "@fortawesome/react-fontawesome": "^0.1.15",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.1.2",
@@ -53,6 +57,7 @@
     "react-chat-elements": "^10.15.0",
     "react-contenteditable": "^3.3.5",
     "react-dom": "^16.13.1",
+    "react-error-boundary": "^3.1.4",
     "react-helmet": "^6.1.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^3.4.3",
