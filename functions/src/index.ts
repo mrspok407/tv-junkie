@@ -35,129 +35,129 @@ interface GroupChatMemberStatusInterface {
 
 const contactsDatabaseRef = (uid: string) => `${uid}/contactsDatabase`;
 
-export const updatePinnedTimeStamp = functions.database
-  .ref("users/{authUid}/contactsDatabase/contactsLastActivity/{contactUid}")
-  .onWrite(async (change, context) => {
-    const {authUid, contactUid} = context.params;
-    const afterData = change.after;
-    const beforeData = change.before;
+// export const updatePinnedTimeStamp = functions.database
+//   .ref("users/{authUid}/contactsDatabase/contactsLastActivity/{contactUid}")
+//   .onWrite(async (change, context) => {
+//     const {authUid, contactUid} = context.params;
+//     const afterData = change.after;
+//     const beforeData = change.before;
 
-    const contactRef = database.ref(`users/${contactsDatabaseRef(authUid)}/contactsList/${contactUid}`);
-    const timeStamp = afterData.val();
+//     const contactRef = database.ref(`users/${contactsDatabaseRef(authUid)}/contactsList/${contactUid}`);
+//     const timeStamp = afterData.val();
 
-    if (!afterData.exists()) return;
+//     if (!afterData.exists()) return;
 
-    if (!beforeData.exists()) {
-      return contactRef.update({
-        pinned_lastActivityTS: `false_${timeStamp}`
-      });
-    }
+//     if (!beforeData.exists()) {
+//       return contactRef.update({
+//         pinned_lastActivityTS: `false_${timeStamp}`
+//       });
+//     }
 
-    if (beforeData.val() !== afterData.val()) {
-      const isPinnedData = await contactRef.child("pinned_lastActivityTS").once("value");
-      const isPinned = !!(isPinnedData?.val().slice(0, 4) === "true");
-      console.log(`${isPinned}_${timeStamp}`);
-      return contactRef.update({
-        pinned_lastActivityTS: `${isPinned}_${timeStamp}`
-      });
-    }
-  });
+//     if (beforeData.val() !== afterData.val()) {
+//       const isPinnedData = await contactRef.child("pinned_lastActivityTS").once("value");
+//       const isPinned = !!(isPinnedData?.val().slice(0, 4) === "true");
+//       console.log(`${isPinned}_${timeStamp}`);
+//       return contactRef.update({
+//         pinned_lastActivityTS: `${isPinned}_${timeStamp}`
+//       });
+//     }
+//   });
 
-export const addNewContactsActivity = functions.database
-  .ref("privateChats/{chatKey}/members/{memberKey}/unreadMessages")
-  .onCreate((snapshot, context) => {
-    const {chatKey, memberKey} = context.params;
-    let otherMemberKey;
+// export const addNewContactsActivity = functions.database
+//   .ref("privateChats/{chatKey}/members/{memberKey}/unreadMessages")
+//   .onCreate((snapshot, context) => {
+//     const {chatKey, memberKey} = context.params;
+//     let otherMemberKey;
 
-    if (memberKey === chatKey.slice(0, memberKey.length)) {
-      otherMemberKey = chatKey.slice(memberKey.length + 1);
-    } else {
-      otherMemberKey = chatKey.slice(0, -memberKey.length - 1);
-    }
+//     if (memberKey === chatKey.slice(0, memberKey.length)) {
+//       otherMemberKey = chatKey.slice(memberKey.length + 1);
+//     } else {
+//       otherMemberKey = chatKey.slice(0, -memberKey.length - 1);
+//     }
 
-    const updateData = {
-      [`${contactsDatabaseRef(memberKey)}/newContactsActivity/${otherMemberKey}`]: true
-    };
+//     const updateData = {
+//       [`${contactsDatabaseRef(memberKey)}/newContactsActivity/${otherMemberKey}`]: true
+//     };
 
-    return database.ref("users").update(updateData);
-  });
+//     return database.ref("users").update(updateData);
+//   });
 
-export const addNewContactsActivityGroupChat = functions.database
-  .ref("groupChats/{chatKey}/members/unreadMessages/{memberKey}")
-  .onCreate((snapshot, context) => {
-    const {chatKey, memberKey} = context.params;
-    const updateData = {
-      [`${contactsDatabaseRef(memberKey)}/newContactsActivity/${chatKey}`]: true
-    };
+// export const addNewContactsActivityGroupChat = functions.database
+//   .ref("groupChats/{chatKey}/members/unreadMessages/{memberKey}")
+//   .onCreate((snapshot, context) => {
+//     const {chatKey, memberKey} = context.params;
+//     const updateData = {
+//       [`${contactsDatabaseRef(memberKey)}/newContactsActivity/${chatKey}`]: true
+//     };
 
-    return database.ref("users").update(updateData);
-  });
+//     return database.ref("users").update(updateData);
+//   });
 
-export const removeNewContactsActivity = functions.database
-  .ref("privateChats/{chatKey}/members/{memberKey}/unreadMessages")
-  .onDelete((snapshot, context) => {
-    const {chatKey, memberKey} = context.params;
-    let otherMemberKey;
+// export const removeNewContactsActivity = functions.database
+//   .ref("privateChats/{chatKey}/members/{memberKey}/unreadMessages")
+//   .onDelete((snapshot, context) => {
+//     const {chatKey, memberKey} = context.params;
+//     let otherMemberKey;
 
-    if (memberKey === chatKey.slice(0, memberKey.length)) {
-      otherMemberKey = chatKey.slice(memberKey.length + 1);
-    } else {
-      otherMemberKey = chatKey.slice(0, -memberKey.length - 1);
-    }
+//     if (memberKey === chatKey.slice(0, memberKey.length)) {
+//       otherMemberKey = chatKey.slice(memberKey.length + 1);
+//     } else {
+//       otherMemberKey = chatKey.slice(0, -memberKey.length - 1);
+//     }
 
-    return database.ref(`users/${memberKey}/contactsDatabase/newContactsActivity/${otherMemberKey}`).set(null);
-  });
+//     return database.ref(`users/${memberKey}/contactsDatabase/newContactsActivity/${otherMemberKey}`).set(null);
+//   });
 
-export const removeNewContactsActivityGroupChat = functions.database
-  .ref("groupChats/{chatKey}/members/unreadMessages/{memberKey}")
-  .onDelete((snapshot, context) => {
-    const {chatKey, memberKey} = context.params;
-    return database.ref(`users/${memberKey}/contactsDatabase/newContactsActivity/${chatKey}`).set(null);
-  });
+// export const removeNewContactsActivityGroupChat = functions.database
+//   .ref("groupChats/{chatKey}/members/unreadMessages/{memberKey}")
+//   .onDelete((snapshot, context) => {
+//     const {chatKey, memberKey} = context.params;
+//     return database.ref(`users/${memberKey}/contactsDatabase/newContactsActivity/${chatKey}`).set(null);
+//   });
 
-export const incrementContacts = functions.database
-  .ref("users/{authUid}/contactsDatabase/contactsList/{contactUid}")
-  .onCreate(async (snapshot) => {
-    const contactsNumberRef = snapshot.ref.parent?.parent?.child("contactsAmount");
+// export const incrementContacts = functions.database
+//   .ref("users/{authUid}/contactsDatabase/contactsList/{contactUid}")
+//   .onCreate(async (snapshot) => {
+//     const contactsNumberRef = snapshot.ref.parent?.parent?.child("contactsAmount");
 
-    return contactsNumberRef?.transaction((currentValue) => {
-      if (currentValue === null) {
-        return 1;
-      } else {
-        return currentValue + 1;
-      }
-    });
-  });
+//     return contactsNumberRef?.transaction((currentValue) => {
+//       if (currentValue === null) {
+//         return 1;
+//       } else {
+//         return currentValue + 1;
+//       }
+//     });
+//   });
 
-export const decrementContacts = functions.database
-  .ref("users/{authUid}/contactsDatabase/contactsList/{contactUid}")
-  .onDelete(async (snapshot) => {
-    const contactsNumberRef = snapshot.ref.parent?.parent?.child("contactsAmount");
+// export const decrementContacts = functions.database
+//   .ref("users/{authUid}/contactsDatabase/contactsList/{contactUid}")
+//   .onDelete(async (snapshot) => {
+//     const contactsNumberRef = snapshot.ref.parent?.parent?.child("contactsAmount");
 
-    return contactsNumberRef?.transaction((currentValue) => {
-      if (currentValue === null) {
-        return 0;
-      } else {
-        return currentValue - 1;
-      }
-    });
-  });
+//     return contactsNumberRef?.transaction((currentValue) => {
+//       if (currentValue === null) {
+//         return 0;
+//       } else {
+//         return currentValue - 1;
+//       }
+//     });
+//   });
 
-export const updateLastSeenPrivateChats = functions.database
-  .ref("privateChats/{chatKey}/members/{memberKey}/status/isOnline")
-  .onDelete(async (snapshot) => {
-    const timeStamp = admin.database.ServerValue.TIMESTAMP;
-    return snapshot.ref.parent?.update({lastSeen: timeStamp});
-  });
+// export const updateLastSeenPrivateChats = functions.database
+//   .ref("privateChats/{chatKey}/members/{memberKey}/status/isOnline")
+//   .onDelete(async (snapshot) => {
+//     const timeStamp = admin.database.ServerValue.TIMESTAMP;
+//     return snapshot.ref.parent?.update({lastSeen: timeStamp});
+//   });
 
-export const updateLastSeenGroupChats = functions.database
-  .ref("groupChats/{chatKey}/members/status/{memberKey}/isOnline")
-  .onDelete(async (snapshot) => {
-    const timeStamp = admin.database.ServerValue.TIMESTAMP;
-    const isMemberExists = await snapshot.ref.parent?.child("role").once("value");
-    if (isMemberExists?.val() === null) return;
-    return snapshot.ref.parent?.update({lastSeen: timeStamp});
-  });
+// export const updateLastSeenGroupChats = functions.database
+//   .ref("groupChats/{chatKey}/members/status/{memberKey}/isOnline")
+//   .onDelete(async (snapshot) => {
+//     const timeStamp = admin.database.ServerValue.TIMESTAMP;
+//     const isMemberExists = await snapshot.ref.parent?.child("role").once("value");
+//     if (isMemberExists?.val() === null) return;
+//     return snapshot.ref.parent?.update({lastSeen: timeStamp});
+//   });
 
 export const addNewGroupMembers = functions.https.onCall(
   async (
