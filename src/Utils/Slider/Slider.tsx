@@ -217,12 +217,7 @@ export default function Slider({ sliderData }: { sliderData: ContentDetailes[] }
                   pathname: `/${mediaType}/${id}`
                 }}
               >
-                <div
-                  className="slider__item"
-                  style={{
-                    backgroundImage: `url(${POSTER_PATH}${poster_path})`
-                  }}
-                />
+                <div className="slider__item lazyload" data-bg={`${POSTER_PATH}${poster_path}`} />
               </Link>
             </div>
           )

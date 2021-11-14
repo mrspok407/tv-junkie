@@ -58,7 +58,7 @@ const useGetInitialContactInfo = () => {
           newContactsRequests: !!newContactsRequests.val(),
           unreadMessages,
           unreadMessagesContact,
-          lastMessage: lastMessage.val() !== null ? Object.values(lastMessage.val()!).map((item) => item)[0] : {}
+          lastMessage: lastMessage.val() !== null ? Object.values(lastMessage.val() || []).map((item) => item)[0] : {}
         }
 
         loadedContactsRef.current = {
