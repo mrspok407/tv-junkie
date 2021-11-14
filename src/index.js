@@ -6,6 +6,8 @@ import App from "./App"
 import Firebase, { FirebaseContext } from "./Components/Firebase"
 import "normalize.css"
 import "@fontsource/open-sans"
+import "lazysizes"
+import "lazysizes/plugins/unveilhooks/ls.unveilhooks"
 import "./index.scss"
 
 ReactDOM.render(

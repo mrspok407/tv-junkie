@@ -11,14 +11,9 @@ type Props = {
   clearAdvSearchMovies: () => void
 }
 
-const AdvSearchResults: React.FC<Props> = ({
-  advancedSearchContent,
-  loadingNewPage,
-  clearAdvSearchMovies
-}) => {
+const AdvSearchResults: React.FC<Props> = ({ advancedSearchContent, loadingNewPage, clearAdvSearchMovies }) => {
   const maxColumns = 4
-  const currentNumOfColumns =
-    advancedSearchContent.length <= maxColumns - 1 ? advancedSearchContent.length : maxColumns
+  const currentNumOfColumns = advancedSearchContent.length <= maxColumns - 1 ? advancedSearchContent.length : maxColumns
 
   return (
     <>
@@ -61,9 +56,7 @@ const AdvSearchResults: React.FC<Props> = ({
             }) => {
               const mediaType = original_title ? "movie" : "show"
 
-              const filteredGenres = genre_ids.map((genreId) =>
-                listOfGenres.filter((item) => item.id === genreId)
-              )
+              const filteredGenres = genre_ids.map((genreId) => listOfGenres.filter((item) => item.id === genreId))
 
               const contentTitle = title || original_title || name || original_name || "-"
               const releaseDate = release_date || first_air_date || "-"
@@ -99,16 +92,11 @@ const AdvSearchResults: React.FC<Props> = ({
                     <div className="content-results__item-overview">
                       <div className="content-results__item-poster">
                         <div
-                          style={
+                          className="lazyload"
+                          data-bg={
                             backdrop_path !== null
-                              ? {
-                                  backgroundImage: `url(https://image.tmdb.org/t/p/w500/${
-                                    backdrop_path || poster_path
-                                  })`
-                                }
-                              : {
-                                  backgroundImage: `url(https://homestaymatch.com/images/no-image-available.png)`
-                                }
+                              ? `https://image.tmdb.org/t/p/w500/${backdrop_path || poster_path}`
+                              : "https://homestaymatch.com/images/no-image-available.png"
                           }
                         />
                       </div>
