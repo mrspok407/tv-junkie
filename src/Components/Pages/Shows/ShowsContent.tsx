@@ -108,16 +108,11 @@ const ShowsContent: React.FC = () => {
                   <div className="content-results__item-overview">
                     <div className="content-results__item-poster">
                       <div
-                        style={
+                        className="lazyload"
+                        data-bg={
                           item.backdrop_path !== null
-                            ? {
-                                backgroundImage: `url(https://image.tmdb.org/t/p/w500/${
-                                  item.backdrop_path || item.poster_path
-                                })`
-                              }
-                            : {
-                                backgroundImage: `url(https://homestaymatch.com/images/no-image-available.png)`
-                              }
+                            ? `https://image.tmdb.org/t/p/w500/${item.backdrop_path || item.poster_path}`
+                            : "https://homestaymatch.com/images/no-image-available.png"
                         }
                       />
                     </div>
