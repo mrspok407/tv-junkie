@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react"
+import { useState, useEffect, useContext, useReducer } from "react"
 import { combineMergeObjects } from "Utils"
 import { organiseFutureEpisodesByMonth } from "Components/Pages/Calendar/CalendarHelpers"
 import { FirebaseContext } from "Components/Firebase"
@@ -61,27 +61,37 @@ export interface UserWillAirEpisodesInterface {
   episodes: SingleEpisodeByMonthInterface[]
 }
 
+const reducer = function (state: any, action: any) {
+  switch (action.type) {
+    case "update": {
+      console.log({ state })
+      return {
+        ...state,
+        shows: action.payload.shows
+      }
+    }
+  }
+}
+
 const useUserShows = () => {
   const [userShows, setUserShows] = useState<UserShowsInterface[]>([])
   const [userWillAirEpisodes, setUserWillAirEpisodes] = useState<UserWillAirEpisodesInterface[]>([])
-  const {
-    userToWatchShows,
-    loadingNotFinishedShows,
-    listenerUserToWatchShow,
-    resetStateToWatchShows
-  } = useGetUserToWatchShows()
+  const { userToWatchShows, loadingNotFinishedShows, listenerUserToWatchShow, resetStateToWatchShows } =
+    useGetUserToWatchShows()
 
-  const {
-    userMovies,
-    loadingMovies,
-    listenerUserMovies,
-    handleUserMoviesOnClient,
-    resetStateUserMovies
-  } = useGetUserMovies()
+  const { userMovies, loadingMovies, listenerUserMovies, handleUserMoviesOnClient, resetStateUserMovies } =
+    useGetUserMovies()
   const [loadingShows, setLoadingShows] = useState(true)
   const [firebaseListeners, setFirebaseListeners] = useState<any>([])
 
   const firebase = useContext(FirebaseContext)
+
+  const [state, dispatch] = useReducer<React.Reducer<any, any>>(reducer, [])
+
+  const [test, setTest] = useState<any>([])
+  useEffect(() => {
+    console.log({ test })
+  }, [test])
 
   useEffect(() => {
     let authSubscriber: any
@@ -93,6 +103,16 @@ const useUserShows = () => {
 
           await updateUserEpisodesFromDatabase({ firebase })
 
+          firebase
+            .userAllShows(authUser.uid)
+            .on("child_added", async (snapshot: { val: () => UserShowsInterface[] }) => {
+              // const shows = Object.values(snapshot.val()).map((show) => {
+              //   return show
+              // })
+              setTest((prevState: any) => [...prevState, snapshot.val()])
+              // console.log({ shows })
+            })
+
           firebase.userAllShows(authUser.uid).on("value", async (snapshot: { val: () => UserShowsInterface[] }) => {
             if (snapshot.val() === null) {
               setLoadingShows(false)
@@ -101,6 +121,10 @@ const useUserShows = () => {
             const shows = Object.values(snapshot.val()).map((show) => {
               return show
             })
+
+            dispatch({ type: "update", payload: { shows } })
+            console.log({ userShows })
+            console.log({ userAllShows: shows })
             const userShowsSS: UserShowsInterface[] = JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY_SHOWS)!)
 
             if (userShowsSS.length === 0) {
