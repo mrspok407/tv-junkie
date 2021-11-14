@@ -29,6 +29,7 @@ module.exports = {
     "max-len": ["error", {"code": 120}],
     "camelcase": "off",
     "@typescript-eslint/no-explicit-any": "off",
-    "operator-linebreak": "off"
+    "operator-linebreak": "off",
+    "linebreak-style": "off"
   }
 };
