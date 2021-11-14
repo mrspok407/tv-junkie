@@ -10,7 +10,7 @@ const useGetInitialContactInfo = () => {
 
   const getContactsInfo = async ({ contactsData }: { contactsData: ContactInfoInterface[] }) => {
     return await Promise.all(
-      contactsData.map(async (contact) => {
+      contactsData?.map(async (contact) => {
         if (loadedContactsRef.current[contact.key]) {
           return {
             ...loadedContactsRef.current[contact.key],
@@ -58,7 +58,7 @@ const useGetInitialContactInfo = () => {
           newContactsRequests: !!newContactsRequests.val(),
           unreadMessages,
           unreadMessagesContact,
-          lastMessage: lastMessage.val() !== null ? Object.values(lastMessage.val() || []).map((item) => item)[0] : {}
+          lastMessage: lastMessage.val() !== null ? Object.values(lastMessage.val() || {}).map((item) => item)[0] : {}
         }
 
         loadedContactsRef.current = {
