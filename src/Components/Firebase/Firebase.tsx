@@ -5,16 +5,16 @@ import "firebase/analytics"
 import "firebase/functions"
 import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 
-// const configProduction = {
-//   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-//   authDomain: process.env.REACT_APP_AUTH_DOMAIN,
-//   databaseURL: process.env.REACT_APP_DATABASE_URL,
-//   projectId: process.env.REACT_APP_PROJECT_ID,
-//   storageBucket: process.env.REACT_APP_STORAGE_BUCKET,
-//   messagingSenderId: process.env.REACT_APP_MESSAGING_SENDER_ID,
-//   measurementId: process.env.REACT_APP_MEASUREMENT_ID,
-//   appId: process.env.REACT_APP_APP_ID
-// }
+const configProduction = {
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_AUTH_DOMAIN,
+  databaseURL: process.env.REACT_APP_DATABASE_URL,
+  projectId: process.env.REACT_APP_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_MESSAGING_SENDER_ID,
+  measurementId: process.env.REACT_APP_MEASUREMENT_ID,
+  appId: process.env.REACT_APP_APP_ID
+}
 
 const configDevelopment = {
   apiKey: process.env.REACT_APP_DEV_FIREBASE_API_KEY,
@@ -27,15 +27,15 @@ const configDevelopment = {
   appId: process.env.REACT_APP_DEV_APP_ID
 }
 
-// let config: any = process.env.NODE_ENV === "production" ? configProduction : configDevelopment
-let config: any = configDevelopment
+let config: any = process.env.NODE_ENV === "production" ? configProduction : configDevelopment
+// let config: any = configDevelopment
 
-if (window.location.hostname === "localhost") {
-  config = {
-    ...config,
-    databaseURL: `http://localhost:9000/?ns=pet-project-development-default-rtdb`
-  }
-}
+// if (window.location.hostname === "localhost") {
+//   config = {
+//     ...config,
+//     databaseURL: `http://localhost:9000/?ns=pet-project-development-default-rtdb`
+//   }
+// }
 
 interface ReferenceInterface {
   uid: string
@@ -68,7 +68,7 @@ class Firebase {
     this.app = app
 
     if (window.location.hostname === "localhost") {
-      app.functions().useEmulator("localhost", 4000)
+      // app.functions().useEmulator("localhost", 4000)
     }
   }
 
