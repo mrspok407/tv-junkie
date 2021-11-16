@@ -5,7 +5,7 @@ import {
   AddShowToDatabaseArg,
   HandleMovieInDatabasesArg,
   HandleShowInDatabasesArg
-} from "Components/AppContext/AppContextHOC"
+} from "Components/AppContext/@Types"
 import addShowToMainDatabase from "./FirebaseHelpers/addShowToMainDatabase"
 import getShowEpisodesFromAPI from "./TmdbAPIHelpers/getShowEpisodesFromAPI"
 import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"

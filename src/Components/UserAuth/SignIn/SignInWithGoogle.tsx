@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from "react"
 import { useHistory } from "react-router-dom"
-import { AppContext, MovieInterface } from "Components/AppContext/AppContextHOC"
+import { AppContext } from "Components/AppContext/AppContextHOC"
+import { MovieInterface } from "Components/AppContext/@Types"
 import * as ROLES from "Utils/Constants/roles"
 import * as ROUTES from "Utils/Constants/routes"
 import { AuthUserGoogleSignInInterface } from "Utils/Interfaces/UserAuth"

@@ -1,5 +1,5 @@
 import * as React from "react"
-import { AppContextInterface, CONTEXT_INITIAL_STATE } from "Components/AppContext/AppContextHOC"
+import { AppContextInterface, CONTEXT_INITIAL_STATE } from "Components/AppContext/@Types"
 
 export enum ActionTypes {
   IncrementLoadedMovies = "incrementLoadedMovies",

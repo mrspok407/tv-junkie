@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react"
+import { useState, useEffect, useContext, useReducer } from "react"
 import { combineMergeObjects } from "Utils"
 import { organiseFutureEpisodesByMonth } from "Components/Pages/Calendar/CalendarHelpers"
 import { FirebaseContext } from "Components/Firebase"
@@ -11,6 +11,11 @@ import spliceNewShowFromDatabase from "./FirebaseHelpers/spliceNewShowFromDataba
 import getFullInfoForUpdatedShow from "./FirebaseHelpers/getFullInfoForUpdatedShow"
 import useGetUserMovies from "./Hooks/UseGetUserMovies"
 import updateUserEpisodesFromDatabase from "Components/UserContent/UseUserShows/FirebaseHelpers/updateUserEpisodesFromDatabase"
+import { useAppDispatch, useAppSelector } from "app/hooks"
+import { addNewShow, selectUserShows, updateInitialLoading, updateUserShows } from "./userShowsSlice"
+import { RootState } from "app/store"
+import sortDataSnapshot from "./FirebaseHelpers/sortDataSnapshot"
+import { SnapshotVal } from "Components/AppContext/@Types"
 
 const SESSION_STORAGE_KEY_SHOWS = "userShows"
 
@@ -64,24 +69,21 @@ export interface UserWillAirEpisodesInterface {
 const useUserShows = () => {
   const [userShows, setUserShows] = useState<UserShowsInterface[]>([])
   const [userWillAirEpisodes, setUserWillAirEpisodes] = useState<UserWillAirEpisodesInterface[]>([])
-  const {
-    userToWatchShows,
-    loadingNotFinishedShows,
-    listenerUserToWatchShow,
-    resetStateToWatchShows
-  } = useGetUserToWatchShows()
+  const { userToWatchShows, loadingNotFinishedShows, listenerUserToWatchShow, resetStateToWatchShows } =
+    useGetUserToWatchShows()
 
-  const {
-    userMovies,
-    loadingMovies,
-    listenerUserMovies,
-    handleUserMoviesOnClient,
-    resetStateUserMovies
-  } = useGetUserMovies()
+  const { userMovies, loadingMovies, listenerUserMovies, handleUserMoviesOnClient, resetStateUserMovies } =
+    useGetUserMovies()
   const [loadingShows, setLoadingShows] = useState(true)
   const [firebaseListeners, setFirebaseListeners] = useState<any>([])
 
   const firebase = useContext(FirebaseContext)
+  const userShowsRedux = useAppSelector(selectUserShows)
+  const dispatch = useAppDispatch()
+
+  useEffect(() => {
+    console.log(userShowsRedux)
+  }, [userShowsRedux])
 
   useEffect(() => {
     let authSubscriber: any
@@ -89,11 +91,31 @@ const useUserShows = () => {
       authSubscriber = firebase.onAuthUserListener(
         async (authUser: AuthUserInterface) => {
           if (!authUser) return
-          setLoadingShows(true)
 
           await updateUserEpisodesFromDatabase({ firebase })
 
-          firebase.userAllShows(authUser.uid).on("value", async (snapshot: { val: () => UserShowsInterface[] }) => {
+          try {
+            const userShowsSnapshot = await firebase.userAllShows(authUser.uid).orderByChild("timeStamp").once("value")
+            dispatch(updateUserShows(userShowsSnapshot.val()))
+
+            const userShowsData = sortDataSnapshot<UserShowsInterface>(userShowsSnapshot)
+            console.log(userShowsData[userShowsData.length - 1].timeStamp)
+            firebase
+              .userAllShows(authUser.uid)
+              .orderByChild("timeStamp")
+              .startAfter(userShowsData[userShowsData.length - 1].timeStamp)
+              .on("child_added", (snapshot: SnapshotVal<UserShowsInterface>) => {
+                dispatch(addNewShow(snapshot.val()))
+              })
+          } catch (error) {
+            dispatch(updateInitialLoading(false))
+          }
+
+          setLoadingShows(true)
+
+          // await updateUserEpisodesFromDatabase({ firebase })
+
+          firebase.userAllShows(authUser.uid).on("value", async (snapshot: SnapshotVal<UserShowsInterface[]>) => {
             if (snapshot.val() === null) {
               setLoadingShows(false)
               return
@@ -101,6 +123,7 @@ const useUserShows = () => {
             const shows = Object.values(snapshot.val()).map((show) => {
               return show
             })
+
             const userShowsSS: UserShowsInterface[] = JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY_SHOWS)!)
 
             if (userShowsSS.length === 0) {
