@@ -133,7 +133,7 @@ const useContentHandler = () => {
           status: showsSubDatabase,
           firstAirDate: show.first_air_date,
           name: show.name,
-          timeStamp: new Date().getTime(),
+          timeStamp: firebase.timeStamp(),
           finished: false,
           id
         }),

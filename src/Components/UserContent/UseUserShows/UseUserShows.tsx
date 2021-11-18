@@ -12,8 +12,7 @@ import getFullInfoForUpdatedShow from "./FirebaseHelpers/getFullInfoForUpdatedSh
 import useGetUserMovies from "./Hooks/UseGetUserMovies"
 import updateUserEpisodesFromDatabase from "Components/UserContent/UseUserShows/FirebaseHelpers/updateUserEpisodesFromDatabase"
 import { useAppDispatch, useAppSelector } from "app/hooks"
-import { addNewShow, selectUserShows, updateInitialLoading, updateUserShows } from "./userShowsSlice"
-import { RootState } from "app/store"
+import { addNewShow, fetchUserShows, selectUserShows, updateInitialLoading, updateUserShows } from "./userShowsSlice"
 import sortDataSnapshot from "./FirebaseHelpers/sortDataSnapshot"
 import { SnapshotVal } from "Components/AppContext/@Types"
 
@@ -79,6 +78,7 @@ const useUserShows = () => {
 
   const firebase = useContext(FirebaseContext)
   const userShowsRedux = useAppSelector(selectUserShows)
+
   const dispatch = useAppDispatch()
 
   useEffect(() => {
@@ -95,18 +95,21 @@ const useUserShows = () => {
           await updateUserEpisodesFromDatabase({ firebase })
 
           try {
-            const userShowsSnapshot = await firebase.userAllShows(authUser.uid).orderByChild("timeStamp").once("value")
-            dispatch(updateUserShows(userShowsSnapshot.val()))
+            dispatch(fetchUserShows(authUser.uid, firebase))
+            // orderByChild(timeSTamp).limitToLast() - просто так последний таймстеп брать и на основе его делать child_added
 
-            const userShowsData = sortDataSnapshot<UserShowsInterface>(userShowsSnapshot)
-            console.log(userShowsData[userShowsData.length - 1].timeStamp)
-            firebase
-              .userAllShows(authUser.uid)
-              .orderByChild("timeStamp")
-              .startAfter(userShowsData[userShowsData.length - 1].timeStamp)
-              .on("child_added", (snapshot: SnapshotVal<UserShowsInterface>) => {
-                dispatch(addNewShow(snapshot.val()))
-              })
+            // const userShowsSnapshot = await firebase.userAllShows(authUser.uid).orderByChild("timeStamp").once("value")
+            // dispatch(updateUserShows(userShowsSnapshot.val()))
+
+            // const userShowsData = sortDataSnapshot<UserShowsInterface>(userShowsSnapshot)
+            // console.log(userShowsData[userShowsData.length - 1].timeStamp)
+            // firebase
+            //   .userAllShows(authUser.uid)
+            //   .orderByChild("timeStamp")
+            //   .startAfter(userShowsData[userShowsData.length - 1].timeStamp)
+            //   .on("child_added", (snapshot: SnapshotVal<UserShowsInterface>) => {
+            //     dispatch(addNewShow(snapshot.val()))
+            //   })
           } catch (error) {
             dispatch(updateInitialLoading(false))
           }

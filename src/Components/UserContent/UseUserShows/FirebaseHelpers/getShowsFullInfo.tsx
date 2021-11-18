@@ -37,7 +37,7 @@ const getShowsFullInfo = ({ userShows, firebase }: GetUserShowsFullInfoArg) => {
     const mergedShows: UserShowsInterface[] = merge(userShows, showsDatabase, {
       arrayMerge: combineMergeObjects
     })
-    const watchingShows: any = mergedShows.filter((show) => show && show.database === "watchingShows")
+    const watchingShows = mergedShows.filter((show) => show.database === "watchingShows")
     const willAirEpisodes: UserWillAirEpisodesInterface[] = organiseFutureEpisodesByMonth(watchingShows)
 
     return { showsFullInfo: mergedShows, willAirEpisodes }
