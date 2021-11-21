@@ -12,7 +12,14 @@ import getFullInfoForUpdatedShow from "./FirebaseHelpers/getFullInfoForUpdatedSh
 import useGetUserMovies from "./Hooks/UseGetUserMovies"
 import updateUserEpisodesFromDatabase from "Components/UserContent/UseUserShows/FirebaseHelpers/updateUserEpisodesFromDatabase"
 import { useAppDispatch, useAppSelector } from "app/hooks"
-import { addNewShow, fetchUserShows, selectUserShows, updateInitialLoading, updateUserShows } from "./userShowsSlice"
+import {
+  addNewShow,
+  fetchUserShows,
+  selectUserShows,
+  testSlice,
+  updateInitialLoading,
+  updateUserShows
+} from "./userShowsSlice"
 import sortDataSnapshot from "./FirebaseHelpers/sortDataSnapshot"
 import { SnapshotVal } from "Components/AppContext/@Types"
 
@@ -95,6 +102,7 @@ const useUserShows = () => {
           await updateUserEpisodesFromDatabase({ firebase })
 
           try {
+            dispatch(testSlice.actions.testRed("fffffffff"))
             dispatch(fetchUserShows(authUser.uid, firebase))
             // orderByChild(timeSTamp).limitToLast() - просто так последний таймстеп брать и на основе его делать child_added
 

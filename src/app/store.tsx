@@ -1,9 +1,11 @@
 import { configureStore, ThunkAction, Action } from "@reduxjs/toolkit"
 import userShowsReducer from "../Components/UserContent/UseUserShows/userShowsSlice"
+import { testSlice } from "../Components/UserContent/UseUserShows/userShowsSlice"
 
 export const store = configureStore({
   reducer: {
-    userShows: userShowsReducer
+    userShows: userShowsReducer,
+    test: testSlice.reducer
   }
 })
 
