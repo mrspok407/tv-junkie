@@ -103,7 +103,8 @@ const useUserShows = () => {
 
           try {
             dispatch(testSlice.actions.testRed("fffffffff"))
-            dispatch(fetchUserShows(authUser.uid, firebase))
+            const promise = dispatch(fetchUserShows(authUser.uid, firebase))
+            promise.then((res) => console.log(res))
             // orderByChild(timeSTamp).limitToLast() - просто так последний таймстеп брать и на основе его делать child_added
 
             // const userShowsSnapshot = await firebase.userAllShows(authUser.uid).orderByChild("timeStamp").once("value")

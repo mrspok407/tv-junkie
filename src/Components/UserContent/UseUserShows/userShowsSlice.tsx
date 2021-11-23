@@ -71,8 +71,9 @@ export const fetchUserShows = (id: any, firebase: any) => async (dispatch: any, 
     // dispatch an action when we get the response back
     //dispatch({ type: "userShows/updateUserShows", payload: userShowsSnapshot.val() })
 
-    dispatch(updateUserShows(Object.values(userShowsSnapshot.val())))
+    dispatch(updateUserShows(sortDataSnapshot(userShowsSnapshot)))
     console.log({ getState: getState() })
+    return selectUserShows(getState())
   } catch (err) {
     dispatch(updateInitialLoading(false))
     // If something went wrong, handle it here
