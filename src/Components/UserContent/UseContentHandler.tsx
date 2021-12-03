@@ -189,13 +189,13 @@ const useContentHandler = () => {
         })
 
       firebase
-        .showInDatabase(id)
+        .showFullData(id)
         .child("usersWatching")
         .once("value", (snapshot: any) => {
           const currentUsersWatching = snapshot.val()
           const prevDatabase = userShow.database
 
-          firebase.showInDatabase(id).update({
+          firebase.showFullData(id).update({
             usersWatching:
               database === "watchingShows"
                 ? currentUsersWatching + 1

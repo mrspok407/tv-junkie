@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState, useEffect, useContext } from "react"
+import React, { useState, useEffect, useContext, useCallback } from "react"
+import { createSelector } from "@reduxjs/toolkit"
 import { useHistory } from "react-router-dom"
 import axios from "axios"
 import { Helmet } from "react-helmet"
@@ -19,7 +20,10 @@ import PlaceholderLoadingFullInfo from "Components/UI/Placeholders/PlaceholderLo
 import useHandleListeners from "./FirebaseHelpers/UseHandleListeners"
 import { ContentDetailes, CONTENT_DETAILS_DEFAULT } from "Utils/Interfaces/ContentDetails"
 import useGoogleRedirect from "Components/UserAuth/SignIn/UseGoogleRedirect"
+import { useAppSelector } from "app/hooks"
+import { testCreateSelector, selectUserShow, selectUserShows } from "Components/UserContent/UseUserShows/userShowsSlice"
 import "./Detailes.scss"
+import { isEqual } from "lodash"
 
 const { CancelToken } = require("axios")
 let cancelRequest: any
@@ -39,6 +43,25 @@ const SHOW_INFO_INITIAL_STATE = {
   id: 0,
   database: "",
   showInUserDatabase: false
+}
+
+const memoizedSelector = (id: any) => {
+  let lastResult: any = null
+  let lastArgs: any = null
+
+  return (...args: any) => {
+    if (isEqual(lastArgs, args) && lastArgs !== null) {
+      return lastResult
+    }
+    const state = args[0]
+    // if (isEqual(selectUserShow(state, id), lastResult) && lastResult !== null) {
+    //   console.log({ lastResultIn: lastResult })
+    //   return lastResult
+    // }
+    lastResult = { ...state }
+    lastArgs = args
+    return lastResult
+  }
 }
 
 export const DetailesPage: React.FC<Props> = ({
@@ -68,6 +91,25 @@ export const DetailesPage: React.FC<Props> = ({
   const [loadingFromDatabase, setLoadingFromDatabase] = useState(true)
 
   useGoogleRedirect()
+
+  // const userShowsRedux = useAppSelector(selectUserShows)
+
+  const memoizedSelectorCallback = useCallback(memoizedSelector(id), [id])
+  const thisShow = useAppSelector((state) => memoizedSelectorCallback(selectUserShow(state, Number(id)), 3, 4))
+
+  //const test = useAppSelector((state) => testCreateSelector(state, Number(id)))
+
+  useEffect(() => {
+    console.log(thisShow)
+  }, [thisShow])
+
+  // useEffect(() => {
+  //   console.log(thisShow)
+  // }, [thisShow])
+
+  useEffect(() => {
+    console.log("rerender")
+  })
 
   useEffect(() => {
     getContent()

@@ -33,6 +33,14 @@ interface GroupChatMemberStatusInterface {
   [key: string]: string | boolean;
 }
 
+interface ApiError {
+  message: string;
+}
+
+const isApiError = (x: any): x is ApiError => {
+  return typeof x.message === "string";
+};
+
 const contactsDatabaseRef = (uid: string) => `${uid}/contactsDatabase`;
 
 export const updatePinnedTimeStamp = functions.database
@@ -207,7 +215,9 @@ export const addNewGroupMembers = functions.https.onCall(
       };
       return database.ref().update(updateData);
     } catch (error) {
-      throw new functions.https.HttpsError("unknown", error.message, error);
+      if (isApiError(error)) {
+        throw new functions.https.HttpsError("unknown", error.message, error);
+      }
     }
   }
 );
@@ -243,7 +253,9 @@ export const removeMemberFromGroup = functions.https.onCall(async (data, context
 
     return database.ref().update(updateData);
   } catch (error) {
-    throw new functions.https.HttpsError("unknown", error.message, error);
+    if (isApiError(error)) {
+      throw new functions.https.HttpsError("unknown", error.message, error);
+    }
   }
 });
 
@@ -313,7 +325,11 @@ export const createNewGroup = functions.https.onCall(
           return {newGroupChatKey: groupChatRef.key};
         });
     } catch (error) {
-      throw new functions.https.HttpsError("unknown", error.message, error);
+      if (isApiError(error)) {
+        throw new functions.https.HttpsError("unknown", error.message, error);
+      } else {
+        return;
+      }
     }
   }
 );
@@ -351,7 +367,9 @@ export const newContactRequest = functions.https.onCall(async (data, context) =>
 
     return database.ref("users").update(updateData);
   } catch (error) {
-    throw new functions.https.HttpsError("unknown", error.message, error);
+    if (isApiError(error)) {
+      throw new functions.https.HttpsError("unknown", error.message, error);
+    }
   }
 });
 
@@ -390,6 +408,8 @@ export const handleContactRequest = functions.https.onCall(async (data, context)
 
     return database.ref().update(updateData);
   } catch (error) {
-    throw new functions.https.HttpsError("unknown", error.message, error);
+    if (isApiError(error)) {
+      throw new functions.https.HttpsError("unknown", error.message, error);
+    }
   }
 });

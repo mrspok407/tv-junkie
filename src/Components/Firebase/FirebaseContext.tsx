@@ -6,7 +6,7 @@ export interface FirebaseInterface {
   app?: any
   user?: any
   showEpisodes?: any
-  showInDatabase?: any
+  showFullData?: any
   timeStamp?: any
   callback?: any
   userAllShows?: any
