@@ -30,7 +30,7 @@ const getFullInfoForUpdatedShow = async ({
 
   if (changedShow) {
     await firebase
-      .showInDatabase(changedShow.id)
+      .showFullData(changedShow.id)
       .once("value")
       .then((snapshot: { val: () => { info: {}; episodes: SeasonEpisodesFromDatabaseInterface[] } }) => {
         const index = userShowsCopy.findIndex((item) => item.id === changedShow.id)

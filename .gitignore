@@ -11,6 +11,8 @@
 # production
 /build
 
+googleCredentials.json
+
 # firebase
 functions/node_modules
 

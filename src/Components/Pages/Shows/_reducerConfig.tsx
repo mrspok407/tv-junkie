@@ -1,5 +1,5 @@
 import * as React from "react"
-import { AppContextInterface, CONTEXT_INITIAL_STATE } from "Components/AppContext/AppContextHOC"
+import { AppContextInterface, CONTEXT_INITIAL_STATE } from "Components/AppContext/@Types"
 
 export enum ActionTypes {
   IncrementLoadedShows = "incrementLoadedShows",
@@ -90,9 +90,7 @@ const reducer: React.Reducer<ShowsContentState, ActionInterface> = (state, actio
         [activeSection]: !!(
           loadedShows[activeSection] >=
           context.userContent.userShows.filter((show: any) =>
-            activeSection === "finishedShows"
-              ? !!show.finished
-              : !!(show.database === activeSection && !show.finished)
+            activeSection === "finishedShows" ? !!show.finished : !!(show.database === activeSection && !show.finished)
           ).length
         )
       }
@@ -102,9 +100,7 @@ const reducer: React.Reducer<ShowsContentState, ActionInterface> = (state, actio
       ...state,
       disableLoad: {
         ...disableLoad,
-        watchingShowsLS: !!(
-          loadedShows.watchingShowsLS >= context.userContentLocalStorage.watchingShows.length
-        )
+        watchingShowsLS: !!(loadedShows.watchingShowsLS >= context.userContentLocalStorage.watchingShows.length)
       }
     }
   } else if (action.type === ActionTypes.ChangeActiveSection) {

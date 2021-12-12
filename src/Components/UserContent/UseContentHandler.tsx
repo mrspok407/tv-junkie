@@ -5,7 +5,7 @@ import {
   AddShowToDatabaseArg,
   HandleMovieInDatabasesArg,
   HandleShowInDatabasesArg
-} from "Components/AppContext/AppContextHOC"
+} from "Components/AppContext/@Types"
 import addShowToMainDatabase from "./FirebaseHelpers/addShowToMainDatabase"
 import getShowEpisodesFromAPI from "./TmdbAPIHelpers/getShowEpisodesFromAPI"
 import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
@@ -133,7 +133,7 @@ const useContentHandler = () => {
           status: showsSubDatabase,
           firstAirDate: show.first_air_date,
           name: show.name,
-          timeStamp: new Date().getTime(),
+          timeStamp: firebase.timeStamp(),
           finished: false,
           id
         }),
@@ -189,13 +189,13 @@ const useContentHandler = () => {
         })
 
       firebase
-        .showInDatabase(id)
+        .showFullData(id)
         .child("usersWatching")
         .once("value", (snapshot: any) => {
           const currentUsersWatching = snapshot.val()
           const prevDatabase = userShow.database
 
-          firebase.showInDatabase(id).update({
+          firebase.showFullData(id).update({
             usersWatching:
               database === "watchingShows"
                 ? currentUsersWatching + 1

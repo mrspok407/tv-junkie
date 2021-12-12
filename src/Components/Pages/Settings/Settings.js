@@ -177,7 +177,7 @@ class Profile extends Component {
 
         data.results.forEach((show) => {
           this.context.firebase
-            .showInDatabase(show.id)
+            .showFullData(show.id)
             .child("id")
             .once("value", (snapshot) => {
               if (snapshot.val() !== null) {
@@ -254,7 +254,7 @@ class Profile extends Component {
                   )
                   .then((data) => {
                     this.context.firebase
-                      .showInDatabase(show.id)
+                      .showFullData(show.id)
                       .update({
                         episodes: data.episodes,
                         status: data.status

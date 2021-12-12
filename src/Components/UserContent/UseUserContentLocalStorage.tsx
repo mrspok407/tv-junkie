@@ -1,4 +1,4 @@
-import { ToggleMovieLSArg } from "Components/AppContext/AppContextHOC"
+import { ToggleMovieLSArg } from "Components/AppContext/@Types"
 import { useState, useEffect } from "react"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
 

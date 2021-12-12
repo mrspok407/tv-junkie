@@ -1,6 +1,7 @@
 import { useEffect, useContext } from "react"
 import { FirebaseContext } from "Components/Firebase"
-import { AppContext, MovieInterface } from "Components/AppContext/AppContextHOC"
+import { AppContext } from "Components/AppContext/AppContextHOC"
+import { MovieInterface } from "Components/AppContext/@Types"
 import * as ROLES from "Utils/Constants/roles"
 import * as ROUTES from "Utils/Constants/routes"
 import { useHistory } from "react-router-dom"

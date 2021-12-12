@@ -21,7 +21,7 @@ interface Arguments {
 }
 
 const addShowToMainDatabase = ({ firebase, show, dataFromAPI }: Arguments): Promise<any> => {
-  return firebase.showInDatabase(show.id).transaction(
+  return firebase.showFullData(show.id).transaction(
     (snapshot: any) => {
       if (snapshot === null) {
         return {
@@ -51,7 +51,7 @@ const addShowToMainDatabase = ({ firebase, show, dataFromAPI }: Arguments): Prom
     (error: any, committed: any, snapshot: any) => {
       if (error) {
       } else if (!committed) {
-        firebase.showInDatabase(show.id).update({
+        firebase.showFullData(show.id).update({
           usersWatching: snapshot.val().usersWatching + 1
         })
       } else {

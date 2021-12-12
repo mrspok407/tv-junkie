@@ -53,7 +53,7 @@ const updateUserEpisodesFromDatabase = async ({ firebase }: Arguments) => {
     Promise.all(
       showsToUpdate.map((show) =>
         firebase
-          .showInDatabase(show)
+          .showFullData(show)
           .once("value")
           .then((snapshot: { val: () => { info: {}; episodes: SeasonEpisodesFromDatabaseInterface[] } }) => {
             return { ...snapshot.val().info, episodes: snapshot.val().episodes }

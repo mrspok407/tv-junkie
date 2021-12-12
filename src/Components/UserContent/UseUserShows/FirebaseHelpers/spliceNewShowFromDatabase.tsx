@@ -19,7 +19,7 @@ const spliceNewShowFromDatabase = ({
   willAirEpisodes: UserWillAirEpisodesInterface[]
 }> => {
   return firebase
-    .showInDatabase(userShow.id)
+    .showFullData(userShow.id)
     .once("value")
     .then((snapshot: { val: () => { info: {}; episodes: SeasonEpisodesFromDatabaseInterface[] } }) => {
       if (snapshot.val() === null) {
