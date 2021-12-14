@@ -21,7 +21,12 @@ import useHandleListeners from "./FirebaseHelpers/UseHandleListeners"
 import { ContentDetailes, CONTENT_DETAILS_DEFAULT } from "Utils/Interfaces/ContentDetails"
 import useGoogleRedirect from "Components/UserAuth/SignIn/UseGoogleRedirect"
 import { useAppSelector } from "app/hooks"
-import { testCreateSelector, selectUserShow, selectUserShows } from "Components/UserContent/UseUserShows/userShowsSlice"
+import {
+  testCreateSelector,
+  selectUserShow,
+  selectUserShows,
+  selectUserShowsIds
+} from "Components/UserContent/UseUserShows/userShowsSlice"
 import "./Detailes.scss"
 import { isEqual } from "lodash"
 
@@ -49,17 +54,20 @@ const memoizedSelector = (id: any) => {
   let lastResult: any = null
   let lastArgs: any = null
 
-  return (...args: any) => {
-    if (isEqual(lastArgs, args) && lastArgs !== null) {
+  return (show: any) => {
+    console.log(show)
+    if (!show) return
+    if (lastResult && lastResult.timeStamp !== show.timeStamp) {
+      console.log(lastResult.timeStamp)
+      // lastResult.timeStamp = show.timeStamp
+
       return lastResult
     }
-    const state = args[0]
     // if (isEqual(selectUserShow(state, id), lastResult) && lastResult !== null) {
     //   console.log({ lastResultIn: lastResult })
     //   return lastResult
     // }
-    lastResult = { ...state }
-    lastArgs = args
+    lastResult = show
     return lastResult
   }
 }
@@ -95,7 +103,12 @@ export const DetailesPage: React.FC<Props> = ({
   // const userShowsRedux = useAppSelector(selectUserShows)
 
   const memoizedSelectorCallback = useCallback(memoizedSelector(id), [id])
-  const thisShow = useAppSelector((state) => memoizedSelectorCallback(selectUserShow(state, Number(id)), 3, 4))
+  // const thisShow = useAppSelector((state) => {
+  //   return memoizedSelectorCallback(selectUserShow(state, Number(id)))
+  // })
+
+  const thisShow = useAppSelector((state) => selectUserShow(state, Number(id)))
+  //const thisShow = useAppSelector((state) => selectUserShowsIds(state))
 
   //const test = useAppSelector((state) => testCreateSelector(state, Number(id)))
 

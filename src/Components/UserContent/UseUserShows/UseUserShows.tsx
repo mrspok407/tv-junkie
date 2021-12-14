@@ -79,13 +79,13 @@ const useUserShows = () => {
   const [firebaseListeners, setFirebaseListeners] = useState<any>([])
 
   const firebase = useContext(FirebaseContext)
-  const userShowsRedux = useAppSelector(selectUserShows)
+  // const userShowsRedux = useAppSelector(selectUserShows)
 
   const dispatch = useAppDispatch()
 
-  useEffect(() => {
-    console.log(userShowsRedux)
-  }, [userShowsRedux])
+  // useEffect(() => {
+  //   console.log(userShowsRedux)
+  // }, [userShowsRedux])
 
   useEffect(() => {
     let authSubscriber: any

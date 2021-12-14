@@ -17,6 +17,9 @@ interface UserShowsState {
     content: {
       [key: string]: UserShowsInterface
     }
+    timeStamps: {
+      [key: string]: number
+    }
   }
   initialLoading: boolean
   error: any
@@ -25,7 +28,8 @@ interface UserShowsState {
 const initialState: UserShowsState = {
   data: {
     ids: [],
-    content: {}
+    content: {},
+    timeStamps: {}
   },
   initialLoading: true,
   error: null
@@ -62,27 +66,37 @@ export const counterSlice = createSlice({
         console.log(action.payload)
         state.data.ids = action.payload.ids
         state.data.content = action.payload.content
+        state.data.timeStamps = action.payload.timeStamps
         state.initialLoading = false
       },
       prepare(data: UserShowsInterface[]) {
-        const content = data.reduce((acc, item) => {
-          acc[item.key] = item
-          return acc
-        }, {} as UserShowsState["data"]["content"])
+        const content: UserShowsState["data"]["content"] = {}
+        const timeStamps: UserShowsState["data"]["timeStamps"] = {}
+        data.forEach((item) => {
+          content[item.key] = item
+          timeStamps[item.key] = item.timeStamp
+        })
         const ids = data.map((item) => item.id)
-
         return {
-          payload: { ids, content }
+          payload: { ids, content, timeStamps }
         }
       }
     },
     addNewShow: (state, action: PayloadAction<UserShowsInterface>) => {
       console.log(action.payload)
+      if (state.data.ids.includes(action.payload.id)) return
       state.data.ids.push(action.payload.id)
       state.data.content[action.payload.id] = action.payload
+      state.data.timeStamps[action.payload.id] = action.payload.timeStamp
     },
     changeShow: (state, action: PayloadAction<UserShowsInterface>) => {
       const show = state.data.content[action.payload.id]
+      const timeStamp = state.data.timeStamps[action.payload.id]
+      if (timeStamp !== action.payload.timeStamp) {
+        console.log("change show ts not equal")
+        state.data.timeStamps[action.payload.id] = action.payload.timeStamp
+        return
+      }
       console.log(action.payload)
       state.data.content[action.payload.id] = { ...show, ...action.payload }
     },
@@ -115,7 +129,7 @@ export const fetchUserShows =
       const userShowsSnapshot = await firebase.userAllShows(uid).orderByChild("timeStamp").once("value")
       const userShows = sortDataSnapshot<UserShowsInterface>(userShowsSnapshot)
       const showsFullData = await fetchShowsFullData({ userShows, firebase })
-      const mergedShows: UserShowsInterface[] = merge(userShows, showsFullData, {
+      const mergedShows: UserShowsInterface[] = merge(showsFullData, userShows, {
         arrayMerge: combineMergeObjects
       })
 
@@ -134,6 +148,8 @@ export const handleNewShow =
     try {
       const showFullDataSnapshot: SnapshotVal<{ info: {}; episodes: SeasonEpisodesFromDatabaseInterface[] }> =
         await firebaseRef.once("value")
+
+      console.log("handleNewShow after AWAIT")
 
       if (showFullDataSnapshot.val() === null) {
         throw new Error(
@@ -172,6 +188,8 @@ export const handleChangeShow =
     const firebaseRef = firebase.showEpisodes(showData.id)
     try {
       const showEpisodesSnapshot: SnapshotVal<SeasonEpisodesFromDatabaseInterface[]> = await firebaseRef.once("value")
+      console.log("handleChangeShow after AWAIT")
+
       if (showEpisodesSnapshot.val() === null) {
         dispatch(changeShow(showData))
         return
