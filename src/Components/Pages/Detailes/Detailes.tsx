@@ -1,6 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect, useContext, useCallback } from "react"
-import { createSelector } from "@reduxjs/toolkit"
 import { useHistory } from "react-router-dom"
 import axios from "axios"
 import { Helmet } from "react-helmet"
@@ -21,14 +20,8 @@ import useHandleListeners from "./FirebaseHelpers/UseHandleListeners"
 import { ContentDetailes, CONTENT_DETAILS_DEFAULT } from "Utils/Interfaces/ContentDetails"
 import useGoogleRedirect from "Components/UserAuth/SignIn/UseGoogleRedirect"
 import { useAppSelector } from "app/hooks"
-import {
-  testCreateSelector,
-  selectUserShow,
-  selectUserShows,
-  selectUserShowsIds
-} from "Components/UserContent/UseUserShows/userShowsSlice"
+import { selectUserShow } from "Components/UserContent/UseUserShows/userShowsSlice"
 import "./Detailes.scss"
-import { isEqual } from "lodash"
 
 const { CancelToken } = require("axios")
 let cancelRequest: any
@@ -102,19 +95,19 @@ export const DetailesPage: React.FC<Props> = ({
 
   // const userShowsRedux = useAppSelector(selectUserShows)
 
-  const memoizedSelectorCallback = useCallback(memoizedSelector(id), [id])
+  // const memoizedSelectorCallback = useCallback(memoizedSelector(id), [id])
   // const thisShow = useAppSelector((state) => {
   //   return memoizedSelectorCallback(selectUserShow(state, Number(id)))
   // })
 
-  const thisShow = useAppSelector((state) => selectUserShow(state, Number(id)))
-  //const thisShow = useAppSelector((state) => selectUserShowsIds(state))
+  // const thisShow = useAppSelector((state) => selectUserShow(state, Number(id)))
+  // //const thisShow = useAppSelector((state) => selectUserShowsIds(state))
 
-  //const test = useAppSelector((state) => testCreateSelector(state, Number(id)))
+  // //const test = useAppSelector((state) => testCreateSelector(state, Number(id)))
 
-  useEffect(() => {
-    console.log(thisShow)
-  }, [thisShow])
+  // useEffect(() => {
+  //   console.log(thisShow)
+  // }, [thisShow])
 
   // useEffect(() => {
   //   console.log(thisShow)
@@ -134,7 +127,7 @@ export const DetailesPage: React.FC<Props> = ({
       setMovieInDatabase(null)
       setShowDatabaseOnClient("")
 
-      firebase.userShowAllEpisodes(authUser && authUser.uid, id).off()
+      firebase.userShowAllEpisodes(authUser?.uid!, id).off()
     }
   }, [mediaType, id])
 

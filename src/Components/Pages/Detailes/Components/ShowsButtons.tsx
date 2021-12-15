@@ -5,6 +5,8 @@ import * as ROUTES from "Utils/Constants/routes"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
 import { HandleListenersArg } from "../FirebaseHelpers/UseHandleListeners"
+import { useAppSelector } from "app/hooks"
+import { selectUserShow, selectUserShows } from "Components/UserContent/UseUserShowsRed/userShowsSliceRed"
 
 type Props = {
   id: number
@@ -25,6 +27,9 @@ const ShowsButtons: React.FC<Props> = ({
   const _notAuthButtons = useRef<HTMLDivElement>(null)
   const context = useContext(AppContext)
   const { authUser } = context
+
+  const userShowsData = useAppSelector((state) => selectUserShows(state))
+  const userShows = Object.values(userShowsData)
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside as EventListener)
@@ -59,18 +64,19 @@ const ShowsButtons: React.FC<Props> = ({
           type="button"
           onClick={() => {
             if (authUser) {
-              changeShowDatabaseOnClient("watchingShows")
+              // changeShowDatabaseOnClient("watchingShows")
               context.userContentHandler.handleShowInDatabases({
                 id: Number(id),
                 data: detailes,
                 database: "watchingShows",
-                userShows: context.userContent.userShows,
+                // userShows: context.userContent.userShows,
+                userShows,
                 handleListeners
               })
-              context.userContent.handleUserShowsOnClient({
-                database: "watchingShows",
-                id: Number(id)
-              })
+              // context.userContent.handleUserShowsOnClient({
+              //   database: "watchingShows",
+              //   id: Number(id)
+              // })
             } else {
               context.userContentLocalStorage.addShowLS({
                 id: Number(id),
@@ -102,7 +108,8 @@ const ShowsButtons: React.FC<Props> = ({
                 id: Number(id),
                 data: detailes,
                 database: "notWatchingShows",
-                userShows: context.userContent.userShows,
+                // userShows: context.userContent.userShows,
+                userShows,
                 handleListeners
               })
               context.userContent.handleUserShowsOnClient({
@@ -141,7 +148,8 @@ const ShowsButtons: React.FC<Props> = ({
                   id: Number(id),
                   data: detailes,
                   database: "droppedShows",
-                  userShows: context.userContent.userShows,
+                  // userShows: context.userContent.userShows,
+                  userShows,
                   handleListeners
                 })
                 context.userContent.handleUserShowsOnClient({
@@ -186,7 +194,8 @@ const ShowsButtons: React.FC<Props> = ({
                   id: Number(id),
                   data: detailes,
                   database: "willWatchShows",
-                  userShows: context.userContent.userShows,
+                  // userShows: context.userContent.userShows,
+                  userShows,
                   handleListeners
                 })
                 context.userContent.handleUserShowsOnClient({

@@ -13,7 +13,7 @@ export interface HandleListenersArg {
   handleLoading?: (isLoading: boolean) => void
 }
 
-const useHandleListeners = ({ id }: { id?: number }) => {
+const useHandleListeners = ({ id }: { id: number }) => {
   const [episodesFromDatabase, setEpisodesFromDatabase] = useState<SeasonEpisodesFromDatabaseInterface[]>([])
   const [releasedEpisodes, setReleasedEpisodes] = useState<SingleEpisodeInterface[]>([])
 

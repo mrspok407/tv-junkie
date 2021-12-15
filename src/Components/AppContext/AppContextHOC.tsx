@@ -7,11 +7,13 @@ import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthU
 import useNewContactsActivity from "Components/Pages/Contacts/Hooks/UseNewContactsActivity"
 import useErrors from "Utils/Hooks/UseErrors"
 import { AppContextInterface, CONTEXT_INITIAL_STATE } from "./@Types"
+import useUserShowsRed from "Components/UserContent/UseUserShowsRed/UseUserShowsRed"
 
 export const AppContext = createContext<AppContextInterface>(CONTEXT_INITIAL_STATE)
 
 const AppContextHOC = (Component: any) =>
   function Comp(props: any) {
+    useUserShowsRed()
     const ContextValue: AppContextInterface = {
       userContentLocalStorage: useUserContentLocalStorage(),
       userContent: useUserShows(),

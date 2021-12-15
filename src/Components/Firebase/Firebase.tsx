@@ -4,6 +4,7 @@ import "firebase/database"
 import "firebase/analytics"
 import "firebase/functions"
 import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
+import { FirebaseInterface } from "./FirebaseContext"
 
 const configProduction = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -117,7 +118,7 @@ class Firebase {
   allShowsList = () => this.db.ref(`allShowsList`)
   showFullData = (showKey: string) => this.db.ref(`allShowsList/${showKey}`)
   showInfo = (showKey: string) => this.db.ref(`allShowsList/${showKey}/info`)
-  showEpisodes = (showKey: string) => this.db.ref(`allShowsList/${showKey}/episodes`)
+  showEpisodes: FirebaseInterface["showEpisodes"] = (showKey) => this.db.ref(`allShowsList/${showKey}/episodes`)
 
   /// Users API ///
   user = (uid: string) => this.db.ref(`users/${uid}`)
@@ -199,7 +200,7 @@ class Firebase {
   userEpisodes = (uid: string) => this.db.ref(`users/${uid}/content/episodes`)
 
   userShowEpisodes = (uid: string, showKey: string) => this.db.ref(`users/${uid}/content/episodes/${showKey}`)
-  userShowAllEpisodes = (uid: string, showKey: string) =>
+  userShowAllEpisodes: FirebaseInterface["userShowAllEpisodes"] = (uid, showKey) =>
     this.db.ref(`users/${uid}/content/episodes/${showKey}/episodes`)
   userShowAllEpisodesInfo = (uid: string, showKey: string) =>
     this.db.ref(`users/${uid}/content/episodes/${showKey}/info`)

@@ -1,7 +1,6 @@
 import { useEffect, useCallback, useReducer } from "react"
 import axios from "axios"
-import reducer, { INITIAL_STATE, StateInterface, ACTIONTYPES } from "./_reducerConfig"
-import { EpisodesDataInterface, ShowEpisodesFromAPIInterface } from "../../ShowsEpisodes"
+import reducer, { INITIAL_STATE } from "./_reducerConfig"
 
 type Props = {
   disable: boolean

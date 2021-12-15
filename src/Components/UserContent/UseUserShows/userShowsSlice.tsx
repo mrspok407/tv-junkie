@@ -34,30 +34,8 @@ const initialState: UserShowsState = {
   initialLoading: true,
   error: null
 }
-export const opachki = createAction<string>("opana")
 
-export const testSlice = createSlice({
-  name: "test",
-  initialState: { test: "" },
-  reducers: {
-    testRed: (state, action: PayloadAction<string>) => {
-      state.test = action.payload
-    }
-  },
-  extraReducers: (builder) => {
-    builder.addCase(opachki, (state, action) => {
-      console.log("test testSlice")
-      state.test = action.payload
-    })
-  }
-})
-
-const hasPrefix = (action: any, prefix: string) => action.type.startsWith(prefix)
-const isStartsWith = (prefix: string) => (action: any) => {
-  return hasPrefix(action, prefix)
-}
-
-export const counterSlice = createSlice({
+export const userShowsSlice = createSlice({
   name: "userShows",
   initialState,
   reducers: {
@@ -107,24 +85,14 @@ export const counterSlice = createSlice({
       state.error = action.payload.error
       state.initialLoading = false
     }
-  },
-  extraReducers: (builder) => {
-    builder
-      // .addCase(opachki, (state, action: any) => {
-      //   console.log("addCase")
-      //   state.initialLoading = action.payload
-      // })
-      .addMatcher(isStartsWith("or"), (state, action) => {
-        console.log("matcher")
-      })
   }
 })
 
-export const { setUserShows, addNewShow, changeShow, setError } = counterSlice.actions
+export const { setUserShows, addNewShow, changeShow, setError } = userShowsSlice.actions
 
 export const fetchUserShows =
   (uid: string, firebase: FirebaseInterface): AppThunk =>
-  async (dispatch, getState) => {
+  async (dispatch) => {
     try {
       const userShowsSnapshot = await firebase.userAllShows(uid).orderByChild("timeStamp").once("value")
       const userShows = sortDataSnapshot<UserShowsInterface>(userShowsSnapshot)
@@ -142,7 +110,7 @@ export const fetchUserShows =
 
 export const handleNewShow =
   (showData: UserShowsInterface, firebase: FirebaseInterface): AppThunk =>
-  async (dispatch, getState) => {
+  async (dispatch) => {
     const isWatchingShow = showData.database === "watchingShows"
     const firebaseRef = isWatchingShow ? firebase.showFullData(showData.id) : firebase.showInfo(showData.id)
     try {
@@ -202,13 +170,9 @@ export const handleChangeShow =
     }
   }
 
-export const selectUserShows = (state: RootState) => state.userShows.data.content
+export const selectUserShows = (state: RootState) => state.userShows.data.info
 export const selectUserShowsIds = (state: RootState) => state.userShows.data.ids
-export const selectUserShow = (state: RootState, id: number) => state.userShows.data.content[id]
+export const selectUserShow = (state: RootState, id: number) => state.userShows.data.info[id]
 export const selectUserShowsLoading = (state: RootState) => state.userShows.initialLoading
 
-export const testCreateSelector = createSelector([selectUserShowsIds, selectUserShow], (ids, show) =>
-  ids.filter((id) => id > show.id)
-)
-
-export default counterSlice.reducer
+export default userShowsSlice.reducer

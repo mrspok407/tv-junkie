@@ -5,14 +5,14 @@ export interface FirebaseInterface {
   auth?: any
   app?: any
   user?: any
-  showEpisodes?: any
+  showEpisodes: (showKey: string | number) => any
   showFullData?: any
   timeStamp?: any
   callback?: any
   userAllShows?: any
   userEpisodes?: any
   userShow?: any
-  userShowAllEpisodes?: any
+  userShowAllEpisodes: (uid: string, showKey: string | number) => any
   userShowAllEpisodesInfo?: any
   watchLaterMovies?: any
   onAuthUserListener?: any
@@ -58,7 +58,9 @@ export const FIREBASE_INITIAL_STATE = {
   unreadMessages: () => {},
   chatMemberStatus: () => {},
   groupChatMembersStatus: () => {},
-  groupChatParticipants: () => {}
+  groupChatParticipants: () => {},
+  userShowAllEpisodes: () => {},
+  showEpisodes: () => {}
 }
 
 export const FirebaseContext = createContext<FirebaseInterface>(FIREBASE_INITIAL_STATE)

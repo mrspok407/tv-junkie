@@ -12,7 +12,7 @@ import getFullInfoForUpdatedShow from "./FirebaseHelpers/getFullInfoForUpdatedSh
 import useGetUserMovies from "./Hooks/UseGetUserMovies"
 import updateUserEpisodesFromDatabase from "Components/UserContent/UseUserShows/FirebaseHelpers/updateUserEpisodesFromDatabase"
 import { useAppDispatch, useAppSelector } from "app/hooks"
-import { changeShow, fetchUserShows, opachki, selectUserShows, testSlice, setUserShows } from "./userShowsSlice"
+import { changeShow, fetchUserShows, selectUserShows, setUserShows } from "./userShowsSlice"
 import sortDataSnapshot from "../FirebaseHelpers/sortDataSnapshot"
 import { SnapshotVal } from "Components/AppContext/@Types"
 
@@ -94,94 +94,66 @@ const useUserShows = () => {
         async (authUser: AuthUserInterface) => {
           if (!authUser) return
 
-          await updateUserEpisodesFromDatabase({ firebase })
+          // await updateUserEpisodesFromDatabase({ firebase })
 
           try {
             // dispatch(testSlice.actions.testRed("fffffffff"))
-            dispatch(fetchUserShows(authUser.uid, firebase))
+            // dispatch(fetchUserShows(authUser.uid, firebase))
             // dispatch(opachki("obana"))
-            // const promise = Promise.all([
-
-            //   new Promise((res) => setTimeout(res, 1000))
-            // ])
-            // promise.then((res) => {
-            //   console.log({ res })
-            //   firebase
-            //     .userAllShows(authUser.uid)
-            //     .orderByChild("timeStamp")
-            //     .on("child_changed", (snapshot: SnapshotVal<UserShowsInterface>) => {
-            //       dispatch(changeShow(snapshot.val()))
-            //     })
-            // })
-
-            // orderByChild(timeSTamp).limitToLast() - просто так последний таймстеп брать и на основе его делать child_added
-
-            // const userShowsSnapshot = await firebase.userAllShows(authUser.uid).orderByChild("timeStamp").once("value")
-            // dispatch(updateUserShows(userShowsSnapshot.val()))
-
-            // const userShowsData = sortDataSnapshot<UserShowsInterface>(userShowsSnapshot)
-            // console.log(userShowsData[userShowsData.length - 1].timeStamp)
-            // firebase
-            //   .userAllShows(authUser.uid)
-            //   .orderByChild("timeStamp")
-            //   .startAfter(userShowsData[userShowsData.length - 1].timeStamp)
-            //   .on("child_added", (snapshot: SnapshotVal<UserShowsInterface>) => {
-            //     dispatch(addNewShow(snapshot.val()))
-            //   })
           } catch (error) {}
 
-          setLoadingShows(true)
+          setLoadingShows(false)
 
           // await updateUserEpisodesFromDatabase({ firebase })
 
-          firebase.userAllShows(authUser.uid).on("value", async (snapshot: SnapshotVal<UserShowsInterface[]>) => {
-            if (snapshot.val() === null) {
-              setLoadingShows(false)
-              return
-            }
-            setLoadingShows(false)
-            // const shows = Object.values(snapshot.val()).map((show) => {
-            //   return show
-            // })
+          // firebase.userAllShows(authUser.uid).on("value", async (snapshot: SnapshotVal<UserShowsInterface[]>) => {
+          //   if (snapshot.val() === null) {
+          //     setLoadingShows(false)
+          //     return
+          //   }
+          //   setLoadingShows(false)
+          //   const shows = Object.values(snapshot.val()).map((show) => {
+          //     return show
+          //   })
 
-            // const userShowsSS: UserShowsInterface[] = JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY_SHOWS)!)
+          //   const userShowsSS: UserShowsInterface[] = JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY_SHOWS)!)
 
-            // if (userShowsSS.length === 0) {
-            //   // listenerUserToWatchShow({ uid: authUser.uid })
-            //   const showFullData = await fetchShowsFullData({
-            //     userShows: shows,
-            //     firebase
-            //   })
-            //   console.log({ showFullData })
-            //   // console.log(showsFullInfo)
-            //   // setUserShows(showsFullInfo)
-            //   // setUserWillAirEpisodes(willAirEpisodes)
-            //   // setLoadingShows(false)
-            // } else if (userShowsSS.length < shows.length) {
-            //   shows.forEach(async (show, index) => {
-            //     if (userShowsSS.find((item) => item.id === show.id)) return
+          //   if (userShowsSS.length === 0) {
+          //     listenerUserToWatchShow({ uid: authUser.uid })
+          //     const showFullData = await fetchShowsFullData({
+          //       userShows: shows,
+          //       firebase
+          //     })
+          //     console.log({ showFullData })
+          //     // console.log(showsFullInfo)
+          //     setUserShows(showFullData)
+          //     //setUserWillAirEpisodes(willAirEpisodes)
+          //     setLoadingShows(false)
+          //   } else if (userShowsSS.length < shows.length) {
+          //     shows.forEach(async (show, index) => {
+          //       if (userShowsSS.find((item) => item.id === show.id)) return
 
-            //     const { showsFullInfo, willAirEpisodes } = await spliceNewShowFromDatabase({
-            //       userShow: show,
-            //       index,
-            //       userShowsSS,
-            //       firebase
-            //     })
-            //     setUserShows(showsFullInfo)
-            //     setUserWillAirEpisodes(willAirEpisodes)
-            //     setLoadingShows(false)
-            //   })
-            // } else if (userShowsSS.length === shows.length) {
-            //   // const { userShowsCopy } = await getFullInfoForUpdatedShow({ userShows: shows, userShowsSS, firebase })
-            //   // const mergedShows = merge(userShowsSS, userShowsCopy, {
-            //   //   arrayMerge: combineMergeObjects
-            //   // })
-            //   // const watchingShows = mergedShows.filter((show) => show.database === "watchingShows")
-            //   // const willAirEpisodes = organiseFutureEpisodesByMonth(watchingShows)
-            //   // setUserWillAirEpisodes(willAirEpisodes)
-            //   // setUserShows(mergedShows)
-            // }
-          })
+          //       const { showsFullInfo, willAirEpisodes } = await spliceNewShowFromDatabase({
+          //         userShow: show,
+          //         index,
+          //         userShowsSS,
+          //         firebase
+          //       })
+          //       setUserShows(showsFullInfo)
+          //       setUserWillAirEpisodes(willAirEpisodes)
+          //       setLoadingShows(false)
+          //     })
+          //   } else if (userShowsSS.length === shows.length) {
+          //     const { userShowsCopy } = await getFullInfoForUpdatedShow({ userShows: shows, userShowsSS, firebase })
+          //     const mergedShows = merge(userShowsSS, userShowsCopy, {
+          //       arrayMerge: combineMergeObjects
+          //     })
+          //     const watchingShows = mergedShows.filter((show) => show.database === "watchingShows")
+          //     const willAirEpisodes = organiseFutureEpisodesByMonth(watchingShows)
+          //     setUserWillAirEpisodes(willAirEpisodes)
+          //     setUserShows(mergedShows)
+          //   }
+          // })
 
           listenerUserMovies({ uid: authUser.uid })
 
