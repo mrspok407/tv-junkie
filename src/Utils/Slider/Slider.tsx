@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState, useCallback, useLayoutEffect } from "react"
-import { Link } from "react-router-dom"
+import { Link, useHistory } from "react-router-dom"
 import debounce from "debounce"
 import classNames from "classnames"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
@@ -8,7 +8,21 @@ import "./Slider.scss"
 
 const POSTER_PATH = "https://image.tmdb.org/t/p/w500/"
 
-export default function Slider({ sliderData }: { sliderData: ContentDetailes[] }) {
+export default function Slider({
+  sliderData,
+  setFadeOut,
+  fadeOut,
+  setFadeIn,
+  fadeIn
+}: {
+  sliderData: ContentDetailes[]
+  setFadeOut?: any
+  fadeOut?: any
+  setFadeIn?: any
+  fadeIn?: any
+}) {
+  const history = useHistory()
+
   const [slider, setSlider] = useState<HTMLDivElement>(null!)
   const [sliderWidth, setSliderWidth] = useState<number>(null!)
 
@@ -209,7 +223,34 @@ export default function Slider({ sliderData }: { sliderData: ContentDetailes[] }
           const mediaType = original_title ? "movie" : "show"
           return (
             <div key={id} className="slider__item-wrapper">
-              <Link
+              <a
+                onClick={(e) => {
+                  e.preventDefault()
+                  if (fadeOut) return
+                  if (fadeIn) return
+                  if (!setFadeOut) {
+                    history.push(`/${mediaType}/${id}`)
+                    return
+                  }
+                  const timeOut = 500
+                  setFadeOut(true)
+                  // setFadeIn(false)
+                  setTimeout(() => {
+                    console.log("push")
+                    history.push(`/${mediaType}/${id}`)
+                  }, 350)
+                  setTimeout(() => {
+                    setFadeOut(false)
+                  }, 900)
+                  // if (blockLinks) e.preventDefault()
+                }}
+                // to={{
+                //   pathname: `/${mediaType}/${id}`
+                // }}
+              >
+                <div className="slider__item lazyload" data-bg={`${POSTER_PATH}${poster_path}`} />
+              </a>
+              {/* <Link
                 onClick={(e) => {
                   if (blockLinks) e.preventDefault()
                 }}
@@ -218,7 +259,7 @@ export default function Slider({ sliderData }: { sliderData: ContentDetailes[] }
                 }}
               >
                 <div className="slider__item lazyload" data-bg={`${POSTER_PATH}${poster_path}`} />
-              </Link>
+              </Link> */}
             </div>
           )
         })}

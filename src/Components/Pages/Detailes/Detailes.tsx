@@ -22,6 +22,7 @@ import useGoogleRedirect from "Components/UserAuth/SignIn/UseGoogleRedirect"
 import { useAppSelector } from "app/hooks"
 import { selectUserShow } from "Components/UserContent/UseUserShows/userShowsSlice"
 import "./Detailes.scss"
+import classNames from "classnames"
 
 const { CancelToken } = require("axios")
 let cancelRequest: any
@@ -93,6 +94,9 @@ export const DetailesPage: React.FC<Props> = ({
 
   useGoogleRedirect()
 
+  const [fadeOut, setFadeOut] = useState(false)
+  const [fadeIn, setFadeIn] = useState(false)
+
   // const userShowsRedux = useAppSelector(selectUserShows)
 
   // const memoizedSelectorCallback = useCallback(memoizedSelector(id), [id])
@@ -118,10 +122,24 @@ export const DetailesPage: React.FC<Props> = ({
   })
 
   useEffect(() => {
+    console.log(fadeOut)
+  }, [fadeOut])
+
+  // useEffect(() => {
+  //   setFadeIn(true)
+  //   setTimeout(() => {
+  //     setFadeIn(false)
+  //   }, 1000)
+  // }, [])
+
+  useEffect(() => {
     getContent()
+    // setFadeIn(true)
 
     return () => {
       if (cancelRequest !== undefined) cancelRequest()
+      setFadeIn(false)
+      setFadeOut(false)
 
       setShowInfo(SHOW_INFO_INITIAL_STATE)
       setMovieInDatabase(null)
@@ -217,6 +235,11 @@ export const DetailesPage: React.FC<Props> = ({
 
         setLoadingAPIrequest(false)
         setSimilarContent(similarContentSortByVotes)
+
+        setFadeIn(true)
+        setTimeout(() => {
+          setFadeIn(false)
+        }, 750)
       })
       .catch((err) => {
         if (axios.isCancel(err)) return
@@ -270,7 +293,12 @@ export const DetailesPage: React.FC<Props> = ({
       </Helmet>
       <Header isLogoVisible={false} />
 
-      <div className="detailes-page-container">
+      <div
+        className={classNames("detailes-page-container", {
+          "detailes-page-container-fadeout": fadeOut,
+          "detailes-page-container-fadein": fadeIn
+        })}
+      >
         {error ? (
           <div className="detailes-page__error">
             <h1>{error}</h1>
@@ -309,7 +337,13 @@ export const DetailesPage: React.FC<Props> = ({
                   {mediaType === "movie" ? "Similar movies" : "Similar shows"}
                 </div>
 
-                <Slider sliderData={similarContent} />
+                <Slider
+                  sliderData={similarContent}
+                  setFadeOut={setFadeOut}
+                  fadeOut={fadeOut}
+                  setFadeIn={setFadeIn}
+                  fadeIn={fadeIn}
+                />
               </div>
             )}
           </div>
