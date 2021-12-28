@@ -111,6 +111,7 @@ class Firebase {
     })
 
   timeStamp = () => this.dbRef.ServerValue.TIMESTAMP
+  ServerValueIncrement = (value: number) => this.dbRef.ServerValue.increment(value)
 
   database = () => this.db
 
@@ -193,6 +194,7 @@ class Firebase {
     this.db.ref(`groupChats/${chatKey}/members/participants`)
 
   /// User Content API ///
+  userContent = (uid: string) => this.db.ref(`users/${uid}/content`)
   userAllShows = (uid: string) => this.db.ref(`users/${uid}/content/shows`)
   userShowsLastUpdateList = (uid: string) => this.db.ref(`users/${uid}/content/showsLastUpdateList`)
   userShow = ({ uid, key }: { uid: string; key: string }) => this.db.ref(`users/${uid}/content/shows/${key}`)

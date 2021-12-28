@@ -1,6 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-has-content */
 import React, { useContext } from "react"
 import ShowsButtons from "./ShowsButtons"
+import ShowsButtonsRed from "./ShowsButtonsRed"
 import classNames from "classnames"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import UserRating from "Components/UI/UserRating/UserRating"
@@ -12,7 +13,7 @@ type Props = {
   movieInDatabase: {} | null
   mediaType: string
   id: number
-  showDatabaseOnClient: string
+  // showDatabaseOnClient: string
   changeShowDatabaseOnClient: (database: string) => void
   handleListeners: ({ id, status, handleLoading }: HandleListenersArg) => void
 }
@@ -22,7 +23,7 @@ export const MainInfo: React.FC<Props> = ({
   detailes,
   mediaType,
   id,
-  showDatabaseOnClient,
+  // showDatabaseOnClient,
   changeShowDatabaseOnClient,
   handleListeners
 }) => {
@@ -121,7 +122,7 @@ export const MainInfo: React.FC<Props> = ({
             <UserRating
               id={id}
               firebaseRef="userShow"
-              showDatabase={showDatabaseOnClient}
+              // showDatabase={showDatabaseOnClient}
               showRating={true}
               mediaType={mediaType}
             />
@@ -161,13 +162,14 @@ export const MainInfo: React.FC<Props> = ({
 
       <div className="detailes-page__info-row detailes-page__info--button">
         {isMediaTypeTV && (
-          <ShowsButtons
-            id={id}
-            detailes={detailes}
-            changeShowDatabaseOnClient={changeShowDatabaseOnClient}
-            showDatabaseOnClient={showDatabaseOnClient}
-            handleListeners={handleListeners}
-          />
+          <ShowsButtonsRed id={id} detailes={detailes} />
+          // <ShowsButtons
+          //   id={id}
+          //   detailes={detailes}
+          //   changeShowDatabaseOnClient={changeShowDatabaseOnClient}
+          //   // showDatabaseOnClient={showDatabaseOnClient}
+          //   handleListeners={handleListeners}
+          // />
         )}
 
         {!isMediaTypeTV && (

@@ -53,14 +53,8 @@ export const userShowsSliceRed = createSlice({
     },
     changeShow: (state, action: PayloadAction<UserShowsInterface>) => {
       const show = state.data.info[action.payload.id]
-      const timeStamp = state.data.timeStamps[action.payload.id]
-      if (timeStamp !== action.payload.timeStamp) {
-        console.log("change show ts not equal")
-        state.data.timeStamps[action.payload.id] = action.payload.timeStamp
-        return
-      }
-      console.log(action.payload)
-      state.data.episodes[action.payload.id] = action.payload.episodes || []
+      const episodes = state.data.episodes[action.payload.id]
+      state.data.episodes[action.payload.id] = action.payload.episodes || episodes || []
       action.payload.episodes = []
       state.data.info[action.payload.id] = { ...show, ...action.payload }
     },
@@ -76,9 +70,10 @@ export const userShowsSliceRed = createSlice({
 
 export const { setUserShows, addNewShow, changeShow, setError } = userShowsSliceRed.actions
 
-export const selectUserShows = (state: RootState) => state.userShows.data.info
-export const selectUserShowsIds = (state: RootState) => state.userShows.data.ids
-export const selectUserShow = (state: RootState, id: number) => state.userShows.data.info[id]
-export const selectUserShowsLoading = (state: RootState) => state.userShows.initialLoading
+export const selectShows = (state: RootState) => state.userShows.data.info
+export const selectShowsIds = (state: RootState) => state.userShows.data.ids
+export const selectShow = (state: RootState, id: number) => state.userShows.data.info[id]
+export const selectShowDatabase = (state: RootState, id: number) => state.userShows.data.info[id]?.database
+export const selectShowsLoading = (state: RootState) => state.userShows.initialLoading
 
 export default userShowsSliceRed.reducer

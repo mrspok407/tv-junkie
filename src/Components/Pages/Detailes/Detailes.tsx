@@ -22,6 +22,7 @@ import useGoogleRedirect from "Components/UserAuth/SignIn/UseGoogleRedirect"
 import { useAppSelector } from "app/hooks"
 import { selectUserShow } from "Components/UserContent/UseUserShows/userShowsSlice"
 import "./Detailes.scss"
+import { selectShowsLoading } from "Components/UserContent/UseUserShowsRed/userShowsSliceRed"
 
 const { CancelToken } = require("axios")
 let cancelRequest: any
@@ -84,12 +85,15 @@ export const DetailesPage: React.FC<Props> = ({
   const [showInfo, setShowInfo] = useState<ShowInfoInterface>(SHOW_INFO_INITIAL_STATE)
   const [movieInDatabase, setMovieInDatabase] = useState<ContentDetailes | null>(null)
 
-  const [showDatabaseOnClient, setShowDatabaseOnClient] = useState<string>("")
+  // const [showDatabaseOnClient, setShowDatabaseOnClient] = useState<string>("")
 
   const [error, setError] = useState<string>()
 
   const [loadingAPIrequest, setLoadingAPIrequest] = useState(true)
   const [loadingFromDatabase, setLoadingFromDatabase] = useState(true)
+
+  const showsLoading = useAppSelector(selectShowsLoading)
+  console.log({ showsLoading })
 
   useGoogleRedirect()
 
@@ -125,7 +129,7 @@ export const DetailesPage: React.FC<Props> = ({
 
       setShowInfo(SHOW_INFO_INITIAL_STATE)
       setMovieInDatabase(null)
-      setShowDatabaseOnClient("")
+      // setShowDatabaseOnClient("")
 
       firebase.userShowAllEpisodes(authUser?.uid!, id).off()
     }
@@ -236,12 +240,12 @@ export const DetailesPage: React.FC<Props> = ({
     if (!authUser || !show) return
 
     setShowInfo({ ...show, showInUserDatabase: true })
-    setShowDatabaseOnClient(show.database)
+    // setShowDatabaseOnClient(show.database)
   }
 
   const changeShowDatabaseOnClient = (database: string) => {
     if (context.userContentHandler.loadingAddShowToDatabase.loading) return
-    setShowDatabaseOnClient(database)
+    // setShowDatabaseOnClient(database)
   }
 
   const getMovieInDatabase = () => {
@@ -275,7 +279,7 @@ export const DetailesPage: React.FC<Props> = ({
           <div className="detailes-page__error">
             <h1>{error}</h1>
           </div>
-        ) : !loadingAPIrequest && !loadingFromDatabase && !context.userContent.loadingShows ? (
+        ) : !loadingAPIrequest && !loadingFromDatabase && !context.userContent.loadingShows && !showsLoading ? (
           <div className="detailes-page">
             <PosterWrapper detailes={detailes} mediaType={mediaType} />
 
@@ -284,7 +288,7 @@ export const DetailesPage: React.FC<Props> = ({
               mediaType={mediaType}
               id={Number(id)}
               changeShowDatabaseOnClient={changeShowDatabaseOnClient}
-              showDatabaseOnClient={showDatabaseOnClient}
+              //showDatabaseOnClient={showDatabaseOnClient}
               movieInDatabase={movieInDatabase}
               handleListeners={handleListeners}
             />
@@ -300,7 +304,7 @@ export const DetailesPage: React.FC<Props> = ({
                 showInfo={showInfo}
                 episodesFromDatabase={episodesFromDatabase}
                 releasedEpisodes={releasedEpisodes}
-                showDatabaseOnClient={showDatabaseOnClient}
+                //showDatabaseOnClient={showDatabaseOnClient}
               />
             )}
             {similarContent.length > 0 && (

@@ -3,7 +3,7 @@ import { FirebaseContext } from "Components/Firebase"
 import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 import { useAppDispatch, useAppSelector } from "app/hooks"
 import { fetchUserShows } from "./Middleware"
-import { selectUserShows } from "./userShowsSliceRed"
+import { selectShows } from "./userShowsSliceRed"
 
 const useUserShowsRed = () => {
   const firebase = useContext(FirebaseContext)

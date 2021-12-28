@@ -6,13 +6,13 @@ import { AppContext } from "Components/AppContext/AppContextHOC"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
 import { HandleListenersArg } from "../FirebaseHelpers/UseHandleListeners"
 import { useAppSelector } from "app/hooks"
-import { selectUserShow, selectUserShows } from "Components/UserContent/UseUserShowsRed/userShowsSliceRed"
+import { selectShow, selectShows } from "Components/UserContent/UseUserShowsRed/userShowsSliceRed"
 
 type Props = {
   id: number
   detailes: ContentDetailes
   changeShowDatabaseOnClient: (database: string) => void
-  showDatabaseOnClient: string | null
+  showDatabaseOnClient?: string | null
   handleListeners: ({ id, status, handleLoading }: HandleListenersArg) => void
 }
 
@@ -28,7 +28,7 @@ const ShowsButtons: React.FC<Props> = ({
   const context = useContext(AppContext)
   const { authUser } = context
 
-  const userShowsData = useAppSelector((state) => selectUserShows(state))
+  const userShowsData = useAppSelector((state) => selectShows(state))
   const userShows = Object.values(userShowsData)
 
   useEffect(() => {

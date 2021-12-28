@@ -11,7 +11,7 @@ import getShowEpisodesFromAPI from "./TmdbAPIHelpers/getShowEpisodesFromAPI"
 import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
 import updateAllEpisodesWatched from "./UseUserShows/FirebaseHelpers/updateAllEpisodesWatched"
 import { useAppSelector } from "app/hooks"
-import { selectUserShow } from "./UseUserShowsRed/userShowsSliceRed"
+import { selectShow } from "./UseUserShowsRed/userShowsSliceRed"
 
 export const LOADING_ADDING_TO_DATABASE_INITIAL = {
   watchingShows: false,

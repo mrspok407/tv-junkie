@@ -22,6 +22,7 @@ export interface FirebaseInterface {
   sendEmailVerification?: any
   passwordReset?: any
   httpsCallable?: any
+  userContent: (uid: string) => any
   messages: ({ chatKey, isGroupChat }: { chatKey: string; isGroupChat: boolean }) => any
   message: ({ chatKey, messageKey, isGroupChat }: { chatKey: string; messageKey: string; isGroupChat: boolean }) => any
   privateChat: () => any
@@ -46,6 +47,7 @@ export interface FirebaseInterface {
 }
 
 export const FIREBASE_INITIAL_STATE = {
+  userContent: () => {},
   newContactsActivity: () => {},
   contactsLastActivity: () => {},
   newContactsRequests: () => {},

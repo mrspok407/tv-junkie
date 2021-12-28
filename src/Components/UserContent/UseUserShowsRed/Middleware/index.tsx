@@ -7,7 +7,7 @@ import fetchShowsFullData from "../FirebaseHelpers/fetchShowsFullData"
 import { merge } from "lodash"
 import { combineMergeObjects } from "Utils"
 import { userShowsListeners } from "./firebaseListeners"
-import { addNewShow, changeShow, selectUserShow, setError, setUserShows } from "../userShowsSliceRed"
+import { addNewShow, changeShow, selectShow, setError, setUserShows } from "../userShowsSliceRed"
 import { fetchEpisodesFullData } from "../FirebaseHelpers"
 
 export const fetchUserShows =
@@ -60,7 +60,8 @@ export const handleNewShow =
 export const handleChangeShow =
   (showData: UserShowsInterface, uid: string, firebase: FirebaseInterface): AppThunk =>
   async (dispatch, getState) => {
-    const showFromStore = selectUserShow(getState(), showData.id)
+    const showFromStore = selectShow(getState(), showData.id)
+    console.log({ showFromStore })
     if (!showFromStore) return
 
     const isWatchingShow = showData.database === "watchingShows"
