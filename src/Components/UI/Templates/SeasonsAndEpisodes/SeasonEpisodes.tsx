@@ -24,7 +24,6 @@ type Props = {
   seasonId: number
   episodesFromDatabase: SeasonEpisodesFromDatabaseInterface[]
   showInfo: ShowInfoInterface
-  showDatabaseOnClient: string | null | undefined
   showEpisodeInfo: (episodeId: number) => void
   toggleWatchedEpisode: (
     seasonNum: number,
@@ -53,7 +52,6 @@ const SeasonEpisodes: React.FC<Props> = ({
   seasonId,
   episodesFromDatabase,
   showInfo,
-  showDatabaseOnClient,
   showEpisodeInfo,
   toggleWatchedEpisode,
   checkMultipleEpisodes
@@ -71,7 +69,6 @@ const SeasonEpisodes: React.FC<Props> = ({
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside as EventListener)
-
     return () => {
       document.removeEventListener("mousedown", handleClickOutside as EventListener)
     }
@@ -117,8 +114,7 @@ const SeasonEpisodes: React.FC<Props> = ({
     }, FADE_OUT_SPEED)
   }
 
-  const showCheckboxes =
-    showInfo.database && showDatabaseOnClient !== "notWatchingShows" && episodesFromDatabase?.length > 0 && true
+  const showCheckboxes = showInfo?.database !== "notWatchingShows" && episodesFromDatabase?.length > 0 && true
 
   const showSeason = showCheckboxes && episodesFromDatabase[season.season_number - 1]
   const seasons = parentComponent === "toWatchPage" ? episodesData : episodesDataFromAPI
@@ -180,7 +176,7 @@ const SeasonEpisodes: React.FC<Props> = ({
               >
                 {parentComponent === "toWatchPage" && (
                   <UserRating
-                    id={showInfo.id}
+                    id={showInfo?.id}
                     firebaseRef="userShowSingleEpisode"
                     seasonNum={season.season_number}
                     episodeNum={indexOfEpisode}
@@ -276,14 +272,14 @@ const SeasonEpisodes: React.FC<Props> = ({
                     episodeAirDateAsDateObj.getTime() < todayDate.getTime() &&
                     episode.air_date && (
                       <>
-                        {showInfo.showInUserDatabase && !!episodesFromDatabase && (
+                        {showInfo?.database && !!episodesFromDatabase && (
                           <UserRating
-                            id={showInfo.id}
+                            id={showInfo?.id}
                             firebaseRef="userShowSingleEpisode"
                             seasonNum={season.season_number}
                             episodeNum={indexOfEpisode}
                             episodeRating={true}
-                            disableRating={!!(showDatabaseOnClient === "notWatchingShows")}
+                            disableRating={!!(showInfo?.database === "notWatchingShows")}
                           />
                         )}
                         {authUser?.email === process.env.REACT_APP_ADMIN_EMAIL && (

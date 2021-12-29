@@ -1,5 +1,6 @@
 import { AppThunk } from "app/store"
 import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
+import addShowFireDatabase from "Components/UserContent/FirebaseHelpers/addShowFireDatabase"
 import getShowEpisodesFromAPI from "Components/UserContent/TmdbAPIHelpers/getShowEpisodesFromAPI"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
 import { selectShow, setError } from "../../userShowsSliceRed"
@@ -43,10 +44,11 @@ export const handleNewUserShow =
   ({ id, database, showDetailes, uid, firebase }: HandleDatbaseChange): AppThunk =>
   async (dispatch) => {
     try {
-      const dataFromAPI: any = await getShowEpisodesFromAPI({ id })
-      console.log({ dataFromAPI })
-      const showsSubDatabase = dataFromAPI.status === "Ended" || dataFromAPI.status === "Canceled" ? "ended" : "ongoing"
-      const userEpisodes = dataFromAPI.episodes.reduce(
+      const showEpisodesTMDB: any = await getShowEpisodesFromAPI({ id })
+      console.log({ showEpisodesTMDB })
+      const showsSubDatabase =
+        showEpisodesTMDB.status === "Ended" || showEpisodesTMDB.status === "Canceled" ? "ended" : "ongoing"
+      const userEpisodes = showEpisodesTMDB.episodes.reduce(
         (acc: {}[], season: { episodes: { air_date: string }[]; season_number: number }) => {
           const episodes = season.episodes.map((episode) => {
             return { watched: false, userRating: 0, air_date: episode.air_date || "" }
@@ -60,6 +62,7 @@ export const handleNewUserShow =
 
       const isShowInDatabase = await firebase.showFullData(id).child("id").once("value")
       if (isShowInDatabase.val() === null) {
+        await addShowFireDatabase({ firebase, showDetailes, showEpisodesTMDB })
       }
 
       const updateData = {

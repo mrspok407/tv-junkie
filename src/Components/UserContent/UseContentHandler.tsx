@@ -10,8 +10,6 @@ import addShowFireDatabase from "./FirebaseHelpers/addShowFireDatabase"
 import getShowEpisodesFromAPI from "./TmdbAPIHelpers/getShowEpisodesFromAPI"
 import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
 import updateAllEpisodesWatched from "./UseUserShows/FirebaseHelpers/updateAllEpisodesWatched"
-import { useAppSelector } from "app/hooks"
-import { selectFirebase } from "Components/Firebase/credentialsSlice"
 
 export const LOADING_ADDING_TO_DATABASE_INITIAL = {
   watchingShows: false,
@@ -25,7 +23,7 @@ const useContentHandler = () => {
   const [loadingAddShowToDatabase, setLoadingAddShowToDatabase] = useState(LOADING_ADDING_TO_DATABASE_INITIAL)
   const [loadingShowsOnRegister, setLoadingShowsOnRegister] = useState(false)
 
-  const firebase = useAppSelector(selectFirebase)
+  const firebase = useContext(FirebaseContext)
   const authUser = useAuthUser()
 
   const addShowsToDatabaseOnRegister = ({ shows, uid }: AddShowsToDatabaseOnRegisterArg) => {

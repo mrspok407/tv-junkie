@@ -19,10 +19,11 @@ import PlaceholderLoadingFullInfo from "Components/UI/Placeholders/PlaceholderLo
 import useHandleListeners from "./FirebaseHelpers/UseHandleListeners"
 import { ContentDetailes, CONTENT_DETAILS_DEFAULT } from "Utils/Interfaces/ContentDetails"
 import useGoogleRedirect from "Components/UserAuth/SignIn/UseGoogleRedirect"
-import { useAppSelector } from "app/hooks"
+import { useAppDispatch, useAppSelector } from "app/hooks"
 import { selectUserShow } from "Components/UserContent/UseUserShows/userShowsSlice"
 import "./Detailes.scss"
 import { selectShowsLoading } from "Components/UserContent/UseUserShowsRed/userShowsSliceRed"
+import { fetchShowEpisodes } from "Components/UserContent/UseUserShowsRed/Middleware"
 
 const { CancelToken } = require("axios")
 let cancelRequest: any
@@ -78,11 +79,13 @@ export const DetailesPage: React.FC<Props> = ({
   const firebase = useContext(FirebaseContext)
   const { authUser } = context
 
-  const { episodesFromDatabase, releasedEpisodes, handleListeners } = useHandleListeners({ id: Number(id) })
+  const dispatch = useAppDispatch()
+
+  // const { episodesFromDatabase, releasedEpisodes, handleListeners } = useHandleListeners({ id: Number(id) })
 
   const [similarContent, setSimilarContent] = useState<ContentDetailes[]>([])
 
-  const [showInfo, setShowInfo] = useState<ShowInfoInterface>(SHOW_INFO_INITIAL_STATE)
+  // const [showInfo, setShowInfo] = useState<ShowInfoInterface>(SHOW_INFO_INITIAL_STATE)
   const [movieInDatabase, setMovieInDatabase] = useState<ContentDetailes | null>(null)
 
   // const [showDatabaseOnClient, setShowDatabaseOnClient] = useState<string>("")
@@ -93,7 +96,6 @@ export const DetailesPage: React.FC<Props> = ({
   const [loadingFromDatabase, setLoadingFromDatabase] = useState(true)
 
   const showsLoading = useAppSelector(selectShowsLoading)
-  console.log({ showsLoading })
 
   useGoogleRedirect()
 
@@ -122,12 +124,17 @@ export const DetailesPage: React.FC<Props> = ({
   })
 
   useEffect(() => {
+    if (showsLoading || mediaType !== "show") return
+    dispatch(fetchShowEpisodes(Number(id), authUser?.uid!, firebase))
+  }, [id, mediaType, showsLoading])
+
+  useEffect(() => {
     getContent()
 
     return () => {
       if (cancelRequest !== undefined) cancelRequest()
 
-      setShowInfo(SHOW_INFO_INITIAL_STATE)
+      // setShowInfo(SHOW_INFO_INITIAL_STATE)
       setMovieInDatabase(null)
       // setShowDatabaseOnClient("")
 
@@ -135,25 +142,25 @@ export const DetailesPage: React.FC<Props> = ({
     }
   }, [mediaType, id])
 
-  useEffect(() => {
-    mediaType === "show" ? getShowInDatabase() : getMovieInDatabase()
-  }, [context, id])
+  // useEffect(() => {
+  //   mediaType === "show" ? getShowInDatabase() : getMovieInDatabase()
+  // }, [context, id])
 
   useEffect(() => {
     if (!authUser || mediaType !== "show" || context.userContent.loadingShows || !detailes) {
       return
     }
 
-    handleListeners({
-      id: Number(id),
-      status: detailes.status,
-      handleLoading
-    })
+    // handleListeners({
+    //   id: Number(id),
+    //   status: detailes.status,
+    //   handleLoading
+    // })
   }, [id, detailes, context.userContent.loadingShows])
 
-  const handleLoading = (isLoading: boolean) => {
-    setLoadingFromDatabase(isLoading)
-  }
+  // const handleLoading = (isLoading: boolean) => {
+  //   setLoadingFromDatabase(isLoading)
+  // }
 
   const getContent = () => {
     setLoadingAPIrequest(true)
@@ -234,19 +241,14 @@ export const DetailesPage: React.FC<Props> = ({
       })
   }
 
-  const getShowInDatabase = () => {
-    const show = context.userContent.userShows.find((show) => show.id === Number(id))
+  // const getShowInDatabase = () => {
+  //   const show = context.userContent.userShows.find((show) => show.id === Number(id))
 
-    if (!authUser || !show) return
+  //   if (!authUser || !show) return
 
-    setShowInfo({ ...show, showInUserDatabase: true })
-    // setShowDatabaseOnClient(show.database)
-  }
-
-  const changeShowDatabaseOnClient = (database: string) => {
-    if (context.userContentHandler.loadingAddShowToDatabase.loading) return
-    // setShowDatabaseOnClient(database)
-  }
+  //   setShowInfo({ ...show, showInUserDatabase: true })
+  //   // setShowDatabaseOnClient(show.database)
+  // }
 
   const getMovieInDatabase = () => {
     const movie = context.userContent.userMovies.find((movie) => movie.id === Number(id))
@@ -279,19 +281,10 @@ export const DetailesPage: React.FC<Props> = ({
           <div className="detailes-page__error">
             <h1>{error}</h1>
           </div>
-        ) : !loadingAPIrequest && !loadingFromDatabase && !context.userContent.loadingShows && !showsLoading ? (
+        ) : !loadingAPIrequest && !showsLoading ? (
           <div className="detailes-page">
             <PosterWrapper detailes={detailes} mediaType={mediaType} />
-
-            <MainInfo
-              detailes={detailes}
-              mediaType={mediaType}
-              id={Number(id)}
-              changeShowDatabaseOnClient={changeShowDatabaseOnClient}
-              //showDatabaseOnClient={showDatabaseOnClient}
-              movieInDatabase={movieInDatabase}
-              handleListeners={handleListeners}
-            />
+            <MainInfo detailes={detailes} mediaType={mediaType} id={Number(id)} movieInDatabase={movieInDatabase} />
 
             <div className="detailes-page__description">{detailes.overview}</div>
 
@@ -301,9 +294,9 @@ export const DetailesPage: React.FC<Props> = ({
                 episodesData={detailes.seasonsFromAPI}
                 showTitle={detailes.name}
                 id={Number(id)}
-                showInfo={showInfo}
-                episodesFromDatabase={episodesFromDatabase}
-                releasedEpisodes={releasedEpisodes}
+                // showInfo={showInfo}
+                // episodesFromDatabase={episodesFromDatabase}
+                // releasedEpisodes={releasedEpisodes}
                 //showDatabaseOnClient={showDatabaseOnClient}
               />
             )}

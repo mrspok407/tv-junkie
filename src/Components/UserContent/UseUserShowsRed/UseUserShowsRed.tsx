@@ -4,10 +4,9 @@ import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 import { useAppDispatch, useAppSelector } from "app/hooks"
 import { fetchUserShows } from "./Middleware"
 import { selectShows, updateInitialLoading } from "./userShowsSliceRed"
-import { selectFirebase } from "Components/Firebase/credentialsSlice"
 
 const useUserShowsRed = () => {
-  const firebase = useAppSelector(selectFirebase)
+  const firebase = useContext(FirebaseContext)
   const dispatch = useAppDispatch()
 
   // const store = useAppSelector((state) => state)
@@ -19,7 +18,7 @@ const useUserShowsRed = () => {
       authSubscriber = firebase.onAuthUserListener(
         async (authUser: AuthUserInterface) => {
           // await updateUserEpisodesFromDatabase({ firebase })
-          dispatch(fetchUserShows(authUser.uid))
+          dispatch(fetchUserShows(authUser.uid, firebase))
         },
         () => {
           dispatch(updateInitialLoading(false))

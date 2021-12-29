@@ -7,6 +7,8 @@ import { SingleEpisodeInterface } from "Components/UserContent/UseUserShows/UseU
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { HandleFadeOutInterface } from "../Templates/SeasonsAndEpisodes/SeasonEpisodes"
 import "./UserRating.scss"
+import { useAppSelector } from "app/hooks"
+import { selectShowDatabase } from "Components/UserContent/UseUserShowsRed/userShowsSliceRed"
 
 const STAR_AMOUNT = 5
 
@@ -19,7 +21,7 @@ type Props = {
   episodeRating?: boolean
   handleFadeOut?: ({ episodeId, episodeIndex, seasonNum, rating }: HandleFadeOutInterface) => void
   parentComponent?: string
-  showDatabase?: string
+  // showDatabase?: string
   disableRating?: boolean
   showRating?: boolean
   mediaType?: string
@@ -33,7 +35,7 @@ const UserRating: React.FC<Props> = ({
   episodeNum = 0,
   episodeId = 0,
   episodeRating,
-  showDatabase,
+  // showDatabase,
   parentComponent,
   disableRating,
   showRating,
@@ -47,6 +49,8 @@ const UserRating: React.FC<Props> = ({
 
   const firebase = useContext(FirebaseContext)
   const { authUser } = useContext(AppContext)
+
+  const showDatabase = useAppSelector((state) => selectShowDatabase(state, id))
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside as EventListener)

@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react"
-import { differenceBtwDatesInDays, todayDate } from "Utils"
+import { differenceBtwDatesInDays, releasedEpisodesToOneArray, todayDate } from "Utils"
 import * as _get from "lodash.get"
 import isAllEpisodesWatched from "./FirebaseHelpers/isAllEpisodesWatched"
 import Loader from "Components/UI/Placeholders/Loader"
@@ -17,15 +17,17 @@ import useFetchSeasons from "./Hooks/UseFetchSeasons/UseFetchSeasons"
 import { tmdbTvSeasonURL } from "Utils/APIUrls"
 import useAxiosPromise from "Utils/Hooks/UseAxiosPromise"
 import "./ShowsEpisodes.scss"
+import { useAppSelector } from "app/hooks"
+import { selectShow, selectShowEpisodes } from "Components/UserContent/UseUserShowsRed/userShowsSliceRed"
 
 type Props = {
   showDatabaseOnClient?: string | null
   episodesData: EpisodesDataInterface[]
   showTitle: string
-  showInfo: ShowInfoInterface
+  showInfo?: ShowInfoInterface
   id: number
-  episodesFromDatabase: SeasonEpisodesFromDatabaseInterface[]
-  releasedEpisodes: SingleEpisodeInterface[]
+  episodesFromDatabase?: SeasonEpisodesFromDatabaseInterface[]
+  releasedEpisodes?: SingleEpisodeInterface[]
   parentComponent: string
 }
 
@@ -52,17 +54,20 @@ export interface ShowEpisodesFromAPIInterface {
 }
 
 const ShowsEpisodes: React.FC<Props> = ({
-  showDatabaseOnClient,
   episodesData,
   showTitle,
-  showInfo,
+  // showInfo,
   id,
-  episodesFromDatabase,
-  releasedEpisodes,
+  // episodesFromDatabase,
+  // releasedEpisodes,
   parentComponent
 }) => {
   const firebase = useContext(FirebaseContext)
   const { authUser } = useContext(AppContext)
+
+  const showInfo = useAppSelector((state) => selectShow(state, id))
+  const episodesFromDatabase = useAppSelector((state) => selectShowEpisodes(state, id))
+  const releasedEpisodes: SingleEpisodeInterface[] = releasedEpisodesToOneArray({ data: episodesFromDatabase })
 
   const seasons = episodesData.filter((item) => item.name !== "Specials")
   const firstSeason = seasons[seasons.length - 1]
@@ -71,6 +76,9 @@ const ShowsEpisodes: React.FC<Props> = ({
 
   const [detailEpisodeInfo, setDetailEpisodeInfo] = useState<number[]>([])
   const [errorShowEpisodes] = useState("")
+
+  console.log({ episodesFromDatabase })
+  console.log({ releasedEpisodes })
 
   const [openSeason, setOpenSeason] = useState({ seasonId: firstSeason?.id, seasonNum: firstSeason?.season_number })
 
@@ -251,7 +259,7 @@ const ShowsEpisodes: React.FC<Props> = ({
     firebase.userShowAllEpisodes(authUser.uid, id).set(episodesFromDatabase)
   }
 
-  const showCheckboxes = showInfo.showInUserDatabase && showDatabaseOnClient !== "notWatchingShows"
+  const showCheckboxes = showInfo?.database !== "notWatchingShows"
 
   const curOpen = parentComponent === "toWatchPage" ? currentlyOpen : currentlyOpenSeasons
 
@@ -325,12 +333,12 @@ const ShowsEpisodes: React.FC<Props> = ({
                     <>
                       {season.poster_path && parentComponent === "detailesPage" && (
                         <div className="episodes__episode-group-poster-wrapper">
-                          {showInfo.showInUserDatabase && daysToNewSeason <= 0 && (
+                          {showInfo?.database && daysToNewSeason <= 0 && (
                             <UserRating
                               id={id}
                               firebaseRef="userShowSeason"
                               seasonNum={season.season_number}
-                              disableRating={!!(showDatabaseOnClient === "notWatchingShows")}
+                              disableRating={!!(showInfo?.database === "notWatchingShows")}
                             />
                           )}
 
@@ -363,7 +371,6 @@ const ShowsEpisodes: React.FC<Props> = ({
                         seasonId={season.id}
                         episodesFromDatabase={episodesFromDatabase}
                         showInfo={showInfo}
-                        showDatabaseOnClient={showDatabaseOnClient}
                         showEpisodeInfo={showEpisodeInfo}
                         toggleWatchedEpisode={toggleWatchedEpisode}
                         checkMultipleEpisodes={checkMultipleEpisodes}
@@ -390,7 +397,6 @@ const ShowsEpisodes: React.FC<Props> = ({
                       seasonId={season.id}
                       episodesFromDatabase={episodesFromDatabase}
                       showInfo={showInfo}
-                      showDatabaseOnClient={showDatabaseOnClient}
                       showEpisodeInfo={showEpisodeInfo}
                       toggleWatchedEpisode={toggleWatchedEpisode}
                       checkMultipleEpisodes={checkMultipleEpisodes}

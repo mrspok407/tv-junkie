@@ -1,32 +1,18 @@
-/* eslint-disable jsx-a11y/anchor-has-content */
 import React, { useContext } from "react"
-import ShowsButtons from "./ShowsButtons"
 import ShowsButtonsRed from "./ShowsButtonsRed"
 import classNames from "classnames"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import UserRating from "Components/UI/UserRating/UserRating"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
-import { HandleListenersArg } from "../FirebaseHelpers/UseHandleListeners"
 
 type Props = {
   detailes: ContentDetailes
   movieInDatabase: {} | null
   mediaType: string
   id: number
-  // showDatabaseOnClient: string
-  changeShowDatabaseOnClient: (database: string) => void
-  handleListeners: ({ id, status, handleLoading }: HandleListenersArg) => void
 }
 
-export const MainInfo: React.FC<Props> = ({
-  movieInDatabase,
-  detailes,
-  mediaType,
-  id,
-  // showDatabaseOnClient,
-  changeShowDatabaseOnClient,
-  handleListeners
-}) => {
+export const MainInfo: React.FC<Props> = ({ movieInDatabase, detailes, mediaType, id }) => {
   const context = useContext(AppContext)
   const { authUser } = context
 
@@ -35,11 +21,8 @@ export const MainInfo: React.FC<Props> = ({
   )
 
   const isMediaTypeTV = mediaType === "show"
-
   const title = isMediaTypeTV ? detailes.name : detailes.title
-
   const yearRelease = isMediaTypeTV ? detailes.first_air_date.slice(0, 4) : detailes.release_date.slice(0, 4)
-
   const yearEnded = isMediaTypeTV && detailes.last_air_date.slice(0, 4)
 
   const yearRange =
@@ -119,13 +102,7 @@ export const MainInfo: React.FC<Props> = ({
         <div className="detailes-page__info-row">
           <div className="detailes-page__info-option">My rating</div>
           <div className="detailes-page__info-value">
-            <UserRating
-              id={id}
-              firebaseRef="userShow"
-              // showDatabase={showDatabaseOnClient}
-              showRating={true}
-              mediaType={mediaType}
-            />
+            <UserRating id={id} firebaseRef="userShow" showRating={true} mediaType={mediaType} />
           </div>
         </div>
       )}
@@ -161,16 +138,7 @@ export const MainInfo: React.FC<Props> = ({
       )}
 
       <div className="detailes-page__info-row detailes-page__info--button">
-        {isMediaTypeTV && (
-          <ShowsButtonsRed id={id} detailes={detailes} />
-          // <ShowsButtons
-          //   id={id}
-          //   detailes={detailes}
-          //   changeShowDatabaseOnClient={changeShowDatabaseOnClient}
-          //   // showDatabaseOnClient={showDatabaseOnClient}
-          //   handleListeners={handleListeners}
-          // />
-        )}
+        {isMediaTypeTV && <ShowsButtonsRed id={id} detailes={detailes} />}
 
         {!isMediaTypeTV && (
           <button

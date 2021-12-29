@@ -1,9 +1,8 @@
-import { Credentials } from "Components/Firebase/@Types"
 import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
 
 type Arguments = {
-  firebase: Credentials["firebase"]
+  firebase: FirebaseInterface
   showDetailes: ContentDetailes
   showEpisodesTMDB: { status: string; episodes: {}[] }
 }

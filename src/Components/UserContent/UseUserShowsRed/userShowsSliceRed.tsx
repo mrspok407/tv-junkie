@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 import { RootState } from "app/store"
-import { UserShowsState } from "./@Types"
+import { SeasonEpisodesFromDatabaseInterface, UserShowsState } from "./@Types"
 import { UserShowsInterface } from "./@Types"
 
 const initialState: UserShowsState = {
@@ -58,6 +58,13 @@ export const userShowsSliceRed = createSlice({
       action.payload.episodes = []
       state.data.info[action.payload.id] = { ...show, ...action.payload }
     },
+    setShowEpisodes: (
+      state,
+      action: PayloadAction<{ id: number; episodes: SeasonEpisodesFromDatabaseInterface[] }>
+    ) => {
+      state.data.episodes[action.payload.id] = action.payload.episodes
+      state.data.info[action.payload.id].episodesFetched = true
+    },
     updateInitialLoading: (state, action: PayloadAction<UserShowsState["initialLoading"]>) => {
       console.log(action.payload)
       state.initialLoading = action.payload
@@ -69,12 +76,15 @@ export const userShowsSliceRed = createSlice({
   }
 })
 
-export const { setUserShows, addNewShow, changeShow, updateInitialLoading, setError } = userShowsSliceRed.actions
+export const { setUserShows, addNewShow, changeShow, setShowEpisodes, updateInitialLoading, setError } =
+  userShowsSliceRed.actions
 
 export const selectShows = (state: RootState) => state.userShows.data.info
 export const selectShowsIds = (state: RootState) => state.userShows.data.ids
 export const selectShow = (state: RootState, id: number) => state.userShows.data.info[id]
 export const selectShowDatabase = (state: RootState, id: number) => state.userShows.data.info[id]?.database
 export const selectShowsLoading = (state: RootState) => state.userShows.initialLoading
+
+export const selectShowEpisodes = (state: RootState, id: number) => state.userShows.data.episodes[id]
 
 export default userShowsSliceRed.reducer

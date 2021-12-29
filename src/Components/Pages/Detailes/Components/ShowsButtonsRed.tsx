@@ -65,14 +65,6 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes }) => {
                   firebase
                 })
               )
-              //   context.userContentHandler.handleShowInDatabases({
-              //     id: Number(id),
-              //     data: detailes,
-              //     database: "watchingShows",
-              //     // userShows: context.userContent.userShows,
-              //     userShows,
-              //     handleListeners
-              //   })
             } else {
               context.userContentLocalStorage.addShowLS({
                 id: Number(id),
@@ -104,15 +96,6 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes }) => {
                   firebase
                 })
               )
-
-              //   context.userContentHandler.handleShowInDatabases({
-              //     id: Number(id),
-              //     data: detailes,
-              //     database: "notWatchingShows",
-              //     // userShows: context.userContent.userShows,
-              //     userShows,
-              //     handleListeners
-              //   })
             } else {
               context.userContentLocalStorage.removeShowLS({
                 id: Number(id)
@@ -142,15 +125,6 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes }) => {
                     firebase
                   })
                 )
-
-                // context.userContentHandler.handleShowInDatabases({
-                //   id: Number(id),
-                //   data: detailes,
-                //   database: "droppedShows",
-                //   // userShows: context.userContent.userShows,
-                //   userShows,
-                //   handleListeners
-                // })
               } else {
                 showDissableBtnWarning("dropBtn")
               }
@@ -187,15 +161,6 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes }) => {
                     firebase
                   })
                 )
-
-                // context.userContentHandler.handleShowInDatabases({
-                //   id: Number(id),
-                //   data: detailes,
-                //   database: "willWatchShows",
-                //   // userShows: context.userContent.userShows,
-                //   userShows,
-                //   handleListeners
-                // })
               } else {
                 showDissableBtnWarning("willWatchBtn")
               }

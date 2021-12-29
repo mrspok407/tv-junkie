@@ -7,7 +7,15 @@ import fetchShowsFullData from "../FirebaseHelpers/fetchShowsFullData"
 import { merge } from "lodash"
 import { combineMergeObjects } from "Utils"
 import { userShowsListeners } from "./firebaseListeners"
-import { addNewShow, changeShow, selectShow, setError, setUserShows } from "../userShowsSliceRed"
+import {
+  addNewShow,
+  changeShow,
+  selectShow,
+  selectShowEpisodes,
+  setError,
+  setShowEpisodes,
+  setUserShows
+} from "../userShowsSliceRed"
 import { fetchEpisodesFullData } from "../FirebaseHelpers"
 
 export const fetchUserShows =
@@ -23,6 +31,18 @@ export const fetchUserShows =
 
       dispatch(setUserShows(mergedShows))
       dispatch(userShowsListeners({ uid, firebase }))
+    } catch (err) {
+      dispatch(setError(err))
+    }
+  }
+
+export const fetchShowEpisodes =
+  (id: number, uid: string, firebase: FirebaseInterface): AppThunk =>
+  async (dispatch, getState) => {
+    if (selectShowEpisodes(getState(), id).length) return
+    try {
+      const episodes = await fetchEpisodesFullData({ uid, showKey: id, firebase })
+      dispatch(setShowEpisodes({ id, episodes }))
     } catch (err) {
       dispatch(setError(err))
     }

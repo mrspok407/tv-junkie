@@ -1,4 +1,4 @@
-import React, { createContext } from "react"
+import React, { createContext, useContext } from "react"
 import useUserContentLocalStorage from "Components/UserContent/UseUserContentLocalStorage"
 import useUserShows from "Components/UserContent/UseUserShows/UseUserShows"
 import useContentHandler from "Components/UserContent/UseContentHandler"
