@@ -59,6 +59,7 @@ export const userShowsSliceRed = createSlice({
       state.data.info[action.payload.id] = { ...show, ...action.payload }
     },
     updateInitialLoading: (state, action: PayloadAction<UserShowsState["initialLoading"]>) => {
+      console.log(action.payload)
       state.initialLoading = action.payload
     },
     setError: (state, action: PayloadAction<any>) => {
@@ -68,7 +69,7 @@ export const userShowsSliceRed = createSlice({
   }
 })
 
-export const { setUserShows, addNewShow, changeShow, setError } = userShowsSliceRed.actions
+export const { setUserShows, addNewShow, changeShow, updateInitialLoading, setError } = userShowsSliceRed.actions
 
 export const selectShows = (state: RootState) => state.userShows.data.info
 export const selectShowsIds = (state: RootState) => state.userShows.data.ids

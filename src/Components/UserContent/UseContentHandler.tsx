@@ -6,12 +6,12 @@ import {
   HandleMovieInDatabasesArg,
   HandleShowInDatabasesArg
 } from "Components/AppContext/@Types"
-import addShowToMainDatabase from "./FirebaseHelpers/addShowToMainDatabase"
+import addShowFireDatabase from "./FirebaseHelpers/addShowFireDatabase"
 import getShowEpisodesFromAPI from "./TmdbAPIHelpers/getShowEpisodesFromAPI"
 import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
 import updateAllEpisodesWatched from "./UseUserShows/FirebaseHelpers/updateAllEpisodesWatched"
 import { useAppSelector } from "app/hooks"
-import { selectShow } from "./UseUserShowsRed/userShowsSliceRed"
+import { selectFirebase } from "Components/Firebase/credentialsSlice"
 
 export const LOADING_ADDING_TO_DATABASE_INITIAL = {
   watchingShows: false,
@@ -25,7 +25,7 @@ const useContentHandler = () => {
   const [loadingAddShowToDatabase, setLoadingAddShowToDatabase] = useState(LOADING_ADDING_TO_DATABASE_INITIAL)
   const [loadingShowsOnRegister, setLoadingShowsOnRegister] = useState(false)
 
-  const firebase = useContext(FirebaseContext)
+  const firebase = useAppSelector(selectFirebase)
   const authUser = useAuthUser()
 
   const addShowsToDatabaseOnRegister = ({ shows, uid }: AddShowsToDatabaseOnRegisterArg) => {
@@ -58,7 +58,7 @@ const useContentHandler = () => {
             id: show.id
           }
 
-          addShowToMainDatabase({ firebase, show, dataFromAPI })
+          addShowFireDatabase({ firebase, showDetailes: show, showEpisodesTMDB: dataFromAPI })
 
           return { showInfo, userEpisodes }
         })
@@ -112,10 +112,11 @@ const useContentHandler = () => {
       setLoadingAddShowToDatabase(LOADING_ADDING_TO_DATABASE_INITIAL)
       return
     }
-    getShowEpisodesFromAPI({ id }).then(async (dataFromAPI: any) => {
-      const showsSubDatabase = dataFromAPI.status === "Ended" || dataFromAPI.status === "Canceled" ? "ended" : "ongoing"
+    getShowEpisodesFromAPI({ id }).then(async (showEpisodesTMDB: any) => {
+      const showsSubDatabase =
+        showEpisodesTMDB.status === "Ended" || showEpisodesTMDB.status === "Canceled" ? "ended" : "ongoing"
 
-      const userEpisodes = dataFromAPI.episodes.reduce(
+      const userEpisodes = showEpisodesTMDB.episodes.reduce(
         (acc: {}[], season: { episodes: { air_date: string }[]; season_number: number }) => {
           const episodes = season.episodes.map((episode) => {
             return { watched: false, userRating: 0, air_date: episode.air_date || "" }
@@ -127,7 +128,7 @@ const useContentHandler = () => {
         []
       )
 
-      await addShowToMainDatabase({ firebase, show, dataFromAPI })
+      await addShowFireDatabase({ firebase, showDetailes: show, showEpisodesTMDB })
       await Promise.all([
         firebase.userAllShows(authUser.uid).child(id).set({
           allEpisodesWatched: false,
@@ -162,7 +163,7 @@ const useContentHandler = () => {
         lastUpdatedInUser: firebase.timeStamp()
       })
 
-      if (handleListeners) handleListeners({ id, status: dataFromAPI.status })
+      if (handleListeners) handleListeners({ id, status: showEpisodesTMDB.status })
     })
   }
 

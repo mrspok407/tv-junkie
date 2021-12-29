@@ -44,6 +44,7 @@ const useUserContentLocalStorage = () => {
   }
 
   const removeShowLS = ({ id }: { id: number }) => {
+    if (!userContent.watchingShows.find((item) => item.id === id)) return
     setUserContent((prevState) => ({
       ...prevState,
       watchingShows: [...prevState.watchingShows.filter((item) => item.id !== id)]
