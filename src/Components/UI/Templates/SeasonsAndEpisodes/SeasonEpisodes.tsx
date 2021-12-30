@@ -10,7 +10,7 @@ import TorrentLinksEpisodes from "./Components/TorrentLinksEpisodes"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { SeasonEpisodesFromDatabaseInterface } from "Components/UserContent/UseUserShows/UseUserShows"
 import { EpisodesDataInterface, ShowEpisodesFromAPIInterface } from "./ShowsEpisodes"
-import { ShowInfoInterface } from "Components/Pages/Detailes/Detailes"
+import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
 
 const FADE_OUT_SPEED = 300
 
@@ -23,7 +23,7 @@ type Props = {
   season: EpisodesDataInterface
   seasonId: number
   episodesFromDatabase: SeasonEpisodesFromDatabaseInterface[]
-  showInfo: ShowInfoInterface
+  showInfo: ContentDetailes
   showEpisodeInfo: (episodeId: number) => void
   toggleWatchedEpisode: (
     seasonNum: number,

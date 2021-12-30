@@ -1,14 +1,14 @@
 import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
-import { ShowInfoInterface } from "Components/Pages/Detailes/Detailes"
 import {
   SeasonEpisodesFromDatabaseInterface,
   SingleEpisodeInterface
 } from "Components/UserContent/UseUserShows/UseUserShows"
 import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 import { differenceBtwDatesInDays, todayDate } from "Utils"
+import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
 
 interface Arguments {
-  showInfo: ShowInfoInterface
+  showInfo: ContentDetailes
   releasedEpisodes: SingleEpisodeInterface[]
   episodesFromDatabase: SeasonEpisodesFromDatabaseInterface[]
   authUser: AuthUserInterface

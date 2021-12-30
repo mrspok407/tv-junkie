@@ -39,7 +39,11 @@ export const fetchUserShows =
 export const fetchShowEpisodes =
   (id: number, uid: string, firebase: FirebaseInterface): AppThunk =>
   async (dispatch, getState) => {
-    if (selectShowEpisodes(getState(), id).length) return
+    if (!selectShow(getState(), id)) return
+    if (selectShowEpisodes(getState(), id).length) {
+      console.log("fetchShowEpisodes earlyReturn")
+      return
+    }
     try {
       const episodes = await fetchEpisodesFullData({ uid, showKey: id, firebase })
       dispatch(setShowEpisodes({ id, episodes }))

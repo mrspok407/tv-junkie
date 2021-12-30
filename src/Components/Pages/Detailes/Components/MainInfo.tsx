@@ -7,12 +7,12 @@ import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
 
 type Props = {
   detailes: ContentDetailes
-  movieInDatabase: {} | null
+  movieInDatabase?: {} | null
   mediaType: string
   id: number
 }
 
-export const MainInfo: React.FC<Props> = ({ movieInDatabase, detailes, mediaType, id }) => {
+export const MainInfo: React.FC<Props> = ({ detailes, mediaType, id }) => {
   const context = useContext(AppContext)
   const { authUser } = context
 
@@ -143,7 +143,7 @@ export const MainInfo: React.FC<Props> = ({ movieInDatabase, detailes, mediaType
         {!isMediaTypeTV && (
           <button
             className={classNames("button", {
-              "button--pressed": movieInDatabase || movieInLS
+              "button--pressed": movieInLS
             })}
             onClick={() => {
               if (authUser) {
@@ -161,7 +161,7 @@ export const MainInfo: React.FC<Props> = ({ movieInDatabase, detailes, mediaType
             }}
             type="button"
           >
-            {movieInDatabase || movieInLS ? "Remove" : "Watch later"}
+            {movieInLS ? "Remove" : "Watch later"}
           </button>
         )}
       </div>

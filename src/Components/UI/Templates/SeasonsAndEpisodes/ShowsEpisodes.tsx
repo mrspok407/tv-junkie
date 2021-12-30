@@ -9,7 +9,6 @@ import {
   SeasonEpisodesFromDatabaseInterface,
   SingleEpisodeInterface
 } from "Components/UserContent/UseUserShows/UseUserShows"
-import { ShowInfoInterface } from "Components/Pages/Detailes/Detailes"
 import { FirebaseContext } from "Components/Firebase"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import SeasonEpisodes from "./SeasonEpisodes"
@@ -19,12 +18,13 @@ import useAxiosPromise from "Utils/Hooks/UseAxiosPromise"
 import "./ShowsEpisodes.scss"
 import { useAppSelector } from "app/hooks"
 import { selectShow, selectShowEpisodes } from "Components/UserContent/UseUserShowsRed/userShowsSliceRed"
+import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
 
 type Props = {
   showDatabaseOnClient?: string | null
   episodesData: EpisodesDataInterface[]
   showTitle: string
-  showInfo?: ShowInfoInterface
+  showInfo?: ContentDetailes
   id: number
   episodesFromDatabase?: SeasonEpisodesFromDatabaseInterface[]
   releasedEpisodes?: SingleEpisodeInterface[]
