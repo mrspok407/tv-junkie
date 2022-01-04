@@ -1,8 +1,5 @@
 import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
-import { SeasonEpisodesFromDatabaseInterface, UserShowsInterface } from "../@Types"
-import { SnapshotVal } from "Components/AppContext/@Types"
-import merge from "deepmerge"
-import { combineMergeObjects } from "Utils"
+import { UserShowsInterface } from "../../@Types"
 import { fetchEpisodesFullData } from "."
 
 interface GetUserShowsFullInfoArg {

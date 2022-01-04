@@ -58,17 +58,17 @@ const isAllEpisodesWatched = ({
 
   const finished = (status === "ended" || showInfo.status === "ended") && isAllEpisodesAired ? true : false
 
-  if (releasedEpisodesWatched) {
-    firebase.userShowAllEpisodesInfo(authUser.uid, showInfo.id).update({
-      allEpisodesWatched: releasedEpisodesWatched,
-      finished,
-      isAllWatched_database: `${releasedEpisodesWatched}_${showInfo.database}`
-    })
+  // if (releasedEpisodesWatched) {
+  firebase.userShowAllEpisodesInfo(authUser.uid, showInfo.id).update({
+    allEpisodesWatched: releasedEpisodesWatched,
+    finished,
+    isAllWatched_database: `${releasedEpisodesWatched}_${showInfo.database}`
+  })
 
-    firebase
-      .userShow({ uid: authUser.uid, key: showInfo.id })
-      .update({ finished, allEpisodesWatched: releasedEpisodesWatched })
-  }
+  firebase
+    .userShow({ uid: authUser.uid, key: showInfo.id })
+    .update({ finished, allEpisodesWatched: releasedEpisodesWatched })
+  // }
 }
 
 export default isAllEpisodesWatched

@@ -1,7 +1,9 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit"
+import { createSlice, current, PayloadAction } from "@reduxjs/toolkit"
 import { RootState } from "app/store"
 import { SeasonEpisodesFromDatabaseInterface, UserShowsState } from "./@Types"
 import { UserShowsInterface } from "./@Types"
+import merge from "deepmerge"
+import { combineMergeObjects } from "Utils"
 
 const initialState: UserShowsState = {
   data: {
@@ -65,25 +67,45 @@ export const userShowsSliceRed = createSlice({
       state.data.episodes[action.payload.id] = action.payload.episodes
       state.data.info[action.payload.id].episodesFetched = true
     },
+    changeShowEpisodes: (
+      state,
+      action: PayloadAction<{ id: number; episodes: SeasonEpisodesFromDatabaseInterface[] }>
+    ) => {
+      console.time("test")
+      const stateEpisodes = state.data.episodes[action.payload.id]
+      const mergeEpisodes: SeasonEpisodesFromDatabaseInterface[] = merge(stateEpisodes, action.payload.episodes, {
+        arrayMerge: combineMergeObjects
+      })
+      console.timeEnd("test")
+      console.log({ mergeEpisodes })
+      state.data.episodes[action.payload.id] = mergeEpisodes
+    },
     updateInitialLoading: (state, action: PayloadAction<UserShowsState["initialLoading"]>) => {
       console.log(action.payload)
       state.initialLoading = action.payload
     },
     setError: (state, action: PayloadAction<any>) => {
-      state.error = action.payload.error
+      state.error = action.payload
       state.initialLoading = false
     }
   }
 })
 
-export const { setUserShows, addNewShow, changeShow, setShowEpisodes, updateInitialLoading, setError } =
-  userShowsSliceRed.actions
+export const {
+  setUserShows,
+  addNewShow,
+  changeShow,
+  setShowEpisodes,
+  changeShowEpisodes,
+  updateInitialLoading,
+  setError
+} = userShowsSliceRed.actions
 
 export const selectShows = (state: RootState) => state.userShows.data.info
 export const selectShowsIds = (state: RootState) => state.userShows.data.ids
 export const selectShow = (state: RootState, id: number) => state.userShows.data.info[id]
 export const selectShowDatabase = (state: RootState, id: number) => state.userShows.data.info[id]?.database
-export const selectShowsLoading = (state: RootState) => state.userShows.initialLoading
+export const selectShowsInitialLoading = (state: RootState) => state.userShows.initialLoading
 
 export const selectShowEpisodes = (state: RootState, id: number) => state.userShows.data.episodes[id]
 

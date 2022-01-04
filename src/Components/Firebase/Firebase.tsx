@@ -209,8 +209,6 @@ class Firebase {
 
   userShowSingleEpisode = ({ uid, key, seasonNum, episodeNum }: ReferenceInterface) =>
     this.db.ref(`users/${uid}/content/episodes/${key}/episodes/${seasonNum - 1}/episodes/${episodeNum}`)
-  userShowSingleEpisodeNotFinished = ({ uid, key, seasonNum, episodeNum }: ReferenceInterface) =>
-    this.db.ref(`users/${uid}/content/episodes/notFinished/${key}/episodes/${seasonNum - 1}/episodes/${episodeNum}`)
 
   userShowSeasonEpisodes = ({ uid, key, seasonNum }: ReferenceInterface) =>
     this.db.ref(`users/${uid}/content/episodes/${key}/episodes/${seasonNum - 1}/episodes`)

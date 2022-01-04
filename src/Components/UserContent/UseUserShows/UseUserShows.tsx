@@ -155,9 +155,9 @@ const useUserShows = () => {
           //   }
           // })
 
-          listenerUserMovies({ uid: authUser.uid })
+          // listenerUserMovies({ uid: authUser.uid })
 
-          setFirebaseListeners([firebase.userAllShows(authUser.uid), firebase.watchLaterMovies(authUser.uid)])
+          // setFirebaseListeners([firebase.userAllShows(authUser.uid), firebase.watchLaterMovies(authUser.uid)])
         },
         () => {
           authSubscriber()
@@ -173,7 +173,7 @@ const useUserShows = () => {
     return () => {
       authSubscriber()
       firebaseListeners.forEach((listener: any) => {
-        listener.off()
+        listener?.off()
       })
     }
     // eslint-disable-next-line

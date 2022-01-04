@@ -19,10 +19,10 @@ import PlaceholderLoadingFullInfo from "Components/UI/Placeholders/PlaceholderLo
 import { ContentDetailes, CONTENT_DETAILS_DEFAULT } from "Utils/Interfaces/ContentDetails"
 import useGoogleRedirect from "Components/UserAuth/SignIn/UseGoogleRedirect"
 import { useAppDispatch, useAppSelector } from "app/hooks"
-import { selectShowsLoading } from "Components/UserContent/UseUserShowsRed/userShowsSliceRed"
+import { selectShowsInitialLoading } from "Components/UserContent/UseUserShowsRed/userShowsSliceRed"
 import { fetchShowEpisodes } from "Components/UserContent/UseUserShowsRed/Middleware"
-import "./Detailes.scss"
 import useGetDataTMDB from "./Hooks/UseGetDataTMDB"
+import "./Detailes.scss"
 
 type Props = {
   match: { params: { id: string; mediaType: string } }
@@ -39,14 +39,9 @@ export const DetailesPage: React.FC<Props> = ({
   const dispatch = useAppDispatch()
 
   const [detailes, loadingTMDB, similarContent, error] = useGetDataTMDB({ id, mediaType })
-  const showsLoading = useAppSelector(selectShowsLoading)
+  const showsInitialLoading = useAppSelector(selectShowsInitialLoading)
 
   useGoogleRedirect()
-
-  useEffect(() => {
-    if (showsLoading || mediaType !== "show" || !authUser) return
-    dispatch(fetchShowEpisodes(Number(id), authUser?.uid!, firebase))
-  }, [id, mediaType, showsLoading, authUser, firebase])
 
   return (
     <>
@@ -72,7 +67,7 @@ export const DetailesPage: React.FC<Props> = ({
           <div className="detailes-page__error">
             <h1>{error}</h1>
           </div>
-        ) : !loadingTMDB && !showsLoading ? (
+        ) : !loadingTMDB && !showsInitialLoading ? (
           <div className="detailes-page">
             <PosterWrapper detailes={detailes} mediaType={mediaType} />
             <MainInfo detailes={detailes} mediaType={mediaType} id={Number(id)} />

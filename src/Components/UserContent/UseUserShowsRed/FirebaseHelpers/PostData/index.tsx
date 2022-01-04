@@ -94,12 +94,3 @@ export const handleNewUserShow =
       dispatch(setError(err))
     }
   }
-
-export const handleNewShowDatabase =
-  ({ id, database, uid, firebase }: HandleDatbaseChange): AppThunk =>
-  async (dispatch, getState) => {
-    const show = selectShow(getState(), id)
-
-    if (!show) {
-    }
-  }

@@ -1,7 +1,7 @@
 import { SnapshotVal } from "Components/AppContext/@Types"
 import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
 import { combineMergeObjects } from "Utils"
-import { SeasonEpisodesFromDatabaseInterface } from "../@Types"
+import { SeasonEpisodesFromDatabaseInterface } from "../../@Types"
 import merge from "deepmerge"
 
 interface FetchEpisodesFullData {

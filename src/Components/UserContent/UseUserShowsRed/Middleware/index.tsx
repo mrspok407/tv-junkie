@@ -1,9 +1,8 @@
 import { AppThunk } from "app/store"
-import { SnapshotVal } from "Components/AppContext/@Types"
 import sortDataSnapshot from "../../FirebaseHelpers/sortDataSnapshot"
 import { SeasonEpisodesFromDatabaseInterface, UserShowsInterface } from "../@Types"
 import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
-import fetchShowsFullData from "../FirebaseHelpers/fetchShowsFullData"
+import fetchShowsFullData from "../FirebaseHelpers/FetchData/fetchShowsFullData"
 import { merge } from "lodash"
 import { combineMergeObjects } from "Utils"
 import { userShowsListeners } from "./firebaseListeners"
@@ -16,7 +15,7 @@ import {
   setShowEpisodes,
   setUserShows
 } from "../userShowsSliceRed"
-import { fetchEpisodesFullData } from "../FirebaseHelpers"
+import { fetchEpisodesFullData } from "../FirebaseHelpers/FetchData"
 
 export const fetchUserShows =
   (uid: string, firebase: FirebaseInterface): AppThunk =>
@@ -46,6 +45,7 @@ export const fetchShowEpisodes =
     }
     try {
       const episodes = await fetchEpisodesFullData({ uid, showKey: id, firebase })
+      console.log("fetchShowEpisodes")
       dispatch(setShowEpisodes({ id, episodes }))
     } catch (err) {
       dispatch(setError(err))

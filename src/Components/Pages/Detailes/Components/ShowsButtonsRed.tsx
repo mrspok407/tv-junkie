@@ -4,18 +4,19 @@ import classNames from "classnames"
 import * as ROUTES from "Utils/Constants/routes"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
-import { HandleListenersArg } from "../FirebaseHelpers/UseHandleListeners"
 import { useAppDispatch, useAppSelector } from "app/hooks"
-import { selectShow, selectShowDatabase, selectShows } from "Components/UserContent/UseUserShowsRed/userShowsSliceRed"
+import { selectShowDatabase } from "Components/UserContent/UseUserShowsRed/userShowsSliceRed"
 import { handleDatabaseChange } from "Components/UserContent/UseUserShowsRed/FirebaseHelpers/PostData"
 import { FirebaseContext } from "Components/Firebase"
+import { fetchShowEpisodes } from "Components/UserContent/UseUserShowsRed/Middleware"
 
 type Props = {
   id: number
   detailes: ContentDetailes
+  mediaType: string
 }
 
-const ShowsButtons: React.FC<Props> = ({ id, detailes }) => {
+const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
   const [disableBtnWarning, setDisableBtnWarning] = useState<string | null>(null)
   const _notAuthButtons = useRef<HTMLDivElement>(null)
   const firebase = useContext(FirebaseContext)
@@ -24,6 +25,11 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes }) => {
 
   const dispatch = useAppDispatch()
   const showDatabase = useAppSelector((state) => selectShowDatabase(state, id))
+
+  useEffect(() => {
+    if (mediaType !== "show" || !authUser || showDatabase === "notWatchingShows") return
+    dispatch(fetchShowEpisodes(Number(id), authUser.uid, firebase))
+  }, [id, mediaType, showDatabase, authUser, firebase, dispatch])
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside as EventListener)

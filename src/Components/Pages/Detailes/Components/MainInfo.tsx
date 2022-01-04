@@ -138,7 +138,7 @@ export const MainInfo: React.FC<Props> = ({ detailes, mediaType, id }) => {
       )}
 
       <div className="detailes-page__info-row detailes-page__info--button">
-        {isMediaTypeTV && <ShowsButtonsRed id={id} detailes={detailes} />}
+        {isMediaTypeTV && <ShowsButtonsRed id={id} detailes={detailes} mediaType={mediaType} />}
 
         {!isMediaTypeTV && (
           <button

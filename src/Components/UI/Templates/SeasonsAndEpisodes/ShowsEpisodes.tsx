@@ -67,6 +67,7 @@ const ShowsEpisodes: React.FC<Props> = ({
 
   const showInfo = useAppSelector((state) => selectShow(state, id))
   const episodesFromDatabase = useAppSelector((state) => selectShowEpisodes(state, id))
+  console.log({ episodesFromDatabase })
   const releasedEpisodes: SingleEpisodeInterface[] = releasedEpisodesToOneArray({ data: episodesFromDatabase })
 
   const seasons = episodesData.filter((item) => item.name !== "Specials")
@@ -76,9 +77,6 @@ const ShowsEpisodes: React.FC<Props> = ({
 
   const [detailEpisodeInfo, setDetailEpisodeInfo] = useState<number[]>([])
   const [errorShowEpisodes] = useState("")
-
-  console.log({ episodesFromDatabase })
-  console.log({ releasedEpisodes })
 
   const [openSeason, setOpenSeason] = useState({ seasonId: firstSeason?.id, seasonNum: firstSeason?.season_number })
 
@@ -191,46 +189,61 @@ const ShowsEpisodes: React.FC<Props> = ({
     if (!authUser) return
     const safeGetSeasonEpisodes: SingleEpisodeInterface[] = _get(episodesFromDatabase[seasonNum - 1], "episodes", [])
 
-    const seasonEpisodes = safeGetSeasonEpisodes.reduce((acc: SingleEpisodeInterface[], episode) => {
+    const seasonEpisodes = safeGetSeasonEpisodes.reduce((acc: SingleEpisodeInterface[], episode, index) => {
       acc.push({
         userRating: episode.userRating,
         watched: episode.watched,
-        air_date: episode.air_date
+        air_date: episode.air_date,
+        index
       })
       return acc
     }, [])
-
-    const seasonEpisodesFromDatabase = releasedEpisodes.filter((item) => item.season_number === seasonNum)
-
-    let isAllEpisodesChecked = true
-
-    seasonEpisodesFromDatabase.forEach((episode: any) => {
-      if (!seasonEpisodes[episode.index].watched) {
-        isAllEpisodesChecked = false
-      }
-    })
-
-    seasonEpisodesFromDatabase.forEach((episode: any) => {
-      seasonEpisodes[episode.index].watched = !isAllEpisodesChecked
-    })
-
-    firebase
-      .userShowSeasonEpisodes({
-        uid: authUser.uid,
-        key: id,
-        seasonNum
+    const notWatchedEpisodes = seasonEpisodes.filter((episode) => !episode.watched)
+    const updateData: any = {}
+    console.log({ notWatchedEpisodes })
+    if (notWatchedEpisodes.length) {
+      notWatchedEpisodes.forEach((episode) => {
+        updateData[`${seasonNum - 1}/episodes/${episode.index}/watched`] = true
       })
-      .set(seasonEpisodes, () => {
-        if (parentComponent === "toWatchPage") {
-          isAllEpisodesWatched({
-            showInfo,
-            releasedEpisodes: releasedEpisodes.filter((item) => !item.watched),
-            episodesFromDatabase,
-            authUser,
-            firebase
-          })
-        }
+      firebase.userShowAllEpisodes(authUser.uid, id).update(updateData)
+    } else {
+      seasonEpisodes.forEach((episode) => {
+        updateData[`${seasonNum - 1}/episodes/${episode.index}/watched`] = false
       })
+      firebase.userShowAllEpisodes(authUser.uid, id).update(updateData)
+    }
+
+    // const seasonEpisodesFromDatabase = releasedEpisodes.filter((item) => item.season_number === seasonNum)
+
+    // let isAllEpisodesChecked = true
+
+    // seasonEpisodesFromDatabase.forEach((episode: any) => {
+    //   if (!seasonEpisodes[episode.index].watched) {
+    //     isAllEpisodesChecked = false
+    //   }
+    // })
+
+    // seasonEpisodesFromDatabase.forEach((episode: any) => {
+    //   seasonEpisodes[episode.index].watched = !isAllEpisodesChecked
+    // })
+
+    // firebase
+    //   .userShowSeasonEpisodes({
+    //     uid: authUser.uid,
+    //     key: id,
+    //     seasonNum
+    //   })
+    //   .set(seasonEpisodes, () => {
+    //     if (parentComponent === "toWatchPage") {
+    //       isAllEpisodesWatched({
+    //         showInfo,
+    //         releasedEpisodes: releasedEpisodes.filter((item) => !item.watched),
+    //         episodesFromDatabase,
+    //         authUser,
+    //         firebase
+    //       })
+    //     }
+    //   })
   }
 
   const checkEveryShowEpisode = () => {
@@ -260,6 +273,8 @@ const ShowsEpisodes: React.FC<Props> = ({
   }
 
   const showCheckboxes = showInfo?.database !== "notWatchingShows"
+
+  console.log({ showInfo, showCheckboxes, releasedEpisodes })
 
   const curOpen = parentComponent === "toWatchPage" ? currentlyOpen : currentlyOpenSeasons
 
