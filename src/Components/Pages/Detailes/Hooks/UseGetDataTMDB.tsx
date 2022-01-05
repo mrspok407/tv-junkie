@@ -15,14 +15,13 @@ type Props = {
 
 const useGetDataTMDB = ({ id, mediaType }: Props) => {
   const history = useHistory()
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [detailes, setDetailes] = useState<ContentDetailes>(CONTENT_DETAILS_DEFAULT)
   const [similarContent, setSimilarContent] = useState<ContentDetailes[]>([])
   const [error, setError] = useState("")
 
   useEffect(() => {
     const getContent = async () => {
-      setLoading(true)
       try {
         const { data } = await axios.get<ContentDetailes>(
           `https://api.themoviedb.org/3/${mediaType === "show" ? "tv" : "movie"}/${id}?api_key=${

@@ -73,6 +73,7 @@ export const userShowsSliceRed = createSlice({
     ) => {
       console.time("test")
       const stateEpisodes = state.data.episodes[action.payload.id]
+      if (!stateEpisodes.length) return
       const mergeEpisodes: SeasonEpisodesFromDatabaseInterface[] = merge(stateEpisodes, action.payload.episodes, {
         arrayMerge: combineMergeObjects
       })
@@ -102,6 +103,7 @@ export const {
 } = userShowsSliceRed.actions
 
 export const selectShows = (state: RootState) => state.userShows.data.info
+export const selectEpisodes = (state: RootState) => state.userShows.data.episodes
 export const selectShowsIds = (state: RootState) => state.userShows.data.ids
 export const selectShow = (state: RootState, id: number) => state.userShows.data.info[id]
 export const selectShowDatabase = (state: RootState, id: number) => state.userShows.data.info[id]?.database

@@ -137,16 +137,16 @@ const ShowsEpisodes: React.FC<Props> = ({
           watched: toggledEpisode !== null ? !toggledEpisode : null
         },
         () => {
-          if (parentComponent === "toWatchPage") {
-            isAllEpisodesWatched({
-              showInfo: showInfo,
-              releasedEpisodes,
-              episodesFromDatabase,
-              authUser: authUser,
-              firebase: firebase,
-              isSingleEpisode: true
-            })
-          }
+          // if (parentComponent === "toWatchPage") {
+          isAllEpisodesWatched({
+            showInfo: showInfo,
+            releasedEpisodes,
+            episodesFromDatabase,
+            authUser: authUser,
+            firebase: firebase,
+            isSingleEpisode: true
+          })
+          //}
         }
       )
   }
@@ -190,6 +190,7 @@ const ShowsEpisodes: React.FC<Props> = ({
     const safeGetSeasonEpisodes: SingleEpisodeInterface[] = _get(episodesFromDatabase[seasonNum - 1], "episodes", [])
 
     const seasonEpisodes = safeGetSeasonEpisodes.reduce((acc: SingleEpisodeInterface[], episode, index) => {
+      if (!releasedEpisodes.find((item) => item.id === episode.id)) return acc
       acc.push({
         userRating: episode.userRating,
         watched: episode.watched,

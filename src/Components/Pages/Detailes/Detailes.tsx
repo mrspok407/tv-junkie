@@ -41,6 +41,8 @@ export const DetailesPage: React.FC<Props> = ({
   const [detailes, loadingTMDB, similarContent, error] = useGetDataTMDB({ id, mediaType })
   const showsInitialLoading = useAppSelector(selectShowsInitialLoading)
 
+  console.log({ loadingTMDB })
+
   useGoogleRedirect()
 
   return (

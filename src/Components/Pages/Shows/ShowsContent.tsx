@@ -7,31 +7,44 @@ import PlaceholderNoShows from "Components/UI/Placeholders/PlaceholderNoShows"
 import Loader from "Components/UI/Placeholders/Loader"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import reducer, { INITIAL_STATE, ShowsContentState, ActionInterface, ActionTypes } from "./_reducerConfig"
+import { useAppDispatch, useAppSelector } from "app/hooks"
+import { selectUserShows } from "Components/UserContent/UseUserShows/userShowsSlice"
+import { selectShowsInitialLoading } from "Components/UserContent/UseUserShowsRed/userShowsSliceRed"
+import { handleDatabaseChange } from "Components/UserContent/UseUserShowsRed/FirebaseHelpers/PostData"
+import { FirebaseContext } from "Components/Firebase"
 
 const SCROLL_THRESHOLD = 800
 
 const ShowsContent: React.FC = () => {
   const [sortByState, setSortByState] = useState("name")
 
+  const firebase = useContext(FirebaseContext)
   const context = useContext(AppContext)
   const { authUser } = context
 
-  const [state, dispatch] = useReducer<React.Reducer<ShowsContentState, ActionInterface>>(reducer, INITIAL_STATE)
+  const dispatch = useAppDispatch()
+  const userShows = useAppSelector(selectUserShows)
+  const showsInitialLoading = useAppSelector(selectShowsInitialLoading)
+
+  const [localState, localDispatch] = useReducer<React.Reducer<ShowsContentState, ActionInterface>>(
+    reducer,
+    INITIAL_STATE
+  )
 
   useEffect(() => {
-    dispatch({ type: ActionTypes.UpdateContext, payload: context })
+    localDispatch({ type: ActionTypes.UpdateContext, payload: context })
   }, [context])
 
   const loadNewContent = () => {
-    if (state.disableLoad[state.activeSection] || authUser === null) return
-    dispatch({ type: ActionTypes.IncrementLoadedShows })
-    dispatch({ type: ActionTypes.DisableLoad })
+    if (localState.disableLoad[localState.activeSection] || authUser === null) return
+    localDispatch({ type: ActionTypes.IncrementLoadedShows })
+    localDispatch({ type: ActionTypes.DisableLoad })
   }
 
   const loadNewContentLS = () => {
-    if (state.disableLoad.watchingShowsLS || authUser !== null) return
-    dispatch({ type: ActionTypes.IncrementLoadedShowsLS })
-    dispatch({ type: ActionTypes.DisableLoadLS })
+    if (localState.disableLoad.watchingShowsLS || authUser !== null) return
+    localDispatch({ type: ActionTypes.IncrementLoadedShowsLS })
+    localDispatch({ type: ActionTypes.DisableLoadLS })
   }
 
   const handleScroll = useCallback(
@@ -41,7 +54,7 @@ const ShowsContent: React.FC = () => {
         loadNewContentLS()
       }
     }),
-    [state.disableLoad, state.activeSection]
+    [localState.disableLoad, localState.activeSection]
   )
   useEffect(() => {
     window.addEventListener("scroll", handleScroll)
@@ -56,11 +69,11 @@ const ShowsContent: React.FC = () => {
   }
 
   const toggleSection = (section: string) => {
-    dispatch({ type: ActionTypes.ChangeActiveSection, payload: section })
+    localDispatch({ type: ActionTypes.ChangeActiveSection, payload: section })
   }
 
   const renderContent = (section: string) => {
-    const content = context.userContent.userShows
+    const content = Object.values(userShows)
       .filter((show) => {
         if (section === "finishedShows") {
           return show.finished
@@ -68,15 +81,14 @@ const ShowsContent: React.FC = () => {
           return show.database === section && !show.finished
         }
       })
-      .sort((a, b) =>
-        // @ts-ignore
+      .sort((a: any, b: any) =>
         a[sortByState] > b[sortByState] ? (sortByState === "timeStamp" ? -1 : 1) : sortByState !== "timeStamp" ? -1 : 1
       )
-      .slice(0, state.loadedShows[section])
+      .slice(0, localState.loadedShows[section])
 
     const shows = authUser
       ? content
-      : context.userContentLocalStorage.watchingShows.slice(0, state.loadedShows.watchingShowsLS)
+      : context.userContentLocalStorage.watchingShows.slice(0, localState.loadedShows.watchingShowsLS)
 
     return (
       <>
@@ -128,16 +140,15 @@ const ShowsContent: React.FC = () => {
                       className="button"
                       onClick={() => {
                         if (authUser) {
-                          context.userContentHandler.handleShowInDatabases({
-                            id: item.id,
-                            data: item,
-                            database: "notWatchingShows",
-                            userShows: context.userContent.userShows
-                          })
-                          context.userContent.handleUserShowsOnClient({
-                            database: "notWatchingShows",
-                            id: item.id
-                          })
+                          dispatch(
+                            handleDatabaseChange({
+                              id: item.id,
+                              database: "notWatchingShows",
+                              showDetailes: userShows[item.id],
+                              uid: authUser.uid,
+                              firebase
+                            })
+                          )
                         } else {
                           context.userContentLocalStorage.removeShowLS({
                             id: item.id
@@ -155,16 +166,16 @@ const ShowsContent: React.FC = () => {
                       <button
                         className="button"
                         onClick={() => {
-                          context.userContentHandler.handleShowInDatabases({
-                            id: item.id,
-                            data: item,
-                            database: "watchingShows",
-                            userShows: context.userContent.userShows
-                          })
-                          context.userContent.handleUserShowsOnClient({
-                            database: "watchingShows",
-                            id: item.id
-                          })
+                          if (!authUser) return
+                          dispatch(
+                            handleDatabaseChange({
+                              id: item.id,
+                              database: "watchingShows",
+                              showDetailes: userShows[item.id],
+                              uid: authUser.uid,
+                              firebase
+                            })
+                          )
                         }}
                         type="button"
                       >
@@ -181,24 +192,24 @@ const ShowsContent: React.FC = () => {
     )
   }
 
-  const content = context.userContent.userShows.filter((show) => {
-    if (state.activeSection === "finishedShows") {
+  const content = Object.values(userShows).filter((show) => {
+    if (localState.activeSection === "finishedShows") {
       return show.finished
     } else {
-      return show.database === state.activeSection && !show.finished
+      return show.database === localState.activeSection && !show.finished
     }
   })
 
   const shows = authUser
     ? content
-    : state.activeSection === "watchingShows"
-    ? context.userContentLocalStorage.watchingShows.slice(0, state.loadedShows.watchingShowsLS)
+    : localState.activeSection === "watchingShows"
+    ? context.userContentLocalStorage.watchingShows.slice(0, localState.loadedShows.watchingShowsLS)
     : []
 
   const maxColumns = 4
   const currentNumOfColumns = shows.length <= maxColumns - 1 ? shows.length : maxColumns
 
-  const loadingShows = authUser ? context.userContent.loadingShows : false
+  const loadingShows = authUser ? showsInitialLoading : false
 
   return (
     <div className="content-results">
@@ -206,7 +217,7 @@ const ShowsContent: React.FC = () => {
         <div className="buttons__col">
           <button
             className={classNames("button", {
-              "button--pressed": state.activeSection === "watchingShows"
+              "button--pressed": localState.activeSection === "watchingShows"
             })}
             type="button"
             onClick={() => toggleSection("watchingShows")}
@@ -217,7 +228,7 @@ const ShowsContent: React.FC = () => {
         <div className="buttons__col">
           <button
             className={classNames("button", {
-              "button--pressed": state.activeSection === "droppedShows"
+              "button--pressed": localState.activeSection === "droppedShows"
             })}
             type="button"
             onClick={() => toggleSection("droppedShows")}
@@ -228,7 +239,7 @@ const ShowsContent: React.FC = () => {
         <div className="buttons__col">
           <button
             className={classNames("button", {
-              "button--pressed": state.activeSection === "willWatchShows"
+              "button--pressed": localState.activeSection === "willWatchShows"
             })}
             type="button"
             onClick={() => toggleSection("willWatchShows")}
@@ -239,7 +250,7 @@ const ShowsContent: React.FC = () => {
         <div className="buttons__col">
           <button
             className={classNames("button", {
-              "button--pressed": state.activeSection === "finishedShows"
+              "button--pressed": localState.activeSection === "finishedShows"
             })}
             type="button"
             onClick={() => toggleSection("finishedShows")}
@@ -252,7 +263,7 @@ const ShowsContent: React.FC = () => {
       {loadingShows || context.userContentHandler.loadingShowsOnRegister ? (
         <Loader className="loader--pink" />
       ) : shows.length === 0 ? (
-        <PlaceholderNoShows authUser={authUser} activeSection={state.activeSection} />
+        <PlaceholderNoShows authUser={authUser} activeSection={localState.activeSection} />
       ) : (
         <>
           {authUser && (
@@ -286,7 +297,7 @@ const ShowsContent: React.FC = () => {
           )}
           <div
             className={classNames("content-results__wrapper", {
-              "content-results__wrapper--finished-shows": state.activeSection === "finishedShows"
+              "content-results__wrapper--finished-shows": localState.activeSection === "finishedShows"
             })}
             style={
               currentNumOfColumns <= 3
@@ -298,7 +309,7 @@ const ShowsContent: React.FC = () => {
                   }
             }
           >
-            {renderContent(state.activeSection)}
+            {renderContent(localState.activeSection)}
           </div>
         </>
       )}

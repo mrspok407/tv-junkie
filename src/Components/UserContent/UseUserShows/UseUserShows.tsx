@@ -7,7 +7,6 @@ import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
 import merge from "deepmerge"
 import useGetUserToWatchShows from "./Hooks/UseGetUserToWatchShows"
 import fetchShowsFullData from "./FirebaseHelpers/fetchShowsFullData"
-import spliceNewShowFromDatabase from "./FirebaseHelpers/spliceNewShowFromDatabase"
 import getFullInfoForUpdatedShow from "./FirebaseHelpers/getFullInfoForUpdatedShow"
 import useGetUserMovies from "./Hooks/UseGetUserMovies"
 import updateUserEpisodesFromDatabase from "Components/UserContent/UseUserShows/FirebaseHelpers/updateUserEpisodesFromDatabase"
@@ -183,18 +182,18 @@ const useUserShows = () => {
     sessionStorage.setItem(SESSION_STORAGE_KEY_SHOWS, JSON.stringify(userShows))
   }, [userShows])
 
-  const handleUserShowsOnClient = ({ database, id }: { id: number; database: string }) => {
-    const userShowsSS: UserShowsInterface[] = JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY_SHOWS)!)
-    if (userShowsSS.find((show) => show.id === id) === undefined) return
+  // const handleUserShowsOnClient = ({ database, id }: { id: number; database: string }) => {
+  //   const userShowsSS: UserShowsInterface[] = JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY_SHOWS)!)
+  //   if (userShowsSS.find((show) => show.id === id) === undefined) return
 
-    const updatedShows = userShowsSS.map((show) => (show.id === id ? { ...show, database } : show))
+  //   const updatedShows = userShowsSS.map((show) => (show.id === id ? { ...show, database } : show))
 
-    const watchingShows = updatedShows.filter((show) => show.database === "watchingShows")
-    const willAirEpisodes = organiseFutureEpisodesByMonth(watchingShows)
+  //   const watchingShows = updatedShows.filter((show) => show.database === "watchingShows")
+  //   const willAirEpisodes = organiseFutureEpisodesByMonth(watchingShows)
 
-    setUserShows(updatedShows)
-    setUserWillAirEpisodes(willAirEpisodes)
-  }
+  //   setUserShows(updatedShows)
+  //   setUserWillAirEpisodes(willAirEpisodes)
+  // }
 
   const resetContentState = () => {
     setUserShows([])
@@ -211,7 +210,6 @@ const useUserShows = () => {
     loadingShows,
     loadingNotFinishedShows,
     loadingMovies,
-    handleUserShowsOnClient,
     handleUserMoviesOnClient,
     resetContentState
   }

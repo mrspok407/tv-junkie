@@ -1,49 +1,78 @@
 import React, { useCallback, useContext, useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import { differenceBtwDatesInDays, todayDate } from "Utils"
-import { organizeMonthEpisodesByEpisodeNumber } from "./CalendarHelpers"
+import { organiseFutureEpisodesByMonth, organizeMonthEpisodesByEpisodeNumber } from "./CalendarHelpers"
 import classNames from "classnames"
 import Loader from "Components/UI/Placeholders/Loader"
 import PlaceholderNoFutureEpisodes from "Components/UI/Placeholders/PlaceholderNoFutureEpisodes"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import TorrentLinksEpisodes from "Components/UI/Templates/SeasonsAndEpisodes/Components/TorrentLinksEpisodes"
+import { useAppSelector } from "app/hooks"
+import {
+  selectEpisodes,
+  selectShows,
+  selectShowsInitialLoading
+} from "Components/UserContent/UseUserShowsRed/userShowsSliceRed"
 import {
   SingleEpisodeByMonthInterface,
   UserWillAirEpisodesInterface
-} from "Components/UserContent/UseUserShows/UseUserShows"
+} from "Components/UserContent/UseUserShowsRed/@Types"
 
 type Props = {
   homePage?: boolean
 }
 
 const CalendarContent: React.FC<Props> = ({ homePage }) => {
-  const [willAirEpisodes, setWillAirEpisodes] = useState<UserWillAirEpisodesInterface[]>([])
   const [openMonths, setOpenMonths] = useState<string[]>([])
+  // const [willAirEpisodes, setWillAirEpisodes] = useState<UserWillAirEpisodesInterface[]>([])
   const [loading, setLoading] = useState(true)
   const context = useContext(AppContext)
 
-  const getContent = useCallback(() => {
-    if (context.userContent.userShows.length === 0) {
-      setLoading(false)
-      return
-    }
+  const showsInitialLoading = useAppSelector(selectShowsInitialLoading)
 
-    const willAirEpisodes = homePage
-      ? context.userContent.userWillAirEpisodes.slice(0, 2)
-      : context.userContent.userWillAirEpisodes
+  const userShows = useAppSelector(selectShows)
+  const userEpisodes = useAppSelector(selectEpisodes)
+  const watchingShows = Object.values(userShows).filter((show) => show.database === "watchingShows")
+  // const watchingShowsEpisodes = watchingShows.reduce((acc, show) => {
+  //   acc.push({...show, episodes: userEpisodes[show.id]})
+  //   return acc
+  // }, [])
+  const willAirEpisodesData: UserWillAirEpisodesInterface[] = organiseFutureEpisodesByMonth(watchingShows, userEpisodes)
+  const willAirEpisodes = homePage ? willAirEpisodesData.slice(0, 2) : willAirEpisodesData
 
+  useEffect(() => {
+    if (!Object.values(userEpisodes).length) return
+    console.log({ userEpisodes })
+    const willAirEpisodes = homePage ? willAirEpisodesData.slice(0, 2) : willAirEpisodesData
     const months = willAirEpisodes.map((item: Object) => {
       return Object.values(item)[0]
     })
-
-    setWillAirEpisodes(willAirEpisodes)
     setOpenMonths(homePage ? [months[0]] : months)
     setLoading(false)
-  }, [context.userContent, homePage])
+  }, [userEpisodes, homePage])
 
-  useEffect(() => {
-    getContent()
-  }, [getContent])
+  // const getContent = useCallback(() => {
+  //   if (context.userContent.userShows.length === 0) {
+  //     setLoading(false)
+  //     return
+  //   }
+
+  //   const willAirEpisodes = homePage
+  //     ? context.userContent.userWillAirEpisodes.slice(0, 2)
+  //     : context.userContent.userWillAirEpisodes
+
+  //   const months = willAirEpisodes.map((item: Object) => {
+  //     return Object.values(item)[0]
+  //   })
+
+  //   setWillAirEpisodes(willAirEpisodes)
+  //   setOpenMonths(homePage ? [months[0]] : months)
+  //   setLoading(false)
+  // }, [context.userContent, homePage])
+
+  // useEffect(() => {
+  //   getContent()
+  // }, [getContent])
 
   const showMonthEpisodes = ({ month }: { month: string }) => {
     if (openMonths.includes(month)) {
@@ -55,9 +84,9 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
 
   return (
     <div className="content-results content-results--calendar">
-      {context.userContent.loadingShows || context.userContentHandler.loadingShowsOnRegister ? (
+      {showsInitialLoading || loading || context.userContentHandler.loadingShowsOnRegister ? (
         <Loader className="loader--pink" />
-      ) : willAirEpisodes.length === 0 && !homePage && !loading ? (
+      ) : willAirEpisodes.length === 0 && !homePage ? (
         <PlaceholderNoFutureEpisodes />
       ) : (
         <div className="episodes episodes--calendar">

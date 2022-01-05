@@ -1,16 +1,16 @@
 import {
+  SingleEpisodeByMonthInterface,
   UserShowsInterface,
-  UserWillAirEpisodesInterface,
-  SingleEpisodeByMonthInterface
-} from "Components/UserContent/UseUserShows/UseUserShows"
+  UserWillAirEpisodesInterface
+} from "Components/UserContent/UseUserShowsRed/@Types"
 import { differenceBtwDatesInDays, todayDate } from "Utils"
 
-export const organiseFutureEpisodesByMonth = (data: UserShowsInterface[]) => {
+export const organiseFutureEpisodesByMonth = (data: UserShowsInterface[], episodes: any) => {
   const sortedAndFiltered = data
     .flatMap((show) => {
-      return show.episodes.flatMap((season) =>
+      return episodes[show.id].flatMap((season: any) =>
         season.episodes.reduce(
-          (acc: { show: string; showId: number; episode_number?: number; air_date: any }[], episode) => {
+          (acc: { show: string; showId: number; episode_number?: number; air_date: any }[], episode: any) => {
             if (differenceBtwDatesInDays(episode.air_date, todayDate) >= 0) {
               acc.push({
                 ...episode,

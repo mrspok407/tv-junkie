@@ -9,7 +9,7 @@ import {
 import addShowFireDatabase from "./FirebaseHelpers/addShowFireDatabase"
 import getShowEpisodesFromAPI from "./TmdbAPIHelpers/getShowEpisodesFromAPI"
 import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
-import updateAllEpisodesWatched from "./UseUserShows/FirebaseHelpers/updateAllEpisodesWatched"
+import updateAllEpisodesWatched from "./UseUserShowsRed/FirebaseHelpers/updateAllEpisodesWatched"
 
 export const LOADING_ADDING_TO_DATABASE_INITIAL = {
   watchingShows: false,

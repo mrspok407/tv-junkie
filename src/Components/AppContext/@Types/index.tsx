@@ -94,7 +94,6 @@ export interface AppContextInterface {
     userMovies: ContentDetailes[]
     resetContentState: () => void
     handleUserMoviesOnClient: ({ id, data }: { id: number; data?: UserMoviesInterface }) => void
-    handleUserShowsOnClient: ({ id, database }: { id: number; database: string }) => void
   }
   userContentHandler: {
     addShowsToDatabaseOnRegister: ({ shows }: AddShowsToDatabaseOnRegisterArg) => void
