@@ -4,6 +4,9 @@ import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 import { useAppDispatch, useAppSelector } from "app/hooks"
 import { fetchUserShows } from "./Middleware"
 import { selectShows, updateInitialLoading } from "./userShowsSliceRed"
+import { batch } from "react-redux"
+import { setAuthUser } from "Components/UserAuth/Session/WithAuthentication/authUserSlice"
+import setupAuthUser from "Components/UserAuth/Session/WithAuthentication/Middleware/setupAuthUser"
 
 const useUserShowsRed = () => {
   const firebase = useContext(FirebaseContext)
@@ -18,7 +21,9 @@ const useUserShowsRed = () => {
       authSubscriber = firebase.onAuthUserListener(
         async (authUser: AuthUserInterface) => {
           // await updateUserEpisodesFromDatabase({ firebase })
-          dispatch(fetchUserShows(authUser.uid, firebase))
+          await dispatch(setupAuthUser(authUser, firebase))
+          console.log("setupAuthUser END")
+          dispatch(fetchUserShows(firebase))
         },
         () => {
           dispatch(updateInitialLoading(false))

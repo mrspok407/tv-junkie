@@ -22,15 +22,15 @@ export const userShowsSliceRed = createSlice({
   reducers: {
     setUserShows: {
       reducer(state, action: PayloadAction<UserShowsState["data"]>) {
-        console.log(action.payload)
+        console.log({ initialPayload: action.payload })
         state.data = action.payload
         state.initialLoading = false
       },
       prepare(data: UserShowsInterface[]) {
+        const ids: UserShowsState["data"]["ids"] = []
         const info: UserShowsState["data"]["info"] = {}
         const episodes: UserShowsState["data"]["episodes"] = {}
         const timeStamps: UserShowsState["data"]["timeStamps"] = {}
-        const ids: UserShowsState["data"]["ids"] = []
         data.forEach((item) => {
           ids.push(item.id)
           episodes[item.key] = item.episodes

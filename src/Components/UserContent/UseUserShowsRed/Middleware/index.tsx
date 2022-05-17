@@ -18,8 +18,10 @@ import {
 import { fetchEpisodesFullData } from "../FirebaseHelpers/FetchData"
 
 export const fetchUserShows =
-  (uid: string, firebase: FirebaseInterface): AppThunk =>
-  async (dispatch) => {
+  (firebase: FirebaseInterface): AppThunk =>
+  async (dispatch, getState) => {
+    console.log("fetchUserShows")
+    const uid = getState().authUser.authUser.uid
     try {
       const userShowsSnapshot = await firebase.userAllShows(uid).orderByChild("timeStamp").once("value")
       const userShows = sortDataSnapshot<UserShowsInterface>(userShowsSnapshot)

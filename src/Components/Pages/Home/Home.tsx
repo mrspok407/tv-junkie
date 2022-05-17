@@ -63,7 +63,7 @@ const HomePage: React.FC = () => {
 
   const renderAuthUser = () => (
     <>
-      {!context.userContent.loadingShows && !context.userContentHandler.loadingShowsOnRegister && (
+      {/* {!context.userContent.loadingShows && !context.userContentHandler.loadingShowsOnRegister && (
         <>
           {context.userContent.userWillAirEpisodes.length > 0 ? (
             <div className="home-page__heading">
@@ -73,7 +73,7 @@ const HomePage: React.FC = () => {
             <PlaceholderHomePageNoFutureEpisodes />
           )}
         </>
-      )}
+      )} */}
 
       <CalendarContent homePage={true} />
 

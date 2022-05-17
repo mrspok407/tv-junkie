@@ -12,7 +12,7 @@ interface UserContent {
 
 const useUserContentLocalStorage = () => {
   const [userContent, setUserContent] = useState<UserContent>({
-    watchingShows: JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)!) || [], // ! means, that I'm telling to TS that I'm confident there will no null value
+    watchingShows: JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)!) || [],
     watchLaterMovies: JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)!) || []
   })
 

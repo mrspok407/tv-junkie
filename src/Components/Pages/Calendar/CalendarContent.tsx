@@ -25,10 +25,11 @@ type Props = {
 const CalendarContent: React.FC<Props> = ({ homePage }) => {
   const [openMonths, setOpenMonths] = useState<string[]>([])
   // const [willAirEpisodes, setWillAirEpisodes] = useState<UserWillAirEpisodesInterface[]>([])
-  const [loading, setLoading] = useState(true)
   const context = useContext(AppContext)
 
   const showsInitialLoading = useAppSelector(selectShowsInitialLoading)
+
+  const appState = useAppSelector((state) => console.log({appState: state}))
 
   const userShows = useAppSelector(selectShows)
   const userEpisodes = useAppSelector(selectEpisodes)
@@ -40,6 +41,8 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
   const willAirEpisodesData: UserWillAirEpisodesInterface[] = organiseFutureEpisodesByMonth(watchingShows, userEpisodes)
   const willAirEpisodes = homePage ? willAirEpisodesData.slice(0, 2) : willAirEpisodesData
 
+  console.log("rerender")
+
   useEffect(() => {
     if (!Object.values(userEpisodes).length) return
     console.log({ userEpisodes })
@@ -48,7 +51,6 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
       return Object.values(item)[0]
     })
     setOpenMonths(homePage ? [months[0]] : months)
-    setLoading(false)
   }, [userEpisodes, homePage])
 
   // const getContent = useCallback(() => {
@@ -84,7 +86,7 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
 
   return (
     <div className="content-results content-results--calendar">
-      {showsInitialLoading || loading || context.userContentHandler.loadingShowsOnRegister ? (
+      {showsInitialLoading || context.userContentHandler.loadingShowsOnRegister ? (
         <Loader className="loader--pink" />
       ) : willAirEpisodes.length === 0 && !homePage ? (
         <PlaceholderNoFutureEpisodes />
