@@ -1,4 +1,4 @@
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 import { useState, useEffect } from "react"
 
 const useContactListeners = () => {

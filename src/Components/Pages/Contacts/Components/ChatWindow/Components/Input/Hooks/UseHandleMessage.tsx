@@ -1,5 +1,5 @@
 import { MessageInterface } from "Components/Pages/Contacts/@Types"
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 
 const useHandleMessage = ({ contactLastActivity }: { contactLastActivity: { timeStamp: number; key: string } }) => {
   const { firebase, authUser, contactsState, contactsDispatch } = useFrequentVariables()

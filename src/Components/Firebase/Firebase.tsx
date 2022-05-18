@@ -3,8 +3,8 @@ import "firebase/auth"
 import "firebase/database"
 import "firebase/analytics"
 import "firebase/functions"
-import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 import { FirebaseInterface } from "./FirebaseContext"
+import { AuthUserInterface } from "Components/UserAuth/Session/WithAuthentication/@Types"
 
 const configProduction = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -96,13 +96,13 @@ class Firebase {
 
   passwordUpdate = (password: string) => this.auth.currentUser.updatePassword(password)
 
-  onAuthUserListener = (next: (authUser: AuthUserInterface) => void, fallback: () => void) =>
-    this.auth.onAuthStateChanged((authUser: AuthUserInterface) => {
+  onAuthUserListener = (next: (authUser: AuthUserInterface["authUser"]) => void, fallback: () => void) =>
+    this.auth.onAuthStateChanged((authUser: AuthUserInterface["authUser"]) => {
       if (authUser) {
         authUser = {
-          uid: authUser.uid,
-          email: authUser.email,
-          emailVerified: authUser.emailVerified
+          uid: authUser?.uid,
+          email: authUser?.email,
+          emailVerified: authUser?.emailVerified
         }
         next(authUser)
       } else {

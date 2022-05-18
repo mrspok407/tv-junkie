@@ -8,6 +8,7 @@ import useSendContactRequest from "./Hooks/UseSendContactRequest"
 import useResponseContactRequest from "./Hooks/UseResponseContactRequest"
 import CreatePortal from "Components/UI/Modal/CreatePortal"
 import ModalContent from "Components/UI/Modal/ModalContent"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 
 type Props = {
   userUid: string
@@ -23,8 +24,7 @@ interface ContactInfo {
 }
 
 const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
-  const { authUser, errors } = useContext(AppContext)
-  const firebase = useContext(FirebaseContext)
+  const { firebase, authUser, errors } = useFrequentVariables()
 
   const [userName, setUserName] = useState("")
   const [loadingUserName, setLoadingUserName] = useState(true)
@@ -143,7 +143,7 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
           <div className="user-profile--own-profile-message">This is your profile</div>
         ) : loadingUserInfo ? (
           <Loader className="loader--small-pink" />
-        ) : !authUser ? (
+        ) : !authUser?.uid ? (
           <div className="user-profile__username">{<span className="user-profile__name">{userName}</span>}</div>
         ) : (
           renderUserInfo()

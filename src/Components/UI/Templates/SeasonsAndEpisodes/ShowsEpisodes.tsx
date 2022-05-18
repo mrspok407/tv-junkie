@@ -19,6 +19,7 @@ import "./ShowsEpisodes.scss"
 import { useAppSelector } from "app/hooks"
 import { selectShow, selectShowEpisodes } from "Components/UserContent/UseUserShowsRed/userShowsSliceRed"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 
 type Props = {
   showDatabaseOnClient?: string | null
@@ -62,8 +63,7 @@ const ShowsEpisodes: React.FC<Props> = ({
   // releasedEpisodes,
   parentComponent
 }) => {
-  const firebase = useContext(FirebaseContext)
-  const { authUser } = useContext(AppContext)
+  const { firebase, authUser } = useFrequentVariables()
 
   const showInfo = useAppSelector((state) => selectShow(state, id))
   const episodesFromDatabase = useAppSelector((state) => selectShowEpisodes(state, id))
@@ -123,7 +123,7 @@ const ShowsEpisodes: React.FC<Props> = ({
   }
 
   const toggleWatchedEpisode = (seasonNum: number, episodeNum: number) => {
-    if (!authUser) return
+    if (!authUser?.uid) return
     const toggledEpisode = _get(episodesFromDatabase[seasonNum - 1], ["episodes", episodeNum, "watched"], null)
     firebase
       .userShowSingleEpisode({
@@ -152,7 +152,7 @@ const ShowsEpisodes: React.FC<Props> = ({
   }
 
   const checkMultipleEpisodes = (episodesData: { id: number; index: number }[], resetFadeOutEpisodes: () => void) => {
-    if (!authUser) return
+    if (!authUser?.uid) return
 
     Promise.all(
       episodesData.map((episode: any) => {
@@ -186,7 +186,7 @@ const ShowsEpisodes: React.FC<Props> = ({
   }
 
   const checkEverySeasonEpisode = (seasonNum: number) => {
-    if (!authUser) return
+    if (!authUser?.uid) return
     const safeGetSeasonEpisodes: SingleEpisodeInterface[] = _get(episodesFromDatabase[seasonNum - 1], "episodes", [])
 
     const seasonEpisodes = safeGetSeasonEpisodes.reduce((acc: SingleEpisodeInterface[], episode, index) => {
@@ -248,7 +248,7 @@ const ShowsEpisodes: React.FC<Props> = ({
   }
 
   const checkEveryShowEpisode = () => {
-    if (!authUser) return
+    if (!authUser?.uid) return
 
     let isAllEpisodesChecked = true
     let userEpisodesFormated: SingleEpisodeInterface[] = []

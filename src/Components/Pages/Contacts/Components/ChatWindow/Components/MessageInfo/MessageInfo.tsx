@@ -2,7 +2,7 @@ import classNames from "classnames"
 import React, { useRef } from "react"
 import { MessageInterface } from "../../../../@Types"
 import MessagePopup from "./MessagePopup"
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 import "./MessageInfo.scss"
 
 type Props = { messageData: MessageInterface }

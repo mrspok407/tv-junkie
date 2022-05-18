@@ -1,14 +1,13 @@
 import { ContactInfoInterface } from "Components/Pages/Contacts/@Types"
 import useFirebaseReferences from "Components/Pages/Contacts/Hooks/UseFirebaseReferences"
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 import { useState, useEffect, useCallback, useRef } from "react"
 
 type Props = {
   activeChat: { chatKey: string }
-  contactInfo: ContactInfoInterface
 }
 
-const usePageFocusHandler = ({ activeChat, contactInfo }: Props) => {
+const usePageFocusHandler = ({ activeChat }: Props) => {
   const { authUser, firebase } = useFrequentVariables()
   const firebaseRefs = useFirebaseReferences()
   const [pageInFocus, setPageInFocus] = useState(true)

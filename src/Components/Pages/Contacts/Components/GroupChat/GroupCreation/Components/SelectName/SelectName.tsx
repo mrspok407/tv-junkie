@@ -1,4 +1,4 @@
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 import React, { useState, useEffect } from "react"
 import Contact from "./Components/Contact/Contact"
 import "./SelectName.scss"

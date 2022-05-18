@@ -9,7 +9,7 @@ import useContactOptions from "./Components/ContactOptionsPopup/Hooks/UseContact
 import useSelectOptions from "./Components/ChatWindow/Components/SelectOptions/Hooks/UseSelectOptions"
 import HandleNewMembers from "./Components/GroupChat/HandleNewMembers/HandleNewMembers"
 import GroupCreation from "./Components/GroupChat/GroupCreation/GroupCreation"
-import useFrequentVariables from "./Hooks/UseFrequentVariables"
+import useFrequentVariables from "../../../Utils/Hooks/UseFrequentVariables"
 import ChatWindowPlaceHolder from "./Components/ChatWindow/Placeholders/ChatWindowPlaceHolder"
 import "./Components/ContactList/ContactList.scss"
 

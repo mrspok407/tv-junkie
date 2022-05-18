@@ -2,6 +2,7 @@ import { useContext, useState } from "react"
 import { FirebaseContext } from "Components/Firebase"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { uniqueNamesGenerator, animals } from "unique-names-generator"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 
 type Props = {
   contactName: string
@@ -9,8 +10,7 @@ type Props = {
 }
 
 const useSendContactRequest = ({ contactName, contactUid }: Props) => {
-  const { authUser, errors } = useContext(AppContext)
-  const firebase = useContext(FirebaseContext)
+  const { firebase, authUser, errors } = useFrequentVariables()
   const [contactRequestLoading, setContactRequestLoading] = useState(false)
 
   const sendContactRequest = async () => {

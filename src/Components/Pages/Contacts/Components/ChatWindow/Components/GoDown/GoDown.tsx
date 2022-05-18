@@ -1,6 +1,6 @@
 import classNames from "classnames"
 import { ContainerRectInterface, MessageInterface } from "Components/Pages/Contacts/@Types"
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 import React, { useState, useEffect, useCallback, useLayoutEffect, useRef } from "react"
 import { throttle } from "throttle-debounce"
 import "./GoDown.scss"

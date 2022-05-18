@@ -1,5 +1,5 @@
 import { MembersStatusGroupChatInterface } from "Components/Pages/Contacts/@Types"
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 import useElementScrolledDown from "Components/Pages/Contacts/Hooks/useElementScrolledDown"
 import React, { useState, useEffect, useCallback } from "react"
 import SearchInput from "./SearchInput/SearchInput"

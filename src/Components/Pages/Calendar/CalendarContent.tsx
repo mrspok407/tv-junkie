@@ -11,25 +11,25 @@ import { useAppSelector } from "app/hooks"
 import {
   selectEpisodes,
   selectShows,
-  selectShowsInitialLoading
+  selectShowsLoading
 } from "Components/UserContent/UseUserShowsRed/userShowsSliceRed"
 import {
   SingleEpisodeByMonthInterface,
   UserWillAirEpisodesInterface
 } from "Components/UserContent/UseUserShowsRed/@Types"
+import { selectAuthUser } from "Components/UserAuth/Session/WithAuthentication/authUserSlice"
 
 type Props = {
   homePage?: boolean
 }
 
 const CalendarContent: React.FC<Props> = ({ homePage }) => {
+  const { authUser } = useAppSelector(selectAuthUser)
   const [openMonths, setOpenMonths] = useState<string[]>([])
   // const [willAirEpisodes, setWillAirEpisodes] = useState<UserWillAirEpisodesInterface[]>([])
   const context = useContext(AppContext)
 
-  const showsInitialLoading = useAppSelector(selectShowsInitialLoading)
-
-  const appState = useAppSelector((state) => console.log({appState: state}))
+  const showsInitialLoading = useAppSelector(selectShowsLoading)
 
   const userShows = useAppSelector(selectShows)
   const userEpisodes = useAppSelector(selectEpisodes)
@@ -40,8 +40,6 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
   // }, [])
   const willAirEpisodesData: UserWillAirEpisodesInterface[] = organiseFutureEpisodesByMonth(watchingShows, userEpisodes)
   const willAirEpisodes = homePage ? willAirEpisodesData.slice(0, 2) : willAirEpisodesData
-
-  console.log("rerender")
 
   useEffect(() => {
     if (!Object.values(userEpisodes).length) return
@@ -162,7 +160,7 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
                             className={classNames("episodes__episode", {
                               "episodes__episode--today": willAirToday,
                               "episodes__episode--today-admin":
-                                context.authUser?.email === process.env.REACT_APP_ADMIN_EMAIL && willAirToday
+                                authUser?.email === process.env.REACT_APP_ADMIN_EMAIL && willAirToday
                             })}
                           >
                             <div className="episodes__episode-wrapper">
@@ -182,7 +180,7 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
 
                               {daysToNewEpisode >= 0 && (
                                 <div className="episodes__episode-days-to-air">
-                                  {willAirToday && context.authUser?.email === process.env.REACT_APP_ADMIN_EMAIL && (
+                                  {willAirToday && authUser?.email === process.env.REACT_APP_ADMIN_EMAIL && (
                                     <TorrentLinksEpisodes
                                       showTitle={episode.show}
                                       seasonNumber={episode.season_number}

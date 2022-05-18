@@ -1,5 +1,5 @@
 import { ContactInfoInterface } from "Components/Pages/Contacts/@Types"
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 
 type Props = {
   contactInfo?: ContactInfoInterface

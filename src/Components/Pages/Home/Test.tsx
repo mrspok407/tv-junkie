@@ -1,15 +1,15 @@
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
 import React, { useState, useContext, useEffect } from "react"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 
 type Props = {
   id: string
 }
 
 const Test: React.FC<Props> = ({ id }) => {
+  const { firebase, authUser } = useFrequentVariables()
   const [show, setShow] = useState<any>({})
-  const firebase = useContext(FirebaseContext)
-  const { authUser } = useContext(AppContext)
 
   useEffect(() => {
     firebase.userShow({ uid: authUser?.uid, key: id }).on("value", (snapshot: any) => {

@@ -5,7 +5,7 @@ import Header from "Components/UI/Header/Header"
 import CalendarContent from "./CalendarContent"
 import WithAuthorization from "Components/UserAuth/Session/WithAuthorization/WithAuthorization"
 import Footer from "Components/UI/Footer/Footer"
-import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
+import { AuthUserInterface } from "Components/UserAuth/Session/WithAuthentication/@Types"
 import "./Calendar.scss"
 
 const CalendarPage: React.FC = () => {
@@ -22,6 +22,6 @@ const CalendarPage: React.FC = () => {
   )
 }
 
-const condition = (authUser: AuthUserInterface) => authUser !== null
+const condition = (authUser: AuthUserInterface["authUser"]) => authUser !== null
 
 export default WithAuthorization(condition)(CalendarPage)

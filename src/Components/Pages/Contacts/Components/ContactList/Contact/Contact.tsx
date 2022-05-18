@@ -7,7 +7,7 @@ import useGetInitialMessages from "../../ChatWindow/FirebaseHelpers/UseGetInitia
 import useHandleContactsStatus from "../../ChatWindow/Hooks/UseHandleContactsStatus"
 import Loader from "Components/UI/Placeholders/Loader"
 import striptags from "striptags"
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 import "./Contact.scss"
 
 type Props = {

@@ -173,6 +173,6 @@ export const handleChangeShow =
 export const selectUserShows = (state: RootState) => state.userShows.data.info
 export const selectUserShowsIds = (state: RootState) => state.userShows.data.ids
 export const selectUserShow = (state: RootState, id: number) => state.userShows.data.info[id]
-export const selectUserShowsLoading = (state: RootState) => state.userShows.initialLoading
+export const selectUserShowsLoading = (state: RootState) => state.userShows.loading
 
 export default userShowsSlice.reducer

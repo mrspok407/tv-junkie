@@ -62,6 +62,6 @@ export interface UserShowsState {
       [key: string]: number
     }
   }
-  initialLoading: boolean
+  loading: boolean
   error: any
 }

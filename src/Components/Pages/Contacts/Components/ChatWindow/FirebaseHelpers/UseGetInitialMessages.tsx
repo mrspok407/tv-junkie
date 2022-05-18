@@ -3,7 +3,7 @@ import { MessageInterface } from "Components/Pages/Contacts/@Types"
 import { setMessagesSnapshot } from "./setMessagesSnapshot"
 import { MESSAGES_TO_RENDER, UNREAD_MESSAGES_TO_RENDER } from "../../@Context/Constants"
 import debounce from "debounce"
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 
 const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGroupChat: boolean }) => {
   const { firebase, authUser, errors, contactsState, contactsDispatch } = useFrequentVariables()

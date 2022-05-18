@@ -3,7 +3,7 @@ import {
   SeasonEpisodesFromDatabaseInterface,
   SingleEpisodeInterface
 } from "Components/UserContent/UseUserShows/UseUserShows"
-import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
+import { AuthUserInterface } from "Components/UserAuth/Session/WithAuthentication/@Types"
 import { differenceBtwDatesInDays, todayDate } from "Utils"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
 
@@ -11,7 +11,7 @@ interface Arguments {
   showInfo: ContentDetailes
   releasedEpisodes: SingleEpisodeInterface[]
   episodesFromDatabase: SeasonEpisodesFromDatabaseInterface[]
-  authUser: AuthUserInterface
+  authUser: AuthUserInterface["authUser"]
   firebase: FirebaseInterface
   isSingleEpisode?: boolean
   multipleEpisodes?: number

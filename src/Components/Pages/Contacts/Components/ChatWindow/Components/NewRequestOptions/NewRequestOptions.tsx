@@ -1,4 +1,4 @@
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 import useResponseContactRequest from "Components/Pages/UserProfile/Hooks/UseResponseContactRequest"
 import React from "react"
 import "./NewRequestOptions.scss"

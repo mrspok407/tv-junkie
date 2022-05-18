@@ -1,14 +1,13 @@
-import React, { useContext, useEffect, useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { Link } from "react-router-dom"
 import classNames from "classnames"
 import * as ROUTES from "Utils/Constants/routes"
-import { AppContext } from "Components/AppContext/AppContextHOC"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
 import { useAppDispatch, useAppSelector } from "app/hooks"
 import { selectShowDatabase } from "Components/UserContent/UseUserShowsRed/userShowsSliceRed"
 import { handleDatabaseChange } from "Components/UserContent/UseUserShowsRed/FirebaseHelpers/PostData"
-import { FirebaseContext } from "Components/Firebase"
 import { fetchShowEpisodes } from "Components/UserContent/UseUserShowsRed/Middleware"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 
 type Props = {
   id: number
@@ -17,17 +16,15 @@ type Props = {
 }
 
 const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
+  const { firebase, authUser, userContentLocalStorage } = useFrequentVariables()
+
   const [disableBtnWarning, setDisableBtnWarning] = useState<string | null>(null)
   const _notAuthButtons = useRef<HTMLDivElement>(null)
-  const firebase = useContext(FirebaseContext)
-  const context = useContext(AppContext)
-  const { authUser } = context
-
   const dispatch = useAppDispatch()
   const showDatabase = useAppSelector((state) => selectShowDatabase(state, id))
 
   useEffect(() => {
-    if (mediaType !== "show" || !authUser || showDatabase === "notWatchingShows") return
+    if (mediaType !== "show" || !authUser?.uid || showDatabase === "notWatchingShows") return
     dispatch(fetchShowEpisodes(Number(id), authUser.uid, firebase))
   }, [id, mediaType, showDatabase, authUser, firebase, dispatch])
 
@@ -57,7 +54,7 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
           className={classNames("button", {
             "button--pressed":
               ["watchingShows", "finishedShows"].includes(showDatabase) ||
-              context.userContentLocalStorage.watchingShows.find((item) => item.id === Number(id))
+              userContentLocalStorage.watchingShows.find((item: any) => item.id === Number(id))
           })}
           type="button"
           onClick={() => {
@@ -72,7 +69,7 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
                 })
               )
             } else {
-              context.userContentLocalStorage.addShowLS({
+              userContentLocalStorage.addShowLS({
                 id: Number(id),
                 data: detailes
               })
@@ -88,7 +85,7 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
           className={classNames("button", {
             "button--pressed":
               showDatabase === "notWatchingShows" ||
-              (!authUser && !context.userContentLocalStorage.watchingShows.find((item) => item.id === Number(id)))
+              (!authUser?.uid && !userContentLocalStorage.watchingShows.find((item: any) => item.id === Number(id)))
           })}
           type="button"
           onClick={() => {
@@ -103,7 +100,7 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
                 })
               )
             } else {
-              context.userContentLocalStorage.removeShowLS({
+              userContentLocalStorage.removeShowLS({
                 id: Number(id)
               })
             }
@@ -117,7 +114,7 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
           <button
             className={classNames("button", {
               "button--pressed": showDatabase === "droppedShows",
-              "button--not-logged-in": !authUser
+              "button--not-logged-in": !authUser?.uid
             })}
             type="button"
             onClick={() => {
@@ -153,7 +150,7 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
           <button
             className={classNames("button", {
               "button--pressed": showDatabase === "willWatchShows",
-              "button--not-logged-in": !authUser
+              "button--not-logged-in": !authUser?.uid
             })}
             type="button"
             onClick={() => {

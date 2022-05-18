@@ -1,5 +1,5 @@
 import classNames from "classnames"
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 import useTimestampFormater from "Components/Pages/Contacts/Hooks/UseTimestampFormater"
 import React, { useRef } from "react"
 import ContactOptionsPopup from "../../../ContactOptionsPopup/ContactOptionsPopup"

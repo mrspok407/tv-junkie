@@ -1,3 +1,4 @@
+import { ThunkDispatch } from "@reduxjs/toolkit"
 import { AppThunk } from "app/store"
 import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
 import { AuthUserInterface } from "../@Types"
@@ -6,14 +7,16 @@ import { setAuthUser } from "../authUserSlice"
 export const setupAuthUser =
   (authUser: AuthUserInterface["authUser"], firebase: FirebaseInterface): AppThunk =>
   async (dispatch) => {
+    const _authUser = { ...authUser }
     try {
-      const username = await firebase.user(authUser?.uid).child("username").once("value")
-      authUser.username = username.val() || "Nameless"
-      localStorage.setItem("authUser", JSON.stringify(authUser))
-      dispatch(setAuthUser(authUser))
-      console.log({ setAuthUser: true, authUser })
-      return Promise.resolve()
-    } catch (error) {}
+      const usernameData = await firebase.user(authUser?.uid).child("username").once("value")
+      _authUser.username = usernameData.val()
+    } catch (error) {
+      _authUser.username = "Nameless"
+    } finally {
+      localStorage.setItem("authUser", JSON.stringify(_authUser))
+      dispatch(setAuthUser(_authUser))
+    }
   }
 
 export default setupAuthUser

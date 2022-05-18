@@ -1,5 +1,5 @@
 import classNames from "classnames"
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 import React, { useState, useRef } from "react"
 import MembersMenu from "./Components/MembersMenu/MembersMenu"
 import NewMembersMenu from "./Components/NewMembersMenu/NewMembersMenu"

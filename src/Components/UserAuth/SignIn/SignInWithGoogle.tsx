@@ -4,7 +4,7 @@ import { AppContext } from "Components/AppContext/AppContextHOC"
 import { MovieInterface } from "Components/AppContext/@Types"
 import * as ROLES from "Utils/Constants/roles"
 import * as ROUTES from "Utils/Constants/routes"
-import { AuthUserGoogleSignInInterface } from "Utils/Interfaces/UserAuth"
+import { AuthUserGoogleSignInInterface } from "../Session/WithAuthentication/@Types"
 
 const LOCAL_STORAGE_KEY_WATCHING_SHOWS = "watchingShowsLocalS"
 const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = "watchLaterMoviesLocalS"

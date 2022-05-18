@@ -11,6 +11,7 @@ import { AppContext } from "Components/AppContext/AppContextHOC"
 import { SeasonEpisodesFromDatabaseInterface } from "Components/UserContent/UseUserShows/UseUserShows"
 import { EpisodesDataInterface, ShowEpisodesFromAPIInterface } from "./ShowsEpisodes"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 
 const FADE_OUT_SPEED = 300
 
@@ -56,10 +57,10 @@ const SeasonEpisodes: React.FC<Props> = ({
   toggleWatchedEpisode,
   checkMultipleEpisodes
 }) => {
+  const { authUser } = useFrequentVariables()
+
   const [fadeOutEpisodes, setFadeOutEpisodes] = useState<{ id: number; index: number }[]>([])
   const [disableCheckboxWarning, setDisableCheckboxWarning] = useState<number | null>(null)
-
-  const { authUser } = useContext(AppContext)
 
   const episodeRef = useRef<HTMLDivElement>(null)
   const checkboxRef = useRef<HTMLDivElement>(null)
@@ -76,7 +77,7 @@ const SeasonEpisodes: React.FC<Props> = ({
   }, [])
 
   const handleClickOutside = (e: CustomEvent) => {
-    if (authUser) return
+    if (authUser?.uid) return
     if (
       checkboxRef.current &&
       registerWarningRef.current &&
@@ -88,7 +89,7 @@ const SeasonEpisodes: React.FC<Props> = ({
   }
 
   const showDissableCheckboxWarning = (checkboxId: number) => {
-    if (authUser) return
+    if (authUser?.uid) return
     setDisableCheckboxWarning(checkboxId)
   }
 
@@ -232,11 +233,11 @@ const SeasonEpisodes: React.FC<Props> = ({
                           toggleWatchedEpisode(season.season_number, indexOfEpisode)
                         }
                       }}
-                      disabled={!showCheckboxes || !authUser}
+                      disabled={!showCheckboxes || !authUser?.uid}
                     />
                     <span
                       className={classNames("custom-checkmark", {
-                        "custom-checkmark--disabled": !showCheckboxes || !authUser
+                        "custom-checkmark--disabled": !showCheckboxes || !authUser?.uid
                       })}
                     />
                   </label>

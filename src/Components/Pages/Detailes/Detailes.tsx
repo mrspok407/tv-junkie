@@ -19,10 +19,11 @@ import PlaceholderLoadingFullInfo from "Components/UI/Placeholders/PlaceholderLo
 import { ContentDetailes, CONTENT_DETAILS_DEFAULT } from "Utils/Interfaces/ContentDetails"
 import useGoogleRedirect from "Components/UserAuth/SignIn/UseGoogleRedirect"
 import { useAppDispatch, useAppSelector } from "app/hooks"
-import { selectShowsInitialLoading } from "Components/UserContent/UseUserShowsRed/userShowsSliceRed"
+import { selectShowsLoading } from "Components/UserContent/UseUserShowsRed/userShowsSliceRed"
 import { fetchShowEpisodes } from "Components/UserContent/UseUserShowsRed/Middleware"
 import useGetDataTMDB from "./Hooks/UseGetDataTMDB"
 import "./Detailes.scss"
+import useFrequentVariables from "../../../Utils/Hooks/UseFrequentVariables"
 
 type Props = {
   match: { params: { id: string; mediaType: string } }
@@ -33,13 +34,8 @@ export const DetailesPage: React.FC<Props> = ({
     params: { id, mediaType }
   }
 }) => {
-  const context = useContext(AppContext)
-  const firebase = useContext(FirebaseContext)
-  const { authUser } = context
-  const dispatch = useAppDispatch()
-
   const [detailes, loadingTMDB, similarContent, error] = useGetDataTMDB({ id, mediaType })
-  const showsInitialLoading = useAppSelector(selectShowsInitialLoading)
+  const showsInitialLoading = useAppSelector(selectShowsLoading)
 
   console.log({ loadingTMDB })
 

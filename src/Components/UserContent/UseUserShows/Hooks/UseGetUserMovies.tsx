@@ -1,32 +1,33 @@
 import { useContext, useEffect, useState } from "react"
 import { FirebaseContext } from "Components/Firebase"
 import { UserMoviesInterface } from "../UseUserShows"
-import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
-import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
+import { useAppSelector } from "app/hooks"
+import { selectAuthUser } from "Components/UserAuth/Session/WithAuthentication/authUserSlice"
+import { AuthUserInterface } from "Components/UserAuth/Session/WithAuthentication/@Types"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 
 type Hook = () => {
   userMovies: UserMoviesInterface[]
   loadingMovies: boolean
-  listenerUserMovies: ({ uid }: AuthUserInterface) => void
+  listenerUserMovies: ({ uid }: AuthUserInterface["authUser"]) => void
   handleUserMoviesOnClient: ({ id, data }: { id: number; data?: UserMoviesInterface }) => void
   resetStateUserMovies: () => void
 }
 
 const useGetUserMovies: Hook = () => {
+  const { firebase, authUser } = useFrequentVariables()
+
   const [userMovies, setUserMovies] = useState<UserMoviesInterface[]>([])
   const [loadingMovies, setLoadingMovies] = useState(true)
 
-  const firebase = useContext(FirebaseContext)
-  const authUser = useAuthUser()
-
   useEffect(() => {
     return () => {
-      if (!authUser) return
+      if (!authUser?.uid) return
       firebase.watchLaterMovies(authUser.uid).off()
     }
   }, [firebase, authUser])
 
-  const listenerUserMovies = ({ uid }: AuthUserInterface) => {
+  const listenerUserMovies = ({ uid }: AuthUserInterface["authUser"]) => {
     firebase.watchLaterMovies(uid).on("value", (snapshot: { val: () => UserMoviesInterface[] }) => {
       if (snapshot.val() === null) {
         setLoadingMovies(false)

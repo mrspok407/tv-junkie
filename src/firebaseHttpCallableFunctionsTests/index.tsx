@@ -1,8 +1,8 @@
 import { GroupCreationNewMemberInterface } from "Components/Pages/Contacts/@Types"
-import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
+import { AuthUserInterface } from "Components/UserAuth/Session/WithAuthentication/@Types"
 
 interface ContextInterface {
-  authUser: AuthUserInterface
+  authUser: AuthUserInterface["authUser"]
 }
 
 interface DataInterface {

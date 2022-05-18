@@ -9,6 +9,7 @@ import { HandleFadeOutInterface } from "../Templates/SeasonsAndEpisodes/SeasonEp
 import "./UserRating.scss"
 import { useAppSelector } from "app/hooks"
 import { selectShowDatabase } from "Components/UserContent/UseUserShowsRed/userShowsSliceRed"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 
 const STAR_AMOUNT = 5
 
@@ -21,7 +22,7 @@ type Props = {
   episodeRating?: boolean
   handleFadeOut?: ({ episodeId, episodeIndex, seasonNum, rating }: HandleFadeOutInterface) => void
   parentComponent?: string
-  // showDatabase?: string
+
   disableRating?: boolean
   showRating?: boolean
   mediaType?: string
@@ -35,7 +36,6 @@ const UserRating: React.FC<Props> = ({
   episodeNum = 0,
   episodeId = 0,
   episodeRating,
-  // showDatabase,
   parentComponent,
   disableRating,
   showRating,
@@ -43,12 +43,11 @@ const UserRating: React.FC<Props> = ({
   userRatingData,
   handleFadeOut = () => {}
 }) => {
+  const { firebase, authUser } = useFrequentVariables()
+
   const [userRating, setUserRating] = useState(userRatingData || 0)
   const [nonAuthWarning, setNonAuthWarning] = useState(false)
   const userRatingRef = useRef<HTMLDivElement>(null)
-
-  const firebase = useContext(FirebaseContext)
-  const { authUser } = useContext(AppContext)
 
   const showDatabase = useAppSelector((state) => selectShowDatabase(state, id))
 
@@ -84,7 +83,7 @@ const UserRating: React.FC<Props> = ({
   }, [getRating])
 
   const onMouseMoveHandler = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (authUser === null) return
+    if (!authUser?.uid) return
     const target = e.target as HTMLButtonElement
     const buttonsNodeList = (target.parentElement as HTMLElement).getElementsByClassName("user-rating__button")
     const currentRating = Number((e.target as HTMLButtonElement).dataset.rating)
@@ -100,7 +99,7 @@ const UserRating: React.FC<Props> = ({
   }
 
   const onMouseLeaveHandler = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (authUser === null) return
+    if (!authUser?.uid) return
     const target = e.target as HTMLButtonElement
     const buttonsNodeList = (target.parentElement as HTMLElement).getElementsByClassName("user-rating__button")
 
@@ -114,7 +113,7 @@ const UserRating: React.FC<Props> = ({
   }
 
   const onClickHandler = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (authUser === null) return
+    if (!authUser?.uid) return
     const rating = Number((e.target as HTMLButtonElement).dataset.rating)
 
     if (parentComponent === "toWatchPage") {
@@ -144,7 +143,8 @@ const UserRating: React.FC<Props> = ({
     }
   }
 
-  const ratingDisabled = authUser === null || disableRating || (!showDatabase && showRating && mediaType !== "movie")
+  const ratingDisabled =
+    authUser?.uid === null || disableRating || (!showDatabase && showRating && mediaType !== "movie")
 
   return (
     <div
@@ -153,7 +153,7 @@ const UserRating: React.FC<Props> = ({
         "user-rating--user-profile": firebaseRef === ""
       })}
       onClick={() => {
-        if (authUser !== null) return
+        if (authUser?.uid) return
         setNonAuthWarning(!nonAuthWarning)
       }}
     >

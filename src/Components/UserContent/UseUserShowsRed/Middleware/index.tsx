@@ -13,25 +13,28 @@ import {
   selectShowEpisodes,
   setError,
   setShowEpisodes,
-  setUserShows
+  setUserShows,
+  updateLoadingShows
 } from "../userShowsSliceRed"
 import { fetchEpisodesFullData } from "../FirebaseHelpers/FetchData"
+import { getAuthUidFromState } from "Components/UserAuth/Session/WithAuthentication/Helpers"
 
 export const fetchUserShows =
   (firebase: FirebaseInterface): AppThunk =>
   async (dispatch, getState) => {
+    dispatch(updateLoadingShows(true))
     console.log("fetchUserShows")
-    const uid = getState().authUser.authUser.uid
+    const authUserUid = getAuthUidFromState(getState())
     try {
-      const userShowsSnapshot = await firebase.userAllShows(uid).orderByChild("timeStamp").once("value")
+      const userShowsSnapshot = await firebase.userAllShows(authUserUid).orderByChild("timeStamp").once("value")
       const userShows = sortDataSnapshot<UserShowsInterface>(userShowsSnapshot)
-      const showsFullData = await fetchShowsFullData({ userShows, firebase, uid })
+      const showsFullData = await fetchShowsFullData({ userShows, firebase, uid: authUserUid })
       const mergedShows: UserShowsInterface[] = merge(showsFullData, userShows, {
         arrayMerge: combineMergeObjects
       })
 
       dispatch(setUserShows(mergedShows))
-      dispatch(userShowsListeners({ uid, firebase }))
+      dispatch(userShowsListeners({ uid: authUserUid, firebase }))
     } catch (err) {
       dispatch(setError(err))
     }

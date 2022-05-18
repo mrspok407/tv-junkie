@@ -5,7 +5,6 @@ import {
 } from "Components/UserContent/UseUserShows/UseUserShows"
 import { LOADING_ADDING_TO_DATABASE_INITIAL } from "Components/UserContent/UseContentHandler"
 import { FirebaseInterface, FIREBASE_INITIAL_STATE } from "Components/Firebase/FirebaseContext"
-import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
 import { UserToWatchShowsInterface } from "Components/UserContent/UseUserShows/Hooks/UseGetUserToWatchShows"
 import { HandleListenersArg } from "Components/Pages/Detailes/FirebaseHelpers/UseHandleListeners"
@@ -111,7 +110,6 @@ export interface AppContextInterface {
     loadingShowsOnRegister: boolean
   }
   firebase: FirebaseInterface
-  authUser: AuthUserInterface | null
   newContactsActivity: boolean | null
   errors: ErrorsInterface
 }
@@ -147,7 +145,6 @@ export const CONTEXT_INITIAL_STATE = {
     loadingShowsOnRegister: false
   },
   firebase: FIREBASE_INITIAL_STATE,
-  authUser: { uid: "", email: "", emailVerified: false },
   newContactsActivity: false,
   errors: { error: {}, handleError: () => {} }
 }

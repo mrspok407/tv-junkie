@@ -1,11 +1,10 @@
-import { AppContext } from "Components/AppContext/AppContextHOC"
-import { FirebaseContext } from "Components/Firebase/FirebaseContext"
 import {
   SeasonEpisodesFromDatabaseInterface,
   SingleEpisodeInterface
 } from "Components/UserContent/UseUserShows/UseUserShows"
-import { useState, useEffect, useContext } from "react"
+import { useState, useEffect } from "react"
 import { releasedEpisodesToOneArray } from "Utils"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 
 export interface HandleListenersArg {
   id: number
@@ -14,14 +13,13 @@ export interface HandleListenersArg {
 }
 
 const useHandleListeners = ({ id }: { id: number }) => {
+  const { firebase, authUser } = useFrequentVariables()
+
   const [episodesFromDatabase, setEpisodesFromDatabase] = useState<SeasonEpisodesFromDatabaseInterface[]>([])
   const [releasedEpisodes, setReleasedEpisodes] = useState<SingleEpisodeInterface[]>([])
 
-  const firebase = useContext(FirebaseContext)
-  const { authUser } = useContext(AppContext)
-
   const handleListeners = ({ id, status, handleLoading }: HandleListenersArg) => {
-    if (status === "-" || !authUser) return
+    if (status === "-" || !authUser?.uid) return
 
     const statusDatabase = status === "Ended" || status === "Canceled" ? "ended" : "ongoing"
     firebase.showEpisodes(id).once("value", (snapshot: { val: () => SeasonEpisodesFromDatabaseInterface[] }) => {
@@ -81,7 +79,7 @@ const useHandleListeners = ({ id }: { id: number }) => {
       setEpisodesFromDatabase([])
       setReleasedEpisodes([])
 
-      if (!authUser) return
+      if (!authUser?.uid) return
       firebase.userShowAllEpisodes(authUser.uid, id).off()
     }
   }, [id, authUser, firebase])

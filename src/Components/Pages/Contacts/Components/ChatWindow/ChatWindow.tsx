@@ -14,7 +14,7 @@ import useShowFloatDate from "./Hooks/UseShowFloatDate"
 import usePageFocusHandler from "./Hooks/UsePageFocusHandler"
 import MessageInput from "./Components/Input/MessageInput"
 import useContactListeners from "./Hooks/UseContactListeners"
-import useFrequentVariables from "../../Hooks/UseFrequentVariables"
+import useFrequentVariables from "../../../../../Utils/Hooks/UseFrequentVariables"
 import MessagesList from "./Components/MessagesList/GroupChat/MessagesListGroupChat"
 import ContactInfo from "./Components/ContactInfo/ContactInfo"
 import GroupInfoSettings from "../GroupChat/GroupInfoSettings/GroupInfoSettings"
@@ -74,7 +74,7 @@ const ChatWindow: React.FC = () => {
   }, [])
 
   const { loadTopMessages, loadingTopMessages } = useLoadTopMessages()
-  const { pageInFocus } = usePageFocusHandler({ activeChat, contactInfo })
+  const { pageInFocus } = usePageFocusHandler({ activeChat })
   const { onMouseEnter } = useIntersectionObserver({
     chatContainerRef: chatContainerRef,
     unreadMessagesAuth: unreadMessagesAuthRef.current,

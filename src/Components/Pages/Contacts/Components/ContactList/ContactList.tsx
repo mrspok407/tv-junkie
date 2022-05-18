@@ -9,7 +9,9 @@ import CreatePortal from "Components/UI/Modal/CreatePortal"
 import ModalContent from "Components/UI/Modal/ModalContent"
 import { CONTACTS_TO_LOAD } from "../@Context/Constants"
 import useGetInitialContactInfo from "./Hooks/UseGetInitialContactInfo"
-import useFrequentVariables from "../../Hooks/UseFrequentVariables"
+import useFrequentVariables from "../../../../../Utils/Hooks/UseFrequentVariables"
+import { useAppSelector } from "app/hooks"
+import { selectAuthUser } from "Components/UserAuth/Session/WithAuthentication/authUserSlice"
 
 type Props = {
   contactListWrapperRef: HTMLDivElement

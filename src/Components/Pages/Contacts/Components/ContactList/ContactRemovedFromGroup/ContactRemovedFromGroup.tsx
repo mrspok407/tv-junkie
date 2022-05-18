@@ -2,7 +2,7 @@ import classNames from "classnames"
 import React, { useEffect, useRef, useState } from "react"
 import { ContactInfoInterface } from "../../../@Types"
 import ContactOptionsPopup from "../../ContactOptionsPopup/ContactOptionsPopup"
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 import useFirebaseReferences from "Components/Pages/Contacts/Hooks/UseFirebaseReferences"
 import "../Contact/Contact.scss"
 

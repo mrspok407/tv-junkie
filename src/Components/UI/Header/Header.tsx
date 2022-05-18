@@ -5,7 +5,7 @@ import logo from "assets/images/main-page-logo.png"
 import Login from "./Login"
 import * as ROUTES from "Utils/Constants/routes"
 import Search from "Components/Pages/SearchPage/Search/Search"
-import { AppContext } from "Components/AppContext/AppContextHOC"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 import "./Header.scss"
 
 type Props = {
@@ -15,8 +15,8 @@ type Props = {
 }
 
 const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false, contactsPage = false }) => {
+  const { authUser, newContactsActivity } = useFrequentVariables()
   const [navMobileOpen, setNavMobileOpen] = useState(false)
-  const { authUser, newContactsActivity } = useContext(AppContext)
   const navRef = useRef<HTMLElement>(null)
   const toggleNavButtonRef = useRef<HTMLButtonElement>(null)
 
@@ -55,7 +55,7 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false, cont
       >
         <ul
           className={classNames("nav__list", {
-            "nav__list--not-auth": !authUser
+            "nav__list--not-auth": !authUser?.uid
           })}
         >
           <NavLink
@@ -68,13 +68,13 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false, cont
             <li className="nav__item nav__item--logo"></li>
           </NavLink>
 
-          {authUser && (
+          {authUser?.uid && (
             <>
               <NavLink
                 exact
                 to={ROUTES.CALENDAR}
                 className={classNames("nav__link", {
-                  "nav__link--non-auth": !authUser
+                  "nav__link--non-auth": !authUser?.uid
                 })}
                 activeClassName="nav__item--active"
                 onClick={() => closeNavMobile()}
@@ -86,7 +86,7 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false, cont
                 exact
                 to={ROUTES.TO_WATCH}
                 className={classNames("nav__link", {
-                  "nav__link--non-auth": !authUser
+                  "nav__link--non-auth": !authUser?.uid
                 })}
                 activeClassName="nav__item--active"
                 onClick={() => closeNavMobile()}
@@ -100,7 +100,7 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false, cont
             exact
             to={ROUTES.SHOWS}
             className={classNames("nav__link", {
-              "nav__link--non-auth": !authUser
+              "nav__link--non-auth": !authUser?.uid
             })}
             activeClassName="nav__item--active"
             onClick={() => closeNavMobile()}
@@ -112,7 +112,7 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false, cont
             exact
             to={ROUTES.MOVIES}
             className={classNames("nav__link", {
-              "nav__link--non-auth": !authUser
+              "nav__link--non-auth": !authUser?.uid
             })}
             activeClassName="nav__item--active"
             onClick={() => closeNavMobile()}
@@ -120,7 +120,7 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false, cont
             <li className="nav__item">Movies</li>
           </NavLink>
 
-          {authUser ? (
+          {authUser?.uid ? (
             <>
               <div className="nav__link nav__link--dropdown">
                 <div className="nav__item--dropdown-mobile">
@@ -128,7 +128,7 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false, cont
                     exact
                     to={ROUTES.CONTACTS_PAGE}
                     className={classNames("nav__link", {
-                      "nav__link--non-auth": !authUser
+                      "nav__link--non-auth": !authUser?.uid
                     })}
                     activeClassName="nav__item--active"
                     onClick={() => closeNavMobile()}
@@ -146,7 +146,7 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false, cont
                     exact
                     to={ROUTES.SETTINGS}
                     className={classNames("nav__link", {
-                      "nav__link--non-auth": !authUser
+                      "nav__link--non-auth": !authUser?.uid
                     })}
                     activeClassName="nav__item--active"
                     onClick={() => closeNavMobile()}
@@ -168,7 +168,7 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false, cont
                       exact
                       to={ROUTES.CONTACTS_PAGE}
                       className={classNames("nav__link", {
-                        "nav__link--non-auth": !authUser
+                        "nav__link--non-auth": !authUser?.uid
                       })}
                       activeClassName="nav__item--active"
                       onClick={() => closeNavMobile()}
@@ -185,7 +185,7 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false, cont
                       exact
                       to={ROUTES.SETTINGS}
                       className={classNames("nav__link", {
-                        "nav__link--non-auth": !authUser
+                        "nav__link--non-auth": !authUser?.uid
                       })}
                       activeClassName="nav__item--active"
                       onClick={() => closeNavMobile()}
@@ -198,7 +198,7 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false, cont
                 </li>
               </div>
 
-              {/* {authUser.roles && !!authUser.roles[ROLES.ADMIN] && (
+              {/* {authUser.roles && !!authUser?.uid.roles[ROLES.ADMIN] && (
                 <NavLink exact to={ROUTES.ADMIN} className="nav__link">
                   <li className="nav__item" onClick={() => this.closeNavMobile()}>
                     Admin
@@ -212,7 +212,7 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false, cont
 
           <li
             className={classNames("nav__item nav__item--nav-search", {
-              "nav__item--nav-search__non-auth": !authUser
+              "nav__item--nav-search__non-auth": !authUser?.uid
             })}
           >
             <Search navSearch={true} navRef={navRef} closeNavMobile={closeNavMobile} />

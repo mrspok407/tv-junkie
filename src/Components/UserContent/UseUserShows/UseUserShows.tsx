@@ -1,19 +1,10 @@
-import { useState, useEffect, useContext, useReducer } from "react"
-import { combineMergeObjects } from "Utils"
-import { organiseFutureEpisodesByMonth } from "Components/Pages/Calendar/CalendarHelpers"
+import { useState, useEffect, useContext } from "react"
 import { FirebaseContext } from "Components/Firebase"
-import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
+import { AuthUserInterface } from "Components/UserAuth/Session/WithAuthentication/@Types"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
-import merge from "deepmerge"
 import useGetUserToWatchShows from "./Hooks/UseGetUserToWatchShows"
-import fetchShowsFullData from "./FirebaseHelpers/fetchShowsFullData"
-import getFullInfoForUpdatedShow from "./FirebaseHelpers/getFullInfoForUpdatedShow"
 import useGetUserMovies from "./Hooks/UseGetUserMovies"
-import updateUserEpisodesFromDatabase from "Components/UserContent/UseUserShows/FirebaseHelpers/updateUserEpisodesFromDatabase"
-import { useAppDispatch, useAppSelector } from "app/hooks"
-import { changeShow, fetchUserShows, selectUserShows, setUserShows } from "./userShowsSlice"
-import sortDataSnapshot from "../FirebaseHelpers/sortDataSnapshot"
-import { SnapshotVal } from "Components/AppContext/@Types"
+import { useAppDispatch } from "app/hooks"
 
 const SESSION_STORAGE_KEY_SHOWS = "userShows"
 
@@ -90,8 +81,8 @@ const useUserShows = () => {
     let authSubscriber: any
     const authUserListener = () => {
       authSubscriber = firebase.onAuthUserListener(
-        async (authUser: AuthUserInterface) => {
-          if (!authUser) return
+        async (authUser: AuthUserInterface["authUser"]) => {
+          if (!authUser?.uid) return
 
           // await updateUserEpisodesFromDatabase({ firebase })
 

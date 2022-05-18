@@ -1,5 +1,5 @@
 import { ContactStatusInterface } from "../@Types"
-import useFrequentVariables from "./UseFrequentVariables"
+import useFrequentVariables from "../../../../Utils/Hooks/UseFrequentVariables"
 
 const useFirebaseReferences = () => {
   const { firebase, authUser, contactsState } = useFrequentVariables()

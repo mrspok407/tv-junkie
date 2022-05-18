@@ -1,5 +1,4 @@
-import { useContext, useState } from "react"
-import { FirebaseContext } from "Components/Firebase"
+import { useState } from "react"
 import {
   AddShowsToDatabaseOnRegisterArg,
   AddShowToDatabaseArg,
@@ -8,8 +7,8 @@ import {
 } from "Components/AppContext/@Types"
 import addShowFireDatabase from "./FirebaseHelpers/addShowFireDatabase"
 import getShowEpisodesFromAPI from "./TmdbAPIHelpers/getShowEpisodesFromAPI"
-import useAuthUser from "Components/UserAuth/Session/WithAuthentication/UseAuthUser"
 import updateAllEpisodesWatched from "./UseUserShowsRed/FirebaseHelpers/updateAllEpisodesWatched"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 
 export const LOADING_ADDING_TO_DATABASE_INITIAL = {
   watchingShows: false,
@@ -20,11 +19,10 @@ export const LOADING_ADDING_TO_DATABASE_INITIAL = {
 }
 
 const useContentHandler = () => {
+  const { firebase, authUser } = useFrequentVariables()
+
   const [loadingAddShowToDatabase, setLoadingAddShowToDatabase] = useState(LOADING_ADDING_TO_DATABASE_INITIAL)
   const [loadingShowsOnRegister, setLoadingShowsOnRegister] = useState(false)
-
-  const firebase = useContext(FirebaseContext)
-  const authUser = useAuthUser()
 
   const addShowsToDatabaseOnRegister = ({ shows, uid }: AddShowsToDatabaseOnRegisterArg) => {
     Promise.all(
@@ -106,7 +104,7 @@ const useContentHandler = () => {
   }
 
   const addShowToDatabase = ({ id, show, database, handleListeners }: AddShowToDatabaseArg) => {
-    if (!authUser) {
+    if (!authUser?.uid) {
       setLoadingAddShowToDatabase(LOADING_ADDING_TO_DATABASE_INITIAL)
       return
     }
@@ -166,7 +164,7 @@ const useContentHandler = () => {
   }
 
   const handleShowInDatabases = ({ id, data, database, userShows, handleListeners }: HandleShowInDatabasesArg) => {
-    if (!authUser) return
+    if (!authUser?.uid) return
     const userShow = userShows.find((show) => show.id === id)
 
     if (userShow) {

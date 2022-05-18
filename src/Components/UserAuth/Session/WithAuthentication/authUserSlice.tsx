@@ -19,11 +19,15 @@ export const authUserSlice = createSlice({
   reducers: {
     setAuthUser: (state, action: PayloadAction<AuthUserInterface["authUser"]>) => {
       state.authUser = action.payload
+    },
+    resetAuthUser: (state) => {
+      console.log(current(state))
+      return authUserInitialState
     }
   }
 })
 
-export const { setAuthUser } = authUserSlice.actions
+export const { setAuthUser, resetAuthUser } = authUserSlice.actions
 
 export const selectAuthUser = (state: RootState) => state.authUser
 

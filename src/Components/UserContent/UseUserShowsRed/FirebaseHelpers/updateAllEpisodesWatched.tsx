@@ -1,11 +1,11 @@
 import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
-import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
+import { AuthUserInterface } from "Components/UserAuth/Session/WithAuthentication/@Types"
 import { releasedEpisodesToOneArray } from "Utils"
 import { SingleEpisodeInterface } from "../@Types"
 
 export interface UpdateAllEpisodesWatchedInterface {
   firebase: FirebaseInterface
-  authUser: AuthUserInterface
+  authUser: AuthUserInterface["authUser"]
   key: string | number
   info?: any
 }

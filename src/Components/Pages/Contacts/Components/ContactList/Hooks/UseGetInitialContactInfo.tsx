@@ -1,10 +1,11 @@
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase/FirebaseContext"
 import { ContactInfoInterface, MessageInterface } from "Components/Pages/Contacts/@Types"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 import { useContext, useRef } from "react"
 
 const useGetInitialContactInfo = () => {
-  const { authUser } = useContext(AppContext)
+  const { authUser } = useFrequentVariables()
   const firebase = useContext(FirebaseContext)
   const loadedContactsRef = useRef<{ [key: string]: ContactInfoInterface }>({})
 

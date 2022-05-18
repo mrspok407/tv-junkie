@@ -1,6 +1,6 @@
 import { MessageInterface } from "Components/Pages/Contacts/@Types"
 import { MESSAGE_LINE_HEIGHT } from "../../../../@Context/Constants"
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 import striptags from "striptags"
 
 type Props = {

@@ -1,23 +1,23 @@
-import React, { useContext } from "react"
+import React from "react"
 import { Helmet } from "react-helmet"
 import { Link } from "react-router-dom"
 import ScrollToTopBar from "Utils/ScrollToTopBar"
 import Header from "Components/UI/Header/Header"
 import CalendarContent from "Components/Pages/Calendar/CalendarContent"
 import Slider from "Utils/Slider/Slider"
-import PlaceholderHomePageNoFutureEpisodes from "Components/UI/Placeholders/PlaceholderHomePageNoFutureEpisodes"
 import * as ROUTES from "Utils/Constants/routes"
 import Footer from "Components/UI/Footer/Footer"
-import { AppContext } from "Components/AppContext/AppContextHOC"
 import ScrollToTopOnMount from "Utils/ScrollToTopOnMount"
 import useGetSlidersContent from "./UseGetSlidersContent"
 import useGoogleRedirect from "Components/UserAuth/SignIn/UseGoogleRedirect"
 import "./Home.scss"
+import { useAppSelector } from "app/hooks"
+import { selectAuthUser } from "Components/UserAuth/Session/WithAuthentication/authUserSlice"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 
 const HomePage: React.FC = () => {
+  const { authUser } = useFrequentVariables()
   const { sliders, slidersLoading } = useGetSlidersContent()
-  const context = useContext(AppContext)
-  const { authUser } = context
 
   useGoogleRedirect()
 
@@ -106,7 +106,7 @@ const HomePage: React.FC = () => {
         <title>TV Junkie</title>
       </Helmet>
       <Header />
-      <div className="home-page__wrapper">{!authUser ? renderNonAuthUser() : renderAuthUser()}</div>
+      <div className="home-page__wrapper">{!authUser?.uid ? renderNonAuthUser() : renderAuthUser()}</div>
       <Footer />
       <ScrollToTopBar />
     </>

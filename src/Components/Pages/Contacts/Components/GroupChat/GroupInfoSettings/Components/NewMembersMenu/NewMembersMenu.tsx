@@ -4,7 +4,7 @@ import {
   CONTACT_INFO_INITIAL_DATA,
   GroupCreationNewMemberInterface
 } from "Components/Pages/Contacts/@Types"
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 import useElementScrolledDown from "Components/Pages/Contacts/Hooks/useElementScrolledDown"
 import React, { useState, useEffect, useRef, useCallback } from "react"
 import { isUnexpectedObject } from "Utils"

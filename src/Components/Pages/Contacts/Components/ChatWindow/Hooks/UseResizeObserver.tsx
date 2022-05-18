@@ -1,5 +1,5 @@
 import useFirebaseReferences from "Components/Pages/Contacts/Hooks/UseFirebaseReferences"
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 import { useLayoutEffect, useCallback } from "react"
 
 type Props = {

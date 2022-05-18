@@ -1,4 +1,4 @@
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 import useHandleMessageOptions from "../../MessageInfo/FirebaseHelpers/UseHandleMessageOptions"
 
 const useSelectOptions = () => {

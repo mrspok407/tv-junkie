@@ -1,6 +1,6 @@
 import classNames from "classnames"
 import { ContactInfoInterface, MembersStatusGroupChatInterface } from "Components/Pages/Contacts/@Types"
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 import useTimestampFormater from "Components/Pages/Contacts/Hooks/UseTimestampFormater"
 import React from "react"
 import useRemoveMember from "./Hooks/UseRemoveMember"

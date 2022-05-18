@@ -1,5 +1,5 @@
 import classNames from "classnames"
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 import React from "react"
 import useCreateNewGroup from "../Hooks/UseCreateNewGroup"
 import "./HandleNewMembers.scss"

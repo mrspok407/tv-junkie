@@ -4,7 +4,7 @@ import * as ROUTES from "Utils/Constants/routes"
 
 export default function PlaceholderNoShows({ authUser, activeSection }) {
   let message
-  const messageForNonAuth = !authUser && activeSection !== "watchingShows" && (
+  const messageForNonAuth = !authUser?.uid && activeSection !== "watchingShows" && (
     <h1>
       To use full features please{" "}
       <Link className="placeholder--no-shows__link" to={ROUTES.LOGIN_PAGE}>

@@ -1,6 +1,6 @@
 import React, { useMemo } from "react"
 import { ContactInfoInterface, GroupCreationNewMemberInterface } from "Components/Pages/Contacts/@Types"
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 import useTimestampFormater from "Components/Pages/Contacts/Hooks/UseTimestampFormater"
 import classNames from "classnames"
 import "./Contact.scss"

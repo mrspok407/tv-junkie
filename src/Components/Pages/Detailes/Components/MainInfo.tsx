@@ -4,6 +4,8 @@ import classNames from "classnames"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import UserRating from "Components/UI/UserRating/UserRating"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
+import { useAppSelector } from "app/hooks"
+import { selectAuthUser } from "Components/UserAuth/Session/WithAuthentication/authUserSlice"
 
 type Props = {
   detailes: ContentDetailes
@@ -14,7 +16,7 @@ type Props = {
 
 export const MainInfo: React.FC<Props> = ({ detailes, mediaType, id }) => {
   const context = useContext(AppContext)
-  const { authUser } = context
+  const { authUser } = useAppSelector(selectAuthUser)
 
   const movieInLS = context.userContentLocalStorage.watchLaterMovies.find(
     (item: { id: number }) => item.id === Number(id)

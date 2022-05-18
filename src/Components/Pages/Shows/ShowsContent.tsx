@@ -9,22 +9,21 @@ import { AppContext } from "Components/AppContext/AppContextHOC"
 import reducer, { INITIAL_STATE, ShowsContentState, ActionInterface, ActionTypes } from "./_reducerConfig"
 import { useAppDispatch, useAppSelector } from "app/hooks"
 import { selectUserShows } from "Components/UserContent/UseUserShows/userShowsSlice"
-import { selectShowsInitialLoading } from "Components/UserContent/UseUserShowsRed/userShowsSliceRed"
+import { selectShowsLoading } from "Components/UserContent/UseUserShowsRed/userShowsSliceRed"
 import { handleDatabaseChange } from "Components/UserContent/UseUserShowsRed/FirebaseHelpers/PostData"
-import { FirebaseContext } from "Components/Firebase"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 
 const SCROLL_THRESHOLD = 800
 
 const ShowsContent: React.FC = () => {
-  const [sortByState, setSortByState] = useState("name")
+  const { firebase, authUser } = useFrequentVariables()
 
-  const firebase = useContext(FirebaseContext)
+  const [sortByState, setSortByState] = useState("name")
   const context = useContext(AppContext)
-  const { authUser } = context
 
   const dispatch = useAppDispatch()
   const userShows = useAppSelector(selectUserShows)
-  const showsInitialLoading = useAppSelector(selectShowsInitialLoading)
+  const showsInitialLoading = useAppSelector(selectShowsLoading)
 
   const [localState, localDispatch] = useReducer<React.Reducer<ShowsContentState, ActionInterface>>(
     reducer,
@@ -166,7 +165,7 @@ const ShowsContent: React.FC = () => {
                       <button
                         className="button"
                         onClick={() => {
-                          if (!authUser) return
+                          if (!authUser?.uid) return
                           dispatch(
                             handleDatabaseChange({
                               id: item.id,
@@ -209,7 +208,7 @@ const ShowsContent: React.FC = () => {
   const maxColumns = 4
   const currentNumOfColumns = shows.length <= maxColumns - 1 ? shows.length : maxColumns
 
-  const loadingShows = authUser ? showsInitialLoading : false
+  const loadingShows = authUser?.uid ? showsInitialLoading : false
 
   return (
     <div className="content-results">

@@ -8,6 +8,7 @@ import PlaceholderNoMovies from "Components/UI/Placeholders/PlaceholderNoMovies"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
 import reducer, { INITIAL_STATE, MoviesContentState, ActionInterface, ActionTypes } from "./_reducerConfig"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 
 const SCROLL_THRESHOLD = 800
 
@@ -20,11 +21,10 @@ type Props = {
 }
 
 const MoviesContent: React.FC<Props> = ({ moviesData, loadingIds, openLinksMoviesId, error, getMovieLinks }) => {
-  const [sortByState, setSortByState] = useState("title")
-
+  const { authUser } = useFrequentVariables()
   const context = useContext(AppContext)
-  const { authUser } = context
 
+  const [sortByState, setSortByState] = useState("title")
   const [state, dispatch] = useReducer<React.Reducer<MoviesContentState, ActionInterface>>(reducer, INITIAL_STATE)
 
   useEffect(() => {
@@ -76,7 +76,7 @@ const MoviesContent: React.FC<Props> = ({ moviesData, loadingIds, openLinksMovie
       ? content
       : context.userContentLocalStorage.watchLaterMovies.slice(0, state.loadedMovies.watchLaterMoviesLS)
 
-    const overviewCharacterLimit = context.authUser?.email === process.env.REACT_APP_ADMIN_EMAIL ? 150 : 300
+    const overviewCharacterLimit = authUser?.email === process.env.REACT_APP_ADMIN_EMAIL ? 150 : 300
 
     return (
       <>
@@ -149,7 +149,7 @@ const MoviesContent: React.FC<Props> = ({ moviesData, loadingIds, openLinksMovie
                   </div>
                 </Link>
 
-                {context.authUser?.email === process.env.REACT_APP_ADMIN_EMAIL && (
+                {authUser?.email === process.env.REACT_APP_ADMIN_EMAIL && (
                   <div className="content-results__item-links">
                     {!openLinksMoviesId.includes(item.id) ? (
                       <button type="button" className="button" onClick={() => getMovieLinks({ id: item.id })}>
@@ -218,11 +218,11 @@ const MoviesContent: React.FC<Props> = ({ moviesData, loadingIds, openLinksMovie
     )
   }
 
-  const movies = authUser ? context.userContent.userMovies : context.userContentLocalStorage.watchLaterMovies
+  const movies = authUser?.uid ? context.userContent.userMovies : context.userContentLocalStorage.watchLaterMovies
   const maxColumns = 4
   const currentNumOfColumns = movies.length <= maxColumns - 1 ? movies.length : maxColumns
 
-  const loadingMovies = authUser ? context.userContent.loadingMovies : false
+  const loadingMovies = authUser?.uid ? context.userContent.loadingMovies : false
 
   return (
     <div className="content-results">

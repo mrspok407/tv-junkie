@@ -1,6 +1,6 @@
 import classNames from "classnames"
 import { MessageInterface } from "Components/Pages/Contacts/@Types"
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 import React from "react"
 import "./InfoMessage.scss"
 

@@ -11,7 +11,7 @@ import { MESSAGES_TO_RENDER, UNREAD_MESSAGES_TO_RENDER } from "./Constants"
 import * as _isEqual from "lodash.isequal"
 import * as _assign from "lodash.assign"
 import { v4 as uuidv4 } from "uuid"
-import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
+import { AuthUserInterface } from "Components/UserAuth/Session/WithAuthentication/@Types"
 
 export type ACTIONTYPES =
   | { type: "updateActiveChat"; payload: { chatKey: string; contactKey: string } }
@@ -47,7 +47,7 @@ export type ACTIONTYPES =
   // Messages Adding //
   | {
       type: "addNewMessage"
-      payload: { newMessage: MessageInterface; chatKey: string; authUser: AuthUserInterface | null }
+      payload: { newMessage: MessageInterface; chatKey: string; authUser: AuthUserInterface["authUser"] | null }
     }
   // Messages Removing //
   | { type: "removeAllMessages"; payload: { chatKey: string } }

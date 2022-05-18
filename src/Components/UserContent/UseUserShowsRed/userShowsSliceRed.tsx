@@ -12,7 +12,7 @@ const initialState: UserShowsState = {
     episodes: {},
     timeStamps: {}
   },
-  initialLoading: true,
+  loading: false,
   error: null
 }
 
@@ -24,7 +24,7 @@ export const userShowsSliceRed = createSlice({
       reducer(state, action: PayloadAction<UserShowsState["data"]>) {
         console.log({ initialPayload: action.payload })
         state.data = action.payload
-        state.initialLoading = false
+        state.loading = false
       },
       prepare(data: UserShowsInterface[]) {
         const ids: UserShowsState["data"]["ids"] = []
@@ -81,13 +81,13 @@ export const userShowsSliceRed = createSlice({
       console.log({ mergeEpisodes })
       state.data.episodes[action.payload.id] = mergeEpisodes
     },
-    updateInitialLoading: (state, action: PayloadAction<UserShowsState["initialLoading"]>) => {
+    updateLoadingShows: (state, action: PayloadAction<UserShowsState["loading"]>) => {
       console.log(action.payload)
-      state.initialLoading = action.payload
+      state.loading = action.payload
     },
     setError: (state, action: PayloadAction<any>) => {
       state.error = action.payload
-      state.initialLoading = false
+      state.loading = false
     }
   }
 })
@@ -98,7 +98,7 @@ export const {
   changeShow,
   setShowEpisodes,
   changeShowEpisodes,
-  updateInitialLoading,
+  updateLoadingShows,
   setError
 } = userShowsSliceRed.actions
 
@@ -107,7 +107,7 @@ export const selectEpisodes = (state: RootState) => state.userShows.data.episode
 export const selectShowsIds = (state: RootState) => state.userShows.data.ids
 export const selectShow = (state: RootState, id: number) => state.userShows.data.info[id]
 export const selectShowDatabase = (state: RootState, id: number) => state.userShows.data.info[id]?.database
-export const selectShowsInitialLoading = (state: RootState) => state.userShows.initialLoading
+export const selectShowsLoading = (state: RootState) => state.userShows.loading
 
 export const selectShowEpisodes = (state: RootState, id: number) => state.userShows.data.episodes[id]
 

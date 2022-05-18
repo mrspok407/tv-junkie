@@ -1,4 +1,4 @@
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 import { useEffect, useLayoutEffect, useRef } from "react"
 
 type Props = {

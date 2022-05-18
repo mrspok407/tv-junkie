@@ -10,7 +10,7 @@ import { AppContext } from "Components/AppContext/AppContextHOC"
 import { MovieInterface } from "Components/AppContext/@Types"
 import SignInWithGoogleForm from "../SignIn/SignInWithGoogle"
 import { FirebaseContext } from "Components/Firebase"
-import { AuthUserFirebaseInterface } from "Utils/Interfaces/UserAuth"
+import { AuthUserFirebaseInterface } from "../Session/WithAuthentication/@Types"
 
 const LOCAL_STORAGE_KEY_WATCHING_SHOWS = "watchingShowsLocalS"
 const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = "watchLaterMoviesLocalS"

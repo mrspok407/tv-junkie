@@ -3,7 +3,8 @@ import axios from "axios"
 import { todayDate } from "Utils"
 import Loader from "Components/UI/Placeholders/Loader"
 import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
-import { AppContext } from "Components/AppContext/AppContextHOC"
+import { useAppSelector } from "app/hooks"
+import { selectAuthUser } from "Components/UserAuth/Session/WithAuthentication/authUserSlice"
 
 const { CancelToken } = require("axios")
 let cancelRequest: any
@@ -20,14 +21,14 @@ interface APIData {
 }
 
 const PosterWrapper = React.memo<Props>(({ detailes, mediaType }) => {
+  const { authUser } = useAppSelector(selectAuthUser)
+
   const [movieTitle, setMovieTitle] = useState("")
   const [movieHash1080p, setMovieHash1080p] = useState("")
   const [movieHash720p, setMovieHash720p] = useState("")
   const [movieAvailable, setMovieAvailable] = useState(true)
   const [loadingTorrentLinks, setLoadingTorrentLinks] = useState(false)
   const [error, setError] = useState("")
-
-  const { authUser } = useContext(AppContext)
 
   const getMovieTorrents = useCallback(() => {
     setLoadingTorrentLinks(true)

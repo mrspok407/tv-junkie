@@ -1,6 +1,6 @@
 import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
 import { SnapshotStringBooleanInterface } from "Components/Pages/Contacts/@Types"
-import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
+import { AuthUserInterface } from "Components/UserAuth/Session/WithAuthentication/@Types"
 import { MESSAGES_TO_LOAD } from "../../@Context/Constants"
 
 export const setMessagesSnapshot = async ({
@@ -12,7 +12,7 @@ export const setMessagesSnapshot = async ({
 }: {
   chatKey: string
   isGroupChat: boolean
-  authUser: AuthUserInterface | null
+  authUser: AuthUserInterface["authUser"] | null
   messagesRef: any
   firebase: FirebaseInterface
 }) => {

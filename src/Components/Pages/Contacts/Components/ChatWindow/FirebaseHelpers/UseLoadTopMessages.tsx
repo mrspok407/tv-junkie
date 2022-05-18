@@ -2,7 +2,7 @@ import { useState, useCallback, useRef } from "react"
 import { MessageInterface } from "Components/Pages/Contacts/@Types"
 import { MESSAGES_TO_LOAD } from "../../@Context/Constants"
 import debounce from "debounce"
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 
 const useLoadTopMessages = () => {
   const { firebase, contactsState, contactsDispatch } = useFrequentVariables()
