@@ -1,6 +1,4 @@
-import { useContext, useState } from "react"
-import { FirebaseContext } from "Components/Firebase"
-import { AppContext } from "Components/AppContext/AppContextHOC"
+import { useState } from "react"
 import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 
 type Props = {
