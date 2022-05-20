@@ -67,7 +67,7 @@ const ChatWindow: React.FC = () => {
 
   const { floatDate, isScrollingTop } = useShowFloatDate({ activeChat, chatContainerRef, renderedMessages })
 
-  const chatContainerCallback = useCallback((node) => {
+  const chatContainerCallback = useCallback((node: any) => {
     if (node !== null) {
       setChatContainerRef(node)
     }
