@@ -4,6 +4,7 @@ import { validEmailRegex } from "Utils"
 import classNames from "classnames"
 import Input from "../Input/Input"
 import { FirebaseContext } from "Components/Firebase"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 
 interface ErrorsInterface {
   emailError: string
@@ -23,14 +24,14 @@ const ERROR_DEFAULT_VALUES = {
 }
 
 const PasswordForget: React.FC = () => {
+  const { firebase } = useFrequentVariables()
+
   const [requiredInputs, setRequiredInputs] = useState<RequiredInputsInterface>({ email: "" })
   const [errors, setErrors] = useState<ErrorsInterface>(ERROR_DEFAULT_VALUES)
   const [submitClicked, setSubmitClicked] = useState(false)
   const [submitRequestLoading, setSubmitRequestLoading] = useState(false)
   const [emailSentSuccess, setEmailSentSuccess] = useState(false)
   const [isEmailValid, setIsEmailValid] = useState(false)
-
-  const firebase = useContext(FirebaseContext)
 
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     setSubmitRequestLoading(true)

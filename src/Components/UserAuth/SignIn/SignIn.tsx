@@ -8,6 +8,7 @@ import classNames from "classnames"
 import Input from "../Input/Input"
 import { AppContext } from "Components/AppContext/AppContextHOC"
 import { FirebaseContext } from "Components/Firebase"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 
 const LOCAL_STORAGE_KEY_WATCHING_SHOWS = "watchingShowsLocalS"
 const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = "watchLaterMoviesLocalS"
@@ -38,6 +39,9 @@ const ERROR_DEFAULT_VALUES = {
 }
 
 const SignInFormBase: React.FC<Props> = ({ closeNavMobile, togglePasswordForget }) => {
+  const context = useContext(AppContext)
+  const { firebase } = useFrequentVariables()
+
   const [requiredInputs, setRequiredInputs] = useState<RequiredInputsInterface>({ email: "", password: "" })
   const [errors, setErrors] = useState<ErrorsInterface>(ERROR_DEFAULT_VALUES)
   const [submitClicked, setSubmitClicked] = useState(false)
@@ -45,8 +49,6 @@ const SignInFormBase: React.FC<Props> = ({ closeNavMobile, togglePasswordForget 
   const [showPassword, setShowPassword] = useState(false)
   const [isEmailValid, setIsEmailValid] = useState(false)
 
-  const context = useContext(AppContext)
-  const firebase = useContext(FirebaseContext)
   const history = useHistory()
 
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {

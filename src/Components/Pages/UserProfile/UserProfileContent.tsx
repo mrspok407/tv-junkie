@@ -14,6 +14,7 @@ import { Link } from "react-router-dom"
 import Loader from "Components/UI/Placeholders/Loader"
 import PlaceholderNoShowsUser from "Components/UI/Placeholders/PlaceholderNoShowsUser"
 import UserRating from "Components/UI/UserRating/UserRating"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 
 const SCROLL_THRESHOLD = 800
 
@@ -22,7 +23,7 @@ type Props = {
 }
 
 const UserProfileContent: React.FC<Props> = ({ userUid }) => {
-  const firebase = useContext(FirebaseContext)
+  const { firebase } = useFrequentVariables()
   const history = useHistory()
 
   const [loadingContent, setLoadingContent] = useState(true)

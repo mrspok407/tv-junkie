@@ -4,6 +4,7 @@ import classNames from "classnames"
 import Input from "../Input/Input"
 import { FirebaseContext } from "Components/Firebase"
 import "./PasswordUpdate.scss"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 
 interface ErrorsInterface {
   [key: string]: string | {}
@@ -21,14 +22,14 @@ const ERROR_DEFAULT_VALUES = {
 }
 
 const PasswordUpdate: React.FC = () => {
+  const { firebase } = useFrequentVariables()
+
   const [requiredInputs, setRequiredInputs] = useState<RequiredInputsInterface>({ password: "" })
   const [errors, setErrors] = useState<ErrorsInterface>(ERROR_DEFAULT_VALUES)
   const [submitClicked, setSubmitClicked] = useState(false)
   const [submitRequestLoading, setSubmitRequestLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [passwordUpdated, setPasswordUpdated] = useState(false)
-
-  const firebase = useContext(FirebaseContext)
 
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     setSubmitRequestLoading(true)

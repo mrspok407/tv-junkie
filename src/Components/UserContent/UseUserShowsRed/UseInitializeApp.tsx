@@ -5,9 +5,10 @@ import { useAppDispatch } from "app/hooks"
 import { fetchUserShows } from "./Middleware"
 import { resetAuthUser } from "Components/UserAuth/Session/WithAuthentication/authUserSlice"
 import setupAuthUser from "Components/UserAuth/Session/WithAuthentication/Middleware/setupAuthUser"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 
 const useInitializeApp = () => {
-  const firebase = useContext(FirebaseContext)
+  const { firebase } = useFrequentVariables()
   const dispatch = useAppDispatch()
 
   useEffect(() => {

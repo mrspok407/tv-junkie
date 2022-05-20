@@ -5,8 +5,7 @@ import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 import { useContext, useRef } from "react"
 
 const useGetInitialContactInfo = () => {
-  const { authUser } = useFrequentVariables()
-  const firebase = useContext(FirebaseContext)
+  const { authUser, firebase } = useFrequentVariables()
   const loadedContactsRef = useRef<{ [key: string]: ContactInfoInterface }>({})
 
   const getContactsInfo = async ({ contactsData }: { contactsData: ContactInfoInterface[] }) => {

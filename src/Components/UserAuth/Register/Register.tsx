@@ -11,6 +11,7 @@ import { MovieInterface } from "Components/AppContext/@Types"
 import SignInWithGoogleForm from "../SignIn/SignInWithGoogle"
 import { FirebaseContext } from "Components/Firebase"
 import { AuthUserFirebaseInterface } from "../Session/WithAuthentication/@Types"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 
 const LOCAL_STORAGE_KEY_WATCHING_SHOWS = "watchingShowsLocalS"
 const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = "watchLaterMoviesLocalS"
@@ -56,6 +57,9 @@ const ERROR_DEFAULT_VALUES = {
 }
 
 const Register: React.FC<Props> = ({ closeNavMobile }) => {
+  const { firebase } = useFrequentVariables()
+  const context = useContext(AppContext)
+
   const [requiredInputs, setRequiredInputs] = useState<RequiredInputsInterface>({
     login: "",
     email: "",
@@ -69,8 +73,6 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
   const [showPassword, setShowPassword] = useState(false)
   const [isEmailValid, setIsEmailValid] = useState(false)
 
-  const context = useContext(AppContext)
-  const firebase = useContext(FirebaseContext)
   const history = useHistory()
 
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {

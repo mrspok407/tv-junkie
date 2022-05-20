@@ -1,6 +1,7 @@
 import { useContext, useState } from "react"
 import { FirebaseContext } from "Components/Firebase"
 import { AppContext } from "Components/AppContext/AppContextHOC"
+import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
 
 type Props = {
   contactUid: string
@@ -9,8 +10,7 @@ type Props = {
 const INITIAL_LOADING_STATE = { accept: false, rejected: false }
 
 const useResponseContactRequest = ({ contactUid }: Props) => {
-  const { errors } = useContext(AppContext)
-  const firebase = useContext(FirebaseContext)
+  const { firebase, errors } = useFrequentVariables()
 
   const [responseContactRequestLoading, setResponseContactRequestLoading] = useState(INITIAL_LOADING_STATE)
 
