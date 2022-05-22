@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react"
+import { useState, useMemo } from 'react'
 
 type Props = {
   timeStamp: number | string | null
@@ -24,7 +24,7 @@ const useTimestampFormater = ({ timeStamp }: Props) => {
     if (timeStampDay === todayDay) {
       setFormatedDate(timeStampTime)
     } else if (timeStampDay === yesterdayDay) {
-      setFormatedDate("Yesterday")
+      setFormatedDate('Yesterday')
     } else {
       setFormatedDate(timeStampDay!)
     }

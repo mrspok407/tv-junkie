@@ -1,5 +1,5 @@
-import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
-import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
+import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
+import { ContentDetailes } from 'Utils/Interfaces/ContentDetails'
 
 type Arguments = {
   firebase: FirebaseInterface
@@ -7,8 +7,7 @@ type Arguments = {
   showEpisodesTMDB: { status: string; episodes: {}[] }
 }
 
-const addShowFireDatabase = ({ firebase, showDetailes, showEpisodesTMDB }: Arguments): Promise<any> => {
-  return firebase.showFullData(showDetailes.id).transaction((snapshot: any) => {
+const addShowFireDatabase = ({ firebase, showDetailes, showEpisodesTMDB }: Arguments): Promise<any> => firebase.showFullData(showDetailes.id).transaction((snapshot: any) => {
     if (snapshot !== null) {
       return
     }
@@ -25,13 +24,12 @@ const addShowFireDatabase = ({ firebase, showDetailes, showEpisodesTMDB }: Argum
         vote_average: showDetailes.vote_average,
         vote_count: showDetailes.vote_count,
         status: showEpisodesTMDB.status,
-        lastUpdatedInDatabase: firebase.timeStamp()
+        lastUpdatedInDatabase: firebase.timeStamp(),
       },
       episodes: showEpisodesTMDB.episodes,
       id: showDetailes.id.toString(),
-      status: showEpisodesTMDB.status
+      status: showEpisodesTMDB.status,
     }
   })
-}
 
 export default addShowFireDatabase

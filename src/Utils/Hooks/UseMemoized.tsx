@@ -1,4 +1,4 @@
-import { useCallback } from "react"
+import { useCallback } from 'react'
 
 interface GenericIdentityFn<ReturnType, ArgumentType> {
   (arg: ArgumentType): ReturnType
@@ -15,7 +15,7 @@ function useMemoized<ReturnType, ArgumentType>({ deps, callback }: { deps: any[]
           callback(...args).catch((error: any) => {
             cache.delete(strX)
             return error
-          })
+          }),
         )
       }
       return cache.get(strX)

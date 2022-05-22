@@ -1,23 +1,23 @@
-import React, { useCallback, useContext, useEffect, useState } from "react"
-import { Link } from "react-router-dom"
-import { differenceBtwDatesInDays, todayDate } from "Utils"
-import { organiseFutureEpisodesByMonth, organizeMonthEpisodesByEpisodeNumber } from "./CalendarHelpers"
-import classNames from "classnames"
-import Loader from "Components/UI/Placeholders/Loader"
-import PlaceholderNoFutureEpisodes from "Components/UI/Placeholders/PlaceholderNoFutureEpisodes"
-import { AppContext } from "Components/AppContext/AppContextHOC"
-import TorrentLinksEpisodes from "Components/UI/Templates/SeasonsAndEpisodes/Components/TorrentLinksEpisodes"
-import { useAppSelector } from "app/hooks"
+import React, { useCallback, useContext, useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { differenceBtwDatesInDays, todayDate } from 'Utils'
+import classNames from 'classnames'
+import Loader from 'Components/UI/Placeholders/Loader'
+import PlaceholderNoFutureEpisodes from 'Components/UI/Placeholders/PlaceholderNoFutureEpisodes'
+import { AppContext } from 'Components/AppContext/AppContextHOC'
+import TorrentLinksEpisodes from 'Components/UI/Templates/SeasonsAndEpisodes/Components/TorrentLinksEpisodes'
+import { useAppSelector } from 'app/hooks'
 import {
   selectEpisodes,
   selectShows,
-  selectShowsLoading
-} from "Components/UserContent/UseUserShowsRed/userShowsSliceRed"
+  selectShowsLoading,
+} from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
 import {
   SingleEpisodeByMonthInterface,
-  UserWillAirEpisodesInterface
-} from "Components/UserContent/UseUserShowsRed/@Types"
-import { selectAuthUser } from "Components/UserAuth/Session/WithAuthentication/authUserSlice"
+  UserWillAirEpisodesInterface,
+} from 'Components/UserContent/UseUserShowsRed/@Types'
+import { selectAuthUser } from 'Components/UserAuth/Session/WithAuthentication/authUserSlice'
+import { organiseFutureEpisodesByMonth, organizeMonthEpisodesByEpisodeNumber } from './CalendarHelpers'
 
 type Props = {
   homePage?: boolean
@@ -33,7 +33,7 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
 
   const userShows = useAppSelector(selectShows)
   const userEpisodes = useAppSelector(selectEpisodes)
-  const watchingShows = Object.values(userShows).filter((show) => show.database === "watchingShows")
+  const watchingShows = Object.values(userShows).filter((show) => show.database === 'watchingShows')
   // const watchingShowsEpisodes = watchingShows.reduce((acc, show) => {
   //   acc.push({...show, episodes: userEpisodes[show.id]})
   //   return acc
@@ -45,9 +45,7 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
     if (!Object.values(userEpisodes).length) return
     console.log({ userEpisodes })
     const willAirEpisodes = homePage ? willAirEpisodesData.slice(0, 2) : willAirEpisodesData
-    const months = willAirEpisodes.map((item: Object) => {
-      return Object.values(item)[0]
-    })
+    const months = willAirEpisodes.map((item: Object) => Object.values(item)[0])
     setOpenMonths(homePage ? [months[0]] : months)
   }, [userEpisodes, homePage])
 
@@ -92,15 +90,15 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
         <div className="episodes episodes--calendar">
           {willAirEpisodes.map((month) => {
             const date = new Date(month.month)
-            const monthLongName = date.toLocaleString("en", { month: "long" })
+            const monthLongName = date.toLocaleString('en', { month: 'long' })
 
             const monthEpisodes: SingleEpisodeByMonthInterface[] = organizeMonthEpisodesByEpisodeNumber(month.episodes)
 
             return (
               <div key={month.month} className="episodes__episode-group">
                 <div
-                  className={classNames("episodes__episode-group-info", {
-                    "episodes__episode-group-info--open": openMonths.includes(month.month)
+                  className={classNames('episodes__episode-group-info', {
+                    'episodes__episode-group-info--open': openMonths.includes(month.month),
                   })}
                   onClick={() => showMonthEpisodes({ month: month.month })}
                 >
@@ -115,7 +113,9 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
                     )}
                   </div>
                   <div className="episodes__episode-group-episodes-left">
-                    {month.episodes.length} {month.episodes.length > 1 ? "episodes" : "episode"}
+                    {month.episodes.length}
+                    {' '}
+                    {month.episodes.length > 1 ? 'episodes' : 'episode'}
                   </div>
                 </div>
 
@@ -130,15 +130,15 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
                         const airDateISO = episode.air_date && new Date(episode.air_date).toISOString()
 
                         const options: any = {
-                          weekday: "short",
-                          day: "numeric"
+                          weekday: 'short',
+                          day: 'numeric',
                         }
 
                         const formatedDate = new Date(airDateISO)
 
                         const episodeAirDate = episode.air_date
-                          ? new Intl.DateTimeFormat("en-US", options).format(formatedDate).split(" ").join(", ")
-                          : "No date available"
+                          ? new Intl.DateTimeFormat('en-US', options).format(formatedDate).split(' ').join(', ')
+                          : 'No date available'
                         // Format Date End //
 
                         // Format Seasons And Episode Numbers //
@@ -146,9 +146,9 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
                         const episodeToString = episode.episode_number.toString()
 
                         const seasonNumber =
-                          seasonToString.length === 1 ? "s".concat(seasonToString) : "s".concat(seasonToString)
+                          seasonToString.length === 1 ? 's'.concat(seasonToString) : 's'.concat(seasonToString)
                         const episodeNumber =
-                          episodeToString.length === 1 ? "e0".concat(episodeToString) : "e".concat(episodeToString)
+                          episodeToString.length === 1 ? 'e0'.concat(episodeToString) : 'e'.concat(episodeToString)
                         // Format Seasons And Episode Numbers End //
 
                         const daysToNewEpisode = differenceBtwDatesInDays(episode.air_date, todayDate)
@@ -157,10 +157,10 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
                         return (
                           <div
                             key={episode.id}
-                            className={classNames("episodes__episode", {
-                              "episodes__episode--today": willAirToday,
-                              "episodes__episode--today-admin":
-                                authUser?.email === process.env.REACT_APP_ADMIN_EMAIL && willAirToday
+                            className={classNames('episodes__episode', {
+                              'episodes__episode--today': willAirToday,
+                              'episodes__episode--today-admin':
+                                authUser?.email === process.env.REACT_APP_ADMIN_EMAIL && willAirToday,
                             })}
                           >
                             <div className="episodes__episode-wrapper">
@@ -191,8 +191,8 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
                                     {daysToNewEpisode > 1
                                       ? `${daysToNewEpisode} days`
                                       : daysToNewEpisode === 1
-                                      ? "1 day"
-                                      : willAirToday && "Today"}
+                                      ? '1 day'
+                                      : willAirToday && 'Today'}
                                   </span>
                                 </div>
                               )}

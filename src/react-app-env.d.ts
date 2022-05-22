@@ -1,13 +1,13 @@
 /// <reference types="react-scripts" />
-declare module "lodash.get"
-declare module "lodash.merge"
-declare module "lodash.mergewith"
-declare module "lodash.assign"
-declare module "lodash.isfunction"
-declare module "lodash.transform"
-declare module "lodash.isequal"
-declare module "lodash.isobject"
-declare module "debounce"
-declare module "classnames"
-declare module "deepmerge"
-declare module "throttle-debounce"
+declare module 'lodash.get'
+declare module 'lodash.merge'
+declare module 'lodash.mergewith'
+declare module 'lodash.assign'
+declare module 'lodash.isfunction'
+declare module 'lodash.transform'
+declare module 'lodash.isequal'
+declare module 'lodash.isobject'
+declare module 'debounce'
+declare module 'classnames'
+declare module 'deepmerge'
+declare module 'throttle-debounce'

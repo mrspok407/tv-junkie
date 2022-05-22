@@ -1,14 +1,14 @@
 import {
   UserMoviesInterface,
   UserShowsInterface,
-  UserWillAirEpisodesInterface
-} from "Components/UserContent/UseUserShows/UseUserShows"
-import { LOADING_ADDING_TO_DATABASE_INITIAL } from "Components/UserContent/UseContentHandler"
-import { FirebaseInterface, FIREBASE_INITIAL_STATE } from "Components/Firebase/FirebaseContext"
-import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
-import { UserToWatchShowsInterface } from "Components/UserContent/UseUserShows/Hooks/UseGetUserToWatchShows"
-import { HandleListenersArg } from "Components/Pages/Detailes/FirebaseHelpers/UseHandleListeners"
-import { SnapshotVal } from "./generics"
+  UserWillAirEpisodesInterface,
+} from 'Components/UserContent/UseUserShows/UseUserShows'
+import { LOADING_ADDING_TO_DATABASE_INITIAL } from 'Components/UserContent/UseContentHandler'
+import { FirebaseInterface, FIREBASE_INITIAL_STATE } from 'Components/Firebase/FirebaseContext'
+import { ContentDetailes } from 'Utils/Interfaces/ContentDetails'
+import { UserToWatchShowsInterface } from 'Components/UserContent/UseUserShows/Hooks/UseGetUserToWatchShows'
+import { HandleListenersArg } from 'Components/Pages/Detailes/FirebaseHelpers/UseHandleListeners'
+import { SnapshotVal } from './generics'
 
 export interface ShowInterface {
   id: number
@@ -121,7 +121,7 @@ export const CONTEXT_INITIAL_STATE = {
     toggleMovieLS: () => {},
     clearContentState: () => {},
     addShowLS: () => {},
-    removeShowLS: () => {}
+    removeShowLS: () => {},
   },
   userContent: {
     loadingShows: true,
@@ -133,7 +133,7 @@ export const CONTEXT_INITIAL_STATE = {
     userMovies: [],
     resetContentState: () => {},
     handleUserMoviesOnClient: () => {},
-    handleUserShowsOnClient: () => {}
+    handleUserShowsOnClient: () => {},
   },
   userContentHandler: {
     addShowsToDatabaseOnRegister: () => {},
@@ -142,11 +142,11 @@ export const CONTEXT_INITIAL_STATE = {
     handleMovieInDatabases: () => {},
     handleLoadingShowsOnRegister: () => {},
     loadingAddShowToDatabase: LOADING_ADDING_TO_DATABASE_INITIAL,
-    loadingShowsOnRegister: false
+    loadingShowsOnRegister: false,
   },
   firebase: FIREBASE_INITIAL_STATE,
   newContactsActivity: false,
-  errors: { error: {}, handleError: () => {} }
+  errors: { error: {}, handleError: () => {} },
 }
 
 export type { SnapshotVal }

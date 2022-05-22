@@ -1,6 +1,6 @@
-import React, { useReducer, createContext } from "react"
-import { ContactsStateInterface } from "../../@Types"
-import reducer, { INITIAL_STATE, ACTIONTYPES } from "./_reducerConfig"
+import React, { useReducer, createContext } from 'react'
+import { ContactsStateInterface } from '../../@Types'
+import reducer, { INITIAL_STATE, ACTIONTYPES } from './_reducerConfig'
 
 export interface ContextInterface {
   state: ContactsStateInterface
@@ -9,8 +9,7 @@ export interface ContextInterface {
 
 export const ContactsContext = createContext<ContextInterface | null>(null)
 
-const ContactsContextHOC = (Component: any) =>
-  function Comp(props: any) {
+const ContactsContextHOC = (Component: any) => function Comp(props: any) {
     const [state, dispatch] = useReducer(reducer, INITIAL_STATE)
     return (
       <ContactsContext.Provider value={{ state, dispatch }}>

@@ -1,9 +1,9 @@
-import React, { Component } from "react"
-import { Helmet } from "react-helmet"
-import WithAuthorization from "Components/UserAuth/Session/WithAuthorization/WithAuthorization"
-import Header from "Components/UI/Header/Header"
-import { AppContext } from "Components/AppContext/AppContextHOC"
-import "./Admin.scss"
+import React, { Component } from 'react'
+import { Helmet } from 'react-helmet'
+import WithAuthorization from 'Components/UserAuth/Session/WithAuthorization/WithAuthorization'
+import Header from 'Components/UI/Header/Header'
+import { AppContext } from 'Components/AppContext/AppContextHOC'
+import './Admin.scss'
 
 class AdminPage extends Component {
   constructor(props) {

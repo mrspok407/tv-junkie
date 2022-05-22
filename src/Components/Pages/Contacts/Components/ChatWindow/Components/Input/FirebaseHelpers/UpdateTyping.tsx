@@ -1,10 +1,10 @@
-import useFirebaseReferences from "Components/Pages/Contacts/Hooks/UseFirebaseReferences"
+import useFirebaseReferences from 'Components/Pages/Contacts/Hooks/UseFirebaseReferences'
 
 let typingTimer: number | null = null
 const TIMEOUT = 1500
 export const updateTyping = async ({
   setTypingNull = null,
-  firebaseRefs
+  firebaseRefs,
 }: {
   setTypingNull?: boolean | null
   firebaseRefs: ReturnType<typeof useFirebaseReferences>

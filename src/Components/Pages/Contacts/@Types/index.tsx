@@ -24,9 +24,9 @@ export interface ContactInfoInterface {
 }
 
 export const CONTACT_INFO_INITIAL_DATA = {
-  status: [false, ""],
-  userName: "",
-  pinned_lastActivityTS: ""
+  status: [false, ''],
+  userName: '',
+  pinned_lastActivityTS: '',
 }
 
 export interface ContactsInterface {
@@ -78,8 +78,8 @@ export interface MembersStatusGroupChatInterface {
 }
 
 export const MESSAGE_INITIAL_DATA = {
-  sender: "",
-  timeStamp: 0
+  sender: '',
+  timeStamp: 0,
 }
 
 export interface MessageInputInterface {

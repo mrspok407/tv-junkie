@@ -1,10 +1,10 @@
-import { MembersStatusGroupChatInterface } from "Components/Pages/Contacts/@Types"
-import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
-import useElementScrolledDown from "Components/Pages/Contacts/Hooks/useElementScrolledDown"
-import React, { useState, useEffect, useCallback } from "react"
-import SearchInput from "./SearchInput/SearchInput"
-import Member from "./Member"
-import "./MembersMenu.scss"
+import { MembersStatusGroupChatInterface } from 'Components/Pages/Contacts/@Types'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import useElementScrolledDown from 'Components/Pages/Contacts/Hooks/useElementScrolledDown'
+import React, { useState, useEffect, useCallback } from 'react'
+import SearchInput from './SearchInput/SearchInput'
+import Member from './Member'
+import './MembersMenu.scss'
 
 const MEMBERS_TO_RENDER = 50
 
@@ -39,7 +39,7 @@ const GroupCreation: React.FC = () => {
   }, [chatParticipantsData]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const getContactsData = async ({ snapshot }: { snapshot: any }) => {
-    let members: MembersStatusGroupChatInterface[] = []
+    const members: MembersStatusGroupChatInterface[] = []
     snapshot.forEach((member: { val: () => MembersStatusGroupChatInterface; key: string }) => {
       if (!chatParticipantsData.includes(member.key)) return
       members.push({ ...member.val(), key: member.key })
@@ -60,10 +60,10 @@ const GroupCreation: React.FC = () => {
 
       try {
         const membersData = await membersListFireRef
-          .orderByChild("userNameLowerCase")
+          .orderByChild('userNameLowerCase')
           .startAt(query.toLowerCase())
-          .endAt(query.toLowerCase() + "\uf8ff")
-          .once("value")
+          .endAt(`${query.toLowerCase()}\uf8ff`)
+          .once('value')
         if (membersData.val() === null) {
           setSearchedMembers(null)
           setIsSearching(false)
@@ -73,12 +73,12 @@ const GroupCreation: React.FC = () => {
         getContactsData({ snapshot: membersData })
       } catch (error) {
         errors.handleError({
-          message: "Some of your contacts were not loaded correctly. Try to reload the page."
+          message: 'Some of your contacts were not loaded correctly. Try to reload the page.',
         })
         setIsSearching(false)
       }
     },
-    [chatParticipantsData, errors] // eslint-disable-line react-hooks/exhaustive-deps
+    [chatParticipantsData, errors], // eslint-disable-line react-hooks/exhaustive-deps
   )
 
   useEffect(() => {

@@ -1,17 +1,17 @@
-import classNames from "classnames"
-import React, { useEffect, useRef } from "react"
-import ChatWindow from "./Components/ChatWindow/ChatWindow"
-import ContactList from "./Components/ContactList/ContactList"
-import ContactsContextHOC from "./Components/@Context/ContactsContext"
-import { ContactInfoInterface } from "./@Types"
-import ConfirmModal from "./Components/ChatWindow/Components/ConfirmModal/ConfirmModal"
-import useContactOptions from "./Components/ContactOptionsPopup/Hooks/UseContactOptions"
-import useSelectOptions from "./Components/ChatWindow/Components/SelectOptions/Hooks/UseSelectOptions"
-import HandleNewMembers from "./Components/GroupChat/HandleNewMembers/HandleNewMembers"
-import GroupCreation from "./Components/GroupChat/GroupCreation/GroupCreation"
-import useFrequentVariables from "../../../Utils/Hooks/UseFrequentVariables"
-import ChatWindowPlaceHolder from "./Components/ChatWindow/Placeholders/ChatWindowPlaceHolder"
-import "./Components/ContactList/ContactList.scss"
+import classNames from 'classnames'
+import React, { useEffect, useRef } from 'react'
+import ChatWindow from './Components/ChatWindow/ChatWindow'
+import ContactList from './Components/ContactList/ContactList'
+import ContactsContextHOC from './Components/@Context/ContactsContext'
+import { ContactInfoInterface } from './@Types'
+import ConfirmModal from './Components/ChatWindow/Components/ConfirmModal/ConfirmModal'
+import useContactOptions from './Components/ContactOptionsPopup/Hooks/UseContactOptions'
+import useSelectOptions from './Components/ChatWindow/Components/SelectOptions/Hooks/UseSelectOptions'
+import HandleNewMembers from './Components/GroupChat/HandleNewMembers/HandleNewMembers'
+import GroupCreation from './Components/GroupChat/GroupCreation/GroupCreation'
+import useFrequentVariables from '../../../Utils/Hooks/UseFrequentVariables'
+import ChatWindowPlaceHolder from './Components/ChatWindow/Placeholders/ChatWindowPlaceHolder'
+import './Components/ContactList/ContactList.scss'
 
 const ContactsContent: React.FC = () => {
   const { firebase, authUser, contactsContext, contactsState } = useFrequentVariables()
@@ -24,13 +24,12 @@ const ContactsContent: React.FC = () => {
     contactsRef.current = contacts
   }, [messages, contacts])
 
-  useEffect(() => {
-    return () => {
+  useEffect(() => () => {
       if (!contactsRef.current) return
       Object.values(contactsRef.current).forEach((contact) => {
         firebase.messages({ chatKey: contact.chatKey, isGroupChat: contact.isGroupChat }).off()
         firebase.unreadMessages({ uid: contact.key, chatKey: contact.chatKey, isGroupChat: false }).off()
-        firebase.contactsDatabase({ uid: contact.key }).child("pageIsOpen").off()
+        firebase.contactsDatabase({ uid: contact.key }).child('pageIsOpen').off()
         firebase
           .chatMemberStatus({ chatKey: contact.chatKey, memberKey: contact.key, isGroupChat: contact.isGroupChat })
           .off()
@@ -39,8 +38,7 @@ const ContactsContent: React.FC = () => {
           firebase.groupChatParticipants({ chatKey: contact.chatKey }).off()
         }
       })
-    }
-  }, [authUser, firebase])
+    }, [authUser, firebase])
 
   useEffect(() => {
     firebase.contactsDatabase({ uid: authUser?.uid }).update({ pageIsOpen: true })
@@ -51,29 +49,28 @@ const ContactsContent: React.FC = () => {
   }, [authUser, firebase])
 
   return (
-    <>
-      <div className="chat-container">
-        <div
-          className={classNames("contact-list-wrapper", {
-            "contact-list-wrapper--hide-mobile": contactsContext?.state.activeChat.chatKey,
-            "contact-list-wrapper--group-creation-active": groupCreation.isActive
+    <div className="chat-container">
+      <div
+        className={classNames('contact-list-wrapper', {
+            'contact-list-wrapper--hide-mobile': contactsContext?.state.activeChat.chatKey,
+            'contact-list-wrapper--group-creation-active': groupCreation.isActive,
           })}
-          ref={contactListWrapperRef}
-        >
-          <ContactList contactListWrapperRef={contactListWrapperRef.current} />
-          {groupCreation.isActive && <GroupCreation contactListWrapperRef={contactListWrapperRef.current} />}
-        </div>
-        {!groupCreation.isActive && Object.values(contacts).filter((contact) => contact.status === true).length ? (
-          <HandleNewMembers />
+        ref={contactListWrapperRef}
+      >
+        <ContactList contactListWrapperRef={contactListWrapperRef.current} />
+        {groupCreation.isActive && <GroupCreation contactListWrapperRef={contactListWrapperRef.current} />}
+      </div>
+      {!groupCreation.isActive && Object.values(contacts).filter((contact) => contact.status === true).length ? (
+        <HandleNewMembers />
         ) : groupCreation.members.length && !groupCreation.error ? (
           <HandleNewMembers />
         ) : (
-          ""
+          ''
         )}
 
-        {activeChat.chatKey === "" || !contacts[activeChat.contactKey] ? (
+      {activeChat.chatKey === '' || !contacts[activeChat.contactKey] ? (
           !Object.keys(contacts)?.length ? (
-            ""
+            ''
           ) : (
             <div className="chat-window-container chat-window-container--no-active-chat">
               <div className="chat-window">Select a chat to start messaging</div>
@@ -92,9 +89,8 @@ const ContactsContent: React.FC = () => {
         ) : (
           <ChatWindow />
         )}
-        {confirmModal.isActive && <ConfirmModal confirmFunctions={confirmModalFunctions} />}
-      </div>
-    </>
+      {confirmModal.isActive && <ConfirmModal confirmFunctions={confirmModalFunctions} />}
+    </div>
   )
 }
 

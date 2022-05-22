@@ -1,5 +1,5 @@
-import { useState } from "react"
-import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
+import { useState } from 'react'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 
 type Props = {
   contactUid: string
@@ -16,12 +16,12 @@ const useResponseContactRequest = ({ contactUid }: Props) => {
     if (responseContactRequestLoading.accept || responseContactRequestLoading.rejected) return
     try {
       setResponseContactRequestLoading((prevState) => ({ ...prevState, [status]: true }))
-      const handleContactRequestCloud = firebase.httpsCallable("handleContactRequest")
+      const handleContactRequestCloud = firebase.httpsCallable('handleContactRequest')
       await handleContactRequestCloud({ contactUid, status })
     } catch (error) {
       errors.handleError({
         errorData: error,
-        message: "There has been some error handling contact request. Please try again."
+        message: 'There has been some error handling contact request. Please try again.',
       })
 
       throw new Error(`There has been some error handling contact request: ${error}`)

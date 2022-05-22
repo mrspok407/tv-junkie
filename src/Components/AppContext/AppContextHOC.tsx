@@ -1,12 +1,14 @@
-import React, { createContext, useContext } from "react"
-import useUserContentLocalStorage from "Components/UserContent/UseUserContentLocalStorage"
-import useUserShows from "Components/UserContent/UseUserShows/UseUserShows"
-import useContentHandler from "Components/UserContent/UseContentHandler"
-import useFirebase from "Components/Firebase/UseFirebase"
-import useNewContactsActivity from "Components/Pages/Contacts/Hooks/UseNewContactsActivity"
-import useErrors from "Utils/Hooks/UseErrors"
-import { AppContextInterface, CONTEXT_INITIAL_STATE } from "./@Types"
-import useInitializeApp from "Components/UserContent/UseUserShowsRed/UseInitializeApp"
+/* eslint-disable react/jsx-props-no-spreading */
+/* eslint-disable react/jsx-no-constructed-context-values */
+import React, { createContext, useContext } from 'react'
+import useUserContentLocalStorage from 'Components/UserContent/UseUserContentLocalStorage'
+import useUserShows from 'Components/UserContent/UseUserShows/UseUserShows'
+import useContentHandler from 'Components/UserContent/UseContentHandler'
+import useFirebase from 'Components/Firebase/UseFirebase'
+import useNewContactsActivity from 'Components/Pages/Contacts/Hooks/UseNewContactsActivity'
+import useErrors from 'Utils/Hooks/UseErrors'
+import useInitializeApp from 'Components/UserContent/UseUserShowsRed/UseInitializeApp'
+import { AppContextInterface, CONTEXT_INITIAL_STATE } from './@Types'
 
 export const AppContext = createContext<AppContextInterface>(CONTEXT_INITIAL_STATE)
 
@@ -19,7 +21,7 @@ const AppContextHOC = (Component: any) =>
       userContentHandler: useContentHandler(),
       firebase: useFirebase(),
       newContactsActivity: useNewContactsActivity(),
-      errors: useErrors()
+      errors: useErrors(),
     }
     return (
       <AppContext.Provider value={ContextValue}>

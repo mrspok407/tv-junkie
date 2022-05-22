@@ -1,7 +1,7 @@
-import React, { useContext } from "react"
-import { AppContext } from "Components/AppContext/AppContextHOC"
+import React, { useContext } from 'react'
+import { AppContext } from 'Components/AppContext/AppContextHOC'
 
-const SESSION_STORAGE_KEY_SHOWS = "userShows"
+const SESSION_STORAGE_KEY_SHOWS = 'userShows'
 
 const SignOutButton = () => {
   const { firebase, userContent } = useContext(AppContext)

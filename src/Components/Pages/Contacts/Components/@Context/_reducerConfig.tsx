@@ -1,3 +1,8 @@
+import * as _isEqual from 'lodash.isequal'
+import * as _assign from 'lodash.assign'
+import { v4 as uuidv4 } from 'uuid'
+import { AuthUserInterface } from 'Components/UserAuth/Session/WithAuthentication/@Types'
+import { MESSAGES_TO_RENDER, UNREAD_MESSAGES_TO_RENDER } from './Constants'
 import {
   ContactInfoInterface,
   ContactsInterface,
@@ -5,23 +10,18 @@ import {
   ContactStatusInterface,
   MembersStatusGroupChatInterface,
   MessageInputInterface,
-  MessageInterface
-} from "../../@Types"
-import { MESSAGES_TO_RENDER, UNREAD_MESSAGES_TO_RENDER } from "./Constants"
-import * as _isEqual from "lodash.isequal"
-import * as _assign from "lodash.assign"
-import { v4 as uuidv4 } from "uuid"
-import { AuthUserInterface } from "Components/UserAuth/Session/WithAuthentication/@Types"
+  MessageInterface,
+} from '../../@Types'
 
 export type ACTIONTYPES =
-  | { type: "updateActiveChat"; payload: { chatKey: string; contactKey: string } }
+  | { type: 'updateActiveChat'; payload: { chatKey: string; contactKey: string } }
   // Unread Messages //
   | {
-      type: "updateContactUnreadMessages"
+      type: 'updateContactUnreadMessages'
       payload: { unreadMessages: string[]; chatKey: string }
     }
   | {
-      type: "updateAuthUserUnreadMessages"
+      type: 'updateAuthUserUnreadMessages'
       payload: {
         chatKey: string
         unreadMessages: string[]
@@ -30,91 +30,91 @@ export type ACTIONTYPES =
         markAsRead?: boolean
       }
     }
-  | { type: "handleGoDown"; payload: { unreadMessages: string[] } }
-  | { type: "updateRerenderUnreadMessagesStart" }
-  //////
-  ////// Messages Handling
-  //////
+  | { type: 'handleGoDown'; payload: { unreadMessages: string[] } }
+  | { type: 'updateRerenderUnreadMessagesStart' }
+  /// ///
+  /// /// Messages Handling
+  /// ///
   | {
-      type: "setInitialMessages"
+      type: 'setInitialMessages'
       payload: { messagesData: MessageInterface[]; startIndex?: number; endIndex?: number; chatKey: string }
     }
   // Messages Rendering //
-  | { type: "renderMessagesOnLoad"; payload: { startIndex?: number; endIndex?: number; chatKey: string } }
-  | { type: "loadTopMessages"; payload: { newTopMessages: MessageInterface[] } }
-  | { type: "renderTopMessages"; payload: { unreadMessagesAuthRef: string[]; chatKey: string } }
-  | { type: "renderBottomMessages"; payload: { unreadMessagesAuthRef: string[]; chatKey: string } }
+  | { type: 'renderMessagesOnLoad'; payload: { startIndex?: number; endIndex?: number; chatKey: string } }
+  | { type: 'loadTopMessages'; payload: { newTopMessages: MessageInterface[] } }
+  | { type: 'renderTopMessages'; payload: { unreadMessagesAuthRef: string[]; chatKey: string } }
+  | { type: 'renderBottomMessages'; payload: { unreadMessagesAuthRef: string[]; chatKey: string } }
   // Messages Adding //
   | {
-      type: "addNewMessage"
-      payload: { newMessage: MessageInterface; chatKey: string; authUser: AuthUserInterface["authUser"] | null }
+      type: 'addNewMessage'
+      payload: { newMessage: MessageInterface; chatKey: string; authUser: AuthUserInterface['authUser'] | null }
     }
   // Messages Removing //
-  | { type: "removeAllMessages"; payload: { chatKey: string } }
-  | { type: "removeMessages"; payload: { removedMessages: MessageInterface[]; chatKey: string } }
+  | { type: 'removeAllMessages'; payload: { chatKey: string } }
+  | { type: 'removeMessages'; payload: { removedMessages: MessageInterface[]; chatKey: string } }
   | {
-      type: "updateMsgDeletionProcess"
+      type: 'updateMsgDeletionProcess'
       payload: { messageDeletionProcess: boolean; deletedMessages: MessageInterface[] }
     }
-  | { type: "updateMsgDeletionProcessLoading"; payload: { messageDeletionProcess: boolean } }
+  | { type: 'updateMsgDeletionProcessLoading'; payload: { messageDeletionProcess: boolean } }
   // Messages Editing //
-  | { type: "editMessage"; payload: { editedMessage: MessageInterface; chatKey: string } }
+  | { type: 'editMessage'; payload: { editedMessage: MessageInterface; chatKey: string } }
 
   // Messages Selection //
-  | { type: "updateSelectedMessages"; payload: { messageKey: string; chatKey: string } }
-  | { type: "clearSelectedMessages"; payload: { chatKey: string } }
+  | { type: 'updateSelectedMessages'; payload: { messageKey: string; chatKey: string } }
+  | { type: 'clearSelectedMessages'; payload: { chatKey: string } }
 
   // Message Input //
-  | { type: "updateMessageInput"; payload: MessageInputInterface }
+  | { type: 'updateMessageInput'; payload: MessageInputInterface }
 
   // Handle Popups //
-  | { type: "updateMessagePopup"; payload: string }
-  | { type: "updateOptionsPopupContactList"; payload: string }
-  | { type: "updateOptionsPopupChatWindow"; payload: string }
-  | { type: "closePopups"; payload: string }
+  | { type: 'updateMessagePopup'; payload: string }
+  | { type: 'updateOptionsPopupContactList'; payload: string }
+  | { type: 'updateOptionsPopupChatWindow'; payload: string }
+  | { type: 'closePopups'; payload: string }
 
   // Contacts Handling //
   | {
-      type: "updateContactsInitial"
+      type: 'updateContactsInitial'
       payload: {
         contacts: ContactsInterface
         unreadMessages: { [key: string]: string[] }
         unreadMessagesContacts: { [key: string]: string[] }
       }
     }
-  | { type: "updateContacts"; payload: { contacts: ContactInfoInterface[] } }
-  | { type: "removeContactCleanUp"; payload: { chatKey: string; contactKey: string } }
+  | { type: 'updateContacts'; payload: { contacts: ContactInfoInterface[] } }
+  | { type: 'removeContactCleanUp'; payload: { chatKey: string; contactKey: string } }
 
   // Group Chat Handling //
   | {
-      type: "updateGroupMembers"
+      type: 'updateGroupMembers'
       payload: {
         removeMember: boolean
         newMember: { key: string; userName?: string; lastSeen?: number | string | null; chatKey?: string }
       }
     }
   | {
-      type: "updateGroupCreation"
+      type: 'updateGroupCreation'
       payload: { isActive?: boolean; selectNameActive?: boolean; groupName?: string; error?: string; loading?: boolean }
     }
-  | { type: "finishGroupCreation"; payload: { newGroupChatKey: string; groupName: string } }
-  | { type: "updateGroupInfoSettings"; payload?: { isActive: boolean } }
+  | { type: 'finishGroupCreation'; payload: { newGroupChatKey: string; groupName: string } }
+  | { type: 'updateGroupInfoSettings'; payload?: { isActive: boolean } }
   | {
-      type: "updateGroupChatParticipants"
+      type: 'updateGroupChatParticipants'
       payload: { participants: string[]; chatKey: string }
     }
 
   // Status Handling //
-  | { type: "updateContactsStatus"; payload: { status: ContactStatusInterface; chatKey: string } }
+  | { type: 'updateContactsStatus'; payload: { status: ContactStatusInterface; chatKey: string } }
   | {
-      type: "updateGroupChatMembersStatus"
+      type: 'updateGroupChatMembersStatus'
       payload: { membersStatus: MembersStatusGroupChatInterface[]; chatKey: string }
     }
 
   // Other //
-  | { type: "updateLastScrollPosition"; payload: { scrollTop: number; chatKey: string } }
-  | { type: "updateConfirmModal"; payload: { isActive: boolean; function: string; contactKey?: string } }
-  | { type: "updateContactsPageIsOpen"; payload: { isPageOpen: boolean | null; chatKey: string } }
+  | { type: 'updateLastScrollPosition'; payload: { scrollTop: number; chatKey: string } }
+  | { type: 'updateConfirmModal'; payload: { isActive: boolean; function: string; contactKey?: string } }
+  | { type: 'updateContactsPageIsOpen'; payload: { isPageOpen: boolean | null; chatKey: string } }
 
 const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
   const {
@@ -139,37 +139,37 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
     firebaseListeners,
     groupInfoSettingsActive,
     rerenderUnreadMessagesStart,
-    markAsRead
+    markAsRead,
   } = state
 
   switch (action.type) {
-    case "updateActiveChat": {
+    case 'updateActiveChat': {
       return {
         ...state,
         activeChat: action.payload,
-        groupInfoSettingsActive: false
+        groupInfoSettingsActive: false,
       }
     }
 
-    case "updateContactUnreadMessages": {
+    case 'updateContactUnreadMessages': {
       if (messageDeletionProcess) return { ...state }
       return {
         ...state,
         contactsUnreadMessages: {
           ...contactsUnreadMessages,
-          [action.payload.chatKey]: action.payload.unreadMessages
+          [action.payload.chatKey]: action.payload.unreadMessages,
         },
         firebaseListeners: {
           ...firebaseListeners,
           contactUnreadMessages: {
             ...firebaseListeners.contactUnreadMessages,
-            [action.payload.chatKey]: true
-          }
-        }
+            [action.payload.chatKey]: true,
+          },
+        },
       }
     }
 
-    case "updateAuthUserUnreadMessages": {
+    case 'updateAuthUserUnreadMessages': {
       const messagesData = messages[activeChat.chatKey]
       if (_isEqual(authUserUnreadMessages[action.payload.chatKey]?.sort(), action.payload.unreadMessages?.sort())) {
         return { ...state }
@@ -179,108 +179,106 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         ...state,
         authUserUnreadMessages: {
           ...authUserUnreadMessages,
-          [action.payload.chatKey]: action.payload.unreadMessages
+          [action.payload.chatKey]: action.payload.unreadMessages,
         },
         renderedMessagesList: {
           ...renderedMessagesList,
           [action.payload.chatKey]: action.payload.resetRenderedMessages
             ? messagesData.slice(-MESSAGES_TO_RENDER)
-            : renderedMessagesList[action.payload.chatKey]
+            : renderedMessagesList[action.payload.chatKey],
         },
         rerenderUnreadMessagesStart: action.payload.rerenderUnreadMessagesStart
           ? uuidv4()
           : rerenderUnreadMessagesStart,
-        markAsRead: action.payload.markAsRead ? uuidv4() : markAsRead
+        markAsRead: action.payload.markAsRead ? uuidv4() : markAsRead,
       }
     }
 
-    case "handleGoDown": {
+    case 'handleGoDown': {
       const messagesData = messages[activeChat.chatKey]
       const renderedMessages = renderedMessagesList[activeChat.chatKey].map((message) => message.key)
-      const unreadMessages = action.payload.unreadMessages
+      const { unreadMessages } = action.payload
 
       if (!action.payload.unreadMessages.length) {
         return {
           ...state,
           renderedMessagesList: {
             ...renderedMessagesList,
-            [activeChat.chatKey]: messagesData.slice(-MESSAGES_TO_RENDER)
+            [activeChat.chatKey]: messagesData.slice(-MESSAGES_TO_RENDER),
           },
           authUserUnreadMessages: {
             ...authUserUnreadMessages,
-            [activeChat.chatKey]: []
-          }
-        }
-      } else {
-        if (action.payload.unreadMessages.some((message) => renderedMessages.includes(message))) {
-          return {
-            ...state,
-            renderedMessagesList: {
-              ...renderedMessagesList,
-              [activeChat.chatKey]: messagesData.slice(-MESSAGES_TO_RENDER)
-            },
-            authUserUnreadMessages: {
-              ...authUserUnreadMessages,
-              [activeChat.chatKey]: []
-            },
-            rerenderUnreadMessagesStart: messages[activeChat.chatKey][0].key
-          }
-        } else {
-          const endIndex = messagesData.length - Math.max(unreadMessages.length! - UNREAD_MESSAGES_TO_RENDER, 0)
-          const startIndex = Math.max(endIndex - MESSAGES_TO_RENDER, 0)
-          return {
-            ...state,
-            renderedMessagesList: {
-              ...renderedMessagesList,
-              [activeChat.chatKey]: messagesData.slice(startIndex, endIndex)
-            },
-            authUserUnreadMessages: {
-              ...authUserUnreadMessages,
-              [activeChat.chatKey]: unreadMessages
-            },
-            rerenderUnreadMessagesStart: uuidv4()
-          }
+            [activeChat.chatKey]: [],
+          },
         }
       }
-    }
-
-    case "updateRerenderUnreadMessagesStart": {
+      if (action.payload.unreadMessages.some((message) => renderedMessages.includes(message))) {
+        return {
+          ...state,
+          renderedMessagesList: {
+            ...renderedMessagesList,
+            [activeChat.chatKey]: messagesData.slice(-MESSAGES_TO_RENDER),
+          },
+          authUserUnreadMessages: {
+            ...authUserUnreadMessages,
+            [activeChat.chatKey]: [],
+          },
+          rerenderUnreadMessagesStart: messages[activeChat.chatKey][0].key,
+        }
+      }
+      const endIndex = messagesData.length - Math.max(unreadMessages.length! - UNREAD_MESSAGES_TO_RENDER, 0)
+      const startIndex = Math.max(endIndex - MESSAGES_TO_RENDER, 0)
       return {
         ...state,
-        rerenderUnreadMessagesStart: uuidv4()
+        renderedMessagesList: {
+          ...renderedMessagesList,
+          [activeChat.chatKey]: messagesData.slice(startIndex, endIndex),
+        },
+        authUserUnreadMessages: {
+          ...authUserUnreadMessages,
+          [activeChat.chatKey]: unreadMessages,
+        },
+        rerenderUnreadMessagesStart: uuidv4(),
       }
     }
 
-    case "setInitialMessages": {
+    case 'updateRerenderUnreadMessagesStart': {
+      return {
+        ...state,
+        rerenderUnreadMessagesStart: uuidv4(),
+      }
+    }
+
+    case 'setInitialMessages': {
       const { startIndex, endIndex } = action.payload
       return {
         ...state,
         messages: {
           ...messages,
-          [action.payload.chatKey]: action.payload.messagesData
+          [action.payload.chatKey]: action.payload.messagesData,
         },
         renderedMessagesList: {
           ...renderedMessagesList,
-          [action.payload.chatKey]: action.payload.messagesData.slice(startIndex, endIndex)
+          [action.payload.chatKey]: action.payload.messagesData.slice(startIndex, endIndex),
         },
-        initialMsgLoadedFinished: [...initialMsgLoadedFinished, action.payload.chatKey]
+        initialMsgLoadedFinished: [...initialMsgLoadedFinished, action.payload.chatKey],
       }
     }
 
-    case "renderMessagesOnLoad": {
+    case 'renderMessagesOnLoad': {
       return {
         ...state,
         renderedMessagesList: {
           ...renderedMessagesList,
           [action.payload.chatKey]: messages[action.payload.chatKey].slice(
             action.payload.startIndex,
-            action.payload.endIndex
-          )
-        }
+            action.payload.endIndex,
+          ),
+        },
       }
     }
 
-    case "loadTopMessages": {
+    case 'loadTopMessages': {
       const newTopMessagesKeys = action.payload.newTopMessages.map((item) => item.key)
       const messagesaDataKeys = messages[activeChat.chatKey].map((item) => item.key)
       if (messagesaDataKeys.some((key) => newTopMessagesKeys.includes(key))) {
@@ -290,12 +288,12 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         ...state,
         messages: {
           ...messages,
-          [activeChat.chatKey]: [...action.payload.newTopMessages, ...messages[activeChat.chatKey]]
-        }
+          [activeChat.chatKey]: [...action.payload.newTopMessages, ...messages[activeChat.chatKey]],
+        },
       }
     }
 
-    case "renderTopMessages": {
+    case 'renderTopMessages': {
       if (messages[activeChat.chatKey][0]?.key === renderedMessagesList[activeChat.chatKey][0]?.key) {
         return { ...state }
       }
@@ -303,7 +301,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
       const indexStart = Math.max(
         messages[activeChat.chatKey].findIndex((item) => item.key === renderedMessagesList[activeChat.chatKey][0].key) -
           (MESSAGES_TO_RENDER - (MESSAGES_TO_RENDER - 25)),
-        0
+        0,
       )
       const indexEnd = indexStart + MESSAGES_TO_RENDER
 
@@ -311,21 +309,21 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         ...state,
         renderedMessagesList: {
           ...renderedMessagesList,
-          [activeChat.chatKey]: messages[activeChat.chatKey].slice(indexStart, indexEnd)
+          [activeChat.chatKey]: messages[activeChat.chatKey].slice(indexStart, indexEnd),
         },
         authUserUnreadMessages: {
           ...authUserUnreadMessages,
-          [action.payload.chatKey]: action.payload.unreadMessagesAuthRef
+          [action.payload.chatKey]: action.payload.unreadMessagesAuthRef,
         },
         rerenderUnreadMessagesStart: !renderedMessagesList[activeChat.chatKey]
           .map((item) => item.key)
           .includes(action.payload.unreadMessagesAuthRef[0])
           ? uuidv4()
-          : rerenderUnreadMessagesStart
+          : rerenderUnreadMessagesStart,
       }
     }
 
-    case "renderBottomMessages": {
+    case 'renderBottomMessages': {
       const messagesData = messages[activeChat.chatKey]
       const renderedMessages = renderedMessagesList[activeChat.chatKey]
 
@@ -337,9 +335,9 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         Math.max(
           messagesData.findIndex((item) => item.key === renderedMessages[renderedMessages.length - 1].key) +
             (MESSAGES_TO_RENDER - (MESSAGES_TO_RENDER - 25)),
-          MESSAGES_TO_RENDER
+          MESSAGES_TO_RENDER,
         ),
-        messagesData.length
+        messagesData.length,
       )
       const indexStart = indexEnd - MESSAGES_TO_RENDER
 
@@ -347,22 +345,22 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         ...state,
         renderedMessagesList: {
           ...renderedMessagesList,
-          [activeChat.chatKey]: messages[activeChat.chatKey].slice(indexStart, indexEnd)
+          [activeChat.chatKey]: messages[activeChat.chatKey].slice(indexStart, indexEnd),
         },
         authUserUnreadMessages: {
           ...authUserUnreadMessages,
-          [action.payload.chatKey]: action.payload.unreadMessagesAuthRef
-        }
+          [action.payload.chatKey]: action.payload.unreadMessagesAuthRef,
+        },
       }
     }
 
-    case "addNewMessage": {
+    case 'addNewMessage': {
       const messagesData = messages[action.payload.chatKey]
       const lastMessage = messagesData[messagesData.length - 1]
       const renderedMessages = renderedMessagesList[action.payload.chatKey]
       const lastRenderedMessage = renderedMessages[renderedMessages.length - 1]
       const unreadMessages = authUserUnreadMessages[action.payload.chatKey] || []
-      const authUser = action.payload.authUser
+      const { authUser } = action.payload
 
       if (activeChat.chatKey !== action.payload.chatKey) {
         if (!lastMessage || !lastRenderedMessage) {
@@ -370,19 +368,19 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
             ...state,
             messages: {
               ...messages,
-              [action.payload.chatKey]: [...messagesData, action.payload.newMessage]
+              [action.payload.chatKey]: [...messagesData, action.payload.newMessage],
             },
             renderedMessagesList: {
               ...renderedMessagesList,
-              [action.payload.chatKey]: [...messagesData, action.payload.newMessage]
+              [action.payload.chatKey]: [...messagesData, action.payload.newMessage],
             },
             authUserUnreadMessages: {
               ...authUserUnreadMessages,
               [action.payload.chatKey]:
                 authUser?.uid !== action.payload.newMessage.sender
                   ? [...unreadMessages, action.payload.newMessage.key]
-                  : unreadMessages
-            }
+                  : unreadMessages,
+            },
           }
         }
         if (lastMessage.key !== lastRenderedMessage.key) {
@@ -390,142 +388,139 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
             ...state,
             messages: {
               ...messages,
-              [action.payload.chatKey]: [...messagesData, action.payload.newMessage]
+              [action.payload.chatKey]: [...messagesData, action.payload.newMessage],
             },
             authUserUnreadMessages: {
               ...authUserUnreadMessages,
               [action.payload.chatKey]:
                 authUser?.uid !== action.payload.newMessage.sender
                   ? [...unreadMessages, action.payload.newMessage.key]
-                  : unreadMessages
-            }
-          }
-        } else {
-          const endIndexRender =
-            [...messagesData, action.payload.newMessage].length - (unreadMessages.length - UNREAD_MESSAGES_TO_RENDER)
-          const startIndexRender = Math.max(endIndexRender - MESSAGES_TO_RENDER, 0)
-          return {
-            ...state,
-            messages: {
-              ...messages,
-              [action.payload.chatKey]: [...messagesData, action.payload.newMessage]
+                  : unreadMessages,
             },
-            renderedMessagesList: {
-              ...renderedMessagesList,
-              [action.payload.chatKey]: [...messagesData, action.payload.newMessage].slice(
-                startIndexRender,
-                endIndexRender
-              )
-            },
-            authUserUnreadMessages: {
-              ...authUserUnreadMessages,
-              [action.payload.chatKey]:
-                authUser?.uid !== action.payload.newMessage.sender
-                  ? [...unreadMessages, action.payload.newMessage.key]
-                  : unreadMessages
-            },
-            lastScrollPosition: {
-              ...lastScrollPosition,
-              [action.payload.chatKey]: undefined
-            }
           }
         }
-      } else {
-        if (!lastMessage || !lastRenderedMessage) {
-          return {
-            ...state,
-            messages: {
-              ...messages,
-              [action.payload.chatKey]: [...messagesData, action.payload.newMessage]
-            },
-            renderedMessagesList: {
-              ...renderedMessagesList,
-              [action.payload.chatKey]: [...messagesData, action.payload.newMessage]
-            },
-            authUserUnreadMessages: {
-              ...authUserUnreadMessages,
-              [action.payload.chatKey]:
-                authUser?.uid !== action.payload.newMessage.sender
-                  ? [...unreadMessages, action.payload.newMessage.key]
-                  : unreadMessages
-            }
-          }
-        }
-        if (lastMessage.key !== lastRenderedMessage.key) {
-          return {
-            ...state,
-            messages: {
-              ...messages,
-              [action.payload.chatKey]: [...messagesData, action.payload.newMessage]
-            },
-            authUserUnreadMessages: {
-              ...authUserUnreadMessages,
-              [action.payload.chatKey]:
-                authUser?.uid !== action.payload.newMessage.sender
-                  ? [...unreadMessages, action.payload.newMessage.key]
-                  : unreadMessages
-            }
-          }
-        } else {
-          return {
-            ...state,
-            messages: {
-              ...messages,
-              [action.payload.chatKey]: [...messagesData, action.payload.newMessage]
-            },
-            renderedMessagesList: {
-              ...renderedMessagesList,
-              [action.payload.chatKey]: [...messagesData, action.payload.newMessage].slice(
-                -MESSAGES_TO_RENDER - unreadMessages.length
-              )
-            },
-            authUserUnreadMessages: {
-              ...authUserUnreadMessages,
-              [action.payload.chatKey]:
-                authUser?.uid !== action.payload.newMessage.sender
-                  ? [...unreadMessages, action.payload.newMessage.key]
-                  : []
-            }
-          }
+        const endIndexRender =
+          [...messagesData, action.payload.newMessage].length - (unreadMessages.length - UNREAD_MESSAGES_TO_RENDER)
+        const startIndexRender = Math.max(endIndexRender - MESSAGES_TO_RENDER, 0)
+        return {
+          ...state,
+          messages: {
+            ...messages,
+            [action.payload.chatKey]: [...messagesData, action.payload.newMessage],
+          },
+          renderedMessagesList: {
+            ...renderedMessagesList,
+            [action.payload.chatKey]: [...messagesData, action.payload.newMessage].slice(
+              startIndexRender,
+              endIndexRender,
+            ),
+          },
+          authUserUnreadMessages: {
+            ...authUserUnreadMessages,
+            [action.payload.chatKey]:
+              authUser?.uid !== action.payload.newMessage.sender
+                ? [...unreadMessages, action.payload.newMessage.key]
+                : unreadMessages,
+          },
+          lastScrollPosition: {
+            ...lastScrollPosition,
+            [action.payload.chatKey]: undefined,
+          },
         }
       }
-    }
-
-    case "removeAllMessages": {
-      const inputRef = document.querySelector(".chat-window__input-message") as HTMLElement
-      if (inputRef) inputRef.innerHTML = ""
+      if (!lastMessage || !lastRenderedMessage) {
+        return {
+          ...state,
+          messages: {
+            ...messages,
+            [action.payload.chatKey]: [...messagesData, action.payload.newMessage],
+          },
+          renderedMessagesList: {
+            ...renderedMessagesList,
+            [action.payload.chatKey]: [...messagesData, action.payload.newMessage],
+          },
+          authUserUnreadMessages: {
+            ...authUserUnreadMessages,
+            [action.payload.chatKey]:
+              authUser?.uid !== action.payload.newMessage.sender
+                ? [...unreadMessages, action.payload.newMessage.key]
+                : unreadMessages,
+          },
+        }
+      }
+      if (lastMessage.key !== lastRenderedMessage.key) {
+        return {
+          ...state,
+          messages: {
+            ...messages,
+            [action.payload.chatKey]: [...messagesData, action.payload.newMessage],
+          },
+          authUserUnreadMessages: {
+            ...authUserUnreadMessages,
+            [action.payload.chatKey]:
+              authUser?.uid !== action.payload.newMessage.sender
+                ? [...unreadMessages, action.payload.newMessage.key]
+                : unreadMessages,
+          },
+        }
+      }
       return {
         ...state,
         messages: {
           ...messages,
-          [action.payload.chatKey]: []
+          [action.payload.chatKey]: [...messagesData, action.payload.newMessage],
         },
         renderedMessagesList: {
           ...renderedMessagesList,
-          [action.payload.chatKey]: []
+          [action.payload.chatKey]: [...messagesData, action.payload.newMessage].slice(
+            -MESSAGES_TO_RENDER - unreadMessages.length,
+          ),
         },
         authUserUnreadMessages: {
           ...authUserUnreadMessages,
-          [action.payload.chatKey]: []
+          [action.payload.chatKey]:
+            authUser?.uid !== action.payload.newMessage.sender
+              ? [...unreadMessages, action.payload.newMessage.key]
+              : [],
+        },
+      }
+    }
+
+    case 'removeAllMessages': {
+      const inputRef = document.querySelector('.chat-window__input-message') as HTMLElement
+      if (inputRef) inputRef.innerHTML = ''
+      return {
+        ...state,
+        messages: {
+          ...messages,
+          [action.payload.chatKey]: [],
+        },
+        renderedMessagesList: {
+          ...renderedMessagesList,
+          [action.payload.chatKey]: [],
+        },
+        authUserUnreadMessages: {
+          ...authUserUnreadMessages,
+          [action.payload.chatKey]: [],
         },
         rerenderUnreadMessagesStart: uuidv4(),
         selectedMessages: {
           ...selectedMessages,
-          [action.payload.chatKey]: []
+          [action.payload.chatKey]: [],
         },
         messagesInput: {
           ...messagesInput,
           [action.payload.chatKey]: {
-            message: "",
+            message: '',
             anchorOffset: 0,
             scrollTop: 0,
-            editingMsgKey: null
-          }
-        }
+            editingMsgKey: null,
+          },
+        },
       }
     }
 
-    case "removeMessages": {
+    case 'removeMessages': {
       const messagesData = messages[action.payload.chatKey]
       if (!messagesData.length) {
         return { ...state }
@@ -533,72 +528,72 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
       const removedMessagesKeys = action.payload.removedMessages.map((message) => message.key)
       const renderedMessages = renderedMessagesList[action.payload.chatKey]
       const endIndex = messagesData.findIndex(
-        (message: MessageInterface) => message.key === renderedMessages[renderedMessages.length - 1].key
+        (message: MessageInterface) => message.key === renderedMessages[renderedMessages.length - 1].key,
       )
       const startIndex = Math.max(endIndex + 1 - (MESSAGES_TO_RENDER + removedMessagesKeys.length), 0)
 
-      const inputRef = document.querySelector(".chat-window__input-message") as HTMLElement
+      const inputRef = document.querySelector('.chat-window__input-message') as HTMLElement
       let messageInput = {}
       const currentMessageEdit = messagesInput[activeChat.chatKey]?.editingMsgKey
       if (currentMessageEdit && removedMessagesKeys.includes(currentMessageEdit)) {
         messageInput = {
-          message: "",
+          message: '',
           anchorOffset: 0,
           scrollTop: 0,
-          editingMsgKey: null
+          editingMsgKey: null,
         }
-        if (inputRef) inputRef.innerHTML = ""
+        if (inputRef) inputRef.innerHTML = ''
       }
 
       return {
         ...state,
         messages: {
           ...messages,
-          [action.payload.chatKey]: [...messagesData.filter((message) => !removedMessagesKeys.includes(message.key))]
+          [action.payload.chatKey]: [...messagesData.filter((message) => !removedMessagesKeys.includes(message.key))],
         },
         contactsUnreadMessages: {
           ...contactsUnreadMessages,
           [action.payload.chatKey]: contactsUnreadMessages[action.payload.chatKey]?.filter(
-            (message) => !removedMessagesKeys.includes(message)
-          )
+            (message) => !removedMessagesKeys.includes(message),
+          ),
         },
         renderedMessagesList: {
           ...renderedMessagesList,
           [action.payload.chatKey]: [
             ...messagesData
               .filter((message) => !removedMessagesKeys.includes(message.key))
-              .slice(startIndex, endIndex + 1)
-          ]
+              .slice(startIndex, endIndex + 1),
+          ],
         },
         selectedMessages: {
           ...selectedMessages,
           [action.payload.chatKey]: selectedMessages[action.payload.chatKey]?.filter(
-            (messageKey) => !removedMessagesKeys.includes(messageKey)
-          )
+            (messageKey) => !removedMessagesKeys.includes(messageKey),
+          ),
         },
         messagesInput: {
           ...messagesInput,
           [action.payload.chatKey]: {
             ...messagesInput[activeChat.chatKey],
-            ...messageInput
-          }
-        }
+            ...messageInput,
+          },
+        },
       }
     }
 
-    case "updateMsgDeletionProcess": {
-      const inputRef = document.querySelector(".chat-window__input-message") as HTMLElement
+    case 'updateMsgDeletionProcess': {
+      const inputRef = document.querySelector('.chat-window__input-message') as HTMLElement
       const deletedMessagesData = action.payload.deletedMessages.map((message) => message.key)
       const currentMessageEdit = messagesInput[activeChat.chatKey]?.editingMsgKey
       let messageInput = {}
       if (currentMessageEdit && deletedMessagesData.includes(currentMessageEdit)) {
         messageInput = {
-          message: "",
+          message: '',
           anchorOffset: 0,
           scrollTop: 0,
-          editingMsgKey: null
+          editingMsgKey: null,
         }
-        if (inputRef) inputRef.innerHTML = ""
+        if (inputRef) inputRef.innerHTML = ''
       }
 
       return {
@@ -608,30 +603,30 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
           ...messagesInput,
           [activeChat.chatKey]: {
             ...messagesInput[activeChat.chatKey],
-            ...messageInput
-          }
-        }
+            ...messageInput,
+          },
+        },
       }
     }
 
-    case "updateMsgDeletionProcessLoading": {
+    case 'updateMsgDeletionProcessLoading': {
       return {
         ...state,
-        messageDeletionProcess: action.payload.messageDeletionProcess
+        messageDeletionProcess: action.payload.messageDeletionProcess,
       }
     }
 
-    case "editMessage": {
+    case 'editMessage': {
       const prevStateMessages = [...messages[action.payload.chatKey]]
       const editededMessageIndex = prevStateMessages.findIndex(
-        (message) => message.key === action.payload.editedMessage.key
+        (message) => message.key === action.payload.editedMessage.key,
       )
       prevStateMessages[editededMessageIndex] =
         editededMessageIndex !== -1 ? action.payload.editedMessage : prevStateMessages[editededMessageIndex]
 
       const prevStateRenderedMessages = [...renderedMessagesList[action.payload.chatKey]]
       const changedRenderedMessageIndex = prevStateRenderedMessages.findIndex(
-        (message) => message.key === action.payload.editedMessage.key
+        (message) => message.key === action.payload.editedMessage.key,
       )
       prevStateRenderedMessages[changedRenderedMessageIndex] =
         changedRenderedMessageIndex !== -1
@@ -642,16 +637,16 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         ...state,
         messages: {
           ...messages,
-          [action.payload.chatKey]: prevStateMessages
+          [action.payload.chatKey]: prevStateMessages,
         },
         renderedMessagesList: {
           ...renderedMessagesList,
-          [action.payload.chatKey]: prevStateRenderedMessages
-        }
+          [action.payload.chatKey]: prevStateRenderedMessages,
+        },
       }
     }
 
-    case "updateSelectedMessages": {
+    case 'updateSelectedMessages': {
       const { messageKey, chatKey } = action.payload
       const messagesData = selectedMessages[chatKey] || []
       const selectedMessagesData = messagesData?.includes(messageKey)
@@ -662,76 +657,76 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         ...state,
         selectedMessages: {
           ...selectedMessages,
-          [chatKey]: selectedMessagesData
-        }
+          [chatKey]: selectedMessagesData,
+        },
       }
     }
 
-    case "clearSelectedMessages": {
+    case 'clearSelectedMessages': {
       return {
         ...state,
         selectedMessages: {
           ...selectedMessages,
-          [action.payload.chatKey]: []
-        }
+          [action.payload.chatKey]: [],
+        },
       }
     }
 
-    case "updateMessageInput": {
+    case 'updateMessageInput': {
       return {
         ...state,
         messagesInput: {
           ...messagesInput,
           [activeChat.chatKey]: {
             ...messagesInput[activeChat.chatKey],
-            ...action.payload
-          }
+            ...action.payload,
+          },
         },
-        messagePopup: action.payload.editingMsgKey !== null ? "" : messagePopup
+        messagePopup: action.payload.editingMsgKey !== null ? '' : messagePopup,
       }
     }
 
-    case "updateMessagePopup": {
+    case 'updateMessagePopup': {
       return {
         ...state,
-        messagePopup: messagePopup === action.payload ? "" : action.payload
+        messagePopup: messagePopup === action.payload ? '' : action.payload,
       }
     }
 
-    case "updateOptionsPopupContactList": {
+    case 'updateOptionsPopupContactList': {
       return {
         ...state,
-        optionsPopupContactList: optionsPopupContactList === action.payload ? "" : action.payload
+        optionsPopupContactList: optionsPopupContactList === action.payload ? '' : action.payload,
       }
     }
 
-    case "updateOptionsPopupChatWindow": {
+    case 'updateOptionsPopupChatWindow': {
       return {
         ...state,
-        optionsPopupChatWindow: optionsPopupChatWindow === action.payload ? "" : action.payload
+        optionsPopupChatWindow: optionsPopupChatWindow === action.payload ? '' : action.payload,
       }
     }
 
-    case "closePopups": {
+    case 'closePopups': {
       return {
         ...state,
-        optionsPopupContactList: "",
-        optionsPopupChatWindow: ""
+        optionsPopupContactList: '',
+        optionsPopupChatWindow: '',
       }
     }
 
-    case "updateContactsInitial": {
+    case 'updateContactsInitial': {
       const authUnreadMerged = _assign({}, action.payload.unreadMessages, authUserUnreadMessages)
       const contactsUnreadMerged = _assign({}, action.payload.unreadMessagesContacts, contactsUnreadMessages)
       return {
         ...state,
         contacts: action.payload.contacts,
         authUserUnreadMessages: authUnreadMerged,
-        contactsUnreadMessages: contactsUnreadMerged
+        contactsUnreadMessages: contactsUnreadMerged,
       }
     }
 
-    case "updateContacts": {
+    case 'updateContacts': {
       action.payload.contacts.reverse()
       const contactsData = action.payload.contacts.reduce((acc: ContactsInterface, contact: ContactInfoInterface) => {
         acc[contact.key] = { ...contacts[contact.key], ...contact }
@@ -749,26 +744,26 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         ...state,
         contacts: contactsData,
         authUserUnreadMessages: authUserUnreadMessagesData,
-        contactsUnreadMessages: contactsUnreadMessagesData
+        contactsUnreadMessages: contactsUnreadMessagesData,
       }
     }
 
-    case "removeContactCleanUp": {
+    case 'removeContactCleanUp': {
       return {
         ...state,
         activeChat: {
-          chatKey: activeChat.chatKey === action.payload.chatKey ? "" : activeChat.chatKey,
-          contactKey: activeChat.contactKey === action.payload.contactKey ? "" : activeChat.contactKey
+          chatKey: activeChat.chatKey === action.payload.chatKey ? '' : activeChat.chatKey,
+          contactKey: activeChat.contactKey === action.payload.contactKey ? '' : activeChat.contactKey,
         },
         groupCreation: {
           ...groupCreation,
-          members: groupCreation.members.filter((member) => member.key !== action.payload.contactKey)
-        }
+          members: groupCreation.members.filter((member) => member.key !== action.payload.contactKey),
+        },
       }
     }
 
-    case "updateGroupMembers": {
-      const newMember = action.payload.newMember
+    case 'updateGroupMembers': {
+      const { newMember } = action.payload
       const currentMembers = groupCreation.members
 
       if (action.payload.removeMember) {
@@ -776,82 +771,81 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
           ...state,
           groupCreation: {
             ...groupCreation,
-            members: currentMembers.filter((member) => member.key !== newMember.key)
-          }
-        }
-      } else {
-        return {
-          ...state,
-          groupCreation: {
-            ...groupCreation,
-            members: [...currentMembers, newMember]
-          }
+            members: currentMembers.filter((member) => member.key !== newMember.key),
+          },
         }
       }
-    }
-
-    case "updateGroupCreation": {
       return {
         ...state,
         groupCreation: {
           ...groupCreation,
-          ...action.payload
-        }
+          members: [...currentMembers, newMember],
+        },
       }
     }
 
-    case "finishGroupCreation": {
+    case 'updateGroupCreation': {
       return {
         ...state,
         groupCreation: {
-          ...INITIAL_STATE.groupCreation
+          ...groupCreation,
+          ...action.payload,
+        },
+      }
+    }
+
+    case 'finishGroupCreation': {
+      return {
+        ...state,
+        groupCreation: {
+          ...INITIAL_STATE.groupCreation,
         },
         activeChat: {
           chatKey: action.payload.newGroupChatKey,
-          contactKey: action.payload.newGroupChatKey
+          contactKey: action.payload.newGroupChatKey,
         },
-        groupInfoSettingsActive: false
+        groupInfoSettingsActive: false,
       }
     }
 
-    case "updateGroupInfoSettings": {
+    case 'updateGroupInfoSettings': {
       return {
         ...state,
-        groupInfoSettingsActive: action.payload ? action.payload.isActive : !groupInfoSettingsActive
+        groupInfoSettingsActive: action.payload ? action.payload.isActive : !groupInfoSettingsActive,
       }
     }
 
-    case "updateGroupChatParticipants": {
+    case 'updateGroupChatParticipants': {
       return {
         ...state,
         chatParticipants: {
           ...chatParticipants,
-          [action.payload.chatKey]: action.payload.participants
-        }
+          [action.payload.chatKey]: action.payload.participants,
+        },
       }
     }
 
-    case "updateContactsStatus": {
+    case 'updateContactsStatus': {
       return {
         ...state,
         contactsStatus: {
           ...contactsStatus,
-          [action.payload.chatKey]: action.payload.status
-        }
+          [action.payload.chatKey]: action.payload.status,
+        },
       }
     }
 
-    case "updateGroupChatMembersStatus": {
+    case 'updateGroupChatMembersStatus': {
       return {
         ...state,
         chatMembersStatus: {
           ...chatMembersStatus,
-          [action.payload.chatKey]: action.payload.membersStatus
-        }
+          [action.payload.chatKey]: action.payload.membersStatus,
+        },
       }
     }
 
-    case "updateLastScrollPosition": {
+    case 'updateLastScrollPosition': {
       if (activeChat.chatKey !== action.payload.chatKey) {
         return { ...state }
       }
@@ -859,32 +853,32 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
         ...state,
         lastScrollPosition: {
           ...lastScrollPosition,
-          [action.payload.chatKey]: action.payload.scrollTop
-        }
+          [action.payload.chatKey]: action.payload.scrollTop,
+        },
       }
     }
 
-    case "updateConfirmModal": {
+    case 'updateConfirmModal': {
       return {
         ...state,
         confirmModal: {
           isActive: action.payload.isActive,
           function: action.payload.function,
-          contactKey: action.payload.contactKey
-        }
+          contactKey: action.payload.contactKey,
+        },
       }
     }
 
-    case "updateContactsPageIsOpen":
+    case 'updateContactsPageIsOpen':
       return {
         ...state,
         contactsStatus: {
           ...contactsStatus,
           [action.payload.chatKey]: {
             ...contactsStatus[action.payload.chatKey],
-            pageIsOpen: action.payload.isPageOpen
-          }
-        }
+            pageIsOpen: action.payload.isPageOpen,
+          },
+        },
       }
 
     default:
@@ -896,43 +890,43 @@ export const INITIAL_STATE = {
   authUserUnreadMessages: {},
   contactsUnreadMessages: {},
   activeChat: {
-    chatKey: "",
-    contactKey: ""
+    chatKey: '',
+    contactKey: '',
   },
   groupCreation: {
     isActive: false,
     selectNameActive: false,
-    groupName: "",
-    error: "",
+    groupName: '',
+    error: '',
     loading: false,
-    members: []
+    members: [],
   },
   messages: {},
   initialMsgLoadedFinished: [],
   selectedMessages: {},
   messagesInput: {},
   renderedMessagesList: {},
-  rerenderUnreadMessagesStart: "",
-  markAsRead: "",
+  rerenderUnreadMessagesStart: '',
+  markAsRead: '',
   contacts: {},
   lastScrollPosition: {},
-  messagePopup: "",
-  optionsPopupContactList: "",
-  optionsPopupChatWindow: "",
-  messagesListRef: "",
+  messagePopup: '',
+  optionsPopupContactList: '',
+  optionsPopupChatWindow: '',
+  messagesListRef: '',
   contactsStatus: {},
   chatMembersStatus: {},
   chatParticipants: {},
   confirmModal: {
     isActive: false,
-    function: "",
-    contactKey: ""
+    function: '',
+    contactKey: '',
   },
   messageDeletionProcess: false,
   firebaseListeners: {
-    contactUnreadMessages: {}
+    contactUnreadMessages: {},
   },
-  groupInfoSettingsActive: false
+  groupInfoSettingsActive: false,
 }
 
 export default reducer

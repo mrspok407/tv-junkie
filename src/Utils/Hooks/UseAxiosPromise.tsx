@@ -1,8 +1,9 @@
-import { useState, useEffect, useCallback } from "react"
-import useMemoized from "./UseMemoized"
-import axios from "axios"
+import { useState, useEffect, useCallback } from 'react'
+import axios from 'axios'
+import useMemoized from './UseMemoized'
 
-const { CancelToken } = require("axios")
+const { CancelToken } = require('axios')
+
 let cancelRequest: any
 
 type Props = {
@@ -18,13 +19,11 @@ type Props = {
 const useAxiosPromise = ({ content, fullRerenderDeps, disable }: Props) => {
   const [promiseData, setPromiseData] = useState<{ promise: Promise<any>; id: number | string; seasonNum: number }>()
 
-  const axiosGet = (url: string) => {
-    return axios.get(url, {
-      cancelToken: new CancelToken(function executor(c: any) {
+  const axiosGet = (url: string) => axios.get(url, {
+      cancelToken: new CancelToken((c: any) => {
         cancelRequest = c
-      })
+      }),
     })
-  }
 
   const memoizedCallback = useMemoized<Promise<any>, string>({ deps: [fullRerenderDeps], callback: axiosGet })
 
@@ -34,15 +33,13 @@ const useAxiosPromise = ({ content, fullRerenderDeps, disable }: Props) => {
     setPromiseData({
       promise,
       id: content.id,
-      seasonNum: content.seasonNum
+      seasonNum: content.seasonNum,
     })
   }, [content.id, disable, memoizedCallback]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => {
-    return () => {
+  useEffect(() => () => {
       if (cancelRequest !== undefined) cancelRequest()
-    }
-  }, [fullRerenderDeps])
+    }, [fullRerenderDeps])
 
   return promiseData
 }

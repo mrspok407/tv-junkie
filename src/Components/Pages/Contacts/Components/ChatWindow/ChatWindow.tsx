@@ -1,35 +1,35 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState, useRef, useCallback, useLayoutEffect, useMemo } from "react"
-import classNames from "classnames"
-import MessageInfo from "./Components/MessageInfo/MessageInfo"
-import { throttle, debounce } from "throttle-debounce"
-import { debounce as debounceWithFlush } from "debounce"
-import useLoadTopMessages from "./FirebaseHelpers/UseLoadTopMessages"
-import useIntersectionObserver from "./Hooks/UseIntersectionObserver"
-import useFirstRenderMessages from "./Hooks/UseFirstRenderMessages"
-import useResizeObserver from "./Hooks/UseResizeObserver"
-import { MessageInterface } from "../../@Types"
-import { convertTimeStampToDate } from "Utils"
-import useShowFloatDate from "./Hooks/UseShowFloatDate"
-import usePageFocusHandler from "./Hooks/UsePageFocusHandler"
-import MessageInput from "./Components/Input/MessageInput"
-import useContactListeners from "./Hooks/UseContactListeners"
-import useFrequentVariables from "../../../../../Utils/Hooks/UseFrequentVariables"
-import MessagesList from "./Components/MessagesList/GroupChat/MessagesListGroupChat"
-import ContactInfo from "./Components/ContactInfo/ContactInfo"
-import GroupInfoSettings from "../GroupChat/GroupInfoSettings/GroupInfoSettings"
-import NewRequestOptions from "./Components/NewRequestOptions/NewRequestOptions"
-import InfoMessage from "./Components/MessagesList/GroupChat/Components/NewMembersMessages/InfoMessage"
-import * as Bowser from "bowser"
-import useFirebaseReferences from "../../Hooks/UseFirebaseReferences"
-import "./ChatWindow.scss"
+import React, { useEffect, useState, useRef, useCallback, useLayoutEffect, useMemo } from 'react'
+import classNames from 'classnames'
+import { throttle, debounce } from 'throttle-debounce'
+import { debounce as debounceWithFlush } from 'debounce'
+import { convertTimeStampToDate } from 'Utils'
+import * as Bowser from 'bowser'
+import MessageInfo from './Components/MessageInfo/MessageInfo'
+import useLoadTopMessages from './FirebaseHelpers/UseLoadTopMessages'
+import useIntersectionObserver from './Hooks/UseIntersectionObserver'
+import useFirstRenderMessages from './Hooks/UseFirstRenderMessages'
+import useResizeObserver from './Hooks/UseResizeObserver'
+import { MessageInterface } from '../../@Types'
+import useShowFloatDate from './Hooks/UseShowFloatDate'
+import usePageFocusHandler from './Hooks/UsePageFocusHandler'
+import MessageInput from './Components/Input/MessageInput'
+import useContactListeners from './Hooks/UseContactListeners'
+import useFrequentVariables from '../../../../../Utils/Hooks/UseFrequentVariables'
+import MessagesList from './Components/MessagesList/GroupChat/MessagesListGroupChat'
+import ContactInfo from './Components/ContactInfo/ContactInfo'
+import GroupInfoSettings from '../GroupChat/GroupInfoSettings/GroupInfoSettings'
+import NewRequestOptions from './Components/NewRequestOptions/NewRequestOptions'
+import InfoMessage from './Components/MessagesList/GroupChat/Components/NewMembersMessages/InfoMessage'
+import useFirebaseReferences from '../../Hooks/UseFirebaseReferences'
+import './ChatWindow.scss'
 
 const browser = Bowser.getParser(window.navigator.userAgent)
-const DEBOUNCE_THROTTLE_DELAY = browser.getBrowserName() === "Firefox" ? 500 : 150
+const DEBOUNCE_THROTTLE_DELAY = browser.getBrowserName() === 'Firefox' ? 500 : 150
 
 const throttleDebounceMap: any = {
   throttle,
-  debounce
+  debounce,
 }
 
 const ChatWindow: React.FC = () => {
@@ -46,7 +46,7 @@ const ChatWindow: React.FC = () => {
     firebaseListeners,
     groupInfoSettingsActive,
     rerenderUnreadMessagesStart,
-    markAsRead
+    markAsRead,
   } = contactsState
   const messagesData = messages[activeChat.chatKey]
   const renderedMessages = renderedMessagesList[activeChat.chatKey] || []
@@ -61,7 +61,7 @@ const ChatWindow: React.FC = () => {
   const [chatContainerRef, setChatContainerRef] = useState<HTMLDivElement>(null!)
 
   const unreadMessagesAuthRef = useRef<string[]>([])
-  const [unreadMsgsListenerChatKey, setUnreadMsgsListenerChatKey] = useState("")
+  const [unreadMsgsListenerChatKey, setUnreadMsgsListenerChatKey] = useState('')
   const isScrolledFirstRenderRef = useRef(false)
   const isScrollBottomRef = useRef(false)
 
@@ -76,26 +76,26 @@ const ChatWindow: React.FC = () => {
   const { loadTopMessages, loadingTopMessages } = useLoadTopMessages()
   const { pageInFocus } = usePageFocusHandler({ activeChat })
   const { onMouseEnter } = useIntersectionObserver({
-    chatContainerRef: chatContainerRef,
+    chatContainerRef,
     unreadMessagesAuth: unreadMessagesAuthRef.current,
     unreadMsgsListenerChatKey,
     pageInFocus,
-    chatWindowLoading
+    chatWindowLoading,
   })
   useResizeObserver({ chatContainerRef, isScrollBottomRef })
   useFirstRenderMessages({
     messages: messagesData,
-    renderedMessages: renderedMessages,
+    renderedMessages,
     unreadMessages: unreadMessagesAuth,
-    chatKey: activeChat.chatKey
+    chatKey: activeChat.chatKey,
   })
   const { contactLastActivity } = useContactListeners()
 
   const getContainerRect = () => {
-    const height = chatContainerRef.getBoundingClientRect().height
-    const scrollHeight = chatContainerRef.scrollHeight
-    const scrollTop = chatContainerRef.scrollTop
-    const top = chatContainerRef.getBoundingClientRect().top
+    const { height } = chatContainerRef.getBoundingClientRect()
+    const { scrollHeight } = chatContainerRef
+    const { scrollTop } = chatContainerRef
+    const { top } = chatContainerRef.getBoundingClientRect()
 
     const thresholdTopLoad = scrollHeight - (scrollHeight - 1500)
     const thresholdTopRender = scrollHeight - (scrollHeight - 1200)
@@ -121,10 +121,10 @@ const ChatWindow: React.FC = () => {
       if (scrollHeight <= height) return
 
       const firstRenderedMessageIndex = messagesRef?.current.findIndex(
-        (item) => item.key === renderedMessagesRef?.current[0]?.key
+        (item) => item.key === renderedMessagesRef?.current[0]?.key,
       )
       const lastRenderedMessageIndex = messagesRef.current.findIndex(
-        (item) => item.key === renderedMessagesRef.current[renderedMessagesRef.current.length - 1]?.key
+        (item) => item.key === renderedMessagesRef.current[renderedMessagesRef.current.length - 1]?.key,
       )
 
       if (scrollTop < 1) {
@@ -143,19 +143,19 @@ const ChatWindow: React.FC = () => {
       if (scrollHeight - 25 <= scrollTop + height) {
         isScrollBottomRef.current = true
         contactsDispatch({
-          type: "updateAuthUserUnreadMessages",
-          payload: { chatKey: activeChat.chatKey, unreadMessages: [], resetRenderedMessages: true }
+          type: 'updateAuthUserUnreadMessages',
+          payload: { chatKey: activeChat.chatKey, unreadMessages: [], resetRenderedMessages: true },
         })
         let updateData: any = {}
         if (contactInfo.isGroupChat) {
           updateData = {
             [`groupChats/${activeChat.chatKey}/members/unreadMessages/${authUser?.uid!}`]: null,
-            [`groupChats/${activeChat.chatKey}/members/status/${authUser?.uid!}/chatBottom`]: true
+            [`groupChats/${activeChat.chatKey}/members/status/${authUser?.uid!}/chatBottom`]: true,
           }
         } else {
           updateData = {
             [`privateChats/${activeChat.chatKey}/members/${authUser?.uid!}/unreadMessages`]: null,
-            [`privateChats/${activeChat.chatKey}/members/${authUser?.uid!}/status/chatBottom`]: true
+            [`privateChats/${activeChat.chatKey}/members/${authUser?.uid!}/status/chatBottom`]: true,
           }
         }
         firebase.database().ref().update(updateData)
@@ -165,16 +165,16 @@ const ChatWindow: React.FC = () => {
       }
 
       contactsDispatch({
-        type: "updateLastScrollPosition",
-        payload: { scrollTop, chatKey: activeChat.chatKey }
+        type: 'updateLastScrollPosition',
+        payload: { scrollTop, chatKey: activeChat.chatKey },
       })
     }, 150),
-    [activeChat, chatContainerRef]
+    [activeChat, chatContainerRef],
   )
 
   let prevScrollTop: any
   const handleScroll = useCallback(
-    throttleDebounceMap[`${browser.getBrowserName() === "Firefox" ? "debounce" : "throttle"}`](
+    throttleDebounceMap[`${browser.getBrowserName() === 'Firefox' ? 'debounce' : 'throttle'}`](
       DEBOUNCE_THROTTLE_DELAY,
       () => {
         if (chatWindowLoading || !chatContainerRef) return
@@ -185,32 +185,30 @@ const ChatWindow: React.FC = () => {
         if (scrollTop < prevScrollTop || prevScrollTop === undefined) {
           if (scrollTop <= thresholdTopRender) {
             contactsDispatch({
-              type: "renderTopMessages",
-              payload: { unreadMessagesAuthRef: unreadMessagesAuthRef.current, chatKey: activeChat.chatKey }
+              type: 'renderTopMessages',
+              payload: { unreadMessagesAuthRef: unreadMessagesAuthRef.current, chatKey: activeChat.chatKey },
             })
           }
           if (scrollTop <= thresholdTopLoad) {
             if (loadingTopMessages) return
             loadTopMessages()
           }
-        } else {
-          if (scrollHeight <= scrollTop + height + thresholdBottomRender) {
+        } else if (scrollHeight <= scrollTop + height + thresholdBottomRender) {
             contactsDispatch({
-              type: "renderBottomMessages",
-              payload: { unreadMessagesAuthRef: unreadMessagesAuthRef.current, chatKey: activeChat.chatKey }
+              type: 'renderBottomMessages',
+              payload: { unreadMessagesAuthRef: unreadMessagesAuthRef.current, chatKey: activeChat.chatKey },
             })
           }
-        }
         prevScrollTop = scrollTop
-      }
+      },
     ),
-    [chatContainerRef, activeChat, loadTopMessages, loadingTopMessages, chatWindowLoading]
+    [chatContainerRef, activeChat, loadTopMessages, loadingTopMessages, chatWindowLoading],
   )
 
   useEffect(() => {
     const unreadMessagesListener = firebase
       .unreadMessages({ uid: authUser?.uid!, chatKey: activeChat.chatKey, isGroupChat: contactInfo.isGroupChat })
-      .on("value", (snapshot: any) => {
+      .on('value', (snapshot: any) => {
         const unreadMessagesData = !snapshot.val() ? [] : Object.keys(snapshot.val())
         unreadMessagesAuthRef.current = unreadMessagesData
         setUnreadMsgsListenerChatKey(activeChat.chatKey)
@@ -218,10 +216,10 @@ const ChatWindow: React.FC = () => {
     return () => {
       firebase
         .unreadMessages({ uid: authUser?.uid!, chatKey: activeChat.chatKey, isGroupChat: contactInfo.isGroupChat })
-        .off("value", unreadMessagesListener)
+        .off('value', unreadMessagesListener)
       contactsDispatch({
-        type: "updateAuthUserUnreadMessages",
-        payload: { chatKey: activeChat.chatKey, unreadMessages: unreadMessagesAuthRef.current }
+        type: 'updateAuthUserUnreadMessages',
+        payload: { chatKey: activeChat.chatKey, unreadMessages: unreadMessagesAuthRef.current },
       })
     }
   }, [activeChat])
@@ -235,8 +233,8 @@ const ChatWindow: React.FC = () => {
     chatContainerRef.scrollTop = 99999
 
     contactsDispatch({
-      type: "updateAuthUserUnreadMessages",
-      payload: { chatKey: activeChat.chatKey, unreadMessages: [], rerenderUnreadMessagesStart: true }
+      type: 'updateAuthUserUnreadMessages',
+      payload: { chatKey: activeChat.chatKey, unreadMessages: [], rerenderUnreadMessagesStart: true },
     })
     firebase
       .unreadMessages({ uid: authUser?.uid!, chatKey: activeChat.chatKey, isGroupChat: contactInfo.isGroupChat })
@@ -246,7 +244,7 @@ const ChatWindow: React.FC = () => {
   useLayoutEffect(() => {
     // UseEffect for first ChatWindow render or when activeChat changes
     if (!chatContainerRef || !messagesData?.length) return
-    if (![true, "removed"].includes(contactInfo.status) && !contactInfo.isGroupChat) return
+    if (![true, 'removed'].includes(contactInfo.status) && !contactInfo.isGroupChat) return
     if (isScrolledFirstRenderRef.current) return
     if (chatWindowLoading) return
 
@@ -262,23 +260,19 @@ const ChatWindow: React.FC = () => {
 
     if (firstUnreadMessageRef) {
       if (isScrollBottom) {
-        firstUnreadMessageRef?.parentElement?.scrollIntoView({ block: "start", inline: "start" })
-      } else {
-        if (isFirstBunch) {
-          firstUnreadMessageRef?.parentElement?.scrollIntoView({ block: "start", inline: "start" })
+        firstUnreadMessageRef?.parentElement?.scrollIntoView({ block: 'start', inline: 'start' })
+      } else if (isFirstBunch) {
+          firstUnreadMessageRef?.parentElement?.scrollIntoView({ block: 'start', inline: 'start' })
         } else {
           chatContainerRef.scrollTop = lastScrollPosition[activeChat.chatKey]!
         }
-      }
-    } else {
-      if (isScrollBottom) {
+    } else if (isScrollBottom) {
         chatContainerRef.scrollTop = getContainerRect().scrollHeight + getContainerRect().height
         isScrollBottomRef.current = true
         firebaseRefs.updateMemberStatus({ value: { chatBottom: true } })
       } else {
         chatContainerRef.scrollTop = lastScrollPosition[activeChat.chatKey]!
       }
-    }
     isScrolledFirstRenderRef.current = true
   }, [
     activeChat,
@@ -288,7 +282,7 @@ const ChatWindow: React.FC = () => {
     chatContainerRef,
     contactInfo,
     chatWindowLoading,
-    lastScrollPosition
+    lastScrollPosition,
   ])
 
   useLayoutEffect(() => {
@@ -306,18 +300,18 @@ const ChatWindow: React.FC = () => {
 
   useEffect(() => {
     if (!chatContainerRef) return
-    chatContainerRef.addEventListener("scroll", handleScroll)
+    chatContainerRef.addEventListener('scroll', handleScroll)
     return () => {
-      chatContainerRef.removeEventListener("scroll", handleScroll)
+      chatContainerRef.removeEventListener('scroll', handleScroll)
     }
   }, [handleScroll, chatContainerRef])
 
   useEffect(() => {
     if (!chatContainerRef) return
-    chatContainerRef.addEventListener("scroll", scrollPositionHandler)
+    chatContainerRef.addEventListener('scroll', scrollPositionHandler)
     return () => {
       scrollPositionHandler.flush()
-      chatContainerRef.removeEventListener("scroll", scrollPositionHandler)
+      chatContainerRef.removeEventListener('scroll', scrollPositionHandler)
     }
   }, [activeChat, chatContainerRef])
 
@@ -332,15 +326,13 @@ const ChatWindow: React.FC = () => {
     firebase.newContactsActivity({ uid: authUser?.uid }).child(`${contactInfo.key}`).set(null)
   }, [contactInfo])
 
-  const firstUnreadMessage = useMemo(() => {
-    return messagesData?.find((message) => message.key === unreadMessagesAuth[0])
-  }, [unreadMsgsListenerChatKey, rerenderUnreadMessagesStart, chatWindowLoading, markAsRead])
+  const firstUnreadMessage = useMemo(() => messagesData?.find((message) => message.key === unreadMessagesAuth[0]), [unreadMsgsListenerChatKey, rerenderUnreadMessagesStart, chatWindowLoading, markAsRead])
 
   return (
     <div className="chat-window-container" onMouseEnter={onMouseEnter}>
       <div
-        className={classNames("chat-window__date chat-window__date--float", {
-          "chat-window__date--float-fadein": isScrollingTop
+        className={classNames('chat-window__date chat-window__date--float', {
+          'chat-window__date--float-fadein': isScrollingTop,
         })}
       >
         {convertTimeStampToDate({ timeStamp: floatDate })}
@@ -349,23 +341,26 @@ const ChatWindow: React.FC = () => {
       {groupInfoSettingsActive && <GroupInfoSettings />}
       <ContactInfo isScrollBottomRef={isScrollBottomRef.current} />
       <div
-        className={classNames("chat-window__messages-list-container", {
-          "chat-window__messages-list-container--loading": messagesData === undefined,
-          "chat-window__messages-list-container--group-chat": contactInfo.isGroupChat
+        className={classNames('chat-window__messages-list-container', {
+          'chat-window__messages-list-container--loading': messagesData === undefined,
+          'chat-window__messages-list-container--group-chat': contactInfo.isGroupChat,
         })}
         ref={chatContainerCallback}
       >
         {contactInfo.isGroupChat ? (
           <MessagesList firstUnreadMessage={firstUnreadMessage} />
         ) : (
-          [true, "removed"].includes(contactInfo.status) &&
+          [true, 'removed'].includes(contactInfo.status) &&
           (chatWindowLoading ? (
             <div className="chat-window__loader-container">
-              <span className="chat-window__loader"></span>
+              <span className="chat-window__loader" />
             </div>
           ) : !messagesData.length ? (
             <div className="chat-window__no-messages">
-              The chat is very empty, <span>so sad</span>.
+              The chat is very empty,
+              {' '}
+              <span>so sad</span>
+              .
             </div>
           ) : (
             <div className="chat-window__messages-list">
@@ -385,8 +380,8 @@ const ChatWindow: React.FC = () => {
                     {currentMessageDate !== prevMessageDate && (
                       <div
                         key={renderedMessage.timeStamp}
-                        className={classNames("chat-window__date", {
-                          "chat-window__date--top": renderedMessage.timeStamp === prevMessage.timeStamp
+                        className={classNames('chat-window__date', {
+                          'chat-window__date--top': renderedMessage.timeStamp === prevMessage.timeStamp,
                         })}
                         data-timestamp={renderedMessage.timeStamp}
                       >
@@ -405,21 +400,21 @@ const ChatWindow: React.FC = () => {
                     )}
 
                     {renderedMessage.isRemovedFromContacts || renderedMessage.isNowContacts ? (
-                      <InfoMessage renderedMessage={renderedMessage} privateChat={true} />
+                      <InfoMessage renderedMessage={renderedMessage} privateChat />
                     ) : (
                       <div
-                        className={classNames("chat-window__message-wrapper", {
-                          "chat-window__message-wrapper--send": renderedMessage.sender === authUser?.uid,
-                          "chat-window__message-wrapper--receive": renderedMessage.sender === activeChat.contactKey,
-                          "chat-window__message-wrapper--selected": selectedMessagesData.includes(renderedMessage.key),
-                          "chat-window__message-wrapper--selection-active": selectedMessagesData.length,
-                          "chat-window__message-wrapper--first-unread": isFirstUnreadMessage
+                        className={classNames('chat-window__message-wrapper', {
+                          'chat-window__message-wrapper--send': renderedMessage.sender === authUser?.uid,
+                          'chat-window__message-wrapper--receive': renderedMessage.sender === activeChat.contactKey,
+                          'chat-window__message-wrapper--selected': selectedMessagesData.includes(renderedMessage.key),
+                          'chat-window__message-wrapper--selection-active': selectedMessagesData.length,
+                          'chat-window__message-wrapper--first-unread': isFirstUnreadMessage,
                         })}
                         onClick={() => {
                           if (!selectedMessagesData.length) return
                           contactsDispatch({
-                            type: "updateSelectedMessages",
-                            payload: { messageKey: renderedMessage.key, chatKey: activeChat.chatKey }
+                            type: 'updateSelectedMessages',
+                            payload: { messageKey: renderedMessage.key, chatKey: activeChat.chatKey },
                           })
                         }}
                       >
@@ -430,11 +425,11 @@ const ChatWindow: React.FC = () => {
                         )}
                         <div
                           className={classNames(`chat-window__message chat-window__message--${renderedMessage.key}`, {
-                            "chat-window__message--send": renderedMessage.sender === authUser?.uid,
-                            "chat-window__message--receive": renderedMessage.sender === activeChat.contactKey,
-                            "chat-window__message--last-in-bunch": renderedMessage.sender !== nextMessage?.sender,
-                            "chat-window__message--deliver-failed": renderedMessage.isDelivered === false,
-                            "chat-window__message--selected": selectedMessagesData.includes(renderedMessage.key)
+                            'chat-window__message--send': renderedMessage.sender === authUser?.uid,
+                            'chat-window__message--receive': renderedMessage.sender === activeChat.contactKey,
+                            'chat-window__message--last-in-bunch': renderedMessage.sender !== nextMessage?.sender,
+                            'chat-window__message--deliver-failed': renderedMessage.isDelivered === false,
+                            'chat-window__message--selected': selectedMessagesData.includes(renderedMessage.key),
                           })}
                           data-key={renderedMessage.key}
                         >
@@ -442,13 +437,13 @@ const ChatWindow: React.FC = () => {
                             <div
                               className="chat-window__message-text"
                               dangerouslySetInnerHTML={{
-                                __html: `${renderedMessage.message}`
+                                __html: `${renderedMessage.message}`,
                               }}
-                            ></div>
+                            />
                             <MessageInfo messageData={renderedMessage} />
                           </div>
                         </div>
-                        <button type="button" className="chat-window__select-btn"></button>
+                        <button type="button" className="chat-window__select-btn" />
                       </div>
                     )}
                   </React.Fragment>
@@ -458,7 +453,7 @@ const ChatWindow: React.FC = () => {
           ))
         )}
 
-        {[false, "rejected"].includes(contactInfo.status) && <NewRequestOptions />}
+        {[false, 'rejected'].includes(contactInfo.status) && <NewRequestOptions />}
       </div>
       {!chatWindowLoading ? (
         contactInfo.isGroupChat && !contactInfo.removedFromGroup ? (
@@ -479,7 +474,7 @@ const ChatWindow: React.FC = () => {
           )
         )
       ) : (
-        ""
+        ''
       )}
     </div>
   )

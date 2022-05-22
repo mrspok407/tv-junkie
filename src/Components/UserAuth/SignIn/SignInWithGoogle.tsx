@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useContext } from "react"
-import { useHistory } from "react-router-dom"
-import { AppContext } from "Components/AppContext/AppContextHOC"
-import { MovieInterface } from "Components/AppContext/@Types"
-import * as ROLES from "Utils/Constants/roles"
-import * as ROUTES from "Utils/Constants/routes"
-import { AuthUserGoogleSignInInterface } from "../Session/WithAuthentication/@Types"
+import React, { useState, useEffect, useContext } from 'react'
+import { useHistory } from 'react-router-dom'
+import { AppContext } from 'Components/AppContext/AppContextHOC'
+import { MovieInterface } from 'Components/AppContext/@Types'
+import * as ROLES from 'Utils/Constants/roles'
+import * as ROUTES from 'Utils/Constants/routes'
+import { AuthUserGoogleSignInInterface } from '../Session/WithAuthentication/@Types'
 
-const LOCAL_STORAGE_KEY_WATCHING_SHOWS = "watchingShowsLocalS"
-const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = "watchLaterMoviesLocalS"
+const LOCAL_STORAGE_KEY_WATCHING_SHOWS = 'watchingShowsLocalS'
+const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = 'watchLaterMoviesLocalS'
 
 const mobileLayout = 1000
 
@@ -28,7 +28,7 @@ const SignInWithGoogleForm = () => {
   }
 
   const onSubmit = (provider: any) => {
-    const signInType = windowSize < mobileLayout ? "signInWithRedirect" : "signInWithPopup"
+    const signInType = windowSize < mobileLayout ? 'signInWithRedirect' : 'signInWithPopup'
 
     context.firebase.app
       .auth()
@@ -42,7 +42,7 @@ const SignInWithGoogleForm = () => {
             username: authUser.user.displayName,
             userNameLowerCase: authUser.user.displayName.toLowerCase(),
             email: authUser.user.email,
-            role: authUser.user.email === process.env.REACT_APP_ADMIN_EMAIL ? ROLES.ADMIN : ROLES.USER
+            role: authUser.user.email === process.env.REACT_APP_ADMIN_EMAIL ? ROLES.ADMIN : ROLES.USER,
           })
           .then(() => {
             if (!authUser.additionalUserInfo.isNewUser) {
@@ -55,7 +55,7 @@ const SignInWithGoogleForm = () => {
 
             context.userContentHandler.addShowsToDatabaseOnRegister({
               shows: watchingShows,
-              uid: authUser.user.uid
+              uid: authUser.user.uid,
             })
 
             watchLaterMovies.forEach((item: MovieInterface) => {
@@ -63,7 +63,7 @@ const SignInWithGoogleForm = () => {
                 id: item.id,
                 data: item,
                 onRegister: true,
-                userOnRegister: authUser.user
+                userOnRegister: authUser.user,
               })
             })
           })
@@ -91,7 +91,7 @@ const SignInWithGoogleForm = () => {
         type="button"
         onClick={() => onSubmit(new context.firebase.app.auth.GoogleAuthProvider())}
       >
-        <div className="auth__form--google-icon"></div>
+        <div className="auth__form--google-icon" />
         <div className="auth__form--google-title">Google Sign In</div>
       </button>
     </div>

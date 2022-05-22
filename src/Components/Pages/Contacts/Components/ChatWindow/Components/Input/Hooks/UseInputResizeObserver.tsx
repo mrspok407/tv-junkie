@@ -1,6 +1,6 @@
-import { ContainerRectInterface } from "Components/Pages/Contacts/@Types"
-import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
-import { useCallback, useRef, useEffect } from "react"
+import { ContainerRectInterface } from 'Components/Pages/Contacts/@Types'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import { useCallback, useRef, useEffect } from 'react'
 
 type Props = {
   inputRef: HTMLDivElement
@@ -17,7 +17,7 @@ const useInputResizeObserver = ({ inputRef, chatContainerRef, getContainerRect }
   const handleResize = useCallback(() => {
     if (!inputRef) return
     if (!chatContainerRef) return
-    const height = inputRef.getBoundingClientRect().height
+    const { height } = inputRef.getBoundingClientRect()
     const heightDiff = height - prevHeight.current
 
     chatContainerRef.scrollTop = getContainerRect().scrollTop + Math.max(heightDiff, 0)
@@ -28,20 +28,19 @@ const useInputResizeObserver = ({ inputRef, chatContainerRef, getContainerRect }
     if (!inputRef) return
     prevHeight.current = inputRef.getBoundingClientRect().height
     if (window.ResizeObserver) {
-      let resizeObserver = new ResizeObserver(() => handleResize())
+      const resizeObserver = new ResizeObserver(() => handleResize())
       resizeObserver.observe(inputRef)
 
       return () => {
         if (!resizeObserver) return
         resizeObserver.disconnect()
       }
-    } else {
-      window.addEventListener("resize", handleResize)
+    }
+      window.addEventListener('resize', handleResize)
 
       return () => {
-        window.removeEventListener("resize", handleResize)
+        window.removeEventListener('resize', handleResize)
       }
-    }
   }, [inputRef, handleResize]) // eslint-disable-line react-hooks/exhaustive-deps
 }
 

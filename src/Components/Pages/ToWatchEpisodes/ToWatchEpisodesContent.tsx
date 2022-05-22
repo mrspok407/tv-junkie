@@ -1,16 +1,16 @@
-import React, { useCallback, useContext, useEffect, useState } from "react"
-import { Link } from "react-router-dom"
-import ShowsEpisodes from "Components/UI/Templates/SeasonsAndEpisodes/ShowsEpisodes"
-import { todayDate, combineMergeObjects, releasedEpisodesToOneArray } from "Utils"
-import Loader from "Components/UI/Placeholders/Loader"
-import PlaceholderNoToWatchEpisodes from "Components/UI/Placeholders/PlaceholderNoToWatchEpisodes"
-import merge from "deepmerge"
-import { AppContext } from "Components/AppContext/AppContextHOC"
+import React, { useCallback, useContext, useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import ShowsEpisodes from 'Components/UI/Templates/SeasonsAndEpisodes/ShowsEpisodes'
+import { todayDate, combineMergeObjects, releasedEpisodesToOneArray } from 'Utils'
+import Loader from 'Components/UI/Placeholders/Loader'
+import PlaceholderNoToWatchEpisodes from 'Components/UI/Placeholders/PlaceholderNoToWatchEpisodes'
+import merge from 'deepmerge'
+import { AppContext } from 'Components/AppContext/AppContextHOC'
 import {
   SeasonEpisodesFromDatabaseInterface,
   SingleEpisodeInterface,
-  UserShowsInterface
-} from "Components/UserContent/UseUserShows/UseUserShows"
+  UserShowsInterface,
+} from 'Components/UserContent/UseUserShows/UseUserShows'
 
 const ToWatchEpisodesContent: React.FC = () => {
   const [watchingShows, setWatchingShows] = useState<UserShowsInterface[]>([])
@@ -20,7 +20,7 @@ const ToWatchEpisodesContent: React.FC = () => {
 
   const getContent = useCallback(() => {
     const watchingShows = context.userContent.userShows.filter(
-      (show) => show.database === "watchingShows" && !show.allEpisodesWatched
+      (show) => show.database === 'watchingShows' && !show.allEpisodesWatched,
     )
     const toWatchEpisodes: any = context.userContent.userToWatchShows
 
@@ -35,7 +35,7 @@ const ToWatchEpisodesContent: React.FC = () => {
         const showToWatch = toWatchEpisodes.find((item: any) => item.id === show.id)
         if (showToWatch) {
           const showMerged = merge(show, showToWatch, {
-            arrayMerge: combineMergeObjects
+            arrayMerge: combineMergeObjects,
           })
           acc.push(showMerged)
         }
@@ -79,7 +79,7 @@ const ToWatchEpisodesContent: React.FC = () => {
             toWatchEpisodes.reverse()
 
             const releasedEpisodes: SingleEpisodeInterface[] = releasedEpisodesToOneArray({
-              data: show.episodes
+              data: show.episodes,
             })
 
             return (

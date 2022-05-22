@@ -1,7 +1,7 @@
-import React, { useState, useCallback } from "react"
-import debounce from "debounce"
-import Loader from "Components/UI/Placeholders/Loader"
-import "./SearchInput.scss"
+import React, { useState, useCallback } from 'react'
+import debounce from 'debounce'
+import Loader from 'Components/UI/Placeholders/Loader'
+import './SearchInput.scss'
 
 type Props = {
   onSearch: (query: string) => void
@@ -9,7 +9,7 @@ type Props = {
 }
 
 const SearchInput: React.FC<Props> = ({ onSearch, isSearching }) => {
-  const [query, setQuery] = useState<string>("")
+  const [query, setQuery] = useState<string>('')
 
   const _runSearch = (query: string) => {
     onSearch(query)
@@ -19,7 +19,7 @@ const SearchInput: React.FC<Props> = ({ onSearch, isSearching }) => {
     debounce((query: string) => {
       _runSearch(query)
     }, 150),
-    []
+    [],
   )
 
   const handleChange = (e: any) => {
@@ -28,8 +28,8 @@ const SearchInput: React.FC<Props> = ({ onSearch, isSearching }) => {
   }
 
   const resetSearch = () => {
-    setQuery("")
-    onSearch("")
+    setQuery('')
+    onSearch('')
   }
 
   const handleKeyDown = (e: any) => {

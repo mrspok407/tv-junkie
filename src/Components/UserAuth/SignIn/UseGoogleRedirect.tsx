@@ -1,14 +1,14 @@
-import { useEffect, useContext } from "react"
-import { FirebaseContext } from "Components/Firebase"
-import { AppContext } from "Components/AppContext/AppContextHOC"
-import { MovieInterface } from "Components/AppContext/@Types"
-import * as ROLES from "Utils/Constants/roles"
-import * as ROUTES from "Utils/Constants/routes"
-import { useHistory } from "react-router-dom"
-import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
+import { useEffect, useContext } from 'react'
+import { FirebaseContext } from 'Components/Firebase'
+import { AppContext } from 'Components/AppContext/AppContextHOC'
+import { MovieInterface } from 'Components/AppContext/@Types'
+import * as ROLES from 'Utils/Constants/roles'
+import * as ROUTES from 'Utils/Constants/routes'
+import { useHistory } from 'react-router-dom'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 
-const LOCAL_STORAGE_KEY_WATCHING_SHOWS = "watchingShowsLocalS"
-const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = "watchLaterMoviesLocalS"
+const LOCAL_STORAGE_KEY_WATCHING_SHOWS = 'watchingShowsLocalS'
+const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = 'watchLaterMoviesLocalS'
 
 const useGoogleRedirect = () => {
   const { firebase } = useFrequentVariables()
@@ -41,7 +41,7 @@ const useGoogleRedirect = () => {
             username: authUserGoogle.user.displayName,
             userNameLowerCase: authUserGoogle.user.displayName.toLowerCase(),
             email: authUserGoogle.user.email,
-            role: authUserGoogle.user.email === process.env.REACT_APP_ADMIN_EMAIL ? ROLES.ADMIN : ROLES.USER
+            role: authUserGoogle.user.email === process.env.REACT_APP_ADMIN_EMAIL ? ROLES.ADMIN : ROLES.USER,
           })
           .then(() => {
             if (!authUserGoogle.additionalUserInfo.isNewUser) {
@@ -54,7 +54,7 @@ const useGoogleRedirect = () => {
 
             context.userContentHandler.addShowsToDatabaseOnRegister({
               shows: watchingShows,
-              uid: authUserGoogle.user.uid
+              uid: authUserGoogle.user.uid,
             })
 
             watchLaterMovies.forEach((item: MovieInterface) => {
@@ -62,7 +62,7 @@ const useGoogleRedirect = () => {
                 id: item.id,
                 data: item,
                 onRegister: true,
-                userOnRegister: authUserGoogle.user
+                userOnRegister: authUserGoogle.user,
               })
             })
           })

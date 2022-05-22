@@ -1,26 +1,26 @@
-import classNames from "classnames"
-import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
-import React, { useState, useRef } from "react"
-import MembersMenu from "./Components/MembersMenu/MembersMenu"
-import NewMembersMenu from "./Components/NewMembersMenu/NewMembersMenu"
-import "./GroupInfoSettings.scss"
+import classNames from 'classnames'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import React, { useState, useRef } from 'react'
+import MembersMenu from './Components/MembersMenu/MembersMenu'
+import NewMembersMenu from './Components/NewMembersMenu/NewMembersMenu'
+import './GroupInfoSettings.scss'
 
 const GroupInfoSettings: React.FC = () => {
   const { contactsState, contactsDispatch } = useFrequentVariables()
   const { activeChat, contacts } = contactsState
   const contactInfo = contacts[activeChat.chatKey] || {}
 
-  const [currentMenu, setCurrentMenu] = useState("members")
+  const [currentMenu, setCurrentMenu] = useState('members')
 
   const groupInfoRef = useRef<HTMLDivElement>(null!)
 
   const renderMenu = () => {
     switch (currentMenu) {
-      case "members": {
+      case 'members': {
         return <MembersMenu />
       }
 
-      case "addNewMembers": {
+      case 'addNewMembers': {
         return <NewMembersMenu />
       }
     }
@@ -30,24 +30,24 @@ const GroupInfoSettings: React.FC = () => {
     <div ref={groupInfoRef} className="group-info-wrapper">
       <div className="group-info">
         <div
-          className={classNames("group-info__options", {
-            "group-info__options--admin": contactInfo.role === "ADMIN"
+          className={classNames('group-info__options', {
+            'group-info__options--admin': contactInfo.role === 'ADMIN',
           })}
         >
           <div
-            className={classNames("group-info__options-menu", {
-              "group-info__options-menu--active": currentMenu === "members"
+            className={classNames('group-info__options-menu', {
+              'group-info__options-menu--active': currentMenu === 'members',
             })}
-            onClick={() => setCurrentMenu("members")}
+            onClick={() => setCurrentMenu('members')}
           >
             Members
           </div>
-          {contactInfo.role === "ADMIN" && (
+          {contactInfo.role === 'ADMIN' && (
             <div
-              className={classNames("group-info__options-menu", {
-                "group-info__options-menu--active": currentMenu === "addNewMembers"
+              className={classNames('group-info__options-menu', {
+                'group-info__options-menu--active': currentMenu === 'addNewMembers',
               })}
-              onClick={() => setCurrentMenu("addNewMembers")}
+              onClick={() => setCurrentMenu('addNewMembers')}
             >
               Add new members
             </div>
@@ -59,8 +59,8 @@ const GroupInfoSettings: React.FC = () => {
         <button
           type="button"
           className="group-info__close-btn"
-          onClick={() => contactsDispatch({ type: "updateGroupInfoSettings", payload: { isActive: false } })}
-        ></button>
+          onClick={() => contactsDispatch({ type: 'updateGroupInfoSettings', payload: { isActive: false } })}
+        />
       </div>
     </div>
   )

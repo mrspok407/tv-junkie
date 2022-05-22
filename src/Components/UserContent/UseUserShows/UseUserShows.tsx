@@ -1,12 +1,12 @@
-import { useState, useEffect, useContext } from "react"
-import { FirebaseContext } from "Components/Firebase"
-import { AuthUserInterface } from "Components/UserAuth/Session/WithAuthentication/@Types"
-import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
-import useGetUserToWatchShows from "./Hooks/UseGetUserToWatchShows"
-import useGetUserMovies from "./Hooks/UseGetUserMovies"
-import { useAppDispatch } from "app/hooks"
+import { useState, useEffect, useContext } from 'react'
+import { FirebaseContext } from 'Components/Firebase'
+import { AuthUserInterface } from 'Components/UserAuth/Session/WithAuthentication/@Types'
+import { ContentDetailes } from 'Utils/Interfaces/ContentDetails'
+import { useAppDispatch } from 'app/hooks'
+import useGetUserToWatchShows from './Hooks/UseGetUserToWatchShows'
+import useGetUserMovies from './Hooks/UseGetUserMovies'
 
-const SESSION_STORAGE_KEY_SHOWS = "userShows"
+const SESSION_STORAGE_KEY_SHOWS = 'userShows'
 
 export interface UserShowsInterface extends ContentDetailes {
   allEpisodesWatched: boolean
@@ -81,7 +81,7 @@ const useUserShows = () => {
     let authSubscriber: any
     const authUserListener = () => {
       authSubscriber = firebase.onAuthUserListener(
-        async (authUser: AuthUserInterface["authUser"]) => {
+        async (authUser: AuthUserInterface['authUser']) => {
           if (!authUser?.uid) return
 
           // await updateUserEpisodesFromDatabase({ firebase })
@@ -155,7 +155,7 @@ const useUserShows = () => {
             listener.off()
           })
           setLoadingShows(false)
-        }
+        },
       )
     }
 
@@ -202,7 +202,7 @@ const useUserShows = () => {
     loadingNotFinishedShows,
     loadingMovies,
     handleUserMoviesOnClient,
-    resetContentState
+    resetContentState,
   }
 }
 

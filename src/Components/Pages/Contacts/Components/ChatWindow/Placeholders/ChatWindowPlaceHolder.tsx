@@ -1,5 +1,5 @@
-import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
-import React, { useEffect } from "react"
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import React, { useEffect } from 'react'
 
 type Props = {
   contactKey: string
@@ -22,7 +22,7 @@ const ChatWindowPlaceHolder: React.FC<Props> = ({ contactKey, text }) => {
           type="button"
           onClick={(e) => {
             e.stopPropagation()
-            contactsDispatch({ type: "updateActiveChat", payload: { chatKey: "", contactKey: "" } })
+            contactsDispatch({ type: 'updateActiveChat', payload: { chatKey: '', contactKey: '' } })
           }}
         >
           Go back

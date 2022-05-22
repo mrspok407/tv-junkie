@@ -1,21 +1,21 @@
-import { useState } from "react"
+import { useState } from 'react'
 import {
   AddShowsToDatabaseOnRegisterArg,
   AddShowToDatabaseArg,
   HandleMovieInDatabasesArg,
-  HandleShowInDatabasesArg
-} from "Components/AppContext/@Types"
-import addShowFireDatabase from "./FirebaseHelpers/addShowFireDatabase"
-import getShowEpisodesFromAPI from "./TmdbAPIHelpers/getShowEpisodesFromAPI"
-import updateAllEpisodesWatched from "./UseUserShowsRed/FirebaseHelpers/updateAllEpisodesWatched"
-import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
+  HandleShowInDatabasesArg,
+} from 'Components/AppContext/@Types'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import addShowFireDatabase from './FirebaseHelpers/addShowFireDatabase'
+import getShowEpisodesFromAPI from './TmdbAPIHelpers/getShowEpisodesFromAPI'
+import updateAllEpisodesWatched from './UseUserShowsRed/FirebaseHelpers/updateAllEpisodesWatched'
 
 export const LOADING_ADDING_TO_DATABASE_INITIAL = {
   watchingShows: false,
   droppedShows: false,
   willWatchShows: false,
   notWatchingShows: false,
-  loading: false
+  loading: false,
 }
 
 const useContentHandler = () => {
@@ -26,39 +26,35 @@ const useContentHandler = () => {
 
   const addShowsToDatabaseOnRegister = ({ shows, uid }: AddShowsToDatabaseOnRegisterArg) => {
     Promise.all(
-      Object.values(shows).map((show) => {
-        return getShowEpisodesFromAPI({ id: show.id }).then((dataFromAPI: any) => {
+      Object.values(shows).map((show) => getShowEpisodesFromAPI({ id: show.id }).then((dataFromAPI: any) => {
           const showsSubDatabase =
-            dataFromAPI.status === "Ended" || dataFromAPI.status === "Canceled" ? "ended" : "ongoing"
+            dataFromAPI.status === 'Ended' || dataFromAPI.status === 'Canceled' ? 'ended' : 'ongoing'
 
           const userEpisodes = dataFromAPI.episodes.reduce(
             (acc: {}[], season: { episodes: { air_date: string }[]; season_number: number }) => {
-              const episodes = season.episodes.map((episode) => {
-                return { watched: false, userRating: 0, air_date: episode.air_date || "" }
-              })
+              const episodes = season.episodes.map((episode) => ({ watched: false, userRating: 0, air_date: episode.air_date || '' }))
 
               acc.push({ season_number: season.season_number, episodes, userRating: 0 })
               return acc
             },
-            []
+            [],
           )
 
           const showInfo = {
             allEpisodesWatched: false,
             finished: false,
-            database: "watchingShows",
+            database: 'watchingShows',
             status: showsSubDatabase,
             firstAirDate: show.first_air_date,
             name: show.name,
             timeStamp: firebase.timeStamp(),
-            id: show.id
+            id: show.id,
           }
 
           addShowFireDatabase({ firebase, showDetailes: show, showEpisodesTMDB: dataFromAPI })
 
           return { showInfo, userEpisodes }
-        })
-      })
+        })),
     )
       .then(async (data) => {
         const userShows = data.reduce((acc, show) => {
@@ -74,23 +70,21 @@ const useContentHandler = () => {
               info: {
                 allEpisodesWatched: false,
                 finished: false,
-                database: "watchingShows",
-                isAllWatched_database: `false_watchingShows`
+                database: 'watchingShows',
+                isAllWatched_database: 'false_watchingShows',
               },
-              episodes: showEpisodes
-            }
+              episodes: showEpisodes,
+            },
           }
         }, {})
 
-        const userShowsLastUpdateList = data.reduce((acc, show) => {
-          return { ...acc, [show.showInfo.id]: { lastUpdatedInUser: show.showInfo.timeStamp } }
-        }, {})
+        const userShowsLastUpdateList = data.reduce((acc, show) => ({ ...acc, [show.showInfo.id]: { lastUpdatedInUser: show.showInfo.timeStamp } }), {})
 
         await Promise.all([
           firebase.userAllShows(uid).set(userShows),
           firebase.userEpisodes(uid).set(userEpisodes, () => {
             setLoadingShowsOnRegister(false)
-          })
+          }),
         ])
         firebase.userShowsLastUpdateList(uid).set(userShowsLastUpdateList)
       })
@@ -110,31 +104,29 @@ const useContentHandler = () => {
     }
     getShowEpisodesFromAPI({ id }).then(async (showEpisodesTMDB: any) => {
       const showsSubDatabase =
-        showEpisodesTMDB.status === "Ended" || showEpisodesTMDB.status === "Canceled" ? "ended" : "ongoing"
+        showEpisodesTMDB.status === 'Ended' || showEpisodesTMDB.status === 'Canceled' ? 'ended' : 'ongoing'
 
       const userEpisodes = showEpisodesTMDB.episodes.reduce(
         (acc: {}[], season: { episodes: { air_date: string }[]; season_number: number }) => {
-          const episodes = season.episodes.map((episode) => {
-            return { watched: false, userRating: 0, air_date: episode.air_date || "" }
-          })
+          const episodes = season.episodes.map((episode) => ({ watched: false, userRating: 0, air_date: episode.air_date || '' }))
 
           acc.push({ season_number: season.season_number, episodes, userRating: 0 })
           return acc
         },
-        []
+        [],
       )
 
       await addShowFireDatabase({ firebase, showDetailes: show, showEpisodesTMDB })
       await Promise.all([
         firebase.userAllShows(authUser.uid).child(id).set({
           allEpisodesWatched: false,
-          database: database,
+          database,
           status: showsSubDatabase,
           firstAirDate: show.first_air_date,
           name: show.name,
           timeStamp: firebase.timeStamp(),
           finished: false,
-          id
+          id,
         }),
         firebase
           .userEpisodes(authUser.uid)
@@ -143,20 +135,20 @@ const useContentHandler = () => {
             {
               episodes: userEpisodes,
               info: {
-                database: database,
+                database,
                 allEpisodesWatched: false,
                 isAllWatched_database: `false_${database}`,
-                finished: false
-              }
+                finished: false,
+              },
             },
             () => {
               setLoadingAddShowToDatabase(LOADING_ADDING_TO_DATABASE_INITIAL)
-            }
-          )
+            },
+          ),
       ])
 
       firebase.userShowsLastUpdateList(authUser.uid).child(id).set({
-        lastUpdatedInUser: firebase.timeStamp()
+        lastUpdatedInUser: firebase.timeStamp(),
       })
 
       if (handleListeners) handleListeners({ id, status: showEpisodesTMDB.status })
@@ -169,7 +161,7 @@ const useContentHandler = () => {
 
     if (userShow) {
       firebase.userShow({ uid: authUser.uid, key: id }).update({
-        database
+        database,
       })
 
       firebase
@@ -177,11 +169,11 @@ const useContentHandler = () => {
         .update(
           {
             database,
-            isAllWatched_database: `${userShow.allEpisodesWatched}_${database}`
+            isAllWatched_database: `${userShow.allEpisodesWatched}_${database}`,
           },
           () => {
-            if (database === "watchingShows") updateAllEpisodesWatched({ firebase, authUser, key: id })
-          }
+            if (database === 'watchingShows') updateAllEpisodesWatched({ firebase, authUser, key: id })
+          },
         )
         .catch((error: any) => {
           console.log(`Error in database occured. ${error}`)
@@ -189,18 +181,18 @@ const useContentHandler = () => {
 
       firebase
         .showFullData(id)
-        .child("usersWatching")
-        .once("value", (snapshot: any) => {
+        .child('usersWatching')
+        .once('value', (snapshot: any) => {
           const currentUsersWatching = snapshot.val()
           const prevDatabase = userShow.database
 
           firebase.showFullData(id).update({
             usersWatching:
-              database === "watchingShows"
+              database === 'watchingShows'
                 ? currentUsersWatching + 1
-                : prevDatabase !== "watchingShows"
+                : prevDatabase !== 'watchingShows'
                 ? currentUsersWatching
-                : currentUsersWatching - 1
+                : currentUsersWatching - 1,
           })
         })
     } else {
@@ -220,7 +212,7 @@ const useContentHandler = () => {
     firebase
       .watchLaterMovies(user.uid)
       .child(id)
-      .once("value", (snapshot: any) => {
+      .once('value', (snapshot: any) => {
         if (snapshot.val() !== null) {
           firebase.watchLaterMovies(user.uid).child(id).set(null)
         } else {
@@ -233,7 +225,7 @@ const useContentHandler = () => {
             backdrop_path: movie.backdrop_path,
             overview: movie.overview,
             genre_ids: movie.genre_ids,
-            timeStamp: firebase.timeStamp()
+            timeStamp: firebase.timeStamp(),
           })
         }
       })
@@ -246,7 +238,7 @@ const useContentHandler = () => {
     handleMovieInDatabases,
     handleLoadingShowsOnRegister,
     loadingAddShowToDatabase,
-    loadingShowsOnRegister
+    loadingShowsOnRegister,
   }
 }
 

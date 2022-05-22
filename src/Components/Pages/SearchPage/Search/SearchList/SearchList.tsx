@@ -1,9 +1,9 @@
 /* eslint-disable jsx-a11y/mouse-events-have-key-events */
-import PlaceholderNoResults from "Components/UI/Placeholders/PlaceholderNoResults"
-import React, { useEffect } from "react"
-import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
-import SearchCard from "./SearchCard"
-import "./SearchList.scss"
+import PlaceholderNoResults from 'Components/UI/Placeholders/PlaceholderNoResults'
+import React, { useEffect } from 'react'
+import { ContentDetailes } from 'Utils/Interfaces/ContentDetails'
+import SearchCard from './SearchCard'
+import './SearchList.scss'
 
 type Props = {
   searchResults: ContentDetailes[]
@@ -26,13 +26,13 @@ const SearchList: React.FC<Props> = ({
   listIsOpen,
   query,
   isSearchingList,
-  error
+  error,
 }) => {
   useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside as EventListener)
+    document.addEventListener('mousedown', handleClickOutside as EventListener)
 
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside as EventListener)
+      document.removeEventListener('mousedown', handleClickOutside as EventListener)
     }
     // eslint-disable-next-line
   }, [])
@@ -41,23 +41,21 @@ const SearchList: React.FC<Props> = ({
     <div className="search-list">
       {error ? (
         <div className="error">
-          <p>{error || "Something gone terrible wrong"}</p>
+          <p>{error || 'Something gone terrible wrong'}</p>
         </div>
-      ) : searchResults.length === 0 && query !== "" && listIsOpen && !isSearchingList ? (
+      ) : searchResults.length === 0 && query !== '' && listIsOpen && !isSearchingList ? (
         <PlaceholderNoResults message="No results found" />
       ) : (
-        searchResults.map((item, index) => {
-          return (
-            <SearchCard
-              key={item.id}
-              detailes={item}
-              closeList={closeList}
-              currentListItem={currentListItem}
-              index={index}
-              mediaTypeSearching={mediaTypeSearching}
-            />
-          )
-        })
+        searchResults.map((item, index) => (
+          <SearchCard
+            key={item.id}
+            detailes={item}
+            closeList={closeList}
+            currentListItem={currentListItem}
+            index={index}
+            mediaTypeSearching={mediaTypeSearching}
+          />
+          ))
       )}
     </div>
   )

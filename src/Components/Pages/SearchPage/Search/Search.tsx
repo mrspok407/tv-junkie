@@ -1,14 +1,14 @@
-import React, { useState, useEffect, useRef } from "react"
-import axios from "axios"
-import { Link, useHistory } from "react-router-dom"
-import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
-import * as _isFunction from "lodash.isfunction"
-import * as ROUTES from "Utils/Constants/routes"
-import SearchList from "./SearchList/SearchList"
-import Input from "./Input/Input"
-import "./Search.scss"
+import React, { useState, useEffect, useRef } from 'react'
+import axios from 'axios'
+import { Link, useHistory } from 'react-router-dom'
+import { ContentDetailes } from 'Utils/Interfaces/ContentDetails'
+import * as _isFunction from 'lodash.isfunction'
+import * as ROUTES from 'Utils/Constants/routes'
+import SearchList from './SearchList/SearchList'
+import Input from './Input/Input'
+import './Search.scss'
 
-const { CancelToken } = require("axios")
+const { CancelToken } = require('axios')
 
 let cancelRequest: any
 
@@ -24,34 +24,32 @@ export interface HandleSearchArg {
 }
 
 const Search: React.FC<Props> = ({ navSearch, navRef, closeNavMobile }) => {
-  const [query, setQuery] = useState("")
+  const [query, setQuery] = useState('')
   const [searchResults, setSearchResults] = useState<ContentDetailes[]>([])
   const [isSearchingList, setIsSearchingList] = useState(false)
   const [listIsOpen, setListIsOpen] = useState(false)
   const [currentListItem, setCurrentListItem] = useState(0)
-  const [mediaTypeSearching, setMediaTypeSearching] = useState("")
-  const [error, setError] = useState("")
+  const [mediaTypeSearching, setMediaTypeSearching] = useState('')
+  const [error, setError] = useState('')
 
   const searchContRef = useRef<HTMLDivElement>(null)
   const history = useHistory()
 
-  useEffect(() => {
-    return () => {
+  useEffect(() => () => {
       if (cancelRequest !== undefined) {
         cancelRequest()
       }
-    }
-  }, [])
+    }, [])
 
   const handleSearch = ({ query, mediatype }: HandleSearchArg) => {
     if (cancelRequest !== undefined) {
       cancelRequest()
     }
     if (!query || !query.trim()) {
-      setQuery("")
+      setQuery('')
       setSearchResults([])
       setIsSearchingList(false)
-      setError("")
+      setError('')
       return
     }
 
@@ -64,10 +62,10 @@ const Search: React.FC<Props> = ({ navSearch, navRef, closeNavMobile }) => {
           process.env.REACT_APP_TMDB_API
         }&query=${query}`,
         {
-          cancelToken: new CancelToken(function executor(c: any) {
+          cancelToken: new CancelToken((c: any) => {
             cancelRequest = c
-          })
-        }
+          }),
+        },
       )
       .then(({ data: { results } }) => {
         const content = [...results]
@@ -81,7 +79,7 @@ const Search: React.FC<Props> = ({ navSearch, navRef, closeNavMobile }) => {
         if (axios.isCancel(err)) return
         setSearchResults([])
         setIsSearchingList(false)
-        setError("Something went wrong")
+        setError('Something went wrong')
       })
   }
 
@@ -94,13 +92,13 @@ const Search: React.FC<Props> = ({ navSearch, navRef, closeNavMobile }) => {
 
   const onFocus = () => {
     if (navSearch) {
-      const navItem = document.querySelectorAll(".nav__link")
-      const input = document.querySelector(".search__input")!
+      const navItem = document.querySelectorAll('.nav__link')
+      const input = document.querySelector('.search__input')!
 
-      input.classList.add("search__input--focus")
+      input.classList.add('search__input--focus')
       navItem.forEach((item) => {
-        item.classList.remove("nav__link-move-back")
-        item.classList.add("nav__link-move")
+        item.classList.remove('nav__link-move-back')
+        item.classList.add('nav__link-move')
       })
     }
 
@@ -108,13 +106,13 @@ const Search: React.FC<Props> = ({ navSearch, navRef, closeNavMobile }) => {
   }
 
   const onBlur = () => {
-    const navItem = document.querySelectorAll(".nav__link")
-    const input = document.querySelector(".search__input")!
+    const navItem = document.querySelectorAll('.nav__link')
+    const input = document.querySelector('.search__input')!
 
-    input.classList.remove("search__input--focus")
+    input.classList.remove('search__input--focus')
     navItem.forEach((item) => {
-      item.classList.remove("nav__link-move")
-      item.classList.add("nav__link-move-back")
+      item.classList.remove('nav__link-move')
+      item.classList.add('nav__link-move-back')
     })
   }
 
@@ -129,7 +127,7 @@ const Search: React.FC<Props> = ({ navSearch, navRef, closeNavMobile }) => {
     if (!listIsOpen || isSearchingList || searchResults.length === 0) return
 
     const content = searchResults[currentListItem]
-    const mediaType = content.original_title ? "movie" : content.original_name ? "show" : null
+    const mediaType = content.original_title ? 'movie' : content.original_name ? 'show' : null
 
     if (!mediaType) return
     if (searchResults.length === 0) return
@@ -181,7 +179,7 @@ const Search: React.FC<Props> = ({ navSearch, navRef, closeNavMobile }) => {
 
           {navSearch && (
             <div className="search__link-to-adv-container">
-              <Link className="search__link-to-adv" to={ROUTES.SEARCH_PAGE}></Link>
+              <Link className="search__link-to-adv" to={ROUTES.SEARCH_PAGE} />
               <span className="tooltip">Advanced search</span>
             </div>
           )}

@@ -1,17 +1,17 @@
 /* eslint-disable array-callback-return */
-import React, { useContext, useEffect, useRef, useState } from "react"
-import { differenceBtwDatesInDays, todayDate } from "Utils"
-import { Link } from "react-router-dom"
-import classNames from "classnames"
-import * as _get from "lodash.get"
-import * as ROUTES from "Utils/Constants/routes"
-import UserRating from "Components/UI/UserRating/UserRating"
-import TorrentLinksEpisodes from "./Components/TorrentLinksEpisodes"
-import { AppContext } from "Components/AppContext/AppContextHOC"
-import { SeasonEpisodesFromDatabaseInterface } from "Components/UserContent/UseUserShows/UseUserShows"
-import { EpisodesDataInterface, ShowEpisodesFromAPIInterface } from "./ShowsEpisodes"
-import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
-import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
+import React, { useContext, useEffect, useRef, useState } from 'react'
+import { differenceBtwDatesInDays, todayDate } from 'Utils'
+import { Link } from 'react-router-dom'
+import classNames from 'classnames'
+import * as _get from 'lodash.get'
+import * as ROUTES from 'Utils/Constants/routes'
+import UserRating from 'Components/UI/UserRating/UserRating'
+import { AppContext } from 'Components/AppContext/AppContextHOC'
+import { SeasonEpisodesFromDatabaseInterface } from 'Components/UserContent/UseUserShows/UseUserShows'
+import { ContentDetailes } from 'Utils/Interfaces/ContentDetails'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import { EpisodesDataInterface, ShowEpisodesFromAPIInterface } from './ShowsEpisodes'
+import TorrentLinksEpisodes from './Components/TorrentLinksEpisodes'
 
 const FADE_OUT_SPEED = 300
 
@@ -55,7 +55,7 @@ const SeasonEpisodes: React.FC<Props> = ({
   showInfo,
   showEpisodeInfo,
   toggleWatchedEpisode,
-  checkMultipleEpisodes
+  checkMultipleEpisodes,
 }) => {
   const { authUser } = useFrequentVariables()
 
@@ -69,9 +69,9 @@ const SeasonEpisodes: React.FC<Props> = ({
   const [timedOut, setTimedOut] = useState(false)
 
   useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside as EventListener)
+    document.addEventListener('mousedown', handleClickOutside as EventListener)
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside as EventListener)
+      document.removeEventListener('mousedown', handleClickOutside as EventListener)
     }
     // eslint-disable-next-line
   }, [])
@@ -115,37 +115,37 @@ const SeasonEpisodes: React.FC<Props> = ({
     }, FADE_OUT_SPEED)
   }
 
-  const showCheckboxes = showInfo?.database !== "notWatchingShows" && episodesFromDatabase?.length > 0 && true
+  const showCheckboxes = showInfo?.database !== 'notWatchingShows' && episodesFromDatabase?.length > 0 && true
 
   const showSeason = showCheckboxes && episodesFromDatabase[season.season_number - 1]
-  const seasons = parentComponent === "toWatchPage" ? episodesData : episodesDataFromAPI
+  const seasons = parentComponent === 'toWatchPage' ? episodesData : episodesDataFromAPI
 
   return (
     <div className="episodes__episode-list">
       {(seasons as Array<EpisodesDataInterface | ShowEpisodesFromAPIInterface>).map((item) => {
-        const correctSeasonId = parentComponent === "toWatchPage" ? item.id : item.seasonId
+        const correctSeasonId = parentComponent === 'toWatchPage' ? item.id : item.seasonId
 
         if (correctSeasonId !== seasonId) return null
 
         return item.episodes.map((episode, episodeIndex) => {
-          if (parentComponent === "toWatchPage" && episode.watched) return
+          if (parentComponent === 'toWatchPage' && episode.watched) return
           const indexOfEpisode: any =
-            parentComponent === "toWatchPage" ? episode.index : item.episodes.length - 1 - episodeIndex
+            parentComponent === 'toWatchPage' ? episode.index : item.episodes.length - 1 - episodeIndex
 
           // Format Date //
           const airDateISO = episode.air_date && new Date(episode.air_date).toISOString()
 
           const options: any = {
-            month: "long",
-            day: "numeric",
-            year: "numeric"
+            month: 'long',
+            day: 'numeric',
+            year: 'numeric',
           }
 
           const formatedDate = new Date(airDateISO as string)
 
           const episodeAirDate = episode.air_date
-            ? new Intl.DateTimeFormat("en-US", options).format(formatedDate as Date)
-            : "No date available"
+            ? new Intl.DateTimeFormat('en-US', options).format(formatedDate as Date)
+            : 'No date available'
           // Format Date End //
 
           const episodeAirDateAsDateObj = episode.air_date && new Date(episode.air_date)
@@ -156,26 +156,26 @@ const SeasonEpisodes: React.FC<Props> = ({
             <div
               ref={episodeRef}
               key={episode.id}
-              className={classNames("episodes__episode", {
-                "episodes__episode--open": detailEpisodeInfo.includes(episode.id as number),
-                "fade-out-episode":
-                  parentComponent === "toWatchPage" && fadeOutEpisodes.find((item: any) => item.id === episode.id)
+              className={classNames('episodes__episode', {
+                'episodes__episode--open': detailEpisodeInfo.includes(episode.id as number),
+                'fade-out-episode':
+                  parentComponent === 'toWatchPage' && fadeOutEpisodes.find((item: any) => item.id === episode.id),
               })}
             >
               <div
                 className="episodes__episode-wrapper"
-                onClick={() => parentComponent === "detailesPage" && showEpisodeInfo(episode.id as number)}
+                onClick={() => parentComponent === 'detailesPage' && showEpisodeInfo(episode.id as number)}
                 style={
                   daysToNewEpisode > 0 || !episode.air_date
                     ? {
-                        backgroundColor: "rgba(132, 90, 90, 0.3)"
+                        backgroundColor: 'rgba(132, 90, 90, 0.3)',
                       }
                     : {
-                        backgroundColor: "#1d1d1d96"
+                        backgroundColor: '#1d1d1d96',
                       }
                 }
               >
-                {parentComponent === "toWatchPage" && (
+                {parentComponent === 'toWatchPage' && (
                   <UserRating
                     id={showInfo?.id}
                     firebaseRef="userShowSingleEpisode"
@@ -188,8 +188,11 @@ const SeasonEpisodes: React.FC<Props> = ({
                 )}
                 <div className="episodes__episode-date">{episodeAirDate}</div>
                 <div className="episodes__episode-name">
-                  <span className="episodes__episode-number">{episode.episode_number}.</span>
-                  {_get(episode, "name", "-")}
+                  <span className="episodes__episode-number">
+                    {episode.episode_number}
+                    .
+                  </span>
+                  {_get(episode, 'name', '-')}
                 </div>
                 {daysToNewEpisode > 0 ? (
                   <div className="episodes__episode-days-to-air">
@@ -199,7 +202,7 @@ const SeasonEpisodes: React.FC<Props> = ({
                   episodeAirDateAsDateObj &&
                   episodeAirDateAsDateObj.getTime() < todayDate.getTime() &&
                   episode.air_date &&
-                  parentComponent === "toWatchPage" &&
+                  parentComponent === 'toWatchPage' &&
                   authUser?.email === process.env.REACT_APP_ADMIN_EMAIL && (
                     <TorrentLinksEpisodes
                       parentComponent={parentComponent}
@@ -222,12 +225,12 @@ const SeasonEpisodes: React.FC<Props> = ({
                       type="checkbox"
                       checked={_get(showSeason, `episodes.${indexOfEpisode}.watched`, false)}
                       onChange={() => {
-                        if (parentComponent === "toWatchPage") {
+                        if (parentComponent === 'toWatchPage') {
                           handleFadeOut({
-                            episodeId: _get(episode, "id") as number,
+                            episodeId: _get(episode, 'id') as number,
                             episodeIndex: indexOfEpisode,
                             seasonNum: season.season_number,
-                            rating: episode.userRating
+                            rating: episode.userRating,
                           })
                         } else {
                           toggleWatchedEpisode(season.season_number, indexOfEpisode)
@@ -236,14 +239,15 @@ const SeasonEpisodes: React.FC<Props> = ({
                       disabled={!showCheckboxes || !authUser?.uid}
                     />
                     <span
-                      className={classNames("custom-checkmark", {
-                        "custom-checkmark--disabled": !showCheckboxes || !authUser?.uid
+                      className={classNames('custom-checkmark', {
+                        'custom-checkmark--disabled': !showCheckboxes || !authUser?.uid,
                       })}
                     />
                   </label>
                   {disableCheckboxWarning === episode.id && (
                     <div ref={registerWarningRef} className="buttons__col-warning">
-                      To use full features please{" "}
+                      To use full features please
+                      {' '}
                       <Link className="buttons__col-link" to={ROUTES.LOGIN_PAGE}>
                         register
                       </Link>
@@ -255,15 +259,15 @@ const SeasonEpisodes: React.FC<Props> = ({
 
               {detailEpisodeInfo.includes(episode.id as number) && (
                 <div
-                  className={classNames("episodes__episode-detailes", {
-                    "episodes__episode-detailes--no-image": !episode.still_path
+                  className={classNames('episodes__episode-detailes', {
+                    'episodes__episode-detailes--no-image': !episode.still_path,
                   })}
                 >
                   {episode.still_path && (
                     <div
                       className="episodes__episode-detailes-image"
                       style={{
-                        backgroundImage: `url(https://image.tmdb.org/t/p/w500${episode.still_path})`
+                        backgroundImage: `url(https://image.tmdb.org/t/p/w500${episode.still_path})`,
                       }}
                     />
                   )}
@@ -279,8 +283,8 @@ const SeasonEpisodes: React.FC<Props> = ({
                             firebaseRef="userShowSingleEpisode"
                             seasonNum={season.season_number}
                             episodeNum={indexOfEpisode}
-                            episodeRating={true}
-                            disableRating={!!(showInfo?.database === "notWatchingShows")}
+                            episodeRating
+                            disableRating={!!(showInfo?.database === 'notWatchingShows')}
                           />
                         )}
                         {authUser?.email === process.env.REACT_APP_ADMIN_EMAIL && (

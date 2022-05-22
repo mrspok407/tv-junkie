@@ -1,13 +1,13 @@
-import * as React from "react"
-import { AppContextInterface, CONTEXT_INITIAL_STATE } from "Components/AppContext/@Types"
+import * as React from 'react'
+import { AppContextInterface, CONTEXT_INITIAL_STATE } from 'Components/AppContext/@Types'
 
 export enum ActionTypes {
-  IncrementLoadedShows = "incrementLoadedShows",
-  IncrementLoadedShowsLS = "incrementLoadedShowsLS",
-  DisableLoad = "disableLoad",
-  DisableLoadLS = "disableLoadLS",
-  ChangeActiveSection = "changeActiveSection",
-  UpdateContext = "updateContext"
+  IncrementLoadedShows = 'incrementLoadedShows',
+  IncrementLoadedShowsLS = 'incrementLoadedShowsLS',
+  DisableLoad = 'disableLoad',
+  DisableLoadLS = 'disableLoadLS',
+  ChangeActiveSection = 'changeActiveSection',
+  UpdateContext = 'updateContext',
 }
 
 export interface ActionInterface {
@@ -47,17 +47,17 @@ const INITIAL_STATE: ShowsContentState = {
     droppedShows: false,
     willWatchShows: false,
     finishedShows: false,
-    watchingShowsLS: false
+    watchingShowsLS: false,
   },
   loadedShows: {
     watchingShows: SHOWS_TO_LOAD_INITIAL,
     watchingShowsLS: SHOWS_TO_LOAD_INITIAL,
     droppedShows: SHOWS_TO_LOAD_INITIAL,
     willWatchShows: SHOWS_TO_LOAD_INITIAL,
-    finishedShows: SHOWS_TO_LOAD_INITIAL
+    finishedShows: SHOWS_TO_LOAD_INITIAL,
   },
-  activeSection: "watchingShows",
-  context: CONTEXT_INITIAL_STATE
+  activeSection: 'watchingShows',
+  context: CONTEXT_INITIAL_STATE,
 }
 
 const reducer: React.Reducer<ShowsContentState, ActionInterface> = (state, action) => {
@@ -69,53 +69,50 @@ const reducer: React.Reducer<ShowsContentState, ActionInterface> = (state, actio
         ...loadedShows,
         [activeSection]: !disableLoad[activeSection]
           ? loadedShows[activeSection] + SHOWS_TO_LOAD_INITIAL
-          : loadedShows[activeSection]
-      }
+          : loadedShows[activeSection],
+      },
     }
-  } else if (action.type === ActionTypes.IncrementLoadedShowsLS) {
+  } if (action.type === ActionTypes.IncrementLoadedShowsLS) {
     return {
       ...state,
       loadedShows: {
         ...loadedShows,
         watchingShowsLS: !disableLoad.watchingShowsLS
           ? loadedShows.watchingShowsLS + SHOWS_TO_LOAD_INITIAL
-          : loadedShows.watchingShowsLS
-      }
+          : loadedShows.watchingShowsLS,
+      },
     }
-  } else if (action.type === ActionTypes.DisableLoad) {
+  } if (action.type === ActionTypes.DisableLoad) {
     return {
       ...state,
       disableLoad: {
         ...disableLoad,
         [activeSection]: !!(
           loadedShows[activeSection] >=
-          context.userContent.userShows.filter((show: any) =>
-            activeSection === "finishedShows" ? !!show.finished : !!(show.database === activeSection && !show.finished)
-          ).length
-        )
-      }
+          context.userContent.userShows.filter((show: any) => (activeSection === 'finishedShows' ? !!show.finished : !!(show.database === activeSection && !show.finished))).length
+        ),
+      },
     }
-  } else if (action.type === ActionTypes.DisableLoadLS) {
+  } if (action.type === ActionTypes.DisableLoadLS) {
     return {
       ...state,
       disableLoad: {
         ...disableLoad,
-        watchingShowsLS: !!(loadedShows.watchingShowsLS >= context.userContentLocalStorage.watchingShows.length)
-      }
+        watchingShowsLS: !!(loadedShows.watchingShowsLS >= context.userContentLocalStorage.watchingShows.length),
+      },
     }
-  } else if (action.type === ActionTypes.ChangeActiveSection) {
+  } if (action.type === ActionTypes.ChangeActiveSection) {
     return {
       ...state,
-      activeSection: action.payload
+      activeSection: action.payload,
     }
-  } else if (action.type === ActionTypes.UpdateContext) {
+  } if (action.type === ActionTypes.UpdateContext) {
     return {
       ...state,
-      context: action.payload
+      context: action.payload,
     }
-  } else {
-    throw new Error()
   }
+    throw new Error()
 }
 
 export default reducer

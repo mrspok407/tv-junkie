@@ -1,8 +1,8 @@
-import classNames from "classnames"
-import { MessageInterface } from "Components/Pages/Contacts/@Types"
-import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
-import React, { useEffect } from "react"
-import useHandleMessageOptions from "./FirebaseHelpers/UseHandleMessageOptions"
+import classNames from 'classnames'
+import { MessageInterface } from 'Components/Pages/Contacts/@Types'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import React, { useEffect } from 'react'
+import useHandleMessageOptions from './FirebaseHelpers/UseHandleMessageOptions'
 
 type Props = {
   messageOptionsRef: HTMLDivElement
@@ -16,33 +16,33 @@ const MessagePopup: React.FC<Props> = ({ messageOptionsRef, messageData }) => {
   const messagesData = messages[activeChat.chatKey] || []
 
   const { selectMessage, deleteMessagePrivateChat, deleteMessageGroupChat, editMessage } = useHandleMessageOptions({
-    messageData
+    messageData,
   })
 
   useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside as EventListener)
+    document.addEventListener('mousedown', handleClickOutside as EventListener)
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside as EventListener)
+      document.removeEventListener('mousedown', handleClickOutside as EventListener)
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleClickOutside = (e: CustomEvent) => {
     if (!messageOptionsRef?.contains(e.target as Node)) {
-      contactsDispatch({ type: "updateMessagePopup", payload: "" })
+      contactsDispatch({ type: 'updateMessagePopup', payload: '' })
     }
   }
 
   return (
     <div
-      className={classNames("popup-container", {
-        "popup-container--sended-message": messageData.sender === authUser?.uid,
-        "popup-container--received-message": messageData.sender !== authUser?.uid,
-        "popup-container--messages-less-two": messagesData.length <= 2,
-        "popup-container--failed-deliver": messageData.isDelivered === false
+      className={classNames('popup-container', {
+        'popup-container--sended-message': messageData.sender === authUser?.uid,
+        'popup-container--received-message': messageData.sender !== authUser?.uid,
+        'popup-container--messages-less-two': messagesData.length <= 2,
+        'popup-container--failed-deliver': messageData.isDelivered === false,
       })}
       onClick={(e) => {
         e.stopPropagation()
-        contactsDispatch({ type: "updateMessagePopup", payload: "" })
+        contactsDispatch({ type: 'updateMessagePopup', payload: '' })
       }}
     >
       {messageData.sender === authUser?.uid && messageData.isDelivered !== false && (

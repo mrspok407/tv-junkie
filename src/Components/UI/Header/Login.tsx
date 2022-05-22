@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from "react"
-import UserAuthForm from "Components/UI/UserAuthForm/UserAuthForm"
+import React, { useState, useRef, useEffect } from 'react'
+import UserAuthForm from 'Components/UI/UserAuthForm/UserAuthForm'
 
 type Props = {
   closeNavMobile?: () => void
@@ -11,9 +11,9 @@ const Login: React.FC<Props> = ({ closeNavMobile }) => {
   const loginButtonRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside as EventListener)
+    document.addEventListener('mousedown', handleClickOutside as EventListener)
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside as EventListener)
+      document.removeEventListener('mousedown', handleClickOutside as EventListener)
     }
   }, [])
 

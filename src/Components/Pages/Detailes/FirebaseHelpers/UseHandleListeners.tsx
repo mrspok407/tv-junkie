@@ -1,10 +1,10 @@
 import {
   SeasonEpisodesFromDatabaseInterface,
-  SingleEpisodeInterface
-} from "Components/UserContent/UseUserShows/UseUserShows"
-import { useState, useEffect } from "react"
-import { releasedEpisodesToOneArray } from "Utils"
-import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
+  SingleEpisodeInterface,
+} from 'Components/UserContent/UseUserShows/UseUserShows'
+import { useState, useEffect } from 'react'
+import { releasedEpisodesToOneArray } from 'Utils'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 
 export interface HandleListenersArg {
   id: number
@@ -19,22 +19,22 @@ const useHandleListeners = ({ id }: { id: number }) => {
   const [releasedEpisodes, setReleasedEpisodes] = useState<SingleEpisodeInterface[]>([])
 
   const handleListeners = ({ id, status, handleLoading }: HandleListenersArg) => {
-    if (status === "-" || !authUser?.uid) return
+    if (status === '-' || !authUser?.uid) return
 
-    const statusDatabase = status === "Ended" || status === "Canceled" ? "ended" : "ongoing"
-    firebase.showEpisodes(id).once("value", (snapshot: { val: () => SeasonEpisodesFromDatabaseInterface[] }) => {
+    const statusDatabase = status === 'Ended' || status === 'Canceled' ? 'ended' : 'ongoing'
+    firebase.showEpisodes(id).once('value', (snapshot: { val: () => SeasonEpisodesFromDatabaseInterface[] }) => {
       if (snapshot.val() === null) {
         if (handleLoading) handleLoading(false)
         return
       }
 
       const releasedEpisodes: SingleEpisodeInterface[] = releasedEpisodesToOneArray({
-        data: snapshot.val()
+        data: snapshot.val(),
       })
 
       firebase
         .userShowAllEpisodes(authUser.uid, id)
-        .on("value", (snapshot: { val: () => SeasonEpisodesFromDatabaseInterface[] }) => {
+        .on('value', (snapshot: { val: () => SeasonEpisodesFromDatabaseInterface[] }) => {
           if (snapshot.val() === null) {
             firebase.userShowAllEpisodes(authUser.uid, id).off()
             if (handleLoading) handleLoading(false)
@@ -43,7 +43,7 @@ const useHandleListeners = ({ id }: { id: number }) => {
 
           const userEpisodes = snapshot.val()
           const allEpisodes = userEpisodes.reduce((acc: SingleEpisodeInterface[], item) => {
-            acc.push(...item.episodes.filter((item) => item.air_date !== ""))
+            acc.push(...item.episodes.filter((item) => item.air_date !== ''))
             return acc
           }, [])
           const releasedUserEpisodes = allEpisodes.slice(0, releasedEpisodes.length)
@@ -51,16 +51,16 @@ const useHandleListeners = ({ id }: { id: number }) => {
           const allEpisodesWatched = !allEpisodes.some((episode) => !episode.watched)
           const releasedEpisodesWatched = !releasedUserEpisodes.some((episode) => !episode.watched)
 
-          const finished = statusDatabase === "ended" && allEpisodesWatched ? true : false
+          const finished = !!(statusDatabase === 'ended' && allEpisodesWatched)
 
           firebase
             .userShow({ uid: authUser.uid, key: id })
-            .child("database")
-            .once("value", (snapshot: { val: () => string }) => {
+            .child('database')
+            .once('value', (snapshot: { val: () => string }) => {
               firebase.userShowAllEpisodesInfo(authUser.uid, id).update({
                 allEpisodesWatched: releasedEpisodesWatched,
                 finished,
-                isAllWatched_database: `${releasedEpisodesWatched}_${snapshot.val()}`
+                isAllWatched_database: `${releasedEpisodesWatched}_${snapshot.val()}`,
               })
             })
 
@@ -74,15 +74,13 @@ const useHandleListeners = ({ id }: { id: number }) => {
     })
   }
 
-  useEffect(() => {
-    return () => {
+  useEffect(() => () => {
       setEpisodesFromDatabase([])
       setReleasedEpisodes([])
 
       if (!authUser?.uid) return
       firebase.userShowAllEpisodes(authUser.uid, id).off()
-    }
-  }, [id, authUser, firebase])
+    }, [id, authUser, firebase])
 
   return { episodesFromDatabase, releasedEpisodes, handleListeners }
 }

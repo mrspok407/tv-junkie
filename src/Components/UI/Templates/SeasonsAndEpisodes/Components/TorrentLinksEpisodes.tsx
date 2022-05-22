@@ -1,6 +1,6 @@
-import React from "react"
-import classNames from "classnames"
-import "./TorrentLinksEpisodes.scss"
+import React from 'react'
+import classNames from 'classnames'
+import './TorrentLinksEpisodes.scss'
 
 type Props = {
   parentComponent?: string
@@ -9,17 +9,17 @@ type Props = {
   episodeNumber: number
 }
 
-const TorrentLinksEpisodes = React.memo<Props>(({ parentComponent = "", showTitle, seasonNumber, episodeNumber }) => {
-  const urlShowTitle = showTitle.split(" ").join("+")
+const TorrentLinksEpisodes = React.memo<Props>(({ parentComponent = '', showTitle, seasonNumber, episodeNumber }) => {
+  const urlShowTitle = showTitle.split(' ').join('+')
 
   const seasonToString = seasonNumber.toString()
   const episodeToString = episodeNumber.toString()
-  const urlSeasonNumber = seasonToString.length === 1 ? "s0".concat(seasonToString) : "s".concat(seasonToString)
-  const urlEpisodeNumber = episodeToString.length === 1 ? "e0".concat(episodeToString) : "e".concat(episodeToString)
+  const urlSeasonNumber = seasonToString.length === 1 ? 's0'.concat(seasonToString) : 's'.concat(seasonToString)
+  const urlEpisodeNumber = episodeToString.length === 1 ? 'e0'.concat(episodeToString) : 'e'.concat(episodeToString)
   return (
     <div
-      className={classNames("torrent-links torrent-links--episodes", {
-        "torrent-links--to-watch-page": parentComponent === "toWatchPage"
+      className={classNames('torrent-links torrent-links--episodes', {
+        'torrent-links--to-watch-page': parentComponent === 'toWatchPage',
       })}
     >
       <a

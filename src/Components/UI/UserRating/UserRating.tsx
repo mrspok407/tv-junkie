@@ -1,15 +1,15 @@
-import React, { useCallback, useContext, useEffect, useRef, useState } from "react"
-import classNames from "classnames"
-import { Link } from "react-router-dom"
-import * as ROUTES from "Utils/Constants/routes"
-import { FirebaseContext } from "Components/Firebase"
-import { SingleEpisodeInterface } from "Components/UserContent/UseUserShows/UseUserShows"
-import { AppContext } from "Components/AppContext/AppContextHOC"
-import { HandleFadeOutInterface } from "../Templates/SeasonsAndEpisodes/SeasonEpisodes"
-import "./UserRating.scss"
-import { useAppSelector } from "app/hooks"
-import { selectShowDatabase } from "Components/UserContent/UseUserShowsRed/userShowsSliceRed"
-import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
+import classNames from 'classnames'
+import { Link } from 'react-router-dom'
+import * as ROUTES from 'Utils/Constants/routes'
+import { FirebaseContext } from 'Components/Firebase'
+import { SingleEpisodeInterface } from 'Components/UserContent/UseUserShows/UseUserShows'
+import { AppContext } from 'Components/AppContext/AppContextHOC'
+import './UserRating.scss'
+import { useAppSelector } from 'app/hooks'
+import { selectShowDatabase } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import { HandleFadeOutInterface } from '../Templates/SeasonsAndEpisodes/SeasonEpisodes'
 
 const STAR_AMOUNT = 5
 
@@ -41,7 +41,7 @@ const UserRating: React.FC<Props> = ({
   showRating,
   mediaType,
   userRatingData,
-  handleFadeOut = () => {}
+  handleFadeOut = () => {},
 }) => {
   const { firebase, authUser } = useFrequentVariables()
 
@@ -52,9 +52,9 @@ const UserRating: React.FC<Props> = ({
   const showDatabase = useAppSelector((state) => selectShowDatabase(state, id))
 
   useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside as EventListener)
+    document.addEventListener('mousedown', handleClickOutside as EventListener)
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside as EventListener)
+      document.removeEventListener('mousedown', handleClickOutside as EventListener)
     }
   }, [])
 
@@ -65,14 +65,14 @@ const UserRating: React.FC<Props> = ({
   }
 
   const getRating = useCallback(() => {
-    if (firebase.auth.currentUser === null || parentComponent === "toWatchPage" || firebaseRef === "") return
+    if (firebase.auth.currentUser === null || parentComponent === 'toWatchPage' || firebaseRef === '') return
 
     firebase[firebaseRef]({
       uid: firebase.auth.currentUser.uid,
       key: Number(id),
-      seasonNum: seasonNum,
-      episodeNum: episodeNum
-    }).once("value", (snapshot: { val: () => { userRating: number } }) => {
+      seasonNum,
+      episodeNum,
+    }).once('value', (snapshot: { val: () => { userRating: number } }) => {
       if (snapshot.val() === null) return
       setUserRating(snapshot.val().userRating)
     })
@@ -85,15 +85,15 @@ const UserRating: React.FC<Props> = ({
   const onMouseMoveHandler = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (!authUser?.uid) return
     const target = e.target as HTMLButtonElement
-    const buttonsNodeList = (target.parentElement as HTMLElement).getElementsByClassName("user-rating__button")
+    const buttonsNodeList = (target.parentElement as HTMLElement).getElementsByClassName('user-rating__button')
     const currentRating = Number((e.target as HTMLButtonElement).dataset.rating)
 
     Array.from(buttonsNodeList).forEach((star, index) => {
       if (index + 1 <= currentRating) {
-        star.classList.add("user-rating__button-hovered")
+        star.classList.add('user-rating__button-hovered')
       }
       if (index + 1 > currentRating) {
-        star.classList.remove("user-rating__button-rated")
+        star.classList.remove('user-rating__button-rated')
       }
     })
   }
@@ -101,13 +101,13 @@ const UserRating: React.FC<Props> = ({
   const onMouseLeaveHandler = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (!authUser?.uid) return
     const target = e.target as HTMLButtonElement
-    const buttonsNodeList = (target.parentElement as HTMLElement).getElementsByClassName("user-rating__button")
+    const buttonsNodeList = (target.parentElement as HTMLElement).getElementsByClassName('user-rating__button')
 
     Array.from(buttonsNodeList).forEach((star, index) => {
-      star.classList.remove("user-rating__button-hovered")
+      star.classList.remove('user-rating__button-hovered')
 
       if (index + 1 <= userRating) {
-        star.classList.add("user-rating__button-rated")
+        star.classList.add('user-rating__button-rated')
       }
     })
   }
@@ -116,16 +116,16 @@ const UserRating: React.FC<Props> = ({
     if (!authUser?.uid) return
     const rating = Number((e.target as HTMLButtonElement).dataset.rating)
 
-    if (parentComponent === "toWatchPage") {
+    if (parentComponent === 'toWatchPage') {
       if (!seasonNum) return
       handleFadeOut({ episodeId, episodeIndex: episodeNum, seasonNum, rating })
     } else {
       firebase[firebaseRef]({
         uid: authUser.uid,
         key: Number(id),
-        seasonNum: seasonNum,
-        episodeNum: episodeNum
-      }).once("value", (snapshot: { val: () => SingleEpisodeInterface }) => {
+        seasonNum,
+        episodeNum,
+      }).once('value', (snapshot: { val: () => SingleEpisodeInterface }) => {
         if (snapshot.val() === null) return
 
         setUserRating(rating)
@@ -133,24 +133,24 @@ const UserRating: React.FC<Props> = ({
         firebase[firebaseRef]({
           uid: authUser.uid,
           key: Number(id),
-          seasonNum: seasonNum,
-          episodeNum: episodeNum
+          seasonNum,
+          episodeNum,
         }).update({
           userRating: rating,
-          watched: parentComponent === "toWatchPage" ? snapshot.val().watched : episodeRating ? true : null
+          watched: parentComponent === 'toWatchPage' ? snapshot.val().watched : episodeRating ? true : null,
         })
       })
     }
   }
 
   const ratingDisabled =
-    authUser?.uid === null || disableRating || (!showDatabase && showRating && mediaType !== "movie")
+    authUser?.uid === null || disableRating || (!showDatabase && showRating && mediaType !== 'movie')
 
   return (
     <div
       ref={userRatingRef}
-      className={classNames("user-rating", {
-        "user-rating--user-profile": firebaseRef === ""
+      className={classNames('user-rating', {
+        'user-rating--user-profile': firebaseRef === '',
       })}
       onClick={() => {
         if (authUser?.uid) return
@@ -162,19 +162,22 @@ const UserRating: React.FC<Props> = ({
           key={n}
           data-rating={n + 1}
           type="button"
-          className={classNames("user-rating__button", {
-            "user-rating__button-rated": n + 1 <= userRating,
-            "user-rating__button--disabled": ratingDisabled
+          className={classNames('user-rating__button', {
+            'user-rating__button-rated': n + 1 <= userRating,
+            'user-rating__button--disabled': ratingDisabled,
           })}
           onMouseMove={!ratingDisabled ? onMouseMoveHandler : undefined}
           onMouseLeave={!ratingDisabled ? onMouseLeaveHandler : undefined}
           onClick={!ratingDisabled ? onClickHandler : undefined}
-        ></button>
+        />
       ))}
 
       {nonAuthWarning && (
         <div className="user-rating__warning">
-          To use full features please <Link to={ROUTES.LOGIN_PAGE}>register</Link>. Your allready selected shows will be
+          To use full features please
+          {' '}
+          <Link to={ROUTES.LOGIN_PAGE}>register</Link>
+          . Your allready selected shows will be
           saved.
         </div>
       )}

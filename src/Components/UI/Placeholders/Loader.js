@@ -1,6 +1,6 @@
-import React from "react"
+import React from 'react'
 
-export default function Loader({ className = "" }) {
+export default function Loader({ className = '' }) {
   return (
     <div className={`loader ${className}`}>
       <div className="loader-shadow">

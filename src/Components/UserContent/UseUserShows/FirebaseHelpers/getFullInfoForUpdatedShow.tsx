@@ -1,7 +1,7 @@
 /* eslint-disable array-callback-return */
-import { SeasonEpisodesFromDatabaseInterface, UserShowsInterface } from "../UseUserShows"
-import { differenceInObjects } from "Utils"
-import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
+import { differenceInObjects } from 'Utils'
+import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
+import { SeasonEpisodesFromDatabaseInterface, UserShowsInterface } from '../UseUserShows'
 
 interface getFullInfoForUpdatedShowArg {
   userShows: UserShowsInterface[]
@@ -12,7 +12,7 @@ interface getFullInfoForUpdatedShowArg {
 const getFullInfoForUpdatedShow = async ({
   userShows,
   userShowsSS,
-  firebase
+  firebase,
 }: getFullInfoForUpdatedShowArg): Promise<{
   userShowsCopy: UserShowsInterface[]
 }> => {
@@ -31,13 +31,13 @@ const getFullInfoForUpdatedShow = async ({
   if (changedShow) {
     await firebase
       .showFullData(changedShow.id)
-      .once("value")
+      .once('value')
       .then((snapshot: { val: () => { info: {}; episodes: SeasonEpisodesFromDatabaseInterface[] } }) => {
         const index = userShowsCopy.findIndex((item) => item.id === changedShow.id)
         const mergedShow = {
           ...changedShow,
           ...snapshot.val().info,
-          episodes: snapshot.val().episodes
+          episodes: snapshot.val().episodes,
         }
         userShowsCopy[index] = mergedShow
       })

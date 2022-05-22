@@ -1,7 +1,9 @@
-import React from "react"
-import { withRouter } from "react-router-dom"
-import * as ROUTES from "Utils/Constants/routes"
-import { AppContext } from "Components/AppContext/AppContextHOC"
+/* eslint-disable react/prop-types */
+/* eslint-disable react/jsx-props-no-spreading */
+import React from 'react'
+import { withRouter } from 'react-router-dom'
+import * as ROUTES from 'Utils/Constants/routes'
+import { AppContext } from 'Components/AppContext/AppContextHOC'
 
 const withAuthorization = (condition) => (Component) => {
   class WithAuthorization extends React.Component {
@@ -13,14 +15,13 @@ const withAuthorization = (condition) => (Component) => {
       this.authorizationListener()
     }
 
-    authorizationListener = () =>
-      this.context.firebase.onAuthUserListener(
+    authorizationListener = () => this.context.firebase.onAuthUserListener(
         (authUser) => {
           if (!condition(authUser)) {
             this.props.history.push(ROUTES.HOME_PAGE)
           }
         },
-        () => this.props.history.push(ROUTES.HOME_PAGE)
+        () => this.props.history.push(ROUTES.HOME_PAGE),
       )
 
     render() {

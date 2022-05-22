@@ -1,4 +1,4 @@
-import { createContext } from "react"
+import { createContext } from 'react'
 
 export interface FirebaseInterface {
   [key: string]: any
@@ -36,7 +36,7 @@ export interface FirebaseInterface {
   chatMemberStatus: ({
     chatKey,
     memberKey,
-    isGroupChat
+    isGroupChat,
   }: {
     chatKey: string
     memberKey: string
@@ -62,7 +62,7 @@ export const FIREBASE_INITIAL_STATE = {
   groupChatMembersStatus: () => {},
   groupChatParticipants: () => {},
   userShowAllEpisodes: () => {},
-  showEpisodes: () => {}
+  showEpisodes: () => {},
 }
 
 export const FirebaseContext = createContext<FirebaseInterface>(FIREBASE_INITIAL_STATE)

@@ -8,7 +8,7 @@ import './Slider.scss'
 
 const POSTER_PATH = 'https://image.tmdb.org/t/p/w500/'
 
-export default function Slider({ sliderData }: { sliderData: ContentDetailes[] }) {
+export const Slider = ({ sliderData }: { sliderData: ContentDetailes[] }) => {
   const [slider, setSlider] = useState<HTMLDivElement>(null!)
   const [sliderWidth, setSliderWidth] = useState<number>(null!)
 
@@ -250,3 +250,5 @@ export default function Slider({ sliderData }: { sliderData: ContentDetailes[] }
     </div>
   )
 }
+
+export default Slider

@@ -1,6 +1,6 @@
-import { GroupCreationNewMemberInterface } from "Components/Pages/Contacts/@Types"
-import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
-import { useState } from "react"
+import { GroupCreationNewMemberInterface } from 'Components/Pages/Contacts/@Types'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import { useState } from 'react'
 
 const useAddNewMembers = () => {
   const { firebase, errors, contactsDispatch } = useFrequentVariables()
@@ -8,7 +8,7 @@ const useAddNewMembers = () => {
 
   const addNewMembers = async ({
     members,
-    groupInfo
+    groupInfo,
   }: {
     members: GroupCreationNewMemberInterface[]
     groupInfo: { groupName: string; key: string }
@@ -16,14 +16,14 @@ const useAddNewMembers = () => {
     setNewMembersLoading(true)
 
     try {
-      const addNewGroupMembersCloud = firebase.httpsCallable("addNewGroupMembers")
+      const addNewGroupMembersCloud = firebase.httpsCallable('addNewGroupMembers')
       await addNewGroupMembersCloud({ members, groupInfo })
       setNewMembersLoading(false)
-      contactsDispatch({ type: "updateGroupInfoSettings", payload: { isActive: false } })
+      contactsDispatch({ type: 'updateGroupInfoSettings', payload: { isActive: false } })
     } catch (error) {
       errors.handleError({
         errorData: error,
-        message: "There has been some error adding new members. Please reload the page."
+        message: 'There has been some error adding new members. Please reload the page.',
       })
       setNewMembersLoading(false)
       throw new Error(`There has been some error updating database: ${error}`)
@@ -32,7 +32,7 @@ const useAddNewMembers = () => {
 
   return {
     newMembersLoading,
-    addNewMembers
+    addNewMembers,
   }
 }
 

@@ -1,4 +1,4 @@
-import React from "react"
+import React from 'react'
 
 type Props = {
   classNameInput: string
@@ -31,36 +31,34 @@ const Input: React.FC<Props> = ({
   handleOnChange,
   handleValidation,
   handleKeyDown,
-  toggleShowPassword
-}) => {
-  return (
-    <>
-      {withLabel && (
-        <label className={classNameLabel} htmlFor={name}>
-          {labelText}
-          {hidePasswordBtn && (
-            <span
-              className={
-                type === "password" ? "auth__form-label-show-password" : "auth__form-label-hide-password"
+  toggleShowPassword,
+}) => (
+  <>
+    {withLabel && (
+    <label className={classNameLabel} htmlFor={name}>
+      {labelText}
+      {hidePasswordBtn && (
+      <span
+        className={
+                type === 'password' ? 'auth__form-label-show-password' : 'auth__form-label-hide-password'
               }
-              onClick={() => toggleShowPassword && toggleShowPassword()}
-            ></span>
-          )}
-        </label>
-      )}
-      <input
-        className={classNameInput}
-        autoComplete={autocomplete}
-        name={name}
-        value={value}
-        onChange={handleOnChange}
-        onBlur={handleValidation}
-        onKeyDown={handleKeyDown}
-        type={type}
-        placeholder={placeholder}
+        onClick={() => toggleShowPassword && toggleShowPassword()}
       />
-    </>
+          )}
+    </label>
+      )}
+    <input
+      className={classNameInput}
+      autoComplete={autocomplete}
+      name={name}
+      value={value}
+      onChange={handleOnChange}
+      onBlur={handleValidation}
+      onKeyDown={handleKeyDown}
+      type={type}
+      placeholder={placeholder}
+    />
+  </>
   )
-}
 
 export default Input

@@ -1,13 +1,13 @@
-import React, { useEffect, useRef, useState } from "react"
-import { Link } from "react-router-dom"
-import classNames from "classnames"
-import * as ROUTES from "Utils/Constants/routes"
-import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
-import { useAppDispatch, useAppSelector } from "app/hooks"
-import { selectShowDatabase } from "Components/UserContent/UseUserShowsRed/userShowsSliceRed"
-import { handleDatabaseChange } from "Components/UserContent/UseUserShowsRed/FirebaseHelpers/PostData"
-import { fetchShowEpisodes } from "Components/UserContent/UseUserShowsRed/Middleware"
-import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
+import React, { useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
+import classNames from 'classnames'
+import * as ROUTES from 'Utils/Constants/routes'
+import { ContentDetailes } from 'Utils/Interfaces/ContentDetails'
+import { useAppDispatch, useAppSelector } from 'app/hooks'
+import { selectShowDatabase } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
+import { handleDatabaseChange } from 'Components/UserContent/UseUserShowsRed/FirebaseHelpers/PostData'
+import { fetchShowEpisodes } from 'Components/UserContent/UseUserShowsRed/Middleware'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 
 type Props = {
   id: number
@@ -24,14 +24,14 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
   const showDatabase = useAppSelector((state) => selectShowDatabase(state, id))
 
   useEffect(() => {
-    if (mediaType !== "show" || !authUser?.uid || showDatabase === "notWatchingShows") return
+    if (mediaType !== 'show' || !authUser?.uid || showDatabase === 'notWatchingShows') return
     dispatch(fetchShowEpisodes(Number(id), authUser.uid, firebase))
   }, [id, mediaType, showDatabase, authUser, firebase, dispatch])
 
   useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside as EventListener)
+    document.addEventListener('mousedown', handleClickOutside as EventListener)
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside as EventListener)
+      document.removeEventListener('mousedown', handleClickOutside as EventListener)
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -51,10 +51,10 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
     <div className="buttons__row">
       <div className="buttons__col">
         <button
-          className={classNames("button", {
-            "button--pressed":
-              ["watchingShows", "finishedShows"].includes(showDatabase) ||
-              userContentLocalStorage.watchingShows.find((item: any) => item.id === Number(id))
+          className={classNames('button', {
+            'button--pressed':
+              ['watchingShows', 'finishedShows'].includes(showDatabase) ||
+              userContentLocalStorage.watchingShows.find((item: any) => item.id === Number(id)),
           })}
           type="button"
           onClick={() => {
@@ -62,16 +62,16 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
               dispatch(
                 handleDatabaseChange({
                   id,
-                  database: "watchingShows",
+                  database: 'watchingShows',
                   showDetailes: detailes,
                   uid: authUser.uid,
-                  firebase
-                })
+                  firebase,
+                }),
               )
             } else {
               userContentLocalStorage.addShowLS({
                 id: Number(id),
-                data: detailes
+                data: detailes,
               })
             }
           }}
@@ -82,10 +82,10 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
 
       <div className="buttons__col">
         <button
-          className={classNames("button", {
-            "button--pressed":
-              showDatabase === "notWatchingShows" ||
-              (!authUser?.uid && !userContentLocalStorage.watchingShows.find((item: any) => item.id === Number(id)))
+          className={classNames('button', {
+            'button--pressed':
+              showDatabase === 'notWatchingShows' ||
+              (!authUser?.uid && !userContentLocalStorage.watchingShows.find((item: any) => item.id === Number(id))),
           })}
           type="button"
           onClick={() => {
@@ -93,15 +93,15 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
               dispatch(
                 handleDatabaseChange({
                   id,
-                  database: "notWatchingShows",
+                  database: 'notWatchingShows',
                   showDetailes: detailes,
                   uid: authUser.uid,
-                  firebase
-                })
+                  firebase,
+                }),
               )
             } else {
               userContentLocalStorage.removeShowLS({
-                id: Number(id)
+                id: Number(id),
               })
             }
           }}
@@ -112,9 +112,9 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
       <div className="buttons__col-wrapper" ref={_notAuthButtons}>
         <div className="buttons__col">
           <button
-            className={classNames("button", {
-              "button--pressed": showDatabase === "droppedShows",
-              "button--not-logged-in": !authUser?.uid
+            className={classNames('button', {
+              'button--pressed': showDatabase === 'droppedShows',
+              'button--not-logged-in': !authUser?.uid,
             })}
             type="button"
             onClick={() => {
@@ -122,23 +122,24 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
                 dispatch(
                   handleDatabaseChange({
                     id,
-                    database: "droppedShows",
+                    database: 'droppedShows',
                     showDetailes: detailes,
                     uid: authUser.uid,
-                    firebase
-                  })
+                    firebase,
+                  }),
                 )
               } else {
-                showDissableBtnWarning("dropBtn")
+                showDissableBtnWarning('dropBtn')
               }
             }}
           >
             Drop
           </button>
 
-          {disableBtnWarning === "dropBtn" && (
+          {disableBtnWarning === 'dropBtn' && (
             <div className="buttons__col-warning">
-              To use full features please{" "}
+              To use full features please
+              {' '}
               <Link className="buttons__col-link" to={ROUTES.LOGIN_PAGE}>
                 register
               </Link>
@@ -148,9 +149,9 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
         </div>
         <div className="buttons__col">
           <button
-            className={classNames("button", {
-              "button--pressed": showDatabase === "willWatchShows",
-              "button--not-logged-in": !authUser?.uid
+            className={classNames('button', {
+              'button--pressed': showDatabase === 'willWatchShows',
+              'button--not-logged-in': !authUser?.uid,
             })}
             type="button"
             onClick={() => {
@@ -158,22 +159,23 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
                 dispatch(
                   handleDatabaseChange({
                     id,
-                    database: "willWatchShows",
+                    database: 'willWatchShows',
                     showDetailes: detailes,
                     uid: authUser.uid,
-                    firebase
-                  })
+                    firebase,
+                  }),
                 )
               } else {
-                showDissableBtnWarning("willWatchBtn")
+                showDissableBtnWarning('willWatchBtn')
               }
             }}
           >
             Will watch
           </button>
-          {disableBtnWarning === "willWatchBtn" && (
+          {disableBtnWarning === 'willWatchBtn' && (
             <div className="buttons__col-warning">
-              To use full features please{" "}
+              To use full features please
+              {' '}
               <Link className="buttons__col-link" to={ROUTES.LOGIN_PAGE}>
                 register
               </Link>

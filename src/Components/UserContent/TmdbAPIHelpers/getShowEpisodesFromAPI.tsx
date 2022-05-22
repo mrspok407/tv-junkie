@@ -1,4 +1,4 @@
-import axios from "axios"
+import axios from 'axios'
 
 interface DataFromAPI {
   episodes: {}[]
@@ -25,7 +25,7 @@ const getShowEpisodesFromAPI = ({ id }: { id: number }) => {
 
       seasonChunks.forEach((item) => {
         const request = axios.get(
-          `https://api.themoviedb.org/3/tv/${id}?api_key=${process.env.REACT_APP_TMDB_API}&append_to_response=${item}`
+          `https://api.themoviedb.org/3/tv/${id}?api_key=${process.env.REACT_APP_TMDB_API}&append_to_response=${item}`,
         )
         apiRequests.push(request)
       })
@@ -44,12 +44,12 @@ const getShowEpisodesFromAPI = ({ id }: { id: number }) => {
         const mergedRowData: { value: {}; status: string } = Object.assign({}, ...rowData)
 
         Object.entries(mergedRowData).forEach(([key, value]) => {
-          if (!key.indexOf("season/")) {
+          if (!key.indexOf('season/')) {
             seasonsData.push({ [key]: value })
           }
         })
 
-        let allEpisodes: {}[] = []
+        const allEpisodes: {}[] = []
 
         seasonsData.forEach((item: any, index) => {
           const season = item[`season/${index + 1}`]
@@ -57,7 +57,7 @@ const getShowEpisodesFromAPI = ({ id }: { id: number }) => {
             return
           }
 
-          let episodes: {}[] = []
+          const episodes: {}[] = []
 
           season.episodes.forEach((item: any) => {
             const updatedEpisode = {
@@ -65,7 +65,7 @@ const getShowEpisodesFromAPI = ({ id }: { id: number }) => {
               episode_number: item.episode_number,
               name: item.name,
               season_number: item.season_number,
-              id: item.id
+              id: item.id,
             }
             episodes.push(updatedEpisode)
           })
@@ -76,7 +76,7 @@ const getShowEpisodesFromAPI = ({ id }: { id: number }) => {
             id: season._id,
             poster_path: season.poster_path,
             name: season.name,
-            episodes
+            episodes,
           }
 
           allEpisodes.push(updatedSeason)
@@ -84,11 +84,11 @@ const getShowEpisodesFromAPI = ({ id }: { id: number }) => {
 
         const dataToPass: DataFromAPI = {
           episodes: allEpisodes,
-          status: mergedRowData.status
+          status: mergedRowData.status,
         }
 
         return dataToPass
-      })
+      }),
     )
     .catch((err) => {
       console.log(err)

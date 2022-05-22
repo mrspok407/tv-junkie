@@ -1,5 +1,3 @@
-import { RootState } from "app/store"
+import { RootState } from 'app/store'
 
-export const getAuthUidFromState = (state: RootState) => {
-  return state.authUser.authUser.uid
-}
+export const getAuthUidFromState = (state: RootState) => state.authUser.authUser.uid

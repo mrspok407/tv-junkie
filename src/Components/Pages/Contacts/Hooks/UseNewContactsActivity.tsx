@@ -1,8 +1,8 @@
-import { useState, useEffect, useContext } from "react"
-import { FirebaseContext } from "Components/Firebase"
-import { useAppSelector } from "app/hooks"
-import { selectAuthUser } from "Components/UserAuth/Session/WithAuthentication/authUserSlice"
-import useFrequentVariables from "../../../../Utils/Hooks/UseFrequentVariables"
+import { useState, useEffect, useContext } from 'react'
+import { FirebaseContext } from 'Components/Firebase'
+import { useAppSelector } from 'app/hooks'
+import { selectAuthUser } from 'Components/UserAuth/Session/WithAuthentication/authUserSlice'
+import useFrequentVariables from '../../../../Utils/Hooks/UseFrequentVariables'
 
 const useNewContactsActivity = () => {
   const { firebase, authUser } = useFrequentVariables()
@@ -15,10 +15,10 @@ const useNewContactsActivity = () => {
   const [newContactsActivity, setNewContactsActivity] = useState(false)
 
   useEffect(() => {
-    firebase.newContactsActivity({ uid: authUser?.uid }).on("value", (snapshot: any) => {
+    firebase.newContactsActivity({ uid: authUser?.uid }).on('value', (snapshot: any) => {
       setNewActivity(!!snapshot.exists())
     })
-    firebase.newContactsRequests({ uid: authUser?.uid }).on("value", (snapshot: any) => {
+    firebase.newContactsRequests({ uid: authUser?.uid }).on('value', (snapshot: any) => {
       setNewRequests(!!snapshot.exists())
     })
 

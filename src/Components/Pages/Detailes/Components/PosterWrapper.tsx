@@ -1,12 +1,13 @@
-import React, { useCallback, useContext, useEffect, useState } from "react"
-import axios from "axios"
-import { todayDate } from "Utils"
-import Loader from "Components/UI/Placeholders/Loader"
-import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
-import { useAppSelector } from "app/hooks"
-import { selectAuthUser } from "Components/UserAuth/Session/WithAuthentication/authUserSlice"
+import React, { useCallback, useContext, useEffect, useState } from 'react'
+import axios from 'axios'
+import { todayDate } from 'Utils'
+import Loader from 'Components/UI/Placeholders/Loader'
+import { ContentDetailes } from 'Utils/Interfaces/ContentDetails'
+import { useAppSelector } from 'app/hooks'
+import { selectAuthUser } from 'Components/UserAuth/Session/WithAuthentication/authUserSlice'
 
-const { CancelToken } = require("axios")
+const { CancelToken } = require('axios')
+
 let cancelRequest: any
 
 type Props = {
@@ -23,31 +24,31 @@ interface APIData {
 const PosterWrapper = React.memo<Props>(({ detailes, mediaType }) => {
   const { authUser } = useAppSelector(selectAuthUser)
 
-  const [movieTitle, setMovieTitle] = useState("")
-  const [movieHash1080p, setMovieHash1080p] = useState("")
-  const [movieHash720p, setMovieHash720p] = useState("")
+  const [movieTitle, setMovieTitle] = useState('')
+  const [movieHash1080p, setMovieHash1080p] = useState('')
+  const [movieHash720p, setMovieHash720p] = useState('')
   const [movieAvailable, setMovieAvailable] = useState(true)
   const [loadingTorrentLinks, setLoadingTorrentLinks] = useState(false)
-  const [error, setError] = useState("")
+  const [error, setError] = useState('')
 
   const getMovieTorrents = useCallback(() => {
     setLoadingTorrentLinks(true)
     axios
       .get<APIData>(`https://yts.mx/api/v2/list_movies.json?query_term=${detailes.imdb_id}`, {
-        cancelToken: new CancelToken(function executor(c: any) {
+        cancelToken: new CancelToken((c: any) => {
           cancelRequest = c
-        })
+        }),
       })
       .then(({ data }) => {
-        if (!data.data.hasOwnProperty("movies")) {
+        if (!data.data.hasOwnProperty('movies')) {
           setMovieAvailable(false)
           return
         }
 
         const movie = data.data.movies[0]
-        const movieHash1080p = movie.torrents.find((item) => item.quality === "1080p") || { hash: "" }
+        const movieHash1080p = movie.torrents.find((item) => item.quality === '1080p') || { hash: '' }
 
-        const movieHash720p = movie.torrents.find((item) => item.quality === "720p") || { hash: "" }
+        const movieHash720p = movie.torrents.find((item) => item.quality === '720p') || { hash: '' }
 
         setMovieTitle(movie.title)
         setMovieHash1080p(movieHash1080p.hash)
@@ -57,12 +58,12 @@ const PosterWrapper = React.memo<Props>(({ detailes, mediaType }) => {
       })
       .catch((err) => {
         if (axios.isCancel(err)) return
-        setError("Something went wrong, sorry")
+        setError('Something went wrong, sorry')
       })
   }, [detailes])
 
   useEffect(() => {
-    if (mediaType === "movie") {
+    if (mediaType === 'movie') {
       getMovieTorrents()
     }
     return () => {
@@ -79,10 +80,10 @@ const PosterWrapper = React.memo<Props>(({ detailes, mediaType }) => {
         style={
           detailes.poster_path
             ? {
-                backgroundImage: `url(https://image.tmdb.org/t/p/w500/${detailes.poster_path})`
+                backgroundImage: `url(https://image.tmdb.org/t/p/w500/${detailes.poster_path})`,
               }
             : {
-                backgroundImage: `url(https://homestaymatch.com/images/no-image-available.png)`
+                backgroundImage: 'url(https://homestaymatch.com/images/no-image-available.png)',
               }
         }
       />
@@ -90,12 +91,12 @@ const PosterWrapper = React.memo<Props>(({ detailes, mediaType }) => {
         <div
           className="detailes-page__poster detailes-page__poster--mobile"
           style={{
-            backgroundImage: `url(https://image.tmdb.org/t/p/w500/${detailes.backdrop_path})`
+            backgroundImage: `url(https://image.tmdb.org/t/p/w500/${detailes.backdrop_path})`,
           }}
         />
       )}
 
-      {mediaType === "movie" &&
+      {mediaType === 'movie' &&
       new Date(detailes.release_date).getTime() < todayDate.getTime() &&
       movieAvailable &&
       authUser?.email === process.env.REACT_APP_ADMIN_EMAIL ? (
@@ -125,10 +126,8 @@ const PosterWrapper = React.memo<Props>(({ detailes, mediaType }) => {
             <Loader className="loader--small-pink" />
           )}
         </div>
-      ) : error ? (
-        error
-      ) : (
-        ""
+      ) : error || (
+        ''
       )}
     </div>
   )

@@ -1,18 +1,19 @@
 /* eslint-disable no-useless-escape */
-import iconMediaTypeMulti from "assets/images/icons/media-type-multi.png"
-import iconMediaTypeMovie from "assets/images/icons/media-type-movie.png"
-import iconMediaTypePerson from "assets/images/icons/media-type-person.png"
-import iconMediaTypeTv from "assets/images/icons/media-type-tv.png"
-import releasedEpisodesToOneArray from "./releasedEpisodesToOneArray"
-import merge from "deepmerge"
-import * as _transform from "lodash.transform"
-import * as _isEqual from "lodash.isequal"
-import * as _isObject from "lodash.isobject"
+import iconMediaTypeMulti from 'assets/images/icons/media-type-multi.png'
+import iconMediaTypeMovie from 'assets/images/icons/media-type-movie.png'
+import iconMediaTypePerson from 'assets/images/icons/media-type-person.png'
+import iconMediaTypeTv from 'assets/images/icons/media-type-tv.png'
+import merge from 'deepmerge'
+import * as _transform from 'lodash.transform'
+import * as _isEqual from 'lodash.isequal'
+import * as _isObject from 'lodash.isobject'
+import releasedEpisodesToOneArray from './releasedEpisodesToOneArray'
 
 export const todayDate = new Date()
 
-export const range = (start, stop, step) =>
+export const range = (start, stop, step) => {
   Array.from({ length: (stop - start) / step + 1 }, (_, i) => start + i * step)
+}
 
 export const differenceBtwDatesInDays = (firstDate, secondDate) => {
   const diffInTime = new Date(firstDate) - new Date(secondDate)
@@ -21,166 +22,167 @@ export const differenceBtwDatesInDays = (firstDate, secondDate) => {
 }
 
 export const sortBy = [
-  { name: "Most vote count", codeName: "vote_count.desc" },
-  { name: "Most popular", codeName: "popularity.desc" },
-  { name: "Most recent", codeName: "primary_release_date.desc" },
-  { name: "Average vote", codeName: "vote_average.desc" }
+  { name: 'Most vote count', codeName: 'vote_count.desc' },
+  { name: 'Most popular', codeName: 'popularity.desc' },
+  { name: 'Most recent', codeName: 'primary_release_date.desc' },
+  { name: 'Average vote', codeName: 'vote_average.desc' },
 ]
 
 export const listOfGenres = [
   {
     id: 28,
-    name: "Action",
-    isChecked: false
+    name: 'Action',
+    isChecked: false,
   },
   {
     id: 12,
-    name: "Adventure",
-    isChecked: false
+    name: 'Adventure',
+    isChecked: false,
   },
   {
     id: 16,
-    name: "Animation",
-    isChecked: false
+    name: 'Animation',
+    isChecked: false,
   },
   {
     id: 35,
-    name: "Comedy",
-    isChecked: false
+    name: 'Comedy',
+    isChecked: false,
   },
   {
     id: 80,
-    name: "Crime",
-    isChecked: false
+    name: 'Crime',
+    isChecked: false,
   },
   {
     id: 99,
-    name: "Documentary",
-    isChecked: false
+    name: 'Documentary',
+    isChecked: false,
   },
   {
     id: 18,
-    name: "Drama",
-    isChecked: false
+    name: 'Drama',
+    isChecked: false,
   },
   {
     id: 10751,
-    name: "Family",
-    isChecked: false
+    name: 'Family',
+    isChecked: false,
   },
   {
     id: 14,
-    name: "Fantasy",
-    isChecked: false
+    name: 'Fantasy',
+    isChecked: false,
   },
   {
     id: 36,
-    name: "History",
-    isChecked: false
+    name: 'History',
+    isChecked: false,
   },
   {
     id: 27,
-    name: "Horror",
-    isChecked: false
+    name: 'Horror',
+    isChecked: false,
   },
   {
     id: 10402,
-    name: "Music",
-    isChecked: false
+    name: 'Music',
+    isChecked: false,
   },
   {
     id: 9648,
-    name: "Mystery",
-    isChecked: false
+    name: 'Mystery',
+    isChecked: false,
   },
   {
     id: 10749,
-    name: "Romance",
-    isChecked: false
+    name: 'Romance',
+    isChecked: false,
   },
   {
     id: 878,
-    name: "Science Fiction",
-    isChecked: false
+    name: 'Science Fiction',
+    isChecked: false,
   },
   {
     id: 10770,
-    name: "TV Movie",
-    isChecked: false
+    name: 'TV Movie',
+    isChecked: false,
   },
   {
     id: 53,
-    name: "Thriller",
-    isChecked: false
+    name: 'Thriller',
+    isChecked: false,
   },
   {
     id: 10752,
-    name: "War",
-    isChecked: false
+    name: 'War',
+    isChecked: false,
   },
   {
     id: 37,
-    name: "Western",
-    isChecked: false
+    name: 'Western',
+    isChecked: false,
   },
   {
     id: 10759,
-    name: "Action & Adventure",
-    isChecked: false
+    name: 'Action & Adventure',
+    isChecked: false,
   },
   {
     id: 10762,
-    name: "Kids",
-    isChecked: false
+    name: 'Kids',
+    isChecked: false,
   },
   {
     id: 10763,
-    name: "News",
-    isChecked: false
+    name: 'News',
+    isChecked: false,
   },
   {
     id: 10764,
-    name: "Reality",
-    isChecked: false
+    name: 'Reality',
+    isChecked: false,
   },
   {
     id: 10765,
-    name: "Sci-Fi & Fantasy",
-    isChecked: false
+    name: 'Sci-Fi & Fantasy',
+    isChecked: false,
   },
   {
     id: 10766,
-    name: "Soap",
-    isChecked: false
+    name: 'Soap',
+    isChecked: false,
   },
   {
     id: 10767,
-    name: "Talk",
-    isChecked: false
+    name: 'Talk',
+    isChecked: false,
   },
   {
     id: 10768,
-    name: "War & Politics",
-    isChecked: false
-  }
+    name: 'War & Politics',
+    isChecked: false,
+  },
 ]
 
 export const mediaTypesArr = [
-  { type: "Multi", icon: iconMediaTypeMulti, id: 22 },
-  { type: "Movie", icon: iconMediaTypeMovie, id: 52 },
-  { type: "TV", icon: iconMediaTypeTv, id: 24 },
-  { type: "Person", icon: iconMediaTypePerson, id: 21 }
+  { type: 'Multi', icon: iconMediaTypeMulti, id: 22 },
+  { type: 'Movie', icon: iconMediaTypeMovie, id: 52 },
+  { type: 'TV', icon: iconMediaTypeTv, id: 24 },
+  { type: 'Person', icon: iconMediaTypePerson, id: 21 },
 ]
 
 export const validEmailRegex = RegExp(
-  /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i
+  // eslint-disable-next-line max-len
+  /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i,
 )
 
 export const combineMergeObjects = (target, source, options) => {
   const destination = target.slice()
 
   source.forEach((item, index) => {
-    if (typeof destination[index] === "undefined") {
+    if (typeof destination[index] === 'undefined') {
       destination[index] = options.cloneUnlessOtherwiseSpecified(item, options)
     } else if (options.isMergeableObject(item)) {
       destination[index] = merge(target[index], item, options)
@@ -192,9 +194,11 @@ export const combineMergeObjects = (target, source, options) => {
 }
 
 export const differenceInObjects = (object, base) => {
+  // eslint-disable-next-line @typescript-eslint/no-shadow
   function changes(object, base) {
-    return _transform(object, function (result, value, key) {
+    return _transform(object, (result, value, key) => {
       if (!_isEqual(value, base[key])) {
+        // eslint-disable-next-line no-param-reassign
         result[key] = _isObject(value) && _isObject(base[key]) ? changes(value, base[key]) : value
       }
     })
@@ -203,7 +207,7 @@ export const differenceInObjects = (object, base) => {
 }
 
 export const isUnexpectedObject = ({ exampleObject, targetObject }) => {
-  return Object.entries(exampleObject).some(([key, value]) => {
+  Object.entries(exampleObject).some(([key, value]) => {
     if (targetObject[key] === undefined) {
       return true
     }
@@ -219,22 +223,22 @@ export const convertTimeStampToDate = ({ timeStamp }) => {
   if (!timeStamp || !Number.isInteger(timeStamp)) return
   const timeStampISO = new Date(timeStamp).toISOString()
   const options = {
-    month: "long",
-    day: "numeric",
-    year: "numeric"
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
   }
   const formatedTimeStamp = new Date(timeStampISO)
-  return new Intl.DateTimeFormat("en-US", options).format(formatedTimeStamp)
+  return new Intl.DateTimeFormat('en-US', options).format(formatedTimeStamp)
 }
 
 export const textToUrl = ({ text }) => {
   const urlRegex = /(((https?:\/\/)|(www\.))[^\s]+)/g
   const textWithUrls = text.replace(urlRegex, (url) => {
     let hyperlink = url
-    if (!hyperlink.match("^https?://")) {
-      hyperlink = "http://" + hyperlink
+    if (!hyperlink.match('^https?://')) {
+      hyperlink = `http://${hyperlink}`
     }
-    return '<a href="' + hyperlink + '" target="_blank" rel="noopener noreferrer">' + url + "</a>"
+    return `<a href="${hyperlink}" target="_blank" rel="noopener noreferrer">${url}</a>`
   })
   return textWithUrls
 }

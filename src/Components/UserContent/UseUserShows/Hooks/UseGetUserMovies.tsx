@@ -1,15 +1,15 @@
-import { useContext, useEffect, useState } from "react"
-import { FirebaseContext } from "Components/Firebase"
-import { UserMoviesInterface } from "../UseUserShows"
-import { useAppSelector } from "app/hooks"
-import { selectAuthUser } from "Components/UserAuth/Session/WithAuthentication/authUserSlice"
-import { AuthUserInterface } from "Components/UserAuth/Session/WithAuthentication/@Types"
-import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
+import { useContext, useEffect, useState } from 'react'
+import { FirebaseContext } from 'Components/Firebase'
+import { useAppSelector } from 'app/hooks'
+import { selectAuthUser } from 'Components/UserAuth/Session/WithAuthentication/authUserSlice'
+import { AuthUserInterface } from 'Components/UserAuth/Session/WithAuthentication/@Types'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import { UserMoviesInterface } from '../UseUserShows'
 
 type Hook = () => {
   userMovies: UserMoviesInterface[]
   loadingMovies: boolean
-  listenerUserMovies: ({ uid }: AuthUserInterface["authUser"]) => void
+  listenerUserMovies: ({ uid }: AuthUserInterface['authUser']) => void
   handleUserMoviesOnClient: ({ id, data }: { id: number; data?: UserMoviesInterface }) => void
   resetStateUserMovies: () => void
 }
@@ -20,23 +20,19 @@ const useGetUserMovies: Hook = () => {
   const [userMovies, setUserMovies] = useState<UserMoviesInterface[]>([])
   const [loadingMovies, setLoadingMovies] = useState(true)
 
-  useEffect(() => {
-    return () => {
+  useEffect(() => () => {
       if (!authUser?.uid) return
       firebase.watchLaterMovies(authUser.uid).off()
-    }
-  }, [firebase, authUser])
+    }, [firebase, authUser])
 
-  const listenerUserMovies = ({ uid }: AuthUserInterface["authUser"]) => {
-    firebase.watchLaterMovies(uid).on("value", (snapshot: { val: () => UserMoviesInterface[] }) => {
+  const listenerUserMovies = ({ uid }: AuthUserInterface['authUser']) => {
+    firebase.watchLaterMovies(uid).on('value', (snapshot: { val: () => UserMoviesInterface[] }) => {
       if (snapshot.val() === null) {
         setLoadingMovies(false)
         return
       }
 
-      const movies: UserMoviesInterface[] = Object.values(snapshot.val()).map((movie) => {
-        return movie
-      })
+      const movies: UserMoviesInterface[] = Object.values(snapshot.val()).map((movie) => movie)
       setUserMovies(movies)
       setLoadingMovies(false)
     })
@@ -62,7 +58,7 @@ const useGetUserMovies: Hook = () => {
     loadingMovies,
     listenerUserMovies,
     handleUserMoviesOnClient,
-    resetStateUserMovies
+    resetStateUserMovies,
   }
 }
 

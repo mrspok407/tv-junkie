@@ -1,6 +1,6 @@
-import { MessageInterface } from "Components/Pages/Contacts/@Types"
-import { useState, useEffect, useRef, useCallback } from "react"
-import { throttle } from "throttle-debounce"
+import { MessageInterface } from 'Components/Pages/Contacts/@Types'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { throttle } from 'throttle-debounce'
 
 type Props = {
   chatContainerRef: HTMLDivElement
@@ -17,8 +17,8 @@ const useShowFloatDate = ({ activeChat, chatContainerRef, renderedMessages }: Pr
 
   let prevScrollTop: any
   const getDates = () => {
-    const dateNodes = document.querySelectorAll(".chat-window__date")
-    const top = chatContainerRef.getBoundingClientRect().top
+    const dateNodes = document.querySelectorAll('.chat-window__date')
+    const { top } = chatContainerRef.getBoundingClientRect()
 
     if (dateNodes) {
       const dates = [...dateNodes].reduce((acc: { timeStamp: number; top: number }[], date: any) => {
@@ -36,7 +36,7 @@ const useShowFloatDate = ({ activeChat, chatContainerRef, renderedMessages }: Pr
     throttle(150, () => {
       if (!chatContainerRef) return
       if (!renderedMessages?.length) return
-      const scrollTop = chatContainerRef.scrollTop
+      const { scrollTop } = chatContainerRef
       getDates()
 
       if (scrollTop < prevScrollTop) {
@@ -48,23 +48,21 @@ const useShowFloatDate = ({ activeChat, chatContainerRef, renderedMessages }: Pr
       }
       prevScrollTop = scrollTop
     }),
-    [renderedMessages, chatContainerRef]
+    [renderedMessages, chatContainerRef],
   )
 
   useEffect(() => {
     if (!chatContainerRef) return
-    chatContainerRef.addEventListener("scroll", handleScroll)
+    chatContainerRef.addEventListener('scroll', handleScroll)
     return () => {
-      chatContainerRef.removeEventListener("scroll", handleScroll)
+      chatContainerRef.removeEventListener('scroll', handleScroll)
     }
   }, [activeChat, chatContainerRef, handleScroll])
 
-  useEffect(() => {
-    return () => {
+  useEffect(() => () => {
       setIsScrollingTop(false)
       window.clearTimeout(floadDateTimeout.current || 0)
-    }
-  }, [activeChat])
+    }, [activeChat])
 
   return { floatDate, isScrollingTop }
 }

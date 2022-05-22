@@ -1,7 +1,7 @@
-import { ContactInfoInterface } from "Components/Pages/Contacts/@Types"
-import useFirebaseReferences from "Components/Pages/Contacts/Hooks/UseFirebaseReferences"
-import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
-import { useState, useEffect, useCallback, useRef } from "react"
+import { ContactInfoInterface } from 'Components/Pages/Contacts/@Types'
+import useFirebaseReferences from 'Components/Pages/Contacts/Hooks/UseFirebaseReferences'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import { useState, useEffect, useCallback, useRef } from 'react'
 
 type Props = {
   activeChat: { chatKey: string }

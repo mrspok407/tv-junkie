@@ -1,12 +1,12 @@
-import React from "react"
-import SelectInput from "../InputTemplates/SelectInput/SelectInput"
-import { range } from "Utils"
+import React from 'react'
+import { range } from 'Utils'
+import SelectInput from '../InputTemplates/SelectInput/SelectInput'
 
 const currentYear = new Date().getFullYear()
 
 export default function DatesInputs({
   setFieldValue,
-  handleChange
+  handleChange,
   // year,
   // changeYear
 }) {
@@ -60,9 +60,9 @@ export default function DatesInputs({
           name="year"
           onChange={(e) => {
             handleChange(e)
-            setFieldValue("decade", "")
-            setFieldValue("yearFrom", "")
-            setFieldValue("yearTo", "")
+            setFieldValue('decade', '')
+            setFieldValue('yearFrom', '')
+            setFieldValue('yearTo', '')
           }}
         >
           <option />
@@ -81,9 +81,9 @@ export default function DatesInputs({
           name="decade"
           onChange={(e) => {
             handleChange(e)
-            setFieldValue("year", "")
-            setFieldValue("yearFrom", "")
-            setFieldValue("yearTo", "")
+            setFieldValue('year', '')
+            setFieldValue('yearFrom', '')
+            setFieldValue('yearTo', '')
           }}
         >
           <option />
@@ -103,8 +103,8 @@ export default function DatesInputs({
             name="yearFrom"
             onChange={(e) => {
               handleChange(e)
-              setFieldValue("decade", "")
-              setFieldValue("year", "")
+              setFieldValue('decade', '')
+              setFieldValue('year', '')
             }}
           >
             <option />
@@ -123,8 +123,8 @@ export default function DatesInputs({
             name="yearTo"
             onChange={(e) => {
               handleChange(e)
-              setFieldValue("decade", "")
-              setFieldValue("year", "")
+              setFieldValue('decade', '')
+              setFieldValue('year', '')
             }}
           >
             <option />

@@ -1,16 +1,16 @@
-import React, { Component } from "react"
-import { Helmet } from "react-helmet"
-import axios from "axios"
-import SignOutButton from "Components/UserAuth/SignOut/SignOutButton"
-import WithAuthorization from "Components/UserAuth/Session/WithAuthorization/WithAuthorization"
-import Header from "Components/UI/Header/Header"
-import Footer from "Components/UI/Footer/Footer"
-import { todayDate } from "Utils"
-import { AppContext } from "Components/AppContext/AppContextHOC"
-import PasswordUpdate from "Components/UserAuth/PasswordUpdate/PasswordUpdate"
-import classNames from "classnames"
-import { LoremIpsum } from "lorem-ipsum"
-import "./Settings.scss"
+import React, { Component } from 'react'
+import { Helmet } from 'react-helmet'
+import axios from 'axios'
+import SignOutButton from 'Components/UserAuth/SignOut/SignOutButton'
+import WithAuthorization from 'Components/UserAuth/Session/WithAuthorization/WithAuthorization'
+import Header from 'Components/UI/Header/Header'
+import Footer from 'Components/UI/Footer/Footer'
+import { todayDate } from 'Utils'
+import { AppContext } from 'Components/AppContext/AppContextHOC'
+import PasswordUpdate from 'Components/UserAuth/PasswordUpdate/PasswordUpdate'
+import classNames from 'classnames'
+import { LoremIpsum } from 'lorem-ipsum'
+import './Settings.scss'
 
 let startTimeStampGroupChats = 1311011245000
 class Profile extends Component {
@@ -21,14 +21,14 @@ class Profile extends Component {
       verificationSent: false,
       loadingVerificationSent: false,
       errorMessage: null,
-      passwordUpdate: "",
+      passwordUpdate: '',
       copiedToClipboard: null,
       authUser: null,
       limitTo: 2,
       shows: [],
       chatBottomFire: false,
       pageInFocus: false,
-      JSON: {}
+      JSON: {},
     }
 
     this.authSubscriber = null
@@ -64,22 +64,22 @@ class Profile extends Component {
       },
       () => {
         this.setState({ authUser: null })
-      }
+      },
     )
   }
 
   addMessagesToPrivateChats = async () => {
-    const authUserUid = "hZK2fqeACBUqZiyj1zrbuFXZzRP2"
-    const firebase = this.context.firebase
+    const authUserUid = 'hZK2fqeACBUqZiyj1zrbuFXZzRP2'
+    const { firebase } = this.context
     const lorem = new LoremIpsum({
       sentencesPerParagraph: {
         max: 8,
-        min: 4
+        min: 4,
       },
       wordsPerSentence: {
         max: 8,
-        min: 4
-      }
+        min: 4,
+      },
     })
     const fourHoursInMS = 14400000
 
@@ -88,7 +88,7 @@ class Profile extends Component {
     //   console.log(JSON.stringify(snapshot.val()))
     // })
 
-    firebase.contactsList({ uid: authUserUid }).once("value", (snapshot) => {
+    firebase.contactsList({ uid: authUserUid }).once('value', (snapshot) => {
       Object.entries(snapshot.val()).forEach(async ([contactKey, contactValue]) => {
         if (contactValue.status !== true) return
         let startTimeStampPrivateChats = 1313142446000
@@ -100,9 +100,9 @@ class Profile extends Component {
           messages[`${messageRef.key}`] = {
             sender: Math.random() > 0.5 ? contactKey : authUserUid,
             message: lorem.generateSentences(Math.ceil(Math.random() * 3)),
-            timeStamp: startTimeStampPrivateChats
+            timeStamp: startTimeStampPrivateChats,
           }
-          startTimeStampPrivateChats = startTimeStampPrivateChats + fourHoursInMS
+          startTimeStampPrivateChats += fourHoursInMS
         }
         console.log(messages)
         await firebase.messages({ chatKey, isGroupChat: false }).set(messages)
@@ -111,19 +111,19 @@ class Profile extends Component {
   }
 
   addMessagesToGroupChats = async () => {
-    const firebase = this.context.firebase
+    const { firebase } = this.context
     const lorem = new LoremIpsum({
       sentencesPerParagraph: {
         max: 8,
-        min: 4
+        min: 4,
       },
       wordsPerSentence: {
         max: 8,
-        min: 4
-      }
+        min: 4,
+      },
     })
     const fourHoursInMS = 14400000
-    firebase.groupChats().once("value", (snapshot) => {
+    firebase.groupChats().once('value', (snapshot) => {
       Object.entries(snapshot.val()).forEach(([chatKey, chatValue]) => {
         Object.entries(chatValue.members.status).forEach(([memberKey, memberValue]) => {
           const numberOfMessages = Math.floor(Math.random() * (15 - 1 + 1)) + 1
@@ -132,9 +132,9 @@ class Profile extends Component {
               sender: memberKey,
               userName: memberValue.userName,
               message: lorem.generateSentences(Math.ceil(Math.random() * 3)),
-              timeStamp: startTimeStampGroupChats
+              timeStamp: startTimeStampGroupChats,
             })
-            startTimeStampGroupChats = startTimeStampGroupChats + fourHoursInMS
+            startTimeStampGroupChats += fourHoursInMS
           }
         })
       })
@@ -162,7 +162,7 @@ class Profile extends Component {
 
     axios
       .get(
-        `https://api.themoviedb.org/3/tv/changes?api_key=${process.env.REACT_APP_TMDB_API}&end_date=${todayConverted}&start_date=${threeDaysBefore}`
+        `https://api.themoviedb.org/3/tv/changes?api_key=${process.env.REACT_APP_TMDB_API}&end_date=${todayConverted}&start_date=${threeDaysBefore}`,
       )
       .then(async ({ data }) => {
         // const tempData = [{ id: 1396 }]
@@ -178,12 +178,12 @@ class Profile extends Component {
         data.results.forEach((show) => {
           this.context.firebase
             .showFullData(show.id)
-            .child("id")
-            .once("value", (snapshot) => {
+            .child('id')
+            .once('value', (snapshot) => {
               if (snapshot.val() !== null) {
                 axios
                   .get(
-                    `https://api.themoviedb.org/3/tv/${show.id}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US`
+                    `https://api.themoviedb.org/3/tv/${show.id}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US`,
                   )
                   .then(({ data: { number_of_seasons } }) => {
                     console.log(show.id)
@@ -200,7 +200,7 @@ class Profile extends Component {
                     }
                     seasonChunks.forEach((item) => {
                       const request = axios.get(
-                        `https://api.themoviedb.org/3/tv/${show.id}?api_key=${process.env.REACT_APP_TMDB_API}&append_to_response=${item}`
+                        `https://api.themoviedb.org/3/tv/${show.id}?api_key=${process.env.REACT_APP_TMDB_API}&append_to_response=${item}`,
                       )
                       apiRequests.push(request)
                     })
@@ -215,7 +215,7 @@ class Profile extends Component {
                       })
                       const mergedRowData = Object.assign({}, ...rowData)
                       Object.entries(mergedRowData).forEach(([key, value]) => {
-                        if (!key.indexOf("season/")) {
+                        if (!key.indexOf('season/')) {
                           seasonsData.push({ [key]: { ...value } })
                         }
                       })
@@ -226,49 +226,49 @@ class Profile extends Component {
                         const episodes = []
                         season.episodes.forEach((item) => {
                           const updatedEpisode = {
-                            air_date: item.air_date || "",
+                            air_date: item.air_date || '',
                             episode_number: item.episode_number || null,
                             name: item.name || null,
                             season_number: item.season_number || null,
-                            id: item.id
+                            id: item.id,
                           }
                           episodes.push(updatedEpisode)
                         })
                         const updatedSeason = {
-                          air_date: season.air_date || "",
+                          air_date: season.air_date || '',
                           season_number: season.season_number || null,
                           id: season._id,
                           poster_path: season.poster_path || null,
                           name: season.name || null,
-                          episodes
+                          episodes,
                         }
                         allEpisodes.push(updatedSeason)
                       })
                       const dataToPass = {
                         episodes: allEpisodes,
                         status: mergedRowData.status,
-                        name: mergedRowData.name
+                        name: mergedRowData.name,
                       }
                       return dataToPass
-                    })
+                    }),
                   )
                   .then((data) => {
                     this.context.firebase
                       .showFullData(show.id)
                       .update({
                         episodes: data.episodes,
-                        status: data.status
+                        status: data.status,
                       })
                       .catch((err) => {
                         console.log(err)
                       })
                     this.context.firebase.showInfo(show.id).update({
                       status: data.status,
-                      name: data.name
+                      name: data.name,
                     })
                     this.context.firebase
                       .showInfo(show.id)
-                      .child("lastUpdatedInDatabase")
+                      .child('lastUpdatedInDatabase')
                       .set(this.context.firebase.timeStamp())
                   })
                   .catch((err) => {
@@ -284,7 +284,7 @@ class Profile extends Component {
     e.preventDefault()
 
     this.setState({
-      passwordUpdate: e.target.value
+      passwordUpdate: e.target.value,
     })
   }
 
@@ -306,22 +306,25 @@ class Profile extends Component {
         <Header />
         <div className="user-settings">
           <div className="user-settings__email">
-            Sign in with <span>{this.context.authUser.email}</span>
+            Sign in with
+            {' '}
+            <span>{this.context.authUser.email}</span>
           </div>
           <div className="user-settings__verified">
             {this.context.authUser.emailVerified ? (
-              "Email verified"
+              'Email verified'
             ) : (
               <>
-                Email not verified{" "}
+                Email not verified
+                {' '}
                 {this.state.verificationSent ? (
                   <div className="user-settings__sent-message">Verification sent</div>
                 ) : (
                   <button onClick={this.sendEmailVerification} className="button button--profile" type="button">
                     {this.state.loadingVerificationSent ? (
-                      <span className="auth__form-loading"></span>
+                      <span className="auth__form-loading" />
                     ) : (
-                      "Send email verification"
+                      'Send email verification'
                     )}
                   </button>
                 )}
@@ -333,41 +336,37 @@ class Profile extends Component {
           </div>
           <PasswordUpdate />
           {[process.env.REACT_APP_TEST_EMAIL, process.env.REACT_APP_ADMIN_EMAIL].includes(
-            this.state.authUser?.email
+            this.state.authUser?.email,
           ) && (
-            <>
-              <div className="update-database">
-                <button onClick={() => this.databaseModify()} className="button button--profile" type="button">
-                  Update Database
-                </button>
-              </div>
-            </>
+            <div className="update-database">
+              <button onClick={() => this.databaseModify()} className="button button--profile" type="button">
+                Update Database
+              </button>
+            </div>
           )}
           <div className="user-settings__copy-user-link">
             <div
-              className={classNames("button", {
-                "button--clipboard-copied": this.state.copiedToClipboard
+              className={classNames('button', {
+                'button--clipboard-copied': this.state.copiedToClipboard,
               })}
-              onClick={() =>
-                this.copyToClipboard(
+              onClick={() => this.copyToClipboard(
                   `${
-                    process.env.NODE_ENV === "production" ? "https://www.tv-junkie.com" : "http://localhost:3000"
-                  }/user/${this.state.authUser.uid}`
-                )
-              }
+                    process.env.NODE_ENV === 'production' ? 'https://www.tv-junkie.com' : 'http://localhost:3000'
+                  }/user/${this.state.authUser.uid}`,
+                )}
             >
               {!this.state.copiedToClipboard ? (
                 <span
-                  className={classNames("clipboard-message", {
-                    "clipboard-message__not-copied": this.state.copiedToClipboard === false
+                  className={classNames('clipboard-message', {
+                    'clipboard-message__not-copied': this.state.copiedToClipboard === false,
                   })}
                 >
                   Copy profile link
                 </span>
               ) : (
                 <span
-                  className={classNames("clipboard-message", {
-                    "clipboard-message__copied": this.state.copiedToClipboard
+                  className={classNames('clipboard-message', {
+                    'clipboard-message__copied': this.state.copiedToClipboard,
                   })}
                 >
                   Copied
@@ -375,7 +374,7 @@ class Profile extends Component {
               )}
             </div>
           </div>
-          {["testchat@gmail.com", process.env.REACT_APP_ADMIN_EMAIL].includes(this.state.authUser?.email) && (
+          {['testchat@gmail.com', process.env.REACT_APP_ADMIN_EMAIL].includes(this.state.authUser?.email) && (
             <>
               <button className="button" onClick={() => this.addMessagesToGroupChats()}>
                 Messages to group chats

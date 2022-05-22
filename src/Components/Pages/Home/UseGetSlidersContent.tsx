@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react"
-import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
-import axios from "axios"
+import { useState, useEffect } from 'react'
+import { ContentDetailes } from 'Utils/Interfaces/ContentDetails'
+import axios from 'axios'
 
 const API_LINK_BASE = `https://api.themoviedb.org/3/discover/tv?api_key=${process.env.REACT_APP_TMDB_API}&\
 language=en-US&page=1&sort_by=vote_count.desc&first_air_date.gte=&first_air_date.lte=&first_air_date_year=&vote_average.gte=&\
@@ -16,21 +16,21 @@ interface ObjectKeysInterface {
 const useGetSlidersContent = () => {
   const [sliders, setSliders] = useState<ObjectKeysInterface>({
     weekTvTrending: {
-      name: "Trending this week",
-      data: []
+      name: 'Trending this week',
+      data: [],
     },
     popularDramas: {
-      name: "Popular dramas",
-      data: []
+      name: 'Popular dramas',
+      data: [],
     },
     popularComedies: {
-      name: "Popular comedies",
-      data: []
+      name: 'Popular comedies',
+      data: [],
     },
     popularCrime: {
-      name: "Popular crime",
-      data: []
-    }
+      name: 'Popular crime',
+      data: [],
+    },
   })
   const [slidersLoading, setSlidersLoading] = useState(false)
   const [error, setError] = useState<string>()
@@ -40,7 +40,7 @@ const useGetSlidersContent = () => {
       setSlidersLoading(true)
 
       const weekTvTrending = axios.get(
-        `https://api.themoviedb.org/3/trending/tv/week?api_key=${process.env.REACT_APP_TMDB_API}`
+        `https://api.themoviedb.org/3/trending/tv/week?api_key=${process.env.REACT_APP_TMDB_API}`,
       )
       const popularDramasPromise = axios.get(`${API_LINK_BASE}&with_genres=18&without_genres=16,35,9648`)
       const popularComediesPromise = axios.get(`${API_LINK_BASE}&with_genres=35&without_genres=16,18`)
@@ -57,15 +57,15 @@ const useGetSlidersContent = () => {
                 ...acc,
                 [key]: {
                   name: sliders[key].name,
-                  data: value.data.results
-                }
+                  data: value.data.results,
+                },
               }
               return acc
             }, {})
 
             setSliders(slidersTemp)
             setSlidersLoading(false)
-          })
+          }),
         )
         .catch((err) => {
           setError(`Something went wrong, sorry. ${err}`)

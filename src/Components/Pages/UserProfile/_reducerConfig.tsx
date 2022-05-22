@@ -1,15 +1,15 @@
-import * as React from "react"
-import { UserShowsInterface } from "Components/UserContent/UseUserShows/UseUserShows"
+import * as React from 'react'
+import { UserShowsInterface } from 'Components/UserContent/UseUserShows/UseUserShows'
 
 const SHOWS_TO_LOAD_INITIAL = 16
 
 export enum ActionTypes {
-  IncrementLoadedShows = "incrementLoadedShows",
-  IncrementLoadedShowsLS = "incrementLoadedShowsLS",
-  DisableLoad = "disableLoad",
-  DisableLoadLS = "disableLoadLS",
-  ChangeActiveSection = "changeActiveSection",
-  UpdateContent = "updateContent"
+  IncrementLoadedShows = 'incrementLoadedShows',
+  IncrementLoadedShowsLS = 'incrementLoadedShowsLS',
+  DisableLoad = 'disableLoad',
+  DisableLoadLS = 'disableLoadLS',
+  ChangeActiveSection = 'changeActiveSection',
+  UpdateContent = 'updateContent',
 }
 
 const reducer: React.Reducer<ShowsContentState, ActionInterface> = (state, action) => {
@@ -21,35 +21,32 @@ const reducer: React.Reducer<ShowsContentState, ActionInterface> = (state, actio
         ...loadedShows,
         [activeSection]: !disableLoad[activeSection]
           ? loadedShows[activeSection] + SHOWS_TO_LOAD_INITIAL
-          : loadedShows[activeSection]
-      }
+          : loadedShows[activeSection],
+      },
     }
-  } else if (action.type === ActionTypes.DisableLoad) {
+  } if (action.type === ActionTypes.DisableLoad) {
     return {
       ...state,
       disableLoad: {
         ...disableLoad,
         [activeSection]: !!(
           loadedShows[activeSection] >=
-          content.filter((show: any) =>
-            activeSection === "finishedShows" ? !!show.finished : !!(show.database === activeSection && !show.finished)
-          ).length
-        )
-      }
+          content.filter((show: any) => (activeSection === 'finishedShows' ? !!show.finished : !!(show.database === activeSection && !show.finished))).length
+        ),
+      },
     }
-  } else if (action.type === ActionTypes.ChangeActiveSection) {
+  } if (action.type === ActionTypes.ChangeActiveSection) {
     return {
       ...state,
-      activeSection: action.payload
+      activeSection: action.payload,
     }
-  } else if (action.type === ActionTypes.UpdateContent) {
+  } if (action.type === ActionTypes.UpdateContent) {
     return {
       ...state,
-      content: action.payload
+      content: action.payload,
     }
-  } else {
-    throw new Error()
   }
+    throw new Error()
 }
 
 export default reducer
@@ -91,15 +88,15 @@ const INITIAL_STATE: ShowsContentState = {
     droppedShows: false,
     willWatchShows: false,
     finishedShows: false,
-    watchingShowsLS: false
+    watchingShowsLS: false,
   },
   loadedShows: {
     watchingShows: SHOWS_TO_LOAD_INITIAL,
     watchingShowsLS: SHOWS_TO_LOAD_INITIAL,
     droppedShows: SHOWS_TO_LOAD_INITIAL,
     willWatchShows: SHOWS_TO_LOAD_INITIAL,
-    finishedShows: SHOWS_TO_LOAD_INITIAL
+    finishedShows: SHOWS_TO_LOAD_INITIAL,
   },
-  activeSection: "watchingShows",
-  content: []
+  activeSection: 'watchingShows',
+  content: [],
 }

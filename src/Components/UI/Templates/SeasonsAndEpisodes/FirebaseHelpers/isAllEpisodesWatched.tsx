@@ -1,17 +1,17 @@
-import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
+import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import {
   SeasonEpisodesFromDatabaseInterface,
-  SingleEpisodeInterface
-} from "Components/UserContent/UseUserShows/UseUserShows"
-import { AuthUserInterface } from "Components/UserAuth/Session/WithAuthentication/@Types"
-import { differenceBtwDatesInDays, todayDate } from "Utils"
-import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
+  SingleEpisodeInterface,
+} from 'Components/UserContent/UseUserShows/UseUserShows'
+import { AuthUserInterface } from 'Components/UserAuth/Session/WithAuthentication/@Types'
+import { differenceBtwDatesInDays, todayDate } from 'Utils'
+import { ContentDetailes } from 'Utils/Interfaces/ContentDetails'
 
 interface Arguments {
   showInfo: ContentDetailes
   releasedEpisodes: SingleEpisodeInterface[]
   episodesFromDatabase: SeasonEpisodesFromDatabaseInterface[]
-  authUser: AuthUserInterface["authUser"]
+  authUser: AuthUserInterface['authUser']
   firebase: FirebaseInterface
   isSingleEpisode?: boolean
   multipleEpisodes?: number
@@ -24,11 +24,11 @@ const isAllEpisodesWatched = ({
   authUser,
   firebase,
   isSingleEpisode,
-  multipleEpisodes
+  multipleEpisodes,
 }: Arguments) => {
-  const status = showInfo.status === "Ended" || showInfo.status === "Canceled" ? "ended" : "ongoing"
+  const status = showInfo.status === 'Ended' || showInfo.status === 'Canceled' ? 'ended' : 'ongoing'
   const allEpisodes = episodesFromDatabase.reduce((acc: SingleEpisodeInterface[], item) => {
-    acc.push(...item.episodes.filter((item) => item.air_date !== ""))
+    acc.push(...item.episodes.filter((item) => item.air_date !== ''))
     return acc
   }, [])
 
@@ -56,13 +56,13 @@ const isAllEpisodesWatched = ({
     ? allEpisodesWatched
     : releasedEpisodesWatched
 
-  const finished = (status === "ended" || showInfo.status === "ended") && isAllEpisodesAired ? true : false
+  const finished = !!((status === 'ended' || showInfo.status === 'ended') && isAllEpisodesAired)
 
   // if (releasedEpisodesWatched) {
   firebase.userShowAllEpisodesInfo(authUser.uid, showInfo.id).update({
     allEpisodesWatched: releasedEpisodesWatched,
     finished,
-    isAllWatched_database: `${releasedEpisodesWatched}_${showInfo.database}`
+    isAllWatched_database: `${releasedEpisodesWatched}_${showInfo.database}`,
   })
 
   firebase

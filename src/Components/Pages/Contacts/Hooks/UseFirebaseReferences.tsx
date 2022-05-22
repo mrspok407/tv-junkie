@@ -1,34 +1,30 @@
-import { ContactStatusInterface } from "../@Types"
-import useFrequentVariables from "../../../../Utils/Hooks/UseFrequentVariables"
+import { ContactStatusInterface } from '../@Types'
+import useFrequentVariables from '../../../../Utils/Hooks/UseFrequentVariables'
 
 const useFirebaseReferences = () => {
   const { firebase, authUser, contactsState } = useFrequentVariables()
   const { activeChat, contacts } = contactsState
   const contactInfo = contacts[activeChat.contactKey] || {}
 
-  const updateMemberStatus = ({ value, isGroupChat, callback }: updateMemberStatus) => {
-    return firebase
+  const updateMemberStatus = ({ value, isGroupChat, callback }: updateMemberStatus) => firebase
       .chatMemberStatus({
         chatKey: activeChat.chatKey,
         memberKey: authUser?.uid!,
-        isGroupChat: isGroupChat || contactInfo.isGroupChat
+        isGroupChat: isGroupChat || contactInfo.isGroupChat,
       })
       .update({ ...value }, callback)
-  }
 
-  const setMemberStatus = ({ value, isGroupChat, callback }: setMemberStatus) => {
-    return firebase
+  const setMemberStatus = ({ value, isGroupChat, callback }: setMemberStatus) => firebase
       .chatMemberStatus({
         chatKey: activeChat.chatKey,
         memberKey: authUser?.uid!,
-        isGroupChat: isGroupChat || contactInfo.isGroupChat
+        isGroupChat: isGroupChat || contactInfo.isGroupChat,
       })
       .set(value, callback)
-  }
 
   return {
     updateMemberStatus,
-    setMemberStatus
+    setMemberStatus,
   }
 }
 
@@ -40,6 +36,6 @@ interface updateMemberStatus {
   callback?: any
 }
 
-interface setMemberStatus extends Omit<updateMemberStatus, "value"> {
+interface setMemberStatus extends Omit<updateMemberStatus, 'value'> {
   value: ContactStatusInterface | null
 }

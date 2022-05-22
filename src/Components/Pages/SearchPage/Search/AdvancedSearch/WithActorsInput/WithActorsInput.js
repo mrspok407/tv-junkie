@@ -1,9 +1,9 @@
-import React, { Component } from "react"
-import { Link } from "react-router-dom"
-import debounce from "debounce"
-import axios, { CancelToken } from "axios"
-import Loader from "Components/UI/Placeholders/Loader"
-import PlaceholderNoResults from "Components/UI/Placeholders/PlaceholderNoResults"
+import React, { Component } from 'react'
+import { Link } from 'react-router-dom'
+import debounce from 'debounce'
+import axios, { CancelToken } from 'axios'
+import Loader from 'Components/UI/Placeholders/Loader'
+import PlaceholderNoResults from 'Components/UI/Placeholders/PlaceholderNoResults'
 
 let cancelRequest
 
@@ -11,23 +11,23 @@ export default class WithActorsInput extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      query: "",
+      query: '',
       actors: [],
       isSearchingActors: false,
       totalPages: null,
-      error: "",
-      listIsOpen: false
+      error: '',
+      listIsOpen: false,
     }
 
     this.searchContRef = React.createRef()
   }
 
   componentDidMount() {
-    document.addEventListener("mousedown", this.handleClickOutside)
+    document.addEventListener('mousedown', this.handleClickOutside)
   }
 
   componentWillUnmount() {
-    document.removeEventListener("mousedown", this.handleClickOutside)
+    document.removeEventListener('mousedown', this.handleClickOutside)
   }
 
   handleSearch = (query) => {
@@ -35,20 +35,20 @@ export default class WithActorsInput extends Component {
       cancelRequest()
     }
 
-    if (!query) return this.setState({ actors: [], isSearchingActors: false, error: "" })
+    if (!query) return this.setState({ actors: [], isSearchingActors: false, error: '' })
 
-    this.setState({ error: "", isSearchingActors: true })
+    this.setState({ error: '', isSearchingActors: true })
     axios
       .get(`https://api.tmdb.org/3/search/person?api_key=${process.env.REACT_APP_TMDB_API}&query=${query}`, {
-        cancelToken: new CancelToken(function executor(c) {
+        cancelToken: new CancelToken((c) => {
           cancelRequest = c
-        })
+        }),
       })
       .then(({ data: { results: actors, total_pages: totalPages } }) => {
         this.setState({
           actors,
           isSearchingActors: false,
-          totalPages
+          totalPages,
         })
       })
       .catch((err) => {
@@ -56,7 +56,7 @@ export default class WithActorsInput extends Component {
         this.setState({
           actors: [],
           isSearchingActors: false,
-          error: "Something went wrong"
+          error: 'Something went wrong',
         })
       })
   }
@@ -65,7 +65,7 @@ export default class WithActorsInput extends Component {
 
   runSearchDeb = debounce(() => this.handleSearch(this.state.query), 300)
 
-  resetSearch = () => this.setState({ query: "" }, this.runSearch)
+  resetSearch = () => this.setState({ query: '' }, this.runSearch)
 
   handleKeyDown = (e) => e.which === 27 && this.resetSearch()
 
@@ -76,14 +76,14 @@ export default class WithActorsInput extends Component {
   handleClickOutside = (e) => {
     if (this.searchContRef.current && !this.searchContRef.current.contains(e.target)) {
       this.setState({
-        listIsOpen: false
+        listIsOpen: false,
       })
     }
   }
 
   onFocus = () => {
     this.setState({
-      listIsOpen: true
+      listIsOpen: true,
     })
   }
 
@@ -92,7 +92,7 @@ export default class WithActorsInput extends Component {
     const { toggleActor, withActors } = this.props
     return error || !Array.isArray(actors) ? (
       <div className="error">
-        <p>{error || "Something gone terrible wrong"}</p>
+        <p>{error || 'Something gone terrible wrong'}</p>
       </div>
     ) : (
       actors.map(({ name, profile_path, id, known_for, known_for_department }) => (
@@ -103,22 +103,25 @@ export default class WithActorsInput extends Component {
               style={
                 profile_path !== null
                   ? {
-                      backgroundImage: `url(https://image.tmdb.org/t/p/w500/${profile_path})`
+                      backgroundImage: `url(https://image.tmdb.org/t/p/w500/${profile_path})`,
                     }
                   : {
-                      backgroundImage: `url(https://d32qys9a6wm9no.cloudfront.net/images/movies/poster/500x735.png)`
+                      backgroundImage: 'url(https://d32qys9a6wm9no.cloudfront.net/images/movies/poster/500x735.png)',
                     }
               }
             />
             <div className="search-card__info-name">{name}</div>
-            <div className="search-card__info-activity">Main activity: {known_for_department}</div>
+            <div className="search-card__info-activity">
+              Main activity:
+              {known_for_department}
+            </div>
             <div className="search-card__info-known-movies">
               {known_for.map((item, i) => {
-                const mediaType = item.media_type === "movie" ? "movie" : "show"
+                const mediaType = item.media_type === 'movie' ? 'movie' : 'show'
 
-                const title = item.media_type === "movie" ? item.original_title || "No title" : item.name || "No title"
+                const title = item.media_type === 'movie' ? item.original_title || 'No title' : item.name || 'No title'
 
-                const releaseDate = item.media_type === "movie" ? item.release_date || "" : item.first_air_date || ""
+                const releaseDate = item.media_type === 'movie' ? item.release_date || '' : item.first_air_date || ''
 
                 return (
                   <span key={item.id}>
@@ -192,7 +195,7 @@ export default class WithActorsInput extends Component {
           {this.state.isSearchingActors && <Loader className="loader--small-pink" />}
           {this.state.query && <button type="button" className="button--input-clear" onClick={this.resetSearch} />}
         </div>
-        {this.state.totalPages === 0 && this.state.query !== "" && this.state.listIsOpen ? (
+        {this.state.totalPages === 0 && this.state.query !== '' && this.state.listIsOpen ? (
           <PlaceholderNoResults message="No results found" handleClickOutside={this.handleClickOutside} />
         ) : (
           this.state.listIsOpen && <div className="search-list search-list--with-actors">{this.renderActors()}</div>

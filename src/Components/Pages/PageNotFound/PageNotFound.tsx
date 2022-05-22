@@ -1,15 +1,15 @@
-import React, { useEffect, useReducer } from "react"
-import { Link, useHistory } from "react-router-dom"
-import { Helmet } from "react-helmet"
-import * as ROUTES from "Utils/Constants/routes"
-import Header from "Components/UI/Header/Header"
-import logo404 from "assets/images/doge-404.png"
-import Footer from "Components/UI/Footer/Footer"
-import "./PageNotFound.scss"
+import React, { useEffect, useReducer } from 'react'
+import { Link, useHistory } from 'react-router-dom'
+import { Helmet } from 'react-helmet'
+import * as ROUTES from 'Utils/Constants/routes'
+import Header from 'Components/UI/Header/Header'
+import logo404 from 'assets/images/doge-404.png'
+import Footer from 'Components/UI/Footer/Footer'
+import './PageNotFound.scss'
 
 const COUNTDOWN_INTERVAL = 1000
 const initialState = {
-  countdownToRedirect: 5
+  countdownToRedirect: 5,
 }
 
 const PageNotFound: React.FC = () => {
@@ -17,17 +17,16 @@ const PageNotFound: React.FC = () => {
 
   const reducer = (state: { countdownToRedirect: number }, action: { type: string }) => {
     const { countdownToRedirect } = state
-    if (action.type === "subtract") {
+    if (action.type === 'subtract') {
       return { countdownToRedirect: countdownToRedirect - 1 }
-    } else {
-      throw new Error()
     }
+      throw new Error()
   }
   const [state, dispatch] = useReducer(reducer, initialState)
 
   useEffect(() => {
     const countdownTimer = setInterval(() => {
-      dispatch({ type: "subtract" })
+      dispatch({ type: 'subtract' })
     }, COUNTDOWN_INTERVAL)
 
     return () => {
@@ -50,13 +49,18 @@ const PageNotFound: React.FC = () => {
       <div className="page-not-found">
         <img className="page-not-found__img" src={logo404} alt="page not found" />
         <h1 className="page-not-found__heading">
-          Very not existing page. You'll be redirected to{" "}
+          Very not existing page. You'll be redirected to
+          {' '}
           <Link className="page-not-found__link" to={ROUTES.HOME_PAGE}>
             Home Page
-          </Link>{" "}
-          in{" "}
+          </Link>
+          {' '}
+          in
+          {' '}
           <span>
-            {state.countdownToRedirect} {state.countdownToRedirect === 1 ? "second" : "seconds"}
+            {state.countdownToRedirect}
+            {' '}
+            {state.countdownToRedirect === 1 ? 'second' : 'seconds'}
           </span>
         </h1>
       </div>

@@ -1,4 +1,4 @@
-import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
+import { ContentDetailes } from 'Utils/Interfaces/ContentDetails'
 
 export interface UserShowsInterface extends ContentDetailes {
   allEpisodesWatched: boolean

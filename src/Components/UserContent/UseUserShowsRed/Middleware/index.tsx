@@ -1,11 +1,12 @@
-import { AppThunk } from "app/store"
-import sortDataSnapshot from "../../FirebaseHelpers/sortDataSnapshot"
-import { SeasonEpisodesFromDatabaseInterface, UserShowsInterface } from "../@Types"
-import { FirebaseInterface } from "Components/Firebase/FirebaseContext"
-import fetchShowsFullData from "../FirebaseHelpers/FetchData/fetchShowsFullData"
-import { merge } from "lodash"
-import { combineMergeObjects } from "Utils"
-import { userShowsListeners } from "./firebaseListeners"
+import { AppThunk } from 'app/store'
+import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
+import { merge } from 'lodash'
+import { combineMergeObjects } from 'Utils'
+import { getAuthUidFromState } from 'Components/UserAuth/Session/WithAuthentication/Helpers'
+import sortDataSnapshot from '../../FirebaseHelpers/sortDataSnapshot'
+import { SeasonEpisodesFromDatabaseInterface, UserShowsInterface } from '../@Types'
+import fetchShowsFullData from '../FirebaseHelpers/FetchData/fetchShowsFullData'
+import { userShowsListeners } from './firebaseListeners'
 import {
   addNewShow,
   changeShow,
@@ -14,23 +15,21 @@ import {
   setError,
   setShowEpisodes,
   setUserShows,
-  updateLoadingShows
-} from "../userShowsSliceRed"
-import { fetchEpisodesFullData } from "../FirebaseHelpers/FetchData"
-import { getAuthUidFromState } from "Components/UserAuth/Session/WithAuthentication/Helpers"
+  updateLoadingShows,
+} from '../userShowsSliceRed'
+import { fetchEpisodesFullData } from '../FirebaseHelpers/FetchData'
 
 export const fetchUserShows =
-  (firebase: FirebaseInterface): AppThunk =>
-  async (dispatch, getState) => {
+  (firebase: FirebaseInterface): AppThunk => async (dispatch, getState) => {
     dispatch(updateLoadingShows(true))
-    console.log("fetchUserShows")
+    console.log('fetchUserShows')
     const authUserUid = getAuthUidFromState(getState())
     try {
-      const userShowsSnapshot = await firebase.userAllShows(authUserUid).orderByChild("timeStamp").once("value")
+      const userShowsSnapshot = await firebase.userAllShows(authUserUid).orderByChild('timeStamp').once('value')
       const userShows = sortDataSnapshot<UserShowsInterface>(userShowsSnapshot)
       const showsFullData = await fetchShowsFullData({ userShows, firebase, uid: authUserUid })
       const mergedShows: UserShowsInterface[] = merge(showsFullData, userShows, {
-        arrayMerge: combineMergeObjects
+        arrayMerge: combineMergeObjects,
       })
 
       dispatch(setUserShows(mergedShows))
@@ -41,16 +40,15 @@ export const fetchUserShows =
   }
 
 export const fetchShowEpisodes =
-  (id: number, uid: string, firebase: FirebaseInterface): AppThunk =>
-  async (dispatch, getState) => {
+  (id: number, uid: string, firebase: FirebaseInterface): AppThunk => async (dispatch, getState) => {
     if (!selectShow(getState(), id)) return
     if (selectShowEpisodes(getState(), id).length) {
-      console.log("fetchShowEpisodes earlyReturn")
+      console.log('fetchShowEpisodes earlyReturn')
       return
     }
     try {
       const episodes = await fetchEpisodesFullData({ uid, showKey: id, firebase })
-      console.log("fetchShowEpisodes")
+      console.log('fetchShowEpisodes')
       dispatch(setShowEpisodes({ id, episodes }))
     } catch (err) {
       dispatch(setError(err))
@@ -58,16 +56,15 @@ export const fetchShowEpisodes =
   }
 
 export const handleNewShow =
-  (showData: UserShowsInterface, uid: string, firebase: FirebaseInterface): AppThunk =>
-  async (dispatch) => {
-    const isWatchingShow = showData.database === "watchingShows"
+  (showData: UserShowsInterface, uid: string, firebase: FirebaseInterface): AppThunk => async (dispatch) => {
+    const isWatchingShow = showData.database === 'watchingShows'
     try {
       let episodes: SeasonEpisodesFromDatabaseInterface[] = []
-      const showInfoSnapshot = await firebase.showInfo(showData.id).once("value")
+      const showInfoSnapshot = await firebase.showInfo(showData.id).once('value')
       if (showInfoSnapshot.val() === null) {
         throw new Error(
           "There's no data in database, by this path. And if this function is called the data should be here.\n" +
-            "Find out the reason why the data is missing at the point of calling this function."
+            'Find out the reason why the data is missing at the point of calling this function.',
         )
       }
 
@@ -78,7 +75,7 @@ export const handleNewShow =
         ...showInfoSnapshot.val(),
         ...showData,
         episodes,
-        episodesFetched: isWatchingShow
+        episodesFetched: isWatchingShow,
       }
       dispatch(addNewShow(show))
     } catch (err) {
@@ -87,24 +84,23 @@ export const handleNewShow =
   }
 
 export const handleChangeShow =
-  (showData: UserShowsInterface, uid: string, firebase: FirebaseInterface): AppThunk =>
-  async (dispatch, getState) => {
+  (showData: UserShowsInterface, uid: string, firebase: FirebaseInterface): AppThunk => async (dispatch, getState) => {
     const showFromStore = selectShow(getState(), showData.id)
     console.log({ showFromStore })
     if (!showFromStore) return
 
-    const isWatchingShow = showData.database === "watchingShows"
+    const isWatchingShow = showData.database === 'watchingShows'
     const isEpisodesFetched = showFromStore.episodesFetched
 
     if (!isWatchingShow || isEpisodesFetched) {
-      console.log("allready fetched")
+      console.log('allready fetched')
       dispatch(changeShow(showData))
       return
     }
 
     try {
       const episodes = await fetchEpisodesFullData({ uid, showKey: showData.id, firebase })
-      console.log("handleChangeShow after AWAIT")
+      console.log('handleChangeShow after AWAIT')
 
       const show = { ...showData, episodes, episodesFetched: true }
       dispatch(changeShow(show))

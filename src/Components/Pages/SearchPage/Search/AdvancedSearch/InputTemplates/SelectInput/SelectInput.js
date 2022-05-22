@@ -1,8 +1,8 @@
-import React from "react"
-import { useField } from "formik"
-import "./SelectInput.scss"
+import React from 'react'
+import { useField } from 'formik'
+import './SelectInput.scss'
 
-export default function SelectInput({ label, className = "", ...props }) {
+export default function SelectInput({ label, className = '', ...props }) {
   const [field, meta] = useField(props)
   return (
     <div className={`select-input-container ${className}`}>

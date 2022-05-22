@@ -1,6 +1,6 @@
-import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
-import React from "react"
-import "./SelectOptions.scss"
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import React from 'react'
+import './SelectOptions.scss'
 
 type Props = {}
 
@@ -11,17 +11,17 @@ const SelectOptions: React.FC<Props> = () => {
   const selectedMessagesData = selectedMessages[activeChat.chatKey] || []
 
   const handleCancel = () => {
-    contactsDispatch({ type: "clearSelectedMessages", payload: { chatKey: activeChat.chatKey } })
+    contactsDispatch({ type: 'clearSelectedMessages', payload: { chatKey: activeChat.chatKey } })
   }
 
   const handleDelete = () => {
     contactsDispatch({
-      type: "updateConfirmModal",
+      type: 'updateConfirmModal',
       payload: {
         isActive: true,
-        function: `${contactInfo.isGroupChat ? "deleteSelectedMessagesGroupChat" : "deleteSelectedMessages"}`,
-        contactKey: activeChat.contactKey
-      }
+        function: `${contactInfo.isGroupChat ? 'deleteSelectedMessagesGroupChat' : 'deleteSelectedMessages'}`,
+        contactKey: activeChat.contactKey,
+      },
     })
   }
   return (

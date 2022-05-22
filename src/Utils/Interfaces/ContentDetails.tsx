@@ -1,7 +1,7 @@
 import {
   SeasonEpisodesFromDatabaseInterface,
-  SingleEpisodeInterface
-} from "Components/UserContent/UseUserShows/UseUserShows"
+  SingleEpisodeInterface,
+} from 'Components/UserContent/UseUserShows/UseUserShows'
 
 export interface SeasonsFromAPI {
   air_date?: string
@@ -65,40 +65,40 @@ interface ContentDetailes {
 
 const CONTENT_DETAILS_DEFAULT: ContentDetailes = {
   id: 0,
-  poster_path: "-",
-  backdrop_path: "-",
-  name: "-",
-  original_name: "-",
-  title: "-",
-  original_title: "-",
-  original_language: "-",
+  poster_path: '-',
+  backdrop_path: '-',
+  name: '-',
+  original_name: '-',
+  title: '-',
+  original_title: '-',
+  original_language: '-',
   known_for: [],
-  known_for_department: "-",
-  profile_path: "-",
+  known_for_department: '-',
+  profile_path: '-',
   origin_country: [],
-  first_air_date: "-",
-  release_date: "-",
-  last_air_date: "-",
-  episode_run_time: ["-"],
-  runtime: "-",
-  status: "-",
+  first_air_date: '-',
+  release_date: '-',
+  last_air_date: '-',
+  episode_run_time: ['-'],
+  runtime: '-',
+  status: '-',
   genres: [],
   genre_ids: [],
   networks: [],
   production_companies: [],
-  vote_average: "-",
-  vote_count: "-",
-  overview: "-",
-  media_type: "-",
-  tagline: "-",
+  vote_average: '-',
+  vote_count: '-',
+  overview: '-',
+  media_type: '-',
+  tagline: '-',
   budget: 0,
-  number_of_seasons: "-",
-  imdb_id: "",
+  number_of_seasons: '-',
+  imdb_id: '',
   seasonsFromAPI: [],
   seasons: [],
   allEpisodesWatched: false,
-  database: "",
-  torrents: [{ hash: "", quality: "" }]
+  database: '',
+  torrents: [{ hash: '', quality: '' }],
 }
 
 export type { ContentDetailes }

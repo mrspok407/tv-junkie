@@ -1,5 +1,5 @@
-import React, { Component } from "react"
-import { throttle } from "throttle-debounce"
+import React, { Component } from 'react'
+import { throttle } from 'throttle-debounce'
 
 const scrollToTopThreshold = 1000
 
@@ -10,16 +10,16 @@ export default class scrollToTop extends Component {
     this.state = {
       scrollToTopShown: false,
       scrollToPreviousShown: false,
-      savedY: 0
+      savedY: 0,
     }
   }
 
   componentDidMount() {
-    window.addEventListener("scroll", this.handleScroll)
+    window.addEventListener('scroll', this.handleScroll)
   }
 
   componentWillUnmount() {
-    window.removeEventListener("scroll", this.handleScroll)
+    window.removeEventListener('scroll', this.handleScroll)
   }
 
   handleScroll = throttle(200, () => {
@@ -39,7 +39,7 @@ export default class scrollToTop extends Component {
     this.setState({
       scrollToTopShown: false,
       scrollToPreviousShown: true,
-      savedY: window.scrollY
+      savedY: window.scrollY,
     })
     window.scrollTo(0, 0)
   }

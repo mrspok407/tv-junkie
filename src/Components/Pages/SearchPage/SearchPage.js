@@ -1,22 +1,22 @@
-import React, { Component } from "react"
-import axios, { CancelToken } from "axios"
-import { throttle } from "throttle-debounce"
-import { Helmet } from "react-helmet"
-import ScrollToTopBar from "Utils/ScrollToTopBar"
-import Search from "./Search/Search"
-import AdvancedSearch from "Components/Pages/SearchPage/Search/AdvancedSearch/AdvancedSearch"
-import SearchResults from "./SearchResults/SearchResults"
-import PlaceholderNoResults from "Components/UI/Placeholders/PlaceholderNoResults"
-import Header from "Components/UI/Header/Header"
-import Footer from "Components/UI/Footer/Footer"
-import googleRedirectHOC from "Components/UserAuth/SignIn/GoogleRedirectHOC"
-import "./SearchPage.scss"
+import React, { Component } from 'react'
+import axios, { CancelToken } from 'axios'
+import { throttle } from 'throttle-debounce'
+import { Helmet } from 'react-helmet'
+import ScrollToTopBar from 'Utils/ScrollToTopBar'
+import AdvancedSearch from 'Components/Pages/SearchPage/Search/AdvancedSearch/AdvancedSearch'
+import PlaceholderNoResults from 'Components/UI/Placeholders/PlaceholderNoResults'
+import Header from 'Components/UI/Header/Header'
+import Footer from 'Components/UI/Footer/Footer'
+import googleRedirectHOC from 'Components/UserAuth/SignIn/GoogleRedirectHOC'
+import SearchResults from './SearchResults/SearchResults'
+import Search from './Search/Search'
+import './SearchPage.scss'
 
-const SESSION_STORAGE_KEY_ADV = "advancedSearchContent"
-const SESSION_STORAGE_KEY_ACTORS = "addedActors"
-const SESSION_STORAGE_KEY_INPUTS = "advSearchInputs"
-const SESSION_STORAGE_KEY_PAGENUMBER = "pageNumber"
-const SESSION_STORAGE_KEY_TOTALPAGES = "totalPages"
+const SESSION_STORAGE_KEY_ADV = 'advancedSearchContent'
+const SESSION_STORAGE_KEY_ACTORS = 'addedActors'
+const SESSION_STORAGE_KEY_INPUTS = 'advSearchInputs'
+const SESSION_STORAGE_KEY_PAGENUMBER = 'pageNumber'
+const SESSION_STORAGE_KEY_TOTALPAGES = 'totalPages'
 
 const currentYear = new Date().getFullYear()
 
@@ -33,19 +33,19 @@ class SearchPage extends Component {
       searchingMovie: false,
       searchingAdvancedSearch: false,
       loadingNewPage: false,
-      error: ""
+      error: '',
     }
   }
 
   componentDidMount() {
-    window.addEventListener("scroll", this.handleScroll)
+    window.addEventListener('scroll', this.handleScroll)
   }
 
   componentWillUnmount() {
     if (cancelRequestAdvSearch !== undefined) {
       cancelRequestAdvSearch()
     }
-    window.removeEventListener("scroll", this.handleScroll)
+    window.removeEventListener('scroll', this.handleScroll)
   }
 
   componentDidUpdate() {
@@ -63,27 +63,27 @@ class SearchPage extends Component {
 
     this.setState({
       searchingAdvancedSearch: true,
-      numOfPagesLoaded: 1
+      numOfPagesLoaded: 1,
     })
 
     const { advancedSearchContent } = this.state
 
     const toYear = yearTo || currentYear
-    const fromYear = yearFrom || "1900"
+    const fromYear = yearFrom || '1900'
     const yearRange =
-      (decade === "" && yearFrom === "" && yearTo === "") || year !== ""
+      (decade === '' && yearFrom === '' && yearTo === '') || year !== ''
         ? {
-            start: "",
-            finish: ""
+            start: '',
+            finish: '',
           }
-        : decade !== ""
+        : decade !== ''
         ? {
             start: `${decade}-01-01`,
-            finish: `${parseInt(decade, 10) + 9}-12-31`
+            finish: `${parseInt(decade, 10) + 9}-12-31`,
           }
         : {
             start: `${fromYear}-01-01`,
-            finish: `${parseInt(toYear, 10)}-12-31`
+            finish: `${parseInt(toYear, 10)}-12-31`,
           }
 
     const getWithGenres = genres
@@ -102,9 +102,9 @@ class SearchPage extends Component {
 
     const getActors = withActors.map((item) => item.id).join()
 
-    const voteCountMoreThan = parseInt(voteCount, 10) <= 100 || voteCount === "" ? "25" : voteCount
+    const voteCountMoreThan = parseInt(voteCount, 10) <= 100 || voteCount === '' ? '25' : voteCount
 
-    const sortTvDate = sortBy === "primary_release_date.desc" ? "first_air_date.desc" : sortBy
+    const sortTvDate = sortBy === 'primary_release_date.desc' ? 'first_air_date.desc' : sortBy
 
     this.setState({
       advSearchInputValues: {
@@ -118,8 +118,8 @@ class SearchPage extends Component {
         sortBy,
         getActors,
         mediaType,
-        sortTvDate
-      }
+        sortTvDate,
+      },
     })
 
     // const sortMapping = {
@@ -137,7 +137,7 @@ class SearchPage extends Component {
     // }
 
     const getMovies =
-      mediaType === "movie" &&
+      mediaType === 'movie' &&
       `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US\
 &include_adult=false&include_video=true&page=${this.state.numOfPagesLoaded}&primary_release_year=${year}&\
 primary_release_date.gte=${yearRange.start}&primary_release_date.lte=${yearRange.finish}\
@@ -145,7 +145,7 @@ primary_release_date.gte=${yearRange.start}&primary_release_date.lte=${yearRange
 vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
 
     const getTvShows =
-      mediaType === "tv" &&
+      mediaType === 'tv' &&
       `https://api.themoviedb.org/3/discover/tv?api_key=${process.env.REACT_APP_TMDB_API}\
 &language=en-US&page=${this.state.numOfPagesLoaded}&sort_by=${sortTvDate}&first_air_date.gte=${yearRange.start}&first_air_date.lte=${yearRange.finish}\
 &first_air_date_year=${year}&vote_average.gte=${rating}&vote_count.gte=${voteCountMoreThan}&include_null_first_air_dates=false\
@@ -153,9 +153,9 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
 
     axios
       .get(getMovies || getTvShows, {
-        cancelToken: new CancelToken(function executor(c) {
+        cancelToken: new CancelToken((c) => {
           cancelRequestAdvSearch = c
-        })
+        }),
       })
       .then(({ data: { results: movies, total_pages: totalPages } }) => {
         this.setState({
@@ -163,42 +163,42 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
           advSearchNoResults: movies.length === 0,
           searchingAdvancedSearch: false,
           numOfPagesLoaded: 1,
-          totalPagesAdvMovies: totalPages
+          totalPagesAdvMovies: totalPages,
         })
       })
       .catch((err) => {
         if (axios.isCancel(err)) return
         this.setState({
           advancedSearchContent: [...advancedSearchContent],
-          searchingAdvancedSearch: false
+          searchingAdvancedSearch: false,
         })
       })
   }
 
   loadMorePages = (getMovies, getTvShows, advancedSearchContent, pageNum) => {
     this.setState({
-      loadingNewPage: true
+      loadingNewPage: true,
     })
 
     axios
       .get(getMovies || getTvShows, {
-        cancelToken: new CancelToken(function executor(c) {
+        cancelToken: new CancelToken((c) => {
           cancelRequestAdvSearch = c
-        })
+        }),
       })
       .then(({ data: { results: movies, total_pages: totalPages } }) => {
         this.setState({
           advancedSearchContent: [...advancedSearchContent, ...movies],
           numOfPagesLoaded: pageNum,
           totalPagesAdvMovies: totalPages,
-          loadingNewPage: false
+          loadingNewPage: false,
         })
       })
       .catch((err) => {
         if (axios.isCancel(err)) return
         this.setState({
           advancedSearchContent: [...advancedSearchContent],
-          loadingNewPage: false
+          loadingNewPage: false,
         })
       })
   }
@@ -206,8 +206,7 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
   handleScroll = throttle(500, () => {
     if (this.state.loadingNewPage) return
 
-    if (this.state.advancedSearchContent.length < 20 || this.state.totalPagesAdvMovies <= this.state.numOfPagesLoaded)
-      return
+    if (this.state.advancedSearchContent.length < 20 || this.state.totalPagesAdvMovies <= this.state.numOfPagesLoaded) return
 
     if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 850) {
       const {
@@ -221,7 +220,7 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
         sortBy,
         getActors,
         mediaType,
-        sortTvDate
+        sortTvDate,
       } = this.state.advSearchInputValues
 
       const pageNum = this.state.numOfPagesLoaded + 1
@@ -229,7 +228,7 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
       const { advancedSearchContent } = this.state
 
       const getMovies =
-        mediaType === "movie" &&
+        mediaType === 'movie' &&
         `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US\
 &include_adult=false&include_video=true&page=${pageNum}&primary_release_year=${year}&\
 primary_release_date.gte=${yearRangeStart}&primary_release_date.lte=${yearRangeFinish}\
@@ -237,7 +236,7 @@ primary_release_date.gte=${yearRangeStart}&primary_release_date.lte=${yearRangeF
 vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
 
       const getTvShows =
-        mediaType === "tv" &&
+        mediaType === 'tv' &&
         `https://api.themoviedb.org/3/discover/tv?api_key=${process.env.REACT_APP_TMDB_API}\
 &language=en-US&page=${pageNum}&sort_by=${sortTvDate}&first_air_date.gte=${yearRangeStart}&first_air_date.lte=${yearRangeFinish}\
 &first_air_date_year=${year}&vote_average.gte=${rating}&vote_count.gte=${voteCountMoreThan}&include_null_first_air_dates=false\
@@ -261,17 +260,17 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
     if (indexInActors !== -1) {
       actorsArr.splice(indexInActors, 1)
       this.setState({
-        withActors: actorsArr
+        withActors: actorsArr,
       })
     } else {
       this.setState({
         withActors: [
           {
             name,
-            id
+            id,
           },
-          ...actorsArr
-        ]
+          ...actorsArr,
+        ],
       })
     }
   }

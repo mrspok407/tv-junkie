@@ -1,4 +1,4 @@
-import React, { Component } from "react"
+import React, { Component } from 'react'
 
 export default class ErrorBoundary extends Component {
   constructor(props) {
@@ -8,8 +8,8 @@ export default class ErrorBoundary extends Component {
 
   componentDidCatch(error, errorInfo) {
     this.setState({
-      error: error,
-      errorInfo: errorInfo
+      error,
+      errorInfo,
     })
   }
 
@@ -27,14 +27,12 @@ export default class ErrorBoundary extends Component {
   }
 }
 
-export function ErrorFallback({ error, resetErrorBoundary }) {
-  return (
-    <div style={{ display: "flex", flexDirection: "column", rowGap: "5px", marginTop: "15px" }} role="alert">
-      <p style={{ fontSize: "1.2rem", color: "white" }}>Something went wrong</p>
-      <pre>{error.message}</pre>
-      <button className="button" onClick={resetErrorBoundary}>
-        Try again
-      </button>
-    </div>
+export const ErrorFallback = ({ error, resetErrorBoundary }) => (
+  <div style={{ display: 'flex', flexDirection: 'column', rowGap: '5px', marginTop: '15px' }} role="alert">
+    <p style={{ fontSize: '1.2rem', color: 'white' }}>Something went wrong</p>
+    <pre>{error.message}</pre>
+    <button className="button" onClick={resetErrorBoundary}>
+      Try again
+    </button>
+  </div>
   )
-}

@@ -1,24 +1,24 @@
 /* eslint-disable react/button-has-type */
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import React, { useState } from "react"
-import { Formik, Form } from "formik"
-import { Persist } from "formik-persist"
-import * as Yup from "yup"
-import classNames from "classnames"
-import DatesInputs from "./DatesInputs/DatesInputs"
-import GenreInputs from "./GenreInputs/GenreInputs"
-import VotesRatingSortType from "./VotesRatingSortType/VotesRatingSortType"
-import WithActorsInput from "./WithActorsInput/WithActorsInput"
-import Loader from "Components/UI/Placeholders/Loader"
-import { listOfGenres } from "Utils"
-import "./AdvancedSearch.scss"
+import React, { useState } from 'react'
+import { Formik, Form } from 'formik'
+import { Persist } from 'formik-persist'
+import * as Yup from 'yup'
+import classNames from 'classnames'
+import Loader from 'Components/UI/Placeholders/Loader'
+import { listOfGenres } from 'Utils'
+import DatesInputs from './DatesInputs/DatesInputs'
+import GenreInputs from './GenreInputs/GenreInputs'
+import VotesRatingSortType from './VotesRatingSortType/VotesRatingSortType'
+import WithActorsInput from './WithActorsInput/WithActorsInput'
+import './AdvancedSearch.scss'
 
 export default function AdvancedSearch({
   advancedSearch,
   searchingAdvancedSearch,
   withActors,
   toggleActor,
-  clearWithActors
+  clearWithActors,
 }) {
   const [advSearchOpen, setAdvSearchOpen] = useState(false)
   const [genres, setGenres] = useState(listOfGenres)
@@ -26,13 +26,13 @@ export default function AdvancedSearch({
   function toggleGenre(e) {
     const newGenres = [...genres]
     const genre = newGenres.find((item) => item.name?.toLowerCase() === e.target.value)
-    const data = e.target.getAttribute("data")
+    const data = e.target.getAttribute('data')
 
     genre.isChecked = !genre.isChecked
 
-    if (data === "withGenre") {
+    if (data === 'withGenre') {
       genre.withGenre = !genre.withGenre
-    } else if (data === "withoutGenre") {
+    } else if (data === 'withoutGenre') {
       genre.withoutGenre = !genre.withoutGenre
     }
 
@@ -41,38 +41,36 @@ export default function AdvancedSearch({
 
   function clearCheckboxes() {
     const newGenres = [...genres]
-    const resetGenres = newGenres.map(({ id, name }) => {
-      return {
+    const resetGenres = newGenres.map(({ id, name }) => ({
         id,
         name,
         isChecked: false,
         withGenre: false,
-        withoutGenre: false
-      }
-    })
+        withoutGenre: false,
+      }))
     setGenres(resetGenres)
   }
 
   return (
     <Formik
       initialValues={{
-        year: "",
-        decade: "",
-        yearFrom: "",
-        yearTo: "",
-        rating: "",
-        voteCount: "",
-        sortBy: "vote_count.desc",
-        mediaType: "movie"
+        year: '',
+        decade: '',
+        yearFrom: '',
+        yearTo: '',
+        rating: '',
+        voteCount: '',
+        sortBy: 'vote_count.desc',
+        mediaType: 'movie',
       }}
       validationSchema={Yup.object({
         // year: Yup.mixed().required("Required")
       })}
       onSubmit={(values, { setSubmitting, setFieldValue }) => {
         let yearTo
-        if (values.yearTo < values.yearFrom && values.yearTo !== "") {
+        if (values.yearTo < values.yearFrom && values.yearTo !== '') {
           yearTo = values.yearFrom
-          setFieldValue("yearTo", values.yearFrom)
+          setFieldValue('yearTo', values.yearFrom)
         } else {
           yearTo = values.yearTo
         }
@@ -87,7 +85,7 @@ export default function AdvancedSearch({
           values.sortBy,
           values.mediaType,
           withActors,
-          genres
+          genres,
         )
         setSubmitting(false)
       }}
@@ -95,7 +93,7 @@ export default function AdvancedSearch({
       {({ setFieldValue, handleChange, values }) => (
         <div className="advanced-search__cont">
           <button className="button button--adv-search-form" onClick={() => setAdvSearchOpen(!advSearchOpen)}>
-            {!advSearchOpen ? "Open Advanced Search" : "Close Advanced Search"}
+            {!advSearchOpen ? 'Open Advanced Search' : 'Close Advanced Search'}
           </button>
           {advSearchOpen && (
             <div className="form__wrapper">
@@ -115,18 +113,18 @@ export default function AdvancedSearch({
                   <div className="inputs__other">
                     <VotesRatingSortType handleChange={handleChange} />
                   </div>
-                  {values.mediaType === "movie" ? (
+                  {values.mediaType === 'movie' ? (
                     <WithActorsInput toggleActor={toggleActor} withActors={withActors} />
                   ) : (
-                    ""
+                    ''
                   )}
                 </div>
 
                 <div className="inputs__buttons">
                   <div className="inputs__buttons--search">
                     <button
-                      className={classNames("button", {
-                        "button--loading": searchingAdvancedSearch
+                      className={classNames('button', {
+                        'button--loading': searchingAdvancedSearch,
                       })}
                       type="submit"
                     >

@@ -1,7 +1,7 @@
-import React from "react"
-import useGoogleRedirect from "./UseGoogleRedirect"
+import React from 'react'
+import useGoogleRedirect from './UseGoogleRedirect'
 
-const googleRedirectHOC = (Component) => (props) => {
+const googleRedirectHOC = (Component) => function (props) {
   useGoogleRedirect()
   return <Component {...props} />
 }

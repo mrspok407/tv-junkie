@@ -1,11 +1,11 @@
-import React, { useContext } from "react"
-import ShowsButtonsRed from "./ShowsButtonsRed"
-import classNames from "classnames"
-import { AppContext } from "Components/AppContext/AppContextHOC"
-import UserRating from "Components/UI/UserRating/UserRating"
-import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
-import { useAppSelector } from "app/hooks"
-import { selectAuthUser } from "Components/UserAuth/Session/WithAuthentication/authUserSlice"
+import React, { useContext } from 'react'
+import classNames from 'classnames'
+import { AppContext } from 'Components/AppContext/AppContextHOC'
+import UserRating from 'Components/UI/UserRating/UserRating'
+import { ContentDetailes } from 'Utils/Interfaces/ContentDetails'
+import { useAppSelector } from 'app/hooks'
+import { selectAuthUser } from 'Components/UserAuth/Session/WithAuthentication/authUserSlice'
+import ShowsButtonsRed from './ShowsButtonsRed'
 
 type Props = {
   detailes: ContentDetailes
@@ -19,16 +19,16 @@ export const MainInfo: React.FC<Props> = ({ detailes, mediaType, id }) => {
   const { authUser } = useAppSelector(selectAuthUser)
 
   const movieInLS = context.userContentLocalStorage.watchLaterMovies.find(
-    (item: { id: number }) => item.id === Number(id)
+    (item: { id: number }) => item.id === Number(id),
   )
 
-  const isMediaTypeTV = mediaType === "show"
+  const isMediaTypeTV = mediaType === 'show'
   const title = isMediaTypeTV ? detailes.name : detailes.title
   const yearRelease = isMediaTypeTV ? detailes.first_air_date.slice(0, 4) : detailes.release_date.slice(0, 4)
   const yearEnded = isMediaTypeTV && detailes.last_air_date.slice(0, 4)
 
   const yearRange =
-    detailes.status === "Ended" || detailes.status === "Canceled"
+    detailes.status === 'Ended' || detailes.status === 'Canceled'
       ? `${yearRelease} - ${yearEnded}`
       : `${yearRelease} - ...`
 
@@ -36,14 +36,14 @@ export const MainInfo: React.FC<Props> = ({ detailes, mediaType, id }) => {
 
   const formatedBudget =
     detailes.budget !== 0 ? (
-      new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD"
+      new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
       })
         .format(detailes.budget)
         .slice(0, -3)
-        .split(",")
-        .join(".")
+        .split(',')
+        .join('.')
     ) : (
       <span className="detailes-page__info-no-info">-</span>
     )
@@ -52,15 +52,15 @@ export const MainInfo: React.FC<Props> = ({ detailes, mediaType, id }) => {
     <div className="detailes-page__info">
       <div className="detailes-page__info-title">
         {title}
-        <span>{isMediaTypeTV && yearRelease !== "-" ? ` (${yearRange})` : ""}</span>
+        <span>{isMediaTypeTV && yearRelease !== '-' ? ` (${yearRange})` : ''}</span>
       </div>
       <div className="detailes-page__info-row">
         <div className="detailes-page__info-option">Year</div>
         <div className="detailes-page__info-value">
-          {yearRelease !== "-" ? `${yearRelease}` : <span className="detailes-page__info-no-info">{yearRelease}</span>}
+          {yearRelease !== '-' ? `${yearRelease}` : <span className="detailes-page__info-no-info">{yearRelease}</span>}
         </div>
       </div>
-      {detailes.status !== "Released" && (
+      {detailes.status !== 'Released' && (
         <div className="detailes-page__info-row">
           <div className="detailes-page__info-option">Status</div>
           <div className="detailes-page__info-value">{detailes.status}</div>
@@ -76,7 +76,7 @@ export const MainInfo: React.FC<Props> = ({ detailes, mediaType, id }) => {
         <div className="detailes-page__info-value">
           {isMediaTypeTV ? (
             detailes.networks
-          ) : detailes.production_companies !== "-" ? (
+          ) : detailes.production_companies !== '-' ? (
             detailes.production_companies
           ) : (
             <span className="detailes-page__info-no-info">-</span>
@@ -86,7 +86,7 @@ export const MainInfo: React.FC<Props> = ({ detailes, mediaType, id }) => {
       <div className="detailes-page__info-row">
         <div className="detailes-page__info-option">Users rating</div>
         <div className="detailes-page__info-value">
-          {detailes.vote_average !== "-" ? (
+          {detailes.vote_average !== '-' ? (
             detailes.vote_average
           ) : (
             <span className="detailes-page__info-no-info">-</span>
@@ -96,7 +96,7 @@ export const MainInfo: React.FC<Props> = ({ detailes, mediaType, id }) => {
       <div className="detailes-page__info-row">
         <div className="detailes-page__info-option">Runtime</div>
         <div className="detailes-page__info-value">
-          {runtime !== "-" && runtime ? `${runtime} min` : <span className="detailes-page__info-no-info">-</span>}
+          {runtime !== '-' && runtime ? `${runtime} min` : <span className="detailes-page__info-no-info">-</span>}
         </div>
       </div>
 
@@ -104,7 +104,7 @@ export const MainInfo: React.FC<Props> = ({ detailes, mediaType, id }) => {
         <div className="detailes-page__info-row">
           <div className="detailes-page__info-option">My rating</div>
           <div className="detailes-page__info-value">
-            <UserRating id={id} firebaseRef="userShow" showRating={true} mediaType={mediaType} />
+            <UserRating id={id} firebaseRef="userShow" showRating mediaType={mediaType} />
           </div>
         </div>
       )}
@@ -114,7 +114,7 @@ export const MainInfo: React.FC<Props> = ({ detailes, mediaType, id }) => {
           <div className="detailes-page__info-row">
             <div className="detailes-page__info-option">Tagline</div>
             <div className="detailes-page__info-value">
-              {detailes.tagline !== "-" ? (
+              {detailes.tagline !== '-' ? (
                 `${detailes.tagline}`
               ) : (
                 <span className="detailes-page__info-no-info">{detailes.tagline}</span>
@@ -144,26 +144,26 @@ export const MainInfo: React.FC<Props> = ({ detailes, mediaType, id }) => {
 
         {!isMediaTypeTV && (
           <button
-            className={classNames("button", {
-              "button--pressed": movieInLS
+            className={classNames('button', {
+              'button--pressed': movieInLS,
             })}
             onClick={() => {
               if (authUser) {
                 context.userContentHandler.handleMovieInDatabases({
                   id: Number(id),
-                  data: detailes
+                  data: detailes,
                 })
                 context.userContent.handleUserMoviesOnClient({ id: Number(id), data: detailes })
               } else {
                 context.userContentLocalStorage.toggleMovieLS({
                   id: Number(id),
-                  data: detailes
+                  data: detailes,
                 })
               }
             }}
             type="button"
           >
-            {movieInLS ? "Remove" : "Watch later"}
+            {movieInLS ? 'Remove' : 'Watch later'}
           </button>
         )}
       </div>

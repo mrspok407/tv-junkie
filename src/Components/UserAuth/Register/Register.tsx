@@ -1,20 +1,20 @@
 /* eslint-disable react/no-access-state-in-setstate */
-import React, { useContext, useState } from "react"
-import { useHistory } from "react-router-dom"
-import { validEmailRegex } from "Utils"
-import * as ROLES from "Utils/Constants/roles"
-import * as ROUTES from "Utils/Constants/routes"
-import classNames from "classnames"
-import Input from "../Input/Input"
-import { AppContext } from "Components/AppContext/AppContextHOC"
-import { MovieInterface } from "Components/AppContext/@Types"
-import SignInWithGoogleForm from "../SignIn/SignInWithGoogle"
-import { FirebaseContext } from "Components/Firebase"
-import { AuthUserFirebaseInterface } from "../Session/WithAuthentication/@Types"
-import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
+import React, { useContext, useState } from 'react'
+import { useHistory } from 'react-router-dom'
+import { validEmailRegex } from 'Utils'
+import * as ROLES from 'Utils/Constants/roles'
+import * as ROUTES from 'Utils/Constants/routes'
+import classNames from 'classnames'
+import { AppContext } from 'Components/AppContext/AppContextHOC'
+import { MovieInterface } from 'Components/AppContext/@Types'
+import { FirebaseContext } from 'Components/Firebase'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import SignInWithGoogleForm from '../SignIn/SignInWithGoogle'
+import { AuthUserFirebaseInterface } from '../Session/WithAuthentication/@Types'
+import Input from '../Input/Input'
 
-const LOCAL_STORAGE_KEY_WATCHING_SHOWS = "watchingShowsLocalS"
-const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = "watchLaterMoviesLocalS"
+const LOCAL_STORAGE_KEY_WATCHING_SHOWS = 'watchingShowsLocalS'
+const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = 'watchLaterMoviesLocalS'
 
 type Props = {
   closeNavMobile: () => void
@@ -45,15 +45,15 @@ interface InputsInterface {
 }
 
 const ERROR_DEFAULT_VALUES = {
-  loginError: "",
+  loginError: '',
   loginOnBlur: false,
-  emailError: "",
+  emailError: '',
   emailOnBlur: false,
-  passwordError: "",
+  passwordError: '',
   passwordOnBlur: false,
-  passwordConfirmError: "",
+  passwordConfirmError: '',
   passwordConfirmOnblur: false,
-  error: { message: "" }
+  error: { message: '' },
 }
 
 const Register: React.FC<Props> = ({ closeNavMobile }) => {
@@ -61,10 +61,10 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
   const context = useContext(AppContext)
 
   const [requiredInputs, setRequiredInputs] = useState<RequiredInputsInterface>({
-    login: "",
-    email: "",
-    password: "",
-    passwordConfirm: ""
+    login: '',
+    email: '',
+    password: '',
+    passwordConfirm: '',
   })
   // const [inputs, setInputs] = useState<InputsInterface>({ login: "" })
   const [errors, setErrors] = useState<ErrorsInterface>(ERROR_DEFAULT_VALUES)
@@ -84,7 +84,7 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
     if (!isFormValid(errorsOnSubmit, requiredInputs)) {
       for (const [key, value] of Object.entries(requiredInputs)) {
         if (value.length === 0) {
-          errorsOnSubmit[`${key}Error`] = "Required"
+          errorsOnSubmit[`${key}Error`] = 'Required'
         }
       }
       setErrors(errorsOnSubmit)
@@ -104,7 +104,7 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
             username: requiredInputs.login,
             userNameLowerCase: requiredInputs.login.toLowerCase(),
             email,
-            role: ROLES.USER
+            role: ROLES.USER,
           })
           .then(() => {
             const watchingShows = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)!) || []
@@ -112,7 +112,7 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
 
             context.userContentHandler.addShowsToDatabaseOnRegister({
               shows: watchingShows,
-              uid: authUser.user.uid
+              uid: authUser.user.uid,
             })
 
             watchLaterMovies.forEach((item: MovieInterface) => {
@@ -120,7 +120,7 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
                 id: item.id,
                 data: item,
                 onRegister: true,
-                userOnRegister: authUser.user
+                userOnRegister: authUser.user,
               })
             })
           })
@@ -133,9 +133,7 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
             if (closeNavMobile) closeNavMobile()
           })
       })
-      .then(() => {
-        return firebase.sendEmailVerification()
-      })
+      .then(() => firebase.sendEmailVerification())
       .then(() => {
         history.push(ROUTES.HOME_PAGE)
       })
@@ -149,37 +147,36 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
 
   const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault()
-    const value = event.target.value
-    const name = event.target.name === "new-password" ? "password" : event.target.name
-    let errorsOnChange = { ...errors }
+    const { value } = event.target
+    const name = event.target.name === 'new-password' ? 'password' : event.target.name
+    const errorsOnChange = { ...errors }
 
     if (errorsOnChange[`${name}OnBlur`] || submitClicked) {
-      if (name === "login") {
-        errorsOnChange[`${name}Error`] = value.length >= 15 ? "Login should be less than 15 characters" : ""
+      if (name === 'login') {
+        errorsOnChange[`${name}Error`] = value.length >= 15 ? 'Login should be less than 15 characters' : ''
       }
 
-      if (name === "email") {
-        errorsOnChange[`${name}Error`] = validEmailRegex.test(value) ? "" : "Invalid email"
+      if (name === 'email') {
+        errorsOnChange[`${name}Error`] = validEmailRegex.test(value) ? '' : 'Invalid email'
       }
 
-      if (name === "password") {
-        errorsOnChange[`${name}Error`] = value.length >= 6 ? "" : "Password should be at least 6 characters"
+      if (name === 'password') {
+        errorsOnChange[`${name}Error`] = value.length >= 6 ? '' : 'Password should be at least 6 characters'
 
         errorsOnChange.passwordConfirmError =
-          value !== requiredInputs.passwordConfirm && value.length >= 6 ? "Passwords are not the same" : ""
+          value !== requiredInputs.passwordConfirm && value.length >= 6 ? 'Passwords are not the same' : ''
       }
 
-      if (name === "passwordConfirm") {
-        if (requiredInputs.password.length >= 6)
-          errorsOnChange[`${name}Error`] = requiredInputs.password !== value ? "Passwords are not the same" : ""
+      if (name === 'passwordConfirm') {
+        if (requiredInputs.password.length >= 6) errorsOnChange[`${name}Error`] = requiredInputs.password !== value ? 'Passwords are not the same' : ''
       }
     }
 
-    if (name === "email") setIsEmailValid(validEmailRegex.test(value))
-    if (value === "") {
-      errorsOnChange[`${name}Error`] = ""
+    if (name === 'email') setIsEmailValid(validEmailRegex.test(value))
+    if (value === '') {
+      errorsOnChange[`${name}Error`] = ''
       errorsOnChange[`${name}OnBlur`] = false
-      errorsOnChange.error.message = ""
+      errorsOnChange.error.message = ''
     }
 
     setErrors(errorsOnChange)
@@ -190,7 +187,7 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
   const handleValidationOnblur = (event: React.FocusEvent<HTMLInputElement>) => {
     event.preventDefault()
     const { value } = event.target
-    const name = event.target.name === "new-password" ? "password" : event.target.name
+    const name = event.target.name === 'new-password' ? 'password' : event.target.name
 
     const { login, email, password, passwordConfirm } = requiredInputs
     const errorsOnBlur = { ...errors }
@@ -198,25 +195,24 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
     errorsOnBlur[`${name}OnBlur`] = true
 
     if (!submitClicked) {
-      if (name === "login") {
-        errorsOnBlur[`${name}Error`] = login.length >= 15 ? "Login should be less than 15 characters" : ""
+      if (name === 'login') {
+        errorsOnBlur[`${name}Error`] = login.length >= 15 ? 'Login should be less than 15 characters' : ''
       }
 
-      if (name === "email") {
-        errorsOnBlur[`${name}Error`] = validEmailRegex.test(email) ? "" : "Invalid email"
+      if (name === 'email') {
+        errorsOnBlur[`${name}Error`] = validEmailRegex.test(email) ? '' : 'Invalid email'
       }
 
-      if (name === "password") {
-        errorsOnBlur[`${name}Error`] = password.length >= 6 ? "" : "Password should be at least 6 characters"
+      if (name === 'password') {
+        errorsOnBlur[`${name}Error`] = password.length >= 6 ? '' : 'Password should be at least 6 characters'
       }
 
-      if (name === "passwordConfirm") {
-        if (password.length >= 6)
-          errorsOnBlur[`${name}Error`] = password !== passwordConfirm ? "Passwords are not the same" : ""
+      if (name === 'passwordConfirm') {
+        if (password.length >= 6) errorsOnBlur[`${name}Error`] = password !== passwordConfirm ? 'Passwords are not the same' : ''
       }
 
-      if (value === "") {
-        errorsOnBlur[`${name}Error`] = ""
+      if (value === '') {
+        errorsOnBlur[`${name}Error`] = ''
         errorsOnBlur[`${name}OnBlur`] = false
       }
     }
@@ -226,9 +222,9 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
   const handleKeyDown = (e: any) => e.which === 27 && resetInput(e.target.name)
 
   const resetInput = (name: string) => {
-    setRequiredInputs({ ...requiredInputs, [`${name}`]: "" })
+    setRequiredInputs({ ...requiredInputs, [`${name}`]: '' })
     // setInputs({ ...inputs, [`${name}`]: "" })
-    setErrors({ ...errors, [`${name}Error`]: "" })
+    setErrors({ ...errors, [`${name}Error`]: '' })
   }
 
   const isFormValid = (errors: ErrorsInterface, requiredInputs: RequiredInputsInterface) => {
@@ -257,8 +253,8 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
   return (
     <form className="auth__form" onSubmit={onSubmit}>
       <Input
-        classNameInput={classNames("auth__form-input", {
-          "auth__form-input--error": errors.loginError
+        classNameInput={classNames('auth__form-input', {
+          'auth__form-input--error': errors.loginError,
         })}
         classNameLabel="auth__form-label"
         name="login"
@@ -274,8 +270,8 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
       <div className="auth__form-error">{errors.loginError}</div>
 
       <Input
-        classNameInput={classNames("auth__form-input", {
-          "auth__form-input--error": errors.emailError
+        classNameInput={classNames('auth__form-input', {
+          'auth__form-input--error': errors.emailError,
         })}
         classNameLabel="auth__form-label"
         name="email"
@@ -291,8 +287,8 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
       <div className="auth__form-error">{errors.emailError}</div>
 
       <Input
-        classNameInput={classNames("auth__form-input  auth__form-input--password", {
-          "auth__form-input--error": errors.passwordError
+        classNameInput={classNames('auth__form-input  auth__form-input--password', {
+          'auth__form-input--error': errors.passwordError,
         })}
         classNameLabel="auth__form-label"
         name="new-password"
@@ -301,18 +297,18 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
         handleOnChange={handleOnChange}
         handleValidation={handleValidationOnblur}
         handleKeyDown={handleKeyDown}
-        type={!showPassword ? "password" : "text"}
+        type={!showPassword ? 'password' : 'text'}
         placeholder="Password"
         labelText="Password"
-        hidePasswordBtn={true}
+        hidePasswordBtn
         toggleShowPassword={toggleShowPassword}
         withLabel
       />
       <div className="auth__form-error">{errors.passwordError}</div>
 
       <Input
-        classNameInput={classNames("auth__form-input auth__form-input--password", {
-          "auth__form-input--error": errors.passwordConfirmError
+        classNameInput={classNames('auth__form-input auth__form-input--password', {
+          'auth__form-input--error': errors.passwordConfirmError,
         })}
         classNameLabel="auth__form-label"
         name="passwordConfirm"
@@ -320,7 +316,7 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
         handleOnChange={handleOnChange}
         handleValidation={handleValidationOnblur}
         handleKeyDown={handleKeyDown}
-        type={!showPassword ? "password" : "text"}
+        type={!showPassword ? 'password' : 'text'}
         placeholder="Password"
         labelText="Confirm Password"
         withLabel
@@ -330,12 +326,12 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
       {errors.error && <div className="auth__form-error">{errors.error.message}</div>}
 
       <button
-        className={classNames("button button--auth__form", {
-          "button--disabled": !isFormValid(errors, requiredInputs) || !isEmailValid
+        className={classNames('button button--auth__form', {
+          'button--disabled': !isFormValid(errors, requiredInputs) || !isEmailValid,
         })}
         type="submit"
       >
-        {submitRequestLoading ? <span className="auth__form-loading"></span> : "Register"}
+        {submitRequestLoading ? <span className="auth__form-loading" /> : 'Register'}
       </button>
       <SignInWithGoogleForm />
     </form>

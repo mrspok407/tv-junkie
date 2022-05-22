@@ -1,14 +1,14 @@
-import React, { useCallback, useContext, useEffect, useReducer, useState } from "react"
-import { Link } from "react-router-dom"
-import { listOfGenres } from "Utils"
-import { throttle } from "throttle-debounce"
-import classNames from "classnames"
-import Loader from "Components/UI/Placeholders/Loader"
-import PlaceholderNoMovies from "Components/UI/Placeholders/PlaceholderNoMovies"
-import { AppContext } from "Components/AppContext/AppContextHOC"
-import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
-import reducer, { INITIAL_STATE, MoviesContentState, ActionInterface, ActionTypes } from "./_reducerConfig"
-import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
+import React, { useCallback, useContext, useEffect, useReducer, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { listOfGenres } from 'Utils'
+import { throttle } from 'throttle-debounce'
+import classNames from 'classnames'
+import Loader from 'Components/UI/Placeholders/Loader'
+import PlaceholderNoMovies from 'Components/UI/Placeholders/PlaceholderNoMovies'
+import { AppContext } from 'Components/AppContext/AppContextHOC'
+import { ContentDetailes } from 'Utils/Interfaces/ContentDetails'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import reducer, { INITIAL_STATE, MoviesContentState, ActionInterface, ActionTypes } from './_reducerConfig'
 
 const SCROLL_THRESHOLD = 800
 
@@ -24,7 +24,7 @@ const MoviesContent: React.FC<Props> = ({ moviesData, loadingIds, openLinksMovie
   const { authUser } = useFrequentVariables()
   const context = useContext(AppContext)
 
-  const [sortByState, setSortByState] = useState("title")
+  const [sortByState, setSortByState] = useState('title')
   const [state, dispatch] = useReducer<React.Reducer<MoviesContentState, ActionInterface>>(reducer, INITIAL_STATE)
 
   useEffect(() => {
@@ -50,12 +50,12 @@ const MoviesContent: React.FC<Props> = ({ moviesData, loadingIds, openLinksMovie
         loadNewContentLS()
       }
     }),
-    [state.disableLoad, state.activeSection]
+    [state.disableLoad, state.activeSection],
   )
   useEffect(() => {
-    window.addEventListener("scroll", handleScroll)
+    window.addEventListener('scroll', handleScroll)
     return () => {
-      window.removeEventListener("scroll", handleScroll)
+      window.removeEventListener('scroll', handleScroll)
     }
   }, [handleScroll])
 
@@ -68,8 +68,7 @@ const MoviesContent: React.FC<Props> = ({ moviesData, loadingIds, openLinksMovie
     const content = context.userContent.userMovies
       .sort((a, b) =>
         // @ts-ignore
-        a[sortByState] > b[sortByState] ? (sortByState === "timeStamp" ? -1 : 1) : sortByState !== "timeStamp" ? -1 : 1
-      )
+        (a[sortByState] > b[sortByState] ? (sortByState === 'timeStamp' ? -1 : 1) : sortByState !== 'timeStamp' ? -1 : 1))
       .slice(0, state.loadedMovies[section])
 
     const movies = authUser
@@ -94,13 +93,13 @@ const MoviesContent: React.FC<Props> = ({ moviesData, loadingIds, openLinksMovie
           }
 
           if (movie) {
-            const hash1080p = movie.torrents.find((item) => item.quality === "1080p")
+            const hash1080p = movie.torrents.find((item) => item.quality === '1080p')
             movieHash1080p = hash1080p && hash1080p.hash
 
-            const hash720p = movie.torrents.find((item) => item.quality === "720p")
+            const hash720p = movie.torrents.find((item) => item.quality === '720p')
             movieHash720p = hash720p && hash720p.hash
 
-            urlMovieTitle = movie.title.split(" ").join("+")
+            urlMovieTitle = movie.title.split(' ').join('+')
           }
           // Movies end //
           return (
@@ -109,19 +108,23 @@ const MoviesContent: React.FC<Props> = ({ moviesData, loadingIds, openLinksMovie
                 <Link
                   to={{
                     pathname: `/movie/${item.id}`,
-                    state: { logoDisable: true, y: 300 }
+                    state: { logoDisable: true, y: 300 },
                   }}
                 >
                   <div className="content-results__item-main-info">
-                    <div className="content-results__item-title">{!item.title ? "No title available" : item.title}</div>
+                    <div className="content-results__item-title">{!item.title ? 'No title available' : item.title}</div>
                     <div className="content-results__item-year">
-                      {!item.release_date ? "" : `(${item.release_date.slice(0, 4)})`}
+                      {!item.release_date ? '' : `(${item.release_date.slice(0, 4)})`}
                     </div>
                     {item.vote_average !== 0 && (
                       <div className="content-results__item-rating">
                         {item.vote_average}
                         <span>/10</span>
-                        <span className="content-results__item-rating-vote-count">({item.vote_count})</span>
+                        <span className="content-results__item-rating-vote-count">
+                          (
+                          {item.vote_count}
+                          )
+                        </span>
                       </div>
                     )}
                   </div>
@@ -137,7 +140,7 @@ const MoviesContent: React.FC<Props> = ({ moviesData, loadingIds, openLinksMovie
                         data-bg={
                           item.backdrop_path !== null
                             ? `https://image.tmdb.org/t/p/w500/${item.backdrop_path || item.poster_path}`
-                            : "https://homestaymatch.com/images/no-image-available.png"
+                            : 'https://homestaymatch.com/images/no-image-available.png'
                         }
                       />
                     </div>
@@ -198,13 +201,13 @@ const MoviesContent: React.FC<Props> = ({ moviesData, loadingIds, openLinksMovie
                     if (authUser) {
                       context.userContentHandler.handleMovieInDatabases({
                         id: item.id,
-                        data: item
+                        data: item,
                       })
                       context.userContent.handleUserMoviesOnClient({ id: item.id })
                     } else {
                       context.userContentLocalStorage.toggleMovieLS({
                         id: item.id,
-                        data: movies
+                        data: movies,
                       })
                     }
                   }}
@@ -237,23 +240,23 @@ const MoviesContent: React.FC<Props> = ({ moviesData, loadingIds, openLinksMovie
               <div className="content-results__sortby-text">Sort by:</div>
               <div className="content-results__sortby-buttons">
                 <div
-                  className={classNames("content-results__sortby-buttons", {
-                    "content-results__sortby-button--active": sortByState === "title"
+                  className={classNames('content-results__sortby-buttons', {
+                    'content-results__sortby-button--active': sortByState === 'title',
                   })}
                 >
-                  <button type="button" className="button button--sortby-shows" onClick={() => sortByHandler("title")}>
+                  <button type="button" className="button button--sortby-shows" onClick={() => sortByHandler('title')}>
                     Alphabetically
                   </button>
                 </div>
                 <div
-                  className={classNames("content-results__sortby-button", {
-                    "content-results__sortby-button--active": sortByState === "timeStamp"
+                  className={classNames('content-results__sortby-button', {
+                    'content-results__sortby-button--active': sortByState === 'timeStamp',
                   })}
                 >
                   <button
                     type="button"
                     className="button button--sortby-shows"
-                    onClick={() => sortByHandler("timeStamp")}
+                    onClick={() => sortByHandler('timeStamp')}
                   >
                     Recently added
                   </button>
@@ -266,10 +269,10 @@ const MoviesContent: React.FC<Props> = ({ moviesData, loadingIds, openLinksMovie
             style={
               currentNumOfColumns <= 3
                 ? {
-                    gridTemplateColumns: "repeat(auto-fit, minmax(300px, 350px))"
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 350px))',
                   }
                 : {
-                    gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))"
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
                   }
             }
           >

@@ -1,8 +1,8 @@
-import { useState, useCallback, useRef } from "react"
-import { MessageInterface } from "Components/Pages/Contacts/@Types"
-import { MESSAGES_TO_LOAD } from "../../@Context/Constants"
-import debounce from "debounce"
-import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
+import { useState, useCallback, useRef } from 'react'
+import { MessageInterface } from 'Components/Pages/Contacts/@Types'
+import debounce from 'debounce'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import { MESSAGES_TO_LOAD } from '../../@Context/Constants'
 
 const useLoadTopMessages = () => {
   const { firebase, contactsState, contactsDispatch } = useFrequentVariables()
@@ -17,10 +17,10 @@ const useLoadTopMessages = () => {
   const messagesToDelete = useRef<MessageInterface[]>([])
   const removeMessagesDebounce = useCallback(
     debounce((removedMessages: any) => {
-      contactsDispatch({ type: "removeMessages", payload: { removedMessages, chatKey: activeChat.chatKey } })
+      contactsDispatch({ type: 'removeMessages', payload: { removedMessages, chatKey: activeChat.chatKey } })
       messagesToDelete.current = []
     }, 100),
-    [activeChat]
+    [activeChat],
   )
 
   const loadTopMessages = useCallback(async () => {
@@ -31,36 +31,36 @@ const useLoadTopMessages = () => {
 
     setLoadingTopMessages(true)
     const topMessagesSnapshot = await messagesRef
-      .orderByChild("timeStamp")
+      .orderByChild('timeStamp')
       .endBefore(messagesData[0].timeStamp)
       .limitToLast(MESSAGES_TO_LOAD)
-      .once("value")
+      .once('value')
 
     if (topMessagesSnapshot.val() === null) {
       setLoadingTopMessages(false)
       return
     }
 
-    let newTopMessages: MessageInterface[] = []
+    const newTopMessages: MessageInterface[] = []
     topMessagesSnapshot.forEach((message: any) => {
       newTopMessages.push({ ...message.val(), key: message.key })
     })
-    contactsDispatch({ type: "loadTopMessages", payload: { newTopMessages } })
+    contactsDispatch({ type: 'loadTopMessages', payload: { newTopMessages } })
 
     messagesRef
-      .orderByChild("timeStamp")
+      .orderByChild('timeStamp')
       .endBefore(messagesData[0].timeStamp)
       .limitToLast(MESSAGES_TO_LOAD)
-      .on("child_changed", (snapshot: { val: () => MessageInterface; key: string }) => {
+      .on('child_changed', (snapshot: { val: () => MessageInterface; key: string }) => {
         const editedMessage = { ...snapshot.val(), key: snapshot.key }
-        contactsDispatch({ type: "editMessage", payload: { editedMessage, chatKey: activeChat.chatKey } })
+        contactsDispatch({ type: 'editMessage', payload: { editedMessage, chatKey: activeChat.chatKey } })
       })
 
     messagesRef
-      .orderByChild("timeStamp")
+      .orderByChild('timeStamp')
       .endBefore(messagesData[0].timeStamp)
       .limitToLast(MESSAGES_TO_LOAD)
-      .on("child_removed", (snapshot: { val: () => MessageInterface; key: string }) => {
+      .on('child_removed', (snapshot: { val: () => MessageInterface; key: string }) => {
         const removedMessage = { ...snapshot.val(), key: snapshot.key }
         messagesToDelete.current.push(removedMessage)
         removeMessagesDebounce(messagesToDelete.current)

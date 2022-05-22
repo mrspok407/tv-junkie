@@ -1,17 +1,17 @@
-import { configureStore, ThunkAction, Action } from "@reduxjs/toolkit"
-import userShowsReducer from "../Components/UserContent/UseUserShowsRed/userShowsSliceRed"
-import authUserReducer, { authUserInitialState } from "../Components/UserAuth/Session/WithAuthentication/authUserSlice"
+import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit'
+import userShowsReducer from '../Components/UserContent/UseUserShowsRed/userShowsSliceRed'
+import authUserReducer, { authUserInitialState } from '../Components/UserAuth/Session/WithAuthentication/authUserSlice'
 
 export const store = configureStore({
   reducer: {
     userShows: userShowsReducer,
-    authUser: authUserReducer
+    authUser: authUserReducer,
   },
   preloadedState: {
     authUser: {
-      authUser: JSON.parse(localStorage.getItem("authUser")!) || authUserInitialState.authUser
-    }
-  }
+      authUser: JSON.parse(localStorage.getItem('authUser')!) || authUserInitialState.authUser,
+    },
+  },
 })
 
 export type AppDispatch = typeof store.dispatch

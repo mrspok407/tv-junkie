@@ -1,6 +1,6 @@
-import { MembersStatusGroupChatInterface } from "Components/Pages/Contacts/@Types"
-import useFrequentVariables from "Utils/Hooks/UseFrequentVariables"
-import { useEffect } from "react"
+import { MembersStatusGroupChatInterface } from 'Components/Pages/Contacts/@Types'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import { useEffect } from 'react'
 
 type Props = {
   chatKey: string
@@ -13,26 +13,26 @@ const useHandleContactsStatus = ({ chatKey, contactKey, isGroupChat }: Props) =>
 
   useEffect(() => {
     if (isGroupChat) {
-      firebase.groupChatMembersStatus({ chatKey }).on("value", (snapshot: any) => {
-        let membersStatus: MembersStatusGroupChatInterface[] = []
+      firebase.groupChatMembersStatus({ chatKey }).on('value', (snapshot: any) => {
+        const membersStatus: MembersStatusGroupChatInterface[] = []
         snapshot.forEach((member: { val: () => MembersStatusGroupChatInterface; key: string }) => {
           membersStatus.push({ ...member.val(), key: member.key })
         })
-        contactsDispatch({ type: "updateGroupChatMembersStatus", payload: { membersStatus, chatKey } })
+        contactsDispatch({ type: 'updateGroupChatMembersStatus', payload: { membersStatus, chatKey } })
       })
 
-      firebase.groupChatParticipants({ chatKey }).on("value", (snapshot: any) => {
-        let participants: string[] = []
+      firebase.groupChatParticipants({ chatKey }).on('value', (snapshot: any) => {
+        const participants: string[] = []
         snapshot.forEach((participant: { key: string }) => {
           participants.push(participant.key)
         })
-        contactsDispatch({ type: "updateGroupChatParticipants", payload: { participants, chatKey } })
+        contactsDispatch({ type: 'updateGroupChatParticipants', payload: { participants, chatKey } })
       })
     } else {
-      firebase.chatMemberStatus({ chatKey, memberKey: contactKey, isGroupChat: false }).on("value", (snapshot: any) => {
+      firebase.chatMemberStatus({ chatKey, memberKey: contactKey, isGroupChat: false }).on('value', (snapshot: any) => {
         contactsDispatch({
-          type: "updateContactsStatus",
-          payload: { status: snapshot.val() || {}, chatKey }
+          type: 'updateContactsStatus',
+          payload: { status: snapshot.val() || {}, chatKey },
         })
       })
     }

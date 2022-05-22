@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from "react"
-import axios from "axios"
-import { Helmet } from "react-helmet"
-import Header from "Components/UI/Header/Header"
-import MoviesContent from "./MoviesContent"
-import ScrollToTop from "Utils/ScrollToTopBar"
-import Footer from "Components/UI/Footer/Footer"
-import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
-import useGoogleRedirect from "Components/UserAuth/SignIn/UseGoogleRedirect"
-const { CancelToken } = require("axios")
+import React, { useEffect, useState } from 'react'
+import axios from 'axios'
+import { Helmet } from 'react-helmet'
+import Header from 'Components/UI/Header/Header'
+import ScrollToTop from 'Utils/ScrollToTopBar'
+import Footer from 'Components/UI/Footer/Footer'
+import { ContentDetailes } from 'Utils/Interfaces/ContentDetails'
+import useGoogleRedirect from 'Components/UserAuth/SignIn/UseGoogleRedirect'
+import MoviesContent from './MoviesContent'
+
+const { CancelToken } = require('axios')
 
 let cancelRequest: any
 
@@ -19,11 +20,9 @@ const Movies: React.FC = () => {
 
   useGoogleRedirect()
 
-  useEffect(() => {
-    return () => {
+  useEffect(() => () => {
       if (cancelRequest !== undefined) cancelRequest()
-    }
-  }, [])
+    }, [])
 
   const getMovieLinks = ({ id }: { id: number }) => {
     if (openLinksMoviesId.includes(id)) return
@@ -35,17 +34,17 @@ const Movies: React.FC = () => {
       .get(
         `https://api.themoviedb.org/3/movie/${id}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US&append_to_response=similar_movies,external_ids`,
         {
-          cancelToken: new CancelToken(function executor(c: any) {
+          cancelToken: new CancelToken((c: any) => {
             cancelRequest = c
-          })
-        }
+          }),
+        },
       )
       .then(({ data: { external_ids } }) => {
         const imdbId = external_ids.imdb_id
         return axios.get(`https://yts.mx/api/v2/list_movies.json?query_term=${imdbId}`, {
-          cancelToken: new CancelToken(function executor(c: any) {
+          cancelToken: new CancelToken((c: any) => {
             cancelRequest = c
-          })
+          }),
         })
       })
       .then((res) => {

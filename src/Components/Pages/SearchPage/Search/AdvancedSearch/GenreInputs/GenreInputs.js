@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect } from "react"
-import classNames from "classnames"
-import CheckboxInput from "../InputTemplates/CheckboxInput"
+import React, { useState, useRef, useEffect } from 'react'
+import classNames from 'classnames'
+import CheckboxInput from '../InputTemplates/CheckboxInput'
 
 export default function GenreInputs({ toggleGenre, genres }) {
   const [withGenresOpen, setWithGenresOpen] = useState(false)
@@ -16,9 +16,9 @@ export default function GenreInputs({ toggleGenre, genres }) {
   }
 
   useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside)
+    document.addEventListener('mousedown', handleClickOutside)
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
+      document.removeEventListener('mousedown', handleClickOutside)
     }
   })
 
@@ -35,23 +35,21 @@ export default function GenreInputs({ toggleGenre, genres }) {
         {withGenresOpen && (
           <div className="inputs__genres-list">
             <div className="inputs__genres-checkbox-wrapper">
-              {genres.map(({ id, name, isChecked, withoutGenre }) => {
-                return (
-                  <CheckboxInput
-                    key={id}
-                    checked={withoutGenre ? !isChecked : isChecked}
-                    label={name}
-                    name={name.toLowerCase()}
-                    value={name.toLowerCase()}
-                    onChange={toggleGenre}
-                    data="withGenre"
-                    disabled={!!withoutGenre}
-                    className={classNames("checkbox-genre", {
-                      "checkbox-genre--disabled": withoutGenre
+              {genres.map(({ id, name, isChecked, withoutGenre }) => (
+                <CheckboxInput
+                  key={id}
+                  checked={withoutGenre ? !isChecked : isChecked}
+                  label={name}
+                  name={name.toLowerCase()}
+                  value={name.toLowerCase()}
+                  onChange={toggleGenre}
+                  data="withGenre"
+                  disabled={!!withoutGenre}
+                  className={classNames('checkbox-genre', {
+                      'checkbox-genre--disabled': withoutGenre,
                     })}
-                  />
-                )
-              })}
+                />
+                ))}
             </div>
           </div>
         )}
@@ -67,23 +65,21 @@ export default function GenreInputs({ toggleGenre, genres }) {
         {withoutGenresOpen && (
           <div className="inputs__genres-list">
             <div className="inputs__genres-checkbox-wrapper">
-              {genres.map(({ id, name, isChecked, withGenre }) => {
-                return (
-                  <CheckboxInput
-                    key={id}
-                    checked={withGenre ? !isChecked : isChecked}
-                    label={name}
-                    name={name.toLowerCase()}
-                    value={name.toLowerCase()}
-                    onChange={toggleGenre}
-                    data="withoutGenre"
-                    disabled={!!withGenre}
-                    className={classNames("checkbox-genre", {
-                      "checkbox-genre--disabled": withGenre
+              {genres.map(({ id, name, isChecked, withGenre }) => (
+                <CheckboxInput
+                  key={id}
+                  checked={withGenre ? !isChecked : isChecked}
+                  label={name}
+                  name={name.toLowerCase()}
+                  value={name.toLowerCase()}
+                  onChange={toggleGenre}
+                  data="withoutGenre"
+                  disabled={!!withGenre}
+                  className={classNames('checkbox-genre', {
+                      'checkbox-genre--disabled': withGenre,
                     })}
-                  />
-                )
-              })}
+                />
+                ))}
             </div>
           </div>
         )}

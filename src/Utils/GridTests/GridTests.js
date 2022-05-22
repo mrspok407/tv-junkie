@@ -1,14 +1,14 @@
-import React, { Component } from "react"
-import "./GridTests.scss"
+import React, { Component } from 'react'
+import './GridTests.scss'
 
-const POSTER_URL = "https://image.tmdb.org/t/p/w500"
+const POSTER_URL = 'https://image.tmdb.org/t/p/w500'
 
 class GridTests extends Component {
   constructor(props) {
     super(props)
 
     this.state = {
-      content: []
+      content: [],
     }
   }
 
@@ -18,12 +18,12 @@ class GridTests extends Component {
 
   deleteItem = (id) => {
     this.setState((prevState) => ({
-      content: [...prevState.content.filter((item) => item.id !== id)]
+      content: [...prevState.content.filter((item) => item.id !== id)],
     }))
   }
 
   render() {
-    const content = this.state.content
+    const { content } = this.state
     return (
       <div className="grid">
         <div className={`grid__items grid__items--${content.length}`}>
