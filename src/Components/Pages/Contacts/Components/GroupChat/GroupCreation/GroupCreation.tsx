@@ -14,7 +14,7 @@ const GroupCreation: React.FC<Props> = ({ contactListWrapperRef }) => {
 
   const [createGroupWrapperNode, setCreateGroupWrapperNode] = useState<HTMLDivElement>(null!)
 
-  const createGroupWrapperRef = useCallback((node) => {
+  const createGroupWrapperRef = useCallback((node: any) => {
     if (node !== null) {
       setCreateGroupWrapperNode(node)
     }

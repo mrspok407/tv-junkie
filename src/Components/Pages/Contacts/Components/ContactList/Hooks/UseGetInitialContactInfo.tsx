@@ -1,14 +1,13 @@
-import { AppContext } from 'Components/AppContext/AppContextHOC'
-import { FirebaseContext } from 'Components/Firebase/FirebaseContext'
 import { ContactInfoInterface, MessageInterface } from 'Components/Pages/Contacts/@Types'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
-import { useContext, useRef } from 'react'
+import { useRef } from 'react'
 
 const useGetInitialContactInfo = () => {
   const { authUser, firebase } = useFrequentVariables()
   const loadedContactsRef = useRef<{ [key: string]: ContactInfoInterface }>({})
 
-  const getContactsInfo = async ({ contactsData }: { contactsData: ContactInfoInterface[] }) => Promise.all(
+  const getContactsInfo = async ({ contactsData }: { contactsData: ContactInfoInterface[] }) =>
+    Promise.all(
       contactsData.map(async (contact) => {
         if (loadedContactsRef.current[contact.key]) {
           return {

@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 interface DataFromAPI {
-  episodes: {}[]
+  episodes: Record<string, unknown>[]
   status: string
 }
 
@@ -34,14 +34,14 @@ const getShowEpisodesFromAPI = ({ id }: { id: number }) => {
     })
     .then(
       axios.spread((...responses) => {
-        const rowData: {}[] = []
-        const seasonsData: {}[] = []
+        const rowData: Record<string, unknown>[] = []
+        const seasonsData: Record<string, unknown>[] = []
 
         responses.forEach((item) => {
           rowData.push(item.data)
         })
 
-        const mergedRowData: { value: {}; status: string } = Object.assign({}, ...rowData)
+        const mergedRowData: { value: Record<string, unknown>; status: string } = Object.assign({}, ...rowData)
 
         Object.entries(mergedRowData).forEach(([key, value]) => {
           if (!key.indexOf('season/')) {
@@ -49,7 +49,7 @@ const getShowEpisodesFromAPI = ({ id }: { id: number }) => {
           }
         })
 
-        const allEpisodes: {}[] = []
+        const allEpisodes: Record<string, unknown>[] = []
 
         seasonsData.forEach((item: any, index) => {
           const season = item[`season/${index + 1}`]
@@ -57,7 +57,7 @@ const getShowEpisodesFromAPI = ({ id }: { id: number }) => {
             return
           }
 
-          const episodes: {}[] = []
+          const episodes: Record<string, unknown>[] = []
 
           season.episodes.forEach((item: any) => {
             const updatedEpisode = {

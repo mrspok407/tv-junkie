@@ -1,3 +1,5 @@
+/* eslint-disable no-nested-ternary */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import classNames from 'classnames'
 import { ContainerRectInterface, MessageInterface } from 'Components/Pages/Contacts/@Types'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
@@ -35,7 +37,7 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
 
   useEffect(() => {
     const unreadMessagesListener = firebase
-      .unreadMessages({ uid: authUser?.uid!, chatKey, isGroupChat: contactInfo.isGroupChat })
+      .unreadMessages({ uid: authUser?.uid, chatKey, isGroupChat: contactInfo.isGroupChat })
       .on('value', (snapshot: any) => {
         const unreadMessagesData = !snapshot.val() ? [] : Object.keys(snapshot.val())
         setUnreadMessages(unreadMessagesData)
@@ -43,7 +45,7 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
 
     return () => {
       firebase
-        .unreadMessages({ uid: authUser?.uid!, chatKey, isGroupChat: contactInfo.isGroupChat })
+        .unreadMessages({ uid: authUser?.uid, chatKey, isGroupChat: contactInfo.isGroupChat })
         .off('value', unreadMessagesListener)
     }
   }, [chatKey, authUser, firebase]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -58,7 +60,7 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
       setWentToLastMessage(true)
     } else {
       if (unreadMessages.some((message) => renderedMessagesArray.includes(message))) {
-        firebase.unreadMessages({ uid: authUser?.uid!, chatKey, isGroupChat: contactInfo.isGroupChat }).set(null)
+        firebase.unreadMessages({ uid: authUser?.uid, chatKey, isGroupChat: contactInfo.isGroupChat }).set(null)
         setUnreadMessages([])
         unreadMessagesAuthRef = []
         setWentToLastMessage(true)
@@ -91,6 +93,7 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
     }
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleScroll = useCallback(
     throttle(150, () => {
       handleFadeIn()

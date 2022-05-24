@@ -5,7 +5,6 @@ import { validEmailRegex } from 'Utils'
 import * as ROUTES from 'Utils/Constants/routes'
 import classNames from 'classnames'
 import { AppContext } from 'Components/AppContext/AppContextHOC'
-import { FirebaseContext } from 'Components/Firebase'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import Input from '../Input/Input'
 import SignInWithGoogleForm from './SignInWithGoogle'
@@ -23,7 +22,7 @@ interface ErrorsInterface {
   emailOnBlur: boolean
   passwordError: string
   error: { message: string }
-  [key: string]: string | boolean | {}
+  [key: string]: string | boolean | Record<string, unknown>
 }
 
 interface RequiredInputsInterface {
@@ -137,7 +136,7 @@ const SignInFormBase: React.FC<Props> = ({ closeNavMobile, togglePasswordForget 
   }
 
   const handleKeyDown = (e: any) => {
-    e.which === 27 && resetInput(e.target.name)
+    if (e.which === 27) resetInput(e.target.name)
   }
 
   const resetInput = (name: string) => {

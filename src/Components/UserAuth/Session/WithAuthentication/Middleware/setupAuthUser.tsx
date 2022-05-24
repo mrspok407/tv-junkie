@@ -5,16 +5,17 @@ import { AuthUserInterface } from '../@Types'
 import { setAuthUser } from '../authUserSlice'
 
 export const setupAuthUser =
-  (authUser: AuthUserInterface['authUser'], firebase: FirebaseInterface): AppThunk => async (dispatch) => {
-    const _authUser = { ...authUser }
+  (authUser: AuthUserInterface['authUser'], firebase: FirebaseInterface): AppThunk =>
+  async (dispatch) => {
+    const authUserData = { ...authUser }
     try {
       const usernameData = await firebase.user(authUser?.uid).child('username').once('value')
-      _authUser.username = usernameData.val()
+      authUserData.username = usernameData.val()
     } catch (error) {
-      _authUser.username = 'Nameless'
+      authUserData.username = 'Nameless'
     } finally {
-      localStorage.setItem('authUser', JSON.stringify(_authUser))
-      dispatch(setAuthUser(_authUser))
+      localStorage.setItem('authUser', JSON.stringify(authUserData))
+      dispatch(setAuthUser(authUserData))
     }
   }
 

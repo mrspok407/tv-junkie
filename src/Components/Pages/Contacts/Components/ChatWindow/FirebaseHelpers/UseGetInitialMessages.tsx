@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-extra-semi */
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { MessageInterface } from 'Components/Pages/Contacts/@Types'
 import debounce from 'debounce'
@@ -14,6 +15,7 @@ const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGr
   const messagesRef = firebase.messages({ chatKey, isGroupChat })
 
   const messagesToDelete = useRef<MessageInterface[]>([])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const removeMessagesDebounce = useCallback(
     debounce((removedMessages: any) => {
       contactsDispatch({ type: 'removeMessages', payload: { removedMessages, chatKey } })
@@ -32,7 +34,7 @@ const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGr
       let firstUnreadMessageKey: any
 
       try {
-        [messagesSnapshot, firstUnreadMessageKey] = await setMessagesSnapshot({
+        ;[messagesSnapshot, firstUnreadMessageKey] = await setMessagesSnapshot({
           chatKey,
           isGroupChat,
           authUser,
@@ -79,12 +81,12 @@ const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGr
           startIndexRender = 0
           endIndexRender = messagesData.length
         } else if (authUnreadMessages.length <= UNREAD_MESSAGES_TO_RENDER) {
-            startIndexRender = Math.max(messagesData.length - MESSAGES_TO_RENDER, 0)
-            endIndexRender = messagesData.length
-          } else {
-            endIndexRender = messagesData.length - (authUnreadMessages.length! - UNREAD_MESSAGES_TO_RENDER)
-            startIndexRender = Math.max(endIndexRender - MESSAGES_TO_RENDER, 0)
-          }
+          startIndexRender = Math.max(messagesData.length - MESSAGES_TO_RENDER, 0)
+          endIndexRender = messagesData.length
+        } else {
+          endIndexRender = messagesData.length - (authUnreadMessages.length! - UNREAD_MESSAGES_TO_RENDER)
+          startIndexRender = Math.max(endIndexRender - MESSAGES_TO_RENDER, 0)
+        }
 
         contactsDispatch({
           type: 'setInitialMessages',

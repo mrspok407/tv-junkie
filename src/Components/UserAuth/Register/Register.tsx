@@ -7,7 +7,6 @@ import * as ROUTES from 'Utils/Constants/routes'
 import classNames from 'classnames'
 import { AppContext } from 'Components/AppContext/AppContextHOC'
 import { MovieInterface } from 'Components/AppContext/@Types'
-import { FirebaseContext } from 'Components/Firebase'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import SignInWithGoogleForm from '../SignIn/SignInWithGoogle'
 import { AuthUserFirebaseInterface } from '../Session/WithAuthentication/@Types'
@@ -30,7 +29,7 @@ interface ErrorsInterface {
   passwordConfirmError: string
   passwordConfirmOnblur: boolean
   error: { message: string }
-  [key: string]: string | boolean | {}
+  [key: string]: string | boolean | Record<string, unknown>
 }
 
 interface RequiredInputsInterface {
@@ -38,10 +37,6 @@ interface RequiredInputsInterface {
   email: string
   password: string
   passwordConfirm: string
-}
-
-interface InputsInterface {
-  login: string
 }
 
 const ERROR_DEFAULT_VALUES = {
@@ -168,7 +163,9 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
       }
 
       if (name === 'passwordConfirm') {
-        if (requiredInputs.password.length >= 6) errorsOnChange[`${name}Error`] = requiredInputs.password !== value ? 'Passwords are not the same' : ''
+        if (requiredInputs.password.length >= 6) {
+          errorsOnChange[`${name}Error`] = requiredInputs.password !== value ? 'Passwords are not the same' : ''
+        }
       }
     }
 
@@ -208,7 +205,9 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
       }
 
       if (name === 'passwordConfirm') {
-        if (password.length >= 6) errorsOnBlur[`${name}Error`] = password !== passwordConfirm ? 'Passwords are not the same' : ''
+        if (password.length >= 6) {
+          errorsOnBlur[`${name}Error`] = password !== passwordConfirm ? 'Passwords are not the same' : ''
+        }
       }
 
       if (value === '') {

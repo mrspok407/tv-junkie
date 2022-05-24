@@ -4,12 +4,12 @@ import SelectInput from '../InputTemplates/SelectInput/SelectInput'
 
 const currentYear = new Date().getFullYear()
 
-export default function DatesInputs({
+export const DatesInputs = ({
   setFieldValue,
   handleChange,
   // year,
   // changeYear
-}) {
+}) => {
   // const [yearIsOpen, setYearIsOpen] = useState(false)
   return (
     <>
@@ -141,3 +141,5 @@ export default function DatesInputs({
     </>
   )
 }
+
+export default DatesInputs

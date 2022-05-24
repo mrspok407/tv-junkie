@@ -8,12 +8,10 @@ import Slider from 'Utils/Slider/Slider'
 import * as ROUTES from 'Utils/Constants/routes'
 import Footer from 'Components/UI/Footer/Footer'
 import ScrollToTopOnMount from 'Utils/ScrollToTopOnMount'
-import useGetSlidersContent from './UseGetSlidersContent'
 import useGoogleRedirect from 'Components/UserAuth/SignIn/UseGoogleRedirect'
-import './Home.scss'
-import { useAppSelector } from 'app/hooks'
-import { selectAuthUser } from 'Components/UserAuth/Session/WithAuthentication/authUserSlice'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import useGetSlidersContent from './UseGetSlidersContent'
+import './Home.scss'
 
 const HomePage: React.FC = () => {
   const { authUser } = useFrequentVariables()
@@ -30,7 +28,7 @@ const HomePage: React.FC = () => {
           <ul className="home-page__heading-list">
             <li className="home-page__heading-item">Keep track of your watching or finished shows</li>
             <li className="home-page__heading-item">Check episodes you watched</li>
-            <li className="home-page__heading-item">Get list of all episodes you haven't watched yet</li>
+            <li className="home-page__heading-item">Get list of all episodes you haven&apos;t watched yet</li>
           </ul>
           <ul className="home-page__heading-list">
             <li className="home-page__heading-item">See dates of upcoming episodes</li>
@@ -41,8 +39,7 @@ const HomePage: React.FC = () => {
         <div className="home-page__heading-register">
           <Link to={ROUTES.LOGIN_PAGE} className="home-page__heading-link">
             Register
-          </Link>
-          {' '}
+          </Link>{' '}
           to get access to full features
         </div>
       </div>
@@ -54,7 +51,7 @@ const HomePage: React.FC = () => {
               <h2 className="home-page__slider-heading">{value.name}</h2>
               <Slider sliderData={value.data} />
             </div>
-            ))}
+          ))}
         </div>
       )}
     </>
@@ -88,7 +85,7 @@ const HomePage: React.FC = () => {
                 <h2 className="home-page__slider-heading">{value.name}</h2>
                 <Slider sliderData={value.data} />
               </div>
-              ))}
+            ))}
           </div>
         )}
       </div>

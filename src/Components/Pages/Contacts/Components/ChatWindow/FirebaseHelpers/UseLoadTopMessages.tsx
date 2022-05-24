@@ -15,6 +15,7 @@ const useLoadTopMessages = () => {
   const [loadingTopMessages, setLoadingTopMessages] = useState(false)
 
   const messagesToDelete = useRef<MessageInterface[]>([])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const removeMessagesDebounce = useCallback(
     debounce((removedMessages: any) => {
       contactsDispatch({ type: 'removeMessages', payload: { removedMessages, chatKey: activeChat.chatKey } })
@@ -67,7 +68,8 @@ const useLoadTopMessages = () => {
       })
 
     setLoadingTopMessages(false)
-  }, [activeChat, messagesData, renderedMessages, contactsDispatch, loadingTopMessages]) // eslint-disable-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeChat, messagesData, renderedMessages, contactsDispatch, loadingTopMessages])
 
   return { loadTopMessages, loadingTopMessages }
 }

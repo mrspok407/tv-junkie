@@ -15,7 +15,7 @@ export interface SeasonsFromAPI {
 }
 
 interface ContentDetailes {
-  [key: string]: string | string[] | number | number[] | {} | undefined
+  [key: string]: string | string[] | number | number[] | Record<string, any> | undefined | boolean
   id: number
   poster_path: string
   backdrop_path: string
@@ -55,8 +55,8 @@ interface ContentDetailes {
   imdb_id: number | string
   seasonsFromAPI: SeasonsFromAPI[]
   seasons: SeasonEpisodesFromDatabaseInterface[]
-  similar?: { results: {}[] }[]
-  similar_movies?: { results: {}[] }[]
+  similar?: { results: Record<string, unknown>[] }[]
+  similar_movies?: { results: Record<string, unknown>[] }[]
   allEpisodesWatched: boolean
   database: string
   userWatching?: boolean

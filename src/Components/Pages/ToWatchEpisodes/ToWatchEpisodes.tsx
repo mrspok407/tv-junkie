@@ -18,8 +18,8 @@ const ToWatchEpisodesPage: React.FC = () => (
     <Footer />
     <ScrollToTop />
   </>
-  )
+)
 
-const condition = (authUser: AuthUserInterface['authUser']) => authUser !== null
+const condition = (authUser: AuthUserInterface['authUser']) => !!authUser?.uid
 
 export default WithAuthorization(condition)(ToWatchEpisodesPage)

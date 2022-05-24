@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { differenceBtwDatesInDays, todayDate } from 'Utils'
 import classNames from 'classnames'
@@ -43,11 +43,10 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
 
   useEffect(() => {
     if (!Object.values(userEpisodes).length) return
-    console.log({ userEpisodes })
     const willAirEpisodes = homePage ? willAirEpisodesData.slice(0, 2) : willAirEpisodesData
-    const months = willAirEpisodes.map((item: Object) => Object.values(item)[0])
+    const months = willAirEpisodes.map((item) => Object.values(item)[0])
     setOpenMonths(homePage ? [months[0]] : months)
-  }, [userEpisodes, homePage])
+  }, [userEpisodes, homePage]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // const getContent = useCallback(() => {
   //   if (context.userContent.userShows.length === 0) {
@@ -80,11 +79,17 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
     }
   }
 
+  if (showsInitialLoading || context.userContentHandler.loadingShowsOnRegister) {
+    return (
+      <div className="content-results content-results--calendar">
+        <Loader className="loader--pink" />
+      </div>
+    )
+  }
+
   return (
     <div className="content-results content-results--calendar">
-      {showsInitialLoading || context.userContentHandler.loadingShowsOnRegister ? (
-        <Loader className="loader--pink" />
-      ) : willAirEpisodes.length === 0 && !homePage ? (
+      {willAirEpisodes.length === 0 && !homePage ? (
         <PlaceholderNoFutureEpisodes />
       ) : (
         <div className="episodes episodes--calendar">
@@ -114,7 +119,6 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
                   </div>
                   <div className="episodes__episode-group-episodes-left">
                     {month.episodes.length}
-                    {' '}
                     {month.episodes.length > 1 ? 'episodes' : 'episode'}
                   </div>
                 </div>
@@ -154,6 +158,18 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
                         const daysToNewEpisode = differenceBtwDatesInDays(episode.air_date, todayDate)
                         const willAirToday = daysToNewEpisode === 0
 
+                        const handleDaysToNewEpisode = () => {
+                          if (daysToNewEpisode > 1) {
+                            return `${daysToNewEpisode} days`
+                          }
+                          if (daysToNewEpisode === 1) {
+                            return '1 day'
+                          }
+                          if (willAirToday) {
+                            return 'Today'
+                          }
+                        }
+
                         return (
                           <div
                             key={episode.id}
@@ -187,13 +203,7 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
                                       episodeNumber={episode.episode_number}
                                     />
                                   )}
-                                  <span>
-                                    {daysToNewEpisode > 1
-                                      ? `${daysToNewEpisode} days`
-                                      : daysToNewEpisode === 1
-                                      ? '1 day'
-                                      : willAirToday && 'Today'}
-                                  </span>
+                                  <span>{handleDaysToNewEpisode()}</span>
                                 </div>
                               )}
                             </div>

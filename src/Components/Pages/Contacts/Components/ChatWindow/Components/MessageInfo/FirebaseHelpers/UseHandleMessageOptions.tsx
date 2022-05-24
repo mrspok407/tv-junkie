@@ -58,7 +58,7 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
     } catch (error) {
       errors.handleError({
         errorData: error,
-        message: "Message hasn't been deleted, because of the unexpected error.",
+        message: 'Message hasn&apos;t been deleted, because of the unexpected error.',
       })
       throw new Error(`There has been some error updating database: ${error}`)
     } finally {
@@ -123,7 +123,7 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
     } catch (error) {
       errors.handleError({
         errorData: error,
-        message: "Message hasn't been deleted, because of the unexpected error.",
+        message: 'Message hasn&apos;t been deleted, because of the unexpected error.',
       })
       throw new Error(`There has been some error updating database: ${error}`)
     } finally {

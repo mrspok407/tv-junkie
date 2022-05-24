@@ -1,4 +1,6 @@
-import React, { Component } from 'react'
+/* eslint-disable no-await-in-loop */
+/* eslint-disable max-len */
+import React, { useEffect, useRef, useState } from 'react'
 import { Helmet } from 'react-helmet'
 import axios from 'axios'
 import SignOutButton from 'Components/UserAuth/SignOut/SignOutButton'
@@ -6,71 +8,45 @@ import WithAuthorization from 'Components/UserAuth/Session/WithAuthorization/Wit
 import Header from 'Components/UI/Header/Header'
 import Footer from 'Components/UI/Footer/Footer'
 import { todayDate } from 'Utils'
-import { AppContext } from 'Components/AppContext/AppContextHOC'
 import PasswordUpdate from 'Components/UserAuth/PasswordUpdate/PasswordUpdate'
 import classNames from 'classnames'
 import { LoremIpsum } from 'lorem-ipsum'
 import './Settings.scss'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 
 let startTimeStampGroupChats = 1311011245000
-class Profile extends Component {
-  constructor(props) {
-    super(props)
 
-    this.state = {
-      verificationSent: false,
-      loadingVerificationSent: false,
-      errorMessage: null,
-      passwordUpdate: '',
-      copiedToClipboard: null,
-      authUser: null,
-      limitTo: 2,
-      shows: [],
-      chatBottomFire: false,
-      pageInFocus: false,
-      JSON: {},
+const Profile = () => {
+  const { firebase, authUser } = useFrequentVariables()
+
+  const [verificationSent, setVerificationSent] = useState(false)
+  const [loadingVerificationSent, setLoadingVerificationSent] = useState(false)
+  const [copiedToClipboard, setCopiedToClipboard] = useState(null)
+
+  const clipboardTimeout = useRef(null)
+
+  useEffect(() => {
+    const timeoutClipBoard = clipboardTimeout.current
+    return () => {
+      window.clearTimeout(timeoutClipBoard)
     }
+  }, [])
 
-    this.authSubscriber = null
-    this.clipboardTimeout = null
-    this.fireListener = null
-  }
-
-  componentDidMount() {
-    this.authUserListener()
-  }
-
-  componentWillUnmount() {
-    this.authSubscriber()
-    window.clearTimeout(this.clipboardTimeout)
-  }
-
-  sendEmailVerification = () => {
-    this.setState({ loadingVerificationSent: true })
-    this.context.firebase
+  const sendEmailVerification = () => {
+    setVerificationSent(true)
+    firebase
       .sendEmailVerification()
       .then(() => {
-        this.setState({ verificationSent: true, loadingVerificationSent: false, error: null })
+        setVerificationSent(true)
+        setLoadingVerificationSent(false)
       })
-      .catch((err) => {
-        this.setState({ loadingVerificationSent: false, error: err })
+      .catch(() => {
+        setLoadingVerificationSent(false)
       })
   }
 
-  authUserListener = () => {
-    this.authSubscriber = this.context.firebase.onAuthUserListener(
-      (authUser) => {
-        this.setState({ authUser })
-      },
-      () => {
-        this.setState({ authUser: null })
-      },
-    )
-  }
-
-  addMessagesToPrivateChats = async () => {
+  const addMessagesToPrivateChats = async () => {
     const authUserUid = 'hZK2fqeACBUqZiyj1zrbuFXZzRP2'
-    const { firebase } = this.context
     const lorem = new LoremIpsum({
       sentencesPerParagraph: {
         max: 8,
@@ -95,7 +71,7 @@ class Profile extends Component {
         const chatKey = contactKey < authUserUid ? `${contactKey}_${authUserUid}` : `${authUserUid}_${contactKey}`
         const numberOfMessages = 1000
         const messages = {}
-        for (let i = 1; i <= numberOfMessages; i++) {
+        for (let i = 1; i <= numberOfMessages; i += 1) {
           const messageRef = await firebase.messages({ chatKey, isGroupChat: false }).push()
           messages[`${messageRef.key}`] = {
             sender: Math.random() > 0.5 ? contactKey : authUserUid,
@@ -110,8 +86,7 @@ class Profile extends Component {
     })
   }
 
-  addMessagesToGroupChats = async () => {
-    const { firebase } = this.context
+  const addMessagesToGroupChats = async () => {
     const lorem = new LoremIpsum({
       sentencesPerParagraph: {
         max: 8,
@@ -141,7 +116,7 @@ class Profile extends Component {
     })
   }
 
-  databaseModify = () => {
+  const databaseModify = () => {
     // this.context.firebase.userAllShows("I9OcmC25eKfieOWppn6Pqr1sVj02").once("value", (snapshot) => {
     //   const modified = Object.entries(snapshot.val()).reduce((acc, [key, value]) => {
     //     return { ...acc, [key]: { lastUpdatedInUser: value.timeStamp } }
@@ -176,7 +151,7 @@ class Profile extends Component {
         //   )
 
         data.results.forEach((show) => {
-          this.context.firebase
+          firebase
             .showFullData(show.id)
             .child('id')
             .once('value', (snapshot) => {
@@ -253,7 +228,7 @@ class Profile extends Component {
                     }),
                   )
                   .then((data) => {
-                    this.context.firebase
+                    firebase
                       .showFullData(show.id)
                       .update({
                         episodes: data.episodes,
@@ -262,14 +237,11 @@ class Profile extends Component {
                       .catch((err) => {
                         console.log(err)
                       })
-                    this.context.firebase.showInfo(show.id).update({
+                    firebase.showInfo(show.id).update({
                       status: data.status,
                       name: data.name,
                     })
-                    this.context.firebase
-                      .showInfo(show.id)
-                      .child('lastUpdatedInDatabase')
-                      .set(this.context.firebase.timeStamp())
+                    firebase.showInfo(show.id).child('lastUpdatedInDatabase').set(firebase.timeStamp())
                   })
                   .catch((err) => {
                     console.log(err)
@@ -280,122 +252,104 @@ class Profile extends Component {
       })
   }
 
-  handleOnChange = (e) => {
-    e.preventDefault()
-
-    this.setState({
-      passwordUpdate: e.target.value,
-    })
-  }
-
-  copyToClipboard = (text) => {
-    clearTimeout(this.clipboardTimeout)
+  const copyToClipboard = (text) => {
+    clearTimeout(clipboardTimeout.current)
     navigator.clipboard.writeText(text)
-    this.setState({ copiedToClipboard: true })
-    this.clipboardTimeout = setTimeout(() => {
-      this.setState({ copiedToClipboard: false })
+    setCopiedToClipboard(true)
+    clipboardTimeout.current = setTimeout(() => {
+      setCopiedToClipboard(false)
     }, 3000)
   }
 
-  render() {
-    return (
-      <>
-        <Helmet>
-          <title>Settings | TV Junkie</title>
-        </Helmet>
-        <Header />
-        <div className="user-settings">
-          <div className="user-settings__email">
-            Sign in with
-            {' '}
-            <span>{this.context.authUser.email}</span>
-          </div>
-          <div className="user-settings__verified">
-            {this.context.authUser.emailVerified ? (
-              'Email verified'
-            ) : (
-              <>
-                Email not verified
-                {' '}
-                {this.state.verificationSent ? (
-                  <div className="user-settings__sent-message">Verification sent</div>
-                ) : (
-                  <button onClick={this.sendEmailVerification} className="button button--profile" type="button">
-                    {this.state.loadingVerificationSent ? (
-                      <span className="auth__form-loading" />
-                    ) : (
-                      'Send email verification'
-                    )}
-                  </button>
-                )}
-              </>
-            )}
-            {this.state.error && (
-              <div className="user-settings__error-email-verification">{this.state.error.message}</div>
-            )}
-          </div>
-          <PasswordUpdate />
-          {[process.env.REACT_APP_TEST_EMAIL, process.env.REACT_APP_ADMIN_EMAIL].includes(
-            this.state.authUser?.email,
-          ) && (
-            <div className="update-database">
-              <button onClick={() => this.databaseModify()} className="button button--profile" type="button">
-                Update Database
-              </button>
-            </div>
-          )}
-          <div className="user-settings__copy-user-link">
-            <div
-              className={classNames('button', {
-                'button--clipboard-copied': this.state.copiedToClipboard,
-              })}
-              onClick={() => this.copyToClipboard(
-                  `${
-                    process.env.NODE_ENV === 'production' ? 'https://www.tv-junkie.com' : 'http://localhost:3000'
-                  }/user/${this.state.authUser.uid}`,
-                )}
-            >
-              {!this.state.copiedToClipboard ? (
-                <span
-                  className={classNames('clipboard-message', {
-                    'clipboard-message__not-copied': this.state.copiedToClipboard === false,
-                  })}
-                >
-                  Copy profile link
-                </span>
-              ) : (
-                <span
-                  className={classNames('clipboard-message', {
-                    'clipboard-message__copied': this.state.copiedToClipboard,
-                  })}
-                >
-                  Copied
-                </span>
-              )}
-            </div>
-          </div>
-          {['testchat@gmail.com', process.env.REACT_APP_ADMIN_EMAIL].includes(this.state.authUser?.email) && (
+  return (
+    <>
+      <Helmet>
+        <title>Settings | TV Junkie</title>
+      </Helmet>
+      <Header />
+      <div className="user-settings">
+        <div className="user-settings__email">
+          Sign in with <span>{authUser.email}</span>
+        </div>
+        <div className="user-settings__verified">
+          {authUser.emailVerified ? (
+            'Email verified'
+          ) : (
             <>
-              <button className="button" onClick={() => this.addMessagesToGroupChats()}>
-                Messages to group chats
-              </button>
-              <button className="button" onClick={() => this.addMessagesToPrivateChats()}>
-                Messages to private chats
-              </button>
+              Email not verified{' '}
+              {verificationSent ? (
+                <div className="user-settings__sent-message">Verification sent</div>
+              ) : (
+                <button onClick={sendEmailVerification} className="button button--profile" type="button">
+                  {loadingVerificationSent ? <span className="auth__form-loading" /> : 'Send email verification'}
+                </button>
+              )}
             </>
           )}
-
-          <div className="user-settings__signout">
-            <SignOutButton />
+          {/* {error && (
+        <div className="user-settings__error-email-verification">{error.message}</div>
+      )} */}
+        </div>
+        <PasswordUpdate />
+        {[process.env.REACT_APP_TEST_EMAIL, process.env.REACT_APP_ADMIN_EMAIL].includes(authUser?.email) && (
+          <div className="update-database">
+            <button onClick={() => databaseModify()} className="button button--profile" type="button">
+              Update Database
+            </button>
+          </div>
+        )}
+        <div className="user-settings__copy-user-link">
+          <div
+            className={classNames('button', {
+              'button--clipboard-copied': copiedToClipboard,
+            })}
+            onClick={() => {
+              copyToClipboard(
+                `${
+                  process.env.NODE_ENV === 'production' ? 'https://www.tv-junkie.com' : 'http://localhost:3000'
+                }/user/${authUser.uid}`,
+              )
+            }}
+          >
+            {!copiedToClipboard ? (
+              <span
+                className={classNames('clipboard-message', {
+                  'clipboard-message__not-copied': copiedToClipboard === false,
+                })}
+              >
+                Copy profile link
+              </span>
+            ) : (
+              <span
+                className={classNames('clipboard-message', {
+                  'clipboard-message__copied': copiedToClipboard,
+                })}
+              >
+                Copied
+              </span>
+            )}
           </div>
         </div>
-        <Footer />
-      </>
-    )
-  }
+        {['testchat@gmail.com', process.env.REACT_APP_ADMIN_EMAIL].includes(authUser?.email) && (
+          <>
+            <button type="button" className="button" onClick={() => addMessagesToGroupChats()}>
+              Messages to group chats
+            </button>
+            <button type="button" className="button" onClick={() => addMessagesToPrivateChats()}>
+              Messages to private chats
+            </button>
+          </>
+        )}
+
+        <div className="user-settings__signout">
+          <SignOutButton />
+        </div>
+      </div>
+      <Footer />
+    </>
+  )
 }
 
-const condition = (authUser) => authUser !== null
+const condition = (authUser) => !!authUser?.uid
 
 export default WithAuthorization(condition)(Profile)
-Profile.contextType = AppContext

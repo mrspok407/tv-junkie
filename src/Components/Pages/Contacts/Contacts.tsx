@@ -6,9 +6,7 @@ import { AuthUserInterface } from 'Components/UserAuth/Session/WithAuthenticatio
 import ContactsContent from './ContactsContent'
 import './styles/index.scss'
 
-type Props = {}
-
-const Contacts: React.FC<Props> = () => (
+const Contacts: React.FC = () => (
   <>
     <Helmet>
       <title>Contacts | TV Junkie</title>
@@ -16,8 +14,8 @@ const Contacts: React.FC<Props> = () => (
     <Header contactsPage isLogoVisible={false} />
     <ContactsContent />
   </>
-  )
+)
 
-const condition = (authUser: AuthUserInterface['authUser']) => authUser !== null
+const condition = (authUser: AuthUserInterface['authUser']) => !!authUser?.uid
 
 export default withAuthorization(condition)(Contacts)

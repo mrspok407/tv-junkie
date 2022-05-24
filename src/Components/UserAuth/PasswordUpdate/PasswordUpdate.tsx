@@ -1,13 +1,12 @@
 /* eslint-disable react/no-access-state-in-setstate */
-import React, { useContext, useState } from 'react'
+import React, { useState } from 'react'
 import classNames from 'classnames'
-import Input from '../Input/Input'
-import { FirebaseContext } from 'Components/Firebase'
-import './PasswordUpdate.scss'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import Input from '../Input/Input'
+import './PasswordUpdate.scss'
 
 interface ErrorsInterface {
-  [key: string]: string | {}
+  [key: string]: string | Record<string, unknown>
   passwordError: string
   error: { message: string }
 }
@@ -80,7 +79,7 @@ const PasswordUpdate: React.FC = () => {
   }
 
   const handleKeyDown = (e: any) => {
-    e.which === 27 && resetInput(e.target.name)
+    if (e.which === 27) resetInput(e.target.name)
   }
 
   const resetInput = (name: string) => {

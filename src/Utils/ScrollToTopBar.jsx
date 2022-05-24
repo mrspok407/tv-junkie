@@ -3,7 +3,7 @@ import { throttle } from 'throttle-debounce'
 
 const scrollToTopThreshold = 1000
 
-export default class scrollToTop extends Component {
+export default class ScrollToTop extends Component {
   constructor(props) {
     super(props)
 

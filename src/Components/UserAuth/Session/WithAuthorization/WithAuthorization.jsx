@@ -7,6 +7,15 @@ import { AppContext } from 'Components/AppContext/AppContextHOC'
 
 const withAuthorization = (condition) => (Component) => {
   class WithAuthorization extends React.Component {
+    constructor(props) {
+      super(props)
+      this.state = {
+        authUser: {
+          uid: '',
+        },
+      }
+    }
+
     componentDidMount() {
       this.authorizationListener()
     }
@@ -15,17 +24,26 @@ const withAuthorization = (condition) => (Component) => {
       this.authorizationListener()
     }
 
-    authorizationListener = () => this.context.firebase.onAuthUserListener(
+    componentDidUpdate() {
+      console.log({ update: this.state.authUser })
+      console.log(condition(this.state.authUser))
+    }
+
+    authorizationListener = () =>
+      this.context.firebase.onAuthUserListener(
         (authUser) => {
           if (!condition(authUser)) {
             this.props.history.push(ROUTES.HOME_PAGE)
+          } else {
+            console.log({ authUser })
+            this.setState({ authUser })
           }
         },
         () => this.props.history.push(ROUTES.HOME_PAGE),
       )
 
     render() {
-      return condition(this.context.authUser) ? <Component {...this.props} /> : null
+      return condition(this.state.authUser) ? <Component {...this.props} /> : <div>test</div>
     }
   }
   WithAuthorization.contextType = AppContext

@@ -50,8 +50,8 @@ const MessageInput: React.FC<Props> = ({
 
   const getSelection = () => {
     const selection = window.getSelection()!
-    const anchorOffset = selection?.anchorOffset!
-    const focusOffset = selection?.focusOffset!
+    const anchorOffset = selection?.anchorOffset
+    const focusOffset = selection?.focusOffset
     return { selection, anchorOffset, focusOffset }
   }
 
@@ -66,7 +66,7 @@ const MessageInput: React.FC<Props> = ({
   }) => {
     const { selection } = getSelection()
     const range = document.createRange()
-    range.setStart(node, Math.min(anchorOffset + anchorShift, node?.textContent?.length!))
+    range.setStart(node, Math.min(anchorOffset + anchorShift, node?.textContent?.length))
     range.collapse(true)
 
     selection?.removeAllRanges()
@@ -88,6 +88,7 @@ const MessageInput: React.FC<Props> = ({
     }
   }, [activeChat]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const updateInputDeb = useCallback(
     debounce((payload: MessageInputInterface) => {
       contactsDispatch({ type: 'updateMessageInput', payload })
@@ -167,7 +168,7 @@ const MessageInput: React.FC<Props> = ({
       newMessageRef?.scrollIntoView({ block: 'start', inline: 'start' })
 
       errors.handleError({
-        message: "Message hasn't been sent, because of the unexpected error. Please reload the page.",
+        message: 'Message hasn&apos;t been sent, because of the unexpected error. Please reload the page.',
       })
     }
   }
@@ -193,7 +194,7 @@ const MessageInput: React.FC<Props> = ({
       }
     } catch (error) {
       errors.handleError({
-        message: "Message hasn't been edited, because of the unexpected error. Please reload the page.",
+        message: 'Message hasn&apos;t been edited, because of the unexpected error. Please reload the page.',
       })
     }
   }
@@ -232,11 +233,11 @@ const MessageInput: React.FC<Props> = ({
         e.currentTarget.innerHTML = `${innerHTML.slice(0, anchorOffset)}\n${innerHTML.slice(anchorOffset)}`
       }
     } else if (anchorOffset === innerHTML.length) {
-        // "\n" at the end, which means only one "\n" needed to be add
-        e.currentTarget.innerHTML = `${innerHTML}\n`
-      } else {
-        e.currentTarget.innerHTML = `${innerHTML.slice(0, anchorOffset)}\n${innerHTML.slice(anchorOffset!)}`
-      }
+      // "\n" at the end, which means only one "\n" needed to be add
+      e.currentTarget.innerHTML = `${innerHTML}\n`
+    } else {
+      e.currentTarget.innerHTML = `${innerHTML.slice(0, anchorOffset)}\n${innerHTML.slice(anchorOffset!)}`
+    }
 
     handleCursorLine({ node: e.currentTarget.childNodes[0], anchorOffset, anchorShift: 1 })
     inputRef.current.scrollTop = scrollTop + MESSAGE_LINE_HEIGHT
@@ -256,10 +257,10 @@ const MessageInput: React.FC<Props> = ({
       if (keysMap.current.Shift) {
         handleNextLine({ textContent, innerHTML, e })
       } else if (!messageInputData.editingMsgKey) {
-          handleSendMessage()
-        } else {
-          handleEditMessage()
-        }
+        handleSendMessage()
+      } else {
+        handleEditMessage()
+      }
     }
   }
 

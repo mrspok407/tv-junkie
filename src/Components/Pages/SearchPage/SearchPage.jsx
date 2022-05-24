@@ -1,3 +1,5 @@
+/* eslint-disable max-len */
+/* eslint-disable no-nested-ternary */
 import React, { Component } from 'react'
 import axios, { CancelToken } from 'axios'
 import { throttle } from 'throttle-debounce'
@@ -30,10 +32,8 @@ class SearchPage extends Component {
       advSearchInputValues: JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY_INPUTS)) || {},
       withActors: JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY_ACTORS)) || [],
       totalPagesAdvMovies: JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY_TOTALPAGES)) || null,
-      searchingMovie: false,
       searchingAdvancedSearch: false,
       loadingNewPage: false,
-      error: '',
     }
   }
 
@@ -160,7 +160,6 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
       .then(({ data: { results: movies, total_pages: totalPages } }) => {
         this.setState({
           advancedSearchContent: movies,
-          advSearchNoResults: movies.length === 0,
           searchingAdvancedSearch: false,
           numOfPagesLoaded: 1,
           totalPagesAdvMovies: totalPages,
@@ -206,7 +205,9 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
   handleScroll = throttle(500, () => {
     if (this.state.loadingNewPage) return
 
-    if (this.state.advancedSearchContent.length < 20 || this.state.totalPagesAdvMovies <= this.state.numOfPagesLoaded) return
+    if (this.state.advancedSearchContent.length < 20 || this.state.totalPagesAdvMovies <= this.state.numOfPagesLoaded) {
+      return
+    }
 
     if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 850) {
       const {
@@ -247,7 +248,7 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
   })
 
   clearAdvSearchMovies = () => {
-    this.setState({ advancedSearchContent: [], advSearchNoResults: false })
+    this.setState({ advancedSearchContent: [] })
   }
 
   clearWithActors = () => {

@@ -21,7 +21,7 @@ const GroupCreation: React.FC = () => {
   const [isSearching, setIsSearching] = useState(false)
 
   const [membersListWrapperRef, setMembersListWrapperRef] = useState<HTMLDivElement>(null!)
-  const membersListWrapperCallback = useCallback((node) => {
+  const membersListWrapperCallback = useCallback((node: any) => {
     if (node !== null) {
       setMembersListWrapperRef(node)
     }

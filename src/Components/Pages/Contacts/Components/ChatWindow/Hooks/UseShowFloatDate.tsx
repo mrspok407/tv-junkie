@@ -32,6 +32,7 @@ const useShowFloatDate = ({ activeChat, chatContainerRef, renderedMessages }: Pr
     }
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleScroll = useCallback(
     throttle(150, () => {
       if (!chatContainerRef) return
@@ -59,10 +60,13 @@ const useShowFloatDate = ({ activeChat, chatContainerRef, renderedMessages }: Pr
     }
   }, [activeChat, chatContainerRef, handleScroll])
 
-  useEffect(() => () => {
+  useEffect(
+    () => () => {
       setIsScrollingTop(false)
       window.clearTimeout(floadDateTimeout.current || 0)
-    }, [activeChat])
+    },
+    [activeChat],
+  )
 
   return { floatDate, isScrollingTop }
 }

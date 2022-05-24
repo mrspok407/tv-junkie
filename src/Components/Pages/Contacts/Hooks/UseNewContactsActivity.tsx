@@ -7,8 +7,6 @@ import useFrequentVariables from '../../../../Utils/Hooks/UseFrequentVariables'
 const useNewContactsActivity = () => {
   const { firebase, authUser } = useFrequentVariables()
 
-  console.log({ ConActiUser: authUser })
-
   const [newActivity, setNewActivity] = useState(false)
   const [newRequests, setNewRequests] = useState(false)
 

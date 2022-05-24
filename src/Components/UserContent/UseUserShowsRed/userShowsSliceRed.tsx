@@ -11,7 +11,7 @@ const initialState: UserShowsState = {
     episodes: {},
     timeStamps: {},
   },
-  loading: false,
+  loading: true,
   error: null,
 }
 

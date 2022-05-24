@@ -1,8 +1,8 @@
 import { AppThunk } from 'app/store'
 import { SnapshotVal } from 'Components/AppContext/@Types'
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
-import { handleNewShow, handleChangeShow } from './index'
-import { changeShow, changeShowEpisodes, selectShow, selectShowsIds } from '../userShowsSliceRed'
+import { handleNewShow, handleChangeShow } from './showHandlers'
+import { changeShowEpisodes, selectShow, selectShowsIds } from '../userShowsSliceRed'
 import { SeasonEpisodesFromDatabaseInterface, UserShowsInterface } from '../@Types'
 
 interface UserShowsListeners {
@@ -11,7 +11,8 @@ interface UserShowsListeners {
 }
 
 export const userShowsListeners =
-  ({ uid, firebase }: UserShowsListeners): AppThunk => async (dispatch, getState) => {
+  ({ uid, firebase }: UserShowsListeners): AppThunk =>
+  async (dispatch, getState) => {
     const firebaseRef = firebase.userAllShows(uid).orderByChild('timeStamp')
 
     const showsIds = selectShowsIds(getState())

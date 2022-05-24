@@ -24,7 +24,7 @@ class AdminPage extends Component {
   }
 }
 
-const condition = (authUser) => authUser && authUser.email === process.env.REACT_APP_ADMIN_EMAIL
+const condition = (authUser) => authUser?.uid && authUser.email === process.env.REACT_APP_ADMIN_EMAIL
 
 export default WithAuthorization(condition)(AdminPage)
 AdminPage.contextType = AppContext

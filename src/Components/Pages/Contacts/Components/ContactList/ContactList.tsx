@@ -4,8 +4,6 @@ import classNames from 'classnames'
 import { isUnexpectedObject } from 'Utils'
 import CreatePortal from 'Components/UI/Modal/CreatePortal'
 import ModalContent from 'Components/UI/Modal/ModalContent'
-import { useAppSelector } from 'app/hooks'
-import { selectAuthUser } from 'Components/UserAuth/Session/WithAuthentication/authUserSlice'
 import { CONTACTS_TO_LOAD } from '../@Context/Constants'
 import useGetInitialContactInfo from './Hooks/UseGetInitialContactInfo'
 import useFrequentVariables from '../../../../../Utils/Hooks/UseFrequentVariables'
@@ -67,7 +65,7 @@ const ContactList: React.FC<Props> = ({ contactListWrapperRef }) => {
       if (contact.val().isGroupChat) {
         chatKey = contact.key
       } else {
-        chatKey = contact.key < authUser?.uid! ? `${contact.key}_${authUser?.uid}` : `${authUser?.uid}_${contact.key}`
+        chatKey = contact.key < authUser?.uid ? `${contact.key}_${authUser?.uid}` : `${authUser?.uid}_${contact.key}`
       }
       contactsData.push({ ...contact.val(), isGroupChat: !!contact.val().isGroupChat, key: contact.key, chatKey })
     })
@@ -140,18 +138,22 @@ const ContactList: React.FC<Props> = ({ contactListWrapperRef }) => {
         'contact-list--group-creation-active': groupCreation.isActive,
       })}
     >
-      {initialLoading ? (
+      {initialLoading && (
         <div className="contact-list__loader-wrapper">
           <span className="contact-list__loader" />
         </div>
-      ) : !contactsData?.length ? (
-        <div className="contact-list--no-contacts-text">You don't have any contacts</div>
+      )}
+
+      {!contactsData?.length && !initialLoading ? (
+        <div className="contact-list--no-contacts-text">You don&apos;t have any contacts</div>
       ) : (
-        contactsData?.map((contact) => (contact.removedFromGroup ? (
-          <ContactRemovedFromGroup key={contact.key} contactInfo={contact} allContactsAmount={allContactsAmount} />
+        contactsData?.map((contact) => {
+          return contact.removedFromGroup ? (
+            <ContactRemovedFromGroup key={contact.key} contactInfo={contact} allContactsAmount={allContactsAmount} />
           ) : (
             <Contact key={contact.key} contactInfo={contact} allContactsAmount={allContactsAmount} />
-          )))
+          )
+        })
       )}
 
       {errors.error && <CreatePortal element={<ModalContent message={errors.error.message} />} />}

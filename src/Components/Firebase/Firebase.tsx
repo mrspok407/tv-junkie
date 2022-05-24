@@ -85,9 +85,11 @@ class Firebase {
 
   /// Auth API ///
 
-  createUserWithEmailAndPassword = (email: string, password: string) => this.auth.createUserWithEmailAndPassword(email, password)
+  createUserWithEmailAndPassword = (email: string, password: string) =>
+    this.auth.createUserWithEmailAndPassword(email, password)
 
-  signInWithEmailAndPassword = (email: string, password: string) => this.auth.signInWithEmailAndPassword(email, password)
+  signInWithEmailAndPassword = (email: string, password: string) =>
+    this.auth.signInWithEmailAndPassword(email, password)
 
   signInWithGooglePopUp = () => this.auth.signInWithPopup(this.googleProvider)
 
@@ -101,14 +103,16 @@ class Firebase {
 
   passwordUpdate = (password: string) => this.auth.currentUser.updatePassword(password)
 
-  onAuthUserListener = (next: (authUser: AuthUserInterface['authUser']) => void, fallback: () => void) => this.auth.onAuthStateChanged((authUser: AuthUserInterface['authUser']) => {
-      if (authUser) {
-        authUser = {
+  onAuthUserListener = (next: (authUser: AuthUserInterface['authUser']) => void, fallback: () => void) =>
+    this.auth.onAuthStateChanged((authUser: AuthUserInterface['authUser']) => {
+      let authUserData = { ...authUser }
+      if (authUserData) {
+        authUserData = {
           uid: authUser?.uid,
           email: authUser?.email,
           emailVerified: authUser?.emailVerified,
         }
-        next(authUser)
+        next(authUserData)
       } else {
         fallback()
       }
@@ -138,17 +142,21 @@ class Firebase {
 
   /// Contacts API ///
 
-  newContactsRequests = ({ uid }: { uid: string | undefined }) => this.db.ref(`users/${uid}/contactsDatabase/newContactsRequests`)
+  newContactsRequests = ({ uid }: { uid: string | undefined }) =>
+    this.db.ref(`users/${uid}/contactsDatabase/newContactsRequests`)
 
-  newContactsActivity = ({ uid }: { uid: string | undefined }) => this.db.ref(`users/${uid}/contactsDatabase/newContactsActivity`)
+  newContactsActivity = ({ uid }: { uid: string | undefined }) =>
+    this.db.ref(`users/${uid}/contactsDatabase/newContactsActivity`)
 
-  contactsLastActivity = ({ uid }: { uid: string | undefined }) => this.db.ref(`users/${uid}/contactsDatabase/contactsLastActivity`)
+  contactsLastActivity = ({ uid }: { uid: string | undefined }) =>
+    this.db.ref(`users/${uid}/contactsDatabase/contactsLastActivity`)
 
   contactsDatabase = ({ uid }: { uid: string | undefined }) => this.db.ref(`users/${uid}/contactsDatabase`)
 
   contactsList = ({ uid }: { uid: string | undefined }) => this.db.ref(`users/${uid}/contactsDatabase/contactsList`)
 
-  contact = ({ authUid, contactUid }: { authUid: string | undefined; contactUid: string }) => this.db.ref(`users/${authUid}/contactsDatabase/contactsList/${contactUid}`)
+  contact = ({ authUid, contactUid }: { authUid: string | undefined; contactUid: string }) =>
+    this.db.ref(`users/${authUid}/contactsDatabase/contactsList/${contactUid}`)
 
   /// Chats API ///
   privateChats = () => this.db.ref('privateChats')
@@ -159,14 +167,14 @@ class Firebase {
     if (isGroupChat) {
       return this.db.ref(`groupChats/${chatKey}/messages`)
     }
-      return this.db.ref(`privateChats/${chatKey}/messages`)
+    return this.db.ref(`privateChats/${chatKey}/messages`)
   }
 
   message = ({ chatKey, messageKey, isGroupChat }: { chatKey: string; messageKey: string; isGroupChat: boolean }) => {
     if (isGroupChat) {
       return this.db.ref(`groupChats/${chatKey}/messages/${messageKey}`)
     }
-      return this.db.ref(`privateChats/${chatKey}/messages/${messageKey}`)
+    return this.db.ref(`privateChats/${chatKey}/messages/${messageKey}`)
   }
 
   unreadMessages = ({
@@ -181,7 +189,7 @@ class Firebase {
     if (isGroupChat) {
       return this.db.ref(`groupChats/${chatKey}/members/unreadMessages/${uid}`)
     }
-      return this.db.ref(`privateChats/${chatKey}/members/${uid}/unreadMessages`)
+    return this.db.ref(`privateChats/${chatKey}/members/${uid}/unreadMessages`)
   }
 
   chatMemberStatus = ({
@@ -196,12 +204,13 @@ class Firebase {
     if (isGroupChat) {
       return this.db.ref(`groupChats/${chatKey}/members/status/${memberKey}`)
     }
-      return this.db.ref(`privateChats/${chatKey}/members/${memberKey}/status`)
+    return this.db.ref(`privateChats/${chatKey}/members/${memberKey}/status`)
   }
 
   groupChatMembersStatus = ({ chatKey }: { chatKey: string }) => this.db.ref(`groupChats/${chatKey}/members/status`)
 
-  groupChatParticipants = ({ chatKey }: { chatKey: string }) => this.db.ref(`groupChats/${chatKey}/members/participants`)
+  groupChatParticipants = ({ chatKey }: { chatKey: string }) =>
+    this.db.ref(`groupChats/${chatKey}/members/participants`)
 
   /// User Content API ///
   userContent = (uid: string) => this.db.ref(`users/${uid}/content`)
@@ -216,17 +225,23 @@ class Firebase {
 
   userShowEpisodes = (uid: string, showKey: string) => this.db.ref(`users/${uid}/content/episodes/${showKey}`)
 
-  userShowAllEpisodes: FirebaseInterface['userShowAllEpisodes'] = (uid, showKey) => this.db.ref(`users/${uid}/content/episodes/${showKey}/episodes`)
+  userShowAllEpisodes: FirebaseInterface['userShowAllEpisodes'] = (uid, showKey) =>
+    this.db.ref(`users/${uid}/content/episodes/${showKey}/episodes`)
 
-  userShowAllEpisodesInfo = (uid: string, showKey: string) => this.db.ref(`users/${uid}/content/episodes/${showKey}/info`)
+  userShowAllEpisodesInfo = (uid: string, showKey: string) =>
+    this.db.ref(`users/${uid}/content/episodes/${showKey}/info`)
 
-  userShowSingleEpisode = ({ uid, key, seasonNum, episodeNum }: ReferenceInterface) => this.db.ref(`users/${uid}/content/episodes/${key}/episodes/${seasonNum - 1}/episodes/${episodeNum}`)
+  userShowSingleEpisode = ({ uid, key, seasonNum, episodeNum }: ReferenceInterface) =>
+    this.db.ref(`users/${uid}/content/episodes/${key}/episodes/${seasonNum - 1}/episodes/${episodeNum}`)
 
-  userShowSeasonEpisodes = ({ uid, key, seasonNum }: ReferenceInterface) => this.db.ref(`users/${uid}/content/episodes/${key}/episodes/${seasonNum - 1}/episodes`)
+  userShowSeasonEpisodes = ({ uid, key, seasonNum }: ReferenceInterface) =>
+    this.db.ref(`users/${uid}/content/episodes/${key}/episodes/${seasonNum - 1}/episodes`)
 
-  userShowSeasonEpisodesNotFinished = ({ uid, key, seasonNum }: ReferenceInterface) => this.db.ref(`users/${uid}/content/episodes/notFinished/${key}/episodes/${seasonNum - 1}/episodes`)
+  userShowSeasonEpisodesNotFinished = ({ uid, key, seasonNum }: ReferenceInterface) =>
+    this.db.ref(`users/${uid}/content/episodes/notFinished/${key}/episodes/${seasonNum - 1}/episodes`)
 
-  userShowSeason = ({ uid, key, seasonNum }: ReferenceInterface) => this.db.ref(`users/${uid}/content/episodes/${key}/episodes/${seasonNum - 1}`)
+  userShowSeason = ({ uid, key, seasonNum }: ReferenceInterface) =>
+    this.db.ref(`users/${uid}/content/episodes/${key}/episodes/${seasonNum - 1}`)
 
   watchLaterMovies = (uid: string) => this.db.ref(`users/${uid}/content/movies/watchLaterMovies`)
 }

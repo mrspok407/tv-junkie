@@ -23,7 +23,8 @@ const LoginPage: React.FC = () => {
     const authorizationListener = () => {
       authSubscriber = firebase.onAuthUserListener(
         (authUser: AuthUserInterface['authUser']) => {
-          if (authUser !== null) {
+          console.log({ authUser })
+          if (authUser?.uid) {
             history.push(ROUTES.HOME_PAGE)
           }
         },
@@ -37,7 +38,7 @@ const LoginPage: React.FC = () => {
     }
   }, [firebase, history])
 
-  if (authUser !== null) {
+  if (authUser?.uid) {
     return null
   }
 
