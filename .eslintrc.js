@@ -62,6 +62,7 @@ module.exports = {
     'react/prop-types': 0,
     'react/sort-comp': 0,
     'react/jsx-one-expression-per-line': 0,
+    'function-paren-newline': 0,
     'max-len': [
       'error',
       {

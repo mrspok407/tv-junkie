@@ -10,7 +10,7 @@ import {
   SeasonEpisodesFromDatabaseInterface,
   SingleEpisodeInterface,
   UserShowsInterface,
-} from 'Components/UserContent/UseUserShows/UseUserShows'
+} from 'Components/UserContent/UseUserShowsRed/@Types'
 
 const ToWatchEpisodesContent: React.FC = () => {
   const [watchingShows, setWatchingShows] = useState<UserShowsInterface[]>([])

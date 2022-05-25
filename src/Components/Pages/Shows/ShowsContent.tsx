@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useCallback, useContext, useEffect, useReducer, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { listOfGenres } from 'Utils'
@@ -7,23 +8,24 @@ import PlaceholderNoShows from 'Components/UI/Placeholders/PlaceholderNoShows'
 import Loader from 'Components/UI/Placeholders/Loader'
 import { AppContext } from 'Components/AppContext/AppContextHOC'
 import { useAppDispatch, useAppSelector } from 'app/hooks'
-import { selectUserShows } from 'Components/UserContent/UseUserShows/userShowsSlice'
-import { selectShowsLoading } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
+import { selectShows, selectShowsLoading } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
 import { handleDatabaseChange } from 'Components/UserContent/UseUserShowsRed/FirebaseHelpers/PostData'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import useAppSelectorArray from 'Utils/Hooks/UseAppSelectorArray'
+import { UserShowsInterface } from 'Components/UserContent/UseUserShowsRed/@Types'
 import reducer, { INITIAL_STATE, ShowsContentState, ActionInterface, ActionTypes } from './_reducerConfig'
 
 const SCROLL_THRESHOLD = 800
 
 const ShowsContent: React.FC = () => {
   const { firebase, authUser } = useFrequentVariables()
+  const context = useContext(AppContext)
+  const dispatch = useAppDispatch()
+
+  const userShows = useAppSelectorArray<UserShowsInterface>(selectShows)
+  const showsInitialLoading = useAppSelector(selectShowsLoading)
 
   const [sortByState, setSortByState] = useState('name')
-  const context = useContext(AppContext)
-
-  const dispatch = useAppDispatch()
-  const userShows = useAppSelector(selectUserShows)
-  const showsInitialLoading = useAppSelector(selectShowsLoading)
 
   const [localState, localDispatch] = useReducer<React.Reducer<ShowsContentState, ActionInterface>>(
     reducer,
@@ -35,13 +37,13 @@ const ShowsContent: React.FC = () => {
   }, [context])
 
   const loadNewContent = () => {
-    if (localState.disableLoad[localState.activeSection] || authUser === null) return
+    if (localState.disableLoad[localState.activeSection] || !authUser?.uid) return
     localDispatch({ type: ActionTypes.IncrementLoadedShows })
-    localDispatch({ type: ActionTypes.DisableLoad })
+    localDispatch({ type: ActionTypes.DisableLoad, payload: { userShows } })
   }
 
   const loadNewContentLS = () => {
-    if (localState.disableLoad.watchingShowsLS || authUser !== null) return
+    if (localState.disableLoad.watchingShowsLS || !authUser?.uid) return
     localDispatch({ type: ActionTypes.IncrementLoadedShowsLS })
     localDispatch({ type: ActionTypes.DisableLoadLS })
   }
@@ -77,14 +79,19 @@ const ShowsContent: React.FC = () => {
         if (section === 'finishedShows') {
           return show.finished
         }
-          return show.database === section && !show.finished
+        return show.database === section && !show.finished
       })
-      .sort((a: any, b: any) => (a[sortByState] > b[sortByState] ? (sortByState === 'timeStamp' ? -1 : 1) : sortByState !== 'timeStamp' ? -1 : 1))
+      .sort((a: any, b: any) =>
+        // eslint-disable-next-line no-nested-ternary
+        a[sortByState] > b[sortByState] ? (sortByState === 'timeStamp' ? -1 : 1) : sortByState !== 'timeStamp' ? -1 : 1,
+      )
       .slice(0, localState.loadedShows[section])
 
-    const shows = authUser
+    const shows = authUser?.uid
       ? content
       : context.userContentLocalStorage.watchingShows.slice(0, localState.loadedShows.watchingShowsLS)
+
+    console.log(context.userContentLocalStorage)
 
     return (
       <>
@@ -104,11 +111,7 @@ const ShowsContent: React.FC = () => {
                       <div className="content-results__item-rating">
                         {item.vote_average}
                         <span>/10</span>
-                        <span className="content-results__item-rating-vote-count">
-                          (
-                          {item.vote_count}
-                          )
-                        </span>
+                        <span className="content-results__item-rating-vote-count">({item.vote_count})</span>
                       </div>
                     )}
                   </div>
@@ -139,13 +142,13 @@ const ShowsContent: React.FC = () => {
                     <button
                       className="button"
                       onClick={() => {
-                        if (authUser) {
+                        if (authUser?.uid) {
                           dispatch(
                             handleDatabaseChange({
                               id: item.id,
                               database: 'notWatchingShows',
                               showDetailes: userShows[item.id],
-                              uid: authUser.uid,
+                              uid: authUser?.uid,
                               firebase,
                             }),
                           )
@@ -172,7 +175,7 @@ const ShowsContent: React.FC = () => {
                               id: item.id,
                               database: 'watchingShows',
                               showDetailes: userShows[item.id],
-                              uid: authUser.uid,
+                              uid: authUser?.uid,
                               firebase,
                             }),
                           )
@@ -196,10 +199,11 @@ const ShowsContent: React.FC = () => {
     if (localState.activeSection === 'finishedShows') {
       return show.finished
     }
-      return show.database === localState.activeSection && !show.finished
+    return show.database === localState.activeSection && !show.finished
   })
 
-  const shows = authUser
+  // eslint-disable-next-line no-nested-ternary
+  const shows = authUser?.uid
     ? content
     : localState.activeSection === 'watchingShows'
     ? context.userContentLocalStorage.watchingShows.slice(0, localState.loadedShows.watchingShowsLS)
@@ -209,6 +213,7 @@ const ShowsContent: React.FC = () => {
   const currentNumOfColumns = shows.length <= maxColumns - 1 ? shows.length : maxColumns
 
   const loadingShows = authUser?.uid ? showsInitialLoading : false
+  const showPlaceHolder = !shows.length && !loadingShows && !context.userContentHandler.loadingShowsOnRegister
 
   return (
     <div className="content-results">
@@ -259,13 +264,13 @@ const ShowsContent: React.FC = () => {
         </div>
       </div>
 
-      {loadingShows || context.userContentHandler.loadingShowsOnRegister ? (
-        <Loader className="loader--pink" />
-      ) : shows.length === 0 ? (
-        <PlaceholderNoShows authUser={authUser} activeSection={localState.activeSection} />
-      ) : (
+      {(loadingShows || context.userContentHandler.loadingShowsOnRegister) && <Loader className="loader--pink" />}
+
+      {showPlaceHolder && <PlaceholderNoShows authUser={authUser} activeSection={localState.activeSection} />}
+
+      {shows.length && (
         <>
-          {authUser && (
+          {authUser.uid && (
             <div className="content-results__sortby">
               <div className="content-results__sortby-text">Sort by:</div>
               <div className="content-results__sortby-buttons">

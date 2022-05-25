@@ -3,7 +3,7 @@ import classNames from 'classnames'
 import { Link } from 'react-router-dom'
 import * as ROUTES from 'Utils/Constants/routes'
 import { FirebaseContext } from 'Components/Firebase'
-import { SingleEpisodeInterface } from 'Components/UserContent/UseUserShows/UseUserShows'
+import { SingleEpisodeInterface } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { AppContext } from 'Components/AppContext/AppContextHOC'
 import './UserRating.scss'
 import { useAppSelector } from 'app/hooks'
@@ -174,10 +174,7 @@ const UserRating: React.FC<Props> = ({
 
       {nonAuthWarning && (
         <div className="user-rating__warning">
-          To use full features please
-          {' '}
-          <Link to={ROUTES.LOGIN_PAGE}>register</Link>
-          . Your allready selected shows will be
+          To use full features please <Link to={ROUTES.LOGIN_PAGE}>register</Link>. Your allready selected shows will be
           saved.
         </div>
       )}

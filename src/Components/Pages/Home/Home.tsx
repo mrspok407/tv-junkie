@@ -10,14 +10,34 @@ import Footer from 'Components/UI/Footer/Footer'
 import ScrollToTopOnMount from 'Utils/ScrollToTopOnMount'
 import useGoogleRedirect from 'Components/UserAuth/SignIn/UseGoogleRedirect'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import useAppSelectorArray from 'Utils/Hooks/UseAppSelectorArray'
+import { UserShowsInterface, UserWillAirEpisodesInterface } from 'Components/UserContent/UseUserShowsRed/@Types'
+import {
+  selectEpisodes,
+  selectShows,
+  selectShowsLoading,
+} from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
+import { useAppSelector } from 'app/hooks'
+import PlaceholderHomePageNoFutureEpisodes from 'Components/UI/Placeholders/PlaceholderHomePageNoFutureEpisodes'
+import { organiseFutureEpisodesByMonth } from '../Calendar/CalendarHelpers'
 import useGetSlidersContent from './UseGetSlidersContent'
 import './Home.scss'
 
 const HomePage: React.FC = () => {
-  const { authUser } = useFrequentVariables()
+  const { authUser, userContentHandler } = useFrequentVariables()
   const { sliders, slidersLoading } = useGetSlidersContent()
 
+  const userShows = useAppSelectorArray<UserShowsInterface>(selectShows)
+  const userEpisodes = useAppSelector(selectEpisodes)
+  const watchingShows = userShows.filter((show) => show.database === 'watchingShows')
+  const willAirEpisodesData: UserWillAirEpisodesInterface[] = organiseFutureEpisodesByMonth(watchingShows, userEpisodes)
+  const willAirEpisodes = willAirEpisodesData.slice(0, 2)
+
+  const showsInitialLoading = useAppSelector(selectShowsLoading)
+
   useGoogleRedirect()
+
+  console.log('rerender')
 
   const renderNonAuthUser = () => (
     <>
@@ -59,9 +79,9 @@ const HomePage: React.FC = () => {
 
   const renderAuthUser = () => (
     <>
-      {/* {!context.userContent.loadingShows && !context.userContentHandler.loadingShowsOnRegister && (
+      {!showsInitialLoading && !userContentHandler.loadingShowsOnRegister && (
         <>
-          {context.userContent.userWillAirEpisodes.length > 0 ? (
+          {willAirEpisodes.length > 0 ? (
             <div className="home-page__heading">
               <h1>Soon to watch</h1>
             </div>
@@ -69,13 +89,9 @@ const HomePage: React.FC = () => {
             <PlaceholderHomePageNoFutureEpisodes />
           )}
         </>
-      )} */}
+      )}
 
       <CalendarContent homePage />
-
-      {/* {showsIds.map((id: any) => (
-        <Test key={id} id={id} />
-      ))} */}
 
       <div className="home-page__sliders-wrapper">
         {!slidersLoading && (

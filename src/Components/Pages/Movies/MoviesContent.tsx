@@ -68,7 +68,9 @@ const MoviesContent: React.FC<Props> = ({ moviesData, loadingIds, openLinksMovie
     const content = context.userContent.userMovies
       .sort((a, b) =>
         // @ts-ignore
-        (a[sortByState] > b[sortByState] ? (sortByState === 'timeStamp' ? -1 : 1) : sortByState !== 'timeStamp' ? -1 : 1))
+        // eslint-disable-next-line no-nested-ternary
+        a[sortByState] > b[sortByState] ? (sortByState === 'timeStamp' ? -1 : 1) : sortByState !== 'timeStamp' ? -1 : 1,
+      )
       .slice(0, state.loadedMovies[section])
 
     const movies = authUser
@@ -120,11 +122,7 @@ const MoviesContent: React.FC<Props> = ({ moviesData, loadingIds, openLinksMovie
                       <div className="content-results__item-rating">
                         {item.vote_average}
                         <span>/10</span>
-                        <span className="content-results__item-rating-vote-count">
-                          (
-                          {item.vote_count}
-                          )
-                        </span>
+                        <span className="content-results__item-rating-vote-count">({item.vote_count})</span>
                       </div>
                     )}
                   </div>

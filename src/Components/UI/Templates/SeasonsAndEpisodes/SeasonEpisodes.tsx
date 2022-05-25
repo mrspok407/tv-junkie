@@ -7,7 +7,7 @@ import * as _get from 'lodash.get'
 import * as ROUTES from 'Utils/Constants/routes'
 import UserRating from 'Components/UI/UserRating/UserRating'
 import { AppContext } from 'Components/AppContext/AppContextHOC'
-import { SeasonEpisodesFromDatabaseInterface } from 'Components/UserContent/UseUserShows/UseUserShows'
+import { SeasonEpisodesFromDatabaseInterface } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { ContentDetailes } from 'Utils/Interfaces/ContentDetails'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import { EpisodesDataInterface, ShowEpisodesFromAPIInterface } from './ShowsEpisodes'
@@ -31,7 +31,7 @@ type Props = {
     episodeNum: number,
     index?: number,
     arrLength?: number,
-    callback?: any
+    callback?: any,
   ) => any
   checkMultipleEpisodes: (episodesData: { id: number; index: number }[], resetFadeOutEpisodes: () => void) => void
 }
@@ -188,10 +188,7 @@ const SeasonEpisodes: React.FC<Props> = ({
                 )}
                 <div className="episodes__episode-date">{episodeAirDate}</div>
                 <div className="episodes__episode-name">
-                  <span className="episodes__episode-number">
-                    {episode.episode_number}
-                    .
-                  </span>
+                  <span className="episodes__episode-number">{episode.episode_number}.</span>
                   {_get(episode, 'name', '-')}
                 </div>
                 {daysToNewEpisode > 0 ? (
@@ -246,8 +243,7 @@ const SeasonEpisodes: React.FC<Props> = ({
                   </label>
                   {disableCheckboxWarning === episode.id && (
                     <div ref={registerWarningRef} className="buttons__col-warning">
-                      To use full features please
-                      {' '}
+                      To use full features please{' '}
                       <Link className="buttons__col-link" to={ROUTES.LOGIN_PAGE}>
                         register
                       </Link>

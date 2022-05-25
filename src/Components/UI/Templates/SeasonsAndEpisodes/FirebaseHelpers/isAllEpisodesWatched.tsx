@@ -2,7 +2,7 @@ import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import {
   SeasonEpisodesFromDatabaseInterface,
   SingleEpisodeInterface,
-} from 'Components/UserContent/UseUserShows/UseUserShows'
+} from 'Components/UserContent/UseUserShowsRed/@Types'
 import { AuthUserInterface } from 'Components/UserAuth/Session/WithAuthentication/@Types'
 import { differenceBtwDatesInDays, todayDate } from 'Utils'
 import { ContentDetailes } from 'Utils/Interfaces/ContentDetails'

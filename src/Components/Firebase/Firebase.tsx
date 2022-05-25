@@ -104,13 +104,13 @@ class Firebase {
   passwordUpdate = (password: string) => this.auth.currentUser.updatePassword(password)
 
   onAuthUserListener = (next: (authUser: AuthUserInterface['authUser']) => void, fallback: () => void) =>
-    this.auth.onAuthStateChanged((authUser: AuthUserInterface['authUser']) => {
-      let authUserData = { ...authUser }
-      if (authUserData) {
+    this.auth.onAuthStateChanged((authUserFirebase: AuthUserInterface['authUser']) => {
+      let authUserData = { ...authUserFirebase }
+      if (authUserFirebase) {
         authUserData = {
-          uid: authUser?.uid,
-          email: authUser?.email,
-          emailVerified: authUser?.emailVerified,
+          uid: authUserFirebase?.uid,
+          email: authUserFirebase?.email,
+          emailVerified: authUserFirebase?.emailVerified,
         }
         next(authUserData)
       } else {

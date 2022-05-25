@@ -19,7 +19,7 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
   const { firebase, authUser, userContentLocalStorage } = useFrequentVariables()
 
   const [disableBtnWarning, setDisableBtnWarning] = useState<string | null>(null)
-  const _notAuthButtons = useRef<HTMLDivElement>(null)
+  const notAuthButtons = useRef<HTMLDivElement>(null)
   const dispatch = useAppDispatch()
   const showDatabase = useAppSelector((state) => selectShowDatabase(state, id))
 
@@ -36,14 +36,14 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleClickOutside = (e: CustomEvent) => {
-    if (authUser) return
-    if (!_notAuthButtons?.current?.contains(e.target as Node)) {
+    if (authUser?.uid) return
+    if (!notAuthButtons?.current?.contains(e.target as Node)) {
       setDisableBtnWarning(null)
     }
   }
 
   const showDissableBtnWarning = (btn: string) => {
-    if (authUser) return
+    if (authUser?.uid) return
     setDisableBtnWarning(btn)
   }
 
@@ -58,13 +58,13 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
           })}
           type="button"
           onClick={() => {
-            if (authUser) {
+            if (authUser?.uid) {
               dispatch(
                 handleDatabaseChange({
                   id,
                   database: 'watchingShows',
                   showDetailes: detailes,
-                  uid: authUser.uid,
+                  uid: authUser?.uid,
                   firebase,
                 }),
               )
@@ -89,13 +89,13 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
           })}
           type="button"
           onClick={() => {
-            if (authUser) {
+            if (authUser?.uid) {
               dispatch(
                 handleDatabaseChange({
                   id,
                   database: 'notWatchingShows',
                   showDetailes: detailes,
-                  uid: authUser.uid,
+                  uid: authUser?.uid,
                   firebase,
                 }),
               )
@@ -109,7 +109,7 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
           Not watching
         </button>
       </div>
-      <div className="buttons__col-wrapper" ref={_notAuthButtons}>
+      <div className="buttons__col-wrapper" ref={notAuthButtons}>
         <div className="buttons__col">
           <button
             className={classNames('button', {
@@ -118,13 +118,13 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
             })}
             type="button"
             onClick={() => {
-              if (authUser) {
+              if (authUser?.uid) {
                 dispatch(
                   handleDatabaseChange({
                     id,
                     database: 'droppedShows',
                     showDetailes: detailes,
-                    uid: authUser.uid,
+                    uid: authUser?.uid,
                     firebase,
                   }),
                 )
@@ -138,8 +138,7 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
 
           {disableBtnWarning === 'dropBtn' && (
             <div className="buttons__col-warning">
-              To use full features please
-              {' '}
+              To use full features please{' '}
               <Link className="buttons__col-link" to={ROUTES.LOGIN_PAGE}>
                 register
               </Link>
@@ -155,13 +154,13 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
             })}
             type="button"
             onClick={() => {
-              if (authUser) {
+              if (authUser?.uid) {
                 dispatch(
                   handleDatabaseChange({
                     id,
                     database: 'willWatchShows',
                     showDetailes: detailes,
-                    uid: authUser.uid,
+                    uid: authUser?.uid,
                     firebase,
                   }),
                 )
@@ -174,8 +173,7 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
           </button>
           {disableBtnWarning === 'willWatchBtn' && (
             <div className="buttons__col-warning">
-              To use full features please
-              {' '}
+              To use full features please{' '}
               <Link className="buttons__col-link" to={ROUTES.LOGIN_PAGE}>
                 register
               </Link>

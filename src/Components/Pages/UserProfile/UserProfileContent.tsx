@@ -3,7 +3,7 @@ import { FirebaseContext } from 'Components/Firebase'
 import { useHistory } from 'react-router'
 import { listOfGenres, combineMergeObjects } from 'Utils'
 import * as ROUTES from 'Utils/Constants/routes'
-import { UserShowsInterface } from 'Components/UserContent/UseUserShows/UseUserShows'
+import { UserShowsInterface } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { ShowInterface } from 'Components/AppContext/@Types'
 
 import { throttle } from 'throttle-debounce'
@@ -47,14 +47,16 @@ const UserProfileContent: React.FC<Props> = ({ userUid }) => {
     const userShows: UserShowsInterface[] = Object.values(userShowsData.val()).map((show: any) => show)
 
     const showsFromDatabase = await Promise.all(
-      userShows.map((show) => firebase
+      userShows.map((show) =>
+        firebase
           .showInfo(show.id)
           .once('value')
           .then((snapshot: { val: () => ShowInterface }) => {
             if (snapshot.val() === null) return
             const info = snapshot.val()
             return { ...info }
-          })),
+          }),
+      ),
     )
 
     const mergedShows: UserShowsInterface[] = merge(userShows, showsFromDatabase, {
@@ -105,16 +107,18 @@ const UserProfileContent: React.FC<Props> = ({ userUid }) => {
         if (section === 'finishedShows') {
           return show.finished
         }
-          return show.database === section && !show.finished
+        return show.database === section && !show.finished
       })
       // @ts-ignore
       // eslint-disable-next-line
       .sort((a, b) => {
         if (sortByState === 'timeStamp') {
           return a[sortByState] > b[sortByState] ? -1 : 1
-        } if (sortByState === 'name') {
+        }
+        if (sortByState === 'name') {
           return a[sortByState] > b[sortByState] ? 1 : -1
-        } if (sortByState === 'userRating') {
+        }
+        if (sortByState === 'userRating') {
           const sortValueOne = !a[sortByState] ? 0 : Number(a[sortByState])
           const sortValueTwo = !b[sortByState] ? 0 : Number(b[sortByState])
           return sortValueOne > sortValueTwo ? -1 : 1
@@ -140,11 +144,7 @@ const UserProfileContent: React.FC<Props> = ({ userUid }) => {
                       <div className="content-results__item-rating">
                         {item.vote_average}
                         <span>/10</span>
-                        <span className="content-results__item-rating-vote-count">
-                          (
-                          {item.vote_count}
-                          )
-                        </span>
+                        <span className="content-results__item-rating-vote-count">({item.vote_count})</span>
                       </div>
                     )}
                   </div>
@@ -182,7 +182,7 @@ const UserProfileContent: React.FC<Props> = ({ userUid }) => {
     if (state.activeSection === 'finishedShows') {
       return show.finished
     }
-      return show.database === state.activeSection && !show.finished
+    return show.database === state.activeSection && !show.finished
   })
 
   const maxColumns = 4
@@ -193,8 +193,8 @@ const UserProfileContent: React.FC<Props> = ({ userUid }) => {
         <div className="buttons__col">
           <button
             className={classNames('button', {
-                'button--pressed': state.activeSection === 'watchingShows',
-              })}
+              'button--pressed': state.activeSection === 'watchingShows',
+            })}
             type="button"
             onClick={() => toggleSection('watchingShows')}
           >
@@ -204,8 +204,8 @@ const UserProfileContent: React.FC<Props> = ({ userUid }) => {
         <div className="buttons__col">
           <button
             className={classNames('button', {
-                'button--pressed': state.activeSection === 'droppedShows',
-              })}
+              'button--pressed': state.activeSection === 'droppedShows',
+            })}
             type="button"
             onClick={() => toggleSection('droppedShows')}
           >
@@ -215,8 +215,8 @@ const UserProfileContent: React.FC<Props> = ({ userUid }) => {
         <div className="buttons__col">
           <button
             className={classNames('button', {
-                'button--pressed': state.activeSection === 'willWatchShows',
-              })}
+              'button--pressed': state.activeSection === 'willWatchShows',
+            })}
             type="button"
             onClick={() => toggleSection('willWatchShows')}
           >
@@ -226,8 +226,8 @@ const UserProfileContent: React.FC<Props> = ({ userUid }) => {
         <div className="buttons__col">
           <button
             className={classNames('button', {
-                'button--pressed': state.activeSection === 'finishedShows',
-              })}
+              'button--pressed': state.activeSection === 'finishedShows',
+            })}
             type="button"
             onClick={() => toggleSection('finishedShows')}
           >
@@ -238,69 +238,69 @@ const UserProfileContent: React.FC<Props> = ({ userUid }) => {
 
       {loadingContent ? (
         <Loader className="loader--pink" />
-        ) : activeSectionContent.length === 0 ? (
-          <PlaceholderNoShowsUser activeSection={state.activeSection} />
-        ) : (
-          <>
-            <div className="content-results__sortby">
-              <div className="content-results__sortby-text">Sort by:</div>
-              <div className="content-results__sortby-buttons">
-                <div
-                  className={classNames('content-results__sortby-buttons', {
-                    'content-results__sortby-button--active': sortByState === 'name',
-                  })}
+      ) : activeSectionContent.length === 0 ? (
+        <PlaceholderNoShowsUser activeSection={state.activeSection} />
+      ) : (
+        <>
+          <div className="content-results__sortby">
+            <div className="content-results__sortby-text">Sort by:</div>
+            <div className="content-results__sortby-buttons">
+              <div
+                className={classNames('content-results__sortby-buttons', {
+                  'content-results__sortby-button--active': sortByState === 'name',
+                })}
+              >
+                <button type="button" className="button button--sortby-shows" onClick={() => sortByHandler('name')}>
+                  Alphabetically
+                </button>
+              </div>
+              <div
+                className={classNames('content-results__sortby-button', {
+                  'content-results__sortby-button--active': sortByState === 'timeStamp',
+                })}
+              >
+                <button
+                  type="button"
+                  className="button button--sortby-shows"
+                  onClick={() => sortByHandler('timeStamp')}
                 >
-                  <button type="button" className="button button--sortby-shows" onClick={() => sortByHandler('name')}>
-                    Alphabetically
-                  </button>
-                </div>
-                <div
-                  className={classNames('content-results__sortby-button', {
-                    'content-results__sortby-button--active': sortByState === 'timeStamp',
-                  })}
+                  Recently added
+                </button>
+              </div>
+              <div
+                className={classNames('content-results__sortby-button', {
+                  'content-results__sortby-button--active': sortByState === 'userRating',
+                })}
+              >
+                <button
+                  type="button"
+                  className="button button--sortby-shows"
+                  onClick={() => sortByHandler('userRating')}
                 >
-                  <button
-                    type="button"
-                    className="button button--sortby-shows"
-                    onClick={() => sortByHandler('timeStamp')}
-                  >
-                    Recently added
-                  </button>
-                </div>
-                <div
-                  className={classNames('content-results__sortby-button', {
-                    'content-results__sortby-button--active': sortByState === 'userRating',
-                  })}
-                >
-                  <button
-                    type="button"
-                    className="button button--sortby-shows"
-                    onClick={() => sortByHandler('userRating')}
-                  >
-                    User rating
-                  </button>
-                </div>
+                  User rating
+                </button>
               </div>
             </div>
+          </div>
 
-            <div
-              className={classNames('content-results__wrapper', {
-                'content-results__wrapper--finished-shows': state.activeSection === 'finishedShows',
-              })}
-              style={
-                currentNumOfColumns <= 3
-                  ? {
-                      gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 350px))',
-                    }
-                  : {
-                      gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-                    }
-              }
-            >
-              {renderContent(state.activeSection)}
-            </div>
-          </>
-        )}
+          <div
+            className={classNames('content-results__wrapper', {
+              'content-results__wrapper--finished-shows': state.activeSection === 'finishedShows',
+            })}
+            style={
+              currentNumOfColumns <= 3
+                ? {
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 350px))',
+                  }
+                : {
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+                  }
+            }
+          >
+            {renderContent(state.activeSection)}
+          </div>
+        </>
+      )}
     </div>
   )
 }

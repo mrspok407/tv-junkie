@@ -1,7 +1,7 @@
 import {
   SeasonEpisodesFromDatabaseInterface,
   SingleEpisodeInterface,
-} from 'Components/UserContent/UseUserShows/UseUserShows'
+} from 'Components/UserContent/UseUserShowsRed/@Types'
 import { useState, useEffect } from 'react'
 import { releasedEpisodesToOneArray } from 'Utils'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
@@ -74,13 +74,16 @@ const useHandleListeners = ({ id }: { id: number }) => {
     })
   }
 
-  useEffect(() => () => {
+  useEffect(
+    () => () => {
       setEpisodesFromDatabase([])
       setReleasedEpisodes([])
 
       if (!authUser?.uid) return
       firebase.userShowAllEpisodes(authUser.uid, id).off()
-    }, [id, authUser, firebase])
+    },
+    [id, authUser, firebase],
+  )
 
   return { episodesFromDatabase, releasedEpisodes, handleListeners }
 }

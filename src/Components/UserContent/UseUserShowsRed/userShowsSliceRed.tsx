@@ -4,7 +4,7 @@ import { createSlice, current, PayloadAction } from '@reduxjs/toolkit'
 import { combineMergeObjects } from 'Utils'
 import { SeasonEpisodesFromDatabaseInterface, UserShowsState, UserShowsInterface } from './@Types'
 
-const initialState: UserShowsState = {
+const userShowsInitialState: UserShowsState = {
   data: {
     ids: [],
     info: {},
@@ -17,7 +17,7 @@ const initialState: UserShowsState = {
 
 export const userShowsSliceRed = createSlice({
   name: 'userShows',
-  initialState,
+  initialState: userShowsInitialState,
   reducers: {
     setUserShows: {
       reducer(state, action: PayloadAction<UserShowsState['data']>) {
@@ -89,6 +89,9 @@ export const userShowsSliceRed = createSlice({
       console.log(action.payload)
       state.loading = action.payload
     },
+    resetShows: () => {
+      return { ...userShowsInitialState, loading: false }
+    },
     setError: (state, action: PayloadAction<any>) => {
       state.error = action.payload
       state.loading = false
@@ -103,6 +106,7 @@ export const {
   setShowEpisodes,
   changeShowEpisodes,
   updateLoadingShows,
+  resetShows,
   setError,
 } = userShowsSliceRed.actions
 

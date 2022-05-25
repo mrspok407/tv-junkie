@@ -1,5 +1,5 @@
 /* eslint-disable array-callback-return */
-import { SeasonEpisodesFromDatabaseInterface } from 'Components/UserContent/UseUserShows/UseUserShows'
+import { SeasonEpisodesFromDatabaseInterface } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { differenceBtwDatesInDays, todayDate } from 'Utils'
 
 export const releasedEpisodes = ({ data }: { data: SeasonEpisodesFromDatabaseInterface[] }) => {

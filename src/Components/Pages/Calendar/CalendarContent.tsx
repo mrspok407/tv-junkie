@@ -14,9 +14,11 @@ import {
 } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
 import {
   SingleEpisodeByMonthInterface,
+  UserShowsInterface,
   UserWillAirEpisodesInterface,
 } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { selectAuthUser } from 'Components/UserAuth/Session/WithAuthentication/authUserSlice'
+import useAppSelectorArray from 'Utils/Hooks/UseAppSelectorArray'
 import { organiseFutureEpisodesByMonth, organizeMonthEpisodesByEpisodeNumber } from './CalendarHelpers'
 
 type Props = {
@@ -31,9 +33,9 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
 
   const showsInitialLoading = useAppSelector(selectShowsLoading)
 
-  const userShows = useAppSelector(selectShows)
+  const userShows = useAppSelectorArray<UserShowsInterface>(selectShows)
   const userEpisodes = useAppSelector(selectEpisodes)
-  const watchingShows = Object.values(userShows).filter((show) => show.database === 'watchingShows')
+  const watchingShows = userShows.filter((show) => show.database === 'watchingShows')
   // const watchingShowsEpisodes = watchingShows.reduce((acc, show) => {
   //   acc.push({...show, episodes: userEpisodes[show.id]})
   //   return acc

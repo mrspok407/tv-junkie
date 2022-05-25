@@ -1,7 +1,7 @@
 import {
   SeasonEpisodesFromDatabaseInterface,
   SingleEpisodeInterface,
-} from 'Components/UserContent/UseUserShows/UseUserShows'
+} from 'Components/UserContent/UseUserShowsRed/@Types'
 
 export interface SeasonsFromAPI {
   air_date?: string

@@ -2,7 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import * as ROUTES from 'Utils/Constants/routes'
 
-export default function PlaceholderNoShows({ authUser, activeSection }) {
+const PlaceholderNoShows = ({ authUser, activeSection }) => {
   let message
   const messageForNonAuth = !authUser?.uid && activeSection !== 'watchingShows' && (
     <h1>
@@ -26,3 +26,5 @@ export default function PlaceholderNoShows({ authUser, activeSection }) {
 
   return <div className="placeholder--no-shows">{messageForNonAuth || message}</div>
 }
+
+export default PlaceholderNoShows

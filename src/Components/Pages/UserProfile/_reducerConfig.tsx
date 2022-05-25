@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { UserShowsInterface } from 'Components/UserContent/UseUserShows/UseUserShows'
+import { UserShowsInterface } from 'Components/UserContent/UseUserShowsRed/@Types'
 
 const SHOWS_TO_LOAD_INITIAL = 16
 
@@ -24,29 +24,34 @@ const reducer: React.Reducer<ShowsContentState, ActionInterface> = (state, actio
           : loadedShows[activeSection],
       },
     }
-  } if (action.type === ActionTypes.DisableLoad) {
+  }
+  if (action.type === ActionTypes.DisableLoad) {
     return {
       ...state,
       disableLoad: {
         ...disableLoad,
         [activeSection]: !!(
           loadedShows[activeSection] >=
-          content.filter((show: any) => (activeSection === 'finishedShows' ? !!show.finished : !!(show.database === activeSection && !show.finished))).length
+          content.filter((show: any) =>
+            activeSection === 'finishedShows' ? !!show.finished : !!(show.database === activeSection && !show.finished),
+          ).length
         ),
       },
     }
-  } if (action.type === ActionTypes.ChangeActiveSection) {
+  }
+  if (action.type === ActionTypes.ChangeActiveSection) {
     return {
       ...state,
       activeSection: action.payload,
     }
-  } if (action.type === ActionTypes.UpdateContent) {
+  }
+  if (action.type === ActionTypes.UpdateContent) {
     return {
       ...state,
       content: action.payload,
     }
   }
-    throw new Error()
+  throw new Error()
 }
 
 export default reducer

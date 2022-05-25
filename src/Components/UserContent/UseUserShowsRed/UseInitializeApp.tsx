@@ -4,7 +4,9 @@ import { useAppDispatch } from 'app/hooks'
 import { resetAuthUser } from 'Components/UserAuth/Session/WithAuthentication/authUserSlice'
 import setupAuthUser from 'Components/UserAuth/Session/WithAuthentication/Middleware/setupAuthUser'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import { logoutAuthUser } from 'Components/UserAuth/Session/WithAuthentication/Middleware/logoutAuthUser'
 import { fetchUserShows } from './Middleware'
+import { updateLoadingShows } from './userShowsSliceRed'
 
 const useInitializeApp = () => {
   const { firebase } = useFrequentVariables()
@@ -17,13 +19,14 @@ const useInitializeApp = () => {
         async (authUser: AuthUserInterface['authUser']) => {
           console.log('User logged in')
           // await updateUserEpisodesFromDatabase({ firebase })
+          dispatch(updateLoadingShows(true))
           await dispatch(setupAuthUser(authUser, firebase))
           console.log('setupAuthUser END')
           dispatch(fetchUserShows(firebase))
         },
         () => {
           console.log('User logged out')
-          dispatch(resetAuthUser())
+          dispatch(logoutAuthUser())
         },
       )
     }

@@ -7,7 +7,7 @@ import UserRating from 'Components/UI/UserRating/UserRating'
 import {
   SeasonEpisodesFromDatabaseInterface,
   SingleEpisodeInterface,
-} from 'Components/UserContent/UseUserShows/UseUserShows'
+} from 'Components/UserContent/UseUserShowsRed/@Types'
 import { FirebaseContext } from 'Components/Firebase'
 import { AppContext } from 'Components/AppContext/AppContextHOC'
 import { tmdbTvSeasonURL } from 'Utils/APIUrls'

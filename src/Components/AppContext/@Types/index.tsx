@@ -2,7 +2,7 @@ import {
   UserMoviesInterface,
   UserShowsInterface,
   UserWillAirEpisodesInterface,
-} from 'Components/UserContent/UseUserShows/UseUserShows'
+} from 'Components/UserContent/UseUserShowsRed/@Types'
 import { LOADING_ADDING_TO_DATABASE_INITIAL } from 'Components/UserContent/UseContentHandler'
 import { FirebaseInterface, FIREBASE_INITIAL_STATE } from 'Components/Firebase/FirebaseContext'
 import { ContentDetailes } from 'Utils/Interfaces/ContentDetails'

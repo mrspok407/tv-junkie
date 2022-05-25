@@ -4,7 +4,7 @@ import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import { AuthUserInterface } from '../@Types'
 import { setAuthUser } from '../authUserSlice'
 
-export const setupAuthUser =
+const setupAuthUser =
   (authUser: AuthUserInterface['authUser'], firebase: FirebaseInterface): AppThunk =>
   async (dispatch) => {
     const authUserData = { ...authUser }

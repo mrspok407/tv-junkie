@@ -8,7 +8,7 @@ import { ContactsContext } from '../../Components/Pages/Contacts/Components/@Con
 const useFrequentVariables = () => {
   const firebase = useContext(FirebaseContext)
   const { authUser } = useAppSelector(selectAuthUser)
-  const { newContactsActivity, errors, userContentLocalStorage } = useContext(AppContext)
+  const { newContactsActivity, errors, userContentLocalStorage, userContentHandler } = useContext(AppContext)
   const contactsContext = useContext(ContactsContext)
   const contactsState = contactsContext?.state!
   const contactsDispatch = contactsContext?.dispatch!
@@ -18,6 +18,7 @@ const useFrequentVariables = () => {
     contactsState,
     contactsDispatch,
     userContentLocalStorage,
+    userContentHandler,
     firebase,
     authUser,
     newContactsActivity,
