@@ -1,8 +1,8 @@
-import app from 'firebase/app'
-import 'firebase/auth'
-import 'firebase/database'
-import 'firebase/analytics'
-import 'firebase/functions'
+import app from 'firebase/compat/app'
+import 'firebase/compat/auth'
+import 'firebase/compat/database'
+import 'firebase/compat/analytics'
+import 'firebase/compat/functions'
 import { AuthUserInterface } from 'Components/UserAuth/Session/WithAuthentication/@Types'
 import { FirebaseInterface } from './FirebaseContext'
 

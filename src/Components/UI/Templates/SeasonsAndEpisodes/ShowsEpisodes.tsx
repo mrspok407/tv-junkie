@@ -1,34 +1,24 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { differenceBtwDatesInDays, releasedEpisodesToOneArray, todayDate } from 'Utils'
 import * as _get from 'lodash.get'
 import Loader from 'Components/UI/Placeholders/Loader'
 import classNames from 'classnames'
 import UserRating from 'Components/UI/UserRating/UserRating'
-import {
-  SeasonEpisodesFromDatabaseInterface,
-  SingleEpisodeInterface,
-} from 'Components/UserContent/UseUserShowsRed/@Types'
-import { FirebaseContext } from 'Components/Firebase'
-import { AppContext } from 'Components/AppContext/AppContextHOC'
+import { SingleEpisodeInterface } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { tmdbTvSeasonURL } from 'Utils/APIUrls'
 import useAxiosPromise from 'Utils/Hooks/UseAxiosPromise'
 import './ShowsEpisodes.scss'
 import { useAppSelector } from 'app/hooks'
 import { selectShow, selectShowEpisodes } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
-import { ContentDetailes } from 'Utils/Interfaces/ContentDetails'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import useFetchSeasons from './Hooks/UseFetchSeasons/UseFetchSeasons'
 import SeasonEpisodes from './SeasonEpisodes'
 import isAllEpisodesWatched from './FirebaseHelpers/isAllEpisodesWatched'
 
 type Props = {
-  showDatabaseOnClient?: string | null
   episodesData: EpisodesDataInterface[]
   showTitle: string
-  showInfo?: ContentDetailes
   id: number
-  episodesFromDatabase?: SeasonEpisodesFromDatabaseInterface[]
-  releasedEpisodes?: SingleEpisodeInterface[]
   parentComponent: string
 }
 
@@ -43,7 +33,7 @@ export interface EpisodesDataInterface {
   episodes: SingleEpisodeInterface[]
 }
 
-export interface currentlyOpenSeasons {
+export interface CurrentlyOpenSeasons {
   seasonId: number
   seasonNum: number
 }
@@ -253,8 +243,8 @@ const ShowsEpisodes: React.FC<Props> = ({
     let isAllEpisodesChecked = true
     let userEpisodesFormated: SingleEpisodeInterface[] = []
 
-    episodesFromDatabase.forEach((season) => {
-      const episodes = season.episodes.filter((item) => item.air_date !== '')
+    episodesFromDatabase.forEach((season: any) => {
+      const episodes = season.episodes.filter((item: any) => item.air_date !== '')
 
       userEpisodesFormated = [...userEpisodesFormated, ...episodes]
     })

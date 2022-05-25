@@ -92,9 +92,6 @@ const ToWatchEpisodesContent: React.FC = () => {
                   episodesData={toWatchEpisodes}
                   showTitle={show.name || show.original_name}
                   id={show.id}
-                  showInfo={show}
-                  episodesFromDatabase={show.episodes}
-                  releasedEpisodes={releasedEpisodes}
                 />
               </div>
             )
