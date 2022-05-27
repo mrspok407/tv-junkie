@@ -1,3 +1,5 @@
+/* eslint-disable no-nested-ternary */
+/* eslint-disable react/jsx-no-undef */
 import React, { useState } from 'react'
 import { differenceBtwDatesInDays, releasedEpisodesToOneArray, todayDate } from 'Utils'
 import * as _get from 'lodash.get'
@@ -7,13 +9,15 @@ import UserRating from 'Components/UI/UserRating/UserRating'
 import { SingleEpisodeInterface } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { tmdbTvSeasonURL } from 'Utils/APIUrls'
 import useAxiosPromise from 'Utils/Hooks/UseAxiosPromise'
-import './ShowsEpisodes.scss'
 import { useAppSelector } from 'app/hooks'
 import { selectShow, selectShowEpisodes } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import useFetchSeasons from './Hooks/UseFetchSeasons/UseFetchSeasons'
 import SeasonEpisodes from './SeasonEpisodes'
 import isAllEpisodesWatched from './FirebaseHelpers/isAllEpisodesWatched'
+import { ActionTypesEnum } from './Hooks/UseFetchSeasons/_reducerConfig'
+import { EpisodesDataInterface, ShowEpisodesFromAPIInterface } from './@Types'
+import './ShowsEpisodes.scss'
 
 type Props = {
   episodesData: EpisodesDataInterface[]
@@ -22,37 +26,7 @@ type Props = {
   parentComponent: string
 }
 
-export interface EpisodesDataInterface {
-  name?: string
-  id: number
-  seasonId?: number
-  air_date?: string
-  season_number: number
-  episode_count?: number
-  poster_path?: string
-  episodes: SingleEpisodeInterface[]
-}
-
-export interface CurrentlyOpenSeasons {
-  seasonId: number
-  seasonNum: number
-}
-
-export interface ShowEpisodesFromAPIInterface {
-  seasonId: number
-  id?: number
-  episodes: SingleEpisodeInterface[]
-}
-
-const ShowsEpisodes: React.FC<Props> = ({
-  episodesData,
-  showTitle,
-  // showInfo,
-  id,
-  // episodesFromDatabase,
-  // releasedEpisodes,
-  parentComponent,
-}) => {
+const ShowsEpisodes: React.FC<Props> = ({ episodesData, showTitle, id, parentComponent }) => {
   const { firebase, authUser } = useFrequentVariables()
 
   const showInfo = useAppSelector((state) => selectShow(state, id))
@@ -98,7 +72,7 @@ const ShowsEpisodes: React.FC<Props> = ({
     }
 
     if (openSeason.seasonId === seasonId) {
-      dispatch({ type: 'handleOpenData', payload: { id: seasonId.toString() } })
+      dispatch({ type: ActionTypesEnum.HandleOpenData, payload: { id: seasonId.toString() } })
     } else {
       setOpenSeason({ seasonId, seasonNum })
     }

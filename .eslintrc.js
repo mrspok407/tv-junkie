@@ -63,6 +63,7 @@ module.exports = {
     'react/sort-comp': 0,
     'react/jsx-one-expression-per-line': 0,
     'function-paren-newline': 0,
+    'jsx-a11y/label-has-associated-control': 0,
     'max-len': [
       'error',
       {

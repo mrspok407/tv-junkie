@@ -1,12 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState, useEffect, useContext, useCallback } from 'react'
-import { useHistory } from 'react-router-dom'
-import axios from 'axios'
+import React from 'react'
 import { Helmet } from 'react-helmet'
-import { AppContext } from 'Components/AppContext/AppContextHOC'
-import { FirebaseContext } from 'Components/Firebase'
-import * as ROUTES from 'Utils/Constants/routes'
-import * as _get from 'lodash.get'
 import Header from 'Components/UI/Header/Header'
 import Slider from 'Utils/Slider/Slider'
 import ShowsEpisodes from 'Components/UI/Templates/SeasonsAndEpisodes/ShowsEpisodes'
@@ -14,16 +8,13 @@ import ScrollToTopBar from 'Utils/ScrollToTopBar'
 import ScrollToTopOnUpdate from 'Utils/ScrollToTopOnUpdate'
 import Footer from 'Components/UI/Footer/Footer'
 import PlaceholderLoadingFullInfo from 'Components/UI/Placeholders/PlaceholderLoadingFullInfo/PlaceholderLoadingFullInfo'
-import { ContentDetailes, CONTENT_DETAILS_DEFAULT } from 'Utils/Interfaces/ContentDetails'
 import useGoogleRedirect from 'Components/UserAuth/SignIn/UseGoogleRedirect'
-import { useAppDispatch, useAppSelector } from 'app/hooks'
+import { useAppSelector } from 'app/hooks'
 import { selectShowsLoading } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
-import { fetchShowEpisodes } from 'Components/UserContent/UseUserShowsRed/Middleware'
 import PosterWrapper from './Components/PosterWrapper'
 import { MainInfo } from './Components/MainInfo'
 import useGetDataTMDB from './Hooks/UseGetDataTMDB'
 import './Detailes.scss'
-import useFrequentVariables from '../../../Utils/Hooks/UseFrequentVariables'
 
 type Props = {
   match: { params: { id: string; mediaType: string } }
@@ -36,8 +27,6 @@ export const DetailesPage: React.FC<Props> = ({
 }) => {
   const [detailes, loadingTMDB, similarContent, error] = useGetDataTMDB({ id, mediaType })
   const showsInitialLoading = useAppSelector(selectShowsLoading)
-
-  console.log({ loadingTMDB })
 
   useGoogleRedirect()
 

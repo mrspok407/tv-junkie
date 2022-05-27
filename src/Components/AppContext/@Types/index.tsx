@@ -77,7 +77,7 @@ export interface ErrorsInterface {
 export interface AppContextInterface {
   userContentLocalStorage: {
     watchLaterMovies: ContentDetailes[]
-    watchingShows: ContentDetailes[]
+    watchingShows: UserShowsInterface[]
     toggleMovieLS: ({ id, data }: ToggleMovieLSArg) => void
     clearContentState: () => void
     addShowLS: ({ id, data }: { id: number; data: ContentDetailes }) => void

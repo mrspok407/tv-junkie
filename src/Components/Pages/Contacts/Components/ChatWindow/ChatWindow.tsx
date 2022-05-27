@@ -194,11 +194,11 @@ const ChatWindow: React.FC = () => {
             loadTopMessages()
           }
         } else if (scrollHeight <= scrollTop + height + thresholdBottomRender) {
-            contactsDispatch({
-              type: 'renderBottomMessages',
-              payload: { unreadMessagesAuthRef: unreadMessagesAuthRef.current, chatKey: activeChat.chatKey },
-            })
-          }
+          contactsDispatch({
+            type: 'renderBottomMessages',
+            payload: { unreadMessagesAuthRef: unreadMessagesAuthRef.current, chatKey: activeChat.chatKey },
+          })
+        }
         prevScrollTop = scrollTop
       },
     ),
@@ -262,17 +262,17 @@ const ChatWindow: React.FC = () => {
       if (isScrollBottom) {
         firstUnreadMessageRef?.parentElement?.scrollIntoView({ block: 'start', inline: 'start' })
       } else if (isFirstBunch) {
-          firstUnreadMessageRef?.parentElement?.scrollIntoView({ block: 'start', inline: 'start' })
-        } else {
-          chatContainerRef.scrollTop = lastScrollPosition[activeChat.chatKey]!
-        }
-    } else if (isScrollBottom) {
-        chatContainerRef.scrollTop = getContainerRect().scrollHeight + getContainerRect().height
-        isScrollBottomRef.current = true
-        firebaseRefs.updateMemberStatus({ value: { chatBottom: true } })
+        firstUnreadMessageRef?.parentElement?.scrollIntoView({ block: 'start', inline: 'start' })
       } else {
         chatContainerRef.scrollTop = lastScrollPosition[activeChat.chatKey]!
       }
+    } else if (isScrollBottom) {
+      chatContainerRef.scrollTop = getContainerRect().scrollHeight + getContainerRect().height
+      isScrollBottomRef.current = true
+      firebaseRefs.updateMemberStatus({ value: { chatBottom: true } })
+    } else {
+      chatContainerRef.scrollTop = lastScrollPosition[activeChat.chatKey]!
+    }
     isScrolledFirstRenderRef.current = true
   }, [
     activeChat,
@@ -326,7 +326,10 @@ const ChatWindow: React.FC = () => {
     firebase.newContactsActivity({ uid: authUser?.uid }).child(`${contactInfo.key}`).set(null)
   }, [contactInfo])
 
-  const firstUnreadMessage = useMemo(() => messagesData?.find((message) => message.key === unreadMessagesAuth[0]), [unreadMsgsListenerChatKey, rerenderUnreadMessagesStart, chatWindowLoading, markAsRead])
+  const firstUnreadMessage = useMemo(
+    () => messagesData?.find((message) => message.key === unreadMessagesAuth[0]),
+    [unreadMsgsListenerChatKey, rerenderUnreadMessagesStart, chatWindowLoading, markAsRead],
+  )
 
   return (
     <div className="chat-window-container" onMouseEnter={onMouseEnter}>
@@ -357,10 +360,7 @@ const ChatWindow: React.FC = () => {
             </div>
           ) : !messagesData.length ? (
             <div className="chat-window__no-messages">
-              The chat is very empty,
-              {' '}
-              <span>so sad</span>
-              .
+              The chat is very empty, <span>so sad</span>.
             </div>
           ) : (
             <div className="chat-window__messages-list">

@@ -1,12 +1,13 @@
 import { ToggleMovieLSArg } from 'Components/AppContext/@Types'
 import { useState, useEffect } from 'react'
 import { ContentDetailes } from 'Utils/Interfaces/ContentDetails'
+import { UserShowsInterface } from './UseUserShowsRed/@Types'
 
 const LOCAL_STORAGE_KEY_WATCHING_SHOWS = 'watchingShowsLocalS'
 const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = 'watchLaterMoviesLocalS'
 
 interface UserContent {
-  watchingShows: ContentDetailes[]
+  watchingShows: UserShowsInterface[]
   watchLaterMovies: ContentDetailes[]
 }
 

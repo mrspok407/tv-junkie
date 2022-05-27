@@ -37,8 +37,6 @@ const HomePage: React.FC = () => {
 
   useGoogleRedirect()
 
-  console.log('rerender')
-
   const renderNonAuthUser = () => (
     <>
       <div className="home-page__heading">

@@ -1,16 +1,15 @@
 /* eslint-disable array-callback-return */
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { differenceBtwDatesInDays, todayDate } from 'Utils'
 import { Link } from 'react-router-dom'
 import classNames from 'classnames'
 import * as _get from 'lodash.get'
 import * as ROUTES from 'Utils/Constants/routes'
 import UserRating from 'Components/UI/UserRating/UserRating'
-import { AppContext } from 'Components/AppContext/AppContextHOC'
 import { SeasonEpisodesFromDatabaseInterface } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { ContentDetailes } from 'Utils/Interfaces/ContentDetails'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
-import { EpisodesDataInterface, ShowEpisodesFromAPIInterface } from './ShowsEpisodes'
+import { EpisodesDataInterface, ShowEpisodesFromAPIInterface } from './@Types'
 import TorrentLinksEpisodes from './Components/TorrentLinksEpisodes'
 
 const FADE_OUT_SPEED = 300

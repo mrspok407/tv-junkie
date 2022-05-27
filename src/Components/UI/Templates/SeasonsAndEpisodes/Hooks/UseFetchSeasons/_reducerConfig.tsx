@@ -1,8 +1,17 @@
+import * as React from 'react'
+
+export enum ActionTypesEnum {
+  HandleLoading = 'handleLoading',
+  HandleSuccess = 'handleSuccess',
+  HandleOpenData = 'handleOpenData',
+  HandleFailure = 'handleFailure',
+}
+
 export type ACTIONTYPES =
-  | { type: 'handleLoading'; payload: { id: string; loading: boolean } }
-  | { type: 'handleSuccess'; payload: { id: string; data: any } }
-  | { type: 'handleOpenData'; payload: { id: string } }
-  | { type: 'handleFailure'; payload: { id: string } }
+  | { type: ActionTypesEnum.HandleLoading; payload: { id: string; loading: boolean } }
+  | { type: ActionTypesEnum.HandleSuccess; payload: { id: string; data: any } }
+  | { type: ActionTypesEnum.HandleOpenData; payload: { id: string } }
+  | { type: ActionTypesEnum.HandleFailure; payload: { id: string } }
 
 export interface StateInterface<DataType> {
   data: DataType[]
@@ -13,12 +22,12 @@ export interface StateInterface<DataType> {
 }
 
 const reducer =
-  <T,>() =>
-  (state: StateInterface<T>, action: ACTIONTYPES): StateInterface<T> => {
+  <T,>(): React.Reducer<StateInterface<T>, ACTIONTYPES> =>
+  (state, action): StateInterface<T> => {
     const { data, openData, loading, fetchedData, errors } = state
 
     switch (action.type) {
-      case 'handleLoading': {
+      case ActionTypesEnum.HandleLoading: {
         const { id } = action.payload
         if (fetchedData.includes(id) || loading.includes(id)) return { ...state }
         return {
@@ -29,7 +38,7 @@ const reducer =
         }
       }
 
-      case 'handleSuccess': {
+      case ActionTypesEnum.HandleSuccess: {
         if (fetchedData.includes(action.payload.id)) {
           return {
             ...state,
@@ -48,7 +57,7 @@ const reducer =
         }
       }
 
-      case 'handleOpenData': {
+      case ActionTypesEnum.HandleOpenData: {
         return {
           ...state,
           openData: openData.includes(action.payload.id)
@@ -57,7 +66,7 @@ const reducer =
         }
       }
 
-      case 'handleFailure': {
+      case ActionTypesEnum.HandleFailure: {
         return {
           ...state,
           loading: loading.filter((item) => item !== action.payload.id),
