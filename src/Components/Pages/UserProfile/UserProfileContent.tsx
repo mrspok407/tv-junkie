@@ -1,7 +1,5 @@
-import React, { useState, useEffect, useContext, useCallback, useReducer } from 'react'
-import { FirebaseContext } from 'Components/Firebase'
-import { useHistory } from 'react-router'
-import { listOfGenres, combineMergeObjects } from 'Utils'
+import React, { useState, useEffect, useCallback, useReducer } from 'react'
+import { listOfGenres, combineMergeObjects, isScrollNearBottom } from 'Utils'
 import * as ROUTES from 'Utils/Constants/routes'
 import { UserShowsInterface } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { ShowInterface } from 'Components/AppContext/@Types'
@@ -9,7 +7,7 @@ import { ShowInterface } from 'Components/AppContext/@Types'
 import { throttle } from 'throttle-debounce'
 import merge from 'deepmerge'
 import classNames from 'classnames'
-import { Link } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
 import Loader from 'Components/UI/Placeholders/Loader'
 import PlaceholderNoShowsUser from 'Components/UI/Placeholders/PlaceholderNoShowsUser'
 import UserRating from 'Components/UI/UserRating/UserRating'
@@ -77,9 +75,10 @@ const UserProfileContent: React.FC<Props> = ({ userUid }) => {
     dispatch({ type: ActionTypes.DisableLoad })
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleScroll = useCallback(
     throttle(500, () => {
-      if (window.innerHeight + window.scrollY >= document.body.scrollHeight - SCROLL_THRESHOLD) {
+      if (isScrollNearBottom({ scrollThreshold: SCROLL_THRESHOLD })) {
         loadNewContent()
       }
     }),

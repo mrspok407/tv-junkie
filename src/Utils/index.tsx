@@ -251,3 +251,7 @@ export const textToUrl = ({ text }: { text: any }) => {
 }
 
 export { releasedEpisodesToOneArray }
+
+export const isScrollNearBottom = ({ scrollThreshold }: { scrollThreshold: number }) => {
+  return window.innerHeight + window.scrollY >= document.body.scrollHeight - scrollThreshold
+}

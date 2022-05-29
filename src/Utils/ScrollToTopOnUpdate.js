@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useLocation, useHistory } from 'react-router-dom'
 
-export default function ScrollToTopOnUpdate() {
+const ScrollToTopOnUpdate = () => {
   const { pathname } = useLocation()
   const history = useHistory()
 
@@ -13,3 +13,5 @@ export default function ScrollToTopOnUpdate() {
 
   return null
 }
+
+export default ScrollToTopOnUpdate

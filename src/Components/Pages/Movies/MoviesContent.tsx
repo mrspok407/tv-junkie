@@ -1,6 +1,6 @@
 import React, { useCallback, useContext, useEffect, useReducer, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { listOfGenres } from 'Utils'
+import { isScrollNearBottom, listOfGenres } from 'Utils'
 import { throttle } from 'throttle-debounce'
 import classNames from 'classnames'
 import Loader from 'Components/UI/Placeholders/Loader'
@@ -45,7 +45,7 @@ const MoviesContent: React.FC<Props> = ({ moviesData, loadingIds, openLinksMovie
 
   const handleScroll = useCallback(
     throttle(500, () => {
-      if (window.innerHeight + window.scrollY >= document.body.scrollHeight - SCROLL_THRESHOLD) {
+      if (isScrollNearBottom({ scrollThreshold: SCROLL_THRESHOLD })) {
         loadNewContent()
         loadNewContentLS()
       }
