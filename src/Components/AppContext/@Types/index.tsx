@@ -34,7 +34,7 @@ export interface MovieInterface {
   vote_count: string | number
   backdrop_path: string
   overview: string
-  genre_ids: number[]
+  genre_ids: number[] | undefined
 }
 
 export interface AddShowsToDatabaseOnRegisterArg {

@@ -19,7 +19,8 @@ const ShowsGrid: React.FC<Props> = ({ data, section }) => {
   return (
     <>
       {data.map((item) => {
-        const filteredGenres = item.genre_ids.map((genreId) => listOfGenres.filter((item) => item.id === genreId))
+        const filteredGenres =
+          item.genre_ids?.map((genreId) => listOfGenres.filter((item) => item.id === genreId)) || []
 
         return (
           <div key={item.id} className="content-results__item content-results__item--shows">
@@ -55,7 +56,7 @@ const ShowsGrid: React.FC<Props> = ({ data, section }) => {
                     />
                   </div>
                   <div className="content-results__item-description">
-                    {item.overview.length > 150 ? `${item.overview.substring(0, 150)}...` : item.overview}
+                    {item.overview?.length > 150 ? `${item.overview?.substring(0, 150)}...` : item.overview}
                   </div>
                 </div>
               </Link>

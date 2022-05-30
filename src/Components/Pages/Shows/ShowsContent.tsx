@@ -1,120 +1,73 @@
-import React, { useCallback, useContext, useEffect, useMemo, useReducer, useState } from 'react'
-import { throttle } from 'throttle-debounce'
+import React, { useCallback, useReducer, useState } from 'react'
 import classNames from 'classnames'
 import PlaceholderNoShows from 'Components/UI/Placeholders/PlaceholderNoShows'
 import Loader from 'Components/UI/Placeholders/Loader'
-import { AppContext } from 'Components/AppContext/AppContextHOC'
 import { useAppSelector } from 'app/hooks'
 import { selectShows, selectShowsLoading } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import useAppSelectorArray from 'Utils/Hooks/UseAppSelectorArray'
 import { UserShowsInterface } from 'Components/UserContent/UseUserShowsRed/@Types'
-import { isScrollNearBottom } from 'Utils'
+import useScrollEffect from 'Utils/Hooks/UseScrollEffect'
 import { INITIAL_STATE, ShowsContentState, ACTIONTYPES, ActionTypesEnum } from './ReducerConfig/@Types'
 import reducer from './ReducerConfig'
 import ShowsGrid from './ShowsGrid'
 import ShowsSectionButtons from './ShowsSectionButtons'
+import UseSectionFilteredShows from './Hooks/UseSectionFilteredShows'
+import UseSortSlicedShows from './Hooks/UseSortSlicedShows'
 
 const SCROLL_THRESHOLD = 800
+const THROTTLE_TIMEOUT = 500
+const MAX_GRID_COLUMNS = 4
 
 const ShowsContent: React.FC = () => {
-  const { authUser } = useFrequentVariables()
-  const context = useContext(AppContext)
+  const { authUser, userContentHandler } = useFrequentVariables()
+
+  const [{ activeSection, loadedShows }, localDispatch] = useReducer<React.Reducer<ShowsContentState, ACTIONTYPES>>(
+    reducer,
+    INITIAL_STATE,
+  )
+  const [sortByGrid, setSortByGrid] = useState('name')
 
   const userShowsStore = useAppSelectorArray<UserShowsInterface>(selectShows)
+  const sectionFilteredShows = UseSectionFilteredShows({ showsData: userShowsStore, activeSection })
+  const sortSlicedShows = UseSortSlicedShows({
+    showsData: sectionFilteredShows,
+    activeSection,
+    sortByState: sortByGrid,
+    loadedShows,
+  })
   const showsInitialLoading = useAppSelector(selectShowsLoading)
 
-  const [sortByState, setSortByState] = useState('name')
-
-  const [{ disableLoad, activeSection, loadedShows }, localDispatch] = useReducer<
-    React.Reducer<ShowsContentState, ACTIONTYPES>
-  >(reducer, INITIAL_STATE)
-
-  useEffect(() => {
-    localDispatch({ type: ActionTypesEnum.UpdateContext, payload: { context } })
-  }, [context])
-
-  const loadNewContent = () => {
-    if (disableLoad[activeSection] || !authUser?.uid) return
-    localDispatch({ type: ActionTypesEnum.IncrementLoadedShows })
-    localDispatch({ type: ActionTypesEnum.DisableLoad, payload: { userShows: userShowsStore } })
-  }
-
-  const loadNewContentLS = () => {
-    if (disableLoad.watchingShowsLS || authUser?.uid) return
-    localDispatch({ type: ActionTypesEnum.IncrementLoadedShowsLS })
-    localDispatch({ type: ActionTypesEnum.DisableLoadLS })
-  }
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const handleScroll = useCallback(
-    throttle(500, () => {
-      if (isScrollNearBottom({ scrollThreshold: SCROLL_THRESHOLD })) {
-        loadNewContent()
-        loadNewContentLS()
-      }
-    }),
-    [disableLoad, activeSection],
-  )
-  useEffect(() => {
-    window.addEventListener('scroll', handleScroll)
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
+  const loadNewContent = useCallback(() => {
+    if (!authUser?.uid) {
+      localDispatch({ type: ActionTypesEnum.IncrementLoadedShowsLS, payload: { sectionFilteredShows } })
+      return
     }
-  }, [handleScroll])
+    localDispatch({ type: ActionTypesEnum.IncrementLoadedShows, payload: { sectionFilteredShows } })
+  }, [sectionFilteredShows, authUser])
 
-  const sortByHandler = (sortBy: string) => {
-    if (sortBy === sortByState) return
-    setSortByState(sortBy)
+  useScrollEffect({ callback: loadNewContent, scrollThreshold: SCROLL_THRESHOLD, timeOut: THROTTLE_TIMEOUT })
+
+  const handleSortBy = (sortBy: string) => {
+    setSortByGrid(sortBy)
   }
 
-  const toggleSection = (section: string) => {
+  const handleToggleSection = (section: string) => {
     localDispatch({ type: ActionTypesEnum.ChangeActiveSection, payload: { activeSection: section } })
   }
 
-  const showsData = useMemo(() => {
-    if (authUser?.uid) {
-      return Object.values(userShowsStore).filter((show) => {
-        if (activeSection === 'finishedShows') {
-          return show.finished
-        }
-        return show.database === activeSection && !show.finished
-      })
-    } else if (activeSection === 'watchingShows') {
-      return context.userContentLocalStorage.watchingShows.slice(0, loadedShows.watchingShowsLS)
-    }
-    return []
-  }, [userShowsStore, activeSection, loadedShows, context, authUser])
-
-  const maxColumns = 4
-  const currentNumOfColumns = showsData.length <= maxColumns - 1 ? showsData.length : maxColumns
-
-  const loadingShows = authUser?.uid ? showsInitialLoading : false
-
   const renderContent = () => {
-    if (loadingShows || context.userContentHandler.loadingShowsOnRegister) {
+    const loadingShows = authUser?.uid ? showsInitialLoading : false
+    if (loadingShows || userContentHandler.loadingShowsOnRegister) {
       return <Loader className="loader--pink" />
     }
-    if (!showsData.length) {
+
+    if (!sortSlicedShows.length) {
       return <PlaceholderNoShows authUser={authUser} activeSection={activeSection} />
     }
 
-    const getSortSlicedShows = () => {
-      const data = showsData
-      if (authUser?.uid) {
-        return data
-          .sort((a: any, b: any) => {
-            if (a[sortByState] > b[sortByState]) {
-              if (sortByState === 'timeStamp') return -1
-              return 1
-            }
-            if (sortByState !== 'timeStamp') return -1
-            return 1
-          })
-          .slice(0, loadedShows[activeSection])
-      }
-      return context.userContentLocalStorage.watchingShows.slice(0, loadedShows.watchingShowsLS)
-    }
+    const currentNumOfColumns =
+      sortSlicedShows.length <= MAX_GRID_COLUMNS - 1 ? sortSlicedShows.length : MAX_GRID_COLUMNS
 
     return (
       <>
@@ -124,23 +77,19 @@ const ShowsContent: React.FC = () => {
             <div className="content-results__sortby-buttons">
               <div
                 className={classNames('content-results__sortby-buttons', {
-                  'content-results__sortby-button--active': sortByState === 'name',
+                  'content-results__sortby-button--active': sortByGrid === 'name',
                 })}
               >
-                <button type="button" className="button button--sortby-shows" onClick={() => sortByHandler('name')}>
+                <button type="button" className="button button--sortby-shows" onClick={() => handleSortBy('name')}>
                   Alphabetically
                 </button>
               </div>
               <div
                 className={classNames('content-results__sortby-button', {
-                  'content-results__sortby-button--active': sortByState === 'timeStamp',
+                  'content-results__sortby-button--active': sortByGrid === 'timeStamp',
                 })}
               >
-                <button
-                  type="button"
-                  className="button button--sortby-shows"
-                  onClick={() => sortByHandler('timeStamp')}
-                >
+                <button type="button" className="button button--sortby-shows" onClick={() => handleSortBy('timeStamp')}>
                   Recently added
                 </button>
               </div>
@@ -161,7 +110,7 @@ const ShowsContent: React.FC = () => {
                 }
           }
         >
-          <ShowsGrid data={getSortSlicedShows()} section={activeSection} />
+          <ShowsGrid data={sortSlicedShows} section={activeSection} />
         </div>
       </>
     )
@@ -169,7 +118,7 @@ const ShowsContent: React.FC = () => {
 
   return (
     <div className="content-results">
-      <ShowsSectionButtons activeSection={activeSection} toggleSection={toggleSection} />
+      <ShowsSectionButtons activeSection={activeSection} handleToggleSection={handleToggleSection} />
       {renderContent()}
     </div>
   )

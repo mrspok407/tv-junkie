@@ -1,10 +1,8 @@
 import React, { useState, useEffect, useCallback, useReducer } from 'react'
-import { listOfGenres, combineMergeObjects, isScrollNearBottom } from 'Utils'
+import { listOfGenres, combineMergeObjects } from 'Utils'
 import * as ROUTES from 'Utils/Constants/routes'
 import { UserShowsInterface } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { ShowInterface } from 'Components/AppContext/@Types'
-
-import { throttle } from 'throttle-debounce'
 import merge from 'deepmerge'
 import classNames from 'classnames'
 import { Link, useHistory } from 'react-router-dom'
@@ -12,9 +10,11 @@ import Loader from 'Components/UI/Placeholders/Loader'
 import PlaceholderNoShowsUser from 'Components/UI/Placeholders/PlaceholderNoShowsUser'
 import UserRating from 'Components/UI/UserRating/UserRating'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import useScrollEffect from 'Utils/Hooks/UseScrollEffect'
 import reducer, { INITIAL_STATE, ShowsContentState, ActionInterface, ActionTypes } from './_reducerConfig'
 
 const SCROLL_THRESHOLD = 800
+const THROTTLE_TIMEOUT = 500
 
 type Props = {
   userUid: string
@@ -75,21 +75,7 @@ const UserProfileContent: React.FC<Props> = ({ userUid }) => {
     dispatch({ type: ActionTypes.DisableLoad })
   }
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const handleScroll = useCallback(
-    throttle(500, () => {
-      if (isScrollNearBottom({ scrollThreshold: SCROLL_THRESHOLD })) {
-        loadNewContent()
-      }
-    }),
-    [state.disableLoad, state.activeSection],
-  )
-  useEffect(() => {
-    window.addEventListener('scroll', handleScroll)
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
-    }
-  }, [handleScroll])
+  useScrollEffect({ callback: loadNewContent, scrollThreshold: SCROLL_THRESHOLD, timeOut: THROTTLE_TIMEOUT })
 
   const sortByHandler = (sortBy: string) => {
     if (sortBy === sortByState) return
@@ -128,7 +114,8 @@ const UserProfileContent: React.FC<Props> = ({ userUid }) => {
     return (
       <>
         {content.map((item) => {
-          const filteredGenres = item.genre_ids.map((genreId) => listOfGenres.filter((item) => item.id === genreId))
+          const filteredGenres =
+            item.genre_ids?.map((genreId) => listOfGenres.filter((item) => item.id === genreId)) || []
 
           return (
             <div key={item.id} className="content-results__item content-results__item--shows">

@@ -2,11 +2,11 @@ import classNames from 'classnames'
 import React from 'react'
 
 type Props = {
-  toggleSection: (section: string) => void
+  handleToggleSection: (section: string) => void
   activeSection: string
 }
 
-const ShowsSectionButtons: React.FC<Props> = ({ toggleSection, activeSection }) => (
+const ShowsSectionButtons: React.FC<Props> = ({ handleToggleSection, activeSection }) => (
   <div className="buttons__row buttons__row--shows-page">
     <div className="buttons__col">
       <button
@@ -14,7 +14,7 @@ const ShowsSectionButtons: React.FC<Props> = ({ toggleSection, activeSection }) 
           'button--pressed': activeSection === 'watchingShows',
         })}
         type="button"
-        onClick={() => toggleSection('watchingShows')}
+        onClick={() => handleToggleSection('watchingShows')}
       >
         Watching
       </button>
@@ -25,7 +25,7 @@ const ShowsSectionButtons: React.FC<Props> = ({ toggleSection, activeSection }) 
           'button--pressed': activeSection === 'droppedShows',
         })}
         type="button"
-        onClick={() => toggleSection('droppedShows')}
+        onClick={() => handleToggleSection('droppedShows')}
       >
         Dropped
       </button>
@@ -36,7 +36,7 @@ const ShowsSectionButtons: React.FC<Props> = ({ toggleSection, activeSection }) 
           'button--pressed': activeSection === 'willWatchShows',
         })}
         type="button"
-        onClick={() => toggleSection('willWatchShows')}
+        onClick={() => handleToggleSection('willWatchShows')}
       >
         Will Watch
       </button>
@@ -47,7 +47,7 @@ const ShowsSectionButtons: React.FC<Props> = ({ toggleSection, activeSection }) 
           'button--pressed': activeSection === 'finishedShows',
         })}
         type="button"
-        onClick={() => toggleSection('finishedShows')}
+        onClick={() => handleToggleSection('finishedShows')}
       >
         Finished
       </button>

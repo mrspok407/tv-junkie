@@ -33,7 +33,7 @@ interface ContentDetailes {
   runtime: string
   status: string
   genres: any
-  genre_ids: number[]
+  genre_ids: number[] | undefined
   networks: any
   known_for: {
     media_type: string

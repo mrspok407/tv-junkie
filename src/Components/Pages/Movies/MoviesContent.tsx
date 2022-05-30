@@ -82,7 +82,8 @@ const MoviesContent: React.FC<Props> = ({ moviesData, loadingIds, openLinksMovie
     return (
       <>
         {movies.map((item) => {
-          const filteredGenres = item.genre_ids.map((genreId) => listOfGenres.filter((item) => item.id === genreId))
+          const filteredGenres =
+            item.genre_ids?.map((genreId) => listOfGenres.filter((item) => item.id === genreId)) || []
 
           // Movies //
           let movie
