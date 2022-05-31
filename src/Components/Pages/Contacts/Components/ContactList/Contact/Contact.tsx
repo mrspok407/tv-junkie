@@ -1,3 +1,5 @@
+/* eslint-disable react/jsx-indent */
+/* eslint-disable no-nested-ternary */
 import classNames from 'classnames'
 import React, { useEffect, useRef, useState } from 'react'
 import Loader from 'Components/UI/Placeholders/Loader'
@@ -9,6 +11,8 @@ import ContactOptionsPopup from '../../ContactOptionsPopup/ContactOptionsPopup'
 import useGetInitialMessages from '../../ChatWindow/FirebaseHelpers/UseGetInitialMessages'
 import useHandleContactsStatus from '../../ChatWindow/Hooks/UseHandleContactsStatus'
 import './Contact.scss'
+
+const USERNAME_MAX_CHARACTERS = 25
 
 type Props = {
   contactInfo: ContactInfoInterface
@@ -111,6 +115,12 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
   const lastMessageText = striptags(lastMessage?.message).slice(0, 30)
   const chatMembersTyping = chatMembersStatusData?.filter((member) => member.isTyping && member.key !== authUser?.uid)
 
+  const renderUsername = () => {
+    const { isGroupChat, groupName, userName } = contactInfo
+    const name = isGroupChat ? groupName : userName
+    return name?.length >= USERNAME_MAX_CHARACTERS ? `${contactNameFormated}...` : name
+  }
+
   return (
     <div
       className={classNames('contact-item', {
@@ -127,15 +137,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
           'contact-item__row--online': contactsStatus[contactInfo.chatKey]?.isOnline,
         })}
       >
-        <div className="contact-item__username">
-          {contactInfo.isGroupChat
-            ? contactInfo.groupName?.length > 25
-              ? `${contactNameFormated}...`
-              : contactInfo.groupName
-            : contactInfo.userName?.length > 25
-            ? `${contactNameFormated}...`
-            : contactInfo.userName}
-        </div>
+        <div className="contact-item__username">{renderUsername()}</div>
         {lastMessage?.sender === authUser?.uid &&
           !contactInfo.isGroupChat &&
           [true, 'removed'].includes(contactInfo.status) && (
@@ -157,48 +159,31 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
             <div className="contact-item__typing">
               {chatMembersTyping?.length === 1 ? (
                 <>
-                  <div>Someone typing</div>
-                  {' '}
-                  <Loader className="loader--typing" />
+                  <div>Someone typing</div> <Loader className="loader--typing" />
                 </>
               ) : (
                 <>
-                  <div>
-                    {chatMembersTyping?.length}
-                    {' '}
-                    people typing
-                  </div>
-                  {' '}
-                  <Loader className="loader--typing" />
+                  <div>{chatMembersTyping?.length} people typing</div> <Loader className="loader--typing" />
                 </>
               )}
             </div>
           ) : (
             lastMessage?.sender && (
               <div className="contact-item__last-message-text">
-                <span>
-                  {lastMessage?.sender === authUser?.uid ? 'You' : lastMessage?.userName}
-                  :
-                </span>
-                {' '}
-                {lastMessageText}
+                <span>{lastMessage?.sender === authUser?.uid ? 'You' : lastMessage?.userName}:</span> {lastMessageText}
               </div>
             )
           )
         ) : contactsStatus[contactInfo.chatKey]?.isTyping ? (
           <div className="contact-item__typing">
-            <div>Typing</div>
-            {' '}
-            <Loader className="loader--typing" />
+            <div>Typing</div> <Loader className="loader--typing" />
           </div>
         ) : (
           <div className="contact-item__last-message-text">
             {contactInfo.receiver === true &&
               ([true, 'removed'].includes(contactInfo.status) ? (
                 <>
-                  {lastMessage?.sender === authUser?.uid && <span>You: </span>}
-                  {' '}
-                  {lastMessageText}
+                  {lastMessage?.sender === authUser?.uid && <span>You: </span>} {lastMessageText}
                 </>
               ) : contactInfo.status === 'rejected' ? (
                 `${contactInfo.userName} rejected you connect request`
@@ -209,11 +194,9 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
               (newContactsRequest
                 ? 'Wants to connect'
                 : [true, 'removed'].includes(contactInfo.status) && (
-                <>
-                  {lastMessage?.sender === authUser?.uid && <span>You: </span>}
-                  {' '}
-                  {lastMessageText}
-                </>
+                    <>
+                      {lastMessage?.sender === authUser?.uid && <span>You: </span>} {lastMessageText}
+                    </>
                   ))}
           </div>
         )}

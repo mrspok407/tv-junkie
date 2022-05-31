@@ -2,9 +2,7 @@ import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import React from 'react'
 import './SelectOptions.scss'
 
-type Props = {}
-
-const SelectOptions: React.FC<Props> = () => {
+const SelectOptions: React.FC = () => {
   const { contactsState, contactsDispatch } = useFrequentVariables()
   const { activeChat, selectedMessages, contacts } = contactsState
   const contactInfo = contacts[activeChat.chatKey] || {}

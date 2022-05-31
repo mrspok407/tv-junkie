@@ -16,7 +16,7 @@ export const userShowsListeners =
     const firebaseRef = firebase.userAllShows(uid).orderByChild('timeStamp')
 
     const showsIds = selectShowsIds(getState())
-    const lastTimestamp = selectShow(getState(), showsIds[showsIds.length - 1]).timeStamp
+    const lastTimestamp = showsIds.length ? selectShow(getState(), showsIds[showsIds.length - 1])?.timeStamp : 0
 
     firebaseRef.startAfter(lastTimestamp).on('child_added', async (snapshot: any) => {
       console.log('child_added')

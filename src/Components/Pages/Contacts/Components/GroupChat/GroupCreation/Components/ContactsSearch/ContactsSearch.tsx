@@ -113,7 +113,7 @@ const ContactsSearch: React.FC<Props> = ({ wrapperRef }) => {
   )
 
   useEffect(() => {
-    (async () => {
+    ;(async () => {
       setInitialLoading(true)
       try {
         let additionalContactsToLoad = 0
@@ -154,8 +154,8 @@ const ContactsSearch: React.FC<Props> = ({ wrapperRef }) => {
   useEffect(() => {
     if (!isScrolledDown) return
     if (loading) return
-    if (allContactsLoaded) return;
-(async () => {
+    if (allContactsLoaded) return
+    ;(async () => {
       try {
         setLoading(true)
         const contactsData = await contactsListRef
@@ -171,9 +171,27 @@ const ContactsSearch: React.FC<Props> = ({ wrapperRef }) => {
         setLoading(false)
       }
     })()
-  }, [isScrolledDown, allContactsLoaded, errors, loading, contactsList]) // eslint-disable-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isScrolledDown, allContactsLoaded, errors, loading, contactsList])
 
   const contactsToRender = !searchedContacts?.length ? contactsList : searchedContacts
+
+  const renderContactList = () => {
+    if (initialLoading) {
+      return (
+        <div className="contact-list__loader-wrapper">
+          <span className="contact-list__loader" />
+        </div>
+      )
+    }
+    if (!contactsList.length) {
+      return <div className="contact-list--no-contacts-text">You don&lsquo;t have any contacts</div>
+    }
+    if (searchedContacts === null) {
+      return <div className="contact-list--no-contacts-text">No contacts found</div>
+    }
+    return contactsToRender.map((contact) => <Contact key={contact.key} contact={contact} />)
+  }
   return (
     <div className="contacts-search">
       <div className="contacts-search__selected-members">
@@ -181,39 +199,31 @@ const ContactsSearch: React.FC<Props> = ({ wrapperRef }) => {
           <div
             key={member.key}
             className="contacts-search__selected-contact"
-            onClick={() => contactsDispatch({
-                  type: 'updateGroupMembers',
-                  payload: { removeMember: true, newMember: { key: member.key } },
-                })}
+            onClick={() =>
+              contactsDispatch({
+                type: 'updateGroupMembers',
+                payload: { removeMember: true, newMember: { key: member.key } },
+              })
+            }
           >
             <div className="contacts-search__selected-contact-name">{member.userName}</div>
             <div className="contacts-search__selected-contact-remove">
               <button type="button" />
             </div>
           </div>
-          ))}
+        ))}
       </div>
       <SearchInput onSearch={handleSearch} isSearching={isSearching} contactsList={contactsList} />
       {!groupCreation.selectNameActive && (
-      <div className="contact-list">
-        {initialLoading ? (
-          <div className="contact-list__loader-wrapper">
-            <span className="contact-list__loader" />
-          </div>
-            ) : !contactsList.length ? (
-              <div className="contact-list--no-contacts-text">You don't have any contacts</div>
-            ) : searchedContacts === null ? (
-              <div className="contact-list--no-contacts-text">No contacts found</div>
-            ) : (
-              contactsToRender.map((contact) => <Contact key={contact.key} contact={contact} />)
-            )}
-        {loading && (
-        <div className="contact-list__loader-wrapper">
-          <span className="contact-list__loader" />
+        <div className="contact-list">
+          {renderContactList()}
+          {loading && (
+            <div className="contact-list__loader-wrapper">
+              <span className="contact-list__loader" />
+            </div>
+          )}
         </div>
-            )}
-      </div>
-        )}
+      )}
     </div>
   )
 }

@@ -13,13 +13,14 @@ type Props = {
 const SearchInput: React.FC<Props> = ({ onSearch, isSearching, contactsList }) => {
   const [query, setQuery] = useState<string>('')
 
-  const _runSearch = (query: string) => {
+  const runSearch = (query: string) => {
     onSearch(query)
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const onSearchDeb = useCallback(
     debounce((query: string) => {
-      _runSearch(query)
+      runSearch(query)
     }, 150),
     [contactsList],
   )

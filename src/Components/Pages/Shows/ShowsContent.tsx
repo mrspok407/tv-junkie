@@ -10,10 +10,11 @@ import { UserShowsInterface } from 'Components/UserContent/UseUserShowsRed/@Type
 import useScrollEffect from 'Utils/Hooks/UseScrollEffect'
 import { INITIAL_STATE, ShowsContentState, ACTIONTYPES, ActionTypesEnum } from './ReducerConfig/@Types'
 import reducer from './ReducerConfig'
-import ShowsGrid from './ShowsGrid'
-import ShowsSectionButtons from './ShowsSectionButtons'
+import ShowsGrid from './Components/ShowsGrid'
+import ShowsSectionButtons from './Components/ShowsSectionButtons'
 import UseSectionFilteredShows from './Hooks/UseSectionFilteredShows'
 import UseSortSlicedShows from './Hooks/UseSortSlicedShows'
+import SortByOptions from './Components/SortByOptions'
 
 const SCROLL_THRESHOLD = 800
 const THROTTLE_TIMEOUT = 500
@@ -26,14 +27,14 @@ const ShowsContent: React.FC = () => {
     reducer,
     INITIAL_STATE,
   )
-  const [sortByGrid, setSortByGrid] = useState('name')
+  const [sortBy, setSortBy] = useState('name')
 
   const userShowsStore = useAppSelectorArray<UserShowsInterface>(selectShows)
   const sectionFilteredShows = UseSectionFilteredShows({ showsData: userShowsStore, activeSection })
   const sortSlicedShows = UseSortSlicedShows({
     showsData: sectionFilteredShows,
     activeSection,
-    sortByState: sortByGrid,
+    sortByState: sortBy,
     loadedShows,
   })
   const showsInitialLoading = useAppSelector(selectShowsLoading)
@@ -49,7 +50,7 @@ const ShowsContent: React.FC = () => {
   useScrollEffect({ callback: loadNewContent, scrollThreshold: SCROLL_THRESHOLD, timeOut: THROTTLE_TIMEOUT })
 
   const handleSortBy = (sortBy: string) => {
-    setSortByGrid(sortBy)
+    setSortBy(sortBy)
   }
 
   const handleToggleSection = (section: string) => {
@@ -71,31 +72,7 @@ const ShowsContent: React.FC = () => {
 
     return (
       <>
-        {authUser.uid && (
-          <div className="content-results__sortby">
-            <div className="content-results__sortby-text">Sort by:</div>
-            <div className="content-results__sortby-buttons">
-              <div
-                className={classNames('content-results__sortby-buttons', {
-                  'content-results__sortby-button--active': sortByGrid === 'name',
-                })}
-              >
-                <button type="button" className="button button--sortby-shows" onClick={() => handleSortBy('name')}>
-                  Alphabetically
-                </button>
-              </div>
-              <div
-                className={classNames('content-results__sortby-button', {
-                  'content-results__sortby-button--active': sortByGrid === 'timeStamp',
-                })}
-              >
-                <button type="button" className="button button--sortby-shows" onClick={() => handleSortBy('timeStamp')}>
-                  Recently added
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        {authUser.uid && <SortByOptions sortBy={sortBy} handleSortBy={handleSortBy} />}
         <div
           className={classNames('content-results__wrapper', {
             'content-results__wrapper--finished-shows': activeSection === 'finishedShows',

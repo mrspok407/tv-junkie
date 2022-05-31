@@ -110,7 +110,7 @@ const ContactOptionsPopup: React.FC<Props> = ({ contactOptionsRef, contactInfo }
         </div>
       )}
 
-      {contactInfo.isGroupChat ? (
+      {contactInfo.isGroupChat && (
         <div className="popup__option">
           <button
             className="popup__option-btn"
@@ -130,7 +130,9 @@ const ContactOptionsPopup: React.FC<Props> = ({ contactOptionsRef, contactInfo }
             {contactInfo.role === 'ADMIN' ? 'Delete chat' : 'Leave chat'}
           </button>
         </div>
-      ) : contactInfo.receiver === true ? (
+      )}
+
+      {contactInfo.receiver === true ? (
         <div className="popup__option">
           <button
             className="popup__option-btn"

@@ -10,7 +10,6 @@
         "email": { ".write": "newData.exists() && auth.token.firebase.sign_in_provider === 'google.com'" },
         "role": { ".write": "newData.exists() && auth.token.firebase.sign_in_provider === 'google.com'" },
         "content": {
-          // ".read": "auth != null && auth.uid == $uid",
           ".read": true,
           ".write": "auth != null && auth.uid == $uid",
           "episodes": {
@@ -20,6 +19,9 @@
                 ".indexOn": ".value"
               }
             }
+          },
+          "shows": {
+            ".indexOn": ["timeStamp"]
           }
         },
         "contactsDatabase": {

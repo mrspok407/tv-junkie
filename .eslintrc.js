@@ -64,6 +64,9 @@ module.exports = {
     'react/jsx-one-expression-per-line': 0,
     'function-paren-newline': 0,
     'jsx-a11y/label-has-associated-control': 0,
+    'react/jsx-curly-newline': 0,
+    '@typescript-eslint/no-extra-semi': 0,
+    'semi-style': 0,
     'max-len': [
       'error',
       {

@@ -1,8 +1,33 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.handleContactRequest = exports.newContactRequest = exports.createNewGroup = exports.removeMemberFromGroup = exports.addNewGroupMembers = exports.updateLastSeenGroupChats = exports.updateLastSeenPrivateChats = exports.decrementContacts = exports.incrementContacts = exports.removeNewContactsActivityGroupChat = exports.removeNewContactsActivity = exports.addNewContactsActivityGroupChat = exports.addNewContactsActivity = exports.updatePinnedTimeStamp = void 0;
-const functions = require("firebase-functions");
-const admin = require("firebase-admin");
+const functions = __importStar(require("firebase-functions"));
+const admin = __importStar(require("firebase-admin"));
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+// const admin = require("firebase-admin");
 // Cloud Functions interesting points:
 //
 // It should always return a promise. So the function will know when it's finished (resolved or rejected).
@@ -24,6 +49,9 @@ const admin = require("firebase-admin");
 // More info: https://firebase.google.com/docs/functions/callable#web https://youtu.be/8mL1VuiL5Kk?t=593
 admin.initializeApp();
 const database = admin.database();
+const isApiError = (x) => {
+    return typeof x.message === "string";
+};
 const contactsDatabaseRef = (uid) => `${uid}/contactsDatabase`;
 exports.updatePinnedTimeStamp = functions.database
     .ref("users/{authUid}/contactsDatabase/contactsLastActivity/{contactUid}")
@@ -174,7 +202,9 @@ exports.addNewGroupMembers = functions.https.onCall(async (data, context) => {
         return database.ref().update(updateData);
     }
     catch (error) {
-        throw new functions.https.HttpsError("unknown", error.message, error);
+        if (isApiError(error)) {
+            throw new functions.https.HttpsError("unknown", error.message, error);
+        }
     }
 });
 exports.removeMemberFromGroup = functions.https.onCall(async (data, context) => {
@@ -206,7 +236,9 @@ exports.removeMemberFromGroup = functions.https.onCall(async (data, context) => 
         return database.ref().update(updateData);
     }
     catch (error) {
-        throw new functions.https.HttpsError("unknown", error.message, error);
+        if (isApiError(error)) {
+            throw new functions.https.HttpsError("unknown", error.message, error);
+        }
     }
 });
 exports.createNewGroup = functions.https.onCall(async (data, context) => {
@@ -265,7 +297,12 @@ exports.createNewGroup = functions.https.onCall(async (data, context) => {
         });
     }
     catch (error) {
-        throw new functions.https.HttpsError("unknown", error.message, error);
+        if (isApiError(error)) {
+            throw new functions.https.HttpsError("unknown", error.message, error);
+        }
+        else {
+            return;
+        }
     }
 });
 exports.newContactRequest = functions.https.onCall(async (data, context) => {
@@ -299,7 +336,9 @@ exports.newContactRequest = functions.https.onCall(async (data, context) => {
         return database.ref("users").update(updateData);
     }
     catch (error) {
-        throw new functions.https.HttpsError("unknown", error.message, error);
+        if (isApiError(error)) {
+            throw new functions.https.HttpsError("unknown", error.message, error);
+        }
     }
 });
 exports.handleContactRequest = functions.https.onCall(async (data, context) => {
@@ -331,7 +370,9 @@ exports.handleContactRequest = functions.https.onCall(async (data, context) => {
         return database.ref().update(updateData);
     }
     catch (error) {
-        throw new functions.https.HttpsError("unknown", error.message, error);
+        if (isApiError(error)) {
+            throw new functions.https.HttpsError("unknown", error.message, error);
+        }
     }
 });
 //# sourceMappingURL=index.js.map

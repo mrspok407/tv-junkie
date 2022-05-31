@@ -1,8 +1,6 @@
-import { useContext, useEffect, useState } from 'react'
-import { FirebaseContext } from 'Components/Firebase'
+/* eslint-disable import/no-cycle */
+import { useEffect, useState } from 'react'
 import { releasedEpisodesToOneArray } from 'Utils'
-import { useAppSelector } from 'app/hooks'
-import { selectAuthUser } from 'Components/UserAuth/Session/WithAuthentication/authUserSlice'
 import { AuthUserInterface } from 'Components/UserAuth/Session/WithAuthentication/@Types'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import { SeasonEpisodesFromDatabaseInterface } from '../UseUserShows'
@@ -19,15 +17,14 @@ export interface UserToWatchShowsInterface {
   episodes: SeasonEpisodesFromDatabaseInterface[]
 }
 
-export interface UserToWatchTest {}
-
 const useGetUserToWatchShows: Hook = () => {
   const { firebase, authUser } = useFrequentVariables()
 
   const [userToWatchShows, setUserToWatchShows] = useState<UserToWatchShowsInterface[]>([])
   const [loadingNotFinishedShows, setLoadingNotFinishedShows] = useState(false)
 
-  useEffect(() => () => {
+  useEffect(
+    () => () => {
       if (!authUser?.uid) return
 
       firebase
@@ -35,7 +32,9 @@ const useGetUserToWatchShows: Hook = () => {
         .orderByChild('info/isAllWatched_database')
         .equalTo('false_watchingShows')
         .off()
-    }, [firebase, authUser])
+    },
+    [firebase, authUser],
+  )
 
   const listenerUserToWatchShow = ({ uid }: AuthUserInterface['authUser']) => {
     setLoadingNotFinishedShows(true)
@@ -43,7 +42,7 @@ const useGetUserToWatchShows: Hook = () => {
       .userEpisodes(uid)
       .orderByChild('info/isAllWatched_database')
       .equalTo('false_watchingShows')
-      .on('value', (snapshot: { val: () => { id: number; episodes: {}[] } }) => {
+      .on('value', (snapshot: { val: () => { id: number; episodes: Record<string, unknown>[] } }) => {
         if (snapshot.val() === null) {
           setUserToWatchShows([])
           setLoadingNotFinishedShows(false)

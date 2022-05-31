@@ -1,6 +1,6 @@
 import { RootState } from 'app/store'
 import merge from 'deepmerge'
-import { createSlice, current, PayloadAction } from '@reduxjs/toolkit'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { combineMergeObjects } from 'Utils'
 import { SeasonEpisodesFromDatabaseInterface, UserShowsState, UserShowsInterface } from './@Types'
 

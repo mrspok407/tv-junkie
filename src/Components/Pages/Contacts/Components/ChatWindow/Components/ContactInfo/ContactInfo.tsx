@@ -1,12 +1,12 @@
+/* eslint-disable no-nested-ternary */
 import classNames from 'classnames'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import useTimestampFormater from 'Components/Pages/Contacts/Hooks/UseTimestampFormater'
 import React, { useRef } from 'react'
-import ContactOptionsPopup from '../../../ContactOptionsPopup/ContactOptionsPopup'
-import Loader from 'Components/UI/Placeholders/Loader'
-import './ContactInfo.scss'
-
 import { LoremIpsum } from 'lorem-ipsum'
+import Loader from 'Components/UI/Placeholders/Loader'
+import ContactOptionsPopup from '../../../ContactOptionsPopup/ContactOptionsPopup'
+import './ContactInfo.scss'
 
 type Props = {
   isScrollBottomRef: any
@@ -126,19 +126,11 @@ const ContactInfo: React.FC<Props> = ({ isScrollBottomRef }) => {
           chatMembersTyping.length ? (
             chatMembersTyping.length === 1 ? (
               <>
-                <div>Someone typing</div>
-                {' '}
-                <Loader className="loader--typing" />
+                <div>Someone typing</div> <Loader className="loader--typing" />
               </>
             ) : (
               <>
-                <div>
-                  {chatMembersTyping.length}
-                  {' '}
-                  people typing
-                </div>
-                {' '}
-                <Loader className="loader--typing" />
+                <div>{chatMembersTyping.length} people typing</div> <Loader className="loader--typing" />
               </>
             )
           ) : !chatMembersStatusData.length ? (
@@ -150,9 +142,7 @@ const ContactInfo: React.FC<Props> = ({ isScrollBottomRef }) => {
           )
         ) : contactsStatus[activeChat.chatKey]?.isTyping ? (
           <>
-            <div>Typing</div>
-            {' '}
-            <Loader className="loader--typing" />
+            <div>Typing</div> <Loader className="loader--typing" />
           </>
         ) : contactsStatus[activeChat.chatKey]?.isOnline ? (
           'Online'

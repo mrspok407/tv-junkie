@@ -1,7 +1,6 @@
 import { useEffect } from 'react'
 import { AuthUserInterface } from 'Components/UserAuth/Session/WithAuthentication/@Types'
 import { useAppDispatch } from 'app/hooks'
-import { resetAuthUser } from 'Components/UserAuth/Session/WithAuthentication/authUserSlice'
 import setupAuthUser from 'Components/UserAuth/Session/WithAuthentication/Middleware/setupAuthUser'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import { logoutAuthUser } from 'Components/UserAuth/Session/WithAuthentication/Middleware/logoutAuthUser'

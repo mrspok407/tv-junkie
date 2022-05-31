@@ -118,7 +118,7 @@ const useHandleMessage = ({ contactLastActivity }: { contactLastActivity: { time
     return messageKey
   }
 
-  const editMessagePrivateChat = async ({
+  const editMessagePrivateChat = ({
     message,
     originalMessage,
   }: {
@@ -135,10 +135,10 @@ const useHandleMessage = ({ contactLastActivity }: { contactLastActivity: { time
       },
       [`members/${authUser?.uid}/status/isTyping`]: null,
     }
-    return await firebase.privateChats().child(activeChat.chatKey).update(updateData)
+    return firebase.privateChats().child(activeChat.chatKey).update(updateData)
   }
 
-  const editMessageGroupChat = async ({
+  const editMessageGroupChat = ({
     message,
     originalMessage,
   }: {
@@ -156,7 +156,7 @@ const useHandleMessage = ({ contactLastActivity }: { contactLastActivity: { time
       },
       [`members/status/${authUser?.uid}/isTyping`]: null,
     }
-    return await firebase.groupChats().child(activeChat.chatKey).update(updateData)
+    return firebase.groupChats().child(activeChat.chatKey).update(updateData)
   }
 
   return { sendMessage, sendMessageGroupChat, editMessagePrivateChat, editMessageGroupChat }

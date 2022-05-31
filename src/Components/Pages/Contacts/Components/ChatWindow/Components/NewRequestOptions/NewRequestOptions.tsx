@@ -19,17 +19,16 @@ const NewRequestOptions: React.FC = () => {
           contactInfo.status === false && (
             <>
               <div className="new-request__message">
-                <span className="new-request__name">{contactInfo.userName}</span>
-                {' '}
-                wants to connect
+                <span className="new-request__name">{contactInfo.userName}</span> wants to connect
               </div>
 
               <div className="new-request__actions--receiver">
-                <button className="button" onClick={() => handleContactRequest({ status: 'accept' })}>
+                <button type="button" className="button" onClick={() => handleContactRequest({ status: 'accept' })}>
                   {responseContactRequestLoading.accept ? <span className="button-loader-circle" /> : 'Accept'}
                 </button>
                 <button
                   className="button"
+                  type="button"
                   onClick={() => {
                     if (Object.values(responseContactRequestLoading).some((item) => item)) return
                     handleContactRequest({ status: 'rejected' })
@@ -47,21 +46,18 @@ const NewRequestOptions: React.FC = () => {
       case true: {
         return contactInfo.status === false ? (
           <div className="new-request__message">
-            The invitation to connect has been sent to
-            {' '}
-            <span className="new-request__name">{contactInfo.userName}</span>
+            The invitation to connect has been sent to <span className="new-request__name">{contactInfo.userName}</span>
           </div>
         ) : (
           contactInfo.status === 'rejected' && (
             <div className="new-request__message">
-              <span className="new-request__name">{contactInfo.userName}</span>
-              {' '}
-              rejected you connect request
-              {' '}
+              <span className="new-request__name">{contactInfo.userName}</span> rejected you connect request{' '}
             </div>
           )
         )
       }
+      default:
+        break
     }
   }
 

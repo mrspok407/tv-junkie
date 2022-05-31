@@ -82,7 +82,8 @@ const useIntersectionObserver = ({
       observedMessages.current = [...observedMessages.current, message.key]
       observerRef?.observe(unreadMessage)
     })
-  }, [activeChat, renderedMessages, unreadMsgsListenerChatKey, contactInfo, pageInFocus, chatWindowLoading]) // eslint-disable-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeChat, renderedMessages, unreadMsgsListenerChatKey, contactInfo, pageInFocus, chatWindowLoading])
 
   const onMouseEnter = () => {
     if (!renderedMessages?.length || !unreadMessagesAuth?.length) return
@@ -105,10 +106,13 @@ const useIntersectionObserver = ({
     ]
   }, [renderedMessages]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => () => {
+  useEffect(
+    () => () => {
       observerRef.disconnect()
       observedMessages.current = []
-    }, [activeChat]) // eslint-disable-line react-hooks/exhaustive-deps
+    },
+    [activeChat], // eslint-disable-line react-hooks/exhaustive-deps
+  )
 
   return { onMouseEnter }
 }

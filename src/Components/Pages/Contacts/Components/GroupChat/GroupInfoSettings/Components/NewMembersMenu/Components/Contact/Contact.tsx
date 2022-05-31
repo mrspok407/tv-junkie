@@ -21,8 +21,18 @@ type Props = {
 const Contact: React.FC<Props> = ({ contact, selectedMembers, handleNewMembers }) => {
   const { contactsState } = useFrequentVariables()
   const { activeChat, chatParticipants } = contactsState
-  const chatParticipantsMemo = useMemo(() => chatParticipants[activeChat.chatKey] || [], [])
+  const chatParticipantsMemo = useMemo(
+    () => chatParticipants[activeChat.chatKey] || [],
+    [activeChat.chatKey, chatParticipants],
+  )
   const formatedDate = useTimestampFormater({ timeStamp: contact.lastSeen! })
+
+  const renderStatus = () => {
+    if (chatParticipantsMemo.includes(contact.key)) return 'Allready a member'
+    if (contact.isOnline) return 'Online'
+    if (formatedDate) return `Last seen: ${formatedDate}`
+    return 'Long time ago'
+  }
 
   return (
     <div
@@ -47,13 +57,7 @@ const Contact: React.FC<Props> = ({ contact, selectedMembers, handleNewMembers }
             'contact-item__status--online': contact.isOnline || chatParticipantsMemo.includes(contact.key),
           })}
         >
-          {chatParticipantsMemo.includes(contact.key)
-            ? 'Allready a member'
-            : contact.isOnline
-            ? 'Online'
-            : formatedDate
-            ? `Last seen: ${formatedDate}`
-            : 'Long time ago'}
+          {renderStatus()}
         </div>
       </div>
     </div>

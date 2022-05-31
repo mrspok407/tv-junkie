@@ -3,11 +3,9 @@ import React, { useState, useEffect } from 'react'
 import Contact from './Components/Contact/Contact'
 import './SelectName.scss'
 
-type Props = {}
-
 const NAME_LENGTH_LIMIT = 45
 
-const SelectName: React.FC<Props> = () => {
+const SelectName: React.FC = () => {
   const { firebase, contactsState, contactsDispatch } = useFrequentVariables()
   const { groupCreation } = contactsState
   const selectedMembersData = groupCreation.members
@@ -15,7 +13,7 @@ const SelectName: React.FC<Props> = () => {
   const [membersWithStatus, setMembersWithStatus] = useState<{ key: string; isOnline: boolean | null }[]>([])
 
   useEffect(() => {
-    (async () => {
+    ;(async () => {
       const membersStatus = await Promise.all(
         selectedMembersData.map(async (member) => {
           const contactStatus = await Promise.all([
@@ -56,10 +54,12 @@ const SelectName: React.FC<Props> = () => {
         <div className="group-creation__heading-go-back">
           <button
             type="button"
-            onClick={() => contactsDispatch({
+            onClick={() =>
+              contactsDispatch({
                 type: 'updateGroupCreation',
                 payload: { selectNameActive: false, error: '' },
-              })}
+              })
+            }
           />
         </div>
         <div className="group-creation__heading-text">New group</div>

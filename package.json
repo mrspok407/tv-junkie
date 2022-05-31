@@ -71,14 +71,15 @@
     "throttle-debounce": "^2.2.1",
     "unique-names-generator": "^4.5.0",
     "uuid": "^8.3.2",
-    "yup": "^0.28.5"
+    "yup": "^0.28.5",
+    "randomcolor": "^0.6.2"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "lint": "eslint . --fix --ext .js,.jsx,.ts,.tsx"
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "browserslist": {
     "production": [
@@ -107,7 +108,6 @@
     "eslint-import-resolver-typescript": "^2.7.1",
     "eslint-plugin-import": "^2.26.0",
     "gh-pages": "^2.2.0",
-    "randomcolor": "^0.6.2",
     "react-element-to-jsx-string": "^14.3.2",
     "redux-devtools": "^3.7.0",
     "typescript": "^4.6.4"

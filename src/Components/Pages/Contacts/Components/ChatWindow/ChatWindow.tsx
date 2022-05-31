@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState, useRef, useCallback, useLayoutEffect, useMemo } from 'react'
 import classNames from 'classnames'

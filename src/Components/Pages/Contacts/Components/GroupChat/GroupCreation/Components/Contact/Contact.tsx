@@ -17,6 +17,12 @@ const Contact: React.FC<Props> = ({ contact, isGroupInfoSearch = false }) => {
 
   const formatedDate = useTimestampFormater({ timeStamp: contact.lastSeen! })
 
+  const renderStatus = () => {
+    if (contact.isOnline) return 'Online'
+    if (formatedDate) return `Last seen: ${formatedDate}`
+    return 'Long time ago'
+  }
+
   return (
     <div
       className={classNames('contact-item', {
@@ -24,7 +30,8 @@ const Contact: React.FC<Props> = ({ contact, isGroupInfoSearch = false }) => {
         'member-item': isGroupInfoSearch,
       })}
       key={contact.key}
-      onClick={() => context?.dispatch({
+      onClick={() =>
+        context?.dispatch({
           type: 'updateGroupMembers',
           payload: {
             removeMember: membersKeys.includes(contact.key),
@@ -35,7 +42,8 @@ const Contact: React.FC<Props> = ({ contact, isGroupInfoSearch = false }) => {
               chatKey: contact.chatKey,
             },
           },
-        })}
+        })
+      }
     >
       <div className="contact-item__select">
         <button type="button" />
@@ -47,7 +55,7 @@ const Contact: React.FC<Props> = ({ contact, isGroupInfoSearch = false }) => {
             'contact-item__status--online': contact.isOnline,
           })}
         >
-          {contact.isOnline ? 'Online' : formatedDate ? `Last seen: ${formatedDate}` : 'Long time ago'}
+          {renderStatus()}
         </div>
       </div>
     </div>

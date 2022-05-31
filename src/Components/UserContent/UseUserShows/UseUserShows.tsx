@@ -1,12 +1,10 @@
+/* eslint-disable import/no-cycle */
 import { useState, useEffect, useContext } from 'react'
 import { FirebaseContext } from 'Components/Firebase'
 import { AuthUserInterface } from 'Components/UserAuth/Session/WithAuthentication/@Types'
 import { ContentDetailes } from 'Utils/Interfaces/ContentDetails'
-import { useAppDispatch } from 'app/hooks'
 import useGetUserToWatchShows from './Hooks/UseGetUserToWatchShows'
 import useGetUserMovies from './Hooks/UseGetUserMovies'
-
-const SESSION_STORAGE_KEY_SHOWS = 'userShows'
 
 export interface UserShowsInterface extends ContentDetailes {
   allEpisodesWatched: boolean
@@ -60,18 +58,13 @@ export interface UserWillAirEpisodesInterface {
 const useUserShows = () => {
   const [userShows, setUserShows] = useState<UserShowsInterface[]>([])
   const [userWillAirEpisodes, setUserWillAirEpisodes] = useState<UserWillAirEpisodesInterface[]>([])
-  const { userToWatchShows, loadingNotFinishedShows, listenerUserToWatchShow, resetStateToWatchShows } =
-    useGetUserToWatchShows()
+  const { userToWatchShows, loadingNotFinishedShows, resetStateToWatchShows } = useGetUserToWatchShows()
 
-  const { userMovies, loadingMovies, listenerUserMovies, handleUserMoviesOnClient, resetStateUserMovies } =
-    useGetUserMovies()
+  const { userMovies, loadingMovies, handleUserMoviesOnClient, resetStateUserMovies } = useGetUserMovies()
   const [loadingShows, setLoadingShows] = useState(true)
-  const [firebaseListeners, setFirebaseListeners] = useState<any>([])
 
   const firebase = useContext(FirebaseContext)
   // const userShowsRedux = useAppSelector(selectUserShows)
-
-  const dispatch = useAppDispatch()
 
   // useEffect(() => {
   //   console.log(userShowsRedux)
@@ -85,12 +78,6 @@ const useUserShows = () => {
           if (!authUser?.uid) return
 
           // await updateUserEpisodesFromDatabase({ firebase })
-
-          try {
-            // dispatch(testSlice.actions.testRed("fffffffff"))
-            // dispatch(fetchUserShows(authUser.uid, firebase))
-            // dispatch(opachki("obana"))
-          } catch (error) {}
 
           setLoadingShows(false)
 
@@ -151,9 +138,6 @@ const useUserShows = () => {
         },
         () => {
           authSubscriber()
-          firebaseListeners.forEach((listener: any) => {
-            listener.off()
-          })
           setLoadingShows(false)
         },
       )
@@ -162,16 +146,9 @@ const useUserShows = () => {
     authUserListener()
     return () => {
       authSubscriber()
-      firebaseListeners.forEach((listener: any) => {
-        listener?.off()
-      })
     }
     // eslint-disable-next-line
   }, [firebase.auth.currentUser])
-
-  useEffect(() => {
-    sessionStorage.setItem(SESSION_STORAGE_KEY_SHOWS, JSON.stringify(userShows))
-  }, [userShows])
 
   // const handleUserShowsOnClient = ({ database, id }: { id: number; database: string }) => {
   //   const userShowsSS: UserShowsInterface[] = JSON.parse(sessionStorage.getItem(SESSION_STORAGE_KEY_SHOWS)!)

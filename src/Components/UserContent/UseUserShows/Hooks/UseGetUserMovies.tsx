@@ -1,7 +1,5 @@
-import { useContext, useEffect, useState } from 'react'
-import { FirebaseContext } from 'Components/Firebase'
-import { useAppSelector } from 'app/hooks'
-import { selectAuthUser } from 'Components/UserAuth/Session/WithAuthentication/authUserSlice'
+/* eslint-disable import/no-cycle */
+import { useEffect, useState } from 'react'
 import { AuthUserInterface } from 'Components/UserAuth/Session/WithAuthentication/@Types'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import { UserMoviesInterface } from '../UseUserShows'
@@ -20,10 +18,13 @@ const useGetUserMovies: Hook = () => {
   const [userMovies, setUserMovies] = useState<UserMoviesInterface[]>([])
   const [loadingMovies, setLoadingMovies] = useState(true)
 
-  useEffect(() => () => {
+  useEffect(
+    () => () => {
       if (!authUser?.uid) return
       firebase.watchLaterMovies(authUser.uid).off()
-    }, [firebase, authUser])
+    },
+    [firebase, authUser],
+  )
 
   const listenerUserMovies = ({ uid }: AuthUserInterface['authUser']) => {
     firebase.watchLaterMovies(uid).on('value', (snapshot: { val: () => UserMoviesInterface[] }) => {

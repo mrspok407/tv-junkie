@@ -16,6 +16,12 @@ const Contact: React.FC<Props> = ({ member, contactInfo }) => {
 
   const { removeMember, removeMemberLoading } = useRemoveMember()
 
+  const renderStatus = () => {
+    if (member.isOnline) return 'Online in chat'
+    if (formatedDate) return `Last seen: ${formatedDate}`
+    return 'Long time ago'
+  }
+
   return (
     <div className={classNames('contact-item member-item', {})} key={member.key}>
       <div className="contact-item__info">
@@ -31,7 +37,7 @@ const Contact: React.FC<Props> = ({ member, contactInfo }) => {
             'contact-item__status--online': member.isOnline,
           })}
         >
-          {member.isOnline ? 'Online in chat' : formatedDate ? `Last seen: ${formatedDate}` : 'Long time ago'}
+          {renderStatus()}
         </div>
       </div>
       {contactInfo.role === 'ADMIN' && member.key !== authUser?.uid && (

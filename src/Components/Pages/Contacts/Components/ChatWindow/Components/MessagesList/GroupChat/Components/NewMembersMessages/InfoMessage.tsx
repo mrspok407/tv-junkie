@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import classNames from 'classnames'
 import { MessageInterface } from 'Components/Pages/Contacts/@Types'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
@@ -31,25 +32,16 @@ const InfoMessage: React.FC<Props> = ({ renderedMessage, privateChat = false }) 
             <div className="chat-window__message-inner">
               {removedMember ? (
                 <div className="chat-window__message-text">
-                  {isAuthUser ? 'You' : `${removedMember.userName}`}
-                  {' '}
-                  <span>
-                    {isAuthUser ? 'were' : 'was'}
-                    {' '}
-                    removed from this group
-                  </span>
+                  {isAuthUser ? 'You' : `${removedMember.userName}`}{' '}
+                  <span>{isAuthUser ? 'were' : 'was'} removed from this group</span>
                 </div>
               ) : leftMember ? (
                 <div className="chat-window__message-text">
-                  {leftMember.userName}
-                  {' '}
-                  <span>left the group</span>
+                  {leftMember.userName} <span>left the group</span>
                 </div>
               ) : (
                 <div className="chat-window__message-text">
-                  {newMembers}
-                  {' '}
-                  <span>joined the group</span>
+                  {newMembers} <span>joined the group</span>
                 </div>
               )}
             </div>
@@ -58,17 +50,11 @@ const InfoMessage: React.FC<Props> = ({ renderedMessage, privateChat = false }) 
               <div className="chat-window__message-text">
                 {renderedMessage.sender !== authUser?.uid ? (
                   <>
-                    {contactInfo.userName}
-                    {' '}
-                    <span>removed you from contacts</span>
+                    {contactInfo.userName} <span>removed you from contacts</span>
                   </>
                 ) : (
                   <>
-                    <span>You remove</span>
-                    {' '}
-                    {contactInfo.userName}
-                    {' '}
-                    <span>from contacts</span>
+                    <span>You remove</span> {contactInfo.userName} <span>from contacts</span>
                   </>
                 )}
               </div>
@@ -77,9 +63,7 @@ const InfoMessage: React.FC<Props> = ({ renderedMessage, privateChat = false }) 
             isNowContacts && (
               <div className="chat-window__message-inner">
                 <div className="chat-window__message-text">
-                  <span>You are now have connection with</span>
-                  {' '}
-                  {contactInfo.userName}
+                  <span>You are now have connection with</span> {contactInfo.userName}
                 </div>
               </div>
             )

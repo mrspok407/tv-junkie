@@ -6,6 +6,8 @@ import { ContactInfoInterface } from '../../../@Types'
 import ContactOptionsPopup from '../../ContactOptionsPopup/ContactOptionsPopup'
 import '../Contact/Contact.scss'
 
+const USERNAME_MAX_CHARACTERS = 25
+
 type Props = {
   contactInfo: ContactInfoInterface
   allContactsAmount: number | null
@@ -47,6 +49,13 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
       : contactNameCutLength
 
   const chatActive = activeChat.contactKey === contactInfo.key
+
+  const renderUsername = () => {
+    const { isGroupChat, groupName, userName } = contactInfo
+    const name = isGroupChat ? groupName : userName
+    return name?.length >= USERNAME_MAX_CHARACTERS ? `${contactNameFormated}...` : name
+  }
+
   return (
     <div
       className={classNames('contact-item', {
@@ -55,15 +64,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo }) => {
       onClick={() => setContactActive()}
     >
       <div className="contact-item__row contact-item__row--top">
-        <div className="contact-item__username">
-          {contactInfo.isGroupChat
-            ? contactInfo.groupName?.length > 25
-              ? `${contactNameFormated}...`
-              : contactInfo.groupName
-            : contactInfo.userName?.length > 25
-            ? `${contactNameFormated}...`
-            : contactInfo.userName}
-        </div>
+        <div className="contact-item__username">{renderUsername()}</div>
       </div>
 
       <div className="contact-item__row contact-item__row--bottom">

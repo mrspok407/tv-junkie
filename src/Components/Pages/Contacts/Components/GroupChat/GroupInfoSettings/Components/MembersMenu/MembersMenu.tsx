@@ -1,7 +1,7 @@
 import { MembersStatusGroupChatInterface } from 'Components/Pages/Contacts/@Types'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import useElementScrolledDown from 'Components/Pages/Contacts/Hooks/useElementScrolledDown'
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import SearchInput from './SearchInput/SearchInput'
 import Member from './Member'
 import './MembersMenu.scss'
@@ -12,7 +12,7 @@ const GroupCreation: React.FC = () => {
   const { firebase, errors, contactsState } = useFrequentVariables()
   const { activeChat, chatMembersStatus, chatParticipants, contacts } = contactsState
   const contactInfo = contacts[activeChat.contactKey] || {}
-  const chatMembersStatusData = chatMembersStatus[contactInfo.chatKey] || []
+  const chatMembersStatusData = useMemo(() => chatMembersStatus[contactInfo.chatKey] || [], [])
   const chatParticipantsData = chatParticipants[contactInfo.chatKey] || []
 
   const [renderedMembers, setRenderedMembers] = useState(MEMBERS_TO_RENDER)
