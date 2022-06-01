@@ -1,12 +1,12 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { listOfGenres } from 'Utils'
-import { ContentDetailes, CONTENT_DETAILS_DEFAULT } from 'Utils/Interfaces/ContentDetails'
+import { LIST_OF_GENRES } from 'Utils/Constants'
+import { DataTMDBAPIInterface, CONTENT_DETAILS_DEFAULT } from 'Utils/Interfaces/DataTMDBAPIInterface'
 import Loader from 'Components/UI/Placeholders/Loader'
 import './SearchResults.scss'
 
 type Props = {
-  advancedSearchContent: ContentDetailes[]
+  advancedSearchContent: DataTMDBAPIInterface[]
   loadingNewPage: boolean
   clearAdvSearchMovies: () => void
 }
@@ -55,7 +55,8 @@ const AdvSearchResults: React.FC<Props> = ({ advancedSearchContent, loadingNewPa
           }) => {
             const mediaType = original_title ? 'movie' : 'show'
 
-            const filteredGenres = genre_ids?.map((genreId) => listOfGenres.filter((item) => item.id === genreId)) || []
+            const filteredGenres =
+              genre_ids?.map((genreId) => LIST_OF_GENRES.filter((item) => item.id === genreId)) || []
 
             const contentTitle = title || original_title || name || original_name || '-'
             const releaseDate = release_date || first_air_date || '-'

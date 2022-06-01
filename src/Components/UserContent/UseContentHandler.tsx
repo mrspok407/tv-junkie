@@ -26,13 +26,18 @@ const useContentHandler = () => {
 
   const addShowsToDatabaseOnRegister = ({ shows, uid }: AddShowsToDatabaseOnRegisterArg) => {
     Promise.all(
-      Object.values(shows).map((show) => getShowEpisodesFromAPI({ id: show.id }).then((dataFromAPI: any) => {
+      Object.values(shows).map((show) =>
+        getShowEpisodesFromAPI({ id: show.id }).then((dataFromAPI: any) => {
           const showsSubDatabase =
             dataFromAPI.status === 'Ended' || dataFromAPI.status === 'Canceled' ? 'ended' : 'ongoing'
 
           const userEpisodes = dataFromAPI.episodes.reduce(
             (acc: {}[], season: { episodes: { air_date: string }[]; season_number: number }) => {
-              const episodes = season.episodes.map((episode) => ({ watched: false, userRating: 0, air_date: episode.air_date || '' }))
+              const episodes = season.episodes.map((episode) => ({
+                watched: false,
+                userRating: 0,
+                air_date: episode.air_date || '',
+              }))
 
               acc.push({ season_number: season.season_number, episodes, userRating: 0 })
               return acc
@@ -54,7 +59,8 @@ const useContentHandler = () => {
           addShowFireDatabase({ firebase, showDetailes: show, showEpisodesTMDB: dataFromAPI })
 
           return { showInfo, userEpisodes }
-        })),
+        }),
+      ),
     )
       .then(async (data) => {
         const userShows = data.reduce((acc, show) => {
@@ -78,7 +84,10 @@ const useContentHandler = () => {
           }
         }, {})
 
-        const userShowsLastUpdateList = data.reduce((acc, show) => ({ ...acc, [show.showInfo.id]: { lastUpdatedInUser: show.showInfo.timeStamp } }), {})
+        const userShowsLastUpdateList = data.reduce(
+          (acc, show) => ({ ...acc, [show.showInfo.id]: { lastUpdatedInUser: show.showInfo.timeStamp } }),
+          {},
+        )
 
         await Promise.all([
           firebase.userAllShows(uid).set(userShows),
@@ -108,7 +117,11 @@ const useContentHandler = () => {
 
       const userEpisodes = showEpisodesTMDB.episodes.reduce(
         (acc: {}[], season: { episodes: { air_date: string }[]; season_number: number }) => {
-          const episodes = season.episodes.map((episode) => ({ watched: false, userRating: 0, air_date: episode.air_date || '' }))
+          const episodes = season.episodes.map((episode) => ({
+            watched: false,
+            userRating: 0,
+            air_date: episode.air_date || '',
+          }))
 
           acc.push({ season_number: season.season_number, episodes, userRating: 0 })
           return acc
@@ -169,7 +182,7 @@ const useContentHandler = () => {
         .update(
           {
             database,
-            isAllWatched_database: `${userShow.allEpisodesWatched}_${database}`,
+            isAllWatched_database: `${userShow.DATA_TMDBAPI_INITIAL}_${database}`,
           },
           () => {
             if (database === 'watchingShows') updateAllEpisodesWatched({ firebase, authUser, key: id })

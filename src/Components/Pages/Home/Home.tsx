@@ -20,7 +20,7 @@ import {
 import { useAppSelector } from 'app/hooks'
 import PlaceholderHomePageNoFutureEpisodes from 'Components/UI/Placeholders/PlaceholderHomePageNoFutureEpisodes'
 import { organiseFutureEpisodesByMonth } from '../Calendar/CalendarHelpers'
-import useGetSlidersContent from './UseGetSlidersContent'
+import useGetSlidersContent from './Hooks/UseGetSlidersContent'
 import './Home.scss'
 
 const HomePage: React.FC = () => {

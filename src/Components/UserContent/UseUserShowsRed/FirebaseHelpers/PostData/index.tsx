@@ -2,19 +2,20 @@ import { AppThunk } from 'app/store'
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import addShowFireDatabase from 'Components/UserContent/FirebaseHelpers/addShowFireDatabase'
 import getShowEpisodesFromAPI from 'Components/UserContent/TmdbAPIHelpers/getShowEpisodesFromAPI'
-import { ContentDetailes } from 'Utils/Interfaces/ContentDetails'
+import { DataTMDBAPIInterface } from 'Utils/Interfaces/DataTMDBAPIInterface'
 import { selectShow, setError } from '../../userShowsSliceRed'
 
 interface HandleDatbaseChange {
   id: number
   database: string
-  showDetailes: ContentDetailes
+  showDetailes: DataTMDBAPIInterface
   firebase: FirebaseInterface
   uid: string
 }
 
 export const handleDatabaseChange =
-  ({ id, database, showDetailes, uid, firebase }: HandleDatbaseChange): AppThunk => async (dispatch, getState) => {
+  ({ id, database, showDetailes, uid, firebase }: HandleDatbaseChange): AppThunk =>
+  async (dispatch, getState) => {
     const show = selectShow(getState(), id)
 
     if (!show) {
@@ -29,7 +30,7 @@ export const handleDatabaseChange =
       ),
       [`users/${uid}/content/shows/${id}/database`]: database,
       [`users/${uid}/content/episodes/${id}/info/database`]: database,
-      [`users/${uid}/content/episodes/${id}/info/isAllWatched_database`]: `${show.allEpisodesWatched}_${database}`,
+      [`users/${uid}/content/episodes/${id}/info/isAllWatched_database`]: `${show.DATA_TMDBAPI_INITIAL}_${database}`,
     }
 
     try {
@@ -40,7 +41,8 @@ export const handleDatabaseChange =
   }
 
 export const handleNewUserShow =
-  ({ id, database, showDetailes, uid, firebase }: HandleDatbaseChange): AppThunk => async (dispatch) => {
+  ({ id, database, showDetailes, uid, firebase }: HandleDatbaseChange): AppThunk =>
+  async (dispatch) => {
     try {
       const showEpisodesTMDB: any = await getShowEpisodesFromAPI({ id })
       console.log({ showEpisodesTMDB })
@@ -48,7 +50,11 @@ export const handleNewUserShow =
         showEpisodesTMDB.status === 'Ended' || showEpisodesTMDB.status === 'Canceled' ? 'ended' : 'ongoing'
       const userEpisodes = showEpisodesTMDB.episodes.reduce(
         (acc: {}[], season: { episodes: { air_date: string }[]; season_number: number }) => {
-          const episodes = season.episodes.map((episode) => ({ watched: false, userRating: 0, air_date: episode.air_date || '' }))
+          const episodes = season.episodes.map((episode) => ({
+            watched: false,
+            userRating: 0,
+            air_date: episode.air_date || '',
+          }))
 
           acc.push({ season_number: season.season_number, episodes, userRating: 0 })
           return acc

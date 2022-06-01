@@ -66,7 +66,9 @@ module.exports = {
     'jsx-a11y/label-has-associated-control': 0,
     'react/jsx-curly-newline': 0,
     '@typescript-eslint/no-extra-semi': 0,
+    'jsx-a11y/anchor-has-content': 0,
     'semi-style': 0,
+    'no-prototype-builtins': 0,
     'max-len': [
       'error',
       {

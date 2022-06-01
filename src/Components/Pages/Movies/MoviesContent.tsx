@@ -1,19 +1,22 @@
+/* eslint-disable max-len */
+/* eslint-disable no-nested-ternary */
 import React, { useCallback, useContext, useEffect, useReducer, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { isScrollNearBottom, listOfGenres } from 'Utils'
+import { isScrollNearBottom } from 'Utils'
 import { throttle } from 'throttle-debounce'
 import classNames from 'classnames'
 import Loader from 'Components/UI/Placeholders/Loader'
 import PlaceholderNoMovies from 'Components/UI/Placeholders/PlaceholderNoMovies'
 import { AppContext } from 'Components/AppContext/AppContextHOC'
-import { ContentDetailes } from 'Utils/Interfaces/ContentDetails'
+import { DataTMDBAPIInterface } from 'Utils/Interfaces/DataTMDBAPIInterface'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import { getGenresFromIds } from 'Utils/FormatTMDBAPIData'
 import reducer, { INITIAL_STATE, MoviesContentState, ActionInterface, ActionTypes } from './_reducerConfig'
 
 const SCROLL_THRESHOLD = 800
 
 type Props = {
-  moviesData: ContentDetailes[]
+  moviesData: DataTMDBAPIInterface[]
   loadingIds: number[]
   openLinksMoviesId: number[]
   error: number[]
@@ -43,6 +46,7 @@ const MoviesContent: React.FC<Props> = ({ moviesData, loadingIds, openLinksMovie
     dispatch({ type: ActionTypes.DisableLoadLS })
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleScroll = useCallback(
     throttle(500, () => {
       if (isScrollNearBottom({ scrollThreshold: SCROLL_THRESHOLD })) {
@@ -82,8 +86,7 @@ const MoviesContent: React.FC<Props> = ({ moviesData, loadingIds, openLinksMovie
     return (
       <>
         {movies.map((item) => {
-          const filteredGenres =
-            item.genre_ids?.map((genreId) => listOfGenres.filter((item) => item.id === genreId)) || []
+          const filteredGenres = getGenresFromIds(item.genre_ids)
 
           // Movies //
           let movie
@@ -129,7 +132,7 @@ const MoviesContent: React.FC<Props> = ({ moviesData, loadingIds, openLinksMovie
                   </div>
                   <div className="content-results__item-genres">
                     {filteredGenres.map((item) => (
-                      <span key={item[0].id}>{item[0].name}</span>
+                      <span key={item.id}>{item.name}</span>
                     ))}
                   </div>
                   <div className="content-results__item-overview">
@@ -198,10 +201,10 @@ const MoviesContent: React.FC<Props> = ({ moviesData, loadingIds, openLinksMovie
                   className="button--del-item"
                   onClick={() => {
                     if (authUser) {
-                      context.userContentHandler.handleMovieInDatabases({
-                        id: item.id,
-                        data: item,
-                      })
+                      // context.userContentHandler.handleMovieInDatabases({
+                      //   id: item.id,
+                      //   data: item,
+                      // })
                       context.userContent.handleUserMoviesOnClient({ id: item.id })
                     } else {
                       context.userContentLocalStorage.toggleMovieLS({

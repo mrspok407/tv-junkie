@@ -9,6 +9,7 @@ type Props = {
 const useElementScrolledDown = ({ element, threshold = 0 }: Props) => {
   const [isScrolledDown, setIsScrolledDown] = useState(false)
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleScroll = useCallback(
     throttle(200, () => {
       const { height } = element.getBoundingClientRect()

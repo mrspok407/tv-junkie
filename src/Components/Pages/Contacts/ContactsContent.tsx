@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import classNames from 'classnames'
 import React, { useEffect, useRef } from 'react'
 import ChatWindow from './Components/ChatWindow/ChatWindow'
@@ -24,7 +25,8 @@ const ContactsContent: React.FC = () => {
     contactsRef.current = contacts
   }, [messages, contacts])
 
-  useEffect(() => () => {
+  useEffect(
+    () => () => {
       if (!contactsRef.current) return
       Object.values(contactsRef.current).forEach((contact) => {
         firebase.messages({ chatKey: contact.chatKey, isGroupChat: contact.isGroupChat }).off()
@@ -38,7 +40,9 @@ const ContactsContent: React.FC = () => {
           firebase.groupChatParticipants({ chatKey: contact.chatKey }).off()
         }
       })
-    }, [authUser, firebase])
+    },
+    [authUser, firebase],
+  )
 
   useEffect(() => {
     firebase.contactsDatabase({ uid: authUser?.uid }).update({ pageIsOpen: true })
@@ -52,9 +56,9 @@ const ContactsContent: React.FC = () => {
     <div className="chat-container">
       <div
         className={classNames('contact-list-wrapper', {
-            'contact-list-wrapper--hide-mobile': contactsContext?.state.activeChat.chatKey,
-            'contact-list-wrapper--group-creation-active': groupCreation.isActive,
-          })}
+          'contact-list-wrapper--hide-mobile': contactsContext?.state.activeChat.chatKey,
+          'contact-list-wrapper--group-creation-active': groupCreation.isActive,
+        })}
         ref={contactListWrapperRef}
       >
         <ContactList contactListWrapperRef={contactListWrapperRef.current} />
@@ -62,33 +66,33 @@ const ContactsContent: React.FC = () => {
       </div>
       {!groupCreation.isActive && Object.values(contacts).filter((contact) => contact.status === true).length ? (
         <HandleNewMembers />
-        ) : groupCreation.members.length && !groupCreation.error ? (
-          <HandleNewMembers />
-        ) : (
-          ''
-        )}
+      ) : groupCreation.members.length && !groupCreation.error ? (
+        <HandleNewMembers />
+      ) : (
+        ''
+      )}
 
       {activeChat.chatKey === '' || !contacts[activeChat.contactKey] ? (
-          !Object.keys(contacts)?.length ? (
-            ''
-          ) : (
-            <div className="chat-window-container chat-window-container--no-active-chat">
-              <div className="chat-window">Select a chat to start messaging</div>
-            </div>
-          )
-        ) : contacts[activeChat.contactKey].chatDeleted ? (
-          <ChatWindowPlaceHolder
-            contactKey={contacts[activeChat.contactKey].key}
-            text="This chat was deleted by it's admin"
-          />
-        ) : contacts[activeChat.contactKey].removedFromGroup ? (
-          <ChatWindowPlaceHolder
-            contactKey={contacts[activeChat.contactKey].key}
-            text="You were removed from this group"
-          />
+        !Object.keys(contacts)?.length ? (
+          ''
         ) : (
-          <ChatWindow />
-        )}
+          <div className="chat-window-container chat-window-container--no-active-chat">
+            <div className="chat-window">Select a chat to start messaging</div>
+          </div>
+        )
+      ) : contacts[activeChat.contactKey].chatDeleted ? (
+        <ChatWindowPlaceHolder
+          contactKey={contacts[activeChat.contactKey].key}
+          text="This chat was deleted by it's admin"
+        />
+      ) : contacts[activeChat.contactKey].removedFromGroup ? (
+        <ChatWindowPlaceHolder
+          contactKey={contacts[activeChat.contactKey].key}
+          text="You were removed from this group"
+        />
+      ) : (
+        <ChatWindow />
+      )}
       {confirmModal.isActive && <ConfirmModal confirmFunctions={confirmModalFunctions} />}
     </div>
   )

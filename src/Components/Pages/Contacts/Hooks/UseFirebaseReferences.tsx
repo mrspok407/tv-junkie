@@ -6,7 +6,8 @@ const useFirebaseReferences = () => {
   const { activeChat, contacts } = contactsState
   const contactInfo = contacts[activeChat.contactKey] || {}
 
-  const updateMemberStatus = ({ value, isGroupChat, callback }: updateMemberStatus) => firebase
+  const updateMemberStatus = ({ value, isGroupChat, callback }: ГpdateMemberStatus) =>
+    firebase
       .chatMemberStatus({
         chatKey: activeChat.chatKey,
         memberKey: authUser?.uid!,
@@ -14,7 +15,8 @@ const useFirebaseReferences = () => {
       })
       .update({ ...value }, callback)
 
-  const setMemberStatus = ({ value, isGroupChat, callback }: setMemberStatus) => firebase
+  const setMemberStatus = ({ value, isGroupChat, callback }: ЫetMemberStatus) =>
+    firebase
       .chatMemberStatus({
         chatKey: activeChat.chatKey,
         memberKey: authUser?.uid!,
@@ -30,12 +32,12 @@ const useFirebaseReferences = () => {
 
 export default useFirebaseReferences
 
-interface updateMemberStatus {
+interface ГpdateMemberStatus {
   value: ContactStatusInterface
   isGroupChat?: boolean
   callback?: any
 }
 
-interface setMemberStatus extends Omit<updateMemberStatus, 'value'> {
+interface ЫetMemberStatus extends Omit<ГpdateMemberStatus, 'value'> {
   value: ContactStatusInterface | null
 }

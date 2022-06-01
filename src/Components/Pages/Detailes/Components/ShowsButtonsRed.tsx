@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import classNames from 'classnames'
 import * as ROUTES from 'Utils/Constants/routes'
-import { ContentDetailes } from 'Utils/Interfaces/ContentDetails'
+import { DataTMDBAPIInterface } from 'Utils/Interfaces/DataTMDBAPIInterface'
 import { useAppDispatch, useAppSelector } from 'app/hooks'
 import { selectShowDatabase } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
 import { handleDatabaseChange } from 'Components/UserContent/UseUserShowsRed/FirebaseHelpers/PostData'
@@ -11,7 +11,7 @@ import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 
 type Props = {
   id: number
-  detailes: ContentDetailes
+  detailes: DataTMDBAPIInterface
   mediaType: string
 }
 

@@ -1,103 +1,64 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import classNames from 'classnames'
-import { AppContext } from 'Components/AppContext/AppContextHOC'
 import UserRating from 'Components/UI/UserRating/UserRating'
-import { ContentDetailes } from 'Utils/Interfaces/ContentDetails'
-import { useAppSelector } from 'app/hooks'
-import { selectAuthUser } from 'Components/UserAuth/Session/WithAuthentication/authUserSlice'
+import { DataTMDBAPIInterface } from 'Utils/Interfaces/DataTMDBAPIInterface'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import { formatMovieBudget } from 'Utils/FormatTMDBAPIData'
+import { CONTENT_INFO_NO_DATA } from 'Utils/Constants'
 import ShowsButtonsRed from './ShowsButtonsRed'
+import useFormatDetailesValues from './Hooks/useFormatDetailesValues'
 
 type Props = {
-  detailes: ContentDetailes
-  movieInDatabase?: {} | null
+  detailes: DataTMDBAPIInterface
   mediaType: string
   id: number
 }
 
 export const MainInfo: React.FC<Props> = ({ detailes, mediaType, id }) => {
-  const context = useContext(AppContext)
-  const { authUser } = useAppSelector(selectAuthUser)
-
-  const movieInLS = context.userContentLocalStorage.watchLaterMovies.find(
-    (item: { id: number }) => item.id === Number(id),
-  )
-
+  const { authUser, userContentLocalStorage } = useFrequentVariables()
   const isMediaTypeTV = mediaType === 'show'
-  const title = isMediaTypeTV ? detailes.name : detailes.title
-  const yearRelease = isMediaTypeTV ? detailes.first_air_date.slice(0, 4) : detailes.release_date.slice(0, 4)
-  const yearEnded = isMediaTypeTV && detailes.last_air_date.slice(0, 4)
 
-  const yearRange =
-    detailes.status === 'Ended' || detailes.status === 'Canceled'
-      ? `${yearRelease} - ${yearEnded}`
-      : `${yearRelease} - ...`
+  const { companyName, genres, title, yearRelease, yearRange, runtime } = useFormatDetailesValues({
+    detailes,
+    isMediaTypeTV,
+  })
 
-  const runtime = isMediaTypeTV ? detailes.episode_run_time[0] : detailes.runtime
+  const movieInLS = userContentLocalStorage.watchLaterMovies.find((item: { id: number }) => item.id === Number(id))
 
-  const formatedBudget =
-    detailes.budget !== 0 ? (
-      new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-      })
-        .format(detailes.budget)
-        .slice(0, -3)
-        .split(',')
-        .join('.')
-    ) : (
-      <span className="detailes-page__info-no-info">-</span>
-    )
+  const noDataPlaceholder = () => <span className="detailes-page__info-no-info">{CONTENT_INFO_NO_DATA}</span>
 
   return (
     <div className="detailes-page__info">
       <div className="detailes-page__info-title">
         {title}
-        <span>{isMediaTypeTV && yearRelease !== '-' ? ` (${yearRange})` : ''}</span>
+        {isMediaTypeTV && <span>{yearRelease ? ` (${yearRange})` : ''}</span>}
       </div>
       <div className="detailes-page__info-row">
         <div className="detailes-page__info-option">Year</div>
-        <div className="detailes-page__info-value">
-          {yearRelease !== '-' ? `${yearRelease}` : <span className="detailes-page__info-no-info">{yearRelease}</span>}
-        </div>
+        <div className="detailes-page__info-value">{yearRelease || noDataPlaceholder()}</div>
       </div>
       {detailes.status !== 'Released' && (
         <div className="detailes-page__info-row">
           <div className="detailes-page__info-option">Status</div>
-          <div className="detailes-page__info-value">{detailes.status}</div>
+          <div className="detailes-page__info-value">{detailes.status || noDataPlaceholder()}</div>
         </div>
       )}
 
       <div className="detailes-page__info-row">
         <div className="detailes-page__info-option">Genres</div>
-        <div className="detailes-page__info-value">{detailes.genres}</div>
+        <div className="detailes-page__info-value">{genres || noDataPlaceholder()}</div>
       </div>
       <div className="detailes-page__info-row">
         <div className="detailes-page__info-option">Company</div>
-        <div className="detailes-page__info-value">
-          {isMediaTypeTV ? (
-            detailes.networks
-          ) : detailes.production_companies !== '-' ? (
-            detailes.production_companies
-          ) : (
-            <span className="detailes-page__info-no-info">-</span>
-          )}
-        </div>
+        <div className="detailes-page__info-value">{companyName || noDataPlaceholder()}</div>
       </div>
       <div className="detailes-page__info-row">
         <div className="detailes-page__info-option">Users rating</div>
-        <div className="detailes-page__info-value">
-          {detailes.vote_average !== '-' ? (
-            detailes.vote_average
-          ) : (
-            <span className="detailes-page__info-no-info">-</span>
-          )}
-        </div>
+        <div className="detailes-page__info-value">{detailes.vote_average || noDataPlaceholder()}</div>
       </div>
       <div className="detailes-page__info-row">
         <div className="detailes-page__info-option">Runtime</div>
-        <div className="detailes-page__info-value">
-          {runtime !== '-' && runtime ? `${runtime} min` : <span className="detailes-page__info-no-info">-</span>}
-        </div>
+        <div className="detailes-page__info-value">{runtime ? `${runtime} min` : noDataPlaceholder()}</div>
       </div>
 
       {isMediaTypeTV && (
@@ -113,17 +74,11 @@ export const MainInfo: React.FC<Props> = ({ detailes, mediaType, id }) => {
         <>
           <div className="detailes-page__info-row">
             <div className="detailes-page__info-option">Tagline</div>
-            <div className="detailes-page__info-value">
-              {detailes.tagline !== '-' ? (
-                `${detailes.tagline}`
-              ) : (
-                <span className="detailes-page__info-no-info">{detailes.tagline}</span>
-              )}
-            </div>
+            <div className="detailes-page__info-value">{detailes.tagline || noDataPlaceholder()}</div>
           </div>
           <div className="detailes-page__info-row">
             <div className="detailes-page__info-option">Budget</div>
-            <div className="detailes-page__info-value">{formatedBudget}</div>
+            <div className="detailes-page__info-value">{formatMovieBudget(detailes.budget) ?? noDataPlaceholder()}</div>
           </div>
           <div className="detailes-page__info-row">
             <div className="detailes-page__info-option">External links</div>
@@ -149,13 +104,13 @@ export const MainInfo: React.FC<Props> = ({ detailes, mediaType, id }) => {
             })}
             onClick={() => {
               if (authUser) {
-                context.userContentHandler.handleMovieInDatabases({
-                  id: Number(id),
-                  data: detailes,
-                })
-                context.userContent.handleUserMoviesOnClient({ id: Number(id), data: detailes })
+                // userContentHandler.handleMovieInDatabases({
+                //   id: Number(id),
+                //   data: detailes,
+                // })
+                // context.userContent.handleUserMoviesOnClient({ id: Number(id), data: detailes })
               } else {
-                context.userContentLocalStorage.toggleMovieLS({
+                userContentLocalStorage.toggleMovieLS({
                   id: Number(id),
                   data: detailes,
                 })

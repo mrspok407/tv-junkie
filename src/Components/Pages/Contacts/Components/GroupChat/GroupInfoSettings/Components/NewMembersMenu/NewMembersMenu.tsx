@@ -52,7 +52,7 @@ const NewMembersMenu: React.FC = () => {
       if (prevState.map((member) => member.key).includes(newMember.key)) {
         return [...prevState.filter((item) => item.key !== newMember.key)]
       }
-        return [...prevState, newMember]
+      return [...prevState, newMember]
     })
   }
 
@@ -142,7 +142,7 @@ const NewMembersMenu: React.FC = () => {
   )
 
   useEffect(() => {
-    (async () => {
+    ;(async () => {
       setInitialLoading(true)
       try {
         let additionalContactsToLoad = 0
@@ -183,8 +183,8 @@ const NewMembersMenu: React.FC = () => {
   useEffect(() => {
     if (!isScrolledDown) return
     if (loadingNewContacts) return
-    if (allContactsLoaded) return;
-(async () => {
+    if (allContactsLoaded) return
+    ;(async () => {
       try {
         setLoadingNewcontacts(true)
         const contactsData = await contactsListRef
@@ -200,59 +200,70 @@ const NewMembersMenu: React.FC = () => {
         setLoadingNewcontacts(false)
       }
     })()
-  }, [isScrolledDown, contactsList, allContactsLoaded, loadingNewContacts, errors]) // eslint-disable-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isScrolledDown, contactsList, allContactsLoaded, loadingNewContacts, errors])
 
   const contactsToRender = !searchedContacts?.length ? contactsList : searchedContacts
+
+  const renderMembersList = () => {
+    if (initialLoading) {
+      return (
+        <div className="contact-list__loader-wrapper">
+          <span className="contact-list__loader" />
+        </div>
+      )
+    }
+    if (!contactsList.length) {
+      return <div className="contact-list--no-contacts-text">You don&lsquo;t have any contacts</div>
+    }
+    if (searchedContacts === null) {
+      return <div className="contact-list--no-contacts-text">No contacts found</div>
+    }
+    return contactsToRender.map((contact) => (
+      <Contact
+        key={contact.key}
+        contact={contact}
+        handleNewMembers={handleNewMembers}
+        selectedMembers={selectedMembers}
+      />
+    ))
+  }
+
   return (
     <div className="members-menu members-menu--new-members">
       <div className="contacts-search">
         <SearchInput onSearch={handleSearch} isSearching={isSearching} contactsList={contactsList} />
         <div className="members-list-wrapper" ref={membersListWrapperRef}>
           <div className="members-list">
-            {initialLoading ? (
+            {renderMembersList()}
+            {loadingNewContacts && (
               <div className="contact-list__loader-wrapper">
                 <span className="contact-list__loader" />
               </div>
-              ) : !contactsList.length ? (
-                <div className="contact-list--no-contacts-text">You don't have any contacts</div>
-              ) : searchedContacts === null ? (
-                <div className="contact-list--no-contacts-text">No contacts found</div>
-              ) : (
-                contactsToRender.map((contact) => (
-                  <Contact
-                    key={contact.key}
-                    contact={contact}
-                    handleNewMembers={handleNewMembers}
-                    selectedMembers={selectedMembers}
-                  />
-                ))
-              )}
-            {loadingNewContacts && (
-            <div className="contact-list__loader-wrapper">
-              <span className="contact-list__loader" />
-            </div>
-              )}
+            )}
           </div>
         </div>
       </div>
       {selectedMembers.length ? (
         <div
           className={classNames('handle-new-members', {
-              'handle-new-members--arrow': true,
-              'handle-new-members--loading': newMembersLoading,
-            })}
+            'handle-new-members--arrow': true,
+            'handle-new-members--loading': newMembersLoading,
+          })}
         >
           <button
             type="button"
-            onClick={() => addNewMembers({
-                  members: selectedMembers,
-                  groupInfo: { groupName: contactInfo.groupName, key: contactInfo.chatKey },
-                })}
+            onClick={() =>
+              addNewMembers({
+                members: selectedMembers,
+                groupInfo: { groupName: contactInfo.groupName, key: contactInfo.chatKey },
+              })
+            }
           />
         </div>
-        ) : (
-          ''
-        )}
+      ) : (
+        ''
+      )}
     </div>
   )
 }

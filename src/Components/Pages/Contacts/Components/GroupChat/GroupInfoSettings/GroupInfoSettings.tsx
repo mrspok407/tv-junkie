@@ -19,10 +19,11 @@ const GroupInfoSettings: React.FC = () => {
       case 'members': {
         return <MembersMenu />
       }
-
       case 'addNewMembers': {
         return <NewMembersMenu />
       }
+      default:
+        break
     }
   }
 

@@ -12,7 +12,10 @@ const GroupCreation: React.FC = () => {
   const { firebase, errors, contactsState } = useFrequentVariables()
   const { activeChat, chatMembersStatus, chatParticipants, contacts } = contactsState
   const contactInfo = contacts[activeChat.contactKey] || {}
-  const chatMembersStatusData = useMemo(() => chatMembersStatus[contactInfo.chatKey] || [], [])
+  const chatMembersStatusData = useMemo(
+    () => chatMembersStatus[contactInfo.chatKey] || [],
+    [chatMembersStatus, contactInfo.chatKey],
+  )
   const chatParticipantsData = chatParticipants[contactInfo.chatKey] || []
 
   const [renderedMembers, setRenderedMembers] = useState(MEMBERS_TO_RENDER)

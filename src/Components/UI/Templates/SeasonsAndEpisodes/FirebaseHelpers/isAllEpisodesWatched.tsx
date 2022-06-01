@@ -5,10 +5,10 @@ import {
 } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { AuthUserInterface } from 'Components/UserAuth/Session/WithAuthentication/@Types'
 import { differenceBtwDatesInDays, todayDate } from 'Utils'
-import { ContentDetailes } from 'Utils/Interfaces/ContentDetails'
+import { DataTMDBAPIInterface } from 'Utils/Interfaces/DataTMDBAPIInterface'
 
 interface Arguments {
-  showInfo: ContentDetailes
+  showInfo: DataTMDBAPIInterface
   releasedEpisodes: SingleEpisodeInterface[]
   episodesFromDatabase: SeasonEpisodesFromDatabaseInterface[]
   authUser: AuthUserInterface['authUser']

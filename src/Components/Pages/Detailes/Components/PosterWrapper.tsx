@@ -1,8 +1,9 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react'
+/* eslint-disable max-len */
+import React, { useCallback, useEffect, useState } from 'react'
 import axios from 'axios'
 import { todayDate } from 'Utils'
 import Loader from 'Components/UI/Placeholders/Loader'
-import { ContentDetailes } from 'Utils/Interfaces/ContentDetails'
+import { DataTMDBAPIInterface } from 'Utils/Interfaces/DataTMDBAPIInterface'
 import { useAppSelector } from 'app/hooks'
 import { selectAuthUser } from 'Components/UserAuth/Session/WithAuthentication/authUserSlice'
 
@@ -11,7 +12,7 @@ const { CancelToken } = require('axios')
 let cancelRequest: any
 
 type Props = {
-  detailes: ContentDetailes
+  detailes: DataTMDBAPIInterface
   mediaType: string
 }
 
@@ -126,8 +127,8 @@ const PosterWrapper = React.memo<Props>(({ detailes, mediaType }) => {
             <Loader className="loader--small-pink" />
           )}
         </div>
-      ) : error || (
-        ''
+      ) : (
+        error || ''
       )}
     </div>
   )

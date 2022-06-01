@@ -20,7 +20,7 @@ const ToWatchEpisodesContent: React.FC = () => {
 
   const getContent = useCallback(() => {
     const watchingShows = context.userContent.userShows.filter(
-      (show) => show.database === 'watchingShows' && !show.allEpisodesWatched,
+      (show) => show.database === 'watchingShows' && !show.DATA_TMDBAPI_INITIAL,
     )
     const toWatchEpisodes: any = context.userContent.userToWatchShows
 

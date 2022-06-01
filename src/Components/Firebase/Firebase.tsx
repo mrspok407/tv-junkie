@@ -32,7 +32,7 @@ const config: any = process.env.NODE_ENV === 'production' ? configProduction : c
 // let config: any = configDevelopment
 
 if (window.location.hostname === 'localhost') {
-  // config.databaseURL = 'http://localhost:9000/?ns=pet-project-development-default-rtdb'
+  config.databaseURL = 'http://localhost:9000/?ns=pet-project-development-default-rtdb'
 }
 
 interface ReferenceInterface {
@@ -72,7 +72,7 @@ class Firebase {
     this.app = app
 
     if (window.location.hostname === 'localhost') {
-      // app.functions().useEmulator('localhost', 4000)
+      app.functions().useEmulator('localhost', 4000)
     }
   }
 

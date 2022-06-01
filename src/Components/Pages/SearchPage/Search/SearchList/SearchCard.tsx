@@ -1,10 +1,10 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import classNames from 'classnames'
-import { ContentDetailes, CONTENT_DETAILS_DEFAULT } from 'Utils/Interfaces/ContentDetails'
+import { DataTMDBAPIInterface, CONTENT_DETAILS_DEFAULT } from 'Utils/Interfaces/DataTMDBAPIInterface'
 
 type Props = {
-  detailes: ContentDetailes
+  detailes: DataTMDBAPIInterface
   index: number
   currentListItem: number
   mediaTypeSearching: string
@@ -54,14 +54,14 @@ const SearchCard: React.FC<Props> = ({
             <div
               className="search-card__info-image"
               style={
-                  poster_path !== null
-                    ? {
-                        backgroundImage: `url(https://image.tmdb.org/t/p/w500/${poster_path || backdrop_path})`,
-                      }
-                    : {
-                        backgroundImage: 'url(https://d32qys9a6wm9no.cloudfront.net/images/movies/poster/500x735.png)',
-                      }
-                }
+                poster_path !== null
+                  ? {
+                      backgroundImage: `url(https://image.tmdb.org/t/p/w500/${poster_path || backdrop_path})`,
+                    }
+                  : {
+                      backgroundImage: 'url(https://d32qys9a6wm9no.cloudfront.net/images/movies/poster/500x735.png)',
+                    }
+              }
             />
             <div className="search-card__info-title">
               {movieTitle || showTitle}
@@ -73,11 +73,11 @@ const SearchCard: React.FC<Props> = ({
 
             <div className="search-card__info-wrapper">
               {vote_average !== 0 && (
-              <div className="search-card__info-rating">
-                {vote_average}
-                <span>/10</span>
-              </div>
-                )}
+                <div className="search-card__info-rating">
+                  {vote_average}
+                  <span>/10</span>
+                </div>
+              )}
               <div className="search-card__info-type">{movieTitle ? 'Movie' : 'Show'}</div>
             </div>
           </div>
@@ -87,14 +87,14 @@ const SearchCard: React.FC<Props> = ({
           <div
             className="search-card__info-image"
             style={
-                profile_path !== null
-                  ? {
-                      backgroundImage: `url(https://image.tmdb.org/t/p/w500/${profile_path})`,
-                    }
-                  : {
-                      backgroundImage: 'url(https://d32qys9a6wm9no.cloudfront.net/images/movies/poster/500x735.png)',
-                    }
-              }
+              profile_path !== null
+                ? {
+                    backgroundImage: `url(https://image.tmdb.org/t/p/w500/${profile_path})`,
+                  }
+                : {
+                    backgroundImage: 'url(https://d32qys9a6wm9no.cloudfront.net/images/movies/poster/500x735.png)',
+                  }
+            }
           />
           <div className="search-card__info-name">{movieTitle || showTitle || personName}</div>
           <div className="search-card__info-activity">
@@ -103,26 +103,22 @@ const SearchCard: React.FC<Props> = ({
           </div>
           <div className="search-card__info-known-movies">
             {known_for.map((item, i) => {
-                const mediaType = item.media_type === 'movie' ? 'movie' : 'show'
+              const mediaType = item.media_type === 'movie' ? 'movie' : 'show'
 
-                const title = item.media_type === 'movie' ? item.original_title || 'No title' : item.name || 'No title'
+              const title = item.media_type === 'movie' ? item.original_title || 'No title' : item.name || 'No title'
 
-                const releaseDate = item.media_type === 'movie' ? item.release_date || '' : item.first_air_date || ''
+              const releaseDate = item.media_type === 'movie' ? item.release_date || '' : item.first_air_date || ''
 
-                return (
-                  <span key={item.id}>
-                    <Link
-                      className="search-card__info-link"
-                      to={`/${mediaType}/${item.id}`}
-                      onClick={() => closeList()}
-                    >
-                      {title}
-                    </Link>
+              return (
+                <span key={item.id}>
+                  <Link className="search-card__info-link" to={`/${mediaType}/${item.id}`} onClick={() => closeList()}>
+                    {title}
+                  </Link>
 
-                    {known_for.length - 1 !== i ? ` (${releaseDate.slice(0, 4)}), ` : ` (${releaseDate.slice(0, 4)})`}
-                  </span>
-                )
-              })}
+                  {known_for.length - 1 !== i ? ` (${releaseDate.slice(0, 4)}), ` : ` (${releaseDate.slice(0, 4)})`}
+                </span>
+              )
+            })}
           </div>
         </div>
       )}

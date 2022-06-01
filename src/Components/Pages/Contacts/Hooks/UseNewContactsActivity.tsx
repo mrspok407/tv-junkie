@@ -1,7 +1,4 @@
-import { useState, useEffect, useContext } from 'react'
-import { FirebaseContext } from 'Components/Firebase'
-import { useAppSelector } from 'app/hooks'
-import { selectAuthUser } from 'Components/UserAuth/Session/WithAuthentication/authUserSlice'
+import { useState, useEffect } from 'react'
 import useFrequentVariables from '../../../../Utils/Hooks/UseFrequentVariables'
 
 const useNewContactsActivity = () => {
@@ -24,7 +21,7 @@ const useNewContactsActivity = () => {
       firebase.newContactsActivity({ uid: authUser?.uid }).off()
       firebase.newContactsRequests({ uid: authUser?.uid }).off()
     }
-  }, [authUser]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [authUser, firebase])
 
   useEffect(() => {
     setNewContactsActivity(!!(newActivity || newRequests))

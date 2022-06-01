@@ -6,22 +6,16 @@ import { Persist } from 'formik-persist'
 import * as Yup from 'yup'
 import classNames from 'classnames'
 import Loader from 'Components/UI/Placeholders/Loader'
-import { listOfGenres } from 'Utils'
+import { LIST_OF_GENRES } from 'Utils/Constants'
 import DatesInputs from './DatesInputs/DatesInputs'
 import GenreInputs from './GenreInputs/GenreInputs'
 import VotesRatingSortType from './VotesRatingSortType/VotesRatingSortType'
 import WithActorsInput from './WithActorsInput/WithActorsInput'
 import './AdvancedSearch.scss'
 
-export default function AdvancedSearch({
-  advancedSearch,
-  searchingAdvancedSearch,
-  withActors,
-  toggleActor,
-  clearWithActors,
-}) {
+const AdvancedSearch = ({ advancedSearch, searchingAdvancedSearch, withActors, toggleActor, clearWithActors }) => {
   const [advSearchOpen, setAdvSearchOpen] = useState(false)
-  const [genres, setGenres] = useState(listOfGenres)
+  const [genres, setGenres] = useState(LIST_OF_GENRES)
 
   function toggleGenre(e) {
     const newGenres = [...genres]
@@ -42,12 +36,12 @@ export default function AdvancedSearch({
   function clearCheckboxes() {
     const newGenres = [...genres]
     const resetGenres = newGenres.map(({ id, name }) => ({
-        id,
-        name,
-        isChecked: false,
-        withGenre: false,
-        withoutGenre: false,
-      }))
+      id,
+      name,
+      isChecked: false,
+      withGenre: false,
+      withoutGenre: false,
+    }))
     setGenres(resetGenres)
   }
 
@@ -155,3 +149,5 @@ export default function AdvancedSearch({
     </Formik>
   )
 }
+
+export default AdvancedSearch

@@ -1,13 +1,14 @@
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
-import { ContentDetailes } from 'Utils/Interfaces/ContentDetails'
+import { DataTMDBAPIInterface } from 'Utils/Interfaces/DataTMDBAPIInterface'
 
 type Arguments = {
   firebase: FirebaseInterface
-  showDetailes: ContentDetailes
+  showDetailes: DataTMDBAPIInterface
   showEpisodesTMDB: { status: string; episodes: {}[] }
 }
 
-const addShowFireDatabase = ({ firebase, showDetailes, showEpisodesTMDB }: Arguments): Promise<any> => firebase.showFullData(showDetailes.id).transaction((snapshot: any) => {
+const addShowFireDatabase = ({ firebase, showDetailes, showEpisodesTMDB }: Arguments): Promise<any> =>
+  firebase.showFullData(showDetailes.id).transaction((snapshot: any) => {
     if (snapshot !== null) {
       return
     }

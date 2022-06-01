@@ -31,8 +31,8 @@ export const ErrorFallback = ({ error, resetErrorBoundary }) => (
   <div style={{ display: 'flex', flexDirection: 'column', rowGap: '5px', marginTop: '15px' }} role="alert">
     <p style={{ fontSize: '1.2rem', color: 'white' }}>Something went wrong</p>
     <pre>{error.message}</pre>
-    <button className="button" onClick={resetErrorBoundary}>
+    <button type="button" className="button" onClick={resetErrorBoundary}>
       Try again
     </button>
   </div>
-  )
+)

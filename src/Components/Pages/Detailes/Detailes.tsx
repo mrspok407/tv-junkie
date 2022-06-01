@@ -38,11 +38,11 @@ export const DetailesPage: React.FC<Props> = ({
             {mediaType === 'show'
               ? `
                 ${detailes.name}
-                ${detailes.first_air_date !== '-' ? `(${detailes.first_air_date.slice(0, 4)})` : ''} | TV Junkie
+                ${detailes.first_air_date?.slice(0, 4)} | TV Junkie
               `
               : `
               ${detailes.title}
-              ${detailes.release_date !== '-' ? `(${detailes.release_date.slice(0, 4)})` : ''} | TV Junkie
+              ${detailes.release_date?.slice(0, 4)} | TV Junkie
               `}
           </title>
         )}

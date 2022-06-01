@@ -1,7 +1,7 @@
-import { ContentDetailes } from 'Utils/Interfaces/ContentDetails'
+import { DataTMDBAPIInterface } from 'Utils/Interfaces/DataTMDBAPIInterface'
 
-export interface UserShowsInterface extends ContentDetailes {
-  allEpisodesWatched: boolean
+export interface UserShowsInterface extends DataTMDBAPIInterface {
+  DATA_TMDBAPI_INITIAL: boolean
   database: string
   finished: boolean
   timeStamp: number
@@ -34,7 +34,7 @@ export interface SeasonEpisodesFromDatabaseInterface {
   id: number
 }
 
-export interface UserMoviesInterface extends ContentDetailes {
+export interface UserMoviesInterface extends DataTMDBAPIInterface {
   timeStamp?: number
 }
 

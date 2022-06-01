@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useReducer } from 'react'
-import { listOfGenres, combineMergeObjects } from 'Utils'
+import { combineMergeObjects } from 'Utils'
+import { LIST_OF_GENRES } from 'Utils/Constants'
 import * as ROUTES from 'Utils/Constants/routes'
 import { UserShowsInterface } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { ShowInterface } from 'Components/AppContext/@Types'
@@ -115,7 +116,7 @@ const UserProfileContent: React.FC<Props> = ({ userUid }) => {
       <>
         {content.map((item) => {
           const filteredGenres =
-            item.genre_ids?.map((genreId) => listOfGenres.filter((item) => item.id === genreId)) || []
+            item.genre_ids?.map((genreId) => LIST_OF_GENRES.filter((item) => item.id === genreId)) || []
 
           return (
             <div key={item.id} className="content-results__item content-results__item--shows">

@@ -1,12 +1,12 @@
 /* eslint-disable jsx-a11y/mouse-events-have-key-events */
 import PlaceholderNoResults from 'Components/UI/Placeholders/PlaceholderNoResults'
 import React, { useEffect } from 'react'
-import { ContentDetailes } from 'Utils/Interfaces/ContentDetails'
+import { DataTMDBAPIInterface } from 'Utils/Interfaces/DataTMDBAPIInterface'
 import SearchCard from './SearchCard'
 import './SearchList.scss'
 
 type Props = {
-  searchResults: ContentDetailes[]
+  searchResults: DataTMDBAPIInterface[]
   handleClickOutside: (e: CustomEvent) => void
   closeList: () => void
   currentListItem: number
@@ -55,7 +55,7 @@ const SearchList: React.FC<Props> = ({
             index={index}
             mediaTypeSearching={mediaTypeSearching}
           />
-          ))
+        ))
       )}
     </div>
   )

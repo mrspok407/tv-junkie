@@ -1,10 +1,11 @@
+/* eslint-disable max-len */
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { Helmet } from 'react-helmet'
 import Header from 'Components/UI/Header/Header'
 import ScrollToTop from 'Utils/ScrollToTopBar'
 import Footer from 'Components/UI/Footer/Footer'
-import { ContentDetailes } from 'Utils/Interfaces/ContentDetails'
+import { DataTMDBAPIInterface } from 'Utils/Interfaces/DataTMDBAPIInterface'
 import useGoogleRedirect from 'Components/UserAuth/SignIn/UseGoogleRedirect'
 import MoviesContent from './MoviesContent'
 
@@ -13,16 +14,19 @@ const { CancelToken } = require('axios')
 let cancelRequest: any
 
 const Movies: React.FC = () => {
-  const [moviesData, setMoviesData] = useState<ContentDetailes[]>([])
+  const [moviesData, setMoviesData] = useState<DataTMDBAPIInterface[]>([])
   const [loadingIds, setLoadingIds] = useState<number[]>([])
   const [openLinksMoviesId, setOpenLinksMoviesId] = useState<number[]>([])
   const [error, setError] = useState<number[]>([])
 
   useGoogleRedirect()
 
-  useEffect(() => () => {
+  useEffect(
+    () => () => {
       if (cancelRequest !== undefined) cancelRequest()
-    }, [])
+    },
+    [],
+  )
 
   const getMovieLinks = ({ id }: { id: number }) => {
     if (openLinksMoviesId.includes(id)) return

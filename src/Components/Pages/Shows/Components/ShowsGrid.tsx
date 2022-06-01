@@ -4,7 +4,7 @@ import { handleDatabaseChange } from 'Components/UserContent/UseUserShowsRed/Fir
 import { selectShows } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { listOfGenres } from 'Utils'
+import { LIST_OF_GENRES } from 'Utils/Constants'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 
 type Props = {
@@ -20,7 +20,7 @@ const ShowsGrid: React.FC<Props> = ({ data, section }) => {
     <>
       {data.map((item) => {
         const filteredGenres =
-          item.genre_ids?.map((genreId) => listOfGenres.filter((item) => item.id === genreId)) || []
+          item.genre_ids?.map((genreId) => LIST_OF_GENRES.filter((item) => item.id === genreId)) || []
 
         return (
           <div key={item.id} className="content-results__item content-results__item--shows">

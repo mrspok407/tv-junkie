@@ -3,12 +3,12 @@ import React, { useEffect, useState, useCallback, useLayoutEffect } from 'react'
 import { Link } from 'react-router-dom'
 import debounce from 'debounce'
 import classNames from 'classnames'
-import { ContentDetailes } from 'Utils/Interfaces/ContentDetails'
+import { DataTMDBAPIInterface } from 'Utils/Interfaces/DataTMDBAPIInterface'
 import './Slider.scss'
 
 const POSTER_PATH = 'https://image.tmdb.org/t/p/w500/'
 
-export const Slider = ({ sliderData }: { sliderData: ContentDetailes[] }) => {
+export const Slider = ({ sliderData }: { sliderData: DataTMDBAPIInterface[] }) => {
   const [slider, setSlider] = useState<HTMLDivElement>(null!)
   const [sliderWidth, setSliderWidth] = useState<number>(null!)
 
