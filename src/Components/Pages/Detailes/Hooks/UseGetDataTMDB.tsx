@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
 import axios from 'axios'
-import { DataTMDBAPIInterface, CONTENT_DETAILS_DEFAULT } from 'Utils/Interfaces/DataTMDBAPIInterface'
+import { DataTMDBAPIInterface, DATA_TMDBAPI_INITIAL } from 'Utils/Interfaces/DataTMDBAPIInterface'
 import * as ROUTES from 'Utils/Constants/routes'
 import * as _get from 'lodash.get'
 
@@ -17,7 +17,7 @@ type Props = {
 const useGetDataTMDB = ({ id, mediaType }: Props) => {
   const history = useHistory()
   const [loading, setLoading] = useState(true)
-  const [detailes, setDetailes] = useState<DataTMDBAPIInterface>(CONTENT_DETAILS_DEFAULT)
+  const [detailes, setDetailes] = useState<DataTMDBAPIInterface>(DATA_TMDBAPI_INITIAL)
   const [similarContent, setSimilarContent] = useState<DataTMDBAPIInterface[]>([])
   const [error, setError] = useState('')
 

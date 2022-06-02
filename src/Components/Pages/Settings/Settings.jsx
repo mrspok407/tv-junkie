@@ -152,7 +152,7 @@ const Profile = () => {
 
         data.results.forEach((show) => {
           firebase
-            .showFullData(show.id)
+            .showFullDataFireDatabase(show.id)
             .child('id')
             .once('value', (snapshot) => {
               if (snapshot.val() !== null) {
@@ -229,7 +229,7 @@ const Profile = () => {
                   )
                   .then((data) => {
                     firebase
-                      .showFullData(show.id)
+                      .showFullDataFireDatabase(show.id)
                       .update({
                         episodes: data.episodes,
                         status: data.status,

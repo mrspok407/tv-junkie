@@ -1,7 +1,8 @@
 import axios from 'axios'
+import { EpisodesFromFireDatabase, SingleEpisodeFromFireDatabase } from '../UseUserShowsRed/@Types'
 
 interface DataFromAPI {
-  episodes: Record<string, unknown>[]
+  episodes: EpisodesFromFireDatabase[]
   status: string
 }
 
@@ -49,7 +50,7 @@ const getShowEpisodesFromAPI = ({ id }: { id: number }) => {
           }
         })
 
-        const allEpisodes: Record<string, unknown>[] = []
+        const allEpisodes: DataFromAPI['episodes'] = []
 
         seasonsData.forEach((item: any, index) => {
           const season = item[`season/${index + 1}`]
@@ -57,7 +58,7 @@ const getShowEpisodesFromAPI = ({ id }: { id: number }) => {
             return
           }
 
-          const episodes: Record<string, unknown>[] = []
+          const episodes: SingleEpisodeFromFireDatabase[] = []
 
           season.episodes.forEach((item: any) => {
             const updatedEpisode = {
@@ -90,9 +91,6 @@ const getShowEpisodesFromAPI = ({ id }: { id: number }) => {
         return dataToPass
       }),
     )
-    .catch((err) => {
-      console.log(err)
-    })
 
   return promise
 }

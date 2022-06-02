@@ -1,7 +1,7 @@
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import { AuthUserInterface } from 'Components/UserAuth/Session/WithAuthentication/@Types'
 import { releasedEpisodesToOneArray } from 'Utils'
-import { SingleEpisodeInterface } from '../@Types'
+import { SingleEpisodeFromFireDatabase } from '../@Types'
 
 export interface UpdateAllEpisodesWatchedInterface {
   firebase: FirebaseInterface
@@ -37,7 +37,7 @@ const updateAllEpisodesWatched = async ({ firebase, authUser, key }: UpdateAllEp
   if (lastTwoSeasonsData === null) return
 
   const userEpisodes = Object.values(lastTwoSeasonsData).map((item: any) => item)
-  const releasedEpisodes: SingleEpisodeInterface[] = releasedEpisodesToOneArray({
+  const releasedEpisodes: SingleEpisodeFromFireDatabase[] = releasedEpisodesToOneArray({
     data: userEpisodes,
   })
 
@@ -50,7 +50,7 @@ const updateAllEpisodesWatched = async ({ firebase, authUser, key }: UpdateAllEp
       .then((snapshot: any) => snapshot.val())
 
     const userEpisodes = Object.values(lastThreeSeasonsData).map((item: any) => item)
-    const releasedEpisodes: SingleEpisodeInterface[] = releasedEpisodesToOneArray({
+    const releasedEpisodes: SingleEpisodeFromFireDatabase[] = releasedEpisodesToOneArray({
       data: userEpisodes,
     })
     const allEpisodesWatched = !releasedEpisodes.some((episode: any) => !episode.watched)
@@ -62,15 +62,15 @@ const updateAllEpisodesWatched = async ({ firebase, authUser, key }: UpdateAllEp
       firebase.userShow({ uid: authUser.uid, key }).update({ allEpisodesWatched }),
     ])
   }
-    const allEpisodesWatched = !releasedEpisodes.some((episode: any) => !episode.watched)
+  const allEpisodesWatched = !releasedEpisodes.some((episode: any) => !episode.watched)
 
-    return Promise.all([
-      firebase.userShowAllEpisodesInfo(authUser.uid, key).update({
-        allEpisodesWatched,
-        isAllWatched_database: `${allEpisodesWatched}_watchingShows`,
-      }),
-      firebase.userShow({ uid: authUser.uid, key }).update({ allEpisodesWatched }),
-    ])
+  return Promise.all([
+    firebase.userShowAllEpisodesInfo(authUser.uid, key).update({
+      allEpisodesWatched,
+      isAllWatched_database: `${allEpisodesWatched}_watchingShows`,
+    }),
+    firebase.userShow({ uid: authUser.uid, key }).update({ allEpisodesWatched }),
+  ])
 }
 
 export default updateAllEpisodesWatched

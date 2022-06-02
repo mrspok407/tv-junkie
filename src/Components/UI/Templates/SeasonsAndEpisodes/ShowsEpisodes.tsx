@@ -6,7 +6,7 @@ import * as _get from 'lodash.get'
 import Loader from 'Components/UI/Placeholders/Loader'
 import classNames from 'classnames'
 import UserRating from 'Components/UI/UserRating/UserRating'
-import { SingleEpisodeInterface } from 'Components/UserContent/UseUserShowsRed/@Types'
+import { SingleEpisodeFromFireDatabase } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { tmdbTvSeasonURL } from 'Utils/APIUrls'
 import useAxiosPromise from 'Utils/Hooks/UseAxiosPromise'
 import { useAppSelector } from 'app/hooks'
@@ -31,8 +31,7 @@ const ShowsEpisodes: React.FC<Props> = ({ episodesData, showTitle, id, parentCom
 
   const showInfo = useAppSelector((state) => selectShow(state, id))
   const episodesFromDatabase = useAppSelector((state) => selectShowEpisodes(state, id))
-  console.log({ episodesFromDatabase })
-  const releasedEpisodes: SingleEpisodeInterface[] = releasedEpisodesToOneArray({ data: episodesFromDatabase })
+  const releasedEpisodes: SingleEpisodeFromFireDatabase[] = releasedEpisodesToOneArray({ data: episodesFromDatabase })
 
   const seasons = episodesData.filter((item) => item.name !== 'Specials')
   const firstSeason = seasons[seasons.length - 1]
@@ -151,9 +150,13 @@ const ShowsEpisodes: React.FC<Props> = ({ episodesData, showTitle, id, parentCom
 
   const checkEverySeasonEpisode = (seasonNum: number) => {
     if (!authUser?.uid) return
-    const safeGetSeasonEpisodes: SingleEpisodeInterface[] = _get(episodesFromDatabase[seasonNum - 1], 'episodes', [])
+    const safeGetSeasonEpisodes: SingleEpisodeFromFireDatabase[] = _get(
+      episodesFromDatabase[seasonNum - 1],
+      'episodes',
+      [],
+    )
 
-    const seasonEpisodes = safeGetSeasonEpisodes.reduce((acc: SingleEpisodeInterface[], episode, index) => {
+    const seasonEpisodes = safeGetSeasonEpisodes.reduce((acc: SingleEpisodeFromFireDatabase[], episode, index) => {
       if (!releasedEpisodes.find((item) => item.id === episode.id)) return acc
       acc.push({
         userRating: episode.userRating,
@@ -215,7 +218,7 @@ const ShowsEpisodes: React.FC<Props> = ({ episodesData, showTitle, id, parentCom
     if (!authUser?.uid) return
 
     let isAllEpisodesChecked = true
-    let userEpisodesFormated: SingleEpisodeInterface[] = []
+    let userEpisodesFormated: SingleEpisodeFromFireDatabase[] = []
 
     episodesFromDatabase.forEach((season: any) => {
       const episodes = season.episodes.filter((item: any) => item.air_date !== '')
@@ -238,8 +241,6 @@ const ShowsEpisodes: React.FC<Props> = ({ episodesData, showTitle, id, parentCom
   }
 
   const showCheckboxes = showInfo?.database !== 'notWatchingShows'
-
-  console.log({ showInfo, showCheckboxes, releasedEpisodes })
 
   const curOpen = parentComponent === 'toWatchPage' ? currentlyOpen : currentlyOpenSeasons
 

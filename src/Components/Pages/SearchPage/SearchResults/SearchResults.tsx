@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { LIST_OF_GENRES } from 'Utils/Constants'
-import { DataTMDBAPIInterface, CONTENT_DETAILS_DEFAULT } from 'Utils/Interfaces/DataTMDBAPIInterface'
+import { DataTMDBAPIInterface, DATA_TMDBAPI_INITIAL } from 'Utils/Interfaces/DataTMDBAPIInterface'
 import Loader from 'Components/UI/Placeholders/Loader'
 import './SearchResults.scss'
 
@@ -45,13 +45,13 @@ const AdvSearchResults: React.FC<Props> = ({ advancedSearchContent, loadingNewPa
             original_name,
             release_date,
             first_air_date,
-            id = CONTENT_DETAILS_DEFAULT.id,
-            vote_average = CONTENT_DETAILS_DEFAULT.vote_average,
-            genre_ids = CONTENT_DETAILS_DEFAULT.genre_ids,
-            overview = CONTENT_DETAILS_DEFAULT.overview,
-            backdrop_path = CONTENT_DETAILS_DEFAULT.backdrop_path,
-            poster_path = CONTENT_DETAILS_DEFAULT.poster_path,
-            vote_count = CONTENT_DETAILS_DEFAULT.vote_count,
+            id = DATA_TMDBAPI_INITIAL.id,
+            vote_average = DATA_TMDBAPI_INITIAL.vote_average,
+            genre_ids = DATA_TMDBAPI_INITIAL.genre_ids,
+            overview = DATA_TMDBAPI_INITIAL.overview,
+            backdrop_path = DATA_TMDBAPI_INITIAL.backdrop_path,
+            poster_path = DATA_TMDBAPI_INITIAL.poster_path,
+            vote_count = DATA_TMDBAPI_INITIAL.vote_count,
           }) => {
             const mediaType = original_title ? 'movie' : 'show'
 

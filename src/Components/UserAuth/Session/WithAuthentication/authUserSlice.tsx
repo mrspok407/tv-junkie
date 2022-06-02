@@ -1,7 +1,5 @@
 import { createSlice, current, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from 'app/store'
-import merge from 'deepmerge'
-import { combineMergeObjects } from 'Utils'
 import { AuthUserInterface } from './@Types'
 
 export const authUserInitialState: AuthUserInterface = {

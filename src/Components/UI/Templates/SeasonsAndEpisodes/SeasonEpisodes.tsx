@@ -6,7 +6,7 @@ import classNames from 'classnames'
 import * as _get from 'lodash.get'
 import * as ROUTES from 'Utils/Constants/routes'
 import UserRating from 'Components/UI/UserRating/UserRating'
-import { SeasonEpisodesFromDatabaseInterface } from 'Components/UserContent/UseUserShowsRed/@Types'
+import { EpisodesFromFireDatabase } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { DataTMDBAPIInterface } from 'Utils/Interfaces/DataTMDBAPIInterface'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import { EpisodesDataInterface, ShowEpisodesFromAPIInterface } from './@Types'
@@ -22,7 +22,7 @@ type Props = {
   detailEpisodeInfo: number[]
   season: EpisodesDataInterface
   seasonId: number
-  episodesFromDatabase: SeasonEpisodesFromDatabaseInterface[]
+  episodesFromDatabase: EpisodesFromFireDatabase[]
   showInfo: DataTMDBAPIInterface
   showEpisodeInfo: (episodeId: number) => void
   toggleWatchedEpisode: (

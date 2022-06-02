@@ -1,7 +1,4 @@
-import {
-  SeasonEpisodesFromDatabaseInterface,
-  SingleEpisodeInterface,
-} from 'Components/UserContent/UseUserShowsRed/@Types'
+import { EpisodesFromFireDatabase, SingleEpisodeFromFireDatabase } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { useState, useEffect } from 'react'
 import { releasedEpisodesToOneArray } from 'Utils'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
@@ -15,26 +12,26 @@ export interface HandleListenersArg {
 const useHandleListeners = ({ id }: { id: number }) => {
   const { firebase, authUser } = useFrequentVariables()
 
-  const [episodesFromDatabase, setEpisodesFromDatabase] = useState<SeasonEpisodesFromDatabaseInterface[]>([])
-  const [releasedEpisodes, setReleasedEpisodes] = useState<SingleEpisodeInterface[]>([])
+  const [episodesFromDatabase, setEpisodesFromDatabase] = useState<EpisodesFromFireDatabase[]>([])
+  const [releasedEpisodes, setReleasedEpisodes] = useState<SingleEpisodeFromFireDatabase[]>([])
 
   const handleListeners = ({ id, status, handleLoading }: HandleListenersArg) => {
     if (status === '-' || !authUser?.uid) return
 
     const statusDatabase = status === 'Ended' || status === 'Canceled' ? 'ended' : 'ongoing'
-    firebase.showEpisodes(id).once('value', (snapshot: { val: () => SeasonEpisodesFromDatabaseInterface[] }) => {
+    firebase.showEpisodes(id).once('value', (snapshot: { val: () => EpisodesFromFireDatabase[] }) => {
       if (snapshot.val() === null) {
         if (handleLoading) handleLoading(false)
         return
       }
 
-      const releasedEpisodes: SingleEpisodeInterface[] = releasedEpisodesToOneArray({
+      const releasedEpisodes: SingleEpisodeFromFireDatabase[] = releasedEpisodesToOneArray({
         data: snapshot.val(),
       })
 
       firebase
         .userShowAllEpisodes(authUser.uid, id)
-        .on('value', (snapshot: { val: () => SeasonEpisodesFromDatabaseInterface[] }) => {
+        .on('value', (snapshot: { val: () => EpisodesFromFireDatabase[] }) => {
           if (snapshot.val() === null) {
             firebase.userShowAllEpisodes(authUser.uid, id).off()
             if (handleLoading) handleLoading(false)
@@ -42,7 +39,7 @@ const useHandleListeners = ({ id }: { id: number }) => {
           }
 
           const userEpisodes = snapshot.val()
-          const allEpisodes = userEpisodes.reduce((acc: SingleEpisodeInterface[], item) => {
+          const allEpisodes = userEpisodes.reduce((acc: SingleEpisodeFromFireDatabase[], item) => {
             acc.push(...item.episodes.filter((item) => item.air_date !== ''))
             return acc
           }, [])

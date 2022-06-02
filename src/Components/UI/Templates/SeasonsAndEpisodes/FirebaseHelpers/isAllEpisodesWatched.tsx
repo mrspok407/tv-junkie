@@ -1,16 +1,13 @@
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
-import {
-  SeasonEpisodesFromDatabaseInterface,
-  SingleEpisodeInterface,
-} from 'Components/UserContent/UseUserShowsRed/@Types'
+import { EpisodesFromFireDatabase, SingleEpisodeFromFireDatabase } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { AuthUserInterface } from 'Components/UserAuth/Session/WithAuthentication/@Types'
 import { differenceBtwDatesInDays, todayDate } from 'Utils'
 import { DataTMDBAPIInterface } from 'Utils/Interfaces/DataTMDBAPIInterface'
 
 interface Arguments {
   showInfo: DataTMDBAPIInterface
-  releasedEpisodes: SingleEpisodeInterface[]
-  episodesFromDatabase: SeasonEpisodesFromDatabaseInterface[]
+  releasedEpisodes: SingleEpisodeFromFireDatabase[]
+  episodesFromDatabase: EpisodesFromFireDatabase[]
   authUser: AuthUserInterface['authUser']
   firebase: FirebaseInterface
   isSingleEpisode?: boolean
@@ -27,7 +24,7 @@ const isAllEpisodesWatched = ({
   multipleEpisodes,
 }: Arguments) => {
   const status = showInfo.status === 'Ended' || showInfo.status === 'Canceled' ? 'ended' : 'ongoing'
-  const allEpisodes = episodesFromDatabase.reduce((acc: SingleEpisodeInterface[], item) => {
+  const allEpisodes = episodesFromDatabase.reduce((acc: SingleEpisodeFromFireDatabase[], item) => {
     acc.push(...item.episodes.filter((item) => item.air_date !== ''))
     return acc
   }, [])

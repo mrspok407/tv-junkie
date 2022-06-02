@@ -1,4 +1,3 @@
-import { ThunkDispatch } from '@reduxjs/toolkit'
 import { AppThunk } from 'app/store'
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import { AuthUserInterface } from '../@Types'

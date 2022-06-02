@@ -3,7 +3,7 @@ import classNames from 'classnames'
 import { Link } from 'react-router-dom'
 import * as ROUTES from 'Utils/Constants/routes'
 import { FirebaseContext } from 'Components/Firebase'
-import { SingleEpisodeInterface } from 'Components/UserContent/UseUserShowsRed/@Types'
+import { SingleEpisodeFromFireDatabase } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { AppContext } from 'Components/AppContext/AppContextHOC'
 import './UserRating.scss'
 import { useAppSelector } from 'app/hooks'
@@ -125,7 +125,7 @@ const UserRating: React.FC<Props> = ({
         key: Number(id),
         seasonNum,
         episodeNum,
-      }).once('value', (snapshot: { val: () => SingleEpisodeInterface }) => {
+      }).once('value', (snapshot: { val: () => SingleEpisodeFromFireDatabase }) => {
         if (snapshot.val() === null) return
 
         setUserRating(rating)

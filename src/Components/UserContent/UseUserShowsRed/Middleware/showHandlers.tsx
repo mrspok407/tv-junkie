@@ -1,6 +1,6 @@
 import { AppThunk } from 'app/store'
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
-import { SeasonEpisodesFromDatabaseInterface, UserShowsInterface } from '../@Types'
+import { EpisodesFromFireDatabase, UserShowsInterface } from '../@Types'
 import { addNewShow, changeShow, selectShow, setError } from '../userShowsSliceRed'
 import { fetchEpisodesFullData } from '../FirebaseHelpers/FetchData'
 
@@ -9,7 +9,7 @@ export const handleNewShow =
   async (dispatch) => {
     const isWatchingShow = showData.database === 'watchingShows'
     try {
-      let episodes: SeasonEpisodesFromDatabaseInterface[] = []
+      let episodes: EpisodesFromFireDatabase[] = []
       const showInfoSnapshot = await firebase.showInfo(showData.id).once('value')
       if (showInfoSnapshot.val() === null) {
         throw new Error(

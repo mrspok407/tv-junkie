@@ -1,12 +1,9 @@
-import {
-  SeasonEpisodesFromDatabaseInterface,
-  SingleEpisodeInterface,
-} from 'Components/UserContent/UseUserShowsRed/@Types'
+import { EpisodesFromFireDatabase, SingleEpisodeFromFireDatabase } from 'Components/UserContent/UseUserShowsRed/@Types'
 
 export interface SeasonsFromAPI {
   air_date?: string
   episode_count?: number
-  episodes: SingleEpisodeInterface[]
+  episodes: SingleEpisodeFromFireDatabase[]
   id: number
   name?: string
   overview?: string
@@ -16,7 +13,7 @@ export interface SeasonsFromAPI {
 
 export interface DataTMDBAPIInterface {
   [key: string]: string | string[] | number | number[] | Record<string, any> | undefined | boolean | null
-  DATA_TMDBAPI_INITIAL: boolean
+  allEpisodesWatched: boolean
   backdrop_path: string | null
   budget: number
   database: string
@@ -50,7 +47,7 @@ export interface DataTMDBAPIInterface {
   profile_path: string | null
   release_date: string
   runtime: number | null
-  seasons: SeasonEpisodesFromDatabaseInterface[]
+  seasons: EpisodesFromFireDatabase[]
   seasonsFromAPI: SeasonsFromAPI[]
   similar?: { results: Record<string, unknown>[] }[]
   similar_movies?: { results: Record<string, unknown>[] }[]
@@ -63,8 +60,8 @@ export interface DataTMDBAPIInterface {
   vote_count: number
 }
 
-const CONTENT_DETAILS_DEFAULT: DataTMDBAPIInterface = {
-  DATA_TMDBAPI_INITIAL: false,
+const DATA_TMDBAPI_INITIAL: DataTMDBAPIInterface = {
+  allEpisodesWatched: false,
   backdrop_path: '-',
   budget: 0,
   database: '',
@@ -101,4 +98,4 @@ const CONTENT_DETAILS_DEFAULT: DataTMDBAPIInterface = {
   vote_count: 0,
 }
 
-export { CONTENT_DETAILS_DEFAULT }
+export { DATA_TMDBAPI_INITIAL }

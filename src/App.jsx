@@ -11,7 +11,6 @@ import CalendarPage from 'Components/Pages/Calendar/Calendar'
 import MoviesPage from 'Components/Pages/Movies/Movies'
 import DetailesPage from 'Components/Pages/Detailes/Detailes'
 import UserProfile from 'Components/Pages/UserProfile/UserProfile'
-import GridTests from 'Utils/GridTests/GridTests'
 import * as ROUTES from 'Utils/Constants/routes'
 import PageNotFound from 'Components/Pages/PageNotFound/PageNotFound'
 import AppContextHOC from 'Components/AppContext/AppContextHOC'
@@ -33,11 +32,10 @@ const App = () => (
         <Route path={ROUTES.CONTACTS_PAGE} exact component={ContactsPage} />
         <Route path={ROUTES.LOGIN_PAGE} exact component={LoginPage} />
         <Route path={ROUTES.ADMIN} exact component={Admin} />
-        <Route path={ROUTES.GRID_TESTS} exact component={GridTests} />
         <Route component={PageNotFound} />
       </Switch>
     </div>
   </Router>
-  )
+)
 
 export default AppContextHOC(App)

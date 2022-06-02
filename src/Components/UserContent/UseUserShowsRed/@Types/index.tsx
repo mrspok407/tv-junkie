@@ -1,37 +1,18 @@
+import { EpisodesFromFireDatabase } from 'Components/Firebase/@Types'
 import { DataTMDBAPIInterface } from 'Utils/Interfaces/DataTMDBAPIInterface'
 
 export interface UserShowsInterface extends DataTMDBAPIInterface {
-  DATA_TMDBAPI_INITIAL: boolean
+  allEpisodesWatched: boolean
   database: string
-  finished: boolean
-  timeStamp: number
-  userRating: string | string
-  episodes: SeasonEpisodesFromDatabaseInterface[]
+  episodes: EpisodesFromFireDatabase[]
   episodesFetched: boolean | undefined
-  lastUpdatedInDatabase: number
-  lastUpdatedInUser: number
+  finished: boolean
   info: { database: string }
   key: string
-}
-
-export interface SingleEpisodeInterface {
-  [key: string]: number | string | boolean | null | undefined
-  id?: number
-  userRating: number
-  watched: boolean
-  air_date: string | null
-  episode_number?: number
-  season_number?: number
-}
-export interface SeasonEpisodesFromDatabaseInterface {
-  episodes: SingleEpisodeInterface[]
-  air_date?: string
-  poster_path?: string
-  episode_count?: number
-  season_number: number
-  userRating: number | string
-  name?: string
-  id: number
+  lastUpdatedInDatabase: number
+  lastUpdatedInUser: number
+  timeStamp: number
+  userRating: string | string
 }
 
 export interface UserMoviesInterface extends DataTMDBAPIInterface {
@@ -39,14 +20,14 @@ export interface UserMoviesInterface extends DataTMDBAPIInterface {
 }
 
 export interface SingleEpisodeByMonthInterface {
+  air_date: any
   episode_number?: number
   show: string
-  air_date: any
   showId: number
 }
 export interface UserWillAirEpisodesInterface {
-  month: string
   episodes: SingleEpisodeByMonthInterface[]
+  month: string
 }
 
 export interface UserShowsState {
@@ -56,7 +37,7 @@ export interface UserShowsState {
       [key: string]: UserShowsInterface
     }
     episodes: {
-      [key: string]: SeasonEpisodesFromDatabaseInterface[]
+      [key: string]: EpisodesFromFireDatabase[]
     }
     timeStamps: {
       [key: string]: number

@@ -3,7 +3,7 @@ import { SnapshotVal } from 'Components/AppContext/@Types'
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import { handleNewShow, handleChangeShow } from './showHandlers'
 import { changeShowEpisodes, selectShow, selectShowsIds } from '../userShowsSliceRed'
-import { SeasonEpisodesFromDatabaseInterface, UserShowsInterface } from '../@Types'
+import { EpisodesFromFireDatabase, UserShowsInterface } from '../@Types'
 
 interface UserShowsListeners {
   firebase: FirebaseInterface
@@ -30,7 +30,7 @@ export const userShowsListeners =
 
     firebase
       .userEpisodes(uid)
-      .on('child_changed', (snapshot: SnapshotVal<{ episodes: SeasonEpisodesFromDatabaseInterface[] }>) => {
+      .on('child_changed', (snapshot: SnapshotVal<{ episodes: EpisodesFromFireDatabase[] }>) => {
         dispatch(changeShowEpisodes({ id: Number(snapshot.key), episodes: snapshot.val().episodes }))
       })
   }

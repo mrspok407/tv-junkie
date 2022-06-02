@@ -1,3 +1,4 @@
+import { SnapshotVal } from 'Components/AppContext/@Types'
 import { createContext } from 'react'
 
 export interface FirebaseInterface {
@@ -6,7 +7,7 @@ export interface FirebaseInterface {
   app?: any
   user?: any
   showEpisodes: (showKey: string | number) => any
-  showFullData?: any
+  showFullDataFireDatabase: (showKey: string | number) => { once: (value: string) => SnapshotVal<> }
   timeStamp?: any
   callback?: any
   userAllShows?: any

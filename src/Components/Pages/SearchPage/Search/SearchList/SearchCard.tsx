@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import classNames from 'classnames'
-import { DataTMDBAPIInterface, CONTENT_DETAILS_DEFAULT } from 'Utils/Interfaces/DataTMDBAPIInterface'
+import { DataTMDBAPIInterface, DATA_TMDBAPI_INITIAL } from 'Utils/Interfaces/DataTMDBAPIInterface'
 
 type Props = {
   detailes: DataTMDBAPIInterface
@@ -19,15 +19,15 @@ const SearchCard: React.FC<Props> = ({
     original_name,
     first_air_date,
     release_date,
-    vote_average = CONTENT_DETAILS_DEFAULT.vote_average,
+    vote_average = DATA_TMDBAPI_INITIAL.vote_average,
     origin_country = [],
-    poster_path = CONTENT_DETAILS_DEFAULT.poster_path,
-    profile_path = CONTENT_DETAILS_DEFAULT.profile_path,
-    backdrop_path = CONTENT_DETAILS_DEFAULT.backdrop_path,
-    known_for = CONTENT_DETAILS_DEFAULT.known_for,
-    known_for_department = CONTENT_DETAILS_DEFAULT.known_for_department,
-    id = CONTENT_DETAILS_DEFAULT.id,
-    media_type = CONTENT_DETAILS_DEFAULT.media_type,
+    poster_path = DATA_TMDBAPI_INITIAL.poster_path,
+    profile_path = DATA_TMDBAPI_INITIAL.profile_path,
+    backdrop_path = DATA_TMDBAPI_INITIAL.backdrop_path,
+    known_for = DATA_TMDBAPI_INITIAL.known_for,
+    known_for_department = DATA_TMDBAPI_INITIAL.known_for_department,
+    id = DATA_TMDBAPI_INITIAL.id,
+    media_type = DATA_TMDBAPI_INITIAL.media_type,
   },
   mediaTypeSearching,
   index,

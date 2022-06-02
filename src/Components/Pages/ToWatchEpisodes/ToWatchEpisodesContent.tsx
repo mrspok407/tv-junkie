@@ -7,8 +7,8 @@ import PlaceholderNoToWatchEpisodes from 'Components/UI/Placeholders/Placeholder
 import merge from 'deepmerge'
 import { AppContext } from 'Components/AppContext/AppContextHOC'
 import {
-  SeasonEpisodesFromDatabaseInterface,
-  SingleEpisodeInterface,
+  EpisodesFromFireDatabase,
+  SingleEpisodeFromFireDatabase,
   UserShowsInterface,
 } from 'Components/UserContent/UseUserShowsRed/@Types'
 
@@ -20,7 +20,7 @@ const ToWatchEpisodesContent: React.FC = () => {
 
   const getContent = useCallback(() => {
     const watchingShows = context.userContent.userShows.filter(
-      (show) => show.database === 'watchingShows' && !show.DATA_TMDBAPI_INITIAL,
+      (show) => show.database === 'watchingShows' && !show.allEpisodesWatched,
     )
     const toWatchEpisodes: any = context.userContent.userToWatchShows
 
@@ -60,8 +60,8 @@ const ToWatchEpisodesContent: React.FC = () => {
       ) : (
         <>
           {watchingShows.map((show) => {
-            const toWatchEpisodes = show.episodes.reduce((acc: SeasonEpisodesFromDatabaseInterface[], season) => {
-              const seasonEpisodes = season.episodes.reduce((acc: SingleEpisodeInterface[], episode, index) => {
+            const toWatchEpisodes = show.episodes.reduce((acc: EpisodesFromFireDatabase[], season) => {
+              const seasonEpisodes = season.episodes.reduce((acc: SingleEpisodeFromFireDatabase[], episode, index) => {
                 if (episode.air_date && new Date(episode.air_date).getTime() < todayDate.getTime()) {
                   acc.push({ ...episode, index })
                 }
@@ -78,7 +78,7 @@ const ToWatchEpisodesContent: React.FC = () => {
             }, [])
             toWatchEpisodes.reverse()
 
-            const releasedEpisodes: SingleEpisodeInterface[] = releasedEpisodesToOneArray({
+            const releasedEpisodes: SingleEpisodeFromFireDatabase[] = releasedEpisodesToOneArray({
               data: show.episodes,
             })
 

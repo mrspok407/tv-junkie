@@ -2,7 +2,7 @@ import { RootState } from 'app/store'
 import merge from 'deepmerge'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { combineMergeObjects } from 'Utils'
-import { SeasonEpisodesFromDatabaseInterface, UserShowsState, UserShowsInterface } from './@Types'
+import { EpisodesFromFireDatabase, UserShowsState, UserShowsInterface } from './@Types'
 
 const userShowsInitialState: UserShowsState = {
   data: {
@@ -64,21 +64,15 @@ export const userShowsSliceRed = createSlice({
       action.payload.episodes = []
       state.data.info[action.payload.id] = { ...show, ...action.payload }
     },
-    setShowEpisodes: (
-      state,
-      action: PayloadAction<{ id: number; episodes: SeasonEpisodesFromDatabaseInterface[] }>,
-    ) => {
+    setShowEpisodes: (state, action: PayloadAction<{ id: number; episodes: EpisodesFromFireDatabase[] }>) => {
       state.data.episodes[action.payload.id] = action.payload.episodes
       state.data.info[action.payload.id].episodesFetched = true
     },
-    changeShowEpisodes: (
-      state,
-      action: PayloadAction<{ id: number; episodes: SeasonEpisodesFromDatabaseInterface[] }>,
-    ) => {
+    changeShowEpisodes: (state, action: PayloadAction<{ id: number; episodes: EpisodesFromFireDatabase[] }>) => {
       console.time('test')
       const stateEpisodes = state.data.episodes[action.payload.id]
       if (!stateEpisodes.length) return
-      const mergeEpisodes: SeasonEpisodesFromDatabaseInterface[] = merge(stateEpisodes, action.payload.episodes, {
+      const mergeEpisodes: EpisodesFromFireDatabase[] = merge(stateEpisodes, action.payload.episodes, {
         arrayMerge: combineMergeObjects,
       })
       console.timeEnd('test')
@@ -93,6 +87,7 @@ export const userShowsSliceRed = createSlice({
       return { ...userShowsInitialState, loading: false }
     },
     setError: (state, action: PayloadAction<any>) => {
+      console.log(action.payload)
       state.error = action.payload
       state.loading = false
     },

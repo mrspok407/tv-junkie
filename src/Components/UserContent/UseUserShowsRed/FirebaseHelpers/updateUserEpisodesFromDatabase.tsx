@@ -1,7 +1,7 @@
 import { releasedEpisodesToOneArray } from 'Utils'
 import mergeWith from 'lodash.mergewith'
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
-import { SeasonEpisodesFromDatabaseInterface, SingleEpisodeInterface, UserShowsInterface } from '../@Types'
+import { EpisodesFromFireDatabase, SingleEpisodeFromFireDatabase, UserShowsInterface } from '../@Types'
 import updateAllEpisodesWatched from './updateAllEpisodesWatched'
 
 interface Arguments {
@@ -39,23 +39,31 @@ const updateUserEpisodesFromDatabase = async ({ firebase }: Arguments) => {
 
   const [userShows, showsFromDatabase] = await Promise.all([
     Promise.all(
-      showsToUpdate.map((show) => firebase
+      showsToUpdate.map((show) =>
+        firebase
           .userShowEpisodes(authUser.uid, show)
           .once('value')
-          .then((snapshot: { val: () => SeasonEpisodesFromDatabaseInterface[] }) => snapshot.val())),
+          .then((snapshot: { val: () => EpisodesFromFireDatabase[] }) => snapshot.val()),
+      ),
     ),
     Promise.all(
-      showsToUpdate.map((show) => firebase
-          .showFullData(show)
+      showsToUpdate.map((show) =>
+        firebase
+          .showFullDataFireDatabase(show)
           .once('value')
-          .then((snapshot: { val: () => { info: {}; episodes: SeasonEpisodesFromDatabaseInterface[] } }) => ({ ...snapshot.val().info, episodes: snapshot.val().episodes }))),
+          .then((snapshot: { val: () => { info: {}; episodes: EpisodesFromFireDatabase[] } }) => ({
+            ...snapshot.val().info,
+            episodes: snapshot.val().episodes,
+          })),
+      ),
     ),
   ])
 
   const mergeCustomizer = (objValue: any, srcValue: any, key: any) => {
     if (key === 'air_date') {
       return objValue === undefined ? '' : objValue
-    } if (key === 'season_number') {
+    }
+    if (key === 'season_number') {
       return objValue
     }
     return undefined
@@ -66,7 +74,7 @@ const updateUserEpisodesFromDatabase = async ({ firebase }: Arguments) => {
 
   mergedShowsEpisodes.forEach((show) => {
     const seasons = show.episodes.reduce((acc: any, season) => {
-      const episodes = season.episodes.reduce((acc: SingleEpisodeInterface[], episode) => {
+      const episodes = season.episodes.reduce((acc: SingleEpisodeFromFireDatabase[], episode) => {
         acc.push({
           userRating: episode.userRating || 0,
           watched: episode.air_date ? episode.watched || false : false,
@@ -85,8 +93,8 @@ const updateUserEpisodesFromDatabase = async ({ firebase }: Arguments) => {
     const statusDatabase =
       show.status === 'Ended' || show.status === 'ended' || show.status === 'Canceled' ? 'ended' : 'ongoing'
 
-    const releasedEpisodes: SingleEpisodeInterface[] = releasedEpisodesToOneArray({ data: show.episodes })
-    const allEpisodes = seasons.reduce((acc: SingleEpisodeInterface[], item: any) => {
+    const releasedEpisodes: SingleEpisodeFromFireDatabase[] = releasedEpisodesToOneArray({ data: show.episodes })
+    const allEpisodes = seasons.reduce((acc: SingleEpisodeFromFireDatabase[], item: any) => {
       acc.push(...item.episodes.filter((item: any) => item.air_date !== ''))
       return acc
     }, [])

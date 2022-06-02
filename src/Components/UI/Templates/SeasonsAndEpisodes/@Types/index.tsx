@@ -1,4 +1,4 @@
-import { SingleEpisodeInterface } from 'Components/UserContent/UseUserShowsRed/@Types'
+import { SingleEpisodeFromFireDatabase } from 'Components/UserContent/UseUserShowsRed/@Types'
 
 export interface EpisodesDataInterface {
   name?: string
@@ -8,7 +8,7 @@ export interface EpisodesDataInterface {
   season_number: number
   episode_count?: number
   poster_path?: string
-  episodes: SingleEpisodeInterface[]
+  episodes: SingleEpisodeFromFireDatabase[]
 }
 
 export interface CurrentlyOpenSeasons {
@@ -19,5 +19,5 @@ export interface CurrentlyOpenSeasons {
 export interface ShowEpisodesFromAPIInterface {
   seasonId: number
   id?: number
-  episodes: SingleEpisodeInterface[]
+  episodes: SingleEpisodeFromFireDatabase[]
 }

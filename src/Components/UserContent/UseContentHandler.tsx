@@ -182,7 +182,7 @@ const useContentHandler = () => {
         .update(
           {
             database,
-            isAllWatched_database: `${userShow.DATA_TMDBAPI_INITIAL}_${database}`,
+            isAllWatched_database: `${userShow.allEpisodesWatched}_${database}`,
           },
           () => {
             if (database === 'watchingShows') updateAllEpisodesWatched({ firebase, authUser, key: id })
@@ -193,13 +193,13 @@ const useContentHandler = () => {
         })
 
       firebase
-        .showFullData(id)
+        .showFullDataFireDatabase(id)
         .child('usersWatching')
         .once('value', (snapshot: any) => {
           const currentUsersWatching = snapshot.val()
           const prevDatabase = userShow.database
 
-          firebase.showFullData(id).update({
+          firebase.showFullDataFireDatabase(id).update({
             usersWatching:
               database === 'watchingShows'
                 ? currentUsersWatching + 1

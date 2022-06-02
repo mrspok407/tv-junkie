@@ -1,8 +1,8 @@
 /* eslint-disable array-callback-return */
-import { SeasonEpisodesFromDatabaseInterface } from 'Components/UserContent/UseUserShowsRed/@Types'
+import { EpisodesFromFireDatabase } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { differenceBtwDatesInDays, todayDate } from 'Utils'
 
-export const releasedEpisodes = ({ data }: { data: SeasonEpisodesFromDatabaseInterface[] }) => {
+export const releasedEpisodes = ({ data }: { data: EpisodesFromFireDatabase[] }) => {
   const modifiedData = Array.isArray(data)
     ? data
         .reduce((acc: any, season) => {

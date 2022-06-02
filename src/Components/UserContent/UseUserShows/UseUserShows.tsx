@@ -7,7 +7,7 @@ import useGetUserToWatchShows from './Hooks/UseGetUserToWatchShows'
 import useGetUserMovies from './Hooks/UseGetUserMovies'
 
 export interface UserShowsInterface extends DataTMDBAPIInterface {
-  DATA_TMDBAPI_INITIAL: boolean
+  allEpisodesWatched: boolean
   database: string
   finished: boolean
   timeStamp: number

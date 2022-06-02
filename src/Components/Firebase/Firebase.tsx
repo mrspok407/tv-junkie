@@ -124,7 +124,7 @@ class Firebase {
   /// Shows In Database ///
   allShowsList = () => this.db.ref('allShowsList')
 
-  showFullData = (showKey: string) => this.db.ref(`allShowsList/${showKey}`)
+  showFullDataFireDatabase = (showKey: string | number) => this.db.ref(`allShowsList/${showKey}`)
 
   showInfo = (showKey: string) => this.db.ref(`allShowsList/${showKey}/info`)
 
