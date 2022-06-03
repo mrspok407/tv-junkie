@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { EpisodesFromFireDatabase, SingleEpisodeFromFireDatabase } from '../UseUserShowsRed/@Types'
+import { EpisodesFromFireDatabase, SingleEpisodeFromFireDatabase } from 'Components/Firebase/@Types'
 
 interface DataFromAPI {
   episodes: EpisodesFromFireDatabase[]

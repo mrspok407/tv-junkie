@@ -1,3 +1,4 @@
+import { EpisodesFromFireDatabase } from 'Components/Firebase/@Types'
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import { DataTMDBAPIInterface } from 'Utils/Interfaces/DataTMDBAPIInterface'
 import { ShowEpisodesTMDB } from '../UseUserShowsRed/FirebaseHelpers/PostData'
@@ -9,7 +10,7 @@ type Arguments = {
 }
 
 const addShowFireDatabase = ({ firebase, showDetailes, showEpisodesTMDB }: Arguments): Promise<any> =>
-  firebase.showFullDataFireDatabase(showDetailes.id).transaction((snapshot: any) => {
+  firebase.showFullDataFireDatabase<EpisodesFromFireDatabase[]>(showDetailes.id).transaction((snapshot: any) => {
     if (snapshot !== null) {
       return
     }

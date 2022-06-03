@@ -1,4 +1,4 @@
-import { EpisodesFromFireDatabase, SingleEpisodeFromFireDatabase } from 'Components/UserContent/UseUserShowsRed/@Types'
+import { EpisodesFromFireDatabase, SingleEpisodeFromFireDatabase } from 'Components/Firebase/@Types'
 
 export interface SeasonsFromAPI {
   air_date?: string

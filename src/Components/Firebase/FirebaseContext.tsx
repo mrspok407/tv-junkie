@@ -1,5 +1,15 @@
 import { SnapshotVal } from 'Components/AppContext/@Types'
 import { createContext } from 'react'
+import { EpisodesFromFireDatabase, EPISODES_FROM_FIRE_DATABASE_INITIAL } from './@Types'
+
+export interface FirebaseOnce<T> {
+  once: (value: string) => Promise<SnapshotVal<T>>
+}
+
+export interface FirebaseReferenceProps<T> {
+  child: (value: string) => FirebaseOnce<T>
+  once: FirebaseOnce<T>['once']
+}
 
 export interface FirebaseInterface {
   [key: string]: any
@@ -7,7 +17,7 @@ export interface FirebaseInterface {
   app?: any
   user?: any
   showEpisodes: (showKey: string | number) => any
-  showFullDataFireDatabase: (showKey: string | number) => { once: (value: string) => SnapshotVal<> }
+  showFullDataFireDatabase: (showKey: string | number) => FirebaseReferenceProps<EpisodesFromFireDatabase>
   timeStamp?: any
   callback?: any
   userAllShows?: any
@@ -47,6 +57,21 @@ export interface FirebaseInterface {
   groupChatParticipants: ({ chatKey }: { chatKey: string }) => any
 }
 
+const firebaseOnceInitial = <T,>(initialState: T) =>
+  Promise.resolve({
+    val: () => {
+      return initialState
+    },
+    key: '',
+  })
+
+const firebaseRefInitial = <T,>(initialState: T) => {
+  return {
+    once: () => firebaseOnceInitial(initialState),
+    child: () => ({ once: () => firebaseOnceInitial(initialState) }),
+  }
+}
+
 export const FIREBASE_INITIAL_STATE = {
   userContent: () => {},
   newContactsActivity: () => {},
@@ -64,6 +89,7 @@ export const FIREBASE_INITIAL_STATE = {
   groupChatParticipants: () => {},
   userShowAllEpisodes: () => {},
   showEpisodes: () => {},
+  showFullDataFireDatabase: () => firebaseRefInitial(EPISODES_FROM_FIRE_DATABASE_INITIAL),
 }
 
 export const FirebaseContext = createContext<FirebaseInterface>(FIREBASE_INITIAL_STATE)

@@ -1,6 +1,7 @@
 import { AppThunk } from 'app/store'
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
-import { EpisodesFromFireDatabase, UserShowsInterface } from '../@Types'
+import { EpisodesFromFireDatabase } from 'Components/Firebase/@Types'
+import { UserShowsInterface } from '../@Types'
 import { addNewShow, changeShow, selectShow, setError } from '../userShowsSliceRed'
 import { fetchEpisodesFullData } from '../FirebaseHelpers/FetchData'
 

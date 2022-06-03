@@ -1,4 +1,4 @@
-import { SingleEpisodeFromFireDatabase } from 'Components/UserContent/UseUserShowsRed/@Types'
+import { SingleEpisodeFromFireDatabase } from 'Components/Firebase/@Types'
 
 export interface EpisodesDataInterface {
   name?: string

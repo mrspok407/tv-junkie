@@ -1,10 +1,9 @@
 import { AppThunk } from 'app/store'
-import { EpisodesFromFireDatabase } from 'Components/Firebase/@Types'
+import { EpisodesFromFireDatabase, EpisodesFromUserDatabase } from 'Components/Firebase/@Types'
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import addShowFireDatabase from 'Components/UserContent/FirebaseHelpers/addShowFireDatabase'
 import getShowEpisodesFromAPI from 'Components/UserContent/TmdbAPIHelpers/getShowEpisodesFromAPI'
 import { DataTMDBAPIInterface } from 'Utils/Interfaces/DataTMDBAPIInterface'
-import { EpisodesFromUserDatabase, SingleEpisodeFromFireDatabase } from '../../@Types'
 import { selectShow, setError } from '../../userShowsSliceRed'
 
 interface HandleDatabaseChange {
@@ -55,7 +54,7 @@ export const handleNewShowInDatabase =
   ({ id, database, showDetailes, uid, firebase }: HandleDatabaseChange): AppThunk =>
   async (dispatch) => {
     try {
-      const showFullDataFireDatabase = await firebase.showFullDataFireDatabase(id).once('value')
+      // const showFullDataFireDatabase = await firebase.showFullDataFireDatabase(id).once('value')
 
       const showEpisodesTMDB: ShowEpisodesTMDB = await getShowEpisodesFromAPI({ id })
       const showsSubDatabase =

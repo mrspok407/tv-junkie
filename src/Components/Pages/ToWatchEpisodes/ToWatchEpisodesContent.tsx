@@ -6,11 +6,8 @@ import Loader from 'Components/UI/Placeholders/Loader'
 import PlaceholderNoToWatchEpisodes from 'Components/UI/Placeholders/PlaceholderNoToWatchEpisodes'
 import merge from 'deepmerge'
 import { AppContext } from 'Components/AppContext/AppContextHOC'
-import {
-  EpisodesFromFireDatabase,
-  SingleEpisodeFromFireDatabase,
-  UserShowsInterface,
-} from 'Components/UserContent/UseUserShowsRed/@Types'
+import { EpisodesFromFireDatabase, SingleEpisodeFromFireDatabase } from 'Components/Firebase/@Types'
+import { UserShowsInterface } from 'Components/UserContent/UseUserShowsRed/@Types'
 
 const ToWatchEpisodesContent: React.FC = () => {
   const [watchingShows, setWatchingShows] = useState<UserShowsInterface[]>([])

@@ -1,9 +1,10 @@
 import { AppThunk } from 'app/store'
 import { SnapshotVal } from 'Components/AppContext/@Types'
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
+import { EpisodesFromFireDatabase } from 'Components/Firebase/@Types'
 import { handleNewShow, handleChangeShow } from './showHandlers'
 import { changeShowEpisodes, selectShow, selectShowsIds } from '../userShowsSliceRed'
-import { EpisodesFromFireDatabase, UserShowsInterface } from '../@Types'
+import { UserShowsInterface } from '../@Types'
 
 interface UserShowsListeners {
   firebase: FirebaseInterface

@@ -1,15 +1,13 @@
-import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import classNames from 'classnames'
 import { Link } from 'react-router-dom'
 import * as ROUTES from 'Utils/Constants/routes'
-import { FirebaseContext } from 'Components/Firebase'
-import { SingleEpisodeFromFireDatabase } from 'Components/UserContent/UseUserShowsRed/@Types'
-import { AppContext } from 'Components/AppContext/AppContextHOC'
-import './UserRating.scss'
+import { SingleEpisodeFromFireDatabase } from 'Components/Firebase/@Types'
 import { useAppSelector } from 'app/hooks'
 import { selectShowDatabase } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import { HandleFadeOutInterface } from '../Templates/SeasonsAndEpisodes/SeasonEpisodes'
+import './UserRating.scss'
 
 const STAR_AMOUNT = 5
 

@@ -1,4 +1,4 @@
-import { EpisodesFromFireDatabase, SingleEpisodeFromFireDatabase } from 'Components/UserContent/UseUserShowsRed/@Types'
+import { EpisodesFromFireDatabase, SingleEpisodeFromFireDatabase } from 'Components/Firebase/@Types'
 import { useState, useEffect } from 'react'
 import { releasedEpisodesToOneArray } from 'Utils'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'

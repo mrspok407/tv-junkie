@@ -1,7 +1,8 @@
 import { releasedEpisodesToOneArray } from 'Utils'
 import mergeWith from 'lodash.mergewith'
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
-import { EpisodesFromFireDatabase, SingleEpisodeFromFireDatabase, UserShowsInterface } from '../@Types'
+import { EpisodesFromFireDatabase, SingleEpisodeFromFireDatabase } from 'Components/Firebase/@Types'
+import { UserShowsInterface } from '../@Types'
 import updateAllEpisodesWatched from './updateAllEpisodesWatched'
 
 interface Arguments {
@@ -51,7 +52,7 @@ const updateUserEpisodesFromDatabase = async ({ firebase }: Arguments) => {
         firebase
           .showFullDataFireDatabase(show)
           .once('value')
-          .then((snapshot: { val: () => { info: {}; episodes: EpisodesFromFireDatabase[] } }) => ({
+          .then((snapshot) => ({
             ...snapshot.val().info,
             episodes: snapshot.val().episodes,
           })),

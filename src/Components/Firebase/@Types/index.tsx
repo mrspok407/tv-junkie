@@ -1,4 +1,4 @@
-export interface ShowFullDataFireDatabase {}
+// export interface ShowFullDataFireDatabase {}
 
 export interface EpisodesFromFireDatabase {
   air_date?: string
@@ -9,6 +9,17 @@ export interface EpisodesFromFireDatabase {
   poster_path?: string
   season_number: number
   userRating?: number | string
+}
+
+export const EPISODES_FROM_FIRE_DATABASE_INITIAL = {
+  air_date: '',
+  episode_count: 0,
+  episodes: [],
+  id: 0,
+  name: '',
+  poster_path: '',
+  season_number: 0,
+  userRating: 0,
 }
 
 export interface SingleEpisodeFromFireDatabase {

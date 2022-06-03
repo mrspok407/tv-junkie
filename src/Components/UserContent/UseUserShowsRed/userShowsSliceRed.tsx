@@ -2,7 +2,8 @@ import { RootState } from 'app/store'
 import merge from 'deepmerge'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { combineMergeObjects } from 'Utils'
-import { EpisodesFromFireDatabase, UserShowsState, UserShowsInterface } from './@Types'
+import { EpisodesFromFireDatabase } from 'Components/Firebase/@Types'
+import { UserShowsState, UserShowsInterface } from './@Types'
 
 const userShowsInitialState: UserShowsState = {
   data: {
