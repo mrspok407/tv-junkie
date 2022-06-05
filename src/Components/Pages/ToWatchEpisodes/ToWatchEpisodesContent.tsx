@@ -17,7 +17,7 @@ const ToWatchEpisodesContent: React.FC = () => {
 
   const getContent = useCallback(() => {
     const watchingShows = context.userContent.userShows.filter(
-      (show) => show.database === 'watchingShows' && !show.allEpisodesWatched,
+      (show) => show.userShowStatus === 'watchingShows' && !show.allEpisodesWatched,
     )
     const toWatchEpisodes: any = context.userContent.userToWatchShows
 

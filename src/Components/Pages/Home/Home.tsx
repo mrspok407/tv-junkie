@@ -29,7 +29,7 @@ const HomePage: React.FC = () => {
 
   const userShows = useAppSelectorArray<UserShowsInterface>(selectShows)
   const userEpisodes = useAppSelector(selectEpisodes)
-  const watchingShows = userShows.filter((show) => show.database === 'watchingShows')
+  const watchingShows = userShows.filter((show) => show.userShowStatus === 'watchingShows')
   const willAirEpisodesData: UserWillAirEpisodesInterface[] = organiseFutureEpisodesByMonth(watchingShows, userEpisodes)
   const willAirEpisodes = willAirEpisodesData.slice(0, 2)
 

@@ -1,6 +1,6 @@
 import { SnapshotVal } from 'Components/AppContext/@Types'
 import { createContext } from 'react'
-import { EpisodesFromFireDatabase, EPISODES_FROM_FIRE_DATABASE_INITIAL } from './@Types'
+import { EpisodesFromFireDatabase, EPISODES_FROM_FIRE_DATABASE_INITIAL, ShowFullDataFireDatabase } from './@Types'
 
 export interface FirebaseOnce<T> {
   once: (value: string) => Promise<SnapshotVal<T>>
@@ -17,7 +17,7 @@ export interface FirebaseInterface {
   app?: any
   user?: any
   showEpisodes: (showKey: string | number) => any
-  showFullDataFireDatabase: (showKey: string | number) => FirebaseReferenceProps<EpisodesFromFireDatabase>
+  showFullDataFireDatabase: (showKey: string | number) => FirebaseReferenceProps<ShowFullDataFireDatabase>
   timeStamp?: any
   callback?: any
   userAllShows?: any

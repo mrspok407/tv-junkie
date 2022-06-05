@@ -1,6 +1,6 @@
 import { ToggleMovieLSArg } from 'Components/AppContext/@Types'
 import { useState, useEffect } from 'react'
-import { DataTMDBAPIInterface } from 'Utils/Interfaces/DataTMDBAPIInterface'
+import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import { UserShowsInterface } from './UseUserShowsRed/@Types'
 
 const LOCAL_STORAGE_KEY_WATCHING_SHOWS = 'watchingShowsLocalS'
@@ -8,7 +8,7 @@ const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = 'watchLaterMoviesLocalS'
 
 interface UserContent {
   watchingShows: UserShowsInterface[]
-  watchLaterMovies: DataTMDBAPIInterface[]
+  watchLaterMovies: MainDataTMDB[]
 }
 
 const useUserContentLocalStorage = () => {

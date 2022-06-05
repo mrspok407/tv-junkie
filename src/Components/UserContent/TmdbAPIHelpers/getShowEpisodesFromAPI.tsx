@@ -1,12 +1,13 @@
+/* eslint-disable max-len */
 import axios from 'axios'
-import { EpisodesFromFireDatabase, SingleEpisodeFromFireDatabase } from 'Components/Firebase/@Types'
+import { EpisodesTMDB, SingleEpisodeTMDB } from 'Utils/@TypesTMDB'
 
-interface DataFromAPI {
-  episodes: EpisodesFromFireDatabase[]
+export interface ShowEpisodesTMDB {
+  episodes: EpisodesTMDB[]
   status: string
 }
 
-const getShowEpisodesFromAPI = ({ id }: { id: number }) => {
+const getShowEpisodesTMDB = ({ id }: { id: number }) => {
   const promise = axios
     .get(`https://api.themoviedb.org/3/tv/${id}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US`)
     .then(({ data: { number_of_seasons } }) => {
@@ -24,11 +25,12 @@ const getShowEpisodesFromAPI = ({ id }: { id: number }) => {
         seasonChunks.push(chunk.join())
       }
 
-      seasonChunks.forEach((item) => {
-        const request = axios.get(
-          `https://api.themoviedb.org/3/tv/${id}?api_key=${process.env.REACT_APP_TMDB_API}&append_to_response=${item}`,
+      seasonChunks.forEach((season) => {
+        apiRequests.push(
+          axios.get(
+            `https://api.themoviedb.org/3/tv/${id}?api_key=${process.env.REACT_APP_TMDB_API}&append_to_response=${season}`,
+          ),
         )
-        apiRequests.push(request)
       })
 
       return axios.all([...apiRequests])
@@ -50,7 +52,7 @@ const getShowEpisodesFromAPI = ({ id }: { id: number }) => {
           }
         })
 
-        const allEpisodes: DataFromAPI['episodes'] = []
+        const allEpisodes: ShowEpisodesTMDB['episodes'] = []
 
         seasonsData.forEach((item: any, index) => {
           const season = item[`season/${index + 1}`]
@@ -58,7 +60,7 @@ const getShowEpisodesFromAPI = ({ id }: { id: number }) => {
             return
           }
 
-          const episodes: SingleEpisodeFromFireDatabase[] = []
+          const episodes: SingleEpisodeTMDB[] = []
 
           season.episodes.forEach((item: any) => {
             const updatedEpisode = {
@@ -83,7 +85,7 @@ const getShowEpisodesFromAPI = ({ id }: { id: number }) => {
           allEpisodes.push(updatedSeason)
         })
 
-        const dataToPass: DataFromAPI = {
+        const dataToPass: ShowEpisodesTMDB = {
           episodes: allEpisodes,
           status: mergedRowData.status,
         }
@@ -95,4 +97,4 @@ const getShowEpisodesFromAPI = ({ id }: { id: number }) => {
   return promise
 }
 
-export default getShowEpisodesFromAPI
+export default getShowEpisodesTMDB

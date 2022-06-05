@@ -5,7 +5,7 @@ import {
 } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { LOADING_ADDING_TO_DATABASE_INITIAL } from 'Components/UserContent/UseContentHandler'
 import { FirebaseInterface, FIREBASE_INITIAL_STATE } from 'Components/Firebase/FirebaseContext'
-import { DataTMDBAPIInterface } from 'Utils/Interfaces/DataTMDBAPIInterface'
+import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import { UserToWatchShowsInterface } from 'Components/UserContent/UseUserShows/Hooks/UseGetUserToWatchShows'
 import { HandleListenersArg } from 'Components/Pages/Detailes/FirebaseHelpers/UseHandleListeners'
 import { SnapshotVal } from './generics'
@@ -38,22 +38,22 @@ export interface MovieInterface {
 }
 
 export interface AddShowsToDatabaseOnRegisterArg {
-  shows: DataTMDBAPIInterface[]
+  shows: MainDataTMDB[]
   uid: string
 }
 
 export interface AddShowToDatabaseArg {
   id: number
-  show: DataTMDBAPIInterface
+  show: MainDataTMDB
   database: string
   handleListeners?: ({ id, status, handleLoading }: HandleListenersArg) => void
 }
 
 export interface HandleShowInDatabasesArg {
   id: number
-  data: DataTMDBAPIInterface
+  data: MainDataTMDB
   database: string
-  userShows: DataTMDBAPIInterface[]
+  userShows: MainDataTMDB[]
   handleListeners?: ({ id, status, handleLoading }: HandleListenersArg) => void
 }
 
@@ -66,7 +66,7 @@ export interface HandleMovieInDatabasesArg {
 
 export interface ToggleMovieLSArg {
   id: number
-  data: DataTMDBAPIInterface[] | DataTMDBAPIInterface
+  data: MainDataTMDB[] | MainDataTMDB
 }
 
 export interface ErrorsInterface {
@@ -76,11 +76,11 @@ export interface ErrorsInterface {
 
 export interface AppContextInterface {
   userContentLocalStorage: {
-    watchLaterMovies: DataTMDBAPIInterface[]
+    watchLaterMovies: MainDataTMDB[]
     watchingShows: UserShowsInterface[]
     toggleMovieLS: ({ id, data }: ToggleMovieLSArg) => void
     clearContentState: () => void
-    addShowLS: ({ id, data }: { id: number; data: DataTMDBAPIInterface }) => void
+    addShowLS: ({ id, data }: { id: number; data: MainDataTMDB }) => void
     removeShowLS: ({ id }: { id: number }) => void
   }
   userContent: {
@@ -90,7 +90,7 @@ export interface AppContextInterface {
     userShows: UserShowsInterface[]
     userWillAirEpisodes: UserWillAirEpisodesInterface[]
     userToWatchShows: UserToWatchShowsInterface[]
-    userMovies: DataTMDBAPIInterface[]
+    userMovies: MainDataTMDB[]
     resetContentState: () => void
     handleUserMoviesOnClient: ({ id, data }: { id: number; data?: UserMoviesInterface }) => void
   }

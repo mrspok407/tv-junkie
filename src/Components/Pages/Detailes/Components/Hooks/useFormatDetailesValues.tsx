@@ -1,9 +1,9 @@
 import { useMemo } from 'react'
 import { formatGenres, formatNetworks } from 'Utils/FormatTMDBAPIData'
-import { DataTMDBAPIInterface } from 'Utils/Interfaces/DataTMDBAPIInterface'
+import { MainDataTMDB } from 'Utils/@TypesTMDB'
 
 type Props = {
-  detailes: DataTMDBAPIInterface
+  detailes: MainDataTMDB
   isMediaTypeTV: boolean
 }
 

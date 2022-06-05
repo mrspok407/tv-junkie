@@ -1,9 +1,26 @@
 import { EpisodesFromFireDatabase, SingleEpisodeFromFireDatabase } from 'Components/Firebase/@Types'
 
-export interface SeasonsFromAPI {
+export interface EpisodesTMDB {
+  air_date?: string
+  episodes: SingleEpisodeTMDB[]
+  id: number
+  name?: string
+  poster_path?: string
+  season_number: number
+}
+
+export interface SingleEpisodeTMDB {
+  [key: string]: number | string | boolean | null | undefined
+  air_date: string | null
+  episode_number?: number
+  id: number
+  name?: string
+  season_number?: number
+}
+
+export interface SeasonsTMDB {
   air_date?: string
   episode_count?: number
-  episodes: SingleEpisodeFromFireDatabase[]
   id: number
   name?: string
   overview?: string
@@ -11,12 +28,12 @@ export interface SeasonsFromAPI {
   season_number: number
 }
 
-export interface DataTMDBAPIInterface {
+export interface MainDataTMDB {
   [key: string]: string | string[] | number | number[] | Record<string, any> | undefined | boolean | null
   allEpisodesWatched: boolean
   backdrop_path: string | null
   budget: number
-  database: string
+  userShowStatus: string
   episode_run_time: number[]
   first_air_date: string
   genre_ids: number[]
@@ -47,8 +64,7 @@ export interface DataTMDBAPIInterface {
   profile_path: string | null
   release_date: string
   runtime: number | null
-  seasons: EpisodesFromFireDatabase[]
-  seasonsFromAPI: SeasonsFromAPI[]
+  seasons: SeasonsTMDB[]
   similar?: { results: Record<string, unknown>[] }[]
   similar_movies?: { results: Record<string, unknown>[] }[]
   status: string
@@ -60,11 +76,11 @@ export interface DataTMDBAPIInterface {
   vote_count: number
 }
 
-const DATA_TMDBAPI_INITIAL: DataTMDBAPIInterface = {
+const MAINDATA_TMDB_INITIAL: MainDataTMDB = {
   allEpisodesWatched: false,
   backdrop_path: '-',
   budget: 0,
-  database: '',
+  userShowStatus: '',
   episode_run_time: [0],
   first_air_date: '-',
   genre_ids: [],
@@ -89,7 +105,6 @@ const DATA_TMDBAPI_INITIAL: DataTMDBAPIInterface = {
   release_date: '-',
   runtime: 0,
   seasons: [],
-  seasonsFromAPI: [],
   status: '-',
   tagline: '-',
   title: '-',
@@ -98,4 +113,4 @@ const DATA_TMDBAPI_INITIAL: DataTMDBAPIInterface = {
   vote_count: 0,
 }
 
-export { DATA_TMDBAPI_INITIAL }
+export { MAINDATA_TMDB_INITIAL }

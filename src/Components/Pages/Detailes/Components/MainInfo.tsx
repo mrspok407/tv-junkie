@@ -1,7 +1,7 @@
 import React from 'react'
 import classNames from 'classnames'
 import UserRating from 'Components/UI/UserRating/UserRating'
-import { DataTMDBAPIInterface } from 'Utils/Interfaces/DataTMDBAPIInterface'
+import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import { formatMovieBudget } from 'Utils/FormatTMDBAPIData'
 import { CONTENT_INFO_NO_DATA } from 'Utils/Constants'
@@ -9,7 +9,7 @@ import ShowsButtonsRed from './ShowsButtonsRed'
 import useFormatDetailesValues from './Hooks/useFormatDetailesValues'
 
 type Props = {
-  detailes: DataTMDBAPIInterface
+  detailes: MainDataTMDB
   mediaType: string
   id: number
 }

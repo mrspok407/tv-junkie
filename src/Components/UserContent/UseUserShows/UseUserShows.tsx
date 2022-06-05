@@ -2,13 +2,13 @@
 import { useState, useEffect, useContext } from 'react'
 import { FirebaseContext } from 'Components/Firebase'
 import { AuthUserInterface } from 'Components/UserAuth/Session/WithAuthentication/@Types'
-import { DataTMDBAPIInterface } from 'Utils/Interfaces/DataTMDBAPIInterface'
+import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import useGetUserToWatchShows from './Hooks/UseGetUserToWatchShows'
 import useGetUserMovies from './Hooks/UseGetUserMovies'
 
-export interface UserShowsInterface extends DataTMDBAPIInterface {
+export interface UserShowsInterface extends MainDataTMDB {
   allEpisodesWatched: boolean
-  database: string
+  userShowStatus: string
   finished: boolean
   timeStamp: number
   userRating: string | string
@@ -40,7 +40,7 @@ export interface SeasonEpisodesFromDatabaseInterface {
   id: number
 }
 
-export interface UserMoviesInterface extends DataTMDBAPIInterface {
+export interface UserMoviesInterface extends MainDataTMDB {
   timeStamp?: number
 }
 

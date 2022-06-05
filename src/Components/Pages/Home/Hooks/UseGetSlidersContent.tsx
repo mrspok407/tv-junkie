@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 import { useState, useEffect } from 'react'
-import { DataTMDBAPIInterface } from 'Utils/Interfaces/DataTMDBAPIInterface'
+import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import axios from 'axios'
 
 const API_LINK_BASE = `https://api.themoviedb.org/3/discover/tv?api_key=${process.env.REACT_APP_TMDB_API}&\
@@ -10,7 +10,7 @@ vote_count.gte=25&include_null_first_air_dates=false`
 interface ObjectKeysInterface {
   [key: string]: {
     name: string
-    data: DataTMDBAPIInterface[]
+    data: MainDataTMDB[]
   }
 }
 

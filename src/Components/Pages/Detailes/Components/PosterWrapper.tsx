@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import axios from 'axios'
 import { todayDate } from 'Utils'
 import Loader from 'Components/UI/Placeholders/Loader'
-import { DataTMDBAPIInterface } from 'Utils/Interfaces/DataTMDBAPIInterface'
+import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import { useAppSelector } from 'app/hooks'
 import { selectAuthUser } from 'Components/UserAuth/Session/WithAuthentication/authUserSlice'
 
@@ -12,7 +12,7 @@ const { CancelToken } = require('axios')
 let cancelRequest: any
 
 type Props = {
-  detailes: DataTMDBAPIInterface
+  detailes: MainDataTMDB
   mediaType: string
 }
 

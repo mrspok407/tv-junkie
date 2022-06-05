@@ -6,8 +6,8 @@ import {
   HandleShowInDatabasesArg,
 } from 'Components/AppContext/@Types'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
-import addShowFireDatabase from './FirebaseHelpers/addShowFireDatabase'
-import getShowEpisodesFromAPI from './TmdbAPIHelpers/getShowEpisodesFromAPI'
+import addShowToFireDatabase from './FirebaseHelpers/addShowFireDatabase'
+import getShowEpisodesTMDB from './TmdbAPIHelpers/getShowEpisodesFromAPI'
 import updateAllEpisodesWatched from './UseUserShowsRed/FirebaseHelpers/updateAllEpisodesWatched'
 
 export const LOADING_ADDING_TO_DATABASE_INITIAL = {
@@ -27,7 +27,7 @@ const useContentHandler = () => {
   const addShowsToDatabaseOnRegister = ({ shows, uid }: AddShowsToDatabaseOnRegisterArg) => {
     Promise.all(
       Object.values(shows).map((show) =>
-        getShowEpisodesFromAPI({ id: show.id }).then((dataFromAPI: any) => {
+        getShowEpisodesTMDB({ id: show.id }).then((dataFromAPI: any) => {
           const showsSubDatabase =
             dataFromAPI.status === 'Ended' || dataFromAPI.status === 'Canceled' ? 'ended' : 'ongoing'
 
@@ -56,7 +56,7 @@ const useContentHandler = () => {
             id: show.id,
           }
 
-          addShowFireDatabase({ firebase, showDetailes: show, showEpisodesTMDB: dataFromAPI })
+          addShowToFireDatabase({ firebase, showDetailes: show, showEpisodesTMDB: dataFromAPI })
 
           return { showInfo, userEpisodes }
         }),
@@ -111,7 +111,7 @@ const useContentHandler = () => {
       setLoadingAddShowToDatabase(LOADING_ADDING_TO_DATABASE_INITIAL)
       return
     }
-    getShowEpisodesFromAPI({ id }).then(async (showEpisodesTMDB: any) => {
+    getShowEpisodesTMDB({ id }).then(async (showEpisodesTMDB: any) => {
       const showsSubDatabase =
         showEpisodesTMDB.status === 'Ended' || showEpisodesTMDB.status === 'Canceled' ? 'ended' : 'ongoing'
 
@@ -129,7 +129,7 @@ const useContentHandler = () => {
         [],
       )
 
-      await addShowFireDatabase({ firebase, showDetailes: show, showEpisodesTMDB })
+      await addShowToFireDatabase({ firebase, showDetailes: show, showEpisodesTMDB })
       await Promise.all([
         firebase.userAllShows(authUser.uid).child(id).set({
           allEpisodesWatched: false,
@@ -197,7 +197,7 @@ const useContentHandler = () => {
         .child('usersWatching')
         .once('value', (snapshot: any) => {
           const currentUsersWatching = snapshot.val()
-          const prevDatabase = userShow.database
+          const prevDatabase = userShow.userShowStatus
 
           firebase.showFullDataFireDatabase(id).update({
             usersWatching:

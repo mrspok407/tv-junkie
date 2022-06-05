@@ -1,12 +1,12 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { LIST_OF_GENRES } from 'Utils/Constants'
-import { DataTMDBAPIInterface, DATA_TMDBAPI_INITIAL } from 'Utils/Interfaces/DataTMDBAPIInterface'
+import { MainDataTMDB, MAINDATA_TMDB_INITIAL } from 'Utils/@TypesTMDB'
 import Loader from 'Components/UI/Placeholders/Loader'
 import './SearchResults.scss'
 
 type Props = {
-  advancedSearchContent: DataTMDBAPIInterface[]
+  advancedSearchContent: MainDataTMDB[]
   loadingNewPage: boolean
   clearAdvSearchMovies: () => void
 }
@@ -45,13 +45,13 @@ const AdvSearchResults: React.FC<Props> = ({ advancedSearchContent, loadingNewPa
             original_name,
             release_date,
             first_air_date,
-            id = DATA_TMDBAPI_INITIAL.id,
-            vote_average = DATA_TMDBAPI_INITIAL.vote_average,
-            genre_ids = DATA_TMDBAPI_INITIAL.genre_ids,
-            overview = DATA_TMDBAPI_INITIAL.overview,
-            backdrop_path = DATA_TMDBAPI_INITIAL.backdrop_path,
-            poster_path = DATA_TMDBAPI_INITIAL.poster_path,
-            vote_count = DATA_TMDBAPI_INITIAL.vote_count,
+            id = MAINDATA_TMDB_INITIAL.id,
+            vote_average = MAINDATA_TMDB_INITIAL.vote_average,
+            genre_ids = MAINDATA_TMDB_INITIAL.genre_ids,
+            overview = MAINDATA_TMDB_INITIAL.overview,
+            backdrop_path = MAINDATA_TMDB_INITIAL.backdrop_path,
+            poster_path = MAINDATA_TMDB_INITIAL.poster_path,
+            vote_count = MAINDATA_TMDB_INITIAL.vote_count,
           }) => {
             const mediaType = original_title ? 'movie' : 'show'
 

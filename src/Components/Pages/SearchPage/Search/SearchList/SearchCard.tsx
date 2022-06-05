@@ -1,10 +1,10 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import classNames from 'classnames'
-import { DataTMDBAPIInterface, DATA_TMDBAPI_INITIAL } from 'Utils/Interfaces/DataTMDBAPIInterface'
+import { MainDataTMDB, MAINDATA_TMDB_INITIAL } from 'Utils/@TypesTMDB'
 
 type Props = {
-  detailes: DataTMDBAPIInterface
+  detailes: MainDataTMDB
   index: number
   currentListItem: number
   mediaTypeSearching: string
@@ -19,15 +19,15 @@ const SearchCard: React.FC<Props> = ({
     original_name,
     first_air_date,
     release_date,
-    vote_average = DATA_TMDBAPI_INITIAL.vote_average,
+    vote_average = MAINDATA_TMDB_INITIAL.vote_average,
     origin_country = [],
-    poster_path = DATA_TMDBAPI_INITIAL.poster_path,
-    profile_path = DATA_TMDBAPI_INITIAL.profile_path,
-    backdrop_path = DATA_TMDBAPI_INITIAL.backdrop_path,
-    known_for = DATA_TMDBAPI_INITIAL.known_for,
-    known_for_department = DATA_TMDBAPI_INITIAL.known_for_department,
-    id = DATA_TMDBAPI_INITIAL.id,
-    media_type = DATA_TMDBAPI_INITIAL.media_type,
+    poster_path = MAINDATA_TMDB_INITIAL.poster_path,
+    profile_path = MAINDATA_TMDB_INITIAL.profile_path,
+    backdrop_path = MAINDATA_TMDB_INITIAL.backdrop_path,
+    known_for = MAINDATA_TMDB_INITIAL.known_for,
+    known_for_department = MAINDATA_TMDB_INITIAL.known_for_department,
+    id = MAINDATA_TMDB_INITIAL.id,
+    media_type = MAINDATA_TMDB_INITIAL.media_type,
   },
   mediaTypeSearching,
   index,

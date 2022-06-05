@@ -1,38 +1,36 @@
-import { EpisodesFromFireDatabase } from 'Components/Firebase/@Types'
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
-import { DataTMDBAPIInterface } from 'Utils/Interfaces/DataTMDBAPIInterface'
-import { ShowEpisodesTMDB } from '../UseUserShowsRed/FirebaseHelpers/PostData'
+import { MainDataTMDB } from 'Utils/@TypesTMDB'
+import { removeUndefinedNullFromObject } from 'Utils'
+import { ShowEpisodesTMDB } from '../TmdbAPIHelpers/getShowEpisodesFromAPI'
 
 type Arguments = {
   firebase: FirebaseInterface
-  showDetailes: DataTMDBAPIInterface
+  showDetailesTMDB: MainDataTMDB
   showEpisodesTMDB: ShowEpisodesTMDB
+  userShowStatus: string
 }
 
-const addShowFireDatabase = ({ firebase, showDetailes, showEpisodesTMDB }: Arguments): Promise<any> =>
-  firebase.showFullDataFireDatabase<EpisodesFromFireDatabase[]>(showDetailes.id).transaction((snapshot: any) => {
+const addShowToFireDatabase = ({
+  showDetailesTMDB,
+  showEpisodesTMDB,
+  userShowStatus,
+  firebase,
+}: Arguments): Promise<any> =>
+  firebase.showFullDataFireDatabase(showDetailesTMDB.id).transaction((snapshot: any) => {
     if (snapshot !== null) {
       return
     }
+
+    const shotDetailesNoUndefined: MainDataTMDB = removeUndefinedNullFromObject(showDetailesTMDB)
     return {
       info: {
-        backdrop_path: showDetailes.backdrop_path,
-        first_air_date: showDetailes.first_air_date,
-        genre_ids: showDetailes.genre_ids,
-        id: showDetailes.id,
-        name: showDetailes.name,
-        original_name: showDetailes.original_name,
-        overview: showDetailes.overview,
-        poster_path: showDetailes.poster_path,
-        vote_average: showDetailes.vote_average,
-        vote_count: showDetailes.vote_count,
-        status: showEpisodesTMDB.status,
-        lastUpdatedInDatabase: firebase.timeStamp(),
+        ...shotDetailesNoUndefined,
       },
       episodes: showEpisodesTMDB.episodes,
-      id: showDetailes.id.toString(),
-      status: showEpisodesTMDB.status,
+      id: showDetailesTMDB.id.toString(),
+      status: showDetailesTMDB.status,
+      usersWatching: userShowStatus === 'watchingShows' && 1,
     }
   })
 
-export default addShowFireDatabase
+export default addShowToFireDatabase

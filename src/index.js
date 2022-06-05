@@ -1,3 +1,5 @@
+/* eslint-disable react/jsx-filename-extension */
+/* eslint-disable react/jsx-no-constructed-context-values */
 import 'react-app-polyfill/ie11'
 import 'react-app-polyfill/stable'
 import React from 'react'

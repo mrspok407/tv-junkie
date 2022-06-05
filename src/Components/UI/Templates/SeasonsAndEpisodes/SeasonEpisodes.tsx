@@ -6,7 +6,7 @@ import classNames from 'classnames'
 import * as _get from 'lodash.get'
 import * as ROUTES from 'Utils/Constants/routes'
 import UserRating from 'Components/UI/UserRating/UserRating'
-import { DataTMDBAPIInterface } from 'Utils/Interfaces/DataTMDBAPIInterface'
+import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import { EpisodesFromFireDatabase } from 'Components/Firebase/@Types'
 import { EpisodesDataInterface, ShowEpisodesFromAPIInterface } from './@Types'
@@ -23,7 +23,7 @@ type Props = {
   season: EpisodesDataInterface
   seasonId: number
   episodesFromDatabase: EpisodesFromFireDatabase[]
-  showInfo: DataTMDBAPIInterface
+  showInfo: MainDataTMDB
   showEpisodeInfo: (episodeId: number) => void
   toggleWatchedEpisode: (
     seasonNum: number,
@@ -114,7 +114,7 @@ const SeasonEpisodes: React.FC<Props> = ({
     }, FADE_OUT_SPEED)
   }
 
-  const showCheckboxes = showInfo?.database !== 'notWatchingShows' && episodesFromDatabase?.length > 0 && true
+  const showCheckboxes = showInfo?.userShowStatus !== 'notWatchingShows' && episodesFromDatabase?.length > 0 && true
 
   const showSeason = showCheckboxes && episodesFromDatabase[season.season_number - 1]
   const seasons = parentComponent === 'toWatchPage' ? episodesData : episodesDataFromAPI
@@ -272,14 +272,14 @@ const SeasonEpisodes: React.FC<Props> = ({
                     episodeAirDateAsDateObj.getTime() < todayDate.getTime() &&
                     episode.air_date && (
                       <>
-                        {showInfo?.database && !!episodesFromDatabase && (
+                        {showInfo?.userShowStatus && !!episodesFromDatabase && (
                           <UserRating
                             id={showInfo?.id}
                             firebaseRef="userShowSingleEpisode"
                             seasonNum={season.season_number}
                             episodeNum={indexOfEpisode}
                             episodeRating
-                            disableRating={!!(showInfo?.database === 'notWatchingShows')}
+                            disableRating={!!(showInfo?.userShowStatus === 'notWatchingShows')}
                           />
                         )}
                         {authUser?.email === process.env.REACT_APP_ADMIN_EMAIL && (

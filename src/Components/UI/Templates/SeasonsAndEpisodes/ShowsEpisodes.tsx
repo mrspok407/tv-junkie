@@ -15,12 +15,13 @@ import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import useFetchSeasons from './Hooks/UseFetchSeasons/UseFetchSeasons'
 import SeasonEpisodes from './SeasonEpisodes'
 import isAllEpisodesWatched from './FirebaseHelpers/isAllEpisodesWatched'
+import { SeasonsTMDB } from 'Utils/@TypesTMDB'
 import { ActionTypesEnum } from './Hooks/UseFetchSeasons/_reducerConfig'
 import { EpisodesDataInterface, ShowEpisodesFromAPIInterface } from './@Types'
 import './ShowsEpisodes.scss'
 
 type Props = {
-  episodesData: EpisodesDataInterface[]
+  episodesData: SeasonsTMDB[]
   showTitle: string
   id: number
   parentComponent: string
@@ -30,6 +31,7 @@ const ShowsEpisodes: React.FC<Props> = ({ episodesData, showTitle, id, parentCom
   const { firebase, authUser } = useFrequentVariables()
 
   const showInfo = useAppSelector((state) => selectShow(state, id))
+  console.log({ showInfo })
   const episodesFromDatabase = useAppSelector((state) => selectShowEpisodes(state, id))
   const releasedEpisodes: SingleEpisodeFromFireDatabase[] = releasedEpisodesToOneArray({ data: episodesFromDatabase })
 
@@ -240,7 +242,7 @@ const ShowsEpisodes: React.FC<Props> = ({ episodesData, showTitle, id, parentCom
     firebase.userShowAllEpisodes(authUser.uid, id).set(episodesFromDatabase)
   }
 
-  const showCheckboxes = showInfo?.database !== 'notWatchingShows'
+  const showCheckboxes = showInfo?.userShowStatus !== 'notWatchingShows'
 
   const curOpen = parentComponent === 'toWatchPage' ? currentlyOpen : currentlyOpenSeasons
 
@@ -321,12 +323,12 @@ const ShowsEpisodes: React.FC<Props> = ({ episodesData, showTitle, id, parentCom
                     <>
                       {season.poster_path && parentComponent === 'detailesPage' && (
                         <div className="episodes__episode-group-poster-wrapper">
-                          {showInfo?.database && daysToNewSeason <= 0 && (
+                          {showInfo?.userShowStatus && daysToNewSeason <= 0 && (
                             <UserRating
                               id={id}
                               firebaseRef="userShowSeason"
                               seasonNum={season.season_number}
-                              disableRating={!!(showInfo?.database === 'notWatchingShows')}
+                              disableRating={!!(showInfo?.userShowStatus === 'notWatchingShows')}
                             />
                           )}
 

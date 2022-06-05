@@ -71,7 +71,7 @@ const ShowsGrid: React.FC<Props> = ({ data, section }) => {
                           handleDatabaseChange({
                             id: item.id,
                             database: 'notWatchingShows',
-                            showDetailes: userShows[item.id],
+                            showDetailesTMDB: userShows[item.id],
                             uid: authUser?.uid,
                             firebase,
                           }),
@@ -98,7 +98,7 @@ const ShowsGrid: React.FC<Props> = ({ data, section }) => {
                           handleDatabaseChange({
                             id: item.id,
                             database: 'watchingShows',
-                            showDetailes: userShows[item.id],
+                            showDetailesTMDB: userShows[item.id],
                             uid: authUser?.uid,
                             firebase,
                           }),

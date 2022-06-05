@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import { Link, useHistory } from 'react-router-dom'
-import { DataTMDBAPIInterface } from 'Utils/Interfaces/DataTMDBAPIInterface'
+import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import * as _isFunction from 'lodash.isfunction'
 import * as ROUTES from 'Utils/Constants/routes'
 import SearchList from './SearchList/SearchList'
@@ -25,7 +25,7 @@ export interface HandleSearchArg {
 
 const Search: React.FC<Props> = ({ navSearch, navRef, closeNavMobile }) => {
   const [query, setQuery] = useState('')
-  const [searchResults, setSearchResults] = useState<DataTMDBAPIInterface[]>([])
+  const [searchResults, setSearchResults] = useState<MainDataTMDB[]>([])
   const [isSearchingList, setIsSearchingList] = useState(false)
   const [listIsOpen, setListIsOpen] = useState(false)
   const [currentListItem, setCurrentListItem] = useState(0)

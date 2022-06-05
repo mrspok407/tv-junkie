@@ -8,7 +8,7 @@ import classNames from 'classnames'
 import Loader from 'Components/UI/Placeholders/Loader'
 import PlaceholderNoMovies from 'Components/UI/Placeholders/PlaceholderNoMovies'
 import { AppContext } from 'Components/AppContext/AppContextHOC'
-import { DataTMDBAPIInterface } from 'Utils/Interfaces/DataTMDBAPIInterface'
+import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import { getGenresFromIds } from 'Utils/FormatTMDBAPIData'
 import reducer, { INITIAL_STATE, MoviesContentState, ActionInterface, ActionTypes } from './_reducerConfig'
@@ -16,7 +16,7 @@ import reducer, { INITIAL_STATE, MoviesContentState, ActionInterface, ActionType
 const SCROLL_THRESHOLD = 800
 
 type Props = {
-  moviesData: DataTMDBAPIInterface[]
+  moviesData: MainDataTMDB[]
   loadingIds: number[]
   openLinksMoviesId: number[]
   error: number[]

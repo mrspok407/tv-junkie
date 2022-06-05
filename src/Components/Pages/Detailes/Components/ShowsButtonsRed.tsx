@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import classNames from 'classnames'
 import * as ROUTES from 'Utils/Constants/routes'
-import { DataTMDBAPIInterface } from 'Utils/Interfaces/DataTMDBAPIInterface'
+import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import { useAppDispatch, useAppSelector } from 'app/hooks'
 import { selectShowDatabase } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
 import { handleDatabaseChange } from 'Components/UserContent/UseUserShowsRed/FirebaseHelpers/PostData'
@@ -11,7 +11,7 @@ import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 
 type Props = {
   id: number
-  detailes: DataTMDBAPIInterface
+  detailes: MainDataTMDB
   mediaType: string
 }
 
@@ -62,9 +62,8 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
               dispatch(
                 handleDatabaseChange({
                   id,
-                  database: 'watchingShows',
-                  showDetailes: detailes,
-                  uid: authUser?.uid,
+                  userShowStatus: 'watchingShows',
+                  showDetailesTMDB: detailes,
                   firebase,
                 }),
               )
@@ -93,9 +92,8 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
               dispatch(
                 handleDatabaseChange({
                   id,
-                  database: 'notWatchingShows',
-                  showDetailes: detailes,
-                  uid: authUser?.uid,
+                  userShowStatus: 'notWatchingShows',
+                  showDetailesTMDB: detailes,
                   firebase,
                 }),
               )
@@ -122,9 +120,8 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
                 dispatch(
                   handleDatabaseChange({
                     id,
-                    database: 'droppedShows',
-                    showDetailes: detailes,
-                    uid: authUser?.uid,
+                    userShowStatus: 'droppedShows',
+                    showDetailesTMDB: detailes,
                     firebase,
                   }),
                 )
@@ -158,9 +155,8 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
                 dispatch(
                   handleDatabaseChange({
                     id,
-                    database: 'willWatchShows',
-                    showDetailes: detailes,
-                    uid: authUser?.uid,
+                    userShowStatus: 'willWatchShows',
+                    showDetailesTMDB: detailes,
                     firebase,
                   }),
                 )

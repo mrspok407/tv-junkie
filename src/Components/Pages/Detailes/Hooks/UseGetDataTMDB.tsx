@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
 import axios from 'axios'
-import { DataTMDBAPIInterface, DATA_TMDBAPI_INITIAL } from 'Utils/Interfaces/DataTMDBAPIInterface'
+import { MainDataTMDB, MAINDATA_TMDB_INITIAL } from 'Utils/@TypesTMDB'
 import * as ROUTES from 'Utils/Constants/routes'
 import * as _get from 'lodash.get'
 
@@ -17,14 +17,14 @@ type Props = {
 const useGetDataTMDB = ({ id, mediaType }: Props) => {
   const history = useHistory()
   const [loading, setLoading] = useState(true)
-  const [detailes, setDetailes] = useState<DataTMDBAPIInterface>(DATA_TMDBAPI_INITIAL)
-  const [similarContent, setSimilarContent] = useState<DataTMDBAPIInterface[]>([])
+  const [detailes, setDetailes] = useState<MainDataTMDB>(MAINDATA_TMDB_INITIAL)
+  const [similarContent, setSimilarContent] = useState<MainDataTMDB[]>([])
   const [error, setError] = useState('')
 
   useEffect(() => {
     const getContent = async () => {
       try {
-        const { data } = await axios.get<DataTMDBAPIInterface>(
+        const { data } = await axios.get<MainDataTMDB>(
           `https://api.themoviedb.org/3/${mediaType === 'show' ? 'tv' : 'movie'}/${id}?api_key=${
             process.env.REACT_APP_TMDB_API
           }&language=en-US&append_to_response=${mediaType === 'show' ? 'similar' : 'similar_movies'}`,
@@ -34,6 +34,8 @@ const useGetDataTMDB = ({ id, mediaType }: Props) => {
             }),
           },
         )
+
+        console.log({ data })
 
         // const genreIds = data.genres && data.genres.length ? data.genres.map((item: { id: number }) => item.id) : '-'
         // const genreNames =
@@ -54,29 +56,29 @@ const useGetDataTMDB = ({ id, mediaType }: Props) => {
 
         setDetailes((prevState) => ({
           ...prevState,
-          id: data.id,
-          poster_path: data.poster_path,
           backdrop_path: data.backdrop_path,
-          name: data.name || data.original_name,
-          original_name: data.original_name,
-          title: data.title || data.original_title,
-          first_air_date: data.first_air_date,
-          release_date: data.release_date,
-          last_air_date: data.last_air_date,
+          budget: data.budget,
           episode_run_time: data.episode_run_time,
-          runtime: data.runtime,
-          status: data.status,
+          first_air_date: data.first_air_date,
           genres: data.genres,
+          id: data.id,
+          imdb_id: data.imdb_id,
+          last_air_date: data.last_air_date,
+          name: data.name || data.original_name,
           networks: data.networks,
+          number_of_seasons: data.number_of_seasons,
+          original_name: data.original_name,
+          overview: data.overview,
+          poster_path: data.poster_path,
           production_companies: data.production_companies,
+          release_date: data.release_date,
+          runtime: data.runtime,
+          seasons: data.seasons ? data.seasons.reverse() : [],
+          status: data.status,
+          tagline: data.tagline,
+          title: data.title || data.original_title,
           vote_average: data.vote_average,
           vote_count: data.vote_count,
-          overview: data.overview,
-          tagline: data.tagline,
-          budget: data.budget,
-          number_of_seasons: data.number_of_seasons,
-          imdb_id: data.imdb_id,
-          seasonsFromAPI: data.seasons ? data.seasons.reverse() : [],
         }))
 
         setLoading(false)
@@ -100,7 +102,7 @@ const useGetDataTMDB = ({ id, mediaType }: Props) => {
     }
   }, [mediaType, id, history])
 
-  return [detailes, loading, similarContent, error] as [DataTMDBAPIInterface, boolean, DataTMDBAPIInterface[], string]
+  return [detailes, loading, similarContent, error] as [MainDataTMDB, boolean, MainDataTMDB[], string]
 }
 
 export default useGetDataTMDB

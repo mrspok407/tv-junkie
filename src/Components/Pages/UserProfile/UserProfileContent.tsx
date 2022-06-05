@@ -93,7 +93,7 @@ const UserProfileContent: React.FC<Props> = ({ userUid }) => {
         if (section === 'finishedShows') {
           return show.finished
         }
-        return show.database === section && !show.finished
+        return show.userShowStatus === section && !show.finished
       })
       // @ts-ignore
       // eslint-disable-next-line
@@ -169,7 +169,7 @@ const UserProfileContent: React.FC<Props> = ({ userUid }) => {
     if (state.activeSection === 'finishedShows') {
       return show.finished
     }
-    return show.database === state.activeSection && !show.finished
+    return show.userShowStatus === state.activeSection && !show.finished
   })
 
   const maxColumns = 4

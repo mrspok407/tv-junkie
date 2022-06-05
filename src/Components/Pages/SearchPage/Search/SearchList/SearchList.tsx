@@ -1,12 +1,12 @@
 /* eslint-disable jsx-a11y/mouse-events-have-key-events */
 import PlaceholderNoResults from 'Components/UI/Placeholders/PlaceholderNoResults'
 import React, { useEffect } from 'react'
-import { DataTMDBAPIInterface } from 'Utils/Interfaces/DataTMDBAPIInterface'
+import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import SearchCard from './SearchCard'
 import './SearchList.scss'
 
 type Props = {
-  searchResults: DataTMDBAPIInterface[]
+  searchResults: MainDataTMDB[]
   handleClickOutside: (e: CustomEvent) => void
   closeList: () => void
   currentListItem: number

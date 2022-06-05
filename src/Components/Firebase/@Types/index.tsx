@@ -1,37 +1,34 @@
-// export interface ShowFullDataFireDatabase {}
+/* eslint-disable @typescript-eslint/no-empty-interface */
+import { EpisodesTMDB, MainDataTMDB, MAINDATA_TMDB_INITIAL, SingleEpisodeTMDB } from 'Utils/@TypesTMDB'
 
-export interface EpisodesFromFireDatabase {
-  air_date?: string
-  episode_count?: number
-  episodes: SingleEpisodeFromFireDatabase[]
-  id: number
-  name?: string
-  poster_path?: string
-  season_number: number
-  userRating?: number | string
+export interface ShowFullDataFireDatabase {
+  info: MainDataTMDB
+  episodes: EpisodesTMDB
+  id: string
+  status: string
+  usersWatching: number
 }
 
 export const EPISODES_FROM_FIRE_DATABASE_INITIAL = {
-  air_date: '',
-  episode_count: 0,
-  episodes: [],
-  id: 0,
-  name: '',
-  poster_path: '',
-  season_number: 0,
-  userRating: 0,
+  info: MAINDATA_TMDB_INITIAL,
+  episodes: {
+    air_date: '',
+    episode_count: 0,
+    episodes: [],
+    id: 0,
+    name: '',
+    poster_path: '',
+    season_number: 0,
+    userRating: 0,
+  },
+  id: '',
+  status: '',
+  usersWatching: 0,
 }
 
-export interface SingleEpisodeFromFireDatabase {
-  [key: string]: number | string | boolean | null | undefined
-  air_date: string | null
-  episode_number?: number
-  id?: number
-  name?: string
-  season_number?: number
-  userRating?: number
-  watched?: boolean
-}
+export interface EpisodesFromFireDatabase extends EpisodesTMDB {}
+
+export interface SingleEpisodeFromFireDatabase extends SingleEpisodeTMDB {}
 
 export interface EpisodesFromUserDatabase {
   episodes: {

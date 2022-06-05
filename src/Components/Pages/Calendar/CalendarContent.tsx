@@ -35,7 +35,7 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
 
   const userShows = useAppSelectorArray<UserShowsInterface>(selectShows)
   const userEpisodes = useAppSelector(selectEpisodes)
-  const watchingShows = userShows.filter((show) => show.database === 'watchingShows')
+  const watchingShows = userShows.filter((show) => show.userShowStatus === 'watchingShows')
   // const watchingShowsEpisodes = watchingShows.reduce((acc, show) => {
   //   acc.push({...show, episodes: userEpisodes[show.id]})
   //   return acc

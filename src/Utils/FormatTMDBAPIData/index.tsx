@@ -1,5 +1,5 @@
 import { LIST_OF_GENRES } from 'Utils/Constants'
-import { DataTMDBAPIInterface } from 'Utils/Interfaces/DataTMDBAPIInterface'
+import { MainDataTMDB } from 'Utils/@TypesTMDB'
 
 export const formatMovieBudget = (budget: number) => {
   if (budget === 0 || typeof budget !== 'number') return null
@@ -13,17 +13,17 @@ export const formatMovieBudget = (budget: number) => {
     .join('.')
 }
 
-export const formatNetworks = (data: DataTMDBAPIInterface['networks']) => {
+export const formatNetworks = (data: MainDataTMDB['networks']) => {
   if (!Array.isArray(data)) return ''
   return data.map((item) => item?.name).join(', ')
 }
 
-export const formatGenres = (data: DataTMDBAPIInterface['genres']) => {
+export const formatGenres = (data: MainDataTMDB['genres']) => {
   if (!Array.isArray(data)) return ''
   return data.map((item) => item?.name).join(', ')
 }
 
-export const getGenresFromIds = (data: DataTMDBAPIInterface['genre_ids']) => {
+export const getGenresFromIds = (data: MainDataTMDB['genre_ids']) => {
   if (!Array.isArray(data)) return []
   return data.reduce((acc, genreId) => {
     const genreInfo = LIST_OF_GENRES.find((item) => item.id === genreId)
@@ -33,5 +33,5 @@ export const getGenresFromIds = (data: DataTMDBAPIInterface['genre_ids']) => {
       acc.push(genreInfo)
       return acc
     }
-  }, [] as DataTMDBAPIInterface['genres'])
+  }, [] as MainDataTMDB['genres'])
 }

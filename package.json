@@ -46,13 +46,16 @@
     "lodash.get": "^4.4.2",
     "lodash.isequal": "^4.5.0",
     "lodash.isfunction": "^3.0.9",
+    "lodash.isnil": "^4.0.0",
     "lodash.isobject": "^3.0.2",
     "lodash.merge": "^4.6.2",
     "lodash.mergewith": "^4.6.2",
+    "lodash.omitby": "^4.6.0",
     "lodash.result": "^4.5.2",
     "lodash.transform": "^4.6.0",
     "lorem-ipsum": "^2.0.3",
     "normalize.css": "^8.0.1",
+    "randomcolor": "^0.6.2",
     "react": "^16.13.1",
     "react-app-polyfill": "^1.0.6",
     "react-chat-elements": "^10.15.0",
@@ -71,8 +74,7 @@
     "throttle-debounce": "^2.2.1",
     "unique-names-generator": "^4.5.0",
     "uuid": "^8.3.2",
-    "yup": "^0.28.5",
-    "randomcolor": "^0.6.2"
+    "yup": "^0.28.5"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -97,6 +99,8 @@
   "devDependencies": {
     "@types/babel__core": "^7.1.17",
     "@types/html-to-text": "^6.0.0",
+    "@types/lodash.isnil": "^4.0.7",
+    "@types/lodash.omitby": "^4.6.7",
     "@types/react": "^18.0.9",
     "@types/sanitize-html": "^2.3.1",
     "@types/styled-components": "^5.1.10",

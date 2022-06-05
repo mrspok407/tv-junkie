@@ -1,13 +1,13 @@
 import { EpisodesFromFireDatabase } from 'Components/Firebase/@Types'
-import { DataTMDBAPIInterface } from 'Utils/Interfaces/DataTMDBAPIInterface'
+import { MainDataTMDB } from 'Utils/@TypesTMDB'
 
-export interface UserShowsInterface extends DataTMDBAPIInterface {
+export interface UserShowsInterface extends MainDataTMDB {
   allEpisodesWatched: boolean
-  database: string
+  userShowStatus: string
   episodes: EpisodesFromFireDatabase[]
   episodesFetched: boolean | undefined
   finished: boolean
-  info: { database: string }
+  info: { userShowStatus: string }
   key: string
   lastUpdatedInDatabase: number
   lastUpdatedInUser: number
@@ -15,7 +15,7 @@ export interface UserShowsInterface extends DataTMDBAPIInterface {
   userRating: string | string
 }
 
-export interface UserMoviesInterface extends DataTMDBAPIInterface {
+export interface UserMoviesInterface extends MainDataTMDB {
   timeStamp?: number
 }
 

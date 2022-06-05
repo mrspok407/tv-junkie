@@ -117,3 +117,20 @@ export { releasedEpisodesToOneArray }
 export const isScrollNearBottom = ({ scrollThreshold }: { scrollThreshold: number }) => {
   return window.innerHeight + window.scrollY >= document.body.scrollHeight - scrollThreshold
 }
+
+export const removeUndefinedNullFromObject = (obj: any) => {
+  const newObj: any = {}
+  Object.keys(obj).forEach((key) => {
+    if (obj[key] === undefined || obj[key] === null) {
+      delete obj[key]
+    } else if (_isObject(obj[key])) {
+      newObj[key] = removeUndefinedNullFromObject(obj[key])
+      if (!Object.keys(newObj[key]).length) {
+        delete newObj[key]
+      }
+    } else {
+      newObj[key] = obj[key]
+    }
+  })
+  return newObj
+}
