@@ -1,5 +1,5 @@
 /* eslint-disable array-callback-return */
-import { EpisodesFromFireDatabase } from 'Components/Firebase/@Types'
+import { EpisodesFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
 import { differenceBtwDatesInDays, todayDate } from 'Utils'
 
 export const releasedEpisodes = ({ data }: { data: EpisodesFromFireDatabase[] }) => {

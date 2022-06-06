@@ -6,7 +6,7 @@ import Loader from 'Components/UI/Placeholders/Loader'
 import PlaceholderNoToWatchEpisodes from 'Components/UI/Placeholders/PlaceholderNoToWatchEpisodes'
 import merge from 'deepmerge'
 import { AppContext } from 'Components/AppContext/AppContextHOC'
-import { EpisodesFromFireDatabase, SingleEpisodeFromFireDatabase } from 'Components/Firebase/@Types'
+import { EpisodesFromFireDatabase, SingleEpisodeFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
 import { UserShowsInterface } from 'Components/UserContent/UseUserShowsRed/@Types'
 
 const ToWatchEpisodesContent: React.FC = () => {
@@ -17,7 +17,7 @@ const ToWatchEpisodesContent: React.FC = () => {
 
   const getContent = useCallback(() => {
     const watchingShows = context.userContent.userShows.filter(
-      (show) => show.userShowStatus === 'watchingShows' && !show.allEpisodesWatched,
+      (show) => show.database === 'watchingShows' && !show.allEpisodesWatched,
     )
     const toWatchEpisodes: any = context.userContent.userToWatchShows
 

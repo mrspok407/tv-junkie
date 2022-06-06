@@ -4,7 +4,6 @@ import { EpisodesTMDB, SingleEpisodeTMDB } from 'Utils/@TypesTMDB'
 
 export interface ShowEpisodesTMDB {
   episodes: EpisodesTMDB[]
-  status: string
 }
 
 const getShowEpisodesTMDB = ({ id }: { id: number }) => {
@@ -44,7 +43,7 @@ const getShowEpisodesTMDB = ({ id }: { id: number }) => {
           rowData.push(item.data)
         })
 
-        const mergedRowData: { value: Record<string, unknown>; status: string } = Object.assign({}, ...rowData)
+        const mergedRowData: { value: Record<string, unknown> } = Object.assign({}, ...rowData)
 
         Object.entries(mergedRowData).forEach(([key, value]) => {
           if (!key.indexOf('season/')) {
@@ -87,7 +86,6 @@ const getShowEpisodesTMDB = ({ id }: { id: number }) => {
 
         const dataToPass: ShowEpisodesTMDB = {
           episodes: allEpisodes,
-          status: mergedRowData.status,
         }
 
         return dataToPass

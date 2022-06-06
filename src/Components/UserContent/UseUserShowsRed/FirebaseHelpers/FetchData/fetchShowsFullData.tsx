@@ -15,7 +15,7 @@ const fetchShowsFullData = ({ userShows, firebase, uid }: GetUserShowsFullInfoAr
       if (showInfo.val() === null) {
         return { ...show, episodes: [] }
       }
-      if (show.userShowStatus === 'watchingShows' && !show.finished) {
+      if (show.database === 'watchingShows' && !show.finished) {
         const episodes = await fetchEpisodesFullData({ uid, showKey: show.id, firebase })
         return { ...showInfo.val(), episodes, episodesFetched: true }
       }

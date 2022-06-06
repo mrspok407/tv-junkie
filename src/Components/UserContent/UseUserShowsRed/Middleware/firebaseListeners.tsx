@@ -1,7 +1,7 @@
 import { AppThunk } from 'app/store'
 import { SnapshotVal } from 'Components/AppContext/@Types'
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
-import { EpisodesFromFireDatabase } from 'Components/Firebase/@Types'
+import { EpisodesFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
 import { handleNewShow, handleChangeShow } from './showHandlers'
 import { changeShowEpisodes, selectShow, selectShowsIds } from '../userShowsSliceRed'
 import { UserShowsInterface } from '../@Types'
@@ -26,12 +26,12 @@ export const userShowsListeners =
 
     firebaseRef.on('child_changed', (snapshot: SnapshotVal<UserShowsInterface>) => {
       console.log('child_changed')
-      dispatch(handleChangeShow(snapshot.val(), uid, firebase))
+      dispatch(handleChangeShow(snapshot.val()!, uid, firebase))
     })
 
     firebase
       .userEpisodes(uid)
       .on('child_changed', (snapshot: SnapshotVal<{ episodes: EpisodesFromFireDatabase[] }>) => {
-        dispatch(changeShowEpisodes({ id: Number(snapshot.key), episodes: snapshot.val().episodes }))
+        dispatch(changeShowEpisodes({ id: Number(snapshot.key), episodes: snapshot.val()!.episodes }))
       })
   }

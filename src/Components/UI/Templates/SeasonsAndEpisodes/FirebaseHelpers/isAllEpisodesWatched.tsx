@@ -1,5 +1,5 @@
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
-import { EpisodesFromFireDatabase, SingleEpisodeFromFireDatabase } from 'Components/Firebase/@Types'
+import { EpisodesFromFireDatabase, SingleEpisodeFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
 import { AuthUserInterface } from 'Components/UserAuth/Session/WithAuthentication/@Types'
 import { differenceBtwDatesInDays, todayDate } from 'Utils'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
@@ -59,7 +59,7 @@ const isAllEpisodesWatched = ({
   firebase.userShowAllEpisodesInfo(authUser.uid, showInfo.id).update({
     allEpisodesWatched: releasedEpisodesWatched,
     finished,
-    isAllWatched_database: `${releasedEpisodesWatched}_${showInfo.userShowStatus}`,
+    isAllWatched_database: `${releasedEpisodesWatched}_${showInfo.database}`,
   })
 
   firebase

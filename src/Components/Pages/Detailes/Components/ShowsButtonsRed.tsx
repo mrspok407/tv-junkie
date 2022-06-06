@@ -62,7 +62,7 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
               dispatch(
                 handleDatabaseChange({
                   id,
-                  userShowStatus: 'watchingShows',
+                  database: 'watchingShows',
                   showDetailesTMDB: detailes,
                   firebase,
                 }),
@@ -92,7 +92,7 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
               dispatch(
                 handleDatabaseChange({
                   id,
-                  userShowStatus: 'notWatchingShows',
+                  database: 'notWatchingShows',
                   showDetailesTMDB: detailes,
                   firebase,
                 }),
@@ -120,7 +120,7 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
                 dispatch(
                   handleDatabaseChange({
                     id,
-                    userShowStatus: 'droppedShows',
+                    database: 'droppedShows',
                     showDetailesTMDB: detailes,
                     firebase,
                   }),
@@ -155,7 +155,7 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
                 dispatch(
                   handleDatabaseChange({
                     id,
-                    userShowStatus: 'willWatchShows',
+                    database: 'willWatchShows',
                     showDetailesTMDB: detailes,
                     firebase,
                   }),

@@ -1,13 +1,13 @@
-import { EpisodesFromFireDatabase } from 'Components/Firebase/@Types'
+import { EpisodesFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
 
 export interface UserShowsInterface extends MainDataTMDB {
   allEpisodesWatched: boolean
-  userShowStatus: string
+  database: string
   episodes: EpisodesFromFireDatabase[]
   episodesFetched: boolean | undefined
   finished: boolean
-  info: { userShowStatus: string }
+  info: { database: string }
   key: string
   lastUpdatedInDatabase: number
   lastUpdatedInUser: number

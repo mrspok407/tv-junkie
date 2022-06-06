@@ -8,7 +8,7 @@ import useGetUserMovies from './Hooks/UseGetUserMovies'
 
 export interface UserShowsInterface extends MainDataTMDB {
   allEpisodesWatched: boolean
-  userShowStatus: string
+  database: string
   finished: boolean
   timeStamp: number
   userRating: string | string

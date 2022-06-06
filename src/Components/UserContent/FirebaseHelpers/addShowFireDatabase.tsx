@@ -7,16 +7,11 @@ type Arguments = {
   firebase: FirebaseInterface
   showDetailesTMDB: MainDataTMDB
   showEpisodesTMDB: ShowEpisodesTMDB
-  userShowStatus: string
+  database: string
 }
 
-const addShowToFireDatabase = ({
-  showDetailesTMDB,
-  showEpisodesTMDB,
-  userShowStatus,
-  firebase,
-}: Arguments): Promise<any> =>
-  firebase.showFullDataFireDatabase(showDetailesTMDB.id).transaction((snapshot: any) => {
+const addShowToFireDatabase = ({ showDetailesTMDB, showEpisodesTMDB, database, firebase }: Arguments) =>
+  firebase.showFullDataFireDatabase(showDetailesTMDB.id).transaction((snapshot) => {
     if (snapshot !== null) {
       return
     }
@@ -29,7 +24,7 @@ const addShowToFireDatabase = ({
       episodes: showEpisodesTMDB.episodes,
       id: showDetailesTMDB.id.toString(),
       status: showDetailesTMDB.status,
-      usersWatching: userShowStatus === 'watchingShows' && 1,
+      usersWatching: database === 'watchingShows' ? 1 : 0,
     }
   })
 

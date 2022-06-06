@@ -2,7 +2,7 @@ import { SnapshotVal } from 'Components/AppContext/@Types'
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import { combineMergeObjects } from 'Utils'
 import merge from 'deepmerge'
-import { EpisodesFromFireDatabase } from 'Components/Firebase/@Types'
+import { EpisodesFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
 
 interface FetchEpisodesFullData {
   uid: string

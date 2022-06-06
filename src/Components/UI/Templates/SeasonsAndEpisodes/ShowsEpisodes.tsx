@@ -6,7 +6,7 @@ import * as _get from 'lodash.get'
 import Loader from 'Components/UI/Placeholders/Loader'
 import classNames from 'classnames'
 import UserRating from 'Components/UI/UserRating/UserRating'
-import { SingleEpisodeFromFireDatabase } from 'Components/Firebase/@Types'
+import { SingleEpisodeFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
 import { tmdbTvSeasonURL } from 'Utils/APIUrls'
 import useAxiosPromise from 'Utils/Hooks/UseAxiosPromise'
 import { useAppSelector } from 'app/hooks'
@@ -31,7 +31,6 @@ const ShowsEpisodes: React.FC<Props> = ({ episodesData, showTitle, id, parentCom
   const { firebase, authUser } = useFrequentVariables()
 
   const showInfo = useAppSelector((state) => selectShow(state, id))
-  console.log({ showInfo })
   const episodesFromDatabase = useAppSelector((state) => selectShowEpisodes(state, id))
   const releasedEpisodes: SingleEpisodeFromFireDatabase[] = releasedEpisodesToOneArray({ data: episodesFromDatabase })
 
@@ -242,7 +241,7 @@ const ShowsEpisodes: React.FC<Props> = ({ episodesData, showTitle, id, parentCom
     firebase.userShowAllEpisodes(authUser.uid, id).set(episodesFromDatabase)
   }
 
-  const showCheckboxes = showInfo?.userShowStatus !== 'notWatchingShows'
+  const showCheckboxes = showInfo?.database !== 'notWatchingShows'
 
   const curOpen = parentComponent === 'toWatchPage' ? currentlyOpen : currentlyOpenSeasons
 
@@ -323,12 +322,12 @@ const ShowsEpisodes: React.FC<Props> = ({ episodesData, showTitle, id, parentCom
                     <>
                       {season.poster_path && parentComponent === 'detailesPage' && (
                         <div className="episodes__episode-group-poster-wrapper">
-                          {showInfo?.userShowStatus && daysToNewSeason <= 0 && (
+                          {showInfo?.database && daysToNewSeason <= 0 && (
                             <UserRating
                               id={id}
                               firebaseRef="userShowSeason"
                               seasonNum={season.season_number}
-                              disableRating={!!(showInfo?.userShowStatus === 'notWatchingShows')}
+                              disableRating={!!(showInfo?.database === 'notWatchingShows')}
                             />
                           )}
 

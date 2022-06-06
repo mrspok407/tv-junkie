@@ -35,7 +35,8 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
 
   const userShows = useAppSelectorArray<UserShowsInterface>(selectShows)
   const userEpisodes = useAppSelector(selectEpisodes)
-  const watchingShows = userShows.filter((show) => show.userShowStatus === 'watchingShows')
+  const watchingShows = userShows.filter((show) => show.database === 'watchingShows')
+  console.log({ watchingShows })
   // const watchingShowsEpisodes = watchingShows.reduce((acc, show) => {
   //   acc.push({...show, episodes: userEpisodes[show.id]})
   //   return acc
@@ -80,6 +81,8 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
       setOpenMonths((prevState) => [...prevState, month])
     }
   }
+
+  console.log({ willAirEpisodes })
 
   if (showsInitialLoading || context.userContentHandler.loadingShowsOnRegister) {
     return (

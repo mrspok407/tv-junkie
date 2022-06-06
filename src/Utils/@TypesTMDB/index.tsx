@@ -1,4 +1,4 @@
-import { EpisodesFromFireDatabase, SingleEpisodeFromFireDatabase } from 'Components/Firebase/@Types'
+import { EpisodesFromFireDatabase, SingleEpisodeFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
 
 export interface EpisodesTMDB {
   air_date?: string
@@ -33,7 +33,7 @@ export interface MainDataTMDB {
   allEpisodesWatched: boolean
   backdrop_path: string | null
   budget: number
-  userShowStatus: string
+  database: string
   episode_run_time: number[]
   first_air_date: string
   genre_ids: number[]
@@ -80,7 +80,7 @@ const MAINDATA_TMDB_INITIAL: MainDataTMDB = {
   allEpisodesWatched: false,
   backdrop_path: '-',
   budget: 0,
-  userShowStatus: '',
+  database: '',
   episode_run_time: [0],
   first_air_date: '-',
   genre_ids: [],

@@ -8,7 +8,7 @@ import * as ROUTES from 'Utils/Constants/routes'
 import UserRating from 'Components/UI/UserRating/UserRating'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
-import { EpisodesFromFireDatabase } from 'Components/Firebase/@Types'
+import { EpisodesFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
 import { EpisodesDataInterface, ShowEpisodesFromAPIInterface } from './@Types'
 import TorrentLinksEpisodes from './Components/TorrentLinksEpisodes'
 
@@ -114,7 +114,7 @@ const SeasonEpisodes: React.FC<Props> = ({
     }, FADE_OUT_SPEED)
   }
 
-  const showCheckboxes = showInfo?.userShowStatus !== 'notWatchingShows' && episodesFromDatabase?.length > 0 && true
+  const showCheckboxes = showInfo?.database !== 'notWatchingShows' && episodesFromDatabase?.length > 0 && true
 
   const showSeason = showCheckboxes && episodesFromDatabase[season.season_number - 1]
   const seasons = parentComponent === 'toWatchPage' ? episodesData : episodesDataFromAPI
@@ -272,14 +272,14 @@ const SeasonEpisodes: React.FC<Props> = ({
                     episodeAirDateAsDateObj.getTime() < todayDate.getTime() &&
                     episode.air_date && (
                       <>
-                        {showInfo?.userShowStatus && !!episodesFromDatabase && (
+                        {showInfo?.database && !!episodesFromDatabase && (
                           <UserRating
                             id={showInfo?.id}
                             firebaseRef="userShowSingleEpisode"
                             seasonNum={season.season_number}
                             episodeNum={indexOfEpisode}
                             episodeRating
-                            disableRating={!!(showInfo?.userShowStatus === 'notWatchingShows')}
+                            disableRating={!!(showInfo?.database === 'notWatchingShows')}
                           />
                         )}
                         {authUser?.email === process.env.REACT_APP_ADMIN_EMAIL && (

@@ -1,7 +1,7 @@
 import { releasedEpisodesToOneArray } from 'Utils'
 import mergeWith from 'lodash.mergewith'
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
-import { SingleEpisodeFromFireDatabase } from 'Components/Firebase/@Types'
+import { SingleEpisodeFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
 import { UserShowsInterface } from '../@Types'
 import updateAllEpisodesWatched from './updateAllEpisodesWatched'
 
@@ -116,7 +116,7 @@ const updateUserEpisodesFromDatabase = async ({ firebase }: Arguments) => {
     firebase.userShowAllEpisodesInfo(authUser.uid, show.id).update({
       allEpisodesWatched: releasedEpisodesWatched,
       finished,
-      isAllWatched_database: `${releasedEpisodesWatched}_${show.info.userShowStatus}`,
+      isAllWatched_database: `${releasedEpisodesWatched}_${show.info.database}`,
     })
     firebase.userShowsLastUpdateList(authUser.uid).child(show.id).update({ lastUpdatedInUser: firebase.timeStamp() })
   })

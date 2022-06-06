@@ -1,14 +1,21 @@
 import { SnapshotVal } from 'Components/AppContext/@Types'
+import { setSnapshotValInitial } from 'Components/AppContext/@Types/generics'
 import { createContext } from 'react'
-import { EpisodesFromFireDatabase, EPISODES_FROM_FIRE_DATABASE_INITIAL, ShowFullDataFireDatabase } from './@Types'
+import { EPISODES_FROM_FIRE_DATABASE_INITIAL, ShowFullDataFireDatabase } from './@TypesFirebase'
 
 export interface FirebaseOnce<T> {
-  once: (value: string) => Promise<SnapshotVal<T>>
+  once: (value: string, callback?: any) => Promise<SnapshotVal<T>>
 }
 
 export interface FirebaseReferenceProps<T> {
   child: (value: string) => FirebaseOnce<T>
   once: FirebaseOnce<T>['once']
+  update: (value: Partial<T>) => Promise<void>
+  set: (value: Partial<T>) => Promise<void>
+  transaction: (
+    callback: (snapshot: T) => any,
+    onComplete?: any,
+  ) => Promise<{ commited: boolean; snapshot: SnapshotVal<T> }>
 }
 
 export interface FirebaseInterface {
@@ -69,6 +76,9 @@ const firebaseRefInitial = <T,>(initialState: T) => {
   return {
     once: () => firebaseOnceInitial(initialState),
     child: () => ({ once: () => firebaseOnceInitial(initialState) }),
+    update: () => Promise.resolve(),
+    set: () => Promise.resolve(),
+    transaction: () => Promise.resolve({ commited: false, snapshot: setSnapshotValInitial(initialState) }),
   }
 }
 

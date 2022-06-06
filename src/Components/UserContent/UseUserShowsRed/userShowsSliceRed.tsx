@@ -2,7 +2,7 @@ import { RootState } from 'app/store'
 import merge from 'deepmerge'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { combineMergeObjects } from 'Utils'
-import { EpisodesFromFireDatabase } from 'Components/Firebase/@Types'
+import { EpisodesFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
 import { UserShowsState, UserShowsInterface } from './@Types'
 
 const userShowsInitialState: UserShowsState = {
@@ -110,7 +110,7 @@ export const selectShows = (state: RootState) => state.userShows.data.info
 export const selectEpisodes = (state: RootState) => state.userShows.data.episodes
 export const selectShowsIds = (state: RootState) => state.userShows.data.ids
 export const selectShow = (state: RootState, id: number) => state.userShows.data.info[id]
-export const selectShowDatabase = (state: RootState, id: number) => state.userShows.data.info[id]?.userShowStatus
+export const selectShowDatabase = (state: RootState, id: number) => state.userShows.data.info[id]?.database
 export const selectShowsLoading = (state: RootState) => state.userShows.loading
 
 export const selectShowEpisodes = (state: RootState, id: number) => state.userShows.data.episodes[id]
