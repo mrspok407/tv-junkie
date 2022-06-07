@@ -4,7 +4,7 @@ import merge from 'lodash.merge'
 import { combineMergeObjects } from 'Utils'
 import { getAuthUidFromState } from 'Components/UserAuth/Session/WithAuthentication/Helpers'
 import sortDataSnapshot from '../../FirebaseHelpers/sortDataSnapshot'
-import { UserShowsInterface } from '../@Types'
+import { EpisodesStoreState, UserShowsInterface } from '../@Types'
 import fetchShowsFullData from '../FirebaseHelpers/FetchData/fetchShowsFullData'
 import { userShowsListeners } from './firebaseListeners'
 import { selectShow, selectShowEpisodes, setError, setShowEpisodes, setUserShows } from '../userShowsSliceRed'
@@ -16,15 +16,17 @@ export const fetchUserShows =
     console.log('fetchUserShows')
     const authUserUid = getAuthUidFromState(getState())
     try {
-      const userShowsSnapshot = await firebase.userAllShows(authUserUid).orderByChild('timeStamp').once('value')
-      const userShows = sortDataSnapshot<UserShowsInterface>(userShowsSnapshot)
+      const userShowsSnapshot = await firebase
+        .showsInfoUserDatabase(authUserUid)
+        .orderByChild('timeStamp')
+        .once('value')
+      const userShows = sortDataSnapshot<ReturnType<typeof userShowsSnapshot.val>>(userShowsSnapshot)!
       const showsFullData = await fetchShowsFullData({ userShows, firebase, uid: authUserUid })
       const mergedShows: UserShowsInterface[] = merge(showsFullData, userShows, {
         arrayMerge: combineMergeObjects,
       })
-
+      console.log({ mergedShows: { ...mergedShows } })
       dispatch(setUserShows(mergedShows))
-      dispatch(userShowsListeners({ uid: authUserUid, firebase }))
     } catch (err) {
       dispatch(setError(err))
     }

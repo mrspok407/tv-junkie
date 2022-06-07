@@ -38,7 +38,7 @@ const UserProfileContent: React.FC<Props> = ({ userUid }) => {
       return
     }
 
-    const userShowsData = await firebase.userAllShows(userUid).once('value')
+    const userShowsData = await firebase.showsInfoUserDatabase(userUid).once('value')
     if (userShowsData.val() === null) {
       setLoadingContent(false)
       return

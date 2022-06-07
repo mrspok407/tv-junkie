@@ -102,7 +102,7 @@ const Profile = () => {
       Object.entries(snapshot.val()).forEach(([chatKey, chatValue]) => {
         Object.entries(chatValue.members.status).forEach(([memberKey, memberValue]) => {
           const numberOfMessages = Math.floor(Math.random() * (15 - 1 + 1)) + 1
-          for (let i = 1; i <= numberOfMessages; i++) {
+          for (let i = 1; i <= numberOfMessages; i += 1) {
             firebase.messages({ chatKey, isGroupChat: true }).push({
               sender: memberKey,
               userName: memberValue.userName,
@@ -237,11 +237,11 @@ const Profile = () => {
                       .catch((err) => {
                         console.log(err)
                       })
-                    firebase.showInfo(show.id).update({
+                    firebase.showInfoFireDatabase(show.id).update({
                       status: data.status,
                       name: data.name,
                     })
-                    firebase.showInfo(show.id).child('lastUpdatedInDatabase').set(firebase.timeStamp())
+                    firebase.showInfoFireDatabase(show.id).child('lastUpdatedInDatabase').set(firebase.timeStamp())
                   })
                   .catch((err) => {
                     console.log(err)

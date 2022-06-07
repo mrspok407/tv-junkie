@@ -1,7 +1,7 @@
 import { EpisodesFromFireDatabase, SingleEpisodeFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
 
 export interface EpisodesTMDB {
-  air_date?: string
+  air_date: string
   episodes: SingleEpisodeTMDB[]
   id: number
   name?: string
@@ -11,7 +11,7 @@ export interface EpisodesTMDB {
 
 export interface SingleEpisodeTMDB {
   [key: string]: number | string | boolean | null | undefined
-  air_date: string | null
+  air_date: string
   episode_number?: number
   id: number
   name?: string

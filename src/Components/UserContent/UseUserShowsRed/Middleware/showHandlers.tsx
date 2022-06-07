@@ -1,7 +1,7 @@
 import { AppThunk } from 'app/store'
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import { EpisodesFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
-import { UserShowsInterface } from '../@Types'
+import { EpisodesStoreState, UserShowsInterface } from '../@Types'
 import { addNewShow, changeShow, selectShow, setError } from '../userShowsSliceRed'
 import { fetchEpisodesFullData } from '../FirebaseHelpers/FetchData'
 
@@ -10,8 +10,8 @@ export const handleNewShow =
   async (dispatch) => {
     const isWatchingShow = showData.database === 'watchingShows'
     try {
-      let episodes: EpisodesFromFireDatabase[] = []
-      const showInfoSnapshot = await firebase.showInfo(showData.id).once('value')
+      let episodes: EpisodesStoreState[] = []
+      const showInfoSnapshot = await firebase.showInfoFireDatabase(showData.id).once('value')
       if (showInfoSnapshot.val() === null) {
         throw new Error(
           "There's no data in database, by this path. And if this function is called the data should be here.\n" +

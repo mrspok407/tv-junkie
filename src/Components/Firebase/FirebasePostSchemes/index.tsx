@@ -18,12 +18,12 @@ export const postUserShowScheme = ({ authUid, showDetailesTMDB, showEpisodes, sh
     [`users/${authUid}/content/shows/${showDetailesTMDB.id}`]: {
       allEpisodesWatched: false,
       database: showDatabase,
-      status: showsSubDatabase,
-      firstAirDate: showDetailesTMDB.first_air_date,
-      name: showDetailesTMDB.name,
-      timeStamp: firebase.timeStamp(),
       finished: false,
+      firstAirDate: showDetailesTMDB.first_air_date,
       id: showDetailesTMDB.id,
+      name: showDetailesTMDB.name,
+      status: showsSubDatabase,
+      timeStamp: firebase.timeStamp(),
     },
     [`users/${authUid}/content/episodes/${showDetailesTMDB.id}`]: {
       episodes: showEpisodes,

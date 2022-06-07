@@ -1,9 +1,9 @@
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
-import { UserShowsInterface } from '../../@Types'
+import { ShowInfoFromUserDatabase } from 'Components/Firebase/@TypesFirebase'
 import { fetchEpisodesFullData } from '.'
 
 interface GetUserShowsFullInfoArg {
-  userShows: UserShowsInterface[]
+  userShows: ShowInfoFromUserDatabase[]
   firebase: FirebaseInterface
   uid: string
 }
@@ -11,7 +11,7 @@ interface GetUserShowsFullInfoArg {
 const fetchShowsFullData = ({ userShows, firebase, uid }: GetUserShowsFullInfoArg) =>
   Promise.all(
     userShows.map(async (show) => {
-      const showInfo = await firebase.showInfo(show.id).once('value')
+      const showInfo = await firebase.showInfoFireDatabase(show.id).once('value')
       if (showInfo.val() === null) {
         return { ...show, episodes: [] }
       }

@@ -126,9 +126,9 @@ class Firebase {
 
   showFullDataFireDatabase = (showKey: string | number) => this.db.ref(`allShowsList/${showKey}`)
 
-  showInfo = (showKey: string) => this.db.ref(`allShowsList/${showKey}/info`)
+  showInfoFireDatabase = (showKey: string | number) => this.db.ref(`allShowsList/${showKey}/info`)
 
-  showEpisodes: FirebaseInterface['showEpisodes'] = (showKey) => this.db.ref(`allShowsList/${showKey}/episodes`)
+  showEpisodesFireDatabase = (showKey: string | number) => this.db.ref(`allShowsList/${showKey}/episodes`)
 
   /// Users API ///
   user = (uid: string) => this.db.ref(`users/${uid}`)
@@ -212,7 +212,7 @@ class Firebase {
   /// User Content API ///
   userContent = (uid: string) => this.db.ref(`users/${uid}/content`)
 
-  userAllShows = (uid: string) => this.db.ref(`users/${uid}/content/shows`)
+  showsInfoUserDatabase = (uid: string) => this.db.ref(`users/${uid}/content/shows`)
 
   userShowsLastUpdateList = (uid: string) => this.db.ref(`users/${uid}/content/showsLastUpdateList`)
 
@@ -222,7 +222,7 @@ class Firebase {
 
   userShowEpisodes = (uid: string, showKey: string) => this.db.ref(`users/${uid}/content/episodes/${showKey}`)
 
-  userShowAllEpisodes: FirebaseInterface['userShowAllEpisodes'] = (uid, showKey) =>
+  showEpisodesUserDatabase = (uid: string, showKey: string | number) =>
     this.db.ref(`users/${uid}/content/episodes/${showKey}/episodes`)
 
   userShowAllEpisodesInfo = (uid: string, showKey: string) =>

@@ -6,6 +6,7 @@ import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import { logoutAuthUser } from 'Components/UserAuth/Session/WithAuthentication/Middleware/logoutAuthUser'
 import { fetchUserShows } from './Middleware'
 import { updateLoadingShows } from './userShowsSliceRed'
+import { userShowsListeners } from './Middleware/firebaseListeners'
 
 const useInitializeApp = () => {
   const { firebase } = useFrequentVariables()
@@ -21,7 +22,8 @@ const useInitializeApp = () => {
           dispatch(updateLoadingShows(true))
           await dispatch(setupAuthUser(authUser, firebase))
           console.log('setupAuthUser END')
-          dispatch(fetchUserShows(firebase))
+          await dispatch(fetchUserShows(firebase))
+          dispatch(userShowsListeners({ uid: authUser.uid, firebase }))
         },
         () => {
           console.log('User logged out')

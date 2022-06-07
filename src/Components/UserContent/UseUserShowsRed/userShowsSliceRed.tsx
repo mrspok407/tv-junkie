@@ -2,10 +2,10 @@ import { RootState } from 'app/store'
 import merge from 'deepmerge'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { combineMergeObjects } from 'Utils'
-import { EpisodesFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
-import { UserShowsState, UserShowsInterface } from './@Types'
+import { EpisodesFromFireDatabase, EpisodesFromUserDatabase } from 'Components/Firebase/@TypesFirebase'
+import { UserShowsStoreState, UserShowsInterface, EpisodesStoreState } from './@Types'
 
-const userShowsInitialState: UserShowsState = {
+const userShowsInitialState: UserShowsStoreState = {
   data: {
     ids: [],
     info: {},
@@ -21,16 +21,16 @@ export const userShowsSliceRed = createSlice({
   initialState: userShowsInitialState,
   reducers: {
     setUserShows: {
-      reducer(state, action: PayloadAction<UserShowsState['data']>) {
+      reducer(state, action: PayloadAction<UserShowsStoreState['data']>) {
         console.log({ initialPayload: action.payload })
         state.data = action.payload
         state.loading = false
       },
       prepare(data: UserShowsInterface[]) {
-        const ids: UserShowsState['data']['ids'] = []
-        const info: UserShowsState['data']['info'] = {}
-        const episodes: UserShowsState['data']['episodes'] = {}
-        const timeStamps: UserShowsState['data']['timeStamps'] = {}
+        const ids: UserShowsStoreState['data']['ids'] = []
+        const info: UserShowsStoreState['data']['info'] = {}
+        const episodes: UserShowsStoreState['data']['episodes'] = {}
+        const timeStamps: UserShowsStoreState['data']['timeStamps'] = {}
         data.forEach((item) => {
           ids.push(item.id)
           episodes[item.key] = item.episodes
@@ -65,22 +65,25 @@ export const userShowsSliceRed = createSlice({
       action.payload.episodes = []
       state.data.info[action.payload.id] = { ...show, ...action.payload }
     },
-    setShowEpisodes: (state, action: PayloadAction<{ id: number; episodes: EpisodesFromFireDatabase[] }>) => {
+    setShowEpisodes: (state, action: PayloadAction<{ id: number; episodes: EpisodesStoreState[] }>) => {
       state.data.episodes[action.payload.id] = action.payload.episodes
       state.data.info[action.payload.id].episodesFetched = true
     },
-    changeShowEpisodes: (state, action: PayloadAction<{ id: number; episodes: EpisodesFromFireDatabase[] }>) => {
+    changeShowEpisodes: (
+      state,
+      action: PayloadAction<{ id: number; episodes: EpisodesFromUserDatabase['episodes'] }>,
+    ) => {
       console.time('test')
       const stateEpisodes = state.data.episodes[action.payload.id]
       if (!stateEpisodes.length) return
-      const mergeEpisodes: EpisodesFromFireDatabase[] = merge(stateEpisodes, action.payload.episodes, {
+      const mergeEpisodes: EpisodesStoreState[] = merge(stateEpisodes, action.payload.episodes, {
         arrayMerge: combineMergeObjects,
       })
       console.timeEnd('test')
       console.log({ mergeEpisodes })
       state.data.episodes[action.payload.id] = mergeEpisodes
     },
-    updateLoadingShows: (state, action: PayloadAction<UserShowsState['loading']>) => {
+    updateLoadingShows: (state, action: PayloadAction<UserShowsStoreState['loading']>) => {
       console.log(action.payload)
       state.loading = action.payload
     },

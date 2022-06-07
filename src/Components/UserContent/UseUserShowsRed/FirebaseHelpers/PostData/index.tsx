@@ -81,8 +81,10 @@ export const handleNewShowInDatabase =
         firebase,
       })
 
-      // const prom = new Promise((res: any) => setTimeout(() => res(4), 2000))
-      // await prom
+      const artificialDelay = new Promise((res: any) => {
+        setTimeout(() => res(4), 2000)
+      })
+      await artificialDelay
 
       firebase.database().ref().update(updateData)
     } catch (err) {

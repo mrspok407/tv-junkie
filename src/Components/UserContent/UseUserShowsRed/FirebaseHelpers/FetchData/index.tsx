@@ -1,8 +1,8 @@
-import { SnapshotVal } from 'Components/AppContext/@Types'
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import { combineMergeObjects } from 'Utils'
 import merge from 'deepmerge'
 import { EpisodesFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
+import { EpisodesStoreState } from '../../@Types'
 
 interface FetchEpisodesFullData {
   uid: string
@@ -10,11 +10,12 @@ interface FetchEpisodesFullData {
   firebase: FirebaseInterface
 }
 export const fetchEpisodesFullData = async ({ uid, showKey, firebase }: FetchEpisodesFullData) => {
-  const [episodesData, userEpisodes]: SnapshotVal<EpisodesFromFireDatabase[]>[] = await Promise.all([
-    firebase.showEpisodes(showKey).once('value'),
-    firebase.userShowAllEpisodes(uid, showKey).once('value'),
+  const [episodesFireDatabase, episodesUserDatabase] = await Promise.all([
+    firebase.showEpisodesFireDatabase(showKey).once('value'),
+    firebase.showEpisodesUserDatabase(uid, showKey).once('value'),
   ])
-  const episodesFullData: EpisodesFromFireDatabase[] = merge(episodesData.val(), userEpisodes.val(), {
+  // firebase.showEpisodesFireDatabase(showKey).update({ test: undefined })
+  const episodesFullData: EpisodesStoreState[] = merge(episodesFireDatabase.val(), episodesUserDatabase.val(), {
     arrayMerge: combineMergeObjects,
   })
   return episodesFullData

@@ -1,9 +1,9 @@
 import { useAppSelector } from 'app/hooks'
 import { AuthUserInterface } from 'Components/UserAuth/Session/WithAuthentication/@Types'
-import { UserShowsState } from 'Components/UserContent/UseUserShowsRed/@Types'
+import { UserShowsStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { useMemo } from 'react'
 
-type UseAppSelectorArray<Type> = (state: { userShows: UserShowsState; authUser: AuthUserInterface }) => {
+type UseAppSelectorArray<Type> = (state: { userShows: UserShowsStoreState; authUser: AuthUserInterface }) => {
   [key: string]: Type
 }
 
