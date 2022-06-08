@@ -2,7 +2,7 @@ import { releasedEpisodesToOneArray } from 'Utils'
 import mergeWith from 'lodash.mergewith'
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import { SingleEpisodeFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
-import { UserShowsInterface } from '../@Types'
+import { ShowInfoStoreState } from '../@Types'
 import updateAllEpisodesWatched from './updateAllEpisodesWatched'
 
 interface Arguments {
@@ -69,7 +69,7 @@ const updateUserEpisodesFromDatabase = async ({ firebase }: Arguments) => {
     }
     return undefined
   }
-  const mergedShowsEpisodes: UserShowsInterface[] = mergeWith(showsFromDatabase, userShows, mergeCustomizer)
+  const mergedShowsEpisodes: ShowInfoStoreState[] = mergeWith(showsFromDatabase, userShows, mergeCustomizer)
 
   let userShowsPromises: any = []
 

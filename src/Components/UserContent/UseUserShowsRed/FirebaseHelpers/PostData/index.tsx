@@ -8,7 +8,8 @@ import addShowToFireDatabase from 'Components/UserContent/FirebaseHelpers/addSho
 import getShowEpisodesTMDB from 'Components/UserContent/TmdbAPIHelpers/getShowEpisodesFromAPI'
 import { EpisodesTMDB, MainDataTMDB } from 'Utils/@TypesTMDB'
 import { formatShowEpisodesForUserDatabase } from 'Utils/FormatTMDBAPIData'
-import { selectShow, setError } from '../../userShowsSliceRed'
+import { ErrorInterface } from 'Utils/Hooks/UseErrors/UseErrors'
+import { selectShow, setShowsError } from '../../userShowsSliceRed'
 
 interface HandleDatabaseChange {
   id: number
@@ -45,7 +46,9 @@ export const handleDatabaseChange =
     try {
       await firebase.database().ref().update(updateData)
     } catch (err) {
-      dispatch(setError(err))
+      const error = err as ErrorInterface
+      dispatch(setShowsError({ message: error.message, errorData: error }))
+      throw new Error(error.message)
     }
   }
 
@@ -88,6 +91,8 @@ export const handleNewShowInDatabase =
 
       firebase.database().ref().update(updateData)
     } catch (err) {
-      dispatch(setError(err))
+      const error = err as ErrorInterface
+      dispatch(setShowsError({ message: error.message, errorData: error }))
+      throw new Error(error.message)
     }
   }

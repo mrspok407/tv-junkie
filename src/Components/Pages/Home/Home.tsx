@@ -11,7 +11,7 @@ import ScrollToTopOnMount from 'Utils/ScrollToTopOnMount'
 import useGoogleRedirect from 'Components/UserAuth/SignIn/UseGoogleRedirect'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import useAppSelectorArray from 'Utils/Hooks/UseAppSelectorArray'
-import { UserShowsInterface, UserWillAirEpisodesInterface } from 'Components/UserContent/UseUserShowsRed/@Types'
+import { ShowInfoStoreState, UserWillAirEpisodesInterface } from 'Components/UserContent/UseUserShowsRed/@Types'
 import {
   selectEpisodes,
   selectShows,
@@ -19,15 +19,15 @@ import {
 } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
 import { useAppSelector } from 'app/hooks'
 import PlaceholderHomePageNoFutureEpisodes from 'Components/UI/Placeholders/PlaceholderHomePageNoFutureEpisodes'
-import { organiseFutureEpisodesByMonth } from '../Calendar/CalendarHelpers'
 import useGetSlidersContent from './Hooks/UseGetSlidersContent'
+import { organiseFutureEpisodesByMonth } from '../Calendar/CalendarHelpers'
 import './Home.scss'
 
 const HomePage: React.FC = () => {
   const { authUser, userContentHandler } = useFrequentVariables()
   const { sliders, slidersLoading } = useGetSlidersContent()
 
-  const userShows = useAppSelectorArray<UserShowsInterface>(selectShows)
+  const userShows = useAppSelectorArray<ShowInfoStoreState>(selectShows)
   const userEpisodes = useAppSelector(selectEpisodes)
   const watchingShows = userShows.filter((show) => show.database === 'watchingShows')
   const willAirEpisodesData: UserWillAirEpisodesInterface[] = organiseFutureEpisodesByMonth(watchingShows, userEpisodes)

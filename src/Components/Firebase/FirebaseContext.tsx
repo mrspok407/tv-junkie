@@ -1,12 +1,12 @@
 /* eslint-disable max-len */
-import { SnapshotVal } from 'Components/AppContext/@Types'
-import { setSnapshotValInitial } from 'Components/AppContext/@Types/generics'
 import { createContext } from 'react'
 import {
   EpisodesFromUserDatabase,
   EPISODES_FROM_FIRE_DATABASE_INITIAL,
+  setSnapshotValInitial,
   ShowFullDataFireDatabase,
   ShowInfoFromUserDatabase,
+  SnapshotVal,
 } from './@TypesFirebase'
 
 export interface FirebaseOnce<T> {

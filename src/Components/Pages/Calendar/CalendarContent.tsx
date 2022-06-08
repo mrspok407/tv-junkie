@@ -14,7 +14,7 @@ import {
 } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
 import {
   SingleEpisodeByMonthInterface,
-  UserShowsInterface,
+  ShowInfoStoreState,
   UserWillAirEpisodesInterface,
 } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { selectAuthUser } from 'Components/UserAuth/Session/WithAuthentication/authUserSlice'
@@ -33,7 +33,7 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
 
   const showsInitialLoading = useAppSelector(selectShowsLoading)
 
-  const userShows = useAppSelectorArray<UserShowsInterface>(selectShows)
+  const userShows = useAppSelectorArray<ShowInfoStoreState>(selectShows)
   const userEpisodes = useAppSelector(selectEpisodes)
   const watchingShows = userShows.filter((show) => show.database === 'watchingShows')
   // const watchingShowsEpisodes = watchingShows.reduce((acc, show) => {

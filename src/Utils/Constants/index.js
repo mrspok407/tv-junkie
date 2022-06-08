@@ -1,4 +1,4 @@
-export const ERROR_MODAL_DURATION = 5000
+export const ERROR_MODAL_DURATION = 10000
 
 export const LIST_OF_GENRES = [
   {

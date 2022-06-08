@@ -1,14 +1,13 @@
 import {
   UserMoviesInterface,
-  UserShowsInterface,
+  ShowInfoStoreState,
   UserWillAirEpisodesInterface,
 } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { LOADING_ADDING_TO_DATABASE_INITIAL } from 'Components/UserContent/UseContentHandler'
 import { FirebaseInterface, FIREBASE_INITIAL_STATE } from 'Components/Firebase/FirebaseContext'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import { UserToWatchShowsInterface } from 'Components/UserContent/UseUserShows/Hooks/UseGetUserToWatchShows'
-import { HandleListenersArg } from 'Components/Pages/Detailes/FirebaseHelpers/UseHandleListeners'
-import { SnapshotVal } from './generics'
+import { ErrorInterface } from 'Utils/Hooks/UseErrors/UseErrors'
 
 export interface ShowInterface {
   id: number
@@ -46,7 +45,6 @@ export interface AddShowToDatabaseArg {
   id: number
   show: MainDataTMDB
   database: string
-  handleListeners?: ({ id, status, handleLoading }: HandleListenersArg) => void
 }
 
 export interface HandleShowInDatabasesArg {
@@ -54,7 +52,6 @@ export interface HandleShowInDatabasesArg {
   data: MainDataTMDB
   database: string
   userShows: MainDataTMDB[]
-  handleListeners?: ({ id, status, handleLoading }: HandleListenersArg) => void
 }
 
 export interface HandleMovieInDatabasesArg {
@@ -69,15 +66,10 @@ export interface ToggleMovieLSArg {
   data: MainDataTMDB[] | MainDataTMDB
 }
 
-export interface ErrorsInterface {
-  error: any
-  handleError: ({ errorData, message }: { errorData?: any; message: string }) => void
-}
-
 export interface AppContextInterface {
   userContentLocalStorage: {
     watchLaterMovies: MainDataTMDB[]
-    watchingShows: UserShowsInterface[]
+    watchingShows: ShowInfoStoreState[]
     toggleMovieLS: ({ id, data }: ToggleMovieLSArg) => void
     clearContentState: () => void
     addShowLS: ({ id, data }: { id: number; data: MainDataTMDB }) => void
@@ -87,7 +79,7 @@ export interface AppContextInterface {
     loadingShows: boolean
     loadingNotFinishedShows: boolean
     loadingMovies: boolean
-    userShows: UserShowsInterface[]
+    userShows: ShowInfoStoreState[]
     userWillAirEpisodes: UserWillAirEpisodesInterface[]
     userToWatchShows: UserToWatchShowsInterface[]
     userMovies: MainDataTMDB[]
@@ -96,7 +88,7 @@ export interface AppContextInterface {
   }
   userContentHandler: {
     addShowsToDatabaseOnRegister: ({ shows }: AddShowsToDatabaseOnRegisterArg) => void
-    addShowToDatabase: ({ id, show, handleListeners }: AddShowToDatabaseArg) => void
+    addShowToDatabase: ({ id, show }: AddShowToDatabaseArg) => void
     handleShowInDatabases: ({ id, data, database, userShows }: HandleShowInDatabasesArg) => void
     handleMovieInDatabases: ({ id, data }: HandleMovieInDatabasesArg) => void
     handleLoadingShowsOnRegister: (isLoading: boolean) => void
@@ -111,7 +103,13 @@ export interface AppContextInterface {
   }
   firebase: FirebaseInterface
   newContactsActivity: boolean | null
-  errors: ErrorsInterface
+  errors: {
+    error: {
+      errorData: any
+      message: string
+    } | null
+    handleError: ({ errorData, message }: { errorData?: any; message: string }) => void
+  }
 }
 
 export const CONTEXT_INITIAL_STATE = {
@@ -146,7 +144,5 @@ export const CONTEXT_INITIAL_STATE = {
   },
   firebase: FIREBASE_INITIAL_STATE,
   newContactsActivity: false,
-  errors: { error: {}, handleError: () => {} },
+  errors: { error: null, handleError: () => {} },
 }
-
-export type { SnapshotVal }

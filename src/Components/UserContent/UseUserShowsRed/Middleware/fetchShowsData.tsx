@@ -1,13 +1,10 @@
 import { AppThunk } from 'app/store'
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
-import merge from 'lodash.merge'
-import { combineMergeObjects } from 'Utils'
 import { getAuthUidFromState } from 'Components/UserAuth/Session/WithAuthentication/Helpers'
+import { ErrorInterface } from 'Utils/Hooks/UseErrors/UseErrors'
 import sortDataSnapshot from '../../FirebaseHelpers/sortDataSnapshot'
-import { EpisodesStoreState, UserShowsInterface } from '../@Types'
 import fetchShowsFullData from '../FirebaseHelpers/FetchData/fetchShowsFullData'
-import { userShowsListeners } from './firebaseListeners'
-import { selectShow, selectShowEpisodes, setError, setShowEpisodes, setUserShows } from '../userShowsSliceRed'
+import { selectShow, selectShowEpisodes, setShowsError, setShowEpisodes, setUserShows } from '../userShowsSliceRed'
 import { fetchEpisodesFullData } from '../FirebaseHelpers/FetchData'
 
 export const fetchUserShows =
@@ -22,13 +19,11 @@ export const fetchUserShows =
         .once('value')
       const userShows = sortDataSnapshot<ReturnType<typeof userShowsSnapshot.val>>(userShowsSnapshot)!
       const showsFullData = await fetchShowsFullData({ userShows, firebase, uid: authUserUid })
-      const mergedShows: UserShowsInterface[] = merge(showsFullData, userShows, {
-        arrayMerge: combineMergeObjects,
-      })
-      console.log({ mergedShows: { ...mergedShows } })
-      dispatch(setUserShows(mergedShows))
+      dispatch(setUserShows(showsFullData))
     } catch (err) {
-      dispatch(setError(err))
+      const error = err as ErrorInterface
+      dispatch(setShowsError({ message: error.message, errorData: error }))
+      throw new Error(error.message)
     }
   }
 
@@ -45,6 +40,8 @@ export const fetchShowEpisodes =
       console.log('fetchShowEpisodes')
       dispatch(setShowEpisodes({ id, episodes }))
     } catch (err) {
-      dispatch(setError(err))
+      const error = err as ErrorInterface
+      dispatch(setShowsError(error))
+      throw new Error(error.message)
     }
   }

@@ -1,7 +1,8 @@
 import { SeasonFromUserDatabase, SingleEpisodeFromUserDatabase } from 'Components/Firebase/@TypesFirebase'
 import { EpisodesTMDB, MainDataTMDB, SingleEpisodeTMDB } from 'Utils/@TypesTMDB'
+import { ErrorInterface } from 'Utils/Hooks/UseErrors/UseErrors'
 
-export interface UserShowsInterface extends MainDataTMDB {
+export interface ShowInfoStoreState extends MainDataTMDB {
   allEpisodesWatched: boolean
   database: string
   episodes: EpisodesStoreState[]
@@ -37,7 +38,7 @@ export interface UserShowsStoreState {
   data: {
     ids: number[]
     info: {
-      [key: string]: UserShowsInterface
+      [key: string]: ShowInfoStoreState
     }
     episodes: {
       [key: string]: EpisodesStoreState[]
@@ -47,5 +48,5 @@ export interface UserShowsStoreState {
     }
   }
   loading: boolean
-  error: any
+  error: ErrorInterface | null
 }

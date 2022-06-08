@@ -3,7 +3,7 @@ import merge from 'deepmerge'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { combineMergeObjects } from 'Utils'
 import { EpisodesFromFireDatabase, EpisodesFromUserDatabase } from 'Components/Firebase/@TypesFirebase'
-import { UserShowsStoreState, UserShowsInterface, EpisodesStoreState } from './@Types'
+import { UserShowsStoreState, ShowInfoStoreState, EpisodesStoreState } from './@Types'
 
 const userShowsInitialState: UserShowsStoreState = {
   data: {
@@ -26,7 +26,7 @@ export const userShowsSliceRed = createSlice({
         state.data = action.payload
         state.loading = false
       },
-      prepare(data: UserShowsInterface[]) {
+      prepare(data: ShowInfoStoreState[]) {
         const ids: UserShowsStoreState['data']['ids'] = []
         const info: UserShowsStoreState['data']['info'] = {}
         const episodes: UserShowsStoreState['data']['episodes'] = {}
@@ -48,7 +48,7 @@ export const userShowsSliceRed = createSlice({
         }
       },
     },
-    addNewShow: (state, action: PayloadAction<UserShowsInterface>) => {
+    addNewShow: (state, action: PayloadAction<ShowInfoStoreState>) => {
       console.log(action.payload)
       if (state.data.ids.includes(action.payload.id)) return
       state.data.ids.push(action.payload.id)
@@ -58,7 +58,7 @@ export const userShowsSliceRed = createSlice({
       state.data.info[action.payload.id] = action.payload
       state.data.timeStamps[action.payload.id] = action.payload.timeStamp
     },
-    changeShow: (state, action: PayloadAction<UserShowsInterface>) => {
+    changeShow: (state, action: PayloadAction<ShowInfoStoreState>) => {
       const show = state.data.info[action.payload.id]
       const episodes = state.data.episodes[action.payload.id]
       state.data.episodes[action.payload.id] = action.payload.episodes || episodes || []
@@ -73,14 +73,11 @@ export const userShowsSliceRed = createSlice({
       state,
       action: PayloadAction<{ id: number; episodes: EpisodesFromUserDatabase['episodes'] }>,
     ) => {
-      console.time('test')
       const stateEpisodes = state.data.episodes[action.payload.id]
       if (!stateEpisodes.length) return
       const mergeEpisodes: EpisodesStoreState[] = merge(stateEpisodes, action.payload.episodes, {
         arrayMerge: combineMergeObjects,
       })
-      console.timeEnd('test')
-      console.log({ mergeEpisodes })
       state.data.episodes[action.payload.id] = mergeEpisodes
     },
     updateLoadingShows: (state, action: PayloadAction<UserShowsStoreState['loading']>) => {
@@ -90,7 +87,7 @@ export const userShowsSliceRed = createSlice({
     resetShows: () => {
       return { ...userShowsInitialState, loading: false }
     },
-    setError: (state, action: PayloadAction<any>) => {
+    setShowsError: (state, action: PayloadAction<UserShowsStoreState['error']>) => {
       console.log(action.payload)
       state.error = action.payload
       state.loading = false
@@ -106,7 +103,7 @@ export const {
   changeShowEpisodes,
   updateLoadingShows,
   resetShows,
-  setError,
+  setShowsError,
 } = userShowsSliceRed.actions
 
 export const selectShows = (state: RootState) => state.userShows.data.info
@@ -117,5 +114,7 @@ export const selectShowDatabase = (state: RootState, id: number) => state.userSh
 export const selectShowsLoading = (state: RootState) => state.userShows.loading
 
 export const selectShowEpisodes = (state: RootState, id: number) => state.userShows.data.episodes[id]
+
+export const selectShowsError = (state: RootState) => state.userShows.error
 
 export default userShowsSliceRed.reducer

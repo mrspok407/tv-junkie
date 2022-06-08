@@ -6,7 +6,7 @@ import useUserShows from 'Components/UserContent/UseUserShows/UseUserShows'
 import useContentHandler from 'Components/UserContent/UseContentHandler'
 import useFirebase from 'Components/Firebase/UseFirebase'
 import useNewContactsActivity from 'Components/Pages/Contacts/Hooks/UseNewContactsActivity'
-import useErrors from 'Utils/Hooks/UseErrors'
+import useErrors from 'Utils/Hooks/UseErrors/UseErrors'
 import useInitializeApp from 'Components/UserContent/UseUserShowsRed/UseInitializeApp'
 import { AppContextInterface, CONTEXT_INITIAL_STATE } from './@Types'
 

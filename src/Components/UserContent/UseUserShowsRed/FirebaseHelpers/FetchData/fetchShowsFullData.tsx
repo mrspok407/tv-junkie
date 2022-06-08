@@ -1,5 +1,6 @@
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import { ShowInfoFromUserDatabase } from 'Components/Firebase/@TypesFirebase'
+import { throwErrorNoData } from 'Components/Firebase/Errors'
 import { fetchEpisodesFullData } from '.'
 
 interface GetUserShowsFullInfoArg {
@@ -13,22 +14,14 @@ const fetchShowsFullData = ({ userShows, firebase, uid }: GetUserShowsFullInfoAr
     userShows.map(async (show) => {
       const showInfo = await firebase.showInfoFireDatabase(show.id).once('value')
       if (showInfo.val() === null) {
-        return { ...show, episodes: [] }
+        throwErrorNoData()
       }
       if (show.database === 'watchingShows' && !show.finished) {
         const episodes = await fetchEpisodesFullData({ uid, showKey: show.id, firebase })
-        return { ...showInfo.val(), episodes, episodesFetched: true }
+        return { ...showInfo.val()!, ...show, episodes, episodesFetched: true }
       }
-      return { ...showInfo.val(), episodes: [] }
+      return { ...showInfo.val()!, ...show, episodes: [], episodesFetched: false }
     }),
   )
 
 export default fetchShowsFullData
-
-// const mergedShows: UserShowsInterface[] = merge(userShows, showsData, {
-//   arrayMerge: combineMergeObjects
-// })
-// const watchingShows = mergedShows.filter((show) => show.database === "watchingShows")
-// const willAirEpisodes: UserWillAirEpisodesInterface[] = organiseFutureEpisodesByMonth(watchingShows)
-
-// return { showsFullInfo: mergedShows, willAirEpisodes }

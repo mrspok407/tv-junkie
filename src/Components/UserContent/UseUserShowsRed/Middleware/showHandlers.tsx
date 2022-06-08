@@ -1,22 +1,20 @@
 import { AppThunk } from 'app/store'
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
-import { EpisodesFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
-import { EpisodesStoreState, UserShowsInterface } from '../@Types'
-import { addNewShow, changeShow, selectShow, setError } from '../userShowsSliceRed'
+import { throwErrorNoData } from 'Components/Firebase/Errors'
+import { ErrorInterface } from 'Utils/Hooks/UseErrors/UseErrors'
+import { EpisodesStoreState, ShowInfoStoreState } from '../@Types'
+import { addNewShow, changeShow, selectShow, setShowsError } from '../userShowsSliceRed'
 import { fetchEpisodesFullData } from '../FirebaseHelpers/FetchData'
 
 export const handleNewShow =
-  (showData: UserShowsInterface, uid: string, firebase: FirebaseInterface): AppThunk =>
+  (showData: ShowInfoStoreState, uid: string, firebase: FirebaseInterface): AppThunk =>
   async (dispatch) => {
     const isWatchingShow = showData.database === 'watchingShows'
     try {
       let episodes: EpisodesStoreState[] = []
       const showInfoSnapshot = await firebase.showInfoFireDatabase(showData.id).once('value')
       if (showInfoSnapshot.val() === null) {
-        throw new Error(
-          "There's no data in database, by this path. And if this function is called the data should be here.\n" +
-            'Find out the reason why the data is missing at the point of calling this function.',
-        )
+        throwErrorNoData()
       }
 
       if (isWatchingShow) {
@@ -30,12 +28,13 @@ export const handleNewShow =
       }
       dispatch(addNewShow(show))
     } catch (err) {
-      dispatch(setError(err))
+      const errors = err as ErrorInterface
+      dispatch(setShowsError(errors))
     }
   }
 
 export const handleChangeShow =
-  (showData: UserShowsInterface, uid: string, firebase: FirebaseInterface): AppThunk =>
+  (showData: ShowInfoStoreState, uid: string, firebase: FirebaseInterface): AppThunk =>
   async (dispatch, getState) => {
     const showFromStore = selectShow(getState(), showData.id)
     console.log({ showFromStore })
@@ -57,6 +56,7 @@ export const handleChangeShow =
       const show = { ...showData, episodes, episodesFetched: true }
       dispatch(changeShow(show))
     } catch (err) {
-      dispatch(setError(err))
+      const errors = err as ErrorInterface
+      dispatch(setShowsError(errors))
     }
   }

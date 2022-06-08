@@ -1,4 +1,4 @@
-import { UserShowsInterface } from 'Components/UserContent/UseUserShowsRed/@Types'
+import { ShowInfoStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
 
 export enum ActionTypesEnum {
   IncrementLoadedShows = 'incrementLoadedShows',
@@ -7,8 +7,8 @@ export enum ActionTypesEnum {
 }
 
 export type ACTIONTYPES =
-  | { type: ActionTypesEnum.IncrementLoadedShows; payload: { sectionFilteredShows: UserShowsInterface[] } }
-  | { type: ActionTypesEnum.IncrementLoadedShowsLS; payload: { sectionFilteredShows: UserShowsInterface[] } }
+  | { type: ActionTypesEnum.IncrementLoadedShows; payload: { sectionFilteredShows: ShowInfoStoreState[] } }
+  | { type: ActionTypesEnum.IncrementLoadedShowsLS; payload: { sectionFilteredShows: ShowInfoStoreState[] } }
   | { type: ActionTypesEnum.ChangeActiveSection; payload: { activeSection: string } }
 
 export interface LoadedShowsInterface {

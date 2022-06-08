@@ -6,7 +6,7 @@ import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import { useAppDispatch, useAppSelector } from 'app/hooks'
 import { selectShowDatabase } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
 import { handleDatabaseChange } from 'Components/UserContent/UseUserShowsRed/FirebaseHelpers/PostData'
-import { fetchShowEpisodes } from 'Components/UserContent/UseUserShowsRed/Middleware'
+import { fetchShowEpisodes } from 'Components/UserContent/UseUserShowsRed/Middleware/fetchShowsData'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 
 type Props = {

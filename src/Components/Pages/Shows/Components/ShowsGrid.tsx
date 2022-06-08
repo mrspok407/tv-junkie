@@ -1,5 +1,5 @@
 import { useAppDispatch, useAppSelector } from 'app/hooks'
-import { UserShowsInterface } from 'Components/UserContent/UseUserShowsRed/@Types'
+import { ShowInfoStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { handleDatabaseChange } from 'Components/UserContent/UseUserShowsRed/FirebaseHelpers/PostData'
 import { selectShows } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
 import React from 'react'
@@ -8,7 +8,7 @@ import { LIST_OF_GENRES } from 'Utils/Constants'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 
 type Props = {
-  data: UserShowsInterface[]
+  data: ShowInfoStoreState[]
   section: string
 }
 

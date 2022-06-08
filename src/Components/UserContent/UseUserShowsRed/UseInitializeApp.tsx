@@ -4,7 +4,7 @@ import { useAppDispatch } from 'app/hooks'
 import setupAuthUser from 'Components/UserAuth/Session/WithAuthentication/Middleware/setupAuthUser'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import { logoutAuthUser } from 'Components/UserAuth/Session/WithAuthentication/Middleware/logoutAuthUser'
-import { fetchUserShows } from './Middleware'
+import { fetchUserShows } from './Middleware/fetchShowsData'
 import { updateLoadingShows } from './userShowsSliceRed'
 import { userShowsListeners } from './Middleware/firebaseListeners'
 
