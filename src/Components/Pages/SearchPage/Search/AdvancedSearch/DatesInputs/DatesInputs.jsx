@@ -4,57 +4,10 @@ import SelectInput from '../InputTemplates/SelectInput/SelectInput'
 
 const currentYear = new Date().getFullYear()
 
-export const DatesInputs = ({
-  setFieldValue,
-  handleChange,
-  // year,
-  // changeYear
-}) => {
-  // const [yearIsOpen, setYearIsOpen] = useState(false)
+const DatesInputs = ({ setFieldValue, handleChange }) => {
   return (
     <>
       <div className="inputs__dates-year">
-        {/* <div className="search__media-type">
-          <button
-            type="button"
-            onClick={() => setYearIsOpen(!yearIsOpen)}
-            className="media-type__button media-type__selected-value"
-          >
-            <span>{year}</span>
-          </button>
-          {yearIsOpen && (
-            <div className="media-type__options">
-              <ul className="media-type__list">
-                {range(1900, currentYear, 1)
-                  .reverse()
-                  .map(item => {
-                    return (
-                      <li
-                        key={item}
-                        className={
-                          item === year
-                            ? "media-type__item media-type__item--selected"
-                            : "media-type__item"
-                        }
-                      >
-                        <button
-                          type="button"
-                          className="media-type__button"
-                          value={item}
-                          onClick={e => {
-                            changeYear(e.target.value)
-                            setYearIsOpen(false)
-                          }}
-                        >
-                          {item}
-                        </button>
-                      </li>
-                    )
-                  })}
-              </ul>
-            </div>
-          )}
-        </div> */}
         <SelectInput
           label="Year"
           name="year"

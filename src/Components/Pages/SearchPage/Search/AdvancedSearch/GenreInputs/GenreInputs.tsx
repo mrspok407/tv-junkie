@@ -1,35 +1,23 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useCallback } from 'react'
 import classNames from 'classnames'
+import useClickOutside from 'Utils/Hooks/UseClickOutside'
 import CheckboxInput from '../InputTemplates/CheckboxInput'
 
-export default function GenreInputs({ toggleGenre, genres }) {
+const GenreInputs = ({ toggleGenre, genres }) => {
   const [withGenresOpen, setWithGenresOpen] = useState(false)
   const [withoutGenresOpen, setWithoutGenresOpen] = useState(false)
 
-  const refWrapper = useRef()
-
-  function handleClickOutside(e) {
-    if (refWrapper.current && !refWrapper.current.contains(e.target)) {
-      setWithGenresOpen(false)
-      setWithoutGenresOpen(false)
-    }
-  }
-
-  useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  })
+  const ref = useRef<any>(null)
+  const handleClickOutside = useCallback(() => {
+    setWithGenresOpen(false)
+    setWithoutGenresOpen(false)
+  }, [])
+  useClickOutside({ ref, callback: handleClickOutside })
 
   return (
-    <div ref={refWrapper} className="inputs__genres">
+    <div ref={ref} className="inputs__genres">
       <div className="inputs__genres-select inputs__genres-select--with">
-        <button
-          type="button"
-          onClick={() => setWithGenresOpen(!withGenresOpen)}
-          className="inputs__genres-button"
-        >
+        <button type="button" onClick={() => setWithGenresOpen(!withGenresOpen)} className="inputs__genres-button">
           With genres
         </button>
         {withGenresOpen && (
@@ -46,10 +34,10 @@ export default function GenreInputs({ toggleGenre, genres }) {
                   data="withGenre"
                   disabled={!!withoutGenre}
                   className={classNames('checkbox-genre', {
-                      'checkbox-genre--disabled': withoutGenre,
-                    })}
+                    'checkbox-genre--disabled': withoutGenre,
+                  })}
                 />
-                ))}
+              ))}
             </div>
           </div>
         )}
@@ -76,10 +64,10 @@ export default function GenreInputs({ toggleGenre, genres }) {
                   data="withoutGenre"
                   disabled={!!withGenre}
                   className={classNames('checkbox-genre', {
-                      'checkbox-genre--disabled': withGenre,
-                    })}
+                    'checkbox-genre--disabled': withGenre,
+                  })}
                 />
-                ))}
+              ))}
             </div>
           </div>
         )}
@@ -87,3 +75,5 @@ export default function GenreInputs({ toggleGenre, genres }) {
     </div>
   )
 }
+
+export default GenreInputs

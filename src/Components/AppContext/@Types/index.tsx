@@ -7,7 +7,6 @@ import { LOADING_ADDING_TO_DATABASE_INITIAL } from 'Components/UserContent/UseCo
 import { FirebaseInterface, FIREBASE_INITIAL_STATE } from 'Components/Firebase/FirebaseContext'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import { UserToWatchShowsInterface } from 'Components/UserContent/UseUserShows/Hooks/UseGetUserToWatchShows'
-import { ErrorInterface } from 'Utils/Hooks/UseErrors/UseErrors'
 
 export interface ShowInterface {
   id: number

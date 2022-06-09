@@ -17,7 +17,7 @@ const AdvancedSearch = ({ advancedSearch, searchingAdvancedSearch, withActors, t
   const [advSearchOpen, setAdvSearchOpen] = useState(false)
   const [genres, setGenres] = useState(LIST_OF_GENRES)
 
-  function toggleGenre(e) {
+  const toggleGenre = (e) => {
     const newGenres = [...genres]
     const genre = newGenres.find((item) => item.name?.toLowerCase() === e.target.value)
     const data = e.target.getAttribute('data')

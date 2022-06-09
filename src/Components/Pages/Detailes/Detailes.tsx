@@ -2,7 +2,7 @@
 import React from 'react'
 import { Helmet } from 'react-helmet'
 import Header from 'Components/UI/Header/Header'
-import Slider from 'Utils/Slider/Slider'
+import Slider from 'Components/UI/Slider/Slider'
 import ShowsEpisodes from 'Components/UI/Templates/SeasonsAndEpisodes/ShowsEpisodes'
 import ScrollToTopBar from 'Utils/ScrollToTopBar'
 import ScrollToTopOnUpdate from 'Utils/ScrollToTopOnUpdate'
