@@ -1,5 +1,5 @@
 import { useAppDispatch, useAppSelector } from 'app/hooks'
-import { ShowInfoStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
+import { ShowFullDataStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { handleDatabaseChange } from 'Components/UserContent/UseUserShowsRed/FirebaseHelpers/PostData'
 import { selectShows } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
 import React from 'react'
@@ -8,7 +8,7 @@ import { LIST_OF_GENRES } from 'Utils/Constants'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 
 type Props = {
-  data: ShowInfoStoreState[]
+  data: ShowFullDataStoreState[]
   section: string
 }
 

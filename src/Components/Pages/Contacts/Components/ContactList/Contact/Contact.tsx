@@ -218,7 +218,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
           </button>
 
           {optionsPopupContactList === contactInfo.key && (
-            <ContactOptionsPopup contactOptionsRef={contactOptionsRef.current} contactInfo={contactInfo} />
+            <ContactOptionsPopup contactOptionsRef={contactOptionsRef} contactInfo={contactInfo} />
           )}
         </div>
         {contactInfo.isGroupChat && <div className="contact-item__group-chat-icon" />}

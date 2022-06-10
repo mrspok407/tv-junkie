@@ -1,10 +1,10 @@
-import { ShowInfoStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
+import { ShowFullDataStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { useMemo } from 'react'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import { LoadedShowsInterface } from '../ReducerConfig/@Types'
 
 type Props = {
-  showsData: ShowInfoStoreState[]
+  showsData: ShowFullDataStoreState[]
   activeSection: string
   sortByState: string
   loadedShows: LoadedShowsInterface

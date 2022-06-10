@@ -91,7 +91,7 @@ const useContentHandler = () => {
 
         await Promise.all([
           firebase.showsInfoUserDatabase(uid).set(userShows),
-          firebase.userEpisodes(uid).set(userEpisodes, () => {
+          firebase.showsEpisodesUserDatabase(uid).set(userEpisodes, () => {
             setLoadingShowsOnRegister(false)
           }),
         ])
@@ -142,7 +142,7 @@ const useContentHandler = () => {
           id,
         }),
         firebase
-          .userEpisodes(authUser.uid)
+          .showsEpisodesUserDatabase(authUser.uid)
           .child(id)
           .set(
             {

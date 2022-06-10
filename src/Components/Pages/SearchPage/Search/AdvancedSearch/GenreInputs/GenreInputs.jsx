@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react'
+import React, { useState, useRef, useCallback } from 'react'
 import classNames from 'classnames'
 import useClickOutside from 'Utils/Hooks/UseClickOutside'
 import CheckboxInput from '../InputTemplates/CheckboxInput'
@@ -7,12 +7,12 @@ const GenreInputs = ({ toggleGenre, genres }) => {
   const [withGenresOpen, setWithGenresOpen] = useState(false)
   const [withoutGenresOpen, setWithoutGenresOpen] = useState(false)
 
-  const ref = useRef<any>(null)
-  const handleClickOutside = useCallback(() => {
+  const ref = useRef(null)
+  const handleCloseGenres = useCallback(() => {
     setWithGenresOpen(false)
     setWithoutGenresOpen(false)
   }, [])
-  useClickOutside({ ref, callback: handleClickOutside })
+  useClickOutside({ ref, callback: handleCloseGenres })
 
   return (
     <div ref={ref} className="inputs__genres">

@@ -1,7 +1,8 @@
 import { ConfirmFunctionsInterface } from 'Components/Pages/Contacts/@Types'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
-import React, { useEffect, useRef } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import './ConfirmModal.scss'
+import useClickOutside from 'Utils/Hooks/UseClickOutside'
 
 type Props = {
   confirmFunctions: ConfirmFunctionsInterface
@@ -13,25 +14,14 @@ const ConfirmModal: React.FC<Props> = ({ confirmFunctions }) => {
 
   const confirmRef = useRef<HTMLDivElement>(null!)
 
-  useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside as EventListener)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside as EventListener)
-    }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
-
-  const handleClickOutside = (e: CustomEvent) => {
-    if (!confirmRef.current?.contains(e.target as Node)) {
-      handleCancel()
-    }
-  }
-
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     contactsDispatch({
       type: 'updateConfirmModal',
       payload: { isActive: false, function: '', contactKey: '' },
     })
-  }
+  }, [contactsDispatch])
+
+  useClickOutside({ ref: confirmRef, callback: handleCancel })
 
   const handleAprove = () => {
     confirmFunctions[confirmModal.function]({ contactInfo: contacts[confirmModal.contactKey!] })

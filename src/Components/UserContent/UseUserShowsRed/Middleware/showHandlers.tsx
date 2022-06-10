@@ -2,13 +2,17 @@ import { AppThunk } from 'app/store'
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import { throwErrorNoData } from 'Components/Firebase/Errors'
 import { ErrorInterface } from 'Utils/Hooks/UseErrors/UseErrors'
-import { EpisodesStoreState, ShowInfoStoreState } from '../@Types'
+import { ShowInfoFromUserDatabase } from 'Components/Firebase/@TypesFirebase'
+import { getAuthUidFromState } from 'Components/UserAuth/Session/WithAuthentication/Helpers'
+import { EpisodesStoreState } from '../@Types'
 import { addNewShow, changeShow, selectShow, setShowsError } from '../userShowsSliceRed'
 import { fetchEpisodesFullData } from '../FirebaseHelpers/FetchData'
 
 export const handleNewShow =
-  (showData: ShowInfoStoreState, uid: string, firebase: FirebaseInterface): AppThunk =>
-  async (dispatch) => {
+  (showData: ShowInfoFromUserDatabase, firebase: FirebaseInterface): AppThunk =>
+  async (dispatch, getState) => {
+    const authUserUid = getAuthUidFromState(getState())
+
     const isWatchingShow = showData.database === 'watchingShows'
     try {
       let episodes: EpisodesStoreState[] = []
@@ -18,10 +22,10 @@ export const handleNewShow =
       }
 
       if (isWatchingShow) {
-        episodes = await fetchEpisodesFullData({ uid, showKey: showData.id, firebase })
+        episodes = await fetchEpisodesFullData({ uid: authUserUid, showKey: showData.id, firebase })
       }
       const show = {
-        ...showInfoSnapshot.val(),
+        ...showInfoSnapshot.val()!,
         ...showData,
         episodes,
         episodesFetched: isWatchingShow,
@@ -34,8 +38,10 @@ export const handleNewShow =
   }
 
 export const handleChangeShow =
-  (showData: ShowInfoStoreState, uid: string, firebase: FirebaseInterface): AppThunk =>
+  (showData: ShowInfoFromUserDatabase, firebase: FirebaseInterface): AppThunk =>
   async (dispatch, getState) => {
+    const authUserUid = getAuthUidFromState(getState())
+
     const showFromStore = selectShow(getState(), showData.id)
     console.log({ showFromStore })
     if (!showFromStore) return
@@ -50,7 +56,7 @@ export const handleChangeShow =
     }
 
     try {
-      const episodes = await fetchEpisodesFullData({ uid, showKey: showData.id, firebase })
+      const episodes = await fetchEpisodesFullData({ uid: authUserUid, showKey: showData.id, firebase })
       console.log('handleChangeShow after AWAIT')
 
       const show = { ...showData, episodes, episodesFetched: true }

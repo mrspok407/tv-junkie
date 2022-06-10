@@ -13,7 +13,7 @@ export interface ShowInfoFireDatabase extends MainDataTMDB {
   lastUpdatedInDatabase: number
 }
 
-export const EPISODES_FROM_FIRE_DATABASE_INITIAL = {
+export const SHOW_FULL_DATA_FIRE_DATABASE_INITIAL = {
   info: {
     ...MAINDATA_TMDB_INITIAL,
     lastUpdatedInDatabase: 0,

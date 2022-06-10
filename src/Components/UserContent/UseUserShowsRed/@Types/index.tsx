@@ -2,7 +2,7 @@ import { SeasonFromUserDatabase, SingleEpisodeFromUserDatabase } from 'Component
 import { EpisodesTMDB, MainDataTMDB, SingleEpisodeTMDB } from 'Utils/@TypesTMDB'
 import { ErrorInterface } from 'Utils/Hooks/UseErrors/UseErrors'
 
-export interface ShowInfoStoreState extends MainDataTMDB {
+export interface ShowFullDataStoreState extends MainDataTMDB {
   allEpisodesWatched: boolean
   database: string
   episodes: EpisodesStoreState[]
@@ -38,7 +38,7 @@ export interface UserShowsStoreState {
   data: {
     ids: number[]
     info: {
-      [key: string]: ShowInfoStoreState
+      [key: string]: ShowFullDataStoreState
     }
     episodes: {
       [key: string]: EpisodesStoreState[]

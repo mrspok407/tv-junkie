@@ -1,11 +1,12 @@
 import classNames from 'classnames'
 import { MessageInterface } from 'Components/Pages/Contacts/@Types'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
-import React, { useEffect } from 'react'
+import React, { useCallback } from 'react'
+import useClickOutside from 'Utils/Hooks/UseClickOutside'
 import useHandleMessageOptions from './FirebaseHelpers/UseHandleMessageOptions'
 
 type Props = {
-  messageOptionsRef: HTMLDivElement
+  messageOptionsRef: { current: HTMLDivElement }
   messageData: MessageInterface
 }
 
@@ -19,18 +20,11 @@ const MessagePopup: React.FC<Props> = ({ messageOptionsRef, messageData }) => {
     messageData,
   })
 
-  useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside as EventListener)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside as EventListener)
-    }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  const updateMessagePopup = useCallback(() => {
+    contactsDispatch({ type: 'updateMessagePopup', payload: '' })
+  }, [contactsDispatch])
 
-  const handleClickOutside = (e: CustomEvent) => {
-    if (!messageOptionsRef?.contains(e.target as Node)) {
-      contactsDispatch({ type: 'updateMessagePopup', payload: '' })
-    }
-  }
+  useClickOutside({ ref: messageOptionsRef, callback: updateMessagePopup })
 
   return (
     <div

@@ -1,9 +1,9 @@
-import { ShowInfoStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
+import { ShowFullDataStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { useMemo } from 'react'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 
 type Props = {
-  showsData: ShowInfoStoreState[]
+  showsData: ShowFullDataStoreState[]
   activeSection: string
 }
 

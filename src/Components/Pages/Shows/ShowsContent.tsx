@@ -6,7 +6,7 @@ import { useAppSelector } from 'app/hooks'
 import { selectShows, selectShowsLoading } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import useAppSelectorArray from 'Utils/Hooks/UseAppSelectorArray'
-import { ShowInfoStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
+import { ShowFullDataStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
 import useScrollEffect from 'Utils/Hooks/UseScrollEffect'
 import { INITIAL_STATE, ShowsContentState, ACTIONTYPES, ActionTypesEnum } from './ReducerConfig/@Types'
 import reducer from './ReducerConfig'
@@ -29,7 +29,7 @@ const ShowsContent: React.FC = () => {
   )
   const [sortBy, setSortBy] = useState('name')
 
-  const userShowsStore = useAppSelectorArray<ShowInfoStoreState>(selectShows)
+  const userShowsStore = useAppSelectorArray<ShowFullDataStoreState>(selectShows)
   const sectionFilteredShows = UseSectionFilteredShows({ showsData: userShowsStore, activeSection })
   const sortSlicedShows = UseSortSlicedShows({
     showsData: sectionFilteredShows,

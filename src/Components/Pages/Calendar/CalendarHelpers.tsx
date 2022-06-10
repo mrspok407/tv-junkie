@@ -1,11 +1,11 @@
 import {
   SingleEpisodeByMonthInterface,
-  ShowInfoStoreState,
+  ShowFullDataStoreState,
   UserWillAirEpisodesInterface,
 } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { differenceBtwDatesInDays, todayDate } from 'Utils'
 
-export const organiseFutureEpisodesByMonth = (data: ShowInfoStoreState[], episodes: any) => {
+export const organiseFutureEpisodesByMonth = (data: ShowFullDataStoreState[], episodes: any) => {
   const sortedAndFiltered = data
     .flatMap((show) =>
       episodes[show.id].flatMap((season: any) =>

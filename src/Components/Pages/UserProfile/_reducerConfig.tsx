@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { ShowInfoStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
+import { ShowFullDataStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
 
 const SHOWS_TO_LOAD_INITIAL = 16
 
@@ -84,7 +84,7 @@ export interface ShowsContentState {
   loadedShows: LoadedShowsInterface
   disableLoad: DisableLoadInterface
   activeSection: string
-  content: ShowInfoStoreState[]
+  content: ShowFullDataStoreState[]
 }
 
 const INITIAL_STATE: ShowsContentState = {

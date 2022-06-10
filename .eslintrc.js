@@ -69,6 +69,7 @@ module.exports = {
     'jsx-a11y/anchor-has-content': 0,
     'semi-style': 0,
     'no-prototype-builtins': 0,
+    'react/no-unused-class-component-methods': 0,
     'max-len': [
       'error',
       {

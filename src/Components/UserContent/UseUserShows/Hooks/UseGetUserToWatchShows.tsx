@@ -28,7 +28,7 @@ const useGetUserToWatchShows: Hook = () => {
       if (!authUser?.uid) return
 
       firebase
-        .userEpisodes(authUser.uid)
+        .showsEpisodesUserDatabase(authUser.uid)
         .orderByChild('info/isAllWatched_database')
         .equalTo('false_watchingShows')
         .off()
@@ -39,7 +39,7 @@ const useGetUserToWatchShows: Hook = () => {
   const listenerUserToWatchShow = ({ uid }: AuthUserInterface['authUser']) => {
     setLoadingNotFinishedShows(true)
     firebase
-      .userEpisodes(uid)
+      .showsEpisodesUserDatabase(uid)
       .orderByChild('info/isAllWatched_database')
       .equalTo('false_watchingShows')
       .on('value', (snapshot: { val: () => { id: number; episodes: Record<string, unknown>[] } }) => {

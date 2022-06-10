@@ -2,27 +2,30 @@
 import { createContext } from 'react'
 import {
   EpisodesFromUserDatabase,
-  EPISODES_FROM_FIRE_DATABASE_INITIAL,
+  SHOW_FULL_DATA_FIRE_DATABASE_INITIAL,
   setSnapshotValInitial,
   ShowFullDataFireDatabase,
   ShowInfoFromUserDatabase,
   SnapshotVal,
 } from './@TypesFirebase'
 
-export interface FirebaseOnce<T> {
+export interface FirebaseFetchMethods<T> {
   once: (value: string, callback?: any) => Promise<SnapshotVal<T>>
+  on: (value: string, callback: (snapshot: any) => void) => void
 }
 
 export interface FirebaseReferenceProps<T> {
   child: (value: string) => FirebaseReferenceProps<T>
   orderByChild: (value: string) => FirebaseReferenceProps<T>
-  once: FirebaseOnce<T>['once']
+  once: FirebaseFetchMethods<T>['once']
+  on: FirebaseFetchMethods<T>['on']
   update: (value: Partial<T>) => Promise<void>
   set: (value: Partial<T>) => Promise<void>
   transaction: (
     callback: (snapshot: T) => any,
     onComplete?: any,
   ) => Promise<{ commited: boolean; snapshot: SnapshotVal<T> }>
+  startAfter: (value: string | number) => FirebaseFetchMethods<T>
 }
 
 export interface FirebaseInterface {
@@ -38,9 +41,9 @@ export interface FirebaseInterface {
   showFullDataFireDatabase: (showKey: string | number) => FirebaseReferenceProps<ShowFullDataFireDatabase>
   showInfoFireDatabase: (showKey: string | number) => FirebaseReferenceProps<ShowFullDataFireDatabase['info']>
   showsInfoUserDatabase: (authUid: string) => FirebaseReferenceProps<ShowInfoFromUserDatabase[]>
+  showsEpisodesUserDatabase: (authUid: string) => FirebaseReferenceProps<EpisodesFromUserDatabase[]>
   timeStamp?: any
   callback?: any
-  userEpisodes?: any
   userShow?: any
   userShowAllEpisodesInfo?: any
   watchLaterMovies?: any
@@ -86,11 +89,13 @@ const firebaseOnceInitial = <T,>(initialState: T) =>
 const firebaseRefInitial = <T,>(initialState: T) => {
   return {
     once: () => firebaseOnceInitial(initialState),
+    on: () => {},
     child: () => firebaseRefInitial(initialState),
     orderByChild: () => firebaseRefInitial(initialState),
     update: () => Promise.resolve(),
     set: () => Promise.resolve(),
     transaction: () => Promise.resolve({ commited: false, snapshot: setSnapshotValInitial(initialState) }),
+    startAfter: () => firebaseRefInitial(initialState),
   }
 }
 
@@ -109,11 +114,12 @@ export const FIREBASE_INITIAL_STATE = {
   chatMemberStatus: () => {},
   groupChatMembersStatus: () => {},
   groupChatParticipants: () => {},
-  showEpisodesFireDatabase: () => firebaseRefInitial(EPISODES_FROM_FIRE_DATABASE_INITIAL.episodes),
-  showFullDataFireDatabase: () => firebaseRefInitial(EPISODES_FROM_FIRE_DATABASE_INITIAL),
-  showInfoFireDatabase: () => firebaseRefInitial(EPISODES_FROM_FIRE_DATABASE_INITIAL.info),
+  showEpisodesFireDatabase: () => firebaseRefInitial(SHOW_FULL_DATA_FIRE_DATABASE_INITIAL.episodes),
+  showFullDataFireDatabase: () => firebaseRefInitial(SHOW_FULL_DATA_FIRE_DATABASE_INITIAL),
+  showInfoFireDatabase: () => firebaseRefInitial(SHOW_FULL_DATA_FIRE_DATABASE_INITIAL.info),
   showsInfoUserDatabase: () => firebaseRefInitial([]),
-  showEpisodesUserDatabase: () => firebaseRefInitial(EPISODES_FROM_FIRE_DATABASE_INITIAL.episodes),
+  showEpisodesUserDatabase: () => firebaseRefInitial([]),
+  showsEpisodesUserDatabase: () => firebaseRefInitial([]),
 }
 
 export const FirebaseContext = createContext<FirebaseInterface>(FIREBASE_INITIAL_STATE)

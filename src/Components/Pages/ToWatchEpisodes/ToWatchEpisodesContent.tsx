@@ -7,10 +7,10 @@ import PlaceholderNoToWatchEpisodes from 'Components/UI/Placeholders/Placeholder
 import merge from 'deepmerge'
 import { AppContext } from 'Components/AppContext/AppContextHOC'
 import { EpisodesFromFireDatabase, SingleEpisodeFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
-import { ShowInfoStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
+import { ShowFullDataStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
 
 const ToWatchEpisodesContent: React.FC = () => {
-  const [watchingShows, setWatchingShows] = useState<ShowInfoStoreState[]>([])
+  const [watchingShows, setWatchingShows] = useState<ShowFullDataStoreState[]>([])
   const [loading, setLoading] = useState(true)
 
   const context = useContext(AppContext)
@@ -28,7 +28,7 @@ const ToWatchEpisodesContent: React.FC = () => {
     }
 
     const watchingShowsModified = watchingShows
-      .reduce((acc: ShowInfoStoreState[], show) => {
+      .reduce((acc: ShowFullDataStoreState[], show) => {
         const showToWatch = toWatchEpisodes.find((item: any) => item.id === show.id)
         if (showToWatch) {
           const showMerged = merge(show, showToWatch, {

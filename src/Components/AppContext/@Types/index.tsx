@@ -1,6 +1,6 @@
 import {
   UserMoviesInterface,
-  ShowInfoStoreState,
+  ShowFullDataStoreState,
   UserWillAirEpisodesInterface,
 } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { LOADING_ADDING_TO_DATABASE_INITIAL } from 'Components/UserContent/UseContentHandler'
@@ -68,7 +68,7 @@ export interface ToggleMovieLSArg {
 export interface AppContextInterface {
   userContentLocalStorage: {
     watchLaterMovies: MainDataTMDB[]
-    watchingShows: ShowInfoStoreState[]
+    watchingShows: ShowFullDataStoreState[]
     toggleMovieLS: ({ id, data }: ToggleMovieLSArg) => void
     clearContentState: () => void
     addShowLS: ({ id, data }: { id: number; data: MainDataTMDB }) => void
@@ -78,7 +78,7 @@ export interface AppContextInterface {
     loadingShows: boolean
     loadingNotFinishedShows: boolean
     loadingMovies: boolean
-    userShows: ShowInfoStoreState[]
+    userShows: ShowFullDataStoreState[]
     userWillAirEpisodes: UserWillAirEpisodesInterface[]
     userToWatchShows: UserToWatchShowsInterface[]
     userMovies: MainDataTMDB[]

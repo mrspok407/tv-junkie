@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useReducer } from 'react'
 import { combineMergeObjects } from 'Utils'
 import { LIST_OF_GENRES } from 'Utils/Constants'
 import * as ROUTES from 'Utils/Constants/routes'
-import { ShowInfoStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
+import { ShowFullDataStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { ShowInterface } from 'Components/AppContext/@Types'
 import merge from 'deepmerge'
 import classNames from 'classnames'
@@ -43,7 +43,7 @@ const UserProfileContent: React.FC<Props> = ({ userUid }) => {
       setLoadingContent(false)
       return
     }
-    const userShows: ShowInfoStoreState[] = Object.values(userShowsData.val()).map((show: any) => show)
+    const userShows: ShowFullDataStoreState[] = Object.values(userShowsData.val()).map((show: any) => show)
 
     const showsFromDatabase = await Promise.all(
       userShows.map((show) =>
@@ -58,7 +58,7 @@ const UserProfileContent: React.FC<Props> = ({ userUid }) => {
       ),
     )
 
-    const mergedShows: ShowInfoStoreState[] = merge(userShows, showsFromDatabase, {
+    const mergedShows: ShowFullDataStoreState[] = merge(userShows, showsFromDatabase, {
       arrayMerge: combineMergeObjects,
     })
 

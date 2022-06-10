@@ -40,7 +40,7 @@ const MessageInfo: React.FC<Props> = ({ messageData }) => {
           </button>
 
           {messagePopup === messageData.key && (
-            <MessagePopup messageOptionsRef={messageOptionsRef.current} messageData={messageData} />
+            <MessagePopup messageOptionsRef={messageOptionsRef} messageData={messageData} />
           )}
         </div>
       ) : (
@@ -66,7 +66,7 @@ const MessageInfo: React.FC<Props> = ({ messageData }) => {
           </button>
 
           {messagePopup === messageData.key && (
-            <MessagePopup messageOptionsRef={messageOptionsRef.current} messageData={messageData} />
+            <MessagePopup messageOptionsRef={messageOptionsRef} messageData={messageData} />
           )}
         </div>
       )}
@@ -88,10 +88,7 @@ const MessageInfo: React.FC<Props> = ({ messageData }) => {
         />
       )}
       <div className="chat-window__message-timestamp">
-        <div>
-          {' '}
-          {new Date(Number(messageData.timeStamp)).toLocaleTimeString().slice(0, -3)}
-        </div>
+        <div> {new Date(Number(messageData.timeStamp)).toLocaleTimeString().slice(0, -3)}</div>
         <div className="chat-window__message-edited">{messageData.isEdited && 'edited'}</div>
       </div>
     </div>

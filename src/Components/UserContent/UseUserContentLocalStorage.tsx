@@ -1,13 +1,13 @@
 import { ToggleMovieLSArg } from 'Components/AppContext/@Types'
 import { useState, useEffect } from 'react'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
-import { ShowInfoStoreState } from './UseUserShowsRed/@Types'
+import { ShowFullDataStoreState } from './UseUserShowsRed/@Types'
 
 const LOCAL_STORAGE_KEY_WATCHING_SHOWS = 'watchingShowsLocalS'
 const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = 'watchLaterMoviesLocalS'
 
 interface UserContent {
-  watchingShows: ShowInfoStoreState[]
+  watchingShows: ShowFullDataStoreState[]
   watchLaterMovies: MainDataTMDB[]
 }
 

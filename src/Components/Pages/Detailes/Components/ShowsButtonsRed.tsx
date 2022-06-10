@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import classNames from 'classnames'
 import * as ROUTES from 'Utils/Constants/routes'
@@ -8,6 +8,7 @@ import { selectShowDatabase } from 'Components/UserContent/UseUserShowsRed/userS
 import { handleDatabaseChange } from 'Components/UserContent/UseUserShowsRed/FirebaseHelpers/PostData'
 import { fetchShowEpisodes } from 'Components/UserContent/UseUserShowsRed/Middleware/fetchShowsData'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import useClickOutside from 'Utils/Hooks/UseClickOutside'
 
 type Props = {
   id: number
@@ -19,7 +20,7 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
   const { firebase, authUser, userContentLocalStorage } = useFrequentVariables()
 
   const [disableBtnWarning, setDisableBtnWarning] = useState<string | null>(null)
-  const notAuthButtons = useRef<HTMLDivElement>(null)
+  const notAuthButtons = useRef<HTMLDivElement>(null!)
   const dispatch = useAppDispatch()
   const showDatabase = useAppSelector((state) => selectShowDatabase(state, id))
 
@@ -28,19 +29,15 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
     dispatch(fetchShowEpisodes(Number(id), authUser.uid, firebase))
   }, [id, mediaType, showDatabase, authUser, firebase, dispatch])
 
-  useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside as EventListener)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside as EventListener)
-    }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
-
-  const handleClickOutside = (e: CustomEvent) => {
-    if (authUser?.uid) return
-    if (!notAuthButtons?.current?.contains(e.target as Node)) {
+  const handleDisableWarnings = useCallback(
+    () => () => {
+      if (authUser?.uid) return
       setDisableBtnWarning(null)
-    }
-  }
+    },
+    [authUser],
+  )
+
+  useClickOutside({ ref: notAuthButtons, callback: handleDisableWarnings })
 
   const showDissableBtnWarning = (btn: string) => {
     if (authUser?.uid) return

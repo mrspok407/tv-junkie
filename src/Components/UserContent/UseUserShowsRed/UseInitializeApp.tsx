@@ -23,7 +23,7 @@ const useInitializeApp = () => {
           await dispatch(setupAuthUser(authUser, firebase))
           console.log('setupAuthUser END')
           await dispatch(fetchUserShows(firebase))
-          dispatch(userShowsListeners({ uid: authUser.uid, firebase }))
+          dispatch(userShowsListeners({ firebase }))
         },
         () => {
           console.log('User logged out')

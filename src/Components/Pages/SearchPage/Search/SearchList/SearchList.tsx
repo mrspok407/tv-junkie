@@ -30,35 +30,36 @@ const SearchList: React.FC<Props> = ({
 }) => {
   useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside as EventListener)
-
     return () => {
       document.removeEventListener('mousedown', handleClickOutside as EventListener)
     }
     // eslint-disable-next-line
   }, [])
 
-  return (
-    <div className="search-list">
-      {error ? (
+  const renderData = () => {
+    if (error) {
+      return (
         <div className="error">
           <p>{error || 'Something gone terrible wrong'}</p>
         </div>
-      ) : searchResults.length === 0 && query !== '' && listIsOpen && !isSearchingList ? (
-        <PlaceholderNoResults message="No results found" />
-      ) : (
-        searchResults.map((item, index) => (
-          <SearchCard
-            key={item.id}
-            detailes={item}
-            closeList={closeList}
-            currentListItem={currentListItem}
-            index={index}
-            mediaTypeSearching={mediaTypeSearching}
-          />
-        ))
-      )}
-    </div>
-  )
+      )
+    }
+    if (searchResults.length === 0 && query !== '' && listIsOpen && !isSearchingList) {
+      return <PlaceholderNoResults message="No results found" />
+    }
+    return searchResults.map((item, index) => (
+      <SearchCard
+        key={item.id}
+        detailes={item}
+        closeList={closeList}
+        currentListItem={currentListItem}
+        index={index}
+        mediaTypeSearching={mediaTypeSearching}
+      />
+    ))
+  }
+
+  return <div className="search-list">{renderData()}</div>
 }
 
 export default SearchList

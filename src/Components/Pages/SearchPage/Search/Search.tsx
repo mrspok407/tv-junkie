@@ -1,3 +1,5 @@
+/* eslint-disable import/no-cycle */
+/* eslint-disable no-nested-ternary */
 import React, { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
 import { Link, useHistory } from 'react-router-dom'
@@ -14,7 +16,6 @@ let cancelRequest: any
 
 type Props = {
   navSearch?: boolean
-  navRef?: React.RefObject<any>
   closeNavMobile: () => void
 }
 
@@ -23,7 +24,7 @@ export interface HandleSearchArg {
   mediatype: { type: string; icon: string }
 }
 
-const Search: React.FC<Props> = ({ navSearch, navRef, closeNavMobile }) => {
+const Search: React.FC<Props> = ({ navSearch, closeNavMobile }) => {
   const [query, setQuery] = useState('')
   const [searchResults, setSearchResults] = useState<MainDataTMDB[]>([])
   const [isSearchingList, setIsSearchingList] = useState(false)

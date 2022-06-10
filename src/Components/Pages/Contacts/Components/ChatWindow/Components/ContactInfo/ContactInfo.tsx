@@ -118,7 +118,7 @@ const ContactInfo: React.FC<Props> = ({ isScrollBottomRef }) => {
         </button>
 
         {optionsPopupChatWindow && (
-          <ContactOptionsPopup contactOptionsRef={contactOptionsRef.current} contactInfo={contactInfo} />
+          <ContactOptionsPopup contactOptionsRef={contactOptionsRef} contactInfo={contactInfo} />
         )}
       </div>
       <div className="contact-info__status">

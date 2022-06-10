@@ -1,11 +1,12 @@
-import React, { useEffect, useContext } from 'react'
+import React, { useContext, useCallback } from 'react'
+import useClickOutside from 'Utils/Hooks/UseClickOutside'
 import { ContactInfoInterface } from '../../@Types'
 import { ContactsContext } from '../@Context/ContactsContext'
 import useContactOptions from './Hooks/UseContactOptions'
 import './ContactOptionsPopup.scss'
 
 type Props = {
-  contactOptionsRef: HTMLDivElement
+  contactOptionsRef: { current: HTMLDivElement }
   contactInfo: ContactInfoInterface
 }
 
@@ -13,18 +14,11 @@ const ContactOptionsPopup: React.FC<Props> = ({ contactOptionsRef, contactInfo }
   const context = useContext(ContactsContext)
   const optionsHandler = useContactOptions({ contactInfo })
 
-  useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside as EventListener)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside as EventListener)
-    }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  const handleClosePopups = useCallback(() => {
+    context?.dispatch({ type: 'closePopups', payload: '' })
+  }, [context])
 
-  const handleClickOutside = (e: CustomEvent) => {
-    if (!contactOptionsRef?.contains(e.target as Node)) {
-      context?.dispatch({ type: 'closePopups', payload: '' })
-    }
-  }
+  useClickOutside({ ref: contactOptionsRef, callback: handleClosePopups })
 
   const isPinned = !!(contactInfo.pinned_lastActivityTS?.slice(0, 4) === 'true')
 

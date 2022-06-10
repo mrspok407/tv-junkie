@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { useHistory } from 'react-router-dom'
@@ -5,6 +6,7 @@ import debounce from 'debounce'
 import classNames from 'classnames'
 import Loader from 'Components/UI/Placeholders/Loader'
 import { mediaTypesArr } from 'Utils'
+import useClickOutside from 'Utils/Hooks/UseClickOutside'
 import { HandleSearchArg } from '../Search'
 import './Input.scss'
 
@@ -39,7 +41,7 @@ const Input: React.FC<Props> = ({
   const [mediaTypesIsOpen, setMediaTypesIsOpen] = useState(false)
   const [searchReset, setSearchReset] = useState(false)
 
-  const mediaTypeRef = useRef<HTMLDivElement>(null)
+  const mediaTypeRef = useRef<HTMLDivElement>(null!)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const history = useHistory()
@@ -49,29 +51,22 @@ const Input: React.FC<Props> = ({
     if (history.action === 'PUSH' && !navSearch && windowWidth > MOBILE_LAYOUT && inputRef?.current) {
       inputRef.current.focus()
     }
-
-    document.addEventListener('mousedown', handleClickOutside as EventListener)
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside as EventListener)
-    }
   }, [])
 
+  const handleCloseMediaTypes = useCallback(() => {
+    setMediaTypesIsOpen(false)
+  }, [])
+  useClickOutside({ ref: mediaTypeRef, callback: handleCloseMediaTypes })
+
   useEffect(() => {
-    _runSearch(query, mediaType)
+    runSearch(query, mediaType)
   }, [mediaType])
 
   useEffect(() => {
-    _runSearch(query, mediaType)
+    runSearch(query, mediaType)
   }, [searchReset])
 
-  const handleClickOutside = (e: CustomEvent) => {
-    if (mediaTypeRef && mediaTypeRef.current && !mediaTypeRef.current.contains(e.target as Node)) {
-      setMediaTypesIsOpen(false)
-    }
-  }
-
-  const _runSearch = (query: string, mediatype: MediaType) => {
+  const runSearch = (query: string, mediatype: MediaType) => {
     onSearch({ query, mediatype })
   }
 

@@ -1,8 +1,8 @@
-import { useEffect, useCallback, useState } from 'react'
+import { useEffect, useCallback } from 'react'
 import * as _isFunction from 'lodash.isfunction'
 
 type Props = {
-  ref: any
+  ref: { current: HTMLElement }
   callback: () => void
 }
 
@@ -11,6 +11,7 @@ const useClickOutside = ({ ref, callback }: Props) => {
     (e: CustomEvent) => {
       if (!_isFunction(callback)) return
       if (!ref.current?.contains(e.target as Node)) {
+        console.log('click')
         callback()
       }
     },
@@ -18,7 +19,7 @@ const useClickOutside = ({ ref, callback }: Props) => {
   )
 
   useEffect(() => {
-    console.log('clickOutside')
+    console.log('event listener on')
     document.addEventListener('mousedown', handleClickOutside as EventListener)
     return () => {
       document.removeEventListener('mousedown', handleClickOutside as EventListener)
