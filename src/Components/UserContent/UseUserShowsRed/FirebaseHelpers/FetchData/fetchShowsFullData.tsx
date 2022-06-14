@@ -1,7 +1,7 @@
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import { ShowInfoFromUserDatabase } from 'Components/Firebase/@TypesFirebase'
 import { throwErrorNoData } from 'Components/Firebase/Errors'
-import { fetchEpisodesFullData } from '.'
+import { fetchEpisodesFullData } from './fetchEpisodesFullData'
 
 interface GetUserShowsFullInfoArg {
   userShows: ShowInfoFromUserDatabase[]

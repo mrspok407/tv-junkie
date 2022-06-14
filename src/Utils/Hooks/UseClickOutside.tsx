@@ -11,7 +11,6 @@ const useClickOutside = ({ ref, callback }: Props) => {
     (e: CustomEvent) => {
       if (!_isFunction(callback)) return
       if (!ref.current?.contains(e.target as Node)) {
-        console.log('click')
         callback()
       }
     },
@@ -19,7 +18,6 @@ const useClickOutside = ({ ref, callback }: Props) => {
   )
 
   useEffect(() => {
-    console.log('event listener on')
     document.addEventListener('mousedown', handleClickOutside as EventListener)
     return () => {
       document.removeEventListener('mousedown', handleClickOutside as EventListener)

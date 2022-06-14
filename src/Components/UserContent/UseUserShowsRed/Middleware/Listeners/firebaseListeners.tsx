@@ -2,8 +2,8 @@ import { AppThunk } from 'app/store'
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import { EpisodesFromUserDatabase, ShowInfoFromUserDatabase, SnapshotVal } from 'Components/Firebase/@TypesFirebase'
 import { getAuthUidFromState } from 'Components/UserAuth/Session/WithAuthentication/Helpers'
-import { handleNewShow, handleChangeShow } from './showHandlers'
-import { changeShowEpisodes, selectShow, selectShowsIds } from '../userShowsSliceRed'
+import { handleNewShow, handleChangeShow } from '../HandleData/handleShowsData'
+import { changeShowEpisodes, selectShow, selectShowsIds } from '../../userShowsSliceRed'
 
 interface UserShowsListeners {
   firebase: FirebaseInterface
@@ -29,11 +29,12 @@ export const userShowsListeners =
       })
 
     showsInfoRef.on('child_changed', (snapshot: SnapshotVal<ShowInfoFromUserDatabase>) => {
-      console.log('child_changed')
+      console.log('child_changed info listener')
       dispatch(handleChangeShow(snapshot.val()!, firebase))
     })
 
     showsEpisodesRef.on('child_changed', (snapshot: SnapshotVal<EpisodesFromUserDatabase>) => {
-      dispatch(changeShowEpisodes({ id: Number(snapshot.key), episodes: snapshot.val()!.episodes }))
+      console.log('child_change episodes listener')
+      dispatch(changeShowEpisodes({ id: Number(snapshot.key), data: snapshot.val()! }))
     })
   }

@@ -1,6 +1,5 @@
 /* eslint-disable max-len */
 import { AppThunk } from 'app/store'
-import { EpisodesFromUserDatabase } from 'Components/Firebase/@TypesFirebase'
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import { postUserShowScheme } from 'Components/Firebase/FirebasePostSchemes'
 import { getAuthUidFromState } from 'Components/UserAuth/Session/WithAuthentication/Helpers'
@@ -18,32 +17,26 @@ interface HandleDatabaseChange {
   firebase: FirebaseInterface
 }
 
-export const handleDatabaseChange =
-  ({ id, database, showDetailesTMDB, firebase }: HandleDatabaseChange): AppThunk =>
+export const updateUserShowStatus =
+  ({ id, database, firebase }: HandleDatabaseChange): AppThunk =>
   async (dispatch, getState) => {
     const authUid = getAuthUidFromState(getState())
-    const showStore = selectShow(getState(), id)
-
-    if (!showStore) {
-      dispatch(handleNewShowInDatabase({ id, database, showDetailesTMDB, firebase }))
-      return
-    }
-    if (showStore.database === database) return
+    const showFromStore = selectShow(getState(), id)
 
     const updateUsersWatching = () => {
       if (database === 'watchingShows') return 1
-      if (showStore.database !== 'watchingShows') return 0
+      if (showFromStore.database !== 'watchingShows') return 0
       return -1
     }
 
-    const updateData = {
-      [`allShowsList/${id}/usersWatching`]: firebase.ServerValueIncrement(updateUsersWatching()),
-      [`users/${authUid}/content/shows/${id}/database`]: database,
-      [`users/${authUid}/content/episodes/${id}/info/database`]: database,
-      [`users/${authUid}/content/episodes/${id}/info/isAllWatched_database`]: `${showStore.allEpisodesWatched}_${database}`,
-    }
-
     try {
+      const updateData = {
+        [`allShowsList/${id}/usersWatching`]: firebase.ServerValueIncrement(updateUsersWatching()),
+        [`users/${authUid}/content/shows/${id}/database`]: database,
+        [`users/${authUid}/content/episodes/${id}/info/database`]: database,
+        [`users/${authUid}/content/episodes/${id}/info/isAllWatched_database`]: `${showFromStore.allEpisodesWatched}_${database}`,
+      }
+
       await firebase.database().ref().update(updateData)
     } catch (err) {
       const error = err as ErrorInterface

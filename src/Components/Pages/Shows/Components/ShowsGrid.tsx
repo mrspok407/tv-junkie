@@ -1,6 +1,7 @@
 import { useAppDispatch, useAppSelector } from 'app/hooks'
 import { ShowFullDataStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
-import { handleDatabaseChange } from 'Components/UserContent/UseUserShowsRed/FirebaseHelpers/PostData'
+import { updateUserShowStatus } from 'Components/UserContent/UseUserShowsRed/Middleware/PostData/postShowsData'
+import { handleUserShowStatus } from 'Components/UserContent/UseUserShowsRed/ShowHandlers/showHandlers'
 import { selectShows } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
 import React from 'react'
 import { Link } from 'react-router-dom'
@@ -66,21 +67,15 @@ const ShowsGrid: React.FC<Props> = ({ data, section }) => {
                   <button
                     className="button"
                     onClick={() => {
-                      if (authUser?.uid) {
-                        dispatch(
-                          handleDatabaseChange({
-                            id: item.id,
-                            database: 'notWatchingShows',
-                            showDetailesTMDB: userShows[item.id],
-                            uid: authUser?.uid,
-                            firebase,
-                          }),
-                        )
-                      } else {
-                        userContentLocalStorage.removeShowLS({
+                      dispatch(
+                        handleUserShowStatus({
                           id: item.id,
-                        })
-                      }
+                          database: 'notWatchingShows',
+                          showDetailesTMDB: userShows[item.id],
+                          firebase,
+                          localStorageHandlers: userContentLocalStorage,
+                        }),
+                      )
                     }}
                     type="button"
                   >
@@ -93,14 +88,13 @@ const ShowsGrid: React.FC<Props> = ({ data, section }) => {
                     <button
                       className="button"
                       onClick={() => {
-                        if (!authUser?.uid) return
                         dispatch(
-                          handleDatabaseChange({
+                          handleUserShowStatus({
                             id: item.id,
                             database: 'watchingShows',
                             showDetailesTMDB: userShows[item.id],
-                            uid: authUser?.uid,
                             firebase,
+                            localStorageHandlers: userContentLocalStorage,
                           }),
                         )
                       }}

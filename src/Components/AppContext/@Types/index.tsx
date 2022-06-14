@@ -60,19 +60,19 @@ export interface HandleMovieInDatabasesArg {
   userOnRegister?: { email: string; uid: string; displayName: string }
 }
 
-export interface ToggleMovieLSArg {
+export interface ToggleDataLS {
   id: number
-  data: MainDataTMDB[] | MainDataTMDB
+  data: MainDataTMDB
+  database: string
 }
 
 export interface AppContextInterface {
   userContentLocalStorage: {
     watchLaterMovies: MainDataTMDB[]
     watchingShows: ShowFullDataStoreState[]
-    toggleMovieLS: ({ id, data }: ToggleMovieLSArg) => void
+    toggleMovieLS: ({ id, data }: ToggleDataLS) => void
     clearContentState: () => void
-    addShowLS: ({ id, data }: { id: number; data: MainDataTMDB }) => void
-    removeShowLS: ({ id }: { id: number }) => void
+    toggleShowLS: ({ id, data }: ToggleDataLS) => void
   }
   userContent: {
     loadingShows: boolean

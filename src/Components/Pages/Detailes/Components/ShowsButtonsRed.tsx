@@ -5,10 +5,10 @@ import * as ROUTES from 'Utils/Constants/routes'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import { useAppDispatch, useAppSelector } from 'app/hooks'
 import { selectShowDatabase } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
-import { handleDatabaseChange } from 'Components/UserContent/UseUserShowsRed/FirebaseHelpers/PostData'
-import { fetchShowEpisodes } from 'Components/UserContent/UseUserShowsRed/Middleware/fetchShowsData'
+import { fetchShowEpisodes } from 'Components/UserContent/UseUserShowsRed/Middleware/FetchData/fetchShowsData'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import useClickOutside from 'Utils/Hooks/UseClickOutside'
+import { handleUserShowStatus } from 'Components/UserContent/UseUserShowsRed/ShowHandlers/showHandlers'
 
 type Props = {
   id: number
@@ -55,21 +55,15 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
           })}
           type="button"
           onClick={() => {
-            if (authUser?.uid) {
-              dispatch(
-                handleDatabaseChange({
-                  id,
-                  database: 'watchingShows',
-                  showDetailesTMDB: detailes,
-                  firebase,
-                }),
-              )
-            } else {
-              userContentLocalStorage.addShowLS({
-                id: Number(id),
-                data: detailes,
-              })
-            }
+            dispatch(
+              handleUserShowStatus({
+                id,
+                database: 'watchingShows',
+                showDetailesTMDB: detailes,
+                firebase,
+                localStorageHandlers: userContentLocalStorage,
+              }),
+            )
           }}
         >
           Watching
@@ -85,20 +79,15 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
           })}
           type="button"
           onClick={() => {
-            if (authUser?.uid) {
-              dispatch(
-                handleDatabaseChange({
-                  id,
-                  database: 'notWatchingShows',
-                  showDetailesTMDB: detailes,
-                  firebase,
-                }),
-              )
-            } else {
-              userContentLocalStorage.removeShowLS({
-                id: Number(id),
-              })
-            }
+            dispatch(
+              handleUserShowStatus({
+                id,
+                database: 'notWatchingShows',
+                showDetailesTMDB: detailes,
+                firebase,
+                localStorageHandlers: userContentLocalStorage,
+              }),
+            )
           }}
         >
           Not watching
@@ -113,18 +102,19 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
             })}
             type="button"
             onClick={() => {
-              if (authUser?.uid) {
-                dispatch(
-                  handleDatabaseChange({
-                    id,
-                    database: 'droppedShows',
-                    showDetailesTMDB: detailes,
-                    firebase,
-                  }),
-                )
-              } else {
+              if (!authUser?.uid) {
                 showDissableBtnWarning('dropBtn')
+                return
               }
+              dispatch(
+                handleUserShowStatus({
+                  id,
+                  database: 'droppedShows',
+                  showDetailesTMDB: detailes,
+                  firebase,
+                  localStorageHandlers: userContentLocalStorage,
+                }),
+              )
             }}
           >
             Drop
@@ -148,18 +138,19 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
             })}
             type="button"
             onClick={() => {
-              if (authUser?.uid) {
-                dispatch(
-                  handleDatabaseChange({
-                    id,
-                    database: 'willWatchShows',
-                    showDetailesTMDB: detailes,
-                    firebase,
-                  }),
-                )
-              } else {
+              if (!authUser?.uid) {
                 showDissableBtnWarning('willWatchBtn')
+                return
               }
+              dispatch(
+                handleUserShowStatus({
+                  id,
+                  database: 'willWatchShows',
+                  showDetailesTMDB: detailes,
+                  firebase,
+                  localStorageHandlers: userContentLocalStorage,
+                }),
+              )
             }}
           >
             Will watch

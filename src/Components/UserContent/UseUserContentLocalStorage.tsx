@@ -1,13 +1,12 @@
-import { ToggleMovieLSArg } from 'Components/AppContext/@Types'
+import { ToggleDataLS } from 'Components/AppContext/@Types'
 import { useState, useEffect } from 'react'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
-import { ShowFullDataStoreState } from './UseUserShowsRed/@Types'
 
 const LOCAL_STORAGE_KEY_WATCHING_SHOWS = 'watchingShowsLocalS'
 const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = 'watchLaterMoviesLocalS'
 
 interface UserContent {
-  watchingShows: ShowFullDataStoreState[]
+  watchingShows: MainDataTMDB[]
   watchLaterMovies: MainDataTMDB[]
 }
 
@@ -17,9 +16,9 @@ const useUserContentLocalStorage = () => {
     watchLaterMovies: JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)!) || [],
   })
 
-  const toggleMovieLS = ({ id, data }: ToggleMovieLSArg) => {
+  const toggleMovieLS = ({ id, data }: ToggleDataLS) => {
     const movieExists = userContent.watchLaterMovies.find((item: { id: number }) => item.id === id)
-    const movie = Array.isArray(data) ? data.find((item: { id: number }) => item.id === id)! : data
+    const movie = data
 
     if (movieExists) {
       setUserContent({
@@ -34,22 +33,23 @@ const useUserContentLocalStorage = () => {
     }
   }
 
-  const addShowLS = ({ id, data = [] }: ToggleMovieLSArg) => {
-    if (userContent.watchingShows.find((item) => item.id === id)) return
-    const show: any = Array.isArray(data) ? data.find((item) => item.id === id) : data
+  const toggleShowLS = ({ id, data, database }: ToggleDataLS) => {
+    const show = userContent.watchingShows.find((item: { id: number }) => item.id === id)
 
-    setUserContent((prevState) => ({
-      ...prevState,
-      watchingShows: [...userContent.watchingShows, { ...show, userWatching: show && true }],
-    }))
-  }
+    if (show && database !== 'watchingShows') {
+      setUserContent((prevState) => ({
+        ...prevState,
+        watchingShows: [...prevState.watchingShows.filter((item) => item.id !== id)],
+      }))
+      return
+    }
 
-  const removeShowLS = ({ id }: { id: number }) => {
-    if (!userContent.watchingShows.find((item) => item.id === id)) return
-    setUserContent((prevState) => ({
-      ...prevState,
-      watchingShows: [...prevState.watchingShows.filter((item) => item.id !== id)],
-    }))
+    if (!show && database === 'watchingShows') {
+      setUserContent((prevState) => ({
+        ...prevState,
+        watchingShows: [...prevState.watchingShows, { ...data, userWatching: !!show, database: 'watchingShows' }],
+      }))
+    }
   }
 
   const clearContentState = () => {
@@ -64,8 +64,7 @@ const useUserContentLocalStorage = () => {
   return {
     ...userContent,
     toggleMovieLS,
-    addShowLS,
-    removeShowLS,
+    toggleShowLS,
     clearContentState,
   }
 }

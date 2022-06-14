@@ -2,10 +2,10 @@ import { AppThunk } from 'app/store'
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import { getAuthUidFromState } from 'Components/UserAuth/Session/WithAuthentication/Helpers'
 import { ErrorInterface } from 'Utils/Hooks/UseErrors/UseErrors'
-import sortDataSnapshot from '../../FirebaseHelpers/sortDataSnapshot'
-import fetchShowsFullData from '../FirebaseHelpers/FetchData/fetchShowsFullData'
-import { selectShow, selectShowEpisodes, setShowsError, setShowEpisodes, setUserShows } from '../userShowsSliceRed'
-import { fetchEpisodesFullData } from '../FirebaseHelpers/FetchData'
+import sortDataSnapshot from '../../../FirebaseHelpers/sortDataSnapshot'
+import fetchShowsFullData from '../../FirebaseHelpers/FetchData/fetchShowsFullData'
+import { selectShow, selectShowEpisodes, setShowsError, setShowEpisodes, setUserShows } from '../../userShowsSliceRed'
+import { fetchEpisodesFullData } from '../../FirebaseHelpers/FetchData/fetchEpisodesFullData'
 
 export const fetchUserShows =
   (firebase: FirebaseInterface): AppThunk =>
