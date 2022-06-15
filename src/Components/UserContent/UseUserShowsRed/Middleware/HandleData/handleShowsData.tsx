@@ -16,8 +16,8 @@ export const handleNewShow =
     const isWatchingShow = showData.database === 'watchingShows'
     try {
       let episodes: EpisodesStoreState[] = []
-      const showInfoSnapshot = await firebase.showInfoFireDatabase(showData.id).once('value')
-      if (showInfoSnapshot.val() === null) {
+      const showInfoFireSnapshot = await firebase.showInfoFireDatabase(showData.id).once('value')
+      if (showInfoFireSnapshot.val() === null) {
         throwErrorNoData()
       }
 
@@ -25,12 +25,12 @@ export const handleNewShow =
         episodes = await fetchEpisodesFullData({ uid: authUserUid, showKey: showData.id, firebase })
       }
       const show = {
-        ...showInfoSnapshot.val()!,
+        ...showInfoFireSnapshot.val()!,
         ...showData,
         episodes,
         episodesFetched: isWatchingShow,
       }
-      return dispatch(addNewShow(show))
+      dispatch(addNewShow(show))
     } catch (err) {
       const errors = err as ErrorInterface
       dispatch(setShowsError(errors))
@@ -48,9 +48,9 @@ export const handleChangeShow =
 
     const isWatchingShow = showData.database === 'watchingShows'
     const isEpisodesFetched = showFromStore.episodesFetched
-
+    console.log({ isWatchingShow })
     if (!isWatchingShow || isEpisodesFetched) {
-      // console.log('allready fetched')
+      console.log('allready fetched')
       dispatch(changeShow(showData))
       return
     }
@@ -59,7 +59,7 @@ export const handleChangeShow =
       const episodes = await fetchEpisodesFullData({ uid: authUserUid, showKey: showData.id, firebase })
       console.log('handleChangeShow after AWAIT')
 
-      const show = { ...showData, episodes, episodesFetched: true }
+      const show = { info: { ...showFromStore, ...showData, episodesFetched: true }, episodes }
       dispatch(changeShow(show))
     } catch (err) {
       const errors = err as ErrorInterface

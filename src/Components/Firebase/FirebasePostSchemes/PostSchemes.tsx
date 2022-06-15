@@ -1,16 +1,14 @@
-import { MainDataTMDB } from 'Utils/@TypesTMDB'
-import { EpisodesFromUserDatabase } from '../@TypesFirebase'
-import { FirebaseInterface } from '../FirebaseContext'
+/* eslint-disable max-len */
 
-interface PostScheme {
-  authUid: string
-  showDetailesTMDB: MainDataTMDB
-  showEpisodes: EpisodesFromUserDatabase['episodes']
-  showDatabase: string
-  firebase: FirebaseInterface
-}
+import { PostUserShowScheme, UpdateUserShowStatusScheme } from './@Types'
 
-export const postUserShowScheme = ({ authUid, showDetailesTMDB, showEpisodes, showDatabase, firebase }: PostScheme) => {
+export const postUserShowScheme = ({
+  authUid,
+  showDetailesTMDB,
+  showEpisodes,
+  showDatabase,
+  firebase,
+}: PostUserShowScheme) => {
   const showsSubDatabase =
     showDetailesTMDB.status === 'Ended' || showDetailesTMDB.status === 'Canceled' ? 'ended' : 'ongoing'
 
@@ -38,5 +36,26 @@ export const postUserShowScheme = ({ authUid, showDetailesTMDB, showEpisodes, sh
     [`allShowsList/${showDetailesTMDB.id}/usersWatching`]: firebase.ServerValueIncrement(
       showDatabase === 'watchingShows' ? 1 : 0,
     ),
+  }
+}
+
+export const updateUserShowStatusScheme = ({
+  authUid,
+  id,
+  userShowStatus,
+  showFromStore,
+  firebase,
+}: UpdateUserShowStatusScheme) => {
+  const updateUsersWatching = () => {
+    if (userShowStatus === 'watchingShows') return 1
+    if (showFromStore.database !== 'watchingShows') return 0
+    return -1
+  }
+
+  return {
+    [`allShowsList/${id}/usersWatching`]: firebase.ServerValueIncrement(updateUsersWatching()),
+    [`users/${authUid}/content/shows/${id}/database`]: userShowStatus,
+    [`users/${authUid}/content/episodes/${id}/info/database`]: userShowStatus,
+    [`users/${authUid}/content/episodes/${id}/info/isAllWatched_database`]: `${showFromStore.allEpisodesWatched}_${userShowStatus}`,
   }
 }

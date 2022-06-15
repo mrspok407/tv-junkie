@@ -24,10 +24,10 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
   const dispatch = useAppDispatch()
   const showDatabase = useAppSelector((state) => selectShowDatabase(state, id))
 
-  useEffect(() => {
-    if (mediaType !== 'show' || !authUser?.uid || showDatabase === 'notWatchingShows') return
-    dispatch(fetchShowEpisodes(Number(id), authUser.uid, firebase))
-  }, [id, mediaType, showDatabase, authUser, firebase, dispatch])
+  // useEffect(() => {
+  //   if (mediaType !== 'show' || !authUser?.uid || showDatabase === 'notWatchingShows') return
+  //   dispatch(fetchShowEpisodes(Number(id), authUser.uid, firebase))
+  // }, [id, mediaType, showDatabase, authUser, firebase, dispatch])
 
   const handleDisableWarnings = useCallback(
     () => () => {

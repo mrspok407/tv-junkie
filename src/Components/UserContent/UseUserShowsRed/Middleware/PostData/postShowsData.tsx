@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 import { AppThunk } from 'app/store'
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
-import { postUserShowScheme } from 'Components/Firebase/FirebasePostSchemes'
+import { postUserShowScheme, updateUserShowStatusScheme } from 'Components/Firebase/FirebasePostSchemes/PostSchemes'
 import { getAuthUidFromState } from 'Components/UserAuth/Session/WithAuthentication/Helpers'
 import addShowToFireDatabase from 'Components/UserContent/FirebaseHelpers/addShowFireDatabase'
 import getShowEpisodesTMDB from 'Components/UserContent/TmdbAPIHelpers/getShowEpisodesFromAPI'
@@ -18,25 +18,13 @@ interface HandleDatabaseChange {
 }
 
 export const updateUserShowStatus =
-  ({ id, database, firebase }: HandleDatabaseChange): AppThunk =>
+  ({ id, database: userShowStatus, firebase }: HandleDatabaseChange): AppThunk =>
   async (dispatch, getState) => {
     const authUid = getAuthUidFromState(getState())
     const showFromStore = selectShow(getState(), id)
 
-    const updateUsersWatching = () => {
-      if (database === 'watchingShows') return 1
-      if (showFromStore.database !== 'watchingShows') return 0
-      return -1
-    }
-
     try {
-      const updateData = {
-        [`allShowsList/${id}/usersWatching`]: firebase.ServerValueIncrement(updateUsersWatching()),
-        [`users/${authUid}/content/shows/${id}/database`]: database,
-        [`users/${authUid}/content/episodes/${id}/info/database`]: database,
-        [`users/${authUid}/content/episodes/${id}/info/isAllWatched_database`]: `${showFromStore.allEpisodesWatched}_${database}`,
-      }
-
+      const updateData = updateUserShowStatusScheme({ authUid, id, userShowStatus, showFromStore, firebase })
       await firebase.database().ref().update(updateData)
     } catch (err) {
       const error = err as ErrorInterface
@@ -49,7 +37,6 @@ export const handleNewShowInDatabase =
   ({ id, database, showDetailesTMDB, firebase }: HandleDatabaseChange): AppThunk =>
   async (dispatch, getState) => {
     const authUid = getAuthUidFromState(getState())
-    let updateData = {}
     let episodesFromFireDatabase: EpisodesTMDB[] = []
 
     try {
@@ -69,18 +56,13 @@ export const handleNewShowInDatabase =
         episodesFromFireDatabase = showDataSnapshot.val()?.episodes!
       }
       const showEpisodesUserDatabase = formatShowEpisodesForUserDatabase(episodesFromFireDatabase)
-      updateData = postUserShowScheme({
+      const updateData = postUserShowScheme({
         authUid,
         showDetailesTMDB,
         showEpisodes: showEpisodesUserDatabase,
         showDatabase: database,
         firebase,
       })
-
-      const artificialDelay = new Promise((res: any) => {
-        setTimeout(() => res(4), 2000)
-      })
-      await artificialDelay
 
       firebase.database().ref().update(updateData)
     } catch (err) {

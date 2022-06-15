@@ -30,7 +30,7 @@ export const userShowsListeners =
 
     showsInfoRef.on('child_changed', (snapshot: SnapshotVal<ShowInfoFromUserDatabase>) => {
       console.log('child_changed info listener')
-      dispatch(handleChangeShow(snapshot.val()!, firebase))
+      dispatch(handleChangeShow({ ...snapshot.val()!, key: snapshot.key }, firebase))
     })
 
     showsEpisodesRef.on('child_changed', (snapshot: SnapshotVal<EpisodesFromUserDatabase>) => {

@@ -28,15 +28,24 @@ export const fetchUserShows =
   }
 
 export const fetchShowEpisodes =
-  (id: number, uid: string, firebase: FirebaseInterface): AppThunk =>
+  (id: number, firebase: FirebaseInterface): AppThunk =>
   async (dispatch, getState) => {
-    if (!selectShow(getState(), id)) return
-    if (selectShowEpisodes(getState(), id).length) {
+    const authUserUid = getAuthUidFromState(getState())
+    const showFromStore = selectShow(getState(), id)
+
+    if (!showFromStore) return
+    if (showFromStore.database === 'notWatchingShows' || showFromStore.episodesFetched) {
       console.log('fetchShowEpisodes earlyReturn')
       return
     }
     try {
-      const episodes = await fetchEpisodesFullData({ uid, showKey: id, firebase })
+      const episodes = await fetchEpisodesFullData({ uid: authUserUid, showKey: id, firebase })
+      // const artificialDelay = new Promise((res) => {
+      //   setTimeout(() => {
+      //     return res(1)
+      //   }, 2500)
+      // })
+      // await artificialDelay
       console.log('fetchShowEpisodes')
       dispatch(setShowEpisodes({ id, episodes }))
     } catch (err) {

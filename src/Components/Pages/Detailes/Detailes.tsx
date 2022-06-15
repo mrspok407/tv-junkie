@@ -14,6 +14,7 @@ import { selectShowsLoading } from 'Components/UserContent/UseUserShowsRed/userS
 import PosterWrapper from './Components/PosterWrapper'
 import { MainInfo } from './Components/MainInfo'
 import useGetDataTMDB from './Hooks/UseGetDataTMDB'
+import useFetchShowEpisodes from './Hooks/UseFetchShowEpisodes'
 import './Detailes.scss'
 
 type Props = {
@@ -26,9 +27,52 @@ export const DetailesPage: React.FC<Props> = ({
   },
 }) => {
   const [detailes, loadingTMDB, similarContent, error] = useGetDataTMDB({ id, mediaType })
+
   const showsInitialLoading = useAppSelector(selectShowsLoading)
+  const { loadingFireEpisodes } = useFetchShowEpisodes({ mediaType, id })
 
   useGoogleRedirect()
+
+  const renderDetailes = () => {
+    if (error) {
+      return (
+        <div className="detailes-page__error">
+          <h1>{error}</h1>
+        </div>
+      )
+    }
+
+    if (loadingTMDB || showsInitialLoading || loadingFireEpisodes) {
+      return <PlaceholderLoadingFullInfo delayAnimation="0.4s" />
+    }
+
+    return (
+      <div className="detailes-page">
+        <PosterWrapper detailes={detailes} mediaType={mediaType} />
+        <MainInfo detailes={detailes} mediaType={mediaType} id={Number(id)} />
+
+        <div className="detailes-page__description">{detailes.overview}</div>
+
+        {mediaType === 'show' && (
+          <ShowsEpisodes
+            parentComponent="detailesPage"
+            episodesData={detailes.seasons}
+            showTitle={detailes.name}
+            id={Number(id)}
+          />
+        )}
+        {similarContent.length && (
+          <div className="detailes-page__slider">
+            <div className="detailes-page__slider-title">
+              {mediaType === 'movie' ? 'Similar movies' : 'Similar shows'}
+            </div>
+
+            <Slider sliderData={similarContent} />
+          </div>
+        )}
+      </div>
+    )
+  }
 
   return (
     <>
@@ -49,42 +93,7 @@ export const DetailesPage: React.FC<Props> = ({
       </Helmet>
       <Header isLogoVisible={false} />
 
-      <div className="detailes-page-container">
-        {error && (
-          <div className="detailes-page__error">
-            <h1>{error}</h1>
-          </div>
-        )}
-
-        {!error && !loadingTMDB && !showsInitialLoading ? (
-          <div className="detailes-page">
-            <PosterWrapper detailes={detailes} mediaType={mediaType} />
-            <MainInfo detailes={detailes} mediaType={mediaType} id={Number(id)} />
-
-            <div className="detailes-page__description">{detailes.overview}</div>
-
-            {mediaType === 'show' && (
-              <ShowsEpisodes
-                parentComponent="detailesPage"
-                episodesData={detailes.seasons}
-                showTitle={detailes.name}
-                id={Number(id)}
-              />
-            )}
-            {similarContent.length && (
-              <div className="detailes-page__slider">
-                <div className="detailes-page__slider-title">
-                  {mediaType === 'movie' ? 'Similar movies' : 'Similar shows'}
-                </div>
-
-                <Slider sliderData={similarContent} />
-              </div>
-            )}
-          </div>
-        ) : (
-          <PlaceholderLoadingFullInfo delayAnimation="0.4s" />
-        )}
-      </div>
+      <div className="detailes-page-container">{renderDetailes()}</div>
       <Footer />
       <ScrollToTopBar />
       <ScrollToTopOnUpdate />
