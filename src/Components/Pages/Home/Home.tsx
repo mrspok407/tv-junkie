@@ -24,7 +24,7 @@ import { organiseFutureEpisodesByMonth } from '../Calendar/CalendarHelpers'
 import './Home.scss'
 
 const HomePage: React.FC = () => {
-  const { authUser, userContentHandler } = useFrequentVariables()
+  const { authUser } = useFrequentVariables()
   const { sliders, slidersLoading } = useGetSlidersContent()
 
   const userShows = useAppSelectorArray<ShowFullDataStoreState>(selectShows)
@@ -77,7 +77,8 @@ const HomePage: React.FC = () => {
 
   const renderAuthUser = () => (
     <>
-      {!showsInitialLoading && !userContentHandler.loadingShowsOnRegister && (
+      {/* {!showsInitialLoading && !userContentHandler.loadingShowsOnRegister && ( */}
+      {!showsInitialLoading && (
         <>
           {willAirEpisodes.length > 0 ? (
             <div className="home-page__heading">

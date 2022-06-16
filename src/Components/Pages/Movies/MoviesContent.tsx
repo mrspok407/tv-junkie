@@ -205,12 +205,11 @@ const MoviesContent: React.FC<Props> = ({ moviesData, loadingIds, openLinksMovie
                       //   id: item.id,
                       //   data: item,
                       // })
-                      context.userContent.handleUserMoviesOnClient({ id: item.id })
                     } else {
-                      context.userContentLocalStorage.toggleMovieLS({
-                        id: item.id,
-                        data: movies,
-                      })
+                      // context.userContentLocalStorage.toggleMovieLS({
+                      //   id: item.id,
+                      //   data: movies,
+                      // })
                     }
                   }}
                   type="button"
@@ -231,7 +230,8 @@ const MoviesContent: React.FC<Props> = ({ moviesData, loadingIds, openLinksMovie
 
   return (
     <div className="content-results">
-      {loadingMovies || context.userContentHandler.loadingShowsOnRegister ? (
+      {/* {loadingMovies || context.userContentHandler.loadingShowsOnRegister ? ( */}
+      {loadingMovies ? (
         <Loader className="loader--pink" />
       ) : movies.length === 0 ? (
         <PlaceholderNoMovies />

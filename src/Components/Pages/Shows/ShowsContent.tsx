@@ -1,4 +1,4 @@
-import React, { useCallback, useReducer, useState } from 'react'
+import React, { useCallback, useContext, useReducer, useState } from 'react'
 import classNames from 'classnames'
 import PlaceholderNoShows from 'Components/UI/Placeholders/PlaceholderNoShows'
 import Loader from 'Components/UI/Placeholders/Loader'
@@ -8,6 +8,7 @@ import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import useAppSelectorArray from 'Utils/Hooks/UseAppSelectorArray'
 import { ShowFullDataStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
 import useScrollEffect from 'Utils/Hooks/UseScrollEffect'
+import { AppContext } from 'Components/AppContext/AppContextHOC'
 import { INITIAL_STATE, ShowsContentState, ACTIONTYPES, ActionTypesEnum } from './ReducerConfig/@Types'
 import reducer from './ReducerConfig'
 import ShowsGrid from './Components/ShowsGrid'
@@ -21,7 +22,8 @@ const THROTTLE_TIMEOUT = 500
 const MAX_GRID_COLUMNS = 4
 
 const ShowsContent: React.FC = () => {
-  const { authUser, userContentHandler } = useFrequentVariables()
+  const { authUser } = useFrequentVariables()
+  const context = useContext(AppContext)
 
   const [{ activeSection, loadedShows }, localDispatch] = useReducer<React.Reducer<ShowsContentState, ACTIONTYPES>>(
     reducer,
@@ -59,7 +61,8 @@ const ShowsContent: React.FC = () => {
 
   const renderContent = () => {
     const loadingShows = authUser?.uid ? showsInitialLoading : false
-    if (loadingShows || userContentHandler.loadingShowsOnRegister) {
+    // if (loadingShows || context.userContentHandler.loadingShowsOnRegister) {
+    if (loadingShows) {
       return <Loader className="loader--pink" />
     }
 

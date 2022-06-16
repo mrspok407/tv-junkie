@@ -1,12 +1,5 @@
-import {
-  UserMoviesInterface,
-  ShowFullDataStoreState,
-  UserWillAirEpisodesInterface,
-} from 'Components/UserContent/UseUserShowsRed/@Types'
-import { LOADING_ADDING_TO_DATABASE_INITIAL } from 'Components/UserContent/UseContentHandler'
 import { FirebaseInterface, FIREBASE_INITIAL_STATE } from 'Components/Firebase/FirebaseContext'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
-import { UserToWatchShowsInterface } from 'Components/UserContent/UseUserShows/Hooks/UseGetUserToWatchShows'
 
 export interface ShowInterface {
   id: number
@@ -69,37 +62,33 @@ export interface ToggleDataLS {
 export interface AppContextInterface {
   userContentLocalStorage: {
     watchLaterMovies: MainDataTMDB[]
-    watchingShows: ShowFullDataStoreState[]
+    watchingShows: MainDataTMDB[]
     toggleMovieLS: ({ id, data }: ToggleDataLS) => void
     clearContentState: () => void
     toggleShowLS: ({ id, data }: ToggleDataLS) => void
   }
-  userContent: {
-    loadingShows: boolean
-    loadingNotFinishedShows: boolean
-    loadingMovies: boolean
-    userShows: ShowFullDataStoreState[]
-    userWillAirEpisodes: UserWillAirEpisodesInterface[]
-    userToWatchShows: UserToWatchShowsInterface[]
-    userMovies: MainDataTMDB[]
-    resetContentState: () => void
-    handleUserMoviesOnClient: ({ id, data }: { id: number; data?: UserMoviesInterface }) => void
-  }
-  userContentHandler: {
-    addShowsToDatabaseOnRegister: ({ shows }: AddShowsToDatabaseOnRegisterArg) => void
-    addShowToDatabase: ({ id, show }: AddShowToDatabaseArg) => void
-    handleShowInDatabases: ({ id, data, database, userShows }: HandleShowInDatabasesArg) => void
-    handleMovieInDatabases: ({ id, data }: HandleMovieInDatabasesArg) => void
-    handleLoadingShowsOnRegister: (isLoading: boolean) => void
-    loadingAddShowToDatabase: {
-      watchingShows: boolean
-      droppedShows: boolean
-      willWatchShows: boolean
-      notWatchingShows: boolean
-      loading: boolean
-    }
-    loadingShowsOnRegister: boolean
-  }
+  // userContent: {
+  //   loadingShows: boolean
+  //   loadingNotFinishedShows: boolean
+  //   loadingMovies: boolean
+  //   userShows: ShowFullDataStoreState[]
+  //   userWillAirEpisodes: UserWillAirEpisodesInterface[]
+  //   userToWatchShows: UserToWatchShowsInterface[]
+  //   userMovies: MainDataTMDB[]
+  //   resetContentState: () => void
+  // }
+  // userContentHandler: {
+  //   // addShowsToDatabaseOnRegister: ({ shows }: AddShowsToDatabaseOnRegisterArg) => void
+  //   // handleLoadingShowsOnRegister: (isLoading: boolean) => void
+  //   // loadingAddShowToDatabase: {
+  //   //   watchingShows: boolean
+  //   //   droppedShows: boolean
+  //   //   willWatchShows: boolean
+  //   //   notWatchingShows: boolean
+  //   //   loading: boolean
+  //   // }
+  //   // loadingShowsOnRegister: boolean
+  // }
   firebase: FirebaseInterface
   newContactsActivity: boolean | null
   errors: {
@@ -117,30 +106,25 @@ export const CONTEXT_INITIAL_STATE = {
     watchingShows: [],
     toggleMovieLS: () => {},
     clearContentState: () => {},
-    addShowLS: () => {},
-    removeShowLS: () => {},
+    toggleShowLS: () => {},
   },
-  userContent: {
-    loadingShows: true,
-    loadingNotFinishedShows: true,
-    loadingMovies: true,
-    userShows: [],
-    userWillAirEpisodes: [],
-    userToWatchShows: [],
-    userMovies: [],
-    resetContentState: () => {},
-    handleUserMoviesOnClient: () => {},
-    handleUserShowsOnClient: () => {},
-  },
-  userContentHandler: {
-    addShowsToDatabaseOnRegister: () => {},
-    addShowToDatabase: () => {},
-    handleShowInDatabases: () => {},
-    handleMovieInDatabases: () => {},
-    handleLoadingShowsOnRegister: () => {},
-    loadingAddShowToDatabase: LOADING_ADDING_TO_DATABASE_INITIAL,
-    loadingShowsOnRegister: false,
-  },
+  // userContent: {
+  //   loadingShows: true,
+  //   loadingNotFinishedShows: true,
+  //   loadingMovies: true,
+  //   userShows: [],
+  //   userWillAirEpisodes: [],
+  //   userToWatchShows: [],
+  //   userMovies: [],
+  //   resetContentState: () => {},
+  //   handleUserShowsOnClient: () => {},
+  // },
+  // userContentHandler: {
+  //   // addShowsToDatabaseOnRegister: () => {},
+  //   // handleLoadingShowsOnRegister: () => {},
+  //   loadingAddShowToDatabase: LOADING_ADDING_TO_DATABASE_INITIAL,
+  //   loadingShowsOnRegister: false,
+  // },
   firebase: FIREBASE_INITIAL_STATE,
   newContactsActivity: false,
   errors: { error: null, handleError: () => {} },

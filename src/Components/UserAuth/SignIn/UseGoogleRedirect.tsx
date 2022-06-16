@@ -23,13 +23,13 @@ const useGoogleRedirect = () => {
   }
 
   useEffect(() => {
-    context.userContentHandler.handleLoadingShowsOnRegister(true)
+    // context.userContentHandler.handleLoadingShowsOnRegister(true)
     firebase.app
       .auth()
       .getRedirectResult()
       .then((result: any) => {
         if (!result.user) {
-          context.userContentHandler.handleLoadingShowsOnRegister(false)
+          // context.userContentHandler.handleLoadingShowsOnRegister(false)
           return
         }
 
@@ -45,26 +45,26 @@ const useGoogleRedirect = () => {
           })
           .then(() => {
             if (!authUserGoogle.additionalUserInfo.isNewUser) {
-              context.userContentHandler.handleLoadingShowsOnRegister(false)
+              // context.userContentHandler.handleLoadingShowsOnRegister(false)
               return
             }
 
             const watchingShows = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)!) || []
             const watchLaterMovies = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)!) || []
 
-            context.userContentHandler.addShowsToDatabaseOnRegister({
-              shows: watchingShows,
-              uid: authUserGoogle.user.uid,
-            })
+            // context.userContentHandler.addShowsToDatabaseOnRegister({
+            //   shows: watchingShows,
+            //   uid: authUserGoogle.user.uid,
+            // })
 
-            watchLaterMovies.forEach((item: MovieInterface) => {
-              context.userContentHandler.handleMovieInDatabases({
-                id: item.id,
-                data: item,
-                onRegister: true,
-                userOnRegister: authUserGoogle.user,
-              })
-            })
+            // watchLaterMovies.forEach((item: MovieInterface) => {
+            //   context.userContentHandler.handleMovieInDatabases({
+            //     id: item.id,
+            //     data: item,
+            //     onRegister: true,
+            //     userOnRegister: authUserGoogle.user,
+            //   })
+            // })
           })
           .then(() => {
             clearLocalStorage()
@@ -74,11 +74,11 @@ const useGoogleRedirect = () => {
           })
           .catch(() => {
             clearLocalStorage()
-            context.userContentHandler.handleLoadingShowsOnRegister(false)
+            // context.userContentHandler.handleLoadingShowsOnRegister(false)
           })
       })
       .catch((error: any) => {
-        context.userContentHandler.handleLoadingShowsOnRegister(false)
+        // context.userContentHandler.handleLoadingShowsOnRegister(false)
         console.log(error)
       })
   }, [firebase]) // eslint-disable-line react-hooks/exhaustive-deps

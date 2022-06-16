@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function Loader({ className = '' }) {
+const Loader = ({ className = '' }) => {
   return (
     <div className={`loader ${className}`}>
       <div className="loader-shadow">
@@ -16,3 +16,5 @@ export default function Loader({ className = '' }) {
     </div>
   )
 }
+
+export default Loader

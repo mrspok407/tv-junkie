@@ -88,7 +88,7 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
       return
     }
 
-    context.userContentHandler.handleLoadingShowsOnRegister(true)
+    // context.userContentHandler.handleLoadingShowsOnRegister(true)
 
     firebase
       .createUserWithEmailAndPassword(email, password)
@@ -105,19 +105,19 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
             const watchingShows = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)!) || []
             const watchLaterMovies = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)!) || []
 
-            context.userContentHandler.addShowsToDatabaseOnRegister({
-              shows: watchingShows,
-              uid: authUser.user.uid,
-            })
+            // context.userContentHandler.addShowsToDatabaseOnRegister({
+            //   shows: watchingShows,
+            //   uid: authUser.user.uid,
+            // })
 
-            watchLaterMovies.forEach((item: MovieInterface) => {
-              context.userContentHandler.handleMovieInDatabases({
-                id: item.id,
-                data: item,
-                onRegister: true,
-                userOnRegister: authUser.user,
-              })
-            })
+            // watchLaterMovies.forEach((item: MovieInterface) => {
+            //   context.userContentHandler.handleMovieInDatabases({
+            //     id: item.id,
+            //     data: item,
+            //     onRegister: true,
+            //     userOnRegister: authUser.user,
+            //   })
+            // })
           })
           .then(() => {
             localStorage.removeItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)
@@ -136,7 +136,7 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
         errorsOnSubmit.error = error
         setErrors(errorsOnSubmit)
         setSubmitRequestLoading(false)
-        context.userContentHandler.handleLoadingShowsOnRegister(false)
+        // context.userContentHandler.handleLoadingShowsOnRegister(false)
       })
   }
 

@@ -1,10 +1,11 @@
 import { ShowFullDataStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { useMemo } from 'react'
+import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import { LoadedShowsInterface } from '../ReducerConfig/@Types'
 
 type Props = {
-  showsData: ShowFullDataStoreState[]
+  showsData: ShowFullDataStoreState[] | MainDataTMDB[]
   activeSection: string
   sortByState: string
   loadedShows: LoadedShowsInterface

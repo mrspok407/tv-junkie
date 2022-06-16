@@ -1,9 +1,11 @@
 import React from 'react'
 
-export default function () {
+const PlaceholderNoMovies = () => {
   return (
     <div className="placeholder--no-movies">
       <h1>Very empty</h1>
     </div>
   )
 }
+
+export default PlaceholderNoMovies

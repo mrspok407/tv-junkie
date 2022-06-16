@@ -34,7 +34,7 @@ const SignInWithGoogleForm = () => {
       .auth()
       [signInType](provider)
       .then((authUser: AuthUserGoogleSignInInterface) => {
-        context.userContentHandler.handleLoadingShowsOnRegister(true)
+        // context.userContentHandler.handleLoadingShowsOnRegister(true)
 
         context.firebase
           .user(authUser.user.uid)
@@ -46,40 +46,40 @@ const SignInWithGoogleForm = () => {
           })
           .then(() => {
             if (!authUser.additionalUserInfo.isNewUser) {
-              context.userContentHandler.handleLoadingShowsOnRegister(false)
+              // context.userContentHandler.handleLoadingShowsOnRegister(false)
               return
             }
 
             const watchingShows = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)!) || []
             const watchLaterMovies = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)!) || []
 
-            context.userContentHandler.addShowsToDatabaseOnRegister({
-              shows: watchingShows,
-              uid: authUser.user.uid,
-            })
+            // context.userContentHandler.addShowsToDatabaseOnRegister({
+            //   shows: watchingShows,
+            //   uid: authUser.user.uid,
+            // })
 
-            watchLaterMovies.forEach((item: MovieInterface) => {
-              context.userContentHandler.handleMovieInDatabases({
-                id: item.id,
-                data: item,
-                onRegister: true,
-                userOnRegister: authUser.user,
-              })
-            })
+            // watchLaterMovies.forEach((item: MovieInterface) => {
+            //   context.userContentHandler.handleMovieInDatabases({
+            //     id: item.id,
+            //     data: item,
+            //     onRegister: true,
+            //     userOnRegister: authUser.user,
+            //   })
+            // })
           })
           .then(() => {
             clearLocalStorage()
           })
           .catch(() => {
             clearLocalStorage()
-            context.userContentHandler.handleLoadingShowsOnRegister(false)
+            // context.userContentHandler.handleLoadingShowsOnRegister(false)
           })
       })
       .then(() => {
         history.push(ROUTES.HOME_PAGE)
       })
       .catch((error: any) => {
-        context.userContentHandler.handleLoadingShowsOnRegister(false)
+        // context.userContentHandler.handleLoadingShowsOnRegister(false)
         console.log(error)
       })
   }

@@ -1,20 +1,20 @@
 import { useAppDispatch, useAppSelector } from 'app/hooks'
 import { ShowFullDataStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
-import { updateUserShowStatus } from 'Components/UserContent/UseUserShowsRed/Middleware/PostData/postShowsData'
 import { handleUserShowStatus } from 'Components/UserContent/UseUserShowsRed/ShowHandlers/showHandlers'
 import { selectShows } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
 import React from 'react'
 import { Link } from 'react-router-dom'
+import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import { LIST_OF_GENRES } from 'Utils/Constants'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 
 type Props = {
-  data: ShowFullDataStoreState[]
+  data: ShowFullDataStoreState[] | MainDataTMDB[]
   section: string
 }
 
 const ShowsGrid: React.FC<Props> = ({ data, section }) => {
-  const { authUser, firebase, userContentLocalStorage } = useFrequentVariables()
+  const { firebase, userContentLocalStorage } = useFrequentVariables()
   const dispatch = useAppDispatch()
   const userShows = useAppSelector(selectShows)
   return (

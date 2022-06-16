@@ -1,5 +1,6 @@
 import { ShowFullDataStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { useMemo } from 'react'
+import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 
 type Props = {
@@ -7,7 +8,7 @@ type Props = {
   activeSection: string
 }
 
-const UseSectionFilteredShows = ({ showsData, activeSection }: Props) => {
+const UseSectionFilteredShows = ({ showsData, activeSection }: Props): ShowFullDataStoreState[] | MainDataTMDB[] => {
   const { authUser, userContentLocalStorage } = useFrequentVariables()
   const sectionFilteredShows = useMemo(() => {
     if (!authUser.uid) {

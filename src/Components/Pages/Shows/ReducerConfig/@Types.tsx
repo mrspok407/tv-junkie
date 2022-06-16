@@ -1,4 +1,5 @@
 import { ShowFullDataStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
+import { MainDataTMDB } from 'Utils/@TypesTMDB'
 
 export enum ActionTypesEnum {
   IncrementLoadedShows = 'incrementLoadedShows',
@@ -7,8 +8,14 @@ export enum ActionTypesEnum {
 }
 
 export type ACTIONTYPES =
-  | { type: ActionTypesEnum.IncrementLoadedShows; payload: { sectionFilteredShows: ShowFullDataStoreState[] } }
-  | { type: ActionTypesEnum.IncrementLoadedShowsLS; payload: { sectionFilteredShows: ShowFullDataStoreState[] } }
+  | {
+      type: ActionTypesEnum.IncrementLoadedShows
+      payload: { sectionFilteredShows: ShowFullDataStoreState[] | MainDataTMDB[] }
+    }
+  | {
+      type: ActionTypesEnum.IncrementLoadedShowsLS
+      payload: { sectionFilteredShows: ShowFullDataStoreState[] | MainDataTMDB[] }
+    }
   | { type: ActionTypesEnum.ChangeActiveSection; payload: { activeSection: string } }
 
 export interface LoadedShowsInterface {

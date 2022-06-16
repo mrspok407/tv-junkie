@@ -110,10 +110,10 @@ export const MainInfo: React.FC<Props> = ({ detailes, mediaType, id }) => {
                 // })
                 // context.userContent.handleUserMoviesOnClient({ id: Number(id), data: detailes })
               } else {
-                userContentLocalStorage.toggleMovieLS({
-                  id: Number(id),
-                  data: detailes,
-                })
+                // userContentLocalStorage.toggleMovieLS({
+                //   id: Number(id),
+                //   data: detailes,
+                // })
               }
             }}
             type="button"

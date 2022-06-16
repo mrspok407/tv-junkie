@@ -81,7 +81,8 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
     }
   }
 
-  if (showsInitialLoading || context.userContentHandler.loadingShowsOnRegister) {
+  // if (showsInitialLoading || context.userContentHandler.loadingShowsOnRegister) {
+  if (showsInitialLoading) {
     return (
       <div className="content-results content-results--calendar">
         <Loader className="loader--pink" />

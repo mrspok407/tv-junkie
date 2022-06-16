@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import ShowsEpisodes from 'Components/UI/Templates/SeasonsAndEpisodes/ShowsEpisodes'
@@ -15,38 +16,38 @@ const ToWatchEpisodesContent: React.FC = () => {
 
   const context = useContext(AppContext)
 
-  const getContent = useCallback(() => {
-    const watchingShows = context.userContent.userShows.filter(
-      (show) => show.database === 'watchingShows' && !show.allEpisodesWatched,
-    )
-    const toWatchEpisodes: any = context.userContent.userToWatchShows
+  // const getContent = useCallback(() => {
+  //   const watchingShows = context.userContent.userShows.filter(
+  //     (show) => show.database === 'watchingShows' && !show.allEpisodesWatched,
+  //   )
+  //   const toWatchEpisodes: any = context.userContent.userToWatchShows
 
-    if (toWatchEpisodes.length === 0) {
-      setWatchingShows([])
-      setLoading(false)
-      return
-    }
+  //   if (toWatchEpisodes.length === 0) {
+  //     setWatchingShows([])
+  //     setLoading(false)
+  //     return
+  //   }
 
-    const watchingShowsModified = watchingShows
-      .reduce((acc: ShowFullDataStoreState[], show) => {
-        const showToWatch = toWatchEpisodes.find((item: any) => item.id === show.id)
-        if (showToWatch) {
-          const showMerged = merge(show, showToWatch, {
-            arrayMerge: combineMergeObjects,
-          })
-          acc.push(showMerged)
-        }
-        return acc
-      }, [])
-      .sort((a, b) => (a.first_air_date > b.first_air_date ? -1 : 1))
+  //   const watchingShowsModified = watchingShows
+  //     .reduce((acc: ShowFullDataStoreState[], show) => {
+  //       const showToWatch = toWatchEpisodes.find((item: any) => item.id === show.id)
+  //       if (showToWatch) {
+  //         const showMerged = merge(show, showToWatch, {
+  //           arrayMerge: combineMergeObjects,
+  //         })
+  //         acc.push(showMerged)
+  //       }
+  //       return acc
+  //     }, [])
+  //     .sort((a, b) => (a.first_air_date > b.first_air_date ? -1 : 1))
 
-    setWatchingShows(watchingShowsModified)
-    setLoading(false)
-  }, [context.userContent])
+  //   setWatchingShows(watchingShowsModified)
+  //   setLoading(false)
+  // }, [context.userContent])
 
-  useEffect(() => {
-    getContent()
-  }, [getContent])
+  // useEffect(() => {
+  //   getContent()
+  // }, [getContent])
 
   return (
     <div className="content-results content-results--to-watch-page">
