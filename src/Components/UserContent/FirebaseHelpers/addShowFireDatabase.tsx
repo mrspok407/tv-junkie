@@ -3,14 +3,14 @@ import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import { removeUndefinedNullFromObject } from 'Utils'
 import { ShowEpisodesTMDB } from '../TmdbAPIHelpers/getShowEpisodesFromAPI'
 
-type Arguments = {
+type AddShowToFireDatabase = {
   firebase: FirebaseInterface
   showDetailesTMDB: MainDataTMDB
   showEpisodesTMDB: ShowEpisodesTMDB
   database: string
 }
 
-const addShowToFireDatabase = ({ showDetailesTMDB, showEpisodesTMDB, database, firebase }: Arguments) =>
+const addShowToFireDatabase = ({ showDetailesTMDB, showEpisodesTMDB, database, firebase }: AddShowToFireDatabase) =>
   firebase.showFullDataFireDatabase(showDetailesTMDB.id).transaction((snapshot) => {
     if (snapshot !== null) {
       return

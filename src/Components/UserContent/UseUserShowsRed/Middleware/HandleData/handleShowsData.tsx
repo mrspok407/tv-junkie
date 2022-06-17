@@ -7,6 +7,7 @@ import { getAuthUidFromState } from 'Components/UserAuth/Session/WithAuthenticat
 import { EpisodesStoreState } from '../../@Types'
 import { addNewShow, changeShow, selectShow, setShowsError } from '../../userShowsSliceRed'
 import { fetchEpisodesFullData } from '../../FirebaseHelpers/FetchData/fetchEpisodesFullData'
+import { handleShowsError } from '../../ErrorHandlers/handleShowsError'
 
 export const handleNewShow =
   (showData: ShowInfoFromUserDatabase, firebase: FirebaseInterface): AppThunk =>
@@ -32,8 +33,7 @@ export const handleNewShow =
       }
       dispatch(addNewShow(show))
     } catch (err) {
-      const errors = err as ErrorInterface
-      dispatch(setShowsError(errors))
+      dispatch(handleShowsError(err))
     }
   }
 
@@ -49,11 +49,11 @@ export const handleChangeShow =
     const isWatchingShow = showData.database === 'watchingShows'
     const isEpisodesFetched = showFromStore.episodesFetched
     console.log({ isWatchingShow })
-    if (!isWatchingShow || isEpisodesFetched) {
-      console.log('allready fetched')
-      dispatch(changeShow(showData))
-      return
-    }
+    // if (!isWatchingShow || isEpisodesFetched) {
+    //   console.log('allready fetched')
+    //   dispatch(changeShow(showData))
+    //   return
+    // }
 
     try {
       const episodes = await fetchEpisodesFullData({ uid: authUserUid, showKey: showData.id, firebase })
@@ -62,7 +62,6 @@ export const handleChangeShow =
       const show = { info: { ...showFromStore, ...showData, episodesFetched: true }, episodes }
       dispatch(changeShow(show))
     } catch (err) {
-      const errors = err as ErrorInterface
-      dispatch(setShowsError(errors))
+      dispatch(handleShowsError(err))
     }
   }

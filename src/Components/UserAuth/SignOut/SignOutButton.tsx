@@ -1,19 +1,14 @@
-import React, { useContext } from 'react'
-import { AppContext } from 'Components/AppContext/AppContextHOC'
-
-const SESSION_STORAGE_KEY_SHOWS = 'userShows'
+import React from 'react'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 
 const SignOutButton = () => {
-  const { firebase, userContent } = useContext(AppContext)
+  const { firebase } = useFrequentVariables()
   const signOut = () => {
-    firebase.signOut().then(() => {
-      userContent.resetContentState()
-      sessionStorage.setItem(SESSION_STORAGE_KEY_SHOWS, JSON.stringify([]))
-    })
+    firebase.signOut()
   }
 
   return (
-    <button type="button" className="button button--profile" onClick={() => signOut()}>
+    <button type="button" className="button button--profile" onClick={signOut}>
       Sign Out
     </button>
   )

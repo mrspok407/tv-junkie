@@ -4,8 +4,9 @@ import { getAuthUidFromState } from 'Components/UserAuth/Session/WithAuthenticat
 import { ErrorInterface } from 'Utils/Hooks/UseErrors/UseErrors'
 import sortDataSnapshot from '../../../FirebaseHelpers/sortDataSnapshot'
 import fetchShowsFullData from '../../FirebaseHelpers/FetchData/fetchShowsFullData'
-import { selectShow, selectShowEpisodes, setShowsError, setShowEpisodes, setUserShows } from '../../userShowsSliceRed'
+import { selectShow, setShowsError, setShowEpisodes, setUserShows } from '../../userShowsSliceRed'
 import { fetchEpisodesFullData } from '../../FirebaseHelpers/FetchData/fetchEpisodesFullData'
+import { handleShowsError } from '../../ErrorHandlers/handleShowsError'
 
 export const fetchUserShows =
   (firebase: FirebaseInterface): AppThunk =>
@@ -21,9 +22,7 @@ export const fetchUserShows =
       const showsFullData = await fetchShowsFullData({ userShows, firebase, uid: authUserUid })
       dispatch(setUserShows(showsFullData))
     } catch (err) {
-      const error = err as ErrorInterface
-      dispatch(setShowsError({ message: error.message, errorData: error }))
-      throw new Error(error.message)
+      dispatch(handleShowsError(err))
     }
   }
 

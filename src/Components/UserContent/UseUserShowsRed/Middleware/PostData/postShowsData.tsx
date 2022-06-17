@@ -3,12 +3,11 @@ import { AppThunk } from 'app/store'
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import { postUserShowScheme, updateUserShowStatusScheme } from 'Components/Firebase/FirebasePostSchemes/PostSchemes'
 import { getAuthUidFromState } from 'Components/UserAuth/Session/WithAuthentication/Helpers'
-import addShowToFireDatabase from 'Components/UserContent/FirebaseHelpers/addShowFireDatabase'
-import getShowEpisodesTMDB from 'Components/UserContent/TmdbAPIHelpers/getShowEpisodesFromAPI'
 import { EpisodesTMDB, MainDataTMDB } from 'Utils/@TypesTMDB'
 import { formatShowEpisodesForUserDatabase } from 'Utils/FormatTMDBAPIData'
-import { ErrorInterface } from 'Utils/Hooks/UseErrors/UseErrors'
-import { selectShow, setShowsError } from '../../userShowsSliceRed'
+import { handleShowsError } from '../../ErrorHandlers/handleShowsError'
+import postShowFireDatabase from '../../FirebaseHelpers/PostData/postShowFireDatabase'
+import { changeUserShowStatus, selectShow } from '../../userShowsSliceRed'
 
 interface HandleDatabaseChange {
   id: number
@@ -23,13 +22,14 @@ export const updateUserShowStatus =
     const authUid = getAuthUidFromState(getState())
     const showFromStore = selectShow(getState(), id)
 
+    dispatch(changeUserShowStatus({ id, userShowStatus }))
+
     try {
       const updateData = updateUserShowStatusScheme({ authUid, id, userShowStatus, showFromStore, firebase })
       await firebase.database().ref().update(updateData)
     } catch (err) {
-      const error = err as ErrorInterface
-      dispatch(setShowsError({ message: error.message, errorData: error }))
-      throw new Error(error.message)
+      dispatch(changeUserShowStatus({ id, userShowStatus }))
+      dispatch(handleShowsError(err))
     }
   }
 
@@ -46,15 +46,10 @@ export const handleNewShowInDatabase =
       if (existsInFireDatabase) {
         episodesFromFireDatabase = showFullDataFireDatabase.val()?.episodes!
       } else {
-        const showEpisodesTMDB = await getShowEpisodesTMDB({ id })
-        const { snapshot: showDataSnapshot } = await addShowToFireDatabase({
-          firebase,
-          database,
-          showDetailesTMDB,
-          showEpisodesTMDB,
-        })
-        episodesFromFireDatabase = showDataSnapshot.val()?.episodes!
+        const showDataSnapshot = await postShowFireDatabase({ firebase, database, showDetailesTMDB })
+        episodesFromFireDatabase = showDataSnapshot?.episodes!
       }
+
       const showEpisodesUserDatabase = formatShowEpisodesForUserDatabase(episodesFromFireDatabase)
       const updateData = postUserShowScheme({
         authUid,
@@ -66,8 +61,6 @@ export const handleNewShowInDatabase =
 
       firebase.database().ref().update(updateData)
     } catch (err) {
-      const error = err as ErrorInterface
-      dispatch(setShowsError({ message: error.message, errorData: error }))
-      throw new Error(error.message)
+      dispatch(handleShowsError(err))
     }
   }

@@ -134,3 +134,8 @@ export const removeUndefinedNullFromObject = (obj: any) => {
   })
   return newObj
 }
+
+export const artificialAsyncDelay = (timeout: number) =>
+  new Promise((res) => {
+    setTimeout(() => res(''), timeout)
+  })

@@ -1,7 +1,7 @@
 import React from 'react'
 import './PlaceholderLoadingFullInfo.scss'
 
-export default function ({ delayAnimation }) {
+const PlaceholderLoadingFullInfo = ({ delayAnimation }) => {
   return (
     <div className="detailes-page detailes-page--placeholder" style={{ animationDelay: delayAnimation }}>
       <div className="detailes-page__poster-wrapper">
@@ -38,3 +38,5 @@ export default function ({ delayAnimation }) {
     </div>
   )
 }
+
+export default PlaceholderLoadingFullInfo

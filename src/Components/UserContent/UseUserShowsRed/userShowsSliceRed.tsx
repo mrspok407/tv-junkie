@@ -70,6 +70,9 @@ export const userShowsSliceRed = createSlice({
         state.data.episodes[action.payload.info.id] = action.payload.episodes
       }
     },
+    changeUserShowStatus: (state, action: PayloadAction<{ id: number; userShowStatus: string }>) => {
+      state.data.info[action.payload.id].database = action.payload.userShowStatus
+    },
     setShowEpisodes: (state, action: PayloadAction<{ id: number; episodes: EpisodesStoreState[] }>) => {
       console.log(action.payload.episodes)
       state.data.episodes[action.payload.id] = action.payload.episodes
@@ -114,6 +117,7 @@ export const {
   updateLoadingShows,
   resetShows,
   setShowsError,
+  changeUserShowStatus,
 } = userShowsSliceRed.actions
 
 export const selectShows = (state: RootState) => state.userShows.data.info

@@ -23,7 +23,7 @@ interface GroupChatMemberStatusInterface {
 
 const contactsDatabaseRef = (uid: string) => `${uid}/contactsDatabase`
 
-export const _removeMemberFromGroup = async ({
+export const removeMemberFromGroupTest = async ({
   data,
   context,
   database,
@@ -62,7 +62,9 @@ export const _removeMemberFromGroup = async ({
       [`users/${member.key}/contactsDatabase/contactsLastActivity/${groupChatKey}`]: timeStampData,
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+    await new Promise((resolve) => {
+      setTimeout(resolve, 1500)
+    })
 
     return database.ref().update(updateData)
   } catch (error) {
@@ -70,7 +72,7 @@ export const _removeMemberFromGroup = async ({
   }
 }
 
-export const _addNewGroupMembers = async ({
+export const addNewGroupMembersTest = async ({
   data,
   context,
   database,
@@ -118,14 +120,16 @@ export const _addNewGroupMembers = async ({
         timeStamp,
       },
     }
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+    await new Promise((resolve) => {
+      setTimeout(resolve, 1500)
+    })
     return database.ref().update(updateData)
   } catch (error) {
     throw new Error(`There has been some error updating database: ${error}`)
   }
 }
 
-export const _createNewGroup = async ({
+export const createNewGroupTest = async ({
   data,
   context,
   database,
@@ -198,7 +202,7 @@ export const _createNewGroup = async ({
   }
 }
 
-export const _newContactRequest = async ({
+export const newContactRequestTest = async ({
   data,
   context,
   database,
@@ -241,7 +245,7 @@ export const _newContactRequest = async ({
   }
 }
 
-export const _handleContactRequest = async ({
+export const handleContactRequestTest = async ({
   data,
   context,
   database,

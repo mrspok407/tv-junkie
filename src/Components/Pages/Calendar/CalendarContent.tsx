@@ -29,7 +29,6 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
   const { authUser } = useAppSelector(selectAuthUser)
   const [openMonths, setOpenMonths] = useState<string[]>([])
   // const [willAirEpisodes, setWillAirEpisodes] = useState<UserWillAirEpisodesInterface[]>([])
-  const context = useContext(AppContext)
 
   const showsInitialLoading = useAppSelector(selectShowsLoading)
 

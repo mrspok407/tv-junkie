@@ -1,13 +1,7 @@
-import React, { Component } from 'react'
+import React from 'react'
 
-export default class PlaceholderNoResults extends Component {
-  render() {
-    return <div className={`placeholder--no-results ${this.props.className || ''}`}>{this.props.message}</div>
-  }
-}
-
-const PlaceholderNoResults = () => {
-  return <div className={`placeholder--no-results ${this.props.className || ''}`}>{this.props.message}</div>
+const PlaceholderNoResults = ({ className, message }) => {
+  return <div className={`placeholder--no-results ${className || ''}`}>{message}</div>
 }
 
 export default PlaceholderNoResults

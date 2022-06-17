@@ -1,11 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import classNames from 'classnames'
 import * as ROUTES from 'Utils/Constants/routes'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import { useAppDispatch, useAppSelector } from 'app/hooks'
 import { selectShowDatabase } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
-import { fetchShowEpisodes } from 'Components/UserContent/UseUserShowsRed/Middleware/FetchData/fetchShowsData'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import useClickOutside from 'Utils/Hooks/UseClickOutside'
 import { handleUserShowStatus } from 'Components/UserContent/UseUserShowsRed/ShowHandlers/showHandlers'
@@ -13,21 +12,15 @@ import { handleUserShowStatus } from 'Components/UserContent/UseUserShowsRed/Sho
 type Props = {
   id: number
   detailes: MainDataTMDB
-  mediaType: string
 }
 
-const ShowsButtons: React.FC<Props> = ({ id, detailes, mediaType }) => {
+const ShowsButtons: React.FC<Props> = ({ id, detailes }) => {
   const { firebase, authUser, userContentLocalStorage } = useFrequentVariables()
 
   const [disableBtnWarning, setDisableBtnWarning] = useState<string | null>(null)
   const notAuthButtons = useRef<HTMLDivElement>(null!)
   const dispatch = useAppDispatch()
   const showDatabase = useAppSelector((state) => selectShowDatabase(state, id))
-
-  // useEffect(() => {
-  //   if (mediaType !== 'show' || !authUser?.uid || showDatabase === 'notWatchingShows') return
-  //   dispatch(fetchShowEpisodes(Number(id), authUser.uid, firebase))
-  // }, [id, mediaType, showDatabase, authUser, firebase, dispatch])
 
   const handleDisableWarnings = useCallback(
     () => () => {

@@ -10,8 +10,8 @@ import {
 } from './@TypesFirebase'
 
 export interface FirebaseFetchMethods<T> {
-  once: (value: string, callback?: any) => Promise<SnapshotVal<T>>
-  on: (value: string, callback: (snapshot: any) => void) => void
+  once: (value: string, callback?: any, errorCallback?: (err: unknown) => any) => Promise<SnapshotVal<T>>
+  on: (value: string, callback: (snapshot: any) => void, errorCallback?: (err: unknown) => any) => void
 }
 
 export interface FirebaseReferenceProps<T> {

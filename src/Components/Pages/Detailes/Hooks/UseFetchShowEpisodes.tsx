@@ -1,8 +1,8 @@
 import { useAppDispatch, useAppSelector } from 'app/hooks'
+import { handleShowsError } from 'Components/UserContent/UseUserShowsRed/ErrorHandlers/handleShowsError'
 import { fetchShowEpisodes } from 'Components/UserContent/UseUserShowsRed/Middleware/FetchData/fetchShowsData'
-import { selectShowsLoading, setShowsError } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
-import React, { useState, useEffect, useCallback } from 'react'
-import { ErrorInterface } from 'Utils/Hooks/UseErrors/UseErrors'
+import { selectShowsLoading } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
+import { useState, useEffect, useCallback } from 'react'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 
 type Props = {
@@ -23,8 +23,7 @@ const useFetchShowEpisodes = ({ mediaType, id }: Props) => {
     try {
       await dispatch(fetchShowEpisodes(Number(id), firebase))
     } catch (err) {
-      const error = err as ErrorInterface
-      dispatch(setShowsError(error))
+      dispatch(handleShowsError(err))
     } finally {
       setLoadingFireEpisodes(false)
     }
