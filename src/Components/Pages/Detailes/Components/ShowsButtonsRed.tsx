@@ -1,13 +1,14 @@
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import classNames from 'classnames'
 import * as ROUTES from 'Utils/Constants/routes'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import { useAppDispatch, useAppSelector } from 'app/hooks'
-import { selectShowDatabase } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
+import { selectShowDatabase, selectShows } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import useClickOutside from 'Utils/Hooks/UseClickOutside'
 import { handleUserShowStatus } from 'Components/UserContent/UseUserShowsRed/ShowHandlers/showHandlers'
+import { shallowEqual } from 'react-redux'
 
 type Props = {
   id: number
@@ -21,6 +22,8 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes }) => {
   const notAuthButtons = useRef<HTMLDivElement>(null!)
   const dispatch = useAppDispatch()
   const showDatabase = useAppSelector((state) => selectShowDatabase(state, id))
+
+  const allShows = useAppSelector(selectShows, shallowEqual)
 
   const handleDisableWarnings = useCallback(
     () => () => {

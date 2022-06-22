@@ -1,5 +1,6 @@
+/* eslint-disable max-len */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Helmet } from 'react-helmet'
 import Header from 'Components/UI/Header/Header'
 import Slider from 'Components/UI/Slider/Slider'

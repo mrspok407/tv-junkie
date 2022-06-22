@@ -2,7 +2,7 @@ import { RootState } from 'app/store'
 import merge from 'deepmerge'
 import { createSlice, current, PayloadAction } from '@reduxjs/toolkit'
 import { combineMergeObjects } from 'Utils'
-import { EpisodesFromUserDatabase, ShowInfoFromUserDatabase } from 'Components/Firebase/@TypesFirebase'
+import { EpisodesFromUserDatabase } from 'Components/Firebase/@TypesFirebase'
 import { UserShowsStoreState, ShowFullDataStoreState, EpisodesStoreState } from './@Types'
 
 const userShowsInitialState: UserShowsStoreState = {
@@ -58,16 +58,17 @@ export const userShowsSliceRed = createSlice({
       state,
       action: PayloadAction<{
         info: ShowFullDataStoreState
-        episodes: EpisodesStoreState[]
+        episodes?: EpisodesStoreState[]
       }>,
     ) => {
       const showFromStore = state.data.info[action.payload.info.id]
       state.data.info[action.payload.info.id] = action.payload.info
+      state.data.timeStamps[action.payload.info.id] = action.payload.info.timeStamp
 
       console.log({ changeShowsPay: action.payload, showFromStore: current(showFromStore) })
 
       if (!showFromStore.episodesFetched) {
-        state.data.episodes[action.payload.info.id] = action.payload.episodes
+        state.data.episodes[action.payload.info.id] = action.payload.episodes || []
       }
     },
     changeUserShowStatus: (state, action: PayloadAction<{ id: number; userShowStatus: string }>) => {

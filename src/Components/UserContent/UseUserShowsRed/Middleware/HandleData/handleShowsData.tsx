@@ -1,11 +1,10 @@
 import { AppThunk } from 'app/store'
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import { throwErrorNoData } from 'Components/Firebase/Errors'
-import { ErrorInterface } from 'Utils/Hooks/UseErrors/UseErrors'
 import { ShowInfoFromUserDatabase } from 'Components/Firebase/@TypesFirebase'
 import { getAuthUidFromState } from 'Components/UserAuth/Session/WithAuthentication/Helpers'
 import { EpisodesStoreState } from '../../@Types'
-import { addNewShow, changeShow, selectShow, setShowsError } from '../../userShowsSliceRed'
+import { addNewShow, changeShow, selectShow } from '../../userShowsSliceRed'
 import { fetchEpisodesFullData } from '../../FirebaseHelpers/FetchData/fetchEpisodesFullData'
 import { handleShowsError } from '../../ErrorHandlers/handleShowsError'
 
@@ -41,19 +40,20 @@ export const handleChangeShow =
   (showData: ShowInfoFromUserDatabase, firebase: FirebaseInterface): AppThunk =>
   async (dispatch, getState) => {
     const authUserUid = getAuthUidFromState(getState())
-    const showFromStore = selectShow(getState(), showData.id)
+    const showFromStore = selectShow(getState(), showData.id) || {}
 
     console.log({ showFromStore })
     if (!showFromStore) return
 
     const isWatchingShow = showData.database === 'watchingShows'
     const isEpisodesFetched = showFromStore.episodesFetched
-    console.log({ isWatchingShow })
-    // if (!isWatchingShow || isEpisodesFetched) {
-    //   console.log('allready fetched')
-    //   dispatch(changeShow(showData))
-    //   return
-    // }
+    if (!isWatchingShow || isEpisodesFetched) {
+      console.log('allready fetched')
+      console.log({ showData })
+      const show = { info: { ...showFromStore, ...showData } }
+      dispatch(changeShow(show))
+      return
+    }
 
     try {
       const episodes = await fetchEpisodesFullData({ uid: authUserUid, showKey: showData.id, firebase })
