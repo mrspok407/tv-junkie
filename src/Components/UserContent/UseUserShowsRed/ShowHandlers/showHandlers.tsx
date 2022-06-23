@@ -3,12 +3,13 @@ import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import { getAuthUidFromState } from 'Components/UserAuth/Session/WithAuthentication/Helpers'
 import useUserContentLocalStorage from 'Components/UserContent/UseUserContentLocalStorage'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
+import { UserShowStatuses } from '../@Types'
 import { handleNewShowInDatabase, updateUserShowStatus } from '../Middleware/PostData/postShowsData'
 import { selectShow } from '../userShowsSliceRed'
 
 type Props = {
   id: number
-  database: string
+  database: UserShowStatuses
   showDetailesTMDB: MainDataTMDB
   firebase: FirebaseInterface
   localStorageHandlers: ReturnType<typeof useUserContentLocalStorage>

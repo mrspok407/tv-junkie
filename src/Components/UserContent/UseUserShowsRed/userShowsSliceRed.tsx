@@ -3,7 +3,7 @@ import merge from 'deepmerge'
 import { createSlice, current, PayloadAction } from '@reduxjs/toolkit'
 import { combineMergeObjects } from 'Utils'
 import { EpisodesFromUserDatabase } from 'Components/Firebase/@TypesFirebase'
-import { UserShowsStoreState, ShowFullDataStoreState, EpisodesStoreState } from './@Types'
+import { UserShowsStoreState, ShowFullDataStoreState, EpisodesStoreState, UserShowStatuses } from './@Types'
 
 const userShowsInitialState: UserShowsStoreState = {
   data: {
@@ -12,7 +12,8 @@ const userShowsInitialState: UserShowsStoreState = {
     episodes: {},
     timeStamps: {},
   },
-  loading: true,
+  initialLoading: true,
+  loadingNewShow: false,
   error: null,
 }
 
@@ -24,7 +25,7 @@ export const userShowsSliceRed = createSlice({
       reducer(state, action: PayloadAction<UserShowsStoreState['data']>) {
         console.log({ initialPayload: action.payload })
         state.data = action.payload
-        state.loading = false
+        state.initialLoading = false
       },
       prepare(data: ShowFullDataStoreState[]) {
         const preparedData = data.reduce(
@@ -46,6 +47,8 @@ export const userShowsSliceRed = createSlice({
     },
     addNewShow: (state, action: PayloadAction<ShowFullDataStoreState>) => {
       console.log(action.payload)
+      state.loadingNewShow = false
+
       if (state.data.ids.includes(action.payload.id)) return
       state.data.ids.push(action.payload.id)
 
@@ -67,11 +70,11 @@ export const userShowsSliceRed = createSlice({
 
       console.log({ changeShowsPay: action.payload, showFromStore: current(showFromStore) })
 
-      if (!showFromStore.episodesFetched) {
+      if (!showFromStore?.episodesFetched) {
         state.data.episodes[action.payload.info.id] = action.payload.episodes || []
       }
     },
-    changeUserShowStatus: (state, action: PayloadAction<{ id: number; userShowStatus: string }>) => {
+    changeUserShowStatus: (state, action: PayloadAction<{ id: number; userShowStatus: UserShowStatuses }>) => {
       state.data.info[action.payload.id].database = action.payload.userShowStatus
     },
     setShowEpisodes: (state, action: PayloadAction<{ id: number; episodes: EpisodesStoreState[] }>) => {
@@ -94,9 +97,13 @@ export const userShowsSliceRed = createSlice({
       })
       state.data.episodes[action.payload.id] = mergeEpisodes
     },
-    updateLoadingShows: (state, action: PayloadAction<UserShowsStoreState['loading']>) => {
+    updateLoadingShows: (state, action: PayloadAction<UserShowsStoreState['initialLoading']>) => {
       console.log(action.payload)
-      state.loading = action.payload
+      state.initialLoading = action.payload
+    },
+    updateLoadingNewShow: (state, action: PayloadAction<UserShowsStoreState['loadingNewShow']>) => {
+      console.log(action.payload)
+      state.loadingNewShow = action.payload
     },
     resetShows: () => {
       return { ...userShowsInitialState, loading: false }
@@ -104,7 +111,8 @@ export const userShowsSliceRed = createSlice({
     setShowsError: (state, action: PayloadAction<UserShowsStoreState['error']>) => {
       console.log(action.payload)
       state.error = action.payload
-      state.loading = false
+      state.initialLoading = false
+      state.loadingNewShow = false
     },
   },
 })
@@ -116,6 +124,7 @@ export const {
   setShowEpisodes,
   changeShowEpisodes,
   updateLoadingShows,
+  updateLoadingNewShow,
   resetShows,
   setShowsError,
   changeUserShowStatus,
@@ -127,7 +136,8 @@ export const selectShowsIds = (state: RootState) => state.userShows.data.ids
 export const selectShow = (state: RootState, id: number) => state.userShows.data.info[id]
 export const selectShowEpisodes = (state: RootState, id: number) => state.userShows.data.episodes[id]
 export const selectShowDatabase = (state: RootState, id: number) => state.userShows.data.info[id]?.database
-export const selectShowsLoading = (state: RootState) => state.userShows.loading
+export const selectShowsLoading = (state: RootState) => state.userShows.initialLoading
+export const selectLoadingNewShow = (state: RootState) => state.userShows.loadingNewShow
 
 export const selectShowsError = (state: RootState) => state.userShows.error
 

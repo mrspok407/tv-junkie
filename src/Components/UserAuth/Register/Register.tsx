@@ -330,7 +330,7 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
         })}
         type="submit"
       >
-        {submitRequestLoading ? <span className="auth__form-loading" /> : 'Register'}
+        {submitRequestLoading ? <span className="button-loader-circle" /> : 'Register'}
       </button>
       <SignInWithGoogleForm />
     </form>

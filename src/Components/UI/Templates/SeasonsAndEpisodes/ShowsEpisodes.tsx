@@ -295,10 +295,7 @@ const ShowsEpisodes: React.FC<Props> = ({ episodesData, showTitle, id, parentCom
                 }
                 onClick={() => showSeasonsEpisodes(season.id, season.season_number)}
               >
-                <div className="episodes__episode-group-name">
-                  Season
-                  {season.season_number}
-                </div>
+                <div className="episodes__episode-group-name">Season {season.season_number}</div>
                 {daysToNewSeason > 0 && (
                   <div className="episodes__episode-group-days-to-air">{daysToNewSeason} days to air</div>
                 )}

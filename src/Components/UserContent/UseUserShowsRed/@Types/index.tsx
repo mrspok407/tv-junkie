@@ -2,9 +2,17 @@ import { SeasonFromUserDatabase, SingleEpisodeFromUserDatabase } from 'Component
 import { EpisodesTMDB, MainDataTMDB, SingleEpisodeTMDB } from 'Utils/@TypesTMDB'
 import { ErrorInterface } from 'Utils/Hooks/UseErrors/UseErrors'
 
+export type UserShowStatuses = 'watchingShows' | 'droppedShows' | 'willWatchShows' | 'notWatchingShows' | ''
+export const showStatusMapper = {
+  watchingShows: 'Watching',
+  droppedShows: 'Drop',
+  willWatchShows: 'Will watch',
+  notWatchingShows: 'Not watching',
+}
+
 export interface ShowFullDataStoreState extends MainDataTMDB {
   allEpisodesWatched: boolean
-  database: string
+  database: UserShowStatuses
   episodes: EpisodesStoreState[]
   episodesFetched: boolean | undefined
   finished: boolean
@@ -47,6 +55,7 @@ export interface UserShowsStoreState {
       [key: string]: number
     }
   }
-  loading: boolean
+  initialLoading: boolean
+  loadingNewShow: UserShowStatuses | false
   error: ErrorInterface | null
 }

@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-empty-interface */
+import { UserShowStatuses } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { EpisodesTMDB, MainDataTMDB, MAINDATA_TMDB_INITIAL, SingleEpisodeTMDB } from 'Utils/@TypesTMDB'
 
 export interface ShowFullDataFireDatabase {
@@ -32,7 +33,7 @@ export interface EpisodesFromUserDatabase {
   episodes: SeasonFromUserDatabase[]
   info: {
     allEpisodesWatched: boolean
-    database: string
+    database: UserShowStatuses
     finished: boolean
     isAllWatched_database: string
   }
@@ -52,7 +53,7 @@ export interface SeasonFromUserDatabase {
 
 export interface ShowInfoFromUserDatabase {
   allEpisodesWatched: boolean
-  database: string
+  database: UserShowStatuses
   finished: boolean
   firstAirDate: string
   id: number

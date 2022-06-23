@@ -77,7 +77,6 @@ const SignInFormBase: React.FC<Props> = ({ closeNavMobile, togglePasswordForget 
         context.userContentLocalStorage.clearContentState()
         if (closeNavMobile) closeNavMobile()
 
-        setSubmitRequestLoading(false)
         history.push(ROUTES.HOME_PAGE)
       })
       .catch((error: any) => {
@@ -218,7 +217,7 @@ const SignInFormBase: React.FC<Props> = ({ closeNavMobile, togglePasswordForget 
         })}
         type="submit"
       >
-        {submitRequestLoading ? <span className="auth__form-loading" /> : 'Sign In'}
+        {submitRequestLoading ? <span className="button-loader-circle" /> : 'Sign In'}
       </button>
       <SignInWithGoogleForm />
     </form>

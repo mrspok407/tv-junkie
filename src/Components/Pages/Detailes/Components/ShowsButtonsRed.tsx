@@ -1,14 +1,14 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import classNames from 'classnames'
 import * as ROUTES from 'Utils/Constants/routes'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import { useAppDispatch, useAppSelector } from 'app/hooks'
-import { selectShowDatabase, selectShows } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
+import { selectLoadingNewShow, selectShowDatabase } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import useClickOutside from 'Utils/Hooks/UseClickOutside'
 import { handleUserShowStatus } from 'Components/UserContent/UseUserShowsRed/ShowHandlers/showHandlers'
-import { shallowEqual } from 'react-redux'
+import { showStatusMapper, UserShowStatuses } from 'Components/UserContent/UseUserShowsRed/@Types'
 
 type Props = {
   id: number
@@ -17,13 +17,13 @@ type Props = {
 
 const ShowsButtons: React.FC<Props> = ({ id, detailes }) => {
   const { firebase, authUser, userContentLocalStorage } = useFrequentVariables()
+  const dispatch = useAppDispatch()
 
   const [disableBtnWarning, setDisableBtnWarning] = useState<string | null>(null)
   const notAuthButtons = useRef<HTMLDivElement>(null!)
-  const dispatch = useAppDispatch()
-  const showDatabase = useAppSelector((state) => selectShowDatabase(state, id))
 
-  const allShows = useAppSelector(selectShows, shallowEqual)
+  const showDatabase = useAppSelector((state) => selectShowDatabase(state, id))
+  const loadingNewShow = useAppSelector(selectLoadingNewShow)
 
   const handleDisableWarnings = useCallback(
     () => () => {
@@ -39,6 +39,9 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes }) => {
     if (authUser?.uid) return
     setDisableBtnWarning(btn)
   }
+
+  const buttonTitle = (showStatus: Exclude<UserShowStatuses, ''>) =>
+    loadingNewShow === showStatus ? <span className="button-loader-circle" /> : showStatusMapper[showStatus]
 
   return (
     <div className="buttons__row">
@@ -62,7 +65,7 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes }) => {
             )
           }}
         >
-          Watching
+          {buttonTitle('watchingShows')}
         </button>
       </div>
 
@@ -86,7 +89,7 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes }) => {
             )
           }}
         >
-          Not watching
+          {buttonTitle('notWatchingShows')}
         </button>
       </div>
       <div className="buttons__col-wrapper" ref={notAuthButtons}>
@@ -113,7 +116,7 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes }) => {
               )
             }}
           >
-            Drop
+            {buttonTitle('droppedShows')}
           </button>
 
           {disableBtnWarning === 'dropBtn' && (
@@ -149,7 +152,7 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes }) => {
               )
             }}
           >
-            Will watch
+            {buttonTitle('willWatchShows')}
           </button>
           {disableBtnWarning === 'willWatchBtn' && (
             <div className="buttons__col-warning">

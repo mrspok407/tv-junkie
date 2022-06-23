@@ -12,8 +12,8 @@ export const handleNewShow =
   (showData: ShowInfoFromUserDatabase, firebase: FirebaseInterface): AppThunk =>
   async (dispatch, getState) => {
     const authUserUid = getAuthUidFromState(getState())
+    const shouldFetchEpisodes = showData.database !== 'notWatchingShows'
 
-    const isWatchingShow = showData.database === 'watchingShows'
     try {
       let episodes: EpisodesStoreState[] = []
       const showInfoFireSnapshot = await firebase.showInfoFireDatabase(showData.id).once('value')
@@ -21,14 +21,14 @@ export const handleNewShow =
         throwErrorNoData()
       }
 
-      if (isWatchingShow) {
+      if (shouldFetchEpisodes) {
         episodes = await fetchEpisodesFullData({ uid: authUserUid, showKey: showData.id, firebase })
       }
       const show = {
         ...showInfoFireSnapshot.val()!,
         ...showData,
         episodes,
-        episodesFetched: isWatchingShow,
+        episodesFetched: shouldFetchEpisodes,
       }
       dispatch(addNewShow(show))
     } catch (err) {
@@ -40,14 +40,16 @@ export const handleChangeShow =
   (showData: ShowInfoFromUserDatabase, firebase: FirebaseInterface): AppThunk =>
   async (dispatch, getState) => {
     const authUserUid = getAuthUidFromState(getState())
-    const showFromStore = selectShow(getState(), showData.id) || {}
+    const showFromStore = selectShow(getState(), showData.id)
 
     console.log({ showFromStore })
     if (!showFromStore) return
 
-    const isWatchingShow = showData.database === 'watchingShows'
+    // const isWatchingShow = showData.database === 'watchingShows'
+    // const isWatchingShow = showData.database !== 'notWatchingShows'
     const isEpisodesFetched = showFromStore.episodesFetched
-    if (!isWatchingShow || isEpisodesFetched) {
+    // if (!isWatchingShow || isEpisodesFetched) {
+    if (isEpisodesFetched) {
       console.log('allready fetched')
       console.log({ showData })
       const show = { info: { ...showFromStore, ...showData } }

@@ -1,4 +1,4 @@
-import { ShowFullDataStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
+import { ShowFullDataStoreState, UserShowStatuses } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import { EpisodesFromUserDatabase } from '../@TypesFirebase'
 import { FirebaseInterface } from '../FirebaseContext'
@@ -7,7 +7,7 @@ export interface PostUserShowScheme {
   authUid: string
   showDetailesTMDB: MainDataTMDB
   showEpisodes: EpisodesFromUserDatabase['episodes']
-  showDatabase: string
+  showDatabase: UserShowStatuses
   firebase: FirebaseInterface
 }
 

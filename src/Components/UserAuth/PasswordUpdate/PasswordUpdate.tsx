@@ -142,7 +142,7 @@ const PasswordUpdate: React.FC = () => {
             })}
             type="submit"
           >
-            {submitRequestLoading ? <span className="auth__form-loading" /> : 'Update Password'}
+            {submitRequestLoading ? <span className="button-loader-circle" /> : 'Update Password'}
           </button>
         </>
       )}

@@ -2,12 +2,13 @@ import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import { removeUndefinedNullFromObject } from 'Utils'
 import { ShowEpisodesTMDB } from '../TmdbAPIHelpers/getShowEpisodesFromAPI'
+import { UserShowStatuses } from '../UseUserShowsRed/@Types'
 
 type AddShowToFireDatabase = {
   firebase: FirebaseInterface
   showDetailesTMDB: MainDataTMDB
   showEpisodesTMDB: ShowEpisodesTMDB
-  database: string
+  database: UserShowStatuses
 }
 
 const addShowToFireDatabase = ({ showDetailesTMDB, showEpisodesTMDB, database, firebase }: AddShowToFireDatabase) =>

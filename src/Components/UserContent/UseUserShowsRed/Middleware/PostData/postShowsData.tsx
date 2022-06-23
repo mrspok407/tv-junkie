@@ -3,15 +3,18 @@ import { AppThunk } from 'app/store'
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import { postUserShowScheme, updateUserShowStatusScheme } from 'Components/Firebase/FirebasePostSchemes/PostSchemes'
 import { getAuthUidFromState } from 'Components/UserAuth/Session/WithAuthentication/Helpers'
+import { batch } from 'react-redux'
+import { artificialAsyncDelay } from 'Utils'
 import { EpisodesTMDB, MainDataTMDB } from 'Utils/@TypesTMDB'
 import { formatShowEpisodesForUserDatabase } from 'Utils/FormatTMDBAPIData'
+import { UserShowStatuses } from '../../@Types'
 import { handleShowsError } from '../../ErrorHandlers/handleShowsError'
 import postShowFireDatabase from '../../FirebaseHelpers/PostData/postShowFireDatabase'
-import { changeUserShowStatus, selectShow, selectShowEpisodes } from '../../userShowsSliceRed'
+import { changeUserShowStatus, selectShow, updateLoadingNewShow } from '../../userShowsSliceRed'
 
 interface HandleDatabaseChange {
   id: number
-  database: string
+  database: UserShowStatuses
   showDetailesTMDB: MainDataTMDB
   firebase: FirebaseInterface
 }
@@ -22,36 +25,16 @@ export const updateUserShowStatus =
     const authUid = getAuthUidFromState(getState())
     const showFromStore = selectShow(getState(), id)
 
-    const allStateBefore = getState()
-
-    const episodesBefore = selectShowEpisodes(getState(), id)
-
-    console.log({ showFromStoreBeforeOU: showFromStore })
-
     dispatch(changeUserShowStatus({ id, userShowStatus }))
-
-    const showFromStoreNewVar = selectShow(getState(), id)
-    const episodesAfter = selectShowEpisodes(getState(), id)
-
-    const allStateAfter = getState()
-
-    console.log({ isAllEpisodesEqual: episodesBefore === episodesAfter })
-    console.log({ isAllStateEqual: allStateBefore === allStateAfter })
-    console.log({ isArrEqual: showFromStore.genre_ids === showFromStoreNewVar.genre_ids })
-    console.log({ isInfoEqual: showFromStore === showFromStoreNewVar })
-    console.log({
-      showFromStoreAfterOU: showFromStore,
-      showFromStoreNewVarAfterOU: showFromStoreNewVar,
-    })
-    // debugger
 
     try {
       const updateData = updateUserShowStatusScheme({ authUid, id, userShowStatus, showFromStore, firebase })
-      await firebase.database().ref().update(updateData)
+      return firebase.database().ref().update(updateData)
     } catch (err) {
-      console.log({ showFromStoreError: showFromStore.database })
-      // dispatch(changeUserShowStatus({ id, userShowStatus }))
-      dispatch(handleShowsError(err))
+      batch(() => {
+        dispatch(changeUserShowStatus({ id, userShowStatus: showFromStore.database }))
+        dispatch(handleShowsError(err))
+      })
     }
   }
 
@@ -61,6 +44,7 @@ export const handleNewShowInDatabase =
     const authUid = getAuthUidFromState(getState())
     let episodesFromFireDatabase: EpisodesTMDB[] = []
 
+    dispatch(updateLoadingNewShow(database))
     try {
       const showFullDataFireDatabase = await firebase.showFullDataFireDatabase(id).once('value')
       const existsInFireDatabase = showFullDataFireDatabase.val() !== null
@@ -72,6 +56,8 @@ export const handleNewShowInDatabase =
         episodesFromFireDatabase = showDataSnapshot?.episodes!
       }
 
+      await artificialAsyncDelay(2500)
+
       const showEpisodesUserDatabase = formatShowEpisodesForUserDatabase(episodesFromFireDatabase)
       const updateData = postUserShowScheme({
         authUid,
@@ -81,7 +67,7 @@ export const handleNewShowInDatabase =
         firebase,
       })
 
-      firebase.database().ref().update(updateData)
+      return firebase.database().ref().update(updateData)
     } catch (err) {
       dispatch(handleShowsError(err))
     }

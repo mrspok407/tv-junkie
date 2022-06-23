@@ -1,4 +1,5 @@
 import { FirebaseInterface, FIREBASE_INITIAL_STATE } from 'Components/Firebase/FirebaseContext'
+import { UserShowStatuses } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
 
 export interface ShowInterface {
@@ -13,7 +14,7 @@ export interface ShowInterface {
   vote_average: string | number
   vote_count: string | number
   allEpisodesWatched: boolean
-  database: string
+  database: UserShowStatuses
   finished: boolean
 }
 
@@ -36,13 +37,13 @@ export interface AddShowsToDatabaseOnRegisterArg {
 export interface AddShowToDatabaseArg {
   id: number
   show: MainDataTMDB
-  database: string
+  database: UserShowStatuses
 }
 
 export interface HandleShowInDatabasesArg {
   id: number
   data: MainDataTMDB
-  database: string
+  database: UserShowStatuses
   userShows: MainDataTMDB[]
 }
 
@@ -56,7 +57,7 @@ export interface HandleMovieInDatabasesArg {
 export interface ToggleDataLS {
   id: number
   data: MainDataTMDB
-  database: string
+  database: UserShowStatuses
 }
 
 export interface AppContextInterface {

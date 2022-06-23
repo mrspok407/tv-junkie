@@ -281,7 +281,7 @@ const Profile = () => {
                 <div className="user-settings__sent-message">Verification sent</div>
               ) : (
                 <button onClick={sendEmailVerification} className="button button--profile" type="button">
-                  {loadingVerificationSent ? <span className="auth__form-loading" /> : 'Send email verification'}
+                  {loadingVerificationSent ? <span className="button-loader-circle" /> : 'Send email verification'}
                 </button>
               )}
             </>

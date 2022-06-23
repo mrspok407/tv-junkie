@@ -1,8 +1,7 @@
 /* eslint-disable react/no-access-state-in-setstate */
-import React, { useContext, useState } from 'react'
+import React, { useState } from 'react'
 import { validEmailRegex } from 'Utils'
 import classNames from 'classnames'
-import { FirebaseContext } from 'Components/Firebase'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import Input from '../Input/Input'
 
@@ -10,7 +9,7 @@ interface ErrorsInterface {
   emailError: string
   emailOnBlur: boolean
   error: { message: string }
-  [key: string]: string | boolean | {}
+  [key: string]: string | boolean | Record<string, unknown>
 }
 
 interface RequiredInputsInterface {
@@ -149,7 +148,7 @@ const PasswordForget: React.FC = () => {
         })}
         type="submit"
       >
-        {submitRequestLoading ? <span className="auth__form-loading" /> : 'Reset Password'}
+        {submitRequestLoading ? <span className="button-loader-circle" /> : 'Reset Password'}
       </button>
     </form>
   )
