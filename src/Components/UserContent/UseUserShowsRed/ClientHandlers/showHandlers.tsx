@@ -4,7 +4,7 @@ import { getAuthUidFromState } from 'Components/UserAuth/Session/WithAuthenticat
 import useUserContentLocalStorage from 'Components/UserContent/UseUserContentLocalStorage'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import { UserShowStatuses } from '../@Types'
-import { handleNewShowInDatabase, updateUserShowStatus } from '../Middleware/PostData/postShowsData'
+import { handleNewShowInDatabase, updateUserShowStatus } from '../DatabaseHandlers/PostData/postShowsData'
 import { selectShow } from '../userShowsSliceRed'
 
 type Props = {

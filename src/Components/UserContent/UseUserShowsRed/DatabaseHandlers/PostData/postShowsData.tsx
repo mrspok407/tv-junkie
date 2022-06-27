@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { AppThunk } from 'app/store'
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import { postUserShowScheme, updateUserShowStatusScheme } from 'Components/Firebase/FirebasePostSchemes/PostSchemes'
@@ -10,7 +9,8 @@ import { formatShowEpisodesForUserDatabase } from 'Utils/FormatTMDBAPIData'
 import { UserShowStatuses } from '../../@Types'
 import { handleShowsError } from '../../ErrorHandlers/handleShowsError'
 import postShowFireDatabase from '../../FirebaseHelpers/PostData/postShowFireDatabase'
-import { changeUserShowStatus, selectShow, updateLoadingNewShow } from '../../userShowsSliceRed'
+import { optimisticChangeUserShowStatus } from '../../OptimisticHandlers'
+import { selectShow, updateLoadingNewShow } from '../../userShowsSliceRed'
 
 interface HandleDatabaseChange {
   id: number
@@ -25,14 +25,14 @@ export const updateUserShowStatus =
     const authUid = getAuthUidFromState(getState())
     const showFromStore = selectShow(getState(), id)
 
-    dispatch(changeUserShowStatus({ id, userShowStatus }))
-
     try {
+      dispatch(optimisticChangeUserShowStatus({ id, userShowStatus }))
+
       const updateData = updateUserShowStatusScheme({ authUid, id, userShowStatus, showFromStore, firebase })
-      return firebase.database().ref().update(updateData)
+      return firebase.rootRef().update(updateData)
     } catch (err) {
       batch(() => {
-        dispatch(changeUserShowStatus({ id, userShowStatus: showFromStore.database }))
+        dispatch(optimisticChangeUserShowStatus({ id, userShowStatus: showFromStore.database }))
         dispatch(handleShowsError(err))
       })
     }
@@ -67,7 +67,7 @@ export const handleNewShowInDatabase =
         firebase,
       })
 
-      return firebase.database().ref().update(updateData)
+      return firebase.rootRef().update(updateData)
     } catch (err) {
       dispatch(handleShowsError(err))
     }

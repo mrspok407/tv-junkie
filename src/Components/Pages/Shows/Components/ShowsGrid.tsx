@@ -1,6 +1,6 @@
 import { useAppDispatch, useAppSelector } from 'app/hooks'
 import { ShowFullDataStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
-import { handleUserShowStatus } from 'Components/UserContent/UseUserShowsRed/ShowHandlers/showHandlers'
+import { handleUserShowStatus } from 'Components/UserContent/UseUserShowsRed/ClientHandlers/showHandlers'
 import { selectShows } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
 import React from 'react'
 import { Link } from 'react-router-dom'

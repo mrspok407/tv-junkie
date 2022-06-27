@@ -54,7 +54,7 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
         })
       })
 
-      await firebase.database().ref().update(updateData)
+      await firebase.rootRef().update(updateData)
     } catch (error) {
       errors.handleError({
         errorData: error,
@@ -119,7 +119,7 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
           lastReadMessage?.timeStamp
       }
 
-      await firebase.database().ref().update(updateData)
+      await firebase.rootRef().update(updateData)
     } catch (error) {
       errors.handleError({
         errorData: error,

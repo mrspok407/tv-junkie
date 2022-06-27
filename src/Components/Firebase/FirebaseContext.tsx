@@ -76,6 +76,7 @@ export interface FirebaseInterface {
   }) => any
   groupChatMembersStatus: ({ chatKey }: { chatKey: string }) => any
   groupChatParticipants: ({ chatKey }: { chatKey: string }) => any
+  rootRef: () => any
 }
 
 const firebaseOnceInitial = <T,>(initialState: T) =>
@@ -114,6 +115,7 @@ export const FIREBASE_INITIAL_STATE = {
   chatMemberStatus: () => {},
   groupChatMembersStatus: () => {},
   groupChatParticipants: () => {},
+  rootRef: () => {},
   showEpisodesFireDatabase: () => firebaseRefInitial(SHOW_FULL_DATA_FIRE_DATABASE_INITIAL.episodes),
   showFullDataFireDatabase: () => firebaseRefInitial(SHOW_FULL_DATA_FIRE_DATABASE_INITIAL),
   showInfoFireDatabase: () => firebaseRefInitial(SHOW_FULL_DATA_FIRE_DATABASE_INITIAL.info),

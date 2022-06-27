@@ -46,7 +46,7 @@ const useContactOptions = ({ contactInfo }: Props) => {
           [`users/${authUser?.uid}/contactsDatabase/newContactsRequests/${contactInfo?.key}`]: null,
         }
       }
-      await firebase.database().ref().update(updateData)
+      await firebase.rootRef().update(updateData)
       contactsDispatch({
         type: 'updateAuthUserUnreadMessages',
         payload: { chatKey: contactInfo?.chatKey!, unreadMessages: [], markAsRead: true },
@@ -87,13 +87,15 @@ const useContactOptions = ({ contactInfo }: Props) => {
       await firebase
         .database()
         .ref()
-        .update(updateData, () => contactsDispatch({
+        .update(updateData, () =>
+          contactsDispatch({
             type: 'updateActiveChat',
             payload: {
               chatKey: activeChat.chatKey === contactInfo.chatKey ? '' : activeChat.chatKey,
               contactKey: activeChat.contactKey === contactInfo.key ? '' : activeChat.contactKey,
             },
-          }))
+          }),
+        )
     } catch (error) {
       errors.handleError({
         errorData: error,
@@ -126,13 +128,15 @@ const useContactOptions = ({ contactInfo }: Props) => {
       await firebase
         .database()
         .ref()
-        .update(updateData, () => contactsDispatch({
+        .update(updateData, () =>
+          contactsDispatch({
             type: 'updateActiveChat',
             payload: {
               chatKey: activeChat.chatKey === contactInfo.chatKey ? '' : activeChat.chatKey,
               contactKey: activeChat.contactKey === contactInfo.key ? '' : activeChat.contactKey,
             },
-          }))
+          }),
+        )
     } catch (error) {
       errors.handleError({
         errorData: error,
@@ -215,7 +219,7 @@ const useContactOptions = ({ contactInfo }: Props) => {
         [`users/${contactInfo.key}/contactsDatabase/newContactsActivity/${authUser?.uid}`]: null,
       }
       contactsDispatch({ type: 'removeAllMessages', payload: { chatKey: contactInfo.chatKey } })
-      await firebase.database().ref().update(updateData)
+      await firebase.rootRef().update(updateData)
     } catch (error) {
       errors.handleError({
         errorData: error,

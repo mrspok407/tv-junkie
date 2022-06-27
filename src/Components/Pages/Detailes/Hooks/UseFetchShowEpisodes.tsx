@@ -1,6 +1,6 @@
 import { useAppDispatch, useAppSelector } from 'app/hooks'
 import { handleShowsError } from 'Components/UserContent/UseUserShowsRed/ErrorHandlers/handleShowsError'
-import { fetchShowEpisodes } from 'Components/UserContent/UseUserShowsRed/Middleware/FetchData/fetchShowsData'
+import { fetchShowEpisodes } from 'Components/UserContent/UseUserShowsRed/DatabaseHandlers/FetchData/fetchShowsData'
 import { selectShowsLoading } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
 import { useState, useEffect, useCallback } from 'react'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'

@@ -7,7 +7,7 @@ import { useAppDispatch, useAppSelector } from 'app/hooks'
 import { selectLoadingNewShow, selectShowDatabase } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import useClickOutside from 'Utils/Hooks/UseClickOutside'
-import { handleUserShowStatus } from 'Components/UserContent/UseUserShowsRed/ShowHandlers/showHandlers'
+import { handleUserShowStatus } from 'Components/UserContent/UseUserShowsRed/ClientHandlers/showHandlers'
 import { showStatusMapper, UserShowStatuses } from 'Components/UserContent/UseUserShowsRed/@Types'
 
 type Props = {

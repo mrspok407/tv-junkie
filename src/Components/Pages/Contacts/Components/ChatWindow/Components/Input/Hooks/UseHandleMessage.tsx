@@ -76,7 +76,7 @@ const useHandleMessage = ({ contactLastActivity }: { contactLastActivity: { time
               timeStampEpoch
           }
         })
-        return firebase.database().ref().update(updateData)
+        return firebase.rootRef().update(updateData)
       })
 
     return messageKey
@@ -113,7 +113,7 @@ const useHandleMessage = ({ contactLastActivity }: { contactLastActivity: { time
     }
 
     contactsDispatch({ type: 'updateRerenderUnreadMessagesStart' })
-    await firebase.database().ref().update(updateData)
+    await firebase.rootRef().update(updateData)
 
     return messageKey
   }

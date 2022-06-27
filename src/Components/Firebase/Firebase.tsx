@@ -120,6 +120,8 @@ class Firebase {
 
   database = () => this.db
 
+  rootRef = () => this.db.ref()
+
   /// Shows In Database ///
   allShowsList = () => this.db.ref('allShowsList')
 

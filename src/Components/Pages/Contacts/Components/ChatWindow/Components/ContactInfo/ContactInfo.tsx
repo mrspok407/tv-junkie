@@ -50,7 +50,7 @@ const ContactInfo: React.FC<Props> = ({ isScrollBottomRef }) => {
         ? true
         : null,
     }
-    return firebase.database().ref().update(updateData)
+    return firebase.rootRef().update(updateData)
   }
 
   const sendMessageCurrentContactGroup = () => {
@@ -72,7 +72,7 @@ const ContactInfo: React.FC<Props> = ({ isScrollBottomRef }) => {
         ? true
         : null,
     }
-    return firebase.database().ref().update(updateData)
+    return firebase.rootRef().update(updateData)
   }
 
   return (

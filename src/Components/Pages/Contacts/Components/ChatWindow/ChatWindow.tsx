@@ -159,7 +159,7 @@ const ChatWindow: React.FC = () => {
             [`privateChats/${activeChat.chatKey}/members/${authUser?.uid!}/status/chatBottom`]: true,
           }
         }
-        firebase.database().ref().update(updateData)
+        firebase.rootRef().update(updateData)
       } else {
         isScrollBottomRef.current = false
         firebaseRefs.updateMemberStatus({ value: { chatBottom: false } })
