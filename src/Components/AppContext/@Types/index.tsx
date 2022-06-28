@@ -94,10 +94,10 @@ export interface AppContextInterface {
   newContactsActivity: boolean | null
   errors: {
     error: {
-      errorData: any
+      errorData?: unknown
       message: string
     } | null
-    handleError: ({ errorData, message }: { errorData?: any; message: string }) => void
+    handleError: ({ errorData, message }: { errorData?: unknown; message: string }) => void
   }
 }
 

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { ERROR_MODAL_DURATION } from 'Utils/Constants'
 
 export interface ErrorInterface {
-  errorData: any
+  errorData?: unknown
   message: string
 }
 
@@ -19,7 +19,7 @@ const useErrors = () => {
   const fadeOutTimeout = useRef<number | null>(null)
 
   const handleError = useCallback(
-    ({ errorData, message }: { errorData?: any; message: string }) => {
+    ({ errorData, message }: ErrorInterface) => {
       setError({ errorData, message })
 
       modalContainerRef.current?.classList.remove('modal-fade-out')

@@ -12,6 +12,7 @@ import {
 export interface FirebaseFetchMethods<T> {
   once: (value: string, callback?: any, errorCallback?: (err: unknown) => any) => Promise<SnapshotVal<T>>
   on: (value: string, callback: (snapshot: any) => void, errorCallback?: (err: unknown) => any) => void
+  off: (value?: string, callbackcallback?: (snapshot: any) => void) => void
 }
 
 export interface FirebaseReferenceProps<T> {
@@ -19,6 +20,7 @@ export interface FirebaseReferenceProps<T> {
   orderByChild: (value: string) => FirebaseReferenceProps<T>
   once: FirebaseFetchMethods<T>['once']
   on: FirebaseFetchMethods<T>['on']
+  off: FirebaseFetchMethods<T>['off']
   update: (value: Partial<T>) => Promise<void>
   set: (value: Partial<T>) => Promise<void>
   transaction: (
@@ -91,6 +93,7 @@ const firebaseRefInitial = <T,>(initialState: T) => {
   return {
     once: () => firebaseOnceInitial(initialState),
     on: () => {},
+    off: () => {},
     child: () => firebaseRefInitial(initialState),
     orderByChild: () => firebaseRefInitial(initialState),
     update: () => Promise.resolve(),

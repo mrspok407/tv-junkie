@@ -1,5 +1,5 @@
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
-import { AuthUserInterface } from 'Components/UserAuth/Session/WithAuthentication/@Types'
+import { AuthUserInterface } from 'Components/UserAuth/Session/Authentication/@Types'
 import { releasedEpisodesToOneArray } from 'Utils'
 import { SingleEpisodeFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
 

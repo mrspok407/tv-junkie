@@ -5,7 +5,7 @@ import { todayDate } from 'Utils'
 import Loader from 'Components/UI/Placeholders/Loader'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import { useAppSelector } from 'app/hooks'
-import { selectAuthUser } from 'Components/UserAuth/Session/WithAuthentication/authUserSlice'
+import { selectAuthUser } from 'Components/UserAuth/Session/Authentication/authUserSlice'
 
 const { CancelToken } = require('axios')
 

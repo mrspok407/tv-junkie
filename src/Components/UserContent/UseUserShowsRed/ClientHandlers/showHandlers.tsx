@@ -1,6 +1,6 @@
 import { AppThunk } from 'app/store'
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
-import { getAuthUidFromState } from 'Components/UserAuth/Session/WithAuthentication/Helpers'
+import { getAuthUidFromState } from 'Components/UserAuth/Session/Authentication/Helpers'
 import useUserContentLocalStorage from 'Components/UserContent/UseUserContentLocalStorage'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import { UserShowStatuses } from '../@Types'

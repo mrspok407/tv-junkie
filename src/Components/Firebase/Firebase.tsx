@@ -3,7 +3,7 @@ import 'firebase/compat/auth'
 import 'firebase/compat/database'
 import 'firebase/compat/analytics'
 import 'firebase/compat/functions'
-import { AuthUserInterface } from 'Components/UserAuth/Session/WithAuthentication/@Types'
+import { AuthUserInterface } from 'Components/UserAuth/Session/Authentication/@Types'
 
 const configProduction = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,

@@ -9,7 +9,7 @@ import { AppContext } from 'Components/AppContext/AppContextHOC'
 import { MovieInterface } from 'Components/AppContext/@Types'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import SignInWithGoogleForm from '../SignIn/SignInWithGoogle'
-import { AuthUserFirebaseInterface } from '../Session/WithAuthentication/@Types'
+import { AuthUserFirebaseInterface } from '../Session/Authentication/@Types'
 import Input from '../Input/Input'
 
 const LOCAL_STORAGE_KEY_WATCHING_SHOWS = 'watchingShowsLocalS'

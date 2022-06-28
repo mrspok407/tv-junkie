@@ -1,7 +1,7 @@
 import * as _isEqual from 'lodash.isequal'
 import * as _assign from 'lodash.assign'
 import { v4 as uuidv4 } from 'uuid'
-import { AuthUserInterface } from 'Components/UserAuth/Session/WithAuthentication/@Types'
+import { AuthUserInterface } from 'Components/UserAuth/Session/Authentication/@Types'
 import { MESSAGES_TO_RENDER, UNREAD_MESSAGES_TO_RENDER } from './Constants'
 import {
   ContactInfoInterface,

@@ -1,6 +1,6 @@
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import { SnapshotStringBooleanInterface } from 'Components/Pages/Contacts/@Types'
-import { AuthUserInterface } from 'Components/UserAuth/Session/WithAuthentication/@Types'
+import { AuthUserInterface } from 'Components/UserAuth/Session/Authentication/@Types'
 import { MESSAGES_TO_LOAD } from '../../@Context/Constants'
 
 export const setMessagesSnapshot = async ({

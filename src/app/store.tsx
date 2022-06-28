@@ -1,6 +1,6 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit'
 import userShowsReducer from '../Components/UserContent/UseUserShowsRed/userShowsSliceRed'
-import authUserReducer, { authUserInitialState } from '../Components/UserAuth/Session/WithAuthentication/authUserSlice'
+import authUserReducer, { authUserInitialState } from '../Components/UserAuth/Session/Authentication/authUserSlice'
 
 export const store = configureStore({
   reducer: {

@@ -1,7 +1,7 @@
 import { useAppSelector } from 'app/hooks'
 import { AppContext } from 'Components/AppContext/AppContextHOC'
 import { FirebaseContext } from 'Components/Firebase'
-import { selectAuthUser } from 'Components/UserAuth/Session/WithAuthentication/authUserSlice'
+import { selectAuthUser } from 'Components/UserAuth/Session/Authentication/authUserSlice'
 import { useContext } from 'react'
 import { ContactsContext } from '../../Components/Pages/Contacts/Components/@Context/ContactsContext'
 

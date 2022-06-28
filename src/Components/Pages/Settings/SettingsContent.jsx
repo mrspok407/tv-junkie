@@ -1,12 +1,8 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable max-len */
 import React, { useEffect, useRef, useState } from 'react'
-import { Helmet } from 'react-helmet'
 import axios from 'axios'
 import SignOutButton from 'Components/UserAuth/SignOut/SignOutButton'
-import WithAuthorization from 'Components/UserAuth/Session/WithAuthorization/WithAuthorization'
-import Header from 'Components/UI/Header/Header'
-import Footer from 'Components/UI/Footer/Footer'
 import { todayDate } from 'Utils'
 import PasswordUpdate from 'Components/UserAuth/PasswordUpdate/PasswordUpdate'
 import classNames from 'classnames'
@@ -16,7 +12,7 @@ import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 
 let startTimeStampGroupChats = 1311011245000
 
-const Profile = () => {
+const SettingsContent = () => {
   const { firebase, authUser } = useFrequentVariables()
 
   const [verificationSent, setVerificationSent] = useState(false)
@@ -262,94 +258,85 @@ const Profile = () => {
   }
 
   return (
-    <>
-      <Helmet>
-        <title>Settings | TV Junkie</title>
-      </Helmet>
-      <Header />
-      <div className="user-settings">
-        <div className="user-settings__email">
-          Sign in with <span>{authUser.email}</span>
-        </div>
-        <div className="user-settings__verified">
-          {authUser.emailVerified ? (
-            'Email verified'
-          ) : (
-            <>
-              Email not verified{' '}
-              {verificationSent ? (
-                <div className="user-settings__sent-message">Verification sent</div>
-              ) : (
-                <button onClick={sendEmailVerification} className="button button--profile" type="button">
-                  {loadingVerificationSent ? <span className="button-loader-circle" /> : 'Send email verification'}
-                </button>
-              )}
-            </>
-          )}
-          {/* {error && (
-        <div className="user-settings__error-email-verification">{error.message}</div>
-      )} */}
-        </div>
-        <PasswordUpdate />
-        {[process.env.REACT_APP_TEST_EMAIL, process.env.REACT_APP_ADMIN_EMAIL].includes(authUser?.email) && (
-          <div className="update-database">
-            <button onClick={() => databaseModify()} className="button button--profile" type="button">
-              Update Database
-            </button>
-          </div>
-        )}
-        <div className="user-settings__copy-user-link">
-          <div
-            className={classNames('button', {
-              'button--clipboard-copied': copiedToClipboard,
-            })}
-            onClick={() => {
-              copyToClipboard(
-                `${
-                  process.env.NODE_ENV === 'production' ? 'https://www.tv-junkie.com' : 'http://localhost:3000'
-                }/user/${authUser.uid}`,
-              )
-            }}
-          >
-            {!copiedToClipboard ? (
-              <span
-                className={classNames('clipboard-message', {
-                  'clipboard-message__not-copied': copiedToClipboard === false,
-                })}
-              >
-                Copy profile link
-              </span>
-            ) : (
-              <span
-                className={classNames('clipboard-message', {
-                  'clipboard-message__copied': copiedToClipboard,
-                })}
-              >
-                Copied
-              </span>
-            )}
-          </div>
-        </div>
-        {['testchat@gmail.com', process.env.REACT_APP_ADMIN_EMAIL].includes(authUser?.email) && (
+    <div className="user-settings">
+      <div className="user-settings__email">
+        Sign in with <span>{authUser.email}</span>
+      </div>
+      <div className="user-settings__verified">
+        {authUser.emailVerified ? (
+          'Email verified'
+        ) : (
           <>
-            <button type="button" className="button" onClick={() => addMessagesToGroupChats()}>
-              Messages to group chats
-            </button>
-            <button type="button" className="button" onClick={() => addMessagesToPrivateChats()}>
-              Messages to private chats
-            </button>
+            Email not verified{' '}
+            {verificationSent ? (
+              <div className="user-settings__sent-message">Verification sent</div>
+            ) : (
+              <button onClick={sendEmailVerification} className="button button--profile" type="button">
+                {loadingVerificationSent ? <span className="button-loader-circle" /> : 'Send email verification'}
+              </button>
+            )}
           </>
         )}
-
-        <div className="user-settings__signout">
-          <SignOutButton />
+        {/* {error && (
+        <div className="user-settings__error-email-verification">{error.message}</div>
+      )} */}
+      </div>
+      <PasswordUpdate />
+      {[process.env.REACT_APP_TEST_EMAIL, process.env.REACT_APP_ADMIN_EMAIL].includes(authUser?.email) && (
+        <div className="update-database">
+          <button onClick={() => databaseModify()} className="button button--profile" type="button">
+            Update Database
+          </button>
+        </div>
+      )}
+      <div className="user-settings__copy-user-link">
+        <div
+          className={classNames('button', {
+            'button--clipboard-copied': copiedToClipboard,
+          })}
+          onClick={() => {
+            copyToClipboard(
+              `${process.env.NODE_ENV === 'production' ? 'https://www.tv-junkie.com' : 'http://localhost:3000'}/user/${
+                authUser.uid
+              }`,
+            )
+          }}
+        >
+          {!copiedToClipboard ? (
+            <span
+              className={classNames('clipboard-message', {
+                'clipboard-message__not-copied': copiedToClipboard === false,
+              })}
+            >
+              Copy profile link
+            </span>
+          ) : (
+            <span
+              className={classNames('clipboard-message', {
+                'clipboard-message__copied': copiedToClipboard,
+              })}
+            >
+              Copied
+            </span>
+          )}
         </div>
       </div>
-      <Footer />
-    </>
+      {['testchat@gmail.com', process.env.REACT_APP_ADMIN_EMAIL].includes(authUser?.email) && (
+        <>
+          <button type="button" className="button" onClick={() => addMessagesToGroupChats()}>
+            Messages to group chats
+          </button>
+          <button type="button" className="button" onClick={() => addMessagesToPrivateChats()}>
+            Messages to private chats
+          </button>
+        </>
+      )}
+
+      <div className="user-settings__signout">
+        <SignOutButton />
+      </div>
+    </div>
   )
 }
 
-const condition = (authUser) => !!authUser?.uid
-
-export default WithAuthorization(condition)(Profile)
+export default SettingsContent

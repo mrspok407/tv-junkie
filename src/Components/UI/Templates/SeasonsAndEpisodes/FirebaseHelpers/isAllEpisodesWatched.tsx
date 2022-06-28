@@ -1,6 +1,6 @@
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import { EpisodesFromFireDatabase, SingleEpisodeFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
-import { AuthUserInterface } from 'Components/UserAuth/Session/WithAuthentication/@Types'
+import { AuthUserInterface } from 'Components/UserAuth/Session/Authentication/@Types'
 import { differenceBtwDatesInDays, todayDate } from 'Utils'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
 

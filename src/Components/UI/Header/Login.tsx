@@ -21,7 +21,6 @@ const Login: React.FC<Props> = ({ closeNavMobile }) => {
     if (loginButtonRef.current === e.target || !authContRef.current || authContRef.current.contains(e.target as Node)) {
       return
     }
-
     setAuthContOpen(false)
   }
 

@@ -17,6 +17,12 @@ const userShowsInitialState: UserShowsStoreState = {
   error: null,
 }
 
+const userShowsResetState = {
+  ...userShowsInitialState,
+  initialLoading: false,
+  loadingNewShow: false as const,
+}
+
 export const userShowsSliceRed = createSlice({
   name: 'userShows',
   initialState: userShowsInitialState,
@@ -106,7 +112,7 @@ export const userShowsSliceRed = createSlice({
       state.loadingNewShow = action.payload
     },
     resetShows: () => {
-      return { ...userShowsInitialState, loading: false }
+      return userShowsResetState
     },
     setShowsError: (state, action: PayloadAction<UserShowsStoreState['error']>) => {
       console.log(action.payload)

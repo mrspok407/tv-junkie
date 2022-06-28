@@ -25,13 +25,10 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes }) => {
   const showDatabase = useAppSelector((state) => selectShowDatabase(state, id))
   const loadingNewShow = useAppSelector(selectLoadingNewShow)
 
-  const handleDisableWarnings = useCallback(
-    () => () => {
-      if (authUser?.uid) return
-      setDisableBtnWarning(null)
-    },
-    [authUser],
-  )
+  const handleDisableWarnings = useCallback(() => {
+    if (authUser?.uid) return
+    setDisableBtnWarning(null)
+  }, [authUser])
 
   useClickOutside({ ref: notAuthButtons, callback: handleDisableWarnings })
 

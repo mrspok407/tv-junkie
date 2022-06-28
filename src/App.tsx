@@ -1,8 +1,7 @@
 import React from 'react'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
-import Settings from 'Components/Pages/Settings/Settings'
-import Admin from 'Components/Pages/Admin/Admin'
-import LoginPage from 'Components/Pages/Login/Login'
+import SettingsPage from 'Components/Pages/Settings/SettingsPage'
+import LoginPage from 'Components/Pages/Login/LoginPage'
 import SearchPage from 'Components/Pages/SearchPage/SearchPage'
 import HomePage from 'Components/Pages/Home/Home'
 import ShowsPage from 'Components/Pages/Shows/Shows'
@@ -33,10 +32,9 @@ const App = () => {
           <Route path={ROUTES.MOVIES} exact component={MoviesPage} />
           <Route path={ROUTES.USER_PROFILE} exact component={UserProfile} />
           <Route path={ROUTES.DETAILES_PAGE} exact component={DetailesPage} />
-          <Route path={ROUTES.SETTINGS} exact component={Settings} />
+          <Route path={ROUTES.SETTINGS} exact component={SettingsPage} />
           <Route path={ROUTES.CONTACTS_PAGE} exact component={ContactsPage} />
           <Route path={ROUTES.LOGIN_PAGE} exact component={LoginPage} />
-          <Route path={ROUTES.ADMIN} exact component={Admin} />
           <Route component={PageNotFound} />
         </Switch>
         {errors.error && <CreatePortal element={<ModalContent message={errors.error.message} />} />}
@@ -45,4 +43,5 @@ const App = () => {
   )
 }
 
-export default AppContextHOC(App)
+// export default AppContextHOC(App)
+export default App

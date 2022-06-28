@@ -1,6 +1,6 @@
 import { AppThunk } from 'app/store'
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
-import { getAuthUidFromState } from 'Components/UserAuth/Session/WithAuthentication/Helpers'
+import { getAuthUidFromState } from 'Components/UserAuth/Session/Authentication/Helpers'
 import { ErrorInterface } from 'Utils/Hooks/UseErrors/UseErrors'
 import sortDataSnapshot from '../../../FirebaseHelpers/sortDataSnapshot'
 import fetchShowsFullData from '../../FirebaseHelpers/FetchData/fetchShowsFullData'

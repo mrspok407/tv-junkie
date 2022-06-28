@@ -1,6 +1,6 @@
 /* eslint-disable import/no-cycle */
 import { useEffect, useState } from 'react'
-import { AuthUserInterface } from 'Components/UserAuth/Session/WithAuthentication/@Types'
+import { AuthUserInterface } from 'Components/UserAuth/Session/Authentication/@Types'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import { UserMoviesInterface } from '../UseUserShows'
 

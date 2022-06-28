@@ -17,7 +17,7 @@ import {
   ShowFullDataStoreState,
   UserWillAirEpisodesInterface,
 } from 'Components/UserContent/UseUserShowsRed/@Types'
-import { selectAuthUser } from 'Components/UserAuth/Session/WithAuthentication/authUserSlice'
+import { selectAuthUser } from 'Components/UserAuth/Session/Authentication/authUserSlice'
 import useAppSelectorArray from 'Utils/Hooks/UseAppSelectorArray'
 import { organiseFutureEpisodesByMonth, organizeMonthEpisodesByEpisodeNumber } from './CalendarHelpers'
 

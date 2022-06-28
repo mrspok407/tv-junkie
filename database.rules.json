@@ -1,16 +1,15 @@
 {
   "rules": {
     "users": {
-      ".read": true,
-      ".write": true,
       "$uid": {
         ".read": "auth != null && auth.uid == $uid",
         ".write": "!data.exists()",
         "username": { ".write": true, ".read": true },
+        "userNameLowerCase": { ".write": true, ".read": true },
         "email": { ".write": "newData.exists() && auth.token.firebase.sign_in_provider === 'google.com'" },
         "role": { ".write": "newData.exists() && auth.token.firebase.sign_in_provider === 'google.com'" },
         "content": {
-          ".read": true,
+          ".read": "auth != null && auth.uid == $uid",
           ".write": "auth != null && auth.uid == $uid",
           "episodes": {
             ".indexOn": ["info/isAllWatched_database", "info/finished"],
