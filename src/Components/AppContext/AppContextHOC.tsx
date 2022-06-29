@@ -1,19 +1,21 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import React, { createContext, useMemo } from 'react'
+import React, { createContext, useMemo, useState } from 'react'
 import useUserContentLocalStorage from 'Components/UserContent/UseUserContentLocalStorage'
-import useFirebase from 'Components/Firebase/UseFirebase'
 import useNewContactsActivity from 'Components/Pages/Contacts/Hooks/UseNewContactsActivity'
-import useErrors from 'Utils/Hooks/UseErrors/UseErrors'
+import useErrors, { ErrorContext } from 'Utils/Hooks/UseErrors/UseErrors'
 import useInitializeApp from 'Components/UserContent/UseUserShowsRed/UseInitializeApp'
 import App from 'App'
 import { AppContextInterface, CONTEXT_INITIAL_STATE } from './@Types'
 
 export const AppContext = createContext<AppContextInterface>(CONTEXT_INITIAL_STATE)
 
-const AppContextHOC = () => {
+export const TestAppContext = createContext(0)
+
+const AppContextHOC = ({ children }) => {
   useInitializeApp()
 
-  const firebase = useFirebase()
+  const [counter, setCounter] = useState(0)
+
   const userContentLocalStorage = useUserContentLocalStorage()
   const newContactsActivity = useNewContactsActivity()
   const errors = useErrors()
@@ -23,16 +25,21 @@ const AppContextHOC = () => {
       userContentLocalStorage,
       // userContent: useUserShows(),
       // userContentHandler: useContentHandler(),
-      firebase,
       newContactsActivity,
       errors,
     }),
     [userContentLocalStorage],
   )
   return (
-    <AppContext.Provider value={ContextValue}>
-      <App />
-    </AppContext.Provider>
+    <TestAppContext.Provider value={counter}>
+      <button onClick={() => setCounter(counter + 1)}>Counter++</button>
+      <AppContext.Provider value={ContextValue}>
+        <ErrorContext.Provider value={errors}>
+          {children}
+          {/* <App /> */}
+        </ErrorContext.Provider>
+      </AppContext.Provider>
+    </TestAppContext.Provider>
   )
 }
 

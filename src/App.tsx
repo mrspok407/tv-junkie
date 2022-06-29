@@ -20,6 +20,7 @@ import ModalContent from 'Components/UI/Modal/ModalContent'
 
 const App = () => {
   const { errors } = useFrequentVariables()
+  console.log('App Rerender')
   return (
     <Router basename="/">
       <div className="container">

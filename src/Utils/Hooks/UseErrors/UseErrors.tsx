@@ -1,12 +1,14 @@
 import { useAppDispatch, useAppSelector } from 'app/hooks'
 import { selectShowsError, setShowsError } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { createContext, useCallback, useEffect, useRef, useState } from 'react'
 import { ERROR_MODAL_DURATION } from 'Utils/Constants'
 
 export interface ErrorInterface {
   errorData?: unknown
   message: string
 }
+
+export const ErrorContext = createContext<any>({})
 
 const useErrors = () => {
   const dispatch = useAppDispatch()

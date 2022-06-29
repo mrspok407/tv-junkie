@@ -19,7 +19,9 @@ ReactDOM.render(
   <Provider store={store}>
     <FirebaseContext.Provider value={new Firebase()}>
       {/* <App /> */}
-      <AppContextHOC />
+      <AppContextHOC>
+        <App />
+      </AppContextHOC>
     </FirebaseContext.Provider>
   </Provider>,
   document.getElementById('root'),

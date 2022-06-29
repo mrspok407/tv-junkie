@@ -90,7 +90,6 @@ export interface AppContextInterface {
   //   // }
   //   // loadingShowsOnRegister: boolean
   // }
-  firebase: FirebaseInterface
   newContactsActivity: boolean | null
   errors: {
     error: {
@@ -126,7 +125,6 @@ export const CONTEXT_INITIAL_STATE = {
   //   loadingAddShowToDatabase: LOADING_ADDING_TO_DATABASE_INITIAL,
   //   loadingShowsOnRegister: false,
   // },
-  firebase: FIREBASE_INITIAL_STATE,
   newContactsActivity: false,
   errors: { error: null, handleError: () => {} },
 }

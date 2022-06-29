@@ -1,24 +1,41 @@
 import { useAppDispatch, useAppSelector } from 'app/hooks'
+import { TestAppContext } from 'Components/AppContext/AppContextHOC'
 import { ShowFullDataStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { handleUserShowStatus } from 'Components/UserContent/UseUserShowsRed/ClientHandlers/showHandlers'
 import { selectShows } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
-import React from 'react'
+import React, { useContext } from 'react'
 import { Link } from 'react-router-dom'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import { LIST_OF_GENRES } from 'Utils/Constants'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import { TestContext } from '../Shows'
 
 type Props = {
   data: ShowFullDataStoreState[] | MainDataTMDB[]
   section: string
 }
 
+const TestComp = React.memo(() => {
+  const counter = useContext(TestContext)
+  const appCounter = useContext(TestAppContext)
+
+  console.log('TestComp Rerender')
+
+  return <div>Opa</div>
+})
+
 const ShowsGrid: React.FC<Props> = ({ data, section }) => {
   const { firebase, userContentLocalStorage } = useFrequentVariables()
   const dispatch = useAppDispatch()
   const userShows = useAppSelector(selectShows)
+
+  const counter = useContext(TestContext)
+  // const appCounter = useContext(TestAppContext)
+
+  console.log('ShowsGrid Rerender')
   return (
     <>
+      <TestComp />
       {data.map((item) => {
         const filteredGenres =
           item.genre_ids?.map((genreId) => LIST_OF_GENRES.filter((item) => item.id === genreId)) || []

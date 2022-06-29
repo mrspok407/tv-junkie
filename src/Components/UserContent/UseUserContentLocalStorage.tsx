@@ -1,5 +1,5 @@
 import { ToggleDataLS } from 'Components/AppContext/@Types'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
 
 const LOCAL_STORAGE_KEY_WATCHING_SHOWS = 'watchingShowsLocalS'
@@ -52,21 +52,30 @@ const useUserContentLocalStorage = () => {
     }
   }
 
-  const clearContentState = () => {
+  const clearContentState = useCallback(() => {
     setUserContent({ watchingShows: [], watchLaterMovies: [] })
-  }
+  }, [])
 
   useEffect(() => {
     localStorage.setItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS, JSON.stringify(userContent.watchingShows))
     localStorage.setItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES, JSON.stringify(userContent.watchLaterMovies))
   }, [userContent])
 
-  return {
-    ...userContent,
-    toggleMovieLS,
-    toggleShowLS,
-    clearContentState,
-  }
+  const result = useMemo(() => {
+    return {
+      ...userContent,
+      toggleMovieLS,
+      toggleShowLS,
+      clearContentState,
+    }
+  }, [clearContentState])
+
+  return result
+
+  // return {      ...userContent,
+  //   toggleMovieLS,
+  //   toggleShowLS,
+  //   clearContentState,}
 }
 
 export default useUserContentLocalStorage
