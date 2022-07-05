@@ -1,9 +1,11 @@
 import { MembersStatusGroupChatInterface } from 'Components/Pages/Contacts/@Types'
+import { ErrorsHandlerContext } from 'Components/AppContext/Contexts/ErrorsContext'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 
 const useRemoveMember = () => {
-  const { firebase, errors, contactsState } = useFrequentVariables()
+  const { firebase, contactsState } = useFrequentVariables()
+  const handleError = useContext(ErrorsHandlerContext)
   const { activeChat } = contactsState
   const [removeMemberLoading, setRemoveMemberLoading] = useState(false)
 
@@ -14,7 +16,7 @@ const useRemoveMember = () => {
       const removeMemberFromGroupCloud = firebase.httpsCallable('removeMemberFromGroup')
       await removeMemberFromGroupCloud({ member, groupChatKey: activeChat.chatKey })
     } catch (error) {
-      errors.handleError({
+      handleError({
         errorData: error,
         message: 'There has been some error removing member. Please reload the page.',
       })

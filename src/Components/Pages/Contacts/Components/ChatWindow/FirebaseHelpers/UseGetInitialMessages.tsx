@@ -1,13 +1,15 @@
 /* eslint-disable @typescript-eslint/no-extra-semi */
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useContext } from 'react'
 import { MessageInterface } from 'Components/Pages/Contacts/@Types'
 import debounce from 'debounce'
+import { ErrorsHandlerContext } from 'Components/AppContext/Contexts/ErrorsContext'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import { setMessagesSnapshot } from './setMessagesSnapshot'
 import { MESSAGES_TO_RENDER, UNREAD_MESSAGES_TO_RENDER } from '../../@Context/Constants'
 
 const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGroupChat: boolean }) => {
-  const { firebase, authUser, errors, contactsState, contactsDispatch } = useFrequentVariables()
+  const { firebase, authUser, contactsState, contactsDispatch } = useFrequentVariables()
+  const handleError = useContext(ErrorsHandlerContext)
   const { messages } = contactsState
   const messagesData = messages[chatKey]
 
@@ -45,7 +47,7 @@ const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGr
         firstUnreadMessageKey =
           firstUnreadMessageKey.val() === null ? false : Object.keys(firstUnreadMessageKey.val()!)[0]
       } catch (error) {
-        errors.handleError({
+        handleError({
           message: 'There were a problem loading messages. Please try to reload the page.',
         })
         contactsDispatch({ type: 'setInitialMessages', payload: { messagesData: [], chatKey } })

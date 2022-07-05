@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import { ErrorsHandlerContext } from 'Components/AppContext/Contexts/ErrorsContext'
 
 type Props = {
   contactUid: string
@@ -8,7 +9,8 @@ type Props = {
 const INITIAL_LOADING_STATE = { accept: false, rejected: false }
 
 const useResponseContactRequest = ({ contactUid }: Props) => {
-  const { firebase, errors } = useFrequentVariables()
+  const { firebase } = useFrequentVariables()
+  const handleError = useContext(ErrorsHandlerContext)
 
   const [responseContactRequestLoading, setResponseContactRequestLoading] = useState(INITIAL_LOADING_STATE)
 
@@ -19,7 +21,7 @@ const useResponseContactRequest = ({ contactUid }: Props) => {
       const handleContactRequestCloud = firebase.httpsCallable('handleContactRequest')
       await handleContactRequestCloud({ contactUid, status })
     } catch (error) {
-      errors.handleError({
+      handleError({
         errorData: error,
         message: 'There has been some error handling contact request. Please try again.',
       })

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react'
-import { AppContext } from 'Components/AppContext/AppContextHOC'
+import { AppContext } from 'Components/AppContext/ContextsWrapper'
 import classNames from 'classnames'
 import Loader from 'Components/UI/Placeholders/Loader'
 import { FirebaseContext } from 'Components/Firebase'
@@ -74,17 +74,13 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
     <>
       {contactInfo?.status === true ? (
         <div className="user-profile__request-message">
-          You're friends with
-          {' '}
-          <span className="user-profile__name">{userName}</span>
+          You're friends with <span className="user-profile__name">{userName}</span>
         </div>
       ) : contactInfo?.status === false ? (
         !contactInfo?.receiver ? (
           <div className="new-request">
             <div className="new-request__message">
-              <span className="new-request__name">{userName}</span>
-              {' '}
-              wants to connect
+              <span className="new-request__name">{userName}</span> wants to connect
             </div>
             <div className="new-request__actions--receiver">
               <button className="button" onClick={() => handleContactRequest({ status: 'accept' })}>
@@ -102,18 +98,13 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
           </div>
         ) : (
           <div className="new-request__message">
-            The invitation to connect has been sent to
-            {' '}
-            <span className="new-request__name">{userName}</span>
+            The invitation to connect has been sent to <span className="new-request__name">{userName}</span>
           </div>
         )
       ) : contactInfo?.status === 'rejected' ? (
         <>
           <div className="user-profile__request-message">
-            <span className="user-profile__name">{userName}</span>
-            {' '}
-            rejected you connect request
-            {' '}
+            <span className="user-profile__name">{userName}</span> rejected you connect request{' '}
           </div>
           <div className="user-profile__actions">
             <button className="button" onClick={() => sendContactRequest()}>
@@ -124,7 +115,9 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
       ) : (
         (contactInfo === null || contactInfo.status === 'removed') && (
           <>
-            <div className="user-profile__username"><span className="user-profile__name">{userName}</span></div>
+            <div className="user-profile__username">
+              <span className="user-profile__name">{userName}</span>
+            </div>
             <div className="user-profile__actions">
               <button className="button" onClick={() => sendContactRequest()}>
                 {contactRequestLoading ? <span className="button-loader-circle" /> : 'Add to contacts'}
@@ -141,11 +134,7 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
   return (
     <>
       <Helmet>
-        <title>
-          {userName || 'Nameless'}
-          {' '}
-          User Profile | TV Junkie
-        </title>
+        <title>{userName || 'Nameless'} User Profile | TV Junkie</title>
       </Helmet>
       <div
         className={classNames('user-profile', {
@@ -157,7 +146,9 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
         ) : loadingUserInfo ? (
           <Loader className="loader--small-pink" />
         ) : !authUser?.uid ? (
-          <div className="user-profile__username"><span className="user-profile__name">{userName}</span></div>
+          <div className="user-profile__username">
+            <span className="user-profile__name">{userName}</span>
+          </div>
         ) : (
           renderUserInfo()
         )}

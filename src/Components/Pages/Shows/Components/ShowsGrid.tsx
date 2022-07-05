@@ -1,9 +1,9 @@
 import { useAppDispatch, useAppSelector } from 'app/hooks'
-import { TestAppContext } from 'Components/AppContext/AppContextHOC'
+import { TestAppContext } from 'Components/AppContext/ContextsWrapper'
 import { ShowFullDataStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { handleUserShowStatus } from 'Components/UserContent/UseUserShowsRed/ClientHandlers/showHandlers'
 import { selectShows } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
-import React, { useContext } from 'react'
+import React, { useContext, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import { LIST_OF_GENRES } from 'Utils/Constants'
@@ -15,27 +15,49 @@ type Props = {
   section: string
 }
 
-const TestComp = React.memo(() => {
-  const counter = useContext(TestContext)
+const TestComp = ({ handleClick }) => {
+  // const testContextValue = useContext(TestContext)
   const appCounter = useContext(TestAppContext)
 
   console.log('TestComp Rerender')
 
-  return <div>Opa</div>
-})
+  return <button onClick={() => handleClick()}>Count+</button>
+}
+
+const useMySelector = (selectorFun) => {
+  const contextValue = useContext(TestContext)
+  const result = selectorFun(contextValue)
+  return useMemo(() => <TestComp handleClick={result} />, [result])
+}
+
+const WrapperTestComp = () => {
+  // const { handleClick } = useContext(TestContext)
+
+  // const myHandleClickFun = useMySelector((contextValue) => contextValue.handleClick)
+
+  // console.log('WrapperTestComp Rerender')
+  // some things removed for clarity
+
+  // return <TestComp handleClick={myHandleClickFun} />
+
+  const contextValue = useContext(TestContext)
+  const result = contextValue.handleClick
+  return useMemo(() => <TestComp handleClick={result} />, [result])
+}
 
 const ShowsGrid: React.FC<Props> = ({ data, section }) => {
   const { firebase, userContentLocalStorage } = useFrequentVariables()
   const dispatch = useAppDispatch()
   const userShows = useAppSelector(selectShows)
 
-  const counter = useContext(TestContext)
+  // const counter = useContext(TestContext)
   // const appCounter = useContext(TestAppContext)
 
   console.log('ShowsGrid Rerender')
   return (
     <>
-      <TestComp />
+      {/* <WrapperTestComp /> */}
+      {/* <TestComp /> */}
       {data.map((item) => {
         const filteredGenres =
           item.genre_ids?.map((genreId) => LIST_OF_GENRES.filter((item) => item.id === genreId)) || []

@@ -1,7 +1,8 @@
 import { ContactInfoInterface, CONTACT_INFO_INITIAL_DATA } from 'Components/Pages/Contacts/@Types'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import useElementScrolledDown from 'Components/Pages/Contacts/Hooks/useElementScrolledDown'
-import React, { useState, useEffect, useCallback } from 'react'
+import { ErrorsHandlerContext } from 'Components/AppContext/Contexts/ErrorsContext'
+import React, { useState, useEffect, useCallback, useContext } from 'react'
 import { isUnexpectedObject } from 'Utils'
 import Contact from '../Contact/Contact'
 import SearchInput from '../SearchInput/SearchInput'
@@ -14,7 +15,8 @@ type Props = {
 const CONTACTS_TO_LOAD = 20
 
 const ContactsSearch: React.FC<Props> = ({ wrapperRef }) => {
-  const { firebase, authUser, errors, contactsState, contactsDispatch } = useFrequentVariables()
+  const { firebase, authUser, contactsState, contactsDispatch } = useFrequentVariables()
+  const handleError = useContext(ErrorsHandlerContext)
   const { groupCreation } = contactsState
 
   const [contactsList, setContactsList] = useState<ContactInfoInterface[]>([])
@@ -40,7 +42,7 @@ const ContactsSearch: React.FC<Props> = ({ wrapperRef }) => {
         isUnexpectedObject({ exampleObject: CONTACT_INFO_INITIAL_DATA, targetObject: contact.val() }) &&
         !contact.val().isGroupChat
       ) {
-        errors.handleError({
+        handleError({
           message: 'Some of your contacts were not loaded correctly. Try to reload the page.',
         })
         return
@@ -103,13 +105,13 @@ const ContactsSearch: React.FC<Props> = ({ wrapperRef }) => {
 
         getContactsData({ snapshot: contactsData, isSearchedData: true })
       } catch (error) {
-        errors.handleError({
+        handleError({
           message: 'Some of your contacts were not loaded correctly. Try to reload the page.',
         })
         setIsSearching(false)
       }
     },
-    [contactsList, errors], // eslint-disable-line react-hooks/exhaustive-deps
+    [contactsList, handleError], // eslint-disable-line react-hooks/exhaustive-deps
   )
 
   useEffect(() => {
@@ -143,13 +145,13 @@ const ContactsSearch: React.FC<Props> = ({ wrapperRef }) => {
         await getInitialContacts()
         getContactsData({ snapshot: contacts })
       } catch (error) {
-        errors.handleError({
+        handleError({
           message: 'Some of your contacts were not loaded correctly. Try to reload the page.',
         })
         setInitialLoading(false)
       }
     })()
-  }, [firebase, authUser, errors]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [firebase, authUser, handleError]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!isScrolledDown) return
@@ -165,14 +167,14 @@ const ContactsSearch: React.FC<Props> = ({ wrapperRef }) => {
           .once('value')
         getContactsData({ snapshot: contactsData })
       } catch (error) {
-        errors.handleError({
+        handleError({
           message: 'Some of your contacts were not loaded correctly. Try to reload the page.',
         })
         setLoading(false)
       }
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isScrolledDown, allContactsLoaded, errors, loading, contactsList])
+  }, [isScrolledDown, allContactsLoaded, handleError, loading, contactsList])
 
   const contactsToRender = !searchedContacts?.length ? contactsList : searchedContacts
 

@@ -1,12 +1,15 @@
 import { ContactInfoInterface } from 'Components/Pages/Contacts/@Types'
+import { ErrorsHandlerContext } from 'Components/AppContext/Contexts/ErrorsContext'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import { useContext } from 'react'
 
 type Props = {
   contactInfo?: ContactInfoInterface
 }
 
 const useContactOptions = ({ contactInfo }: Props) => {
-  const { firebase, authUser, errors, contactsState, contactsDispatch } = useFrequentVariables()
+  const { firebase, authUser, contactsState, contactsDispatch } = useFrequentVariables()
+  const handleError = useContext(ErrorsHandlerContext)
   const { activeChat, chatParticipants } = contactsState
 
   const updateIsPinned = async () => {
@@ -19,7 +22,7 @@ const useContactOptions = ({ contactInfo }: Props) => {
         pinned_lastActivityTS: `${isPinned}_${timeStamp}`,
       })
     } catch (error) {
-      errors.handleError({
+      handleError({
         errorData: error,
         message: 'There has been some error updating database. Please try again.',
       })
@@ -52,7 +55,7 @@ const useContactOptions = ({ contactInfo }: Props) => {
         payload: { chatKey: contactInfo?.chatKey!, unreadMessages: [], markAsRead: true },
       })
     } catch (error) {
-      errors.handleError({
+      handleError({
         errorData: error,
         message: 'There has been some error updating database. Please try again.',
       })
@@ -97,7 +100,7 @@ const useContactOptions = ({ contactInfo }: Props) => {
           }),
         )
     } catch (error) {
-      errors.handleError({
+      handleError({
         errorData: error,
         message: 'There has been some error updating database. Please try again.',
       })
@@ -138,7 +141,7 @@ const useContactOptions = ({ contactInfo }: Props) => {
           }),
         )
     } catch (error) {
-      errors.handleError({
+      handleError({
         errorData: error,
         message: 'There has been some error updating database. Please try again.',
       })
@@ -196,7 +199,7 @@ const useContactOptions = ({ contactInfo }: Props) => {
           })
         })
     } catch (error) {
-      errors.handleError({
+      handleError({
         errorData: error,
         message: 'There has been some error updating database. Please try again.',
       })
@@ -221,7 +224,7 @@ const useContactOptions = ({ contactInfo }: Props) => {
       contactsDispatch({ type: 'removeAllMessages', payload: { chatKey: contactInfo.chatKey } })
       await firebase.rootRef().update(updateData)
     } catch (error) {
-      errors.handleError({
+      handleError({
         errorData: error,
         message:
           'There has been some error deleting chat history, it may not work. Please reload the page and try again.',

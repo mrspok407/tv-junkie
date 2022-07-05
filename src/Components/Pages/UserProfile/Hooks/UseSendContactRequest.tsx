@@ -1,6 +1,6 @@
 import { useContext, useState } from 'react'
 import { FirebaseContext } from 'Components/Firebase'
-import { AppContext } from 'Components/AppContext/AppContextHOC'
+import { AppContext } from 'Components/AppContext/ContextsWrapper'
 import { uniqueNamesGenerator, animals } from 'unique-names-generator'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 

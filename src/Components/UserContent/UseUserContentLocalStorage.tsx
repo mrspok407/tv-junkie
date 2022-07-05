@@ -61,7 +61,16 @@ const useUserContentLocalStorage = () => {
     localStorage.setItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES, JSON.stringify(userContent.watchLaterMovies))
   }, [userContent])
 
-  const result = useMemo(() => {
+  // const result = useMemo(() => {
+  //   return {
+  //     ...userContent,
+  //     toggleMovieLS,
+  //     toggleShowLS,
+  //     clearContentState,
+  //   }
+  // }, [clearContentState])
+
+  return useMemo(() => {
     return {
       ...userContent,
       toggleMovieLS,
@@ -69,8 +78,6 @@ const useUserContentLocalStorage = () => {
       clearContentState,
     }
   }, [clearContentState])
-
-  return result
 
   // return {      ...userContent,
   //   toggleMovieLS,

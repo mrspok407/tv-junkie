@@ -5,8 +5,9 @@ import {
   GroupCreationNewMemberInterface,
 } from 'Components/Pages/Contacts/@Types'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import { ErrorsHandlerContext } from 'Components/AppContext/Contexts/ErrorsContext'
 import useElementScrolledDown from 'Components/Pages/Contacts/Hooks/useElementScrolledDown'
-import React, { useState, useEffect, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useRef, useCallback, useContext } from 'react'
 import { isUnexpectedObject } from 'Utils'
 import Contact from './Components/Contact/Contact'
 import SearchInput from '../../../GroupCreation/Components/SearchInput/SearchInput'
@@ -17,7 +18,9 @@ import './NewMembersMenu.scss'
 const CONTACTS_TO_LOAD = 20
 
 const NewMembersMenu: React.FC = () => {
-  const { firebase, authUser, errors, contactsState } = useFrequentVariables()
+  const { firebase, authUser, contactsState } = useFrequentVariables()
+  const handleError = useContext(ErrorsHandlerContext)
+
   const { activeChat, contacts } = contactsState
   const contactInfo = contacts[activeChat.contactKey] || {}
 
@@ -69,7 +72,7 @@ const NewMembersMenu: React.FC = () => {
         isUnexpectedObject({ exampleObject: CONTACT_INFO_INITIAL_DATA, targetObject: contact.val() }) &&
         !contact.val().isGroupChat
       ) {
-        errors.handleError({
+        handleError({
           message: 'Some of your contacts were not loaded correctly. Try to reload the page.',
         })
         return
@@ -132,13 +135,13 @@ const NewMembersMenu: React.FC = () => {
 
         getContactsData({ snapshot: contactsData, isSearchedData: true })
       } catch (error) {
-        errors.handleError({
+        handleError({
           message: 'Some of your contacts were not loaded correctly. Try to reload the page.',
         })
         setIsSearching(false)
       }
     },
-    [contactsList, errors], // eslint-disable-line react-hooks/exhaustive-deps
+    [contactsList, handleError], // eslint-disable-line react-hooks/exhaustive-deps
   )
 
   useEffect(() => {
@@ -172,13 +175,13 @@ const NewMembersMenu: React.FC = () => {
         await getInitialContacts()
         getContactsData({ snapshot: contacts })
       } catch (error) {
-        errors.handleError({
+        handleError({
           message: 'Some of your contacts were not loaded correctly. Try to reload the page.',
         })
         setInitialLoading(false)
       }
     })()
-  }, [firebase, authUser, errors]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [firebase, authUser, handleError]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!isScrolledDown) return
@@ -194,14 +197,14 @@ const NewMembersMenu: React.FC = () => {
           .once('value')
         getContactsData({ snapshot: contactsData })
       } catch (error) {
-        errors.handleError({
+        handleError({
           message: 'Some of your contacts were not loaded correctly. Try to reload the page.',
         })
         setLoadingNewcontacts(false)
       }
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isScrolledDown, contactsList, allContactsLoaded, loadingNewContacts, errors])
+  }, [isScrolledDown, contactsList, allContactsLoaded, loadingNewContacts, handleError])
 
   const contactsToRender = !searchedContacts?.length ? contactsList : searchedContacts
 

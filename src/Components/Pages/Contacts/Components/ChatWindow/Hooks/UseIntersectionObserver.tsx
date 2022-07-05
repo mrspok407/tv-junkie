@@ -1,5 +1,6 @@
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
-import { useEffect, useLayoutEffect, useRef } from 'react'
+import { ErrorsHandlerContext } from 'Components/AppContext/Contexts/ErrorsContext'
+import { useContext, useEffect, useLayoutEffect, useRef } from 'react'
 
 type Props = {
   chatContainerRef: HTMLDivElement
@@ -16,7 +17,8 @@ const useIntersectionObserver = ({
   pageInFocus,
   chatWindowLoading,
 }: Props) => {
-  const { firebase, authUser, errors, contactsState } = useFrequentVariables()
+  const { firebase, authUser, contactsState } = useFrequentVariables()
+  const handleError = useContext(ErrorsHandlerContext)
   const { activeChat, renderedMessagesList, contacts } = contactsState
   const renderedMessages = renderedMessagesList[activeChat.chatKey]
   const contactInfo = contacts[activeChat.contactKey] || {}
@@ -49,7 +51,7 @@ const useIntersectionObserver = ({
                   .child(key)
                   .set(null)
               } catch (error) {
-                errors.handleError({
+                handleError({
                   errorData: error,
                   message: 'There has been some error updating database. Tye to realod the page.',
                 })

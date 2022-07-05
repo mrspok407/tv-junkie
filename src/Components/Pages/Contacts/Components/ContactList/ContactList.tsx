@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useContext } from 'react'
 import useElementScrolledDown from 'Components/Pages/Contacts/Hooks/useElementScrolledDown'
 import classNames from 'classnames'
 import { isUnexpectedObject } from 'Utils'
-import CreatePortal from 'Components/UI/Modal/CreatePortal'
-import ModalContent from 'Components/UI/Modal/ModalContent'
+import { ErrorsHandlerContext } from 'Components/AppContext/Contexts/ErrorsContext'
 import { CONTACTS_TO_LOAD } from '../@Context/Constants'
 import useGetInitialContactInfo from './Hooks/UseGetInitialContactInfo'
 import useFrequentVariables from '../../../../../Utils/Hooks/UseFrequentVariables'
@@ -16,7 +15,9 @@ type Props = {
 }
 
 const ContactList: React.FC<Props> = ({ contactListWrapperRef }) => {
-  const { firebase, authUser, errors, contactsState, contactsDispatch } = useFrequentVariables()
+  const { firebase, authUser, contactsState, contactsDispatch } = useFrequentVariables()
+
+  const handleError = useContext(ErrorsHandlerContext)
   const { contacts, groupCreation } = contactsState
   const contactsData = Object.values(contacts)?.map((contact) => contact)
 
@@ -56,7 +57,7 @@ const ContactList: React.FC<Props> = ({ contactListWrapperRef }) => {
         isUnexpectedObject({ exampleObject: CONTACT_INFO_INITIAL_DATA, targetObject: contact.val() }) &&
         !contact.val().isGroupChat
       ) {
-        errors.handleError({
+        handleError({
           message: 'Some of your contacts were not loaded correctly. Try to reload the page.',
         })
         return
@@ -155,8 +156,6 @@ const ContactList: React.FC<Props> = ({ contactListWrapperRef }) => {
           )
         })
       )}
-
-      {errors.error && <CreatePortal element={<ModalContent message={errors.error.message} />} />}
     </div>
   )
 }

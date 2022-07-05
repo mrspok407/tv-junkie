@@ -8,7 +8,7 @@ import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import useAppSelectorArray from 'Utils/Hooks/UseAppSelectorArray'
 import { ShowFullDataStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
 import useScrollEffect from 'Utils/Hooks/UseScrollEffect'
-import { AppContext, TestAppContext } from 'Components/AppContext/AppContextHOC'
+import { AppContext, TestAppContext } from 'Components/AppContext/ContextsWrapper'
 import { INITIAL_STATE, ShowsContentState, ACTIONTYPES, ActionTypesEnum } from './ReducerConfig/@Types'
 import reducer from './ReducerConfig'
 import ShowsGrid from './Components/ShowsGrid'
@@ -16,7 +16,6 @@ import ShowsSectionButtons from './Components/ShowsSectionButtons'
 import UseSectionFilteredShows from './Hooks/UseSectionFilteredShows'
 import UseSortSlicedShows from './Hooks/UseSortSlicedShows'
 import SortByOptions from './Components/SortByOptions'
-import { TestContext } from './Shows'
 
 const SCROLL_THRESHOLD = 800
 const THROTTLE_TIMEOUT = 500
@@ -27,10 +26,6 @@ const ShowsContent: React.FC = () => {
   const context = useContext(AppContext)
 
   console.log('ShowsContent Rerender')
-
-  // const appCounter = useContext(TestAppContext)
-
-  //  const counter = useContext(TestContext)
 
   const [{ activeSection, loadedShows }, localDispatch] = useReducer<React.Reducer<ShowsContentState, ACTIONTYPES>>(
     reducer,
@@ -82,6 +77,7 @@ const ShowsContent: React.FC = () => {
 
     return (
       <>
+        {/* <div style={{ color: '#ffffff' }}>{testContextValue.counter}</div> */}
         {authUser.uid && <SortByOptions sortBy={sortBy} handleSortBy={handleSortBy} />}
 
         <div

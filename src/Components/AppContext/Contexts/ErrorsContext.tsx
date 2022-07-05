@@ -1,6 +1,6 @@
 import { useAppDispatch, useAppSelector } from 'app/hooks'
 import { selectShowsError, setShowsError } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
-import { createContext, useCallback, useEffect, useRef, useState } from 'react'
+import { createContext, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ERROR_MODAL_DURATION } from 'Utils/Constants'
 
 export interface ErrorInterface {
@@ -8,9 +8,20 @@ export interface ErrorInterface {
   message: string
 }
 
-export const ErrorContext = createContext<any>({})
+export interface ErrorContextInt {
+  error: ErrorInterface | null
+  handleError: ({ errorData, message }: ErrorInterface) => void
+}
 
-const useErrors = () => {
+const INITIAL_VALUE_ERRORS = {
+  error: null,
+  handleError: () => {},
+}
+
+export const ErrorsContext = createContext<ErrorContextInt['error']>(INITIAL_VALUE_ERRORS.error)
+export const ErrorsHandlerContext = createContext<ErrorContextInt['handleError']>(INITIAL_VALUE_ERRORS.handleError)
+
+const useErrorsContext = () => {
   const dispatch = useAppDispatch()
   const showsError = useAppSelector(selectShowsError)
 
@@ -46,7 +57,7 @@ const useErrors = () => {
     handleError({ errorData: showsError, message: 'Error in the database occured. Please reload the page.' })
   }, [showsError, handleError])
 
-  return { error, handleError }
+  return [error, handleError] as const
 }
 
-export default useErrors
+export default useErrorsContext

@@ -6,8 +6,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { store } from 'app/store'
 import { Provider } from 'react-redux'
-import AppContextHOC from 'Components/AppContext/AppContextHOC'
-import App from './App'
+import ContextsWrapper from 'Components/AppContext/ContextsWrapper'
+import App from 'App'
 import Firebase, { FirebaseContext } from './Components/Firebase'
 import 'normalize.css'
 import '@fontsource/open-sans'
@@ -18,10 +18,9 @@ import './index.scss'
 ReactDOM.render(
   <Provider store={store}>
     <FirebaseContext.Provider value={new Firebase()}>
-      {/* <App /> */}
-      <AppContextHOC>
+      <ContextsWrapper>
         <App />
-      </AppContextHOC>
+      </ContextsWrapper>
     </FirebaseContext.Provider>
   </Provider>,
   document.getElementById('root'),

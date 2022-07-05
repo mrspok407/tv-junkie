@@ -1,6 +1,8 @@
 import { MessageInterface } from 'Components/Pages/Contacts/@Types'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import striptags from 'striptags'
+import { ErrorsHandlerContext } from 'Components/AppContext/Contexts/ErrorsContext'
+import { useContext } from 'react'
 import { MESSAGE_LINE_HEIGHT } from '../../../../@Context/Constants'
 
 type Props = {
@@ -8,7 +10,8 @@ type Props = {
 }
 
 const useHandleMessageOptions = ({ messageData }: Props) => {
-  const { firebase, authUser, errors, contactsState, contactsDispatch } = useFrequentVariables()
+  const { firebase, authUser, contactsState, contactsDispatch } = useFrequentVariables()
+  const handleError = useContext(ErrorsHandlerContext)
   const { activeChat, messages, contacts, chatMembersStatus, contactsUnreadMessages } = contactsState
   const contactInfo = contacts[activeChat.contactKey]
   const contactsUnreadMessagesData = contactsUnreadMessages[activeChat.chatKey]
@@ -56,7 +59,7 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
 
       await firebase.rootRef().update(updateData)
     } catch (error) {
-      errors.handleError({
+      handleError({
         errorData: error,
         message: 'Message hasn&apos;t been deleted, because of the unexpected error.',
       })
@@ -121,7 +124,7 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
 
       await firebase.rootRef().update(updateData)
     } catch (error) {
-      errors.handleError({
+      handleError({
         errorData: error,
         message: 'Message hasn&apos;t been deleted, because of the unexpected error.',
       })

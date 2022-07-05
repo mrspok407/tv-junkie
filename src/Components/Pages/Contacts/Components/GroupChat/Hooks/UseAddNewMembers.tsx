@@ -1,9 +1,11 @@
 import { GroupCreationNewMemberInterface } from 'Components/Pages/Contacts/@Types'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
-import { useState } from 'react'
+import { ErrorsHandlerContext } from 'Components/AppContext/Contexts/ErrorsContext'
+import { useContext, useState } from 'react'
 
 const useAddNewMembers = () => {
-  const { firebase, errors, contactsDispatch } = useFrequentVariables()
+  const { firebase, contactsDispatch } = useFrequentVariables()
+  const handleError = useContext(ErrorsHandlerContext)
   const [newMembersLoading, setNewMembersLoading] = useState(false)
 
   const addNewMembers = async ({
@@ -21,7 +23,7 @@ const useAddNewMembers = () => {
       setNewMembersLoading(false)
       contactsDispatch({ type: 'updateGroupInfoSettings', payload: { isActive: false } })
     } catch (error) {
-      errors.handleError({
+      handleError({
         errorData: error,
         message: 'There has been some error adding new members. Please reload the page.',
       })

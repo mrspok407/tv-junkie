@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { useHistory } from 'react-router-dom'
-import { AppContext } from 'Components/AppContext/AppContextHOC'
+import { AppContext } from 'Components/AppContext/ContextsWrapper'
 import { MovieInterface } from 'Components/AppContext/@Types'
 import * as ROLES from 'Utils/Constants/roles'
 import * as ROUTES from 'Utils/Constants/routes'

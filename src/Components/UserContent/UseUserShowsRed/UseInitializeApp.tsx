@@ -12,6 +12,8 @@ const useInitializeApp = () => {
   const { firebase } = useFrequentVariables()
   const dispatch = useAppDispatch()
 
+  console.log({ firebase })
+
   useEffect(() => {
     let authSubscriber: any
     const authUserListener = () => {

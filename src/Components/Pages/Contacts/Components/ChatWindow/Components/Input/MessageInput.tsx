@@ -1,11 +1,12 @@
 import { ContainerRectInterface, MessageInputInterface, MessageInterface } from 'Components/Pages/Contacts/@Types'
-import React, { useEffect, useRef, useCallback, useLayoutEffect } from 'react'
+import React, { useEffect, useRef, useCallback, useLayoutEffect, useContext } from 'react'
 import debounce from 'debounce'
 import classNames from 'classnames'
 import striptags from 'striptags'
 import { textToUrl } from 'Utils'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import useFirebaseReferences from 'Components/Pages/Contacts/Hooks/UseFirebaseReferences'
+import { ErrorsHandlerContext } from 'Components/AppContext/Contexts/ErrorsContext'
 import { MESSAGE_LINE_HEIGHT, MOBILE_LAYOUT_THRESHOLD } from '../../../@Context/Constants'
 import GoDown from '../GoDown/GoDown'
 import { updateTyping } from './FirebaseHelpers/UpdateTyping'
@@ -30,7 +31,9 @@ const MessageInput: React.FC<Props> = ({
   unreadMessagesAuthRef,
   contactLastActivity,
 }) => {
-  const { authUser, errors, contactsState, contactsDispatch } = useFrequentVariables()
+  const { authUser, contactsState, contactsDispatch } = useFrequentVariables()
+  const handleError = useContext(ErrorsHandlerContext)
+
   const firebaseRefs = useFirebaseReferences()
   const { activeChat, messagesInput, messages, selectedMessages, contacts } = contactsState
   const contactInfo = contacts[activeChat.contactKey]
@@ -167,7 +170,7 @@ const MessageInput: React.FC<Props> = ({
       const newMessageRef = document.querySelector(`.chat-window__message--${timeStampEpoch.toString()}`)
       newMessageRef?.scrollIntoView({ block: 'start', inline: 'start' })
 
-      errors.handleError({
+      handleError({
         message: 'Message hasn&apos;t been sent, because of the unexpected error. Please reload the page.',
       })
     }
@@ -193,7 +196,7 @@ const MessageInput: React.FC<Props> = ({
         await editMessagePrivateChat({ message: editedMessageText, originalMessage })
       }
     } catch (error) {
-      errors.handleError({
+      handleError({
         message: 'Message hasn&apos;t been edited, because of the unexpected error. Please reload the page.',
       })
     }

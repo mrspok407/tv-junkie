@@ -1,7 +1,8 @@
 import { MembersStatusGroupChatInterface } from 'Components/Pages/Contacts/@Types'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import useElementScrolledDown from 'Components/Pages/Contacts/Hooks/useElementScrolledDown'
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import { ErrorsHandlerContext } from 'Components/AppContext/Contexts/ErrorsContext'
+import React, { useState, useEffect, useCallback, useMemo, useContext } from 'react'
 import SearchInput from './SearchInput/SearchInput'
 import Member from './Member'
 import './MembersMenu.scss'
@@ -9,7 +10,9 @@ import './MembersMenu.scss'
 const MEMBERS_TO_RENDER = 50
 
 const GroupCreation: React.FC = () => {
-  const { firebase, errors, contactsState } = useFrequentVariables()
+  const { firebase, contactsState } = useFrequentVariables()
+  const handleError = useContext(ErrorsHandlerContext)
+
   const { activeChat, chatMembersStatus, chatParticipants, contacts } = contactsState
   const contactInfo = contacts[activeChat.contactKey] || {}
   const chatMembersStatusData = useMemo(
@@ -75,13 +78,13 @@ const GroupCreation: React.FC = () => {
 
         getContactsData({ snapshot: membersData })
       } catch (error) {
-        errors.handleError({
+        handleError({
           message: 'Some of your contacts were not loaded correctly. Try to reload the page.',
         })
         setIsSearching(false)
       }
     },
-    [chatParticipantsData, errors], // eslint-disable-line react-hooks/exhaustive-deps
+    [chatParticipantsData, handleError], // eslint-disable-line react-hooks/exhaustive-deps
   )
 
   useEffect(() => {

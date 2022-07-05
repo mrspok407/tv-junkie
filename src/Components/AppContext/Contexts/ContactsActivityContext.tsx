@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react'
-import useFrequentVariables from '../../../../Utils/Hooks/UseFrequentVariables'
+import { useState, useEffect, createContext } from 'react'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 
-const useNewContactsActivity = () => {
+export const ContactsActivityContext = createContext<boolean>(false)
+
+export const useContactsActivityContext = () => {
   const { firebase, authUser } = useFrequentVariables()
 
   const [newActivity, setNewActivity] = useState(false)
@@ -30,4 +32,4 @@ const useNewContactsActivity = () => {
   return newContactsActivity
 }
 
-export default useNewContactsActivity
+export default useContactsActivityContext

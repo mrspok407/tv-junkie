@@ -1,6 +1,6 @@
 import { useEffect, useContext } from 'react'
 import { FirebaseContext } from 'Components/Firebase'
-import { AppContext } from 'Components/AppContext/AppContextHOC'
+import { AppContext } from 'Components/AppContext/ContextsWrapper'
 import { MovieInterface } from 'Components/AppContext/@Types'
 import * as ROLES from 'Utils/Constants/roles'
 import * as ROUTES from 'Utils/Constants/routes'

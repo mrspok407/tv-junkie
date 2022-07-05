@@ -6,7 +6,7 @@ import { todayDate, combineMergeObjects, releasedEpisodesToOneArray } from 'Util
 import Loader from 'Components/UI/Placeholders/Loader'
 import PlaceholderNoToWatchEpisodes from 'Components/UI/Placeholders/PlaceholderNoToWatchEpisodes'
 import merge from 'deepmerge'
-import { AppContext } from 'Components/AppContext/AppContextHOC'
+import { AppContext } from 'Components/AppContext/ContextsWrapper'
 import { EpisodesFromFireDatabase, SingleEpisodeFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
 import { ShowFullDataStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
 
