@@ -3,7 +3,6 @@ import { combineMergeObjects } from 'Utils'
 import { LIST_OF_GENRES } from 'Utils/Constants'
 import * as ROUTES from 'Utils/Constants/routes'
 import { ShowFullDataStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
-import { ShowInterface } from 'Components/AppContext/@Types'
 import merge from 'deepmerge'
 import classNames from 'classnames'
 import { Link, useHistory } from 'react-router-dom'
@@ -43,14 +42,14 @@ const UserProfileContent: React.FC<Props> = ({ userUid }) => {
       setLoadingContent(false)
       return
     }
-    const userShows: ShowFullDataStoreState[] = Object.values(userShowsData.val()).map((show: any) => show)
+    const userShows = Object.values(userShowsData.val()!).map((show: any) => show)
 
     const showsFromDatabase = await Promise.all(
       userShows.map((show) =>
         firebase
           .showInfo(show.id)
           .once('value')
-          .then((snapshot: { val: () => ShowInterface }) => {
+          .then((snapshot: any) => {
             if (snapshot.val() === null) return
             const info = snapshot.val()
             return { ...info }

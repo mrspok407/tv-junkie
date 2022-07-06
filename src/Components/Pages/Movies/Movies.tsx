@@ -70,13 +70,13 @@ const Movies: React.FC = () => {
         <title>All your movies | TV Junkie</title>
       </Helmet>
       <Header />
-      <MoviesContent
+      {/* <MoviesContent
         moviesData={moviesData}
         getMovieLinks={getMovieLinks}
         loadingIds={loadingIds}
         openLinksMoviesId={openLinksMoviesId}
         error={error}
-      />
+      /> */}
       <Footer />
       <ScrollToTop />
     </>

@@ -1,5 +1,6 @@
+import { LocalStorageValueContext } from 'Components/AppContext/Contexts/LocalStorageContentContext/LocalStorageContentContext'
 import { ShowFullDataStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
-import { useMemo } from 'react'
+import { useContext, useMemo } from 'react'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import { LoadedShowsInterface } from '../ReducerConfig/@Types'
@@ -12,12 +13,13 @@ type Props = {
 }
 
 const UseSortSlicedShows = ({ showsData, activeSection, sortByState, loadedShows }: Props) => {
-  const { authUser, userContentLocalStorage } = useFrequentVariables()
+  const { authUser } = useFrequentVariables()
+  const localStorageContent = useContext(LocalStorageValueContext)
 
   const sortSlicedShows = useMemo(() => {
     if (!authUser?.uid) {
       if (activeSection !== 'watchingShows') return []
-      return userContentLocalStorage.watchingShows.slice(0, loadedShows.watchingShowsLS)
+      return localStorageContent.watchingShows.slice(0, loadedShows.watchingShowsLS)
     }
     return showsData
       .sort((a: any, b: any) => {
@@ -29,7 +31,7 @@ const UseSortSlicedShows = ({ showsData, activeSection, sortByState, loadedShows
         return 1
       })
       .slice(0, loadedShows[activeSection])
-  }, [activeSection, authUser, loadedShows, showsData, sortByState, userContentLocalStorage.watchingShows])
+  }, [activeSection, authUser, loadedShows, showsData, sortByState, localStorageContent])
 
   return sortSlicedShows
 }

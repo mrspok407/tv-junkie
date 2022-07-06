@@ -1,8 +1,7 @@
 import { useContext, useState } from 'react'
-import { FirebaseContext } from 'Components/Firebase'
-import { AppContext } from 'Components/AppContext/ContextsWrapper'
 import { uniqueNamesGenerator, animals } from 'unique-names-generator'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import { ErrorsHandlerContext } from 'Components/AppContext/Contexts/ErrorsContext'
 
 type Props = {
   contactName: string
@@ -10,7 +9,8 @@ type Props = {
 }
 
 const useSendContactRequest = ({ contactName, contactUid }: Props) => {
-  const { firebase, authUser, errors } = useFrequentVariables()
+  const { firebase, authUser } = useFrequentVariables()
+  const handleError = useContext(ErrorsHandlerContext)
   const [contactRequestLoading, setContactRequestLoading] = useState(false)
 
   const sendContactRequest = async () => {
@@ -28,7 +28,7 @@ const useSendContactRequest = ({ contactName, contactUid }: Props) => {
         authUserName: authUser?.username,
       })
     } catch (error) {
-      errors.handleError({
+      handleError({
         errorData: error,
         message: 'There has been some error updating database. Please try again.',
       })

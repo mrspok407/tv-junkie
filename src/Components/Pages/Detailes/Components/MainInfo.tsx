@@ -7,6 +7,7 @@ import { formatMovieBudget } from 'Utils/FormatTMDBAPIData'
 import { CONTENT_INFO_NO_DATA } from 'Utils/Constants'
 import ShowsButtonsRed from './ShowsButtonsRed'
 import useFormatDetailesValues from './Hooks/useFormatDetailesValues'
+import MovieButtons from './MovieButtons'
 
 type Props = {
   detailes: MainDataTMDB
@@ -15,15 +16,13 @@ type Props = {
 }
 
 export const MainInfo: React.FC<Props> = ({ detailes, mediaType, id }) => {
-  const { authUser, userContentLocalStorage } = useFrequentVariables()
+  const { authUser } = useFrequentVariables()
   const isMediaTypeTV = mediaType === 'show'
 
   const { companyName, genres, title, yearRelease, yearRange, runtime } = useFormatDetailesValues({
     detailes,
     isMediaTypeTV,
   })
-
-  const movieInLS = userContentLocalStorage.watchLaterMovies.find((item: { id: number }) => item.id === Number(id))
 
   const noDataPlaceholder = () => <span className="detailes-page__info-no-info">{CONTENT_INFO_NO_DATA}</span>
 
@@ -96,31 +95,7 @@ export const MainInfo: React.FC<Props> = ({ detailes, mediaType, id }) => {
 
       <div className="detailes-page__info-row detailes-page__info--button">
         {isMediaTypeTV && <ShowsButtonsRed id={id} detailes={detailes} />}
-
-        {!isMediaTypeTV && (
-          <button
-            className={classNames('button', {
-              'button--pressed': movieInLS,
-            })}
-            onClick={() => {
-              if (authUser) {
-                // userContentHandler.handleMovieInDatabases({
-                //   id: Number(id),
-                //   data: detailes,
-                // })
-                // context.userContent.handleUserMoviesOnClient({ id: Number(id), data: detailes })
-              } else {
-                // userContentLocalStorage.toggleMovieLS({
-                //   id: Number(id),
-                //   data: detailes,
-                // })
-              }
-            }}
-            type="button"
-          >
-            {movieInLS ? 'Remove' : 'Watch later'}
-          </button>
-        )}
+        {!isMediaTypeTV && <MovieButtons id={id} detailes={detailes} />}
       </div>
     </div>
   )

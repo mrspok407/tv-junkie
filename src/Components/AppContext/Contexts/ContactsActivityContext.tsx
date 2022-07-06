@@ -3,7 +3,7 @@ import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 
 export const ContactsActivityContext = createContext<boolean>(false)
 
-export const useContactsActivityContext = () => {
+const useContactsActivityContext = () => {
   const { firebase, authUser } = useFrequentVariables()
 
   const [newActivity, setNewActivity] = useState(false)

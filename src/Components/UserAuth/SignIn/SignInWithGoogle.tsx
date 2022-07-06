@@ -1,42 +1,38 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { useHistory } from 'react-router-dom'
-import { AppContext } from 'Components/AppContext/ContextsWrapper'
-import { MovieInterface } from 'Components/AppContext/@Types'
 import * as ROLES from 'Utils/Constants/roles'
 import * as ROUTES from 'Utils/Constants/routes'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import {
+  LOCAL_STORAGE_KEY_WATCHING_SHOWS,
+  LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES,
+} from 'Components/AppContext/Contexts/LocalStorageContentContext/@Types'
+import { LocalStorageHandlersContext } from 'Components/AppContext/Contexts/LocalStorageContentContext/LocalStorageContentContext'
 import { AuthUserGoogleSignInInterface } from '../Session/Authentication/@Types'
-
-const LOCAL_STORAGE_KEY_WATCHING_SHOWS = 'watchingShowsLocalS'
-const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = 'watchLaterMoviesLocalS'
 
 const mobileLayout = 1000
 
 const SignInWithGoogleForm = () => {
+  const { firebase } = useFrequentVariables()
+  const localStorageHandlers = useContext(LocalStorageHandlersContext)
+
   const [windowSize, setWindowSize] = useState(window.innerWidth)
-  const context = useContext(AppContext)
   const history = useHistory()
 
   useEffect(() => {
     setWindowSize(window.innerWidth)
   }, [])
 
-  const clearLocalStorage = () => {
-    localStorage.removeItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)
-    localStorage.removeItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)
-
-    context.userContentLocalStorage.clearContentState()
-  }
-
   const onSubmit = (provider: any) => {
     const signInType = windowSize < mobileLayout ? 'signInWithRedirect' : 'signInWithPopup'
 
-    context.firebase.app
+    firebase.app
       .auth()
       [signInType](provider)
       .then((authUser: AuthUserGoogleSignInInterface) => {
         // context.userContentHandler.handleLoadingShowsOnRegister(true)
 
-        context.firebase
+        firebase
           .user(authUser.user.uid)
           .update({
             username: authUser.user.displayName,
@@ -67,12 +63,8 @@ const SignInWithGoogleForm = () => {
             //   })
             // })
           })
-          .then(() => {
-            clearLocalStorage()
-          })
-          .catch(() => {
-            clearLocalStorage()
-            // context.userContentHandler.handleLoadingShowsOnRegister(false)
+          .finally(() => {
+            localStorageHandlers.clearLocalStorageContent()
           })
       })
       .then(() => {
@@ -89,7 +81,7 @@ const SignInWithGoogleForm = () => {
       <button
         className="button button--auth__form"
         type="button"
-        onClick={() => onSubmit(new context.firebase.app.auth.GoogleAuthProvider())}
+        onClick={() => onSubmit(new firebase.app.auth.GoogleAuthProvider())}
       >
         <div className="auth__form--google-icon" />
         <div className="auth__form--google-title">Google Sign In</div>

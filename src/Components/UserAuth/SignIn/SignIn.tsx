@@ -4,13 +4,10 @@ import { useHistory } from 'react-router-dom'
 import { validEmailRegex } from 'Utils'
 import * as ROUTES from 'Utils/Constants/routes'
 import classNames from 'classnames'
-import { AppContext } from 'Components/AppContext/ContextsWrapper'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import { LocalStorageHandlersContext } from 'Components/AppContext/Contexts/LocalStorageContentContext/LocalStorageContentContext'
 import Input from '../Input/Input'
 import SignInWithGoogleForm from './SignInWithGoogle'
-
-const LOCAL_STORAGE_KEY_WATCHING_SHOWS = 'watchingShowsLocalS'
-const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = 'watchLaterMoviesLocalS'
 
 type Props = {
   closeNavMobile: () => void
@@ -38,8 +35,8 @@ const ERROR_DEFAULT_VALUES = {
 }
 
 const SignInFormBase: React.FC<Props> = ({ closeNavMobile, togglePasswordForget }) => {
-  const context = useContext(AppContext)
   const { firebase } = useFrequentVariables()
+  const localStorageHandlers = useContext(LocalStorageHandlersContext)
 
   const [requiredInputs, setRequiredInputs] = useState<RequiredInputsInterface>({ email: '', password: '' })
   const [errors, setErrors] = useState<ErrorsInterface>(ERROR_DEFAULT_VALUES)
@@ -71,10 +68,7 @@ const SignInFormBase: React.FC<Props> = ({ closeNavMobile, togglePasswordForget 
     firebase
       .signInWithEmailAndPassword(email, password)
       .then(() => {
-        localStorage.removeItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)
-        localStorage.removeItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)
-
-        context.userContentLocalStorage.clearContentState()
+        localStorageHandlers.clearLocalStorageContent()
         if (closeNavMobile) closeNavMobile()
 
         history.push(ROUTES.HOME_PAGE)

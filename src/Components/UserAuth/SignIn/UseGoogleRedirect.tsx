@@ -1,26 +1,18 @@
 import { useEffect, useContext } from 'react'
-import { FirebaseContext } from 'Components/Firebase'
-import { AppContext } from 'Components/AppContext/ContextsWrapper'
-import { MovieInterface } from 'Components/AppContext/@Types'
 import * as ROLES from 'Utils/Constants/roles'
 import * as ROUTES from 'Utils/Constants/routes'
 import { useHistory } from 'react-router-dom'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
-
-const LOCAL_STORAGE_KEY_WATCHING_SHOWS = 'watchingShowsLocalS'
-const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = 'watchLaterMoviesLocalS'
+import { LocalStorageHandlersContext } from 'Components/AppContext/Contexts/LocalStorageContentContext/LocalStorageContentContext'
+import {
+  LOCAL_STORAGE_KEY_WATCHING_SHOWS,
+  LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES,
+} from 'Components/AppContext/Contexts/LocalStorageContentContext/@Types'
 
 const useGoogleRedirect = () => {
   const { firebase } = useFrequentVariables()
-  const context = useContext(AppContext)
+  const localStorageHandlers = useContext(LocalStorageHandlersContext)
   const history = useHistory()
-
-  const clearLocalStorage = () => {
-    localStorage.removeItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)
-    localStorage.removeItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)
-
-    context.userContentLocalStorage.clearContentState()
-  }
 
   useEffect(() => {
     // context.userContentHandler.handleLoadingShowsOnRegister(true)
@@ -67,14 +59,10 @@ const useGoogleRedirect = () => {
             // })
           })
           .then(() => {
-            clearLocalStorage()
-          })
-          .then(() => {
             history.push(ROUTES.HOME_PAGE)
           })
-          .catch(() => {
-            clearLocalStorage()
-            // context.userContentHandler.handleLoadingShowsOnRegister(false)
+          .finally(() => {
+            localStorageHandlers.clearLocalStorageContent()
           })
       })
       .catch((error: any) => {

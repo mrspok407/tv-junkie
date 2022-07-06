@@ -1,4 +1,3 @@
-import { EpisodesFromFireDatabase, SingleEpisodeFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
 import { UserShowStatuses } from 'Components/UserContent/UseUserShowsRed/@Types'
 
 export interface EpisodesTMDB {

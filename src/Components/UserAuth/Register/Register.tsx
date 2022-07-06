@@ -5,15 +5,11 @@ import { validEmailRegex } from 'Utils'
 import * as ROLES from 'Utils/Constants/roles'
 import * as ROUTES from 'Utils/Constants/routes'
 import classNames from 'classnames'
-import { AppContext } from 'Components/AppContext/ContextsWrapper'
-import { MovieInterface } from 'Components/AppContext/@Types'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import { LocalStorageHandlersContext } from 'Components/AppContext/Contexts/LocalStorageContentContext/LocalStorageContentContext'
 import SignInWithGoogleForm from '../SignIn/SignInWithGoogle'
 import { AuthUserFirebaseInterface } from '../Session/Authentication/@Types'
 import Input from '../Input/Input'
-
-const LOCAL_STORAGE_KEY_WATCHING_SHOWS = 'watchingShowsLocalS'
-const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = 'watchLaterMoviesLocalS'
 
 type Props = {
   closeNavMobile: () => void
@@ -53,7 +49,7 @@ const ERROR_DEFAULT_VALUES = {
 
 const Register: React.FC<Props> = ({ closeNavMobile }) => {
   const { firebase } = useFrequentVariables()
-  const context = useContext(AppContext)
+  const localStorageHandlers = useContext(LocalStorageHandlersContext)
 
   const [requiredInputs, setRequiredInputs] = useState<RequiredInputsInterface>({
     login: '',
@@ -102,14 +98,12 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
             role: ROLES.USER,
           })
           .then(() => {
-            const watchingShows = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)!) || []
-            const watchLaterMovies = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)!) || []
-
+            // const watchingShows = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)!) || []
+            // const watchLaterMovies = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)!) || []
             // context.userContentHandler.addShowsToDatabaseOnRegister({
             //   shows: watchingShows,
             //   uid: authUser.user.uid,
             // })
-
             // watchLaterMovies.forEach((item: MovieInterface) => {
             //   context.userContentHandler.handleMovieInDatabases({
             //     id: item.id,
@@ -120,11 +114,7 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
             // })
           })
           .then(() => {
-            localStorage.removeItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)
-            localStorage.removeItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)
-
-            context.userContentLocalStorage.clearContentState()
-
+            localStorageHandlers.clearLocalStorageContent()
             if (closeNavMobile) closeNavMobile()
           })
       })

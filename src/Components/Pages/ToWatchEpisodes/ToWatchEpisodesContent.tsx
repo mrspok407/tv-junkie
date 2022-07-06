@@ -6,7 +6,6 @@ import { todayDate, combineMergeObjects, releasedEpisodesToOneArray } from 'Util
 import Loader from 'Components/UI/Placeholders/Loader'
 import PlaceholderNoToWatchEpisodes from 'Components/UI/Placeholders/PlaceholderNoToWatchEpisodes'
 import merge from 'deepmerge'
-import { AppContext } from 'Components/AppContext/ContextsWrapper'
 import { EpisodesFromFireDatabase, SingleEpisodeFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
 import { ShowFullDataStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
 
@@ -14,7 +13,7 @@ const ToWatchEpisodesContent: React.FC = () => {
   const [watchingShows, setWatchingShows] = useState<ShowFullDataStoreState[]>([])
   const [loading, setLoading] = useState(true)
 
-  const context = useContext(AppContext)
+  const context = {}
 
   // const getContent = useCallback(() => {
   //   const watchingShows = context.userContent.userShows.filter(

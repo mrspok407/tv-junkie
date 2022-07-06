@@ -1,7 +1,7 @@
 import { AppThunk } from 'app/store'
+import { LocalStorageContentInt } from 'Components/AppContext/Contexts/LocalStorageContentContext/@Types'
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import { getAuthUidFromState } from 'Components/UserAuth/Session/Authentication/Helpers'
-import useUserContentLocalStorage from 'Components/UserContent/UseUserContentLocalStorage'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import { UserShowStatuses } from '../@Types'
 import { handleNewShowInDatabase, updateUserShowStatus } from '../DatabaseHandlers/PostData/postShowsData'
@@ -10,28 +10,28 @@ import { selectShow } from '../userShowsSliceRed'
 type Props = {
   id: number
   database: UserShowStatuses
-  showDetailesTMDB: MainDataTMDB
+  showFullDetailes: MainDataTMDB
   firebase: FirebaseInterface
-  localStorageHandlers: ReturnType<typeof useUserContentLocalStorage>
+  localStorageHandlers: LocalStorageContentInt['handlers']
 }
 
 export const handleUserShowStatus =
-  ({ id, database, showDetailesTMDB, firebase, localStorageHandlers }: Props): AppThunk =>
+  ({ id, database, showFullDetailes, firebase, localStorageHandlers }: Props): AppThunk =>
   async (dispatch, getState) => {
     const authUid = getAuthUidFromState(getState())
     const showFromStore = selectShow(getState(), id)
 
     if (!authUid) {
-      localStorageHandlers.toggleShowLS({
+      localStorageHandlers.toggleShow({
         id: Number(id),
-        data: showDetailesTMDB,
-        database,
+        data: showFullDetailes,
+        userShowStatus: database,
       })
       return
     }
 
     if (!showFromStore) {
-      dispatch(handleNewShowInDatabase({ id, database, showDetailesTMDB, firebase }))
+      dispatch(handleNewShowInDatabase({ id, database, showDetailesTMDB: showFullDetailes, firebase }))
       return
     }
 
@@ -40,7 +40,7 @@ export const handleUserShowStatus =
       updateUserShowStatus({
         id,
         database,
-        showDetailesTMDB,
+        showDetailesTMDB: showFullDetailes,
         firebase,
       }),
     )

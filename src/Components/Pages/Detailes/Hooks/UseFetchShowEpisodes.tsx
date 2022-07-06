@@ -18,9 +18,8 @@ const useFetchShowEpisodes = ({ mediaType, id }: Props) => {
   const [loadingFireEpisodes, setLoadingFireEpisodes] = useState(true)
 
   const handleFetch = useCallback(async () => {
-    if (mediaType !== 'show' || showsInitialLoading) return
-
     try {
+      if (mediaType !== 'show' || showsInitialLoading) return
       await dispatch(fetchShowEpisodes(Number(id), firebase))
     } catch (err) {
       dispatch(handleShowsError(err))

@@ -1,63 +1,29 @@
 import { useAppDispatch, useAppSelector } from 'app/hooks'
-import { TestAppContext } from 'Components/AppContext/ContextsWrapper'
+import { LocalStorageHandlersContext } from 'Components/AppContext/Contexts/LocalStorageContentContext/LocalStorageContentContext'
 import { ShowFullDataStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { handleUserShowStatus } from 'Components/UserContent/UseUserShowsRed/ClientHandlers/showHandlers'
 import { selectShows } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
-import React, { useContext, useMemo } from 'react'
+import React, { useContext } from 'react'
 import { Link } from 'react-router-dom'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import { LIST_OF_GENRES } from 'Utils/Constants'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
-import { TestContext } from '../Shows'
 
 type Props = {
   data: ShowFullDataStoreState[] | MainDataTMDB[]
   section: string
 }
 
-const TestComp = ({ handleClick }) => {
-  // const testContextValue = useContext(TestContext)
-  const appCounter = useContext(TestAppContext)
-
-  console.log('TestComp Rerender')
-
-  return <button onClick={() => handleClick()}>Count+</button>
-}
-
-const useMySelector = (selectorFun) => {
-  const contextValue = useContext(TestContext)
-  const result = selectorFun(contextValue)
-  return useMemo(() => <TestComp handleClick={result} />, [result])
-}
-
-const WrapperTestComp = () => {
-  // const { handleClick } = useContext(TestContext)
-
-  // const myHandleClickFun = useMySelector((contextValue) => contextValue.handleClick)
-
-  // console.log('WrapperTestComp Rerender')
-  // some things removed for clarity
-
-  // return <TestComp handleClick={myHandleClickFun} />
-
-  const contextValue = useContext(TestContext)
-  const result = contextValue.handleClick
-  return useMemo(() => <TestComp handleClick={result} />, [result])
-}
-
 const ShowsGrid: React.FC<Props> = ({ data, section }) => {
-  const { firebase, userContentLocalStorage } = useFrequentVariables()
+  const { firebase } = useFrequentVariables()
+  const localStorageHandlers = useContext(LocalStorageHandlersContext)
+
   const dispatch = useAppDispatch()
   const userShows = useAppSelector(selectShows)
-
-  // const counter = useContext(TestContext)
-  // const appCounter = useContext(TestAppContext)
 
   console.log('ShowsGrid Rerender')
   return (
     <>
-      {/* <WrapperTestComp /> */}
-      {/* <TestComp /> */}
       {data.map((item) => {
         const filteredGenres =
           item.genre_ids?.map((genreId) => LIST_OF_GENRES.filter((item) => item.id === genreId)) || []
@@ -110,9 +76,9 @@ const ShowsGrid: React.FC<Props> = ({ data, section }) => {
                         handleUserShowStatus({
                           id: item.id,
                           database: 'notWatchingShows',
-                          showDetailesTMDB: userShows[item.id],
+                          showFullDetailes: userShows[item.id],
                           firebase,
-                          localStorageHandlers: userContentLocalStorage,
+                          localStorageHandlers,
                         }),
                       )
                     }}
@@ -131,9 +97,9 @@ const ShowsGrid: React.FC<Props> = ({ data, section }) => {
                           handleUserShowStatus({
                             id: item.id,
                             database: 'watchingShows',
-                            showDetailesTMDB: userShows[item.id],
+                            showFullDetailes: userShows[item.id],
                             firebase,
-                            localStorageHandlers: userContentLocalStorage,
+                            localStorageHandlers,
                           }),
                         )
                       }}

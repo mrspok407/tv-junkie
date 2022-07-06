@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useCallback, useContext, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import classNames from 'classnames'
 import * as ROUTES from 'Utils/Constants/routes'
@@ -9,6 +9,10 @@ import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import useClickOutside from 'Utils/Hooks/UseClickOutside'
 import { handleUserShowStatus } from 'Components/UserContent/UseUserShowsRed/ClientHandlers/showHandlers'
 import { showStatusMapper, UserShowStatuses } from 'Components/UserContent/UseUserShowsRed/@Types'
+import {
+  LocalStorageHandlersContext,
+  LocalStorageValueContext,
+} from 'Components/AppContext/Contexts/LocalStorageContentContext/LocalStorageContentContext'
 
 type Props = {
   id: number
@@ -16,7 +20,10 @@ type Props = {
 }
 
 const ShowsButtons: React.FC<Props> = ({ id, detailes }) => {
-  const { firebase, authUser, userContentLocalStorage } = useFrequentVariables()
+  const { firebase, authUser } = useFrequentVariables()
+  const localStorageContent = useContext(LocalStorageValueContext)
+  const localStorageHandlers = useContext(LocalStorageHandlersContext)
+
   const dispatch = useAppDispatch()
 
   const [disableBtnWarning, setDisableBtnWarning] = useState<string | null>(null)
@@ -40,14 +47,13 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes }) => {
   const buttonTitle = (showStatus: Exclude<UserShowStatuses, ''>) =>
     loadingNewShow === showStatus ? <span className="button-loader-circle" /> : showStatusMapper[showStatus]
 
+  const showExistsInLocalStorage = localStorageContent.watchingShows.find((item) => item.id === Number(id))
   return (
     <div className="buttons__row">
       <div className="buttons__col">
         <button
           className={classNames('button', {
-            'button--pressed':
-              ['watchingShows', 'finishedShows'].includes(showDatabase) ||
-              userContentLocalStorage.watchingShows.find((item: any) => item.id === Number(id)),
+            'button--pressed': ['watchingShows', 'finishedShows'].includes(showDatabase) || showExistsInLocalStorage,
           })}
           type="button"
           onClick={() => {
@@ -55,9 +61,9 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes }) => {
               handleUserShowStatus({
                 id,
                 database: 'watchingShows',
-                showDetailesTMDB: detailes,
+                showFullDetailes: detailes,
                 firebase,
-                localStorageHandlers: userContentLocalStorage,
+                localStorageHandlers,
               }),
             )
           }}
@@ -69,9 +75,7 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes }) => {
       <div className="buttons__col">
         <button
           className={classNames('button', {
-            'button--pressed':
-              showDatabase === 'notWatchingShows' ||
-              (!authUser?.uid && !userContentLocalStorage.watchingShows.find((item: any) => item.id === Number(id))),
+            'button--pressed': showDatabase === 'notWatchingShows' || (!authUser?.uid && !showExistsInLocalStorage),
           })}
           type="button"
           onClick={() => {
@@ -79,9 +83,9 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes }) => {
               handleUserShowStatus({
                 id,
                 database: 'notWatchingShows',
-                showDetailesTMDB: detailes,
+                showFullDetailes: detailes,
                 firebase,
-                localStorageHandlers: userContentLocalStorage,
+                localStorageHandlers,
               }),
             )
           }}
@@ -106,9 +110,9 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes }) => {
                 handleUserShowStatus({
                   id,
                   database: 'droppedShows',
-                  showDetailesTMDB: detailes,
+                  showFullDetailes: detailes,
                   firebase,
-                  localStorageHandlers: userContentLocalStorage,
+                  localStorageHandlers,
                 }),
               )
             }}
@@ -142,9 +146,9 @@ const ShowsButtons: React.FC<Props> = ({ id, detailes }) => {
                 handleUserShowStatus({
                   id,
                   database: 'willWatchShows',
-                  showDetailesTMDB: detailes,
+                  showFullDetailes: detailes,
                   firebase,
-                  localStorageHandlers: userContentLocalStorage,
+                  localStorageHandlers,
                 }),
               )
             }}

@@ -15,7 +15,7 @@ import PageNotFound from 'Components/Pages/PageNotFound/PageNotFound'
 import ContactsPage from 'Components/Pages/Contacts/Contacts'
 import useInitializeApp from 'Components/UserContent/UseUserShowsRed/UseInitializeApp'
 import { ErrorsHandlerContext } from 'Components/AppContext/Contexts/ErrorsContext'
-import ErrorPopup from 'Components/UI/ErrorPopup/ErrorPopup'
+import ErrorPopupGlobal from 'Components/UI/ErrorPopupGlobal/ErrorPopupGlobal'
 
 const App = () => {
   useInitializeApp()
@@ -27,7 +27,9 @@ const App = () => {
   return (
     <Router basename="/">
       <div className="container">
-        <button onClick={() => errorHandler({ errorData: 'test', message: 'test' })}>ErrorHandler</button>
+        <button type="button" onClick={() => errorHandler({ errorData: 'test', message: 'test' })}>
+          ErrorHandler
+        </button>
 
         <Switch>
           <Route path={ROUTES.HOME_PAGE} exact component={HomePage} />
@@ -43,7 +45,7 @@ const App = () => {
           <Route path={ROUTES.LOGIN_PAGE} exact component={LoginPage} />
           <Route component={PageNotFound} />
         </Switch>
-        <ErrorPopup />
+        <ErrorPopupGlobal />
       </div>
     </Router>
   )

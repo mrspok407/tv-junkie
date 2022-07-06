@@ -1,13 +1,12 @@
 /* eslint-disable max-len */
 /* eslint-disable no-nested-ternary */
-import React, { useCallback, useContext, useEffect, useReducer, useState } from 'react'
+import React, { useCallback, useEffect, useReducer, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { isScrollNearBottom } from 'Utils'
 import { throttle } from 'throttle-debounce'
 import classNames from 'classnames'
 import Loader from 'Components/UI/Placeholders/Loader'
 import PlaceholderNoMovies from 'Components/UI/Placeholders/PlaceholderNoMovies'
-import { AppContext } from 'Components/AppContext/ContextsWrapper'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import { getGenresFromIds } from 'Utils/FormatTMDBAPIData'
@@ -25,14 +24,15 @@ type Props = {
 
 const MoviesContent: React.FC<Props> = ({ moviesData, loadingIds, openLinksMoviesId, error, getMovieLinks }) => {
   const { authUser } = useFrequentVariables()
-  const context = useContext(AppContext)
+
+  const context = {}
 
   const [sortByState, setSortByState] = useState('title')
   const [state, dispatch] = useReducer<React.Reducer<MoviesContentState, ActionInterface>>(reducer, INITIAL_STATE)
 
-  useEffect(() => {
-    dispatch({ type: ActionTypes.UpdateContext, payload: context })
-  }, [context])
+  // useEffect(() => {
+  //   dispatch({ type: ActionTypes.UpdateContext, payload: context })
+  // }, [context])
 
   const loadNewContent = () => {
     if (state.disableLoad[state.activeSection] || authUser === null) return

@@ -1,11 +1,7 @@
-import React, { useState, useEffect, useContext, useCallback } from 'react'
-import { AppContext } from 'Components/AppContext/ContextsWrapper'
+import React, { useState, useEffect, useCallback } from 'react'
 import classNames from 'classnames'
 import Loader from 'Components/UI/Placeholders/Loader'
-import { FirebaseContext } from 'Components/Firebase'
 import { Helmet } from 'react-helmet'
-import CreatePortal from 'Components/UI/Modal/CreatePortal'
-import ModalContent from 'Components/UI/Modal/ModalContent'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import useResponseContactRequest from './Hooks/UseResponseContactRequest'
 import useSendContactRequest from './Hooks/UseSendContactRequest'
@@ -24,7 +20,7 @@ interface ContactInfo {
 }
 
 const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
-  const { firebase, authUser, errors } = useFrequentVariables()
+  const { firebase, authUser } = useFrequentVariables()
 
   const [userName, setUserName] = useState('')
   const [loadingUserName, setLoadingUserName] = useState(true)
@@ -153,7 +149,6 @@ const UserProfileInfo: React.FC<Props> = ({ userUid }) => {
           renderUserInfo()
         )}
       </div>
-      {errors.error && <CreatePortal element={<ModalContent message={errors.error.message} />} />}
     </>
   )
 }

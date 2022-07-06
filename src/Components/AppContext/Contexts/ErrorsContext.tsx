@@ -1,3 +1,4 @@
+import React from 'react'
 import { useAppDispatch, useAppSelector } from 'app/hooks'
 import { selectShowsError, setShowsError } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
 import { createContext, useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -18,8 +19,20 @@ const INITIAL_VALUE_ERRORS = {
   handleError: () => {},
 }
 
-export const ErrorsContext = createContext<ErrorContextInt['error']>(INITIAL_VALUE_ERRORS.error)
+export const ErrorsValueContext = createContext<ErrorContextInt['error']>(INITIAL_VALUE_ERRORS.error)
 export const ErrorsHandlerContext = createContext<ErrorContextInt['handleError']>(INITIAL_VALUE_ERRORS.handleError)
+
+export interface ErrorsProviderInt extends ErrorContextInt {
+  children: React.ReactNode
+}
+
+export const ErrorsProvider = ({ error, handleError, children }: ErrorsProviderInt) => {
+  return (
+    <ErrorsValueContext.Provider value={error}>
+      <ErrorsHandlerContext.Provider value={handleError}>{children}</ErrorsHandlerContext.Provider>
+    </ErrorsValueContext.Provider>
+  )
+}
 
 const useErrorsContext = () => {
   const dispatch = useAppDispatch()

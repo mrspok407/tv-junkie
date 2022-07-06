@@ -1,10 +1,9 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { differenceBtwDatesInDays, todayDate } from 'Utils'
 import classNames from 'classnames'
 import Loader from 'Components/UI/Placeholders/Loader'
 import PlaceholderNoFutureEpisodes from 'Components/UI/Placeholders/PlaceholderNoFutureEpisodes'
-import { AppContext } from 'Components/AppContext/ContextsWrapper'
 import TorrentLinksEpisodes from 'Components/UI/Templates/SeasonsAndEpisodes/Components/TorrentLinksEpisodes'
 import { useAppSelector } from 'app/hooks'
 import {

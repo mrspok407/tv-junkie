@@ -1,5 +1,6 @@
+import { LocalStorageValueContext } from 'Components/AppContext/Contexts/LocalStorageContentContext/LocalStorageContentContext'
 import { ShowFullDataStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
-import { useMemo } from 'react'
+import { useContext, useMemo } from 'react'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 
@@ -9,15 +10,16 @@ type Props = {
 }
 
 const UseSectionFilteredShows = ({ showsData, activeSection }: Props): ShowFullDataStoreState[] | MainDataTMDB[] => {
-  const { authUser, userContentLocalStorage } = useFrequentVariables()
+  const { authUser } = useFrequentVariables()
+  const localStorageContent = useContext(LocalStorageValueContext)
   const sectionFilteredShows = useMemo(() => {
     if (!authUser.uid) {
-      return userContentLocalStorage.watchingShows
+      return localStorageContent.watchingShows
     }
     return showsData.filter((show) => {
       return activeSection === 'finishedShows' ? !!show.finished : !!(show.database === activeSection && !show.finished)
     })
-  }, [showsData, activeSection, userContentLocalStorage.watchingShows, authUser])
+  }, [showsData, activeSection, localStorageContent, authUser])
 
   return sectionFilteredShows
 }
