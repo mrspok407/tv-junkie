@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 
-import { PostUserShowScheme, UpdateUserShowStatusScheme } from './@Types'
+import { PostUserShowScheme, UpdateUserShowStatusScheme } from '../@Types'
 
 export const postUserShowScheme = ({
   authUid,

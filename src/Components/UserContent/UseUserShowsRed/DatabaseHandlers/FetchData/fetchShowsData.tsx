@@ -1,10 +1,9 @@
 import { AppThunk } from 'app/store'
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import { getAuthUidFromState } from 'Components/UserAuth/Session/Authentication/Helpers'
-import { ErrorInterface } from 'Utils/Hooks/UseErrors/UseErrors'
 import sortDataSnapshot from '../../../FirebaseHelpers/sortDataSnapshot'
 import fetchShowsFullData from '../../FirebaseHelpers/FetchData/fetchShowsFullData'
-import { selectShow, setShowsError, setShowEpisodes, setUserShows } from '../../userShowsSliceRed'
+import { selectShow, setShowEpisodes, setUserShows } from '../../userShowsSliceRed'
 import { fetchEpisodesFullData } from '../../FirebaseHelpers/FetchData/fetchEpisodesFullData'
 import { handleShowsError } from '../../ErrorHandlers/handleShowsError'
 
@@ -48,8 +47,6 @@ export const fetchShowEpisodes =
       console.log('fetchShowEpisodes')
       dispatch(setShowEpisodes({ id, episodes }))
     } catch (err) {
-      const error = err as ErrorInterface
-      dispatch(setShowsError(error))
-      throw new Error(error.message)
+      dispatch(handleShowsError(err))
     }
   }

@@ -1,7 +1,6 @@
-import React from 'react'
 import { useAppDispatch, useAppSelector } from 'app/hooks'
 import { selectShowsError, setShowsError } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
-import { createContext, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { createContext, useCallback, useEffect, useRef, useState } from 'react'
 import { ERROR_MODAL_DURATION } from 'Utils/Constants'
 
 export interface ErrorInterface {

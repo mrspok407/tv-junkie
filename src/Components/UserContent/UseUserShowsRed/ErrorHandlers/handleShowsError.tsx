@@ -1,5 +1,5 @@
 import { AppThunk } from 'app/store'
-import { ErrorInterface } from 'Utils/Hooks/UseErrors/UseErrors'
+import { ErrorInterface } from 'Components/AppContext/Contexts/ErrorsContext'
 import { setShowsError } from '../userShowsSliceRed'
 
 export const handleShowsError =

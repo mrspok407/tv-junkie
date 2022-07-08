@@ -17,6 +17,6 @@ const Footer: React.FC = () => (
       <a className="tmdb-logo" href="https://www.themoviedb.org/" rel="noopener noreferrer" target="_blank" />
     </div>
   </footer>
-  )
+)
 
 export default Footer

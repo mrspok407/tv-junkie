@@ -68,7 +68,6 @@ const SignInFormBase: React.FC<Props> = ({ closeNavMobile, togglePasswordForget 
     firebase
       .signInWithEmailAndPassword(email, password)
       .then(() => {
-        localStorageHandlers.clearLocalStorageContent()
         if (closeNavMobile) closeNavMobile()
 
         history.push(ROUTES.HOME_PAGE)

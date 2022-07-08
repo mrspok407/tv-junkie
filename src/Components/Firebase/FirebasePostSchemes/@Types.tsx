@@ -1,3 +1,4 @@
+import { AuthUserFirebaseInterface } from 'Components/UserAuth/Session/Authentication/@Types'
 import { ShowFullDataStoreState, UserShowStatuses } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import { EpisodesFromUserDatabase } from '../@TypesFirebase'
@@ -16,5 +17,11 @@ export interface UpdateUserShowStatusScheme {
   id: number
   userShowStatus: string
   showFromStore: ShowFullDataStoreState
+  firebase: FirebaseInterface
+}
+
+export interface PostUserDataOnRegister {
+  authUserFirebase: AuthUserFirebaseInterface
+  userName: string
   firebase: FirebaseInterface
 }

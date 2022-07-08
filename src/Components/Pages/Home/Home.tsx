@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Helmet } from 'react-helmet'
 import { Link } from 'react-router-dom'
 import ScrollToTopBar from 'Utils/ScrollToTopBar'
@@ -118,7 +118,9 @@ const HomePage: React.FC = () => {
       </Helmet>
       <Header />
       <div className="home-page__wrapper">{!authUser?.uid ? renderNonAuthUser() : renderAuthUser()}</div>
-      <Footer />
+      <React.StrictMode>
+        <Footer />
+      </React.StrictMode>
       <ScrollToTopBar />
     </>
   )

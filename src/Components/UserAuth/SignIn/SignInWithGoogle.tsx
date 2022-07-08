@@ -63,9 +63,6 @@ const SignInWithGoogleForm = () => {
             //   })
             // })
           })
-          .finally(() => {
-            localStorageHandlers.clearLocalStorageContent()
-          })
       })
       .then(() => {
         history.push(ROUTES.HOME_PAGE)

@@ -61,9 +61,6 @@ const useGoogleRedirect = () => {
           .then(() => {
             history.push(ROUTES.HOME_PAGE)
           })
-          .finally(() => {
-            localStorageHandlers.clearLocalStorageContent()
-          })
       })
       .catch((error: any) => {
         // context.userContentHandler.handleLoadingShowsOnRegister(false)

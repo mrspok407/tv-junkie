@@ -1,6 +1,9 @@
 import { AppThunk } from 'app/store'
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
-import { postUserShowScheme, updateUserShowStatusScheme } from 'Components/Firebase/FirebasePostSchemes/PostSchemes'
+import {
+  postUserShowScheme,
+  updateUserShowStatusScheme,
+} from 'Components/Firebase/FirebasePostSchemes/Post/ContentSchemes'
 import { getAuthUidFromState } from 'Components/UserAuth/Session/Authentication/Helpers'
 import { batch } from 'react-redux'
 import { artificialAsyncDelay } from 'Utils'

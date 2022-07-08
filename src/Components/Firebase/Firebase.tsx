@@ -72,6 +72,7 @@ class Firebase {
 
     if (window.location.hostname === 'localhost') {
       app.functions().useEmulator('localhost', 4000)
+      app.auth().useEmulator('http://localhost:9099')
     }
   }
 

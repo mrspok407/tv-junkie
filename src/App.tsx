@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 import SettingsPage from 'Components/Pages/Settings/SettingsPage'
 import LoginPage from 'Components/Pages/Login/LoginPage'
@@ -14,23 +14,15 @@ import * as ROUTES from 'Utils/Constants/routes'
 import PageNotFound from 'Components/Pages/PageNotFound/PageNotFound'
 import ContactsPage from 'Components/Pages/Contacts/Contacts'
 import useInitializeApp from 'Components/UserContent/UseUserShowsRed/UseInitializeApp'
-import { ErrorsHandlerContext } from 'Components/AppContext/Contexts/ErrorsContext'
 import ErrorPopupGlobal from 'Components/UI/ErrorPopupGlobal/ErrorPopupGlobal'
 
 const App = () => {
   useInitializeApp()
 
-  const errorHandler = useContext(ErrorsHandlerContext)
-  //  const errors = useContext(ErrorsContext)
-
   console.log('App Rerender')
   return (
     <Router basename="/">
       <div className="container">
-        <button type="button" onClick={() => errorHandler({ errorData: 'test', message: 'test' })}>
-          ErrorHandler
-        </button>
-
         <Switch>
           <Route path={ROUTES.HOME_PAGE} exact component={HomePage} />
           <Route path={ROUTES.SEARCH_PAGE} exact component={SearchPage} />

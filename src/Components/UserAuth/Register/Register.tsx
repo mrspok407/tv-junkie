@@ -6,16 +6,22 @@ import * as ROLES from 'Utils/Constants/roles'
 import * as ROUTES from 'Utils/Constants/routes'
 import classNames from 'classnames'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
-import { LocalStorageHandlersContext } from 'Components/AppContext/Contexts/LocalStorageContentContext/LocalStorageContentContext'
+import {
+  LocalStorageHandlersContext,
+  LocalStorageValueContext,
+} from 'Components/AppContext/Contexts/LocalStorageContentContext/LocalStorageContentContext'
+import { ErrorInterface, ErrorsHandlerContext } from 'Components/AppContext/Contexts/ErrorsContext'
 import SignInWithGoogleForm from '../SignIn/SignInWithGoogle'
 import { AuthUserFirebaseInterface } from '../Session/Authentication/@Types'
 import Input from '../Input/Input'
+import getShowEpisodesTMDB from 'Components/UserContent/TmdbAPIHelpers/getShowEpisodesFromAPI'
+import { formatShowEpisodesForUserDatabase } from 'Utils/FormatTMDBAPIData'
 
 type Props = {
   closeNavMobile: () => void
 }
 
-interface ErrorsInterface {
+interface FormErrorsInt {
   loginError: string
   loginOnBlur: boolean
   emailError: string
@@ -49,6 +55,9 @@ const ERROR_DEFAULT_VALUES = {
 
 const Register: React.FC<Props> = ({ closeNavMobile }) => {
   const { firebase } = useFrequentVariables()
+  const handleError = useContext(ErrorsHandlerContext)
+
+  const localStorageContent = useContext(LocalStorageValueContext)
   const localStorageHandlers = useContext(LocalStorageHandlersContext)
 
   const [requiredInputs, setRequiredInputs] = useState<RequiredInputsInterface>({
@@ -58,7 +67,7 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
     passwordConfirm: '',
   })
   // const [inputs, setInputs] = useState<InputsInterface>({ login: "" })
-  const [errors, setErrors] = useState<ErrorsInterface>(ERROR_DEFAULT_VALUES)
+  const [errors, setErrors] = useState<FormErrorsInt>(ERROR_DEFAULT_VALUES)
   const [submitClicked, setSubmitClicked] = useState(false)
   const [submitRequestLoading, setSubmitRequestLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
@@ -66,7 +75,7 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
 
   const history = useHistory()
 
-  const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     setSubmitRequestLoading(true)
     event.preventDefault()
     const { email, password } = requiredInputs
@@ -86,9 +95,45 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
 
     // context.userContentHandler.handleLoadingShowsOnRegister(true)
 
+    try {
+      const authUser: AuthUserFirebaseInterface = await firebase.createUserWithEmailAndPassword(email, password)
+
+      const { watchingShows } = localStorageContent
+      // const showEpisodesTMDB = await getShowEpisodesTMDB({ id: showDetailesTMDB.id })
+
+      console.time('test')
+      const episodesFullData = await Promise.all(
+        watchingShows.map((show) => {
+          return getShowEpisodesTMDB({ id: show.id })
+        }),
+      )
+
+      console.log({ episodesFullData })
+
+      const episodesModified = watchingShows.reduce((acc: any, show, index) => {
+        const showEpisodesUserDatabase = formatShowEpisodesForUserDatabase(episodesFullData[index].episodes)
+        acc[show.id] = showEpisodesUserDatabase
+
+        return acc
+      }, {})
+
+      console.log({ episodesModified })
+
+      console.timeEnd('test')
+    } catch (err) {
+      const error = err as ErrorInterface
+      setErrors({ ...errorsOnSubmit, error: { message: error.message } })
+      setSubmitRequestLoading(false)
+      handleError({ errorData: error, message: 'Error occured durring register process. Please try again.' })
+    }
+
+    return
+
     firebase
       .createUserWithEmailAndPassword(email, password)
       .then((authUser: AuthUserFirebaseInterface) => {
+        console.log({ authUser })
+
         firebase
           .user(authUser.user.uid)
           .set({
@@ -114,7 +159,6 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
             // })
           })
           .then(() => {
-            localStorageHandlers.clearLocalStorageContent()
             if (closeNavMobile) closeNavMobile()
           })
       })
@@ -126,6 +170,7 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
         errorsOnSubmit.error = error
         setErrors(errorsOnSubmit)
         setSubmitRequestLoading(false)
+        handleError({ errorData: error, message: 'Error occured durring register process. Please try again.' })
         // context.userContentHandler.handleLoadingShowsOnRegister(false)
       })
   }
@@ -216,7 +261,7 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
     setErrors({ ...errors, [`${name}Error`]: '' })
   }
 
-  const isFormValid = (errors: ErrorsInterface, requiredInputs: RequiredInputsInterface) => {
+  const isFormValid = (errors: FormErrorsInt, requiredInputs: RequiredInputsInterface) => {
     let isValid = true
 
     for (const value of Object.values(requiredInputs)) {
