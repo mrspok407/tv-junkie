@@ -1,7 +1,7 @@
 /* eslint-disable react/no-access-state-in-setstate */
 import React, { useContext, useState } from 'react'
 import { useHistory } from 'react-router-dom'
-import { validEmailRegex } from 'Utils'
+import { artificialAsyncDelay, validEmailRegex } from 'Utils'
 import * as ROLES from 'Utils/Constants/roles'
 import * as ROUTES from 'Utils/Constants/routes'
 import classNames from 'classnames'
@@ -11,11 +11,15 @@ import {
   LocalStorageValueContext,
 } from 'Components/AppContext/Contexts/LocalStorageContentContext/LocalStorageContentContext'
 import { ErrorInterface, ErrorsHandlerContext } from 'Components/AppContext/Contexts/ErrorsContext'
-import SignInWithGoogleForm from '../SignIn/SignInWithGoogle'
-import { AuthUserFirebaseInterface } from '../Session/Authentication/@Types'
-import Input from '../Input/Input'
 import getShowEpisodesTMDB from 'Components/UserContent/TmdbAPIHelpers/getShowEpisodesFromAPI'
-import { formatShowEpisodesForUserDatabase } from 'Utils/FormatTMDBAPIData'
+import { formatEpisodesInfoForUserDatabase, formatShowEpisodesForUserDatabase } from 'Utils/FormatTMDBAPIData'
+import { EpisodesFromUserDatabase, SeasonFromUserDatabase } from 'Components/Firebase/@TypesFirebase'
+import { DataOnRegisterEpisodes, DataOnRegisterEpisodesInfo } from 'Components/Firebase/FirebasePostSchemes/@Types'
+import { postUserDataOnRegisterScheme } from 'Components/Firebase/FirebasePostSchemes/Post/AuthenticationSchemes'
+import addShowToFireDatabase from 'Components/UserContent/FirebaseHelpers/addShowFireDatabase'
+import { AuthUserFirebaseInterface } from '../Session/Authentication/@Types'
+import SignInWithGoogleForm from '../SignIn/SignInWithGoogle'
+import Input from '../Input/Input'
 
 type Props = {
   closeNavMobile: () => void
@@ -57,7 +61,7 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
   const { firebase } = useFrequentVariables()
   const handleError = useContext(ErrorsHandlerContext)
 
-  const localStorageContent = useContext(LocalStorageValueContext)
+  const { watchingShows: watchingShowsLS } = useContext(LocalStorageValueContext)
   const localStorageHandlers = useContext(LocalStorageHandlersContext)
 
   const [requiredInputs, setRequiredInputs] = useState<RequiredInputsInterface>({
@@ -76,9 +80,11 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
   const history = useHistory()
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    if (submitRequestLoading) return
+
     setSubmitRequestLoading(true)
     event.preventDefault()
-    const { email, password } = requiredInputs
+    const { email, password, login } = requiredInputs
     const errorsOnSubmit = { ...errors }
 
     if (!isFormValid(errorsOnSubmit, requiredInputs)) {
@@ -98,29 +104,67 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
     try {
       const authUser: AuthUserFirebaseInterface = await firebase.createUserWithEmailAndPassword(email, password)
 
-      const { watchingShows } = localStorageContent
       // const showEpisodesTMDB = await getShowEpisodesTMDB({ id: showDetailesTMDB.id })
 
-      console.time('test')
+      console.time('episodesFullData')
       const episodesFullData = await Promise.all(
-        watchingShows.map((show) => {
+        watchingShowsLS.map((show) => {
           return getShowEpisodesTMDB({ id: show.id })
         }),
       )
+      console.timeEnd('episodesFullData')
 
-      console.log({ episodesFullData })
+      console.time('addShowToFireDatabase')
+      const addShowToFireDatabasePromiseALL = await Promise.all(
+        watchingShowsLS.map((show) => {
+          return addShowToFireDatabase({
+            firebase,
+            database: show.database,
+            showDetailesTMDB: show,
+            showEpisodesTMDB: episodesFullData.find((item) => item.showId === show.id)!,
+          })
+        }),
+      )
+      await artificialAsyncDelay(2500)
 
-      const episodesModified = watchingShows.reduce((acc: any, show, index) => {
-        const showEpisodesUserDatabase = formatShowEpisodesForUserDatabase(episodesFullData[index].episodes)
-        acc[show.id] = showEpisodesUserDatabase
+      // watchingShowsLS.forEach(async (show) => {
+      //   const { snapshot } = await addShowToFireDatabase({
+      //     firebase,
+      //     database: show.database,
+      //     showDetailesTMDB: show,
+      //     showEpisodesTMDB: episodesFullData.find((item) => item.showId === show.id)!,
+      //   })
+      //   console.log({ snapshot: snapshot.val() })
+      // })
+      // console.log({ addShowToFireDatabasePromiseALL })
 
-        return acc
-      }, {})
+      console.timeEnd('addShowToFireDatabase')
 
-      console.log({ episodesModified })
+      const episodesForUserDatabase: DataOnRegisterEpisodes = {}
+      const episodesInfoForUserDatabase: DataOnRegisterEpisodesInfo = {}
 
-      console.timeEnd('test')
+      episodesFullData.forEach((show) => {
+        const showEpisodesUserDatabase = formatShowEpisodesForUserDatabase(show.episodes)
+        const showInfoEpisodesUserDatabase = formatEpisodesInfoForUserDatabase(
+          watchingShowsLS.find((item) => item.id === show.showId)!,
+        )
+        episodesForUserDatabase[show.showId] = showEpisodesUserDatabase
+        episodesInfoForUserDatabase[show.showId] = showInfoEpisodesUserDatabase
+      })
+
+      const updateData = postUserDataOnRegisterScheme({
+        authUserFirebase: authUser,
+        userName: login,
+        selectedShows: watchingShowsLS,
+        episodes: episodesForUserDatabase,
+        episodesInfo: episodesInfoForUserDatabase,
+        firebase,
+      })
+      return firebase.rootRef().update(updateData, () => {
+        console.log('postUserDataOnRegisterScheme')
+      })
     } catch (err) {
+      console.log({ err })
       const error = err as ErrorInterface
       setErrors({ ...errorsOnSubmit, error: { message: error.message } })
       setSubmitRequestLoading(false)
