@@ -4,6 +4,7 @@ import { EpisodesTMDB, SingleEpisodeTMDB } from 'Utils/@TypesTMDB'
 
 export interface ShowEpisodesTMDB {
   episodes: EpisodesTMDB[]
+  showId: number
 }
 
 const getShowEpisodesTMDB = ({ id }: { id: number }) => {
@@ -86,11 +87,15 @@ const getShowEpisodesTMDB = ({ id }: { id: number }) => {
 
         const dataToPass: ShowEpisodesTMDB = {
           episodes: allEpisodes,
+          showId: id,
         }
 
         return dataToPass
       }),
     )
+    .catch(() => {
+      return { episodes: [], showId: id }
+    })
 
   return promise
 }

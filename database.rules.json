@@ -1,5 +1,7 @@
 {
   "rules": {
+    ".read": true,
+    ".write": true,
     "users": {
       "$uid": {
         ".read": "auth != null && auth.uid == $uid",
@@ -55,15 +57,17 @@
     },
     "allShowsList": {
       ".read": "root.child('users').child(auth.uid).child('role').val() === 'ADMIN'",
-      ".write": false,
+      ".write": true,
       "$id": {
-        ".read": "auth != null",
-        ".write": "(auth != null && !data.exists()) || root.child('users').child(auth.uid).child('role').val() === 'ADMIN'",
-        "usersWatching": {
-          ".write": "auth != null && data.exists() && newData.exists()"
-        },
-        "info": { ".read": true },
-        ".validate": "newData.hasChildren(['id', 'info'])"
+        ".write": true
+        // ".read": "auth != null",
+        // // ".write": "(auth != null && !data.exists()) || root.child('users').child(auth.uid).child('role').val() === 'ADMIN'",
+        // ".write": "(auth != null && !data.exists())",
+        // "usersWatching": {
+        //   ".write": "auth != null && data.exists() && newData.exists()"
+        // },
+        // "info": { ".read": true },
+        // ".validate": "newData.hasChildren(['id', 'info'])"
       }
     }
   }

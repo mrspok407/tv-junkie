@@ -34,7 +34,7 @@ export const userShowsListeners =
 
     const showsIds = selectShowsIds(getState())
     const lastTimestamp = showsIds.length ? selectShow(getState(), showsIds[showsIds.length - 1])?.timeStamp : 0
-
+    console.log({ lastTimestamp })
     showsInfoRef
       .orderByChild('timeStamp')
       .startAfter(lastTimestamp)

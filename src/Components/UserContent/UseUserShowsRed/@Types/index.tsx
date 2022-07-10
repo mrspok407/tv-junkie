@@ -1,6 +1,6 @@
+import { ErrorInterface } from 'Components/AppContext/Contexts/ErrorsContext'
 import { SeasonFromUserDatabase, SingleEpisodeFromUserDatabase } from 'Components/Firebase/@TypesFirebase'
 import { EpisodesTMDB, MainDataTMDB, SingleEpisodeTMDB } from 'Utils/@TypesTMDB'
-import { ErrorInterface } from 'Utils/Hooks/UseErrors/UseErrors'
 
 export type UserShowStatuses = 'watchingShows' | 'droppedShows' | 'willWatchShows' | 'notWatchingShows' | ''
 export const showStatusMapper = {

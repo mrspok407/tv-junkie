@@ -13,6 +13,7 @@ const fetchShowsFullData = ({ userShows, firebase, uid }: GetUserShowsFullInfoAr
   Promise.all(
     userShows.map(async (show) => {
       const showInfo = await firebase.showInfoFireDatabase(show.id).once('value')
+      console.log({ fetchShowsFullData: showInfo })
       if (showInfo.val() === null) {
         throwErrorNoData()
       }

@@ -55,3 +55,12 @@ export const formatShowEpisodesForUserDatabase = (
   }, [])
   return formattedEpisodes
 }
+
+export const formatEpisodesInfoForUserDatabase = (showDetailes: MainDataTMDB): EpisodesFromUserDatabase['info'] => {
+  return {
+    database: showDetailes.database,
+    allEpisodesWatched: false,
+    isAllWatched_database: `false_${showDetailes.database}`,
+    finished: false,
+  }
+}

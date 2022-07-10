@@ -43,7 +43,7 @@ const useInitializeApp = () => {
     return () => {
       authSubscriber()
     }
-  }, [firebase, dispatch])
+  }, [firebase, dispatch, localStorageHandlers])
 }
 
 export default useInitializeApp

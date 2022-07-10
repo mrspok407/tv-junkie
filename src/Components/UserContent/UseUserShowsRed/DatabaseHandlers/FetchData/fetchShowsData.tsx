@@ -17,10 +17,12 @@ export const fetchUserShows =
         .showsInfoUserDatabase(authUserUid)
         .orderByChild('timeStamp')
         .once('value')
+      console.log({ userShowsSnapshot: userShowsSnapshot.val() })
       const userShows = sortDataSnapshot<ReturnType<typeof userShowsSnapshot.val>>(userShowsSnapshot)!
       const showsFullData = await fetchShowsFullData({ userShows, firebase, uid: authUserUid })
       dispatch(setUserShows(showsFullData))
     } catch (err) {
+      console.log({ err })
       dispatch(handleShowsError(err))
     }
   }

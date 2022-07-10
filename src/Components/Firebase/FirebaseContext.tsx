@@ -44,6 +44,7 @@ export interface FirebaseInterface {
   showInfoFireDatabase: (showKey: string | number) => FirebaseReferenceProps<ShowFullDataFireDatabase['info']>
   showsInfoUserDatabase: (authUid: string) => FirebaseReferenceProps<ShowInfoFromUserDatabase[]>
   showsEpisodesUserDatabase: (authUid: string) => FirebaseReferenceProps<EpisodesFromUserDatabase[]>
+  ServerValueIncrement: (value: number) => any
   timeStamp?: any
   callback?: any
   userShow?: any
@@ -119,6 +120,7 @@ export const FIREBASE_INITIAL_STATE = {
   groupChatMembersStatus: () => {},
   groupChatParticipants: () => {},
   rootRef: () => {},
+  ServerValueIncrement: () => {},
   showEpisodesFireDatabase: () => firebaseRefInitial(SHOW_FULL_DATA_FIRE_DATABASE_INITIAL.episodes),
   showFullDataFireDatabase: () => firebaseRefInitial(SHOW_FULL_DATA_FIRE_DATABASE_INITIAL),
   showInfoFireDatabase: () => firebaseRefInitial(SHOW_FULL_DATA_FIRE_DATABASE_INITIAL.info),

@@ -1,26 +1,61 @@
+import { EpisodesFromUserDatabase, ShowInfoFromUserDatabase } from 'Components/Firebase/@TypesFirebase'
 import getShowEpisodesTMDB from 'Components/UserContent/TmdbAPIHelpers/getShowEpisodesFromAPI'
 import * as ROLES from 'Utils/Constants/roles'
 import { formatShowEpisodesForUserDatabase } from 'Utils/FormatTMDBAPIData'
-import { PostUserDataOnRegister } from '../@Types'
+import { DataOnRegisterEpisodesFullData, DataOnRegisterShowInfo, PostUserDataOnRegister } from '../@Types'
 
-export const postUserDataOnRegisterScheme = ({ authUserFirebase, userName, firebase }: PostUserDataOnRegister) => {
+export const postUserDataOnRegisterScheme = ({
+  authUserFirebase,
+  userName,
+  selectedShows,
+  episodes,
+  episodesInfo,
+  firebase,
+}: PostUserDataOnRegister) => {
   const authUid = authUserFirebase.user.uid
-
   const userData = {
-    username: userName,
-    userNameLowerCase: userName.toLowerCase(),
-    email: authUserFirebase.user.email,
-    role: ROLES.USER,
+    [`users/${authUid}/username`]: userName,
+    [`users/${authUid}/userNameLowerCase`]: userName.toLowerCase(),
+    [`users/${authUid}/email`]: authUserFirebase.user.email,
+    [`users/${authUid}/role`]: ROLES.USER,
   }
 
-  const showEpisodesTMDB = await getShowEpisodesTMDB({ id: showDetailesTMDB.id })
-  const showEpisodesUserDatabase = formatShowEpisodesForUserDatabase(episodesFromFireDatabase)
+  const episodesData: DataOnRegisterEpisodesFullData = {}
+  const showsInfo: DataOnRegisterShowInfo = {}
+  const showsLastUpdated: { [key: string]: { lastUpdatedInUser: number } } = {}
+
+  const showsFireDatabaseUsersWatching: { [key: string]: number } = {}
+
+  selectedShows.forEach((show) => {
+    episodesData[show.id] = {
+      episodes: episodes[show.id],
+      info: episodesInfo[show.id],
+    }
+
+    const showsSubDatabase = show.status === 'Ended' || show.status === 'Canceled' ? 'ended' : 'ongoing'
+    showsInfo[show.id] = {
+      allEpisodesWatched: false,
+      database: show.database,
+      finished: false,
+      firstAirDate: show.first_air_date,
+      id: show.id,
+      name: show.name,
+      status: showsSubDatabase,
+      timeStamp: firebase.timeStamp(),
+      userRating: '',
+      key: show.id.toString(),
+    }
+    showsLastUpdated[show.id] = {
+      lastUpdatedInUser: firebase.timeStamp(),
+    }
+    showsFireDatabaseUsersWatching[`allShowsList/${show.id}/usersWatching`] = firebase.ServerValueIncrement(1)
+  })
 
   return {
-    [`allShowsList/${id}/usersWatching`]: firebase.ServerValueIncrement(updateUsersWatching()),
-    [`users/${authUid}`]: userData,
-    [`users/${authUid}/content/shows/${id}/database`]: userShowStatus,
-    [`users/${authUid}/content/episodes/${id}/info/database`]: userShowStatus,
-    [`users/${authUid}/content/episodes/${id}/info/isAllWatched_database`]: `${showFromStore.allEpisodesWatched}_${userShowStatus}`,
+    ...showsFireDatabaseUsersWatching,
+    ...userData,
+    [`users/${authUid}/content/episodes`]: episodesData,
+    [`users/${authUid}/content/shows`]: showsInfo,
+    [`users/${authUid}/content/showsLastUpdatedList`]: showsLastUpdated,
   }
 }
