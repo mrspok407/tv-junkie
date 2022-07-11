@@ -20,6 +20,7 @@ import addShowToFireDatabase from 'Components/UserContent/FirebaseHelpers/addSho
 import { AuthUserFirebaseInterface } from '../Session/Authentication/@Types'
 import SignInWithGoogleForm from '../SignIn/SignInWithGoogle'
 import Input from '../Input/Input'
+import useAuthListenerSubscriber from '../Session/Authentication/Hooks/useAuthListenerSubscriber'
 
 type Props = {
   closeNavMobile: () => void
@@ -63,6 +64,8 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
 
   const { watchingShows: watchingShowsLS } = useContext(LocalStorageValueContext)
   const localStorageHandlers = useContext(LocalStorageHandlersContext)
+
+  const authUserListener = useAuthListenerSubscriber()
 
   const [requiredInputs, setRequiredInputs] = useState<RequiredInputsInterface>({
     login: '',
@@ -115,6 +118,7 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
       console.timeEnd('episodesFullData')
 
       console.time('addShowToFireDatabase')
+
       const addShowToFireDatabasePromiseALL = await Promise.all(
         watchingShowsLS.map((show) => {
           return addShowToFireDatabase({
@@ -125,9 +129,8 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
           })
         }),
       )
-      await artificialAsyncDelay(2500)
-
-      // watchingShowsLS.forEach(async (show) => {
+      console.timeEnd('addShowToFireDatabase')
+      // watchingShowsLS.forEach(async (show, index, array) => {
       //   const { snapshot } = await addShowToFireDatabase({
       //     firebase,
       //     database: show.database,
@@ -135,10 +138,13 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
       //     showEpisodesTMDB: episodesFullData.find((item) => item.showId === show.id)!,
       //   })
       //   console.log({ snapshot: snapshot.val() })
+      //   if (index === array.length - 1) {
+      //     console.timeEnd('addShowToFireDatabase')
+      //   }
       // })
-      // console.log({ addShowToFireDatabasePromiseALL })
 
-      console.timeEnd('addShowToFireDatabase')
+      await artificialAsyncDelay(2500)
+      // console.log({ addShowToFireDatabasePromiseALL })
 
       const episodesForUserDatabase: DataOnRegisterEpisodes = {}
       const episodesInfoForUserDatabase: DataOnRegisterEpisodesInfo = {}
@@ -162,6 +168,7 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
       })
       return firebase.rootRef().update(updateData, () => {
         console.log('postUserDataOnRegisterScheme')
+        authUserListener()
       })
     } catch (err) {
       console.log({ err })

@@ -8,6 +8,7 @@ import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import { LocalStorageHandlersContext } from 'Components/AppContext/Contexts/LocalStorageContentContext/LocalStorageContentContext'
 import Input from '../Input/Input'
 import SignInWithGoogleForm from './SignInWithGoogle'
+import useAuthListenerSubscriber from '../Session/Authentication/Hooks/useAuthListenerSubscriber'
 
 type Props = {
   closeNavMobile: () => void
@@ -37,6 +38,7 @@ const ERROR_DEFAULT_VALUES = {
 const SignInFormBase: React.FC<Props> = ({ closeNavMobile, togglePasswordForget }) => {
   const { firebase } = useFrequentVariables()
   const localStorageHandlers = useContext(LocalStorageHandlersContext)
+  const authUserListener = useAuthListenerSubscriber()
 
   const [requiredInputs, setRequiredInputs] = useState<RequiredInputsInterface>({ email: '', password: '' })
   const [errors, setErrors] = useState<ErrorsInterface>(ERROR_DEFAULT_VALUES)
@@ -75,7 +77,10 @@ const SignInFormBase: React.FC<Props> = ({ closeNavMobile, togglePasswordForget 
       .catch((error: any) => {
         errorsOnSubmit.error = error
         setErrors(errorsOnSubmit)
+      })
+      .finally(() => {
         setSubmitRequestLoading(false)
+        authUserListener()
       })
   }
 
