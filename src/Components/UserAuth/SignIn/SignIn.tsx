@@ -37,8 +37,7 @@ const ERROR_DEFAULT_VALUES = {
 
 const SignInFormBase: React.FC<Props> = ({ closeNavMobile, togglePasswordForget }) => {
   const { firebase } = useFrequentVariables()
-  const localStorageHandlers = useContext(LocalStorageHandlersContext)
-  const authUserListener = useAuthListenerSubscriber()
+  const initializeAuthUserListener = useAuthListenerSubscriber()
 
   const [requiredInputs, setRequiredInputs] = useState<RequiredInputsInterface>({ email: '', password: '' })
   const [errors, setErrors] = useState<ErrorsInterface>(ERROR_DEFAULT_VALUES)
@@ -69,18 +68,15 @@ const SignInFormBase: React.FC<Props> = ({ closeNavMobile, togglePasswordForget 
 
     firebase
       .signInWithEmailAndPassword(email, password)
-      .then(() => {
-        if (closeNavMobile) closeNavMobile()
-
-        history.push(ROUTES.HOME_PAGE)
-      })
       .catch((error: any) => {
         errorsOnSubmit.error = error
         setErrors(errorsOnSubmit)
       })
       .finally(() => {
+        if (closeNavMobile) closeNavMobile()
+        history.push(ROUTES.HOME_PAGE)
         setSubmitRequestLoading(false)
-        authUserListener()
+        initializeAuthUserListener()
       })
   }
 

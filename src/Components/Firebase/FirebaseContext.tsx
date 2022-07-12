@@ -1,5 +1,6 @@
 /* eslint-disable max-len */
 import { createContext } from 'react'
+import { MAINDATA_TMDB_INITIAL } from 'Utils/@TypesTMDB'
 import {
   EpisodesFromUserDatabase,
   SHOW_FULL_DATA_FIRE_DATABASE_INITIAL,
@@ -44,10 +45,24 @@ export interface FirebaseInterface {
   showInfoFireDatabase: (showKey: string | number) => FirebaseReferenceProps<ShowFullDataFireDatabase['info']>
   showsInfoUserDatabase: (authUid: string) => FirebaseReferenceProps<ShowInfoFromUserDatabase[]>
   showsEpisodesUserDatabase: (authUid: string) => FirebaseReferenceProps<EpisodesFromUserDatabase[]>
+  userShow: ({
+    authUid,
+    key,
+  }: {
+    authUid: string
+    key: string | number
+  }) => FirebaseReferenceProps<ShowInfoFromUserDatabase | null>
+  userShowId: ({ authUid, key }: { authUid: string; key: string | number }) => FirebaseReferenceProps<number | null>
+  userShowAllEpisodesWatched: ({
+    authUid,
+    key,
+  }: {
+    authUid: string
+    key: string | number
+  }) => FirebaseReferenceProps<boolean | null>
   ServerValueIncrement: (value: number) => any
   timeStamp?: any
   callback?: any
-  userShow?: any
   userShowAllEpisodesInfo?: any
   watchLaterMovies?: any
   onAuthUserListener?: any
@@ -127,6 +142,9 @@ export const FIREBASE_INITIAL_STATE = {
   showsInfoUserDatabase: () => firebaseRefInitial([]),
   showEpisodesUserDatabase: () => firebaseRefInitial([]),
   showsEpisodesUserDatabase: () => firebaseRefInitial([]),
+  userShow: () => firebaseRefInitial(null),
+  userShowId: () => firebaseRefInitial(null),
+  userShowAllEpisodesWatched: () => firebaseRefInitial(null),
 }
 
 export const FirebaseContext = createContext<FirebaseInterface>(FIREBASE_INITIAL_STATE)

@@ -1,6 +1,6 @@
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
-import { artificialAsyncDelay, removeUndefinedNullFromObject } from 'Utils'
+import { removeUndefinedNullFromObject } from 'Utils'
 import { ShowEpisodesTMDB } from '../TmdbAPIHelpers/getShowEpisodesFromAPI'
 import { UserShowStatuses } from '../UseUserShowsRed/@Types'
 
@@ -11,7 +11,12 @@ type AddShowToFireDatabase = {
   database: UserShowStatuses
 }
 
-const addShowToFireDatabase = ({ showDetailesTMDB, showEpisodesTMDB, database, firebase }: AddShowToFireDatabase) =>
+const addShowToFireDatabase = async ({
+  showDetailesTMDB,
+  showEpisodesTMDB,
+  database,
+  firebase,
+}: AddShowToFireDatabase) =>
   firebase.showFullDataFireDatabase(showDetailesTMDB.id).transaction((snapshot) => {
     if (snapshot !== null) {
       return

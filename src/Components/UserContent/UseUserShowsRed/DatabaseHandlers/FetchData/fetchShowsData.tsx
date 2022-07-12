@@ -19,7 +19,7 @@ export const fetchUserShows =
         .once('value')
       console.log({ userShowsSnapshot: userShowsSnapshot.val() })
       const userShows = sortDataSnapshot<ReturnType<typeof userShowsSnapshot.val>>(userShowsSnapshot)!
-      const showsFullData = await fetchShowsFullData({ userShows, firebase, uid: authUserUid })
+      const showsFullData = await fetchShowsFullData({ userShows, firebase, authUserUid })
       dispatch(setUserShows(showsFullData))
     } catch (err) {
       console.log({ err })
@@ -39,13 +39,7 @@ export const fetchShowEpisodes =
       return
     }
     try {
-      const episodes = await fetchEpisodesFullData({ uid: authUserUid, showKey: id, firebase })
-      // const artificialDelay = new Promise((res) => {
-      //   setTimeout(() => {
-      //     return res(1)
-      //   }, 2500)
-      // })
-      // await artificialDelay
+      const episodes = await fetchEpisodesFullData({ authUserUid, showKey: id, firebase })
       console.log('fetchShowEpisodes')
       dispatch(setShowEpisodes({ id, episodes }))
     } catch (err) {

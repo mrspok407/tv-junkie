@@ -16,7 +16,7 @@ const useAuthListenerSubscriber = () => {
 
   const authSubscriber = useRef<any>()
 
-  const authUserListener = useCallback(() => {
+  const initializeAuthUserListener = useCallback(() => {
     authSubscriber.current = firebase.onAuthUserListener(
       async (authUser: AuthUserInterface['authUser']) => {
         console.log('User logged in')
@@ -35,7 +35,7 @@ const useAuthListenerSubscriber = () => {
     )
   }, [firebase, dispatch, localStorageHandlers])
 
-  return authUserListener
+  return initializeAuthUserListener
 }
 
 export default useAuthListenerSubscriber

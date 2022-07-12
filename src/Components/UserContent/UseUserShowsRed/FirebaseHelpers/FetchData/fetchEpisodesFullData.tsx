@@ -4,14 +4,14 @@ import merge from 'deepmerge'
 import { EpisodesStoreState } from '../../@Types'
 
 interface FetchEpisodesFullData {
-  uid: string
+  authUserUid: string
   showKey: string | number
   firebase: FirebaseInterface
 }
-export const fetchEpisodesFullData = async ({ uid, showKey, firebase }: FetchEpisodesFullData) => {
+export const fetchEpisodesFullData = async ({ authUserUid, showKey, firebase }: FetchEpisodesFullData) => {
   const [episodesFireDatabase, episodesUserDatabase] = await Promise.all([
     firebase.showEpisodesFireDatabase(showKey).once('value'),
-    firebase.showEpisodesUserDatabase(uid, showKey).once('value'),
+    firebase.showEpisodesUserDatabase(authUserUid, showKey).once('value'),
   ])
   const episodesFullData: EpisodesStoreState[] = merge(
     episodesFireDatabase.val() || [],

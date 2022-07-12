@@ -44,11 +44,13 @@ export const updateUserShowStatusScheme = ({
   id,
   userShowStatus,
   showFromStore,
+  showUserDatabase,
   firebase,
 }: UpdateUserShowStatusScheme) => {
+  const showData = showFromStore! || showUserDatabase!
   const updateUsersWatching = () => {
     if (userShowStatus === 'watchingShows') return 1
-    if (showFromStore.database !== 'watchingShows') return 0
+    if (showData.database !== 'watchingShows') return 0
     return -1
   }
 
@@ -56,6 +58,6 @@ export const updateUserShowStatusScheme = ({
     [`allShowsList/${id}/usersWatching`]: firebase.ServerValueIncrement(updateUsersWatching()),
     [`users/${authUid}/content/shows/${id}/database`]: userShowStatus,
     [`users/${authUid}/content/episodes/${id}/info/database`]: userShowStatus,
-    [`users/${authUid}/content/episodes/${id}/info/isAllWatched_database`]: `${showFromStore.allEpisodesWatched}_${userShowStatus}`,
+    [`users/${authUid}/content/episodes/${id}/info/isAllWatched_database`]: `${showData.allEpisodesWatched}_${userShowStatus}`,
   }
 }

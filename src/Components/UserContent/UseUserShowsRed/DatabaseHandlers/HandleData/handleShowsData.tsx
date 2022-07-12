@@ -22,7 +22,7 @@ export const handleNewShow =
       }
 
       if (shouldFetchEpisodes) {
-        episodes = await fetchEpisodesFullData({ uid: authUserUid, showKey: showData.id, firebase })
+        episodes = await fetchEpisodesFullData({ authUserUid, showKey: showData.id, firebase })
       }
       const show = {
         ...showInfoFireSnapshot.val()!,
@@ -58,7 +58,7 @@ export const handleChangeShow =
     }
 
     try {
-      const episodes = await fetchEpisodesFullData({ uid: authUserUid, showKey: showData.id, firebase })
+      const episodes = await fetchEpisodesFullData({ authUserUid, showKey: showData.id, firebase })
       console.log('handleChangeShow after AWAIT')
 
       const show = { info: { ...showFromStore, ...showData, episodesFetched: true }, episodes }

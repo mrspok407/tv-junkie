@@ -1,7 +1,4 @@
-import { EpisodesFromUserDatabase, ShowInfoFromUserDatabase } from 'Components/Firebase/@TypesFirebase'
-import getShowEpisodesTMDB from 'Components/UserContent/TmdbAPIHelpers/getShowEpisodesFromAPI'
 import * as ROLES from 'Utils/Constants/roles'
-import { formatShowEpisodesForUserDatabase } from 'Utils/FormatTMDBAPIData'
 import { DataOnRegisterEpisodesFullData, DataOnRegisterShowInfo, PostUserDataOnRegister } from '../@Types'
 
 export const postUserDataOnRegisterScheme = ({
@@ -32,7 +29,6 @@ export const postUserDataOnRegisterScheme = ({
       info: episodesInfo[show.id],
     }
 
-    const showsSubDatabase = show.status === 'Ended' || show.status === 'Canceled' ? 'ended' : 'ongoing'
     showsInfo[show.id] = {
       allEpisodesWatched: false,
       database: show.database,
@@ -40,7 +36,7 @@ export const postUserDataOnRegisterScheme = ({
       firstAirDate: show.first_air_date,
       id: show.id,
       name: show.name,
-      status: showsSubDatabase,
+      status: show.status === 'Ended' || show.status === 'Canceled' ? 'ended' : 'ongoing',
       timeStamp: firebase.timeStamp(),
       userRating: '',
       key: show.id.toString(),

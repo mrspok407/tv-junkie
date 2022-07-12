@@ -55,7 +55,13 @@ export const userShowsListeners =
       (snapshot: SnapshotVal<ShowInfoFromUserDatabase>) => {
         console.log('child_changed info listener')
         console.log(snapshot.val())
-        dispatch(handleChangeShow({ ...snapshot.val()!, key: snapshot.key }, firebase))
+        const showFromStore = selectShow(getState(), snapshot.val()!.id)
+
+        if (showFromStore) {
+          dispatch(handleChangeShow({ ...snapshot.val()!, key: snapshot.key }, firebase))
+        } else {
+          dispatch(handleNewShow({ ...snapshot.val()!, key: snapshot.key }, firebase))
+        }
       },
       (err) => {
         console.log({ errInfoListener: err })

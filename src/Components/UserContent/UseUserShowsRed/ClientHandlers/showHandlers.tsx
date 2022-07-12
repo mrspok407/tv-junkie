@@ -40,7 +40,6 @@ export const handleUserShowStatus =
       updateUserShowStatus({
         id,
         database,
-        showDetailesTMDB: showFullDetailes,
         firebase,
       }),
     )

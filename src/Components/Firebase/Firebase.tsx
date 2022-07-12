@@ -220,7 +220,14 @@ class Firebase {
 
   userShowsLastUpdateList = (uid: string) => this.db.ref(`users/${uid}/content/showsLastUpdateList`)
 
-  userShow = ({ uid, key }: { uid: string; key: string }) => this.db.ref(`users/${uid}/content/shows/${key}`)
+  userShow = ({ authUid, key }: { authUid: string; key: string }) =>
+    this.db.ref(`users/${authUid}/content/shows/${key}`)
+
+  userShowId = ({ authUid, key }: { authUid: string; key: string | number }) =>
+    this.db.ref(`users/${authUid}/content/shows/${key}/id`)
+
+  userShowAllEpisodesWatched = ({ authUid, key }: { authUid: string; key: string | number }) =>
+    this.db.ref(`users/${authUid}/content/shows/${key}/allEpisodesWatched`)
 
   userShowEpisodes = (uid: string, showKey: string) => this.db.ref(`users/${uid}/content/episodes/${showKey}`)
 

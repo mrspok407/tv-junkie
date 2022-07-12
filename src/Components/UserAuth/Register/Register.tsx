@@ -1,26 +1,19 @@
 /* eslint-disable react/no-access-state-in-setstate */
 import React, { useContext, useState } from 'react'
 import { useHistory } from 'react-router-dom'
-import { artificialAsyncDelay, validEmailRegex } from 'Utils'
+import { validEmailRegex } from 'Utils'
 import * as ROLES from 'Utils/Constants/roles'
 import * as ROUTES from 'Utils/Constants/routes'
 import classNames from 'classnames'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
-import {
-  LocalStorageHandlersContext,
-  LocalStorageValueContext,
-} from 'Components/AppContext/Contexts/LocalStorageContentContext/LocalStorageContentContext'
+import { LocalStorageValueContext } from 'Components/AppContext/Contexts/LocalStorageContentContext/LocalStorageContentContext'
 import { ErrorInterface, ErrorsHandlerContext } from 'Components/AppContext/Contexts/ErrorsContext'
-import getShowEpisodesTMDB from 'Components/UserContent/TmdbAPIHelpers/getShowEpisodesFromAPI'
-import { formatEpisodesInfoForUserDatabase, formatShowEpisodesForUserDatabase } from 'Utils/FormatTMDBAPIData'
-import { EpisodesFromUserDatabase, SeasonFromUserDatabase } from 'Components/Firebase/@TypesFirebase'
-import { DataOnRegisterEpisodes, DataOnRegisterEpisodesInfo } from 'Components/Firebase/FirebasePostSchemes/@Types'
 import { postUserDataOnRegisterScheme } from 'Components/Firebase/FirebasePostSchemes/Post/AuthenticationSchemes'
-import addShowToFireDatabase from 'Components/UserContent/FirebaseHelpers/addShowFireDatabase'
 import { AuthUserFirebaseInterface } from '../Session/Authentication/@Types'
 import SignInWithGoogleForm from '../SignIn/SignInWithGoogle'
 import Input from '../Input/Input'
 import useAuthListenerSubscriber from '../Session/Authentication/Hooks/useAuthListenerSubscriber'
+import { formatEpisodesForUserDatabaseOnRegister, handleContentOnRegister } from './Helpers'
 
 type Props = {
   closeNavMobile: () => void
@@ -60,20 +53,16 @@ const ERROR_DEFAULT_VALUES = {
 
 const Register: React.FC<Props> = ({ closeNavMobile }) => {
   const { firebase } = useFrequentVariables()
+  const initializeAuthUserListener = useAuthListenerSubscriber()
   const handleError = useContext(ErrorsHandlerContext)
 
   const { watchingShows: watchingShowsLS } = useContext(LocalStorageValueContext)
-  const localStorageHandlers = useContext(LocalStorageHandlersContext)
-
-  const authUserListener = useAuthListenerSubscriber()
-
   const [requiredInputs, setRequiredInputs] = useState<RequiredInputsInterface>({
     login: '',
     email: '',
     password: '',
     passwordConfirm: '',
   })
-  // const [inputs, setInputs] = useState<InputsInterface>({ login: "" })
   const [errors, setErrors] = useState<FormErrorsInt>(ERROR_DEFAULT_VALUES)
   const [submitClicked, setSubmitClicked] = useState(false)
   const [submitRequestLoading, setSubmitRequestLoading] = useState(false)
@@ -81,6 +70,11 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
   const [isEmailValid, setIsEmailValid] = useState(false)
 
   const history = useHistory()
+
+  const handleSuccessSubmit = () => {
+    initializeAuthUserListener()
+    firebase.sendEmailVerification()
+  }
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     if (submitRequestLoading) return
@@ -102,61 +96,14 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
       return
     }
 
-    // context.userContentHandler.handleLoadingShowsOnRegister(true)
-
     try {
       const authUser: AuthUserFirebaseInterface = await firebase.createUserWithEmailAndPassword(email, password)
 
-      // const showEpisodesTMDB = await getShowEpisodesTMDB({ id: showDetailesTMDB.id })
-
-      console.time('episodesFullData')
-      const episodesFullData = await Promise.all(
-        watchingShowsLS.map((show) => {
-          return getShowEpisodesTMDB({ id: show.id })
-        }),
+      const episodesData = await handleContentOnRegister(watchingShowsLS, firebase)
+      const { episodesForUserDatabase, episodesInfoForUserDatabase } = formatEpisodesForUserDatabaseOnRegister(
+        watchingShowsLS,
+        episodesData,
       )
-      console.timeEnd('episodesFullData')
-
-      console.time('addShowToFireDatabase')
-
-      const addShowToFireDatabasePromiseALL = await Promise.all(
-        watchingShowsLS.map((show) => {
-          return addShowToFireDatabase({
-            firebase,
-            database: show.database,
-            showDetailesTMDB: show,
-            showEpisodesTMDB: episodesFullData.find((item) => item.showId === show.id)!,
-          })
-        }),
-      )
-      console.timeEnd('addShowToFireDatabase')
-      // watchingShowsLS.forEach(async (show, index, array) => {
-      //   const { snapshot } = await addShowToFireDatabase({
-      //     firebase,
-      //     database: show.database,
-      //     showDetailesTMDB: show,
-      //     showEpisodesTMDB: episodesFullData.find((item) => item.showId === show.id)!,
-      //   })
-      //   console.log({ snapshot: snapshot.val() })
-      //   if (index === array.length - 1) {
-      //     console.timeEnd('addShowToFireDatabase')
-      //   }
-      // })
-
-      await artificialAsyncDelay(2500)
-      // console.log({ addShowToFireDatabasePromiseALL })
-
-      const episodesForUserDatabase: DataOnRegisterEpisodes = {}
-      const episodesInfoForUserDatabase: DataOnRegisterEpisodesInfo = {}
-
-      episodesFullData.forEach((show) => {
-        const showEpisodesUserDatabase = formatShowEpisodesForUserDatabase(show.episodes)
-        const showInfoEpisodesUserDatabase = formatEpisodesInfoForUserDatabase(
-          watchingShowsLS.find((item) => item.id === show.showId)!,
-        )
-        episodesForUserDatabase[show.showId] = showEpisodesUserDatabase
-        episodesInfoForUserDatabase[show.showId] = showInfoEpisodesUserDatabase
-      })
 
       const updateData = postUserDataOnRegisterScheme({
         authUserFirebase: authUser,
@@ -166,64 +113,16 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
         episodesInfo: episodesInfoForUserDatabase,
         firebase,
       })
-      return firebase.rootRef().update(updateData, () => {
-        console.log('postUserDataOnRegisterScheme')
-        authUserListener()
-      })
+      return firebase.rootRef().update(updateData, handleSuccessSubmit)
     } catch (err) {
-      console.log({ err })
       const error = err as ErrorInterface
       setErrors({ ...errorsOnSubmit, error: { message: error.message } })
-      setSubmitRequestLoading(false)
       handleError({ errorData: error, message: 'Error occured durring register process. Please try again.' })
+    } finally {
+      if (closeNavMobile) closeNavMobile()
+      setSubmitRequestLoading(false)
+      history.push(ROUTES.HOME_PAGE)
     }
-
-    return
-
-    firebase
-      .createUserWithEmailAndPassword(email, password)
-      .then((authUser: AuthUserFirebaseInterface) => {
-        console.log({ authUser })
-
-        firebase
-          .user(authUser.user.uid)
-          .set({
-            username: requiredInputs.login,
-            userNameLowerCase: requiredInputs.login.toLowerCase(),
-            email,
-            role: ROLES.USER,
-          })
-          .then(() => {
-            // const watchingShows = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)!) || []
-            // const watchLaterMovies = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)!) || []
-            // context.userContentHandler.addShowsToDatabaseOnRegister({
-            //   shows: watchingShows,
-            //   uid: authUser.user.uid,
-            // })
-            // watchLaterMovies.forEach((item: MovieInterface) => {
-            //   context.userContentHandler.handleMovieInDatabases({
-            //     id: item.id,
-            //     data: item,
-            //     onRegister: true,
-            //     userOnRegister: authUser.user,
-            //   })
-            // })
-          })
-          .then(() => {
-            if (closeNavMobile) closeNavMobile()
-          })
-      })
-      .then(() => firebase.sendEmailVerification())
-      .then(() => {
-        history.push(ROUTES.HOME_PAGE)
-      })
-      .catch((error: any) => {
-        errorsOnSubmit.error = error
-        setErrors(errorsOnSubmit)
-        setSubmitRequestLoading(false)
-        handleError({ errorData: error, message: 'Error occured durring register process. Please try again.' })
-        // context.userContentHandler.handleLoadingShowsOnRegister(false)
-      })
   }
 
   const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
