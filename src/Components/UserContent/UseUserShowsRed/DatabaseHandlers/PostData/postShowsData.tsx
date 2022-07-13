@@ -1,5 +1,4 @@
 import { AppThunk } from 'app/store'
-import { ShowInfoFromUserDatabase } from 'Components/Firebase/@TypesFirebase'
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import {
   postUserShowScheme,
@@ -15,12 +14,10 @@ import { handleShowsError } from '../../ErrorHandlers/handleShowsError'
 import postShowFireDatabase from '../../FirebaseHelpers/PostData/postShowFireDatabase'
 import { optimisticChangeUserShowStatus } from '../../OptimisticHandlers'
 import { selectShow, updateLoadingNewShow } from '../../userShowsSliceRed'
-import { handleNewShow } from '../HandleData/handleShowsData'
 
 interface HandleDatabaseChange {
   id: number
   database: UserShowStatuses
-  showUserDatabase?: ShowInfoFromUserDatabase | null
   firebase: FirebaseInterface
 }
 
@@ -29,27 +26,15 @@ interface HandleNewShow extends HandleDatabaseChange {
 }
 
 export const updateUserShowStatus =
-  ({ id, database: userShowStatus, showUserDatabase, firebase }: HandleDatabaseChange): AppThunk =>
+  ({ id, database: userShowStatus, firebase }: HandleDatabaseChange): AppThunk =>
   async (dispatch, getState) => {
     const authUid = getAuthUidFromState(getState())
     const showFromStore = selectShow(getState(), id)
 
-    try {
-      let updateData = {}
-      console.log({ showFromStore })
-      if (showFromStore) {
-        dispatch(optimisticChangeUserShowStatus({ id, userShowStatus }))
-        updateData = updateUserShowStatusScheme({ authUid, id, userShowStatus, showFromStore, firebase })
-      } else {
-        if (userShowStatus === showUserDatabase?.database) {
-          dispatch(handleNewShow(showUserDatabase, firebase))
-          return
-        }
-        updateData = updateUserShowStatusScheme({ authUid, id, userShowStatus, showUserDatabase, firebase })
-      }
+    dispatch(optimisticChangeUserShowStatus({ id, userShowStatus }))
 
-      // await artificialAsyncDelay(2500)
-      console.log({ updateData })
+    try {
+      const updateData = updateUserShowStatusScheme({ authUid, id, userShowStatus, showFromStore, firebase })
       return firebase.rootRef().update(updateData)
     } catch (err) {
       console.log({ errThunk: err })
@@ -68,35 +53,27 @@ export const handleNewShowInDatabase =
 
     dispatch(updateLoadingNewShow(database))
     try {
-      const [showFullDataFireDatabase, showUserDatabase] = await Promise.all([
-        firebase.showFullDataFireDatabase(id).once('value'),
-        firebase.userShow({ authUid, key: id }).once('value'),
-      ])
+      const showFullDataFireDatabase = await firebase.showFullDataFireDatabase(id).once('value')
       const existsInFireDatabase = showFullDataFireDatabase.val() !== null
 
       if (existsInFireDatabase) {
         episodesFromFireDatabase = showFullDataFireDatabase.val()?.episodes!
       } else {
-        const showDataSnapshot = await postShowFireDatabase({ firebase, database, showDetailesTMDB })
-        episodesFromFireDatabase = showDataSnapshot?.episodes!
+        const showData = await postShowFireDatabase({ firebase, database, showDetailesTMDB })
+        episodesFromFireDatabase = showData?.episodes!
       }
 
       // await artificialAsyncDelay(2500)
-      console.log({ showUserDatabase: showUserDatabase.val() })
-      if (showUserDatabase.val() === null) {
-        const showEpisodesUserDatabase = formatShowEpisodesForUserDatabase(episodesFromFireDatabase)
-        const updateData = postUserShowScheme({
-          authUid,
-          showDetailesTMDB,
-          showEpisodes: showEpisodesUserDatabase,
-          showDatabase: database,
-          firebase,
-        })
+      const showEpisodesUserDatabase = formatShowEpisodesForUserDatabase(episodesFromFireDatabase)
+      const updateData = postUserShowScheme({
+        authUid,
+        showDetailesTMDB,
+        showEpisodes: showEpisodesUserDatabase,
+        showDatabase: database,
+        firebase,
+      })
 
-        return firebase.rootRef().update(updateData)
-      } else {
-        return dispatch(updateUserShowStatus({ id, database, showUserDatabase: showUserDatabase.val(), firebase }))
-      }
+      return firebase.rootRef().update(updateData)
     } catch (err) {
       dispatch(handleShowsError(err))
     }

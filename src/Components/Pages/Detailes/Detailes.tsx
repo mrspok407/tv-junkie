@@ -1,10 +1,10 @@
 /* eslint-disable max-len */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Helmet } from 'react-helmet'
 import Header from 'Components/UI/Header/Header'
 import Slider from 'Components/UI/Slider/Slider'
-import ShowsEpisodes from 'Components/UI/Templates/SeasonsAndEpisodes/ShowsEpisodes'
+import ShowEpisodes from 'Components/UI/Templates/SeasonsAndEpisodes/ShowEpisodes'
 import ScrollToTopBar from 'Utils/ScrollToTopBar'
 import ScrollToTopOnUpdate from 'Utils/ScrollToTopOnUpdate'
 import Footer from 'Components/UI/Footer/Footer'
@@ -55,7 +55,7 @@ export const DetailesPage: React.FC<Props> = ({
         <div className="detailes-page__description">{detailes.overview}</div>
 
         {mediaType === 'show' && (
-          <ShowsEpisodes
+          <ShowEpisodes
             parentComponent="detailesPage"
             episodesData={detailes.seasons}
             showTitle={detailes.name}

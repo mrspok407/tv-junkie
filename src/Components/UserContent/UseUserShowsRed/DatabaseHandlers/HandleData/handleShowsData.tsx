@@ -44,12 +44,7 @@ export const handleChangeShow =
 
     console.log({ showFromStore })
     if (!showFromStore) return
-
-    // const isWatchingShow = showData.database === 'watchingShows'
-    // const isWatchingShow = showData.database !== 'notWatchingShows'
-    const isEpisodesFetched = showFromStore.episodesFetched
-    // if (!isWatchingShow || isEpisodesFetched) {
-    if (isEpisodesFetched) {
+    if (showFromStore.episodesFetched) {
       console.log('allready fetched')
       console.log({ showData })
       const show = { info: { ...showFromStore, ...showData } }

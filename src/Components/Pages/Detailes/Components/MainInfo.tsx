@@ -1,8 +1,6 @@
 import React from 'react'
-import classNames from 'classnames'
 import UserRating from 'Components/UI/UserRating/UserRating'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
-import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import { formatMovieBudget } from 'Utils/FormatTMDBAPIData'
 import { CONTENT_INFO_NO_DATA } from 'Utils/Constants'
 import ShowsButtonsRed from './ShowsButtonsRed'
@@ -16,7 +14,6 @@ type Props = {
 }
 
 export const MainInfo: React.FC<Props> = ({ detailes, mediaType, id }) => {
-  const { authUser } = useFrequentVariables()
   const isMediaTypeTV = mediaType === 'show'
 
   const { companyName, genres, title, yearRelease, yearRange, runtime } = useFormatDetailesValues({
@@ -64,7 +61,7 @@ export const MainInfo: React.FC<Props> = ({ detailes, mediaType, id }) => {
         <div className="detailes-page__info-row">
           <div className="detailes-page__info-option">My rating</div>
           <div className="detailes-page__info-value">
-            <UserRating id={id} firebaseRef="userShow" showRating mediaType={mediaType} />
+            <UserRating id={id} firebaseRef="userShow" />
           </div>
         </div>
       )}

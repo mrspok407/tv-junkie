@@ -3,8 +3,6 @@ import classNames from 'classnames'
 import { Link } from 'react-router-dom'
 import * as ROUTES from 'Utils/Constants/routes'
 import { SingleEpisodeFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
-import { useAppSelector } from 'app/hooks'
-import { selectShowDatabase } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import { HandleFadeOutInterface } from '../Templates/SeasonsAndEpisodes/SeasonEpisodes'
 import './UserRating.scss'
@@ -20,10 +18,7 @@ type Props = {
   episodeRating?: boolean
   handleFadeOut?: ({ episodeId, episodeIndex, seasonNum, rating }: HandleFadeOutInterface) => void
   parentComponent?: string
-
   disableRating?: boolean
-  showRating?: boolean
-  mediaType?: string
   userRatingData?: number | string
 }
 
@@ -36,8 +31,6 @@ const UserRating: React.FC<Props> = ({
   episodeRating,
   parentComponent,
   disableRating,
-  showRating,
-  mediaType,
   userRatingData,
   handleFadeOut = () => {},
 }) => {
@@ -46,8 +39,6 @@ const UserRating: React.FC<Props> = ({
   const [userRating, setUserRating] = useState(userRatingData || 0)
   const [nonAuthWarning, setNonAuthWarning] = useState(false)
   const userRatingRef = useRef<HTMLDivElement>(null)
-
-  const showDatabase = useAppSelector((state) => selectShowDatabase(state, id))
 
   useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside as EventListener)
@@ -66,7 +57,7 @@ const UserRating: React.FC<Props> = ({
     if (firebase.auth.currentUser === null || parentComponent === 'toWatchPage' || firebaseRef === '') return
 
     firebase[firebaseRef]({
-      uid: firebase.auth.currentUser.uid,
+      authUid: firebase.auth.currentUser.uid,
       key: Number(id),
       seasonNum,
       episodeNum,
@@ -119,7 +110,7 @@ const UserRating: React.FC<Props> = ({
       handleFadeOut({ episodeId, episodeIndex: episodeNum, seasonNum, rating })
     } else {
       firebase[firebaseRef]({
-        uid: authUser.uid,
+        authUid: authUser.uid,
         key: Number(id),
         seasonNum,
         episodeNum,
@@ -129,7 +120,7 @@ const UserRating: React.FC<Props> = ({
         setUserRating(rating)
 
         firebase[firebaseRef]({
-          uid: authUser.uid,
+          authUid: authUser.uid,
           key: Number(id),
           seasonNum,
           episodeNum,
@@ -141,8 +132,7 @@ const UserRating: React.FC<Props> = ({
     }
   }
 
-  const ratingDisabled =
-    authUser?.uid === null || disableRating || (!showDatabase && showRating && mediaType !== 'movie')
+  const ratingDisabled = !authUser?.uid || disableRating
 
   return (
     <div

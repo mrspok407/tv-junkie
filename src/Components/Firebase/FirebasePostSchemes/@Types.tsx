@@ -16,8 +16,7 @@ export interface UpdateUserShowStatusScheme {
   authUid: string
   id: number
   userShowStatus: string
-  showFromStore?: ShowFullDataStoreState
-  showUserDatabase?: ShowInfoFromUserDatabase | null
+  showFromStore: ShowFullDataStoreState
   firebase: FirebaseInterface
 }
 

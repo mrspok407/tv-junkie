@@ -35,7 +35,7 @@ if (window.location.hostname === 'localhost') {
 }
 
 interface ReferenceInterface {
-  uid: string
+  authUid: string
   key: string
   seasonNum: number
   episodeNum: number
@@ -220,8 +220,7 @@ class Firebase {
 
   userShowsLastUpdateList = (uid: string) => this.db.ref(`users/${uid}/content/showsLastUpdateList`)
 
-  userShow = ({ authUid, key }: { authUid: string; key: string }) =>
-    this.db.ref(`users/${authUid}/content/shows/${key}`)
+  userShow = ({ authUid, key }: ReferenceInterface) => this.db.ref(`users/${authUid}/content/shows/${key}`)
 
   userShowId = ({ authUid, key }: { authUid: string; key: string | number }) =>
     this.db.ref(`users/${authUid}/content/shows/${key}/id`)
@@ -237,17 +236,17 @@ class Firebase {
   userShowAllEpisodesInfo = (uid: string, showKey: string) =>
     this.db.ref(`users/${uid}/content/episodes/${showKey}/info`)
 
-  userShowSingleEpisode = ({ uid, key, seasonNum, episodeNum }: ReferenceInterface) =>
-    this.db.ref(`users/${uid}/content/episodes/${key}/episodes/${seasonNum - 1}/episodes/${episodeNum}`)
+  userShowSingleEpisode = ({ authUid, key, seasonNum, episodeNum }: ReferenceInterface) =>
+    this.db.ref(`users/${authUid}/content/episodes/${key}/episodes/${seasonNum - 1}/episodes/${episodeNum}`)
 
-  userShowSeasonEpisodes = ({ uid, key, seasonNum }: ReferenceInterface) =>
-    this.db.ref(`users/${uid}/content/episodes/${key}/episodes/${seasonNum - 1}/episodes`)
+  userShowSeasonEpisodes = ({ authUid, key, seasonNum }: ReferenceInterface) =>
+    this.db.ref(`users/${authUid}/content/episodes/${key}/episodes/${seasonNum - 1}/episodes`)
 
-  userShowSeasonEpisodesNotFinished = ({ uid, key, seasonNum }: ReferenceInterface) =>
-    this.db.ref(`users/${uid}/content/episodes/notFinished/${key}/episodes/${seasonNum - 1}/episodes`)
+  userShowSeasonEpisodesNotFinished = ({ authUid, key, seasonNum }: ReferenceInterface) =>
+    this.db.ref(`users/${authUid}/content/episodes/notFinished/${key}/episodes/${seasonNum - 1}/episodes`)
 
-  userShowSeason = ({ uid, key, seasonNum }: ReferenceInterface) =>
-    this.db.ref(`users/${uid}/content/episodes/${key}/episodes/${seasonNum - 1}`)
+  userShowSeason = ({ authUid, key, seasonNum }: ReferenceInterface) =>
+    this.db.ref(`users/${authUid}/content/episodes/${key}/episodes/${seasonNum - 1}`)
 
   watchLaterMovies = (uid: string) => this.db.ref(`users/${uid}/content/movies/watchLaterMovies`)
 }

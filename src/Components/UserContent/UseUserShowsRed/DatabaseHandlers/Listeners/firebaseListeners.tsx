@@ -26,7 +26,6 @@ export const userShowsListeners =
   async (dispatch, getState) => {
     console.log('userShowsListeners')
     const authUserUid = getAuthUidFromState(getState())
-
     const { showsInfoRef, showsEpisodesRef } = userShowsListenersRefs(firebase, authUserUid)
 
     // const showsInfoRef = firebase.showsInfoUserDatabase(authUserUid).orderByChild('timeStamp')
@@ -55,13 +54,7 @@ export const userShowsListeners =
       (snapshot: SnapshotVal<ShowInfoFromUserDatabase>) => {
         console.log('child_changed info listener')
         console.log(snapshot.val())
-        const showFromStore = selectShow(getState(), snapshot.val()!.id)
-
-        if (showFromStore) {
-          dispatch(handleChangeShow({ ...snapshot.val()!, key: snapshot.key }, firebase))
-        } else {
-          dispatch(handleNewShow({ ...snapshot.val()!, key: snapshot.key }, firebase))
-        }
+        dispatch(handleChangeShow({ ...snapshot.val()!, key: snapshot.key }, firebase))
       },
       (err) => {
         console.log({ errInfoListener: err })

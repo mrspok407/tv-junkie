@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable react/jsx-no-undef */
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { differenceBtwDatesInDays, releasedEpisodesToOneArray, todayDate } from 'Utils'
 import * as _get from 'lodash.get'
 import Loader from 'Components/UI/Placeholders/Loader'
@@ -16,9 +16,9 @@ import { SeasonsTMDB } from 'Utils/@TypesTMDB'
 import useFetchSeasons from './Hooks/UseFetchSeasons/UseFetchSeasons'
 import SeasonEpisodes from './SeasonEpisodes'
 import isAllEpisodesWatched from './FirebaseHelpers/isAllEpisodesWatched'
-import { ActionTypesEnum } from './Hooks/UseFetchSeasons/_reducerConfig'
 import { EpisodesDataInterface, ShowEpisodesFromAPIInterface } from './@Types'
 import './ShowsEpisodes.scss'
+import { ActionTypesEnum } from './Hooks/UseFetchSeasons/ReducerConfig/@Types'
 
 type Props = {
   episodesData: SeasonsTMDB[]
@@ -27,7 +27,7 @@ type Props = {
   parentComponent: string
 }
 
-const ShowsEpisodes: React.FC<Props> = ({ episodesData, showTitle, id, parentComponent }) => {
+const ShowEpisodes: React.FC<Props> = ({ episodesData, showTitle, id, parentComponent }) => {
   const { firebase, authUser } = useFrequentVariables()
 
   const showInfo = useAppSelector((state) => selectShow(state, id))
@@ -44,20 +44,24 @@ const ShowsEpisodes: React.FC<Props> = ({ episodesData, showTitle, id, parentCom
 
   const [openSeason, setOpenSeason] = useState({ seasonId: firstSeason?.id, seasonNum: firstSeason?.season_number })
 
-  const promiseData = useAxiosPromise({
-    fullRerenderDeps: id,
-    content: {
-      id: openSeason.seasonId,
-      seasonNum: openSeason.seasonNum,
-      url: tmdbTvSeasonURL({ showId: id, seasonNum: openSeason?.seasonNum }),
-    },
+  // const promiseData = useAxiosPromise({
+  //   fullRerenderDeps: id,
+  //   content: {
+  //     id: openSeason.seasonId,
+  //     seasonNum: openSeason.seasonNum,
+  //     url: tmdbTvSeasonURL({ showId: id, seasonNum: openSeason?.seasonNum }),
+  //   },
+  //   disable: parentComponent === 'toWatchPage',
+  // })
+
+  const { state, handleFetch } = useFetchSeasons<ShowEpisodesFromAPIInterface>({
     disable: parentComponent === 'toWatchPage',
+    showId: id,
   })
 
-  const { state, dispatch } = useFetchSeasons<ShowEpisodesFromAPIInterface>({
-    disable: parentComponent === 'toWatchPage',
-    promiseData,
-  })
+  useEffect(() => {
+    console.log({ state })
+  }, [state])
 
   const { data: episodesDataFromAPI, loading: loadingSeasons, openData: currentlyOpenSeasons } = state
 
@@ -71,11 +75,17 @@ const ShowsEpisodes: React.FC<Props> = ({ episodesData, showTitle, id, parentCom
       return
     }
 
-    if (openSeason.seasonId === seasonId) {
-      dispatch({ type: ActionTypesEnum.HandleOpenData, payload: { id: seasonId.toString() } })
-    } else {
-      setOpenSeason({ seasonId, seasonNum })
-    }
+    console.log('showSeasonsEpisodes')
+
+    handleFetch({ seasonNum, seasonId })
+
+    // if (openSeason.seasonId === seasonId) {
+    //   console.log('ActionTypesEnum.HandleOpenData')
+    //   dispatch({ type: ActionTypesEnum.HandleOpenData, payload: { id: seasonId.toString() } })
+    // } else {
+    //   console.log('other')
+    //   setOpenSeason({ seasonId, seasonNum })
+    // }
   }
 
   const showEpisodeInfo = (episodeId: number) => {
@@ -243,7 +253,8 @@ const ShowsEpisodes: React.FC<Props> = ({ episodesData, showTitle, id, parentCom
 
   const showCheckboxes = showInfo?.database !== 'notWatchingShows'
 
-  const curOpen = parentComponent === 'toWatchPage' ? currentlyOpen : currentlyOpenSeasons
+  // const curOpen = parentComponent === 'toWatchPage' ? currentlyOpen : currentlyOpenSeasons
+  const curOpen = currentlyOpenSeasons
 
   return (
     <>
@@ -278,11 +289,11 @@ const ShowsEpisodes: React.FC<Props> = ({ episodesData, showTitle, id, parentCom
               className={classNames('episodes__episode-group', {
                 'episodes__episode-group--no-poster': !season.poster_path && parentComponent === 'detailesPage',
               })}
-              style={!loadingSeasons.includes(season.id.toString()) ? { rowGap: '10px' } : { rowGap: '0px' }}
+              style={!loadingSeasons.includes(season.id) ? { rowGap: '10px' } : { rowGap: '0px' }}
             >
               <div
                 className={classNames('episodes__episode-group-info', {
-                  'episodes__episode-group-info--open': currentlyOpenSeasons.includes(season.id.toString()),
+                  'episodes__episode-group-info--open': currentlyOpenSeasons.includes(season.id),
                 })}
                 style={
                   daysToNewSeason > 0
@@ -314,8 +325,8 @@ const ShowsEpisodes: React.FC<Props> = ({ episodesData, showTitle, id, parentCom
               </div>
 
               {parentComponent === 'detailesPage' &&
-                (!loadingSeasons.includes(season.id.toString()) ? (
-                  curOpen.includes(season.id.toString()) && (
+                (!loadingSeasons.includes(season.id) ? (
+                  curOpen.includes(season.id) && (
                     <>
                       {season.poster_path && parentComponent === 'detailesPage' && (
                         <div className="episodes__episode-group-poster-wrapper">
@@ -370,8 +381,8 @@ const ShowsEpisodes: React.FC<Props> = ({ episodesData, showTitle, id, parentCom
                 ))}
 
               {parentComponent === 'toWatchPage' &&
-                curOpen.includes(season.id.toString()) &&
-                (!loadingSeasons.includes(season.id.toString()) ? (
+                curOpen.includes(season.id) &&
+                (!loadingSeasons.includes(season.id) ? (
                   <>
                     <SeasonEpisodes
                       parentComponent={parentComponent}
@@ -413,4 +424,4 @@ const ShowsEpisodes: React.FC<Props> = ({ episodesData, showTitle, id, parentCom
   )
 }
 
-export default ShowsEpisodes
+export default ShowEpisodes

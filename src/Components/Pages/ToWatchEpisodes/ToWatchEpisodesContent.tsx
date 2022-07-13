@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import ShowsEpisodes from 'Components/UI/Templates/SeasonsAndEpisodes/ShowsEpisodes'
+import ShowEpisodes from 'Components/UI/Templates/SeasonsAndEpisodes/ShowEpisodes'
 import { todayDate, combineMergeObjects, releasedEpisodesToOneArray } from 'Utils'
 import Loader from 'Components/UI/Placeholders/Loader'
 import PlaceholderNoToWatchEpisodes from 'Components/UI/Placeholders/PlaceholderNoToWatchEpisodes'
@@ -84,7 +84,7 @@ const ToWatchEpisodesContent: React.FC = () => {
                 <Link className="towatch__show-name" to={`/show/${show.id}`}>
                   {show.name}
                 </Link>
-                <ShowsEpisodes
+                <ShowEpisodes
                   parentComponent="toWatchPage"
                   episodesData={toWatchEpisodes}
                   showTitle={show.name || show.original_name}
