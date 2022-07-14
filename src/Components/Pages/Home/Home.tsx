@@ -118,9 +118,7 @@ const HomePage: React.FC = () => {
       </Helmet>
       <Header />
       <div className="home-page__wrapper">{!authUser?.uid ? renderNonAuthUser() : renderAuthUser()}</div>
-      <React.StrictMode>
-        <Footer />
-      </React.StrictMode>
+      <Footer />
       <ScrollToTopBar />
     </>
   )

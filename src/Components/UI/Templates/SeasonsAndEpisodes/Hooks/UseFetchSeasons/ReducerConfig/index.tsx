@@ -1,35 +1,37 @@
 import produce from 'immer'
 import * as React from 'react'
+import { isArrayIncludes } from 'Utils'
 import { FetchSeasonsInt, ACTIONTYPES, ActionTypesEnum } from './@Types'
 
 const reducer = <T,>(): React.Reducer<FetchSeasonsInt<T>, ACTIONTYPES> =>
   produce((draft, action) => {
-    const { openData, loading, fetchedData, errors } = draft
+    const { openData, loadingData, fetchedData, errors } = draft
+    const isSeasonLoading = (id: number) => loadingData.includes(id)
 
     switch (action.type) {
       case ActionTypesEnum.HandleLoading: {
         const { seasonId } = action.payload
-        if (fetchedData.includes(seasonId) || loading.includes(seasonId)) break
-        draft.loading = [...loading, action.payload.seasonId]
+        if (fetchedData.includes(seasonId) || isSeasonLoading(seasonId)) break
+        draft.loadingData = [...loadingData, action.payload.seasonId]
         break
       }
 
       case ActionTypesEnum.HandleSuccess: {
         console.log('HandleSuccess')
         const { data, seasonId } = action.payload
-        console.log(action.payload)
+
         if (fetchedData.includes(seasonId)) {
           draft.openData = openData.includes(seasonId)
             ? openData.filter((item) => item !== seasonId)
             : [...openData, seasonId]
-          console.log('test')
           break
         }
 
-        draft.loading = loading.filter((item) => item !== seasonId)
+        draft.loadingData = loadingData.filter((item) => item !== seasonId)
         draft.data.push(data)
         draft.fetchedData.push(seasonId)
         draft.openData.push(seasonId)
+        draft.errors = errors.filter((item) => item !== seasonId)
         break
       }
 
@@ -43,8 +45,10 @@ const reducer = <T,>(): React.Reducer<FetchSeasonsInt<T>, ACTIONTYPES> =>
 
       case ActionTypesEnum.HandleFailure: {
         const { seasonId } = action.payload
-        draft.loading = loading.filter((item) => item !== seasonId)
-        draft.errors = [...errors, seasonId]
+        draft.loadingData = loadingData.filter((item) => item !== seasonId)
+        if (!isArrayIncludes(seasonId, errors)) {
+          draft.errors = [...errors, seasonId]
+        }
         break
       }
 

@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable react/jsx-no-undef */
-import React, { useEffect, useState } from 'react'
-import { differenceBtwDatesInDays, releasedEpisodesToOneArray, todayDate } from 'Utils'
+import React, { useEffect, useMemo, useState } from 'react'
+import { differenceBtwDatesInDays, isArrayIncludes, releasedEpisodesToOneArray, todayDate } from 'Utils'
 import * as _get from 'lodash.get'
 import Loader from 'Components/UI/Placeholders/Loader'
 import classNames from 'classnames'
@@ -12,16 +12,15 @@ import useAxiosPromise from 'Utils/Hooks/UseAxiosPromise'
 import { useAppSelector } from 'app/hooks'
 import { selectShow, selectShowEpisodes } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
-import { SeasonsTMDB } from 'Utils/@TypesTMDB'
+import { SeasonTMDB } from 'Utils/@TypesTMDB'
 import useFetchSeasons from './Hooks/UseFetchSeasons/UseFetchSeasons'
 import SeasonEpisodes from './SeasonEpisodes'
 import isAllEpisodesWatched from './FirebaseHelpers/isAllEpisodesWatched'
-import { EpisodesDataInterface, ShowEpisodesFromAPIInterface } from './@Types'
+import { ShowEpisodesFromAPIInterface } from './@Types'
 import './ShowsEpisodes.scss'
-import { ActionTypesEnum } from './Hooks/UseFetchSeasons/ReducerConfig/@Types'
 
 type Props = {
-  episodesData: SeasonsTMDB[]
+  episodesData: SeasonTMDB[]
   showTitle: string
   id: number
   parentComponent: string
@@ -34,58 +33,22 @@ const ShowEpisodes: React.FC<Props> = ({ episodesData, showTitle, id, parentComp
   const episodesFromDatabase = useAppSelector((state) => selectShowEpisodes(state, id))
   const releasedEpisodes: SingleEpisodeFromFireDatabase[] = releasedEpisodesToOneArray({ data: episodesFromDatabase })
 
-  const seasons = episodesData.filter((item) => item.name !== 'Specials')
+  const seasons = useMemo(() => episodesData.filter((item) => item.name !== 'Specials'), [episodesData])
   const firstSeason = seasons[seasons.length - 1]
-
-  const [currentlyOpen, setCurrentlyOpen] = useState<string[]>(seasons.length ? [firstSeason?.id.toString()] : [])
 
   const [detailEpisodeInfo, setDetailEpisodeInfo] = useState<number[]>([])
   const [errorShowEpisodes] = useState('')
 
-  const [openSeason, setOpenSeason] = useState({ seasonId: firstSeason?.id, seasonNum: firstSeason?.season_number })
-
-  // const promiseData = useAxiosPromise({
-  //   fullRerenderDeps: id,
-  //   content: {
-  //     id: openSeason.seasonId,
-  //     seasonNum: openSeason.seasonNum,
-  //     url: tmdbTvSeasonURL({ showId: id, seasonNum: openSeason?.seasonNum }),
-  //   },
-  //   disable: parentComponent === 'toWatchPage',
-  // })
-
   const { state, handleFetch } = useFetchSeasons<ShowEpisodesFromAPIInterface>({
     disable: parentComponent === 'toWatchPage',
     showId: id,
+    preloadSeason: firstSeason,
   })
 
-  useEffect(() => {
-    console.log({ state })
-  }, [state])
-
-  const { data: episodesDataFromAPI, loading: loadingSeasons, openData: currentlyOpenSeasons } = state
+  const { data: episodesDataFromAPI, loadingData: loadingSeasons, openData: currentlyOpenSeasons, errors } = state
 
   const showSeasonsEpisodes = (seasonId: number, seasonNum: number) => {
-    if (parentComponent === 'toWatchPage') {
-      if (currentlyOpen.includes(seasonId.toString())) {
-        setCurrentlyOpen([...currentlyOpen.filter((item) => item !== seasonId.toString())])
-      } else {
-        setCurrentlyOpen([...currentlyOpen, seasonId.toString()])
-      }
-      return
-    }
-
-    console.log('showSeasonsEpisodes')
-
     handleFetch({ seasonNum, seasonId })
-
-    // if (openSeason.seasonId === seasonId) {
-    //   console.log('ActionTypesEnum.HandleOpenData')
-    //   dispatch({ type: ActionTypesEnum.HandleOpenData, payload: { id: seasonId.toString() } })
-    // } else {
-    //   console.log('other')
-    //   setOpenSeason({ seasonId, seasonNum })
-    // }
   }
 
   const showEpisodeInfo = (episodeId: number) => {
@@ -179,7 +142,6 @@ const ShowEpisodes: React.FC<Props> = ({ episodesData, showTitle, id, parentComp
     }, [])
     const notWatchedEpisodes = seasonEpisodes.filter((episode) => !episode.watched)
     const updateData: any = {}
-    console.log({ notWatchedEpisodes })
     if (notWatchedEpisodes.length) {
       notWatchedEpisodes.forEach((episode) => {
         updateData[`${seasonNum - 1}/episodes/${episode.index}/watched`] = true
@@ -256,6 +218,8 @@ const ShowEpisodes: React.FC<Props> = ({ episodesData, showTitle, id, parentComp
   // const curOpen = parentComponent === 'toWatchPage' ? currentlyOpen : currentlyOpenSeasons
   const curOpen = currentlyOpenSeasons
 
+  console.log({ errors })
+
   return (
     <>
       {showCheckboxes && parentComponent === 'detailesPage' && _get(releasedEpisodes, 'length', 0) ? (
@@ -294,24 +258,21 @@ const ShowEpisodes: React.FC<Props> = ({ episodesData, showTitle, id, parentComp
               <div
                 className={classNames('episodes__episode-group-info', {
                   'episodes__episode-group-info--open': currentlyOpenSeasons.includes(season.id),
+                  'episodes__episode-group-info--error': isArrayIncludes(season.id, errors),
+                  'episodes__episode-group-info--not-aired': daysToNewSeason > 0,
                 })}
-                style={
-                  daysToNewSeason > 0
-                    ? {
-                        backgroundColor: 'rgba(132, 90, 90, 0.3)',
-                      }
-                    : {
-                        backgroundColor: '#1d1d1d96',
-                      }
-                }
                 onClick={() => showSeasonsEpisodes(season.id, season.season_number)}
               >
                 <div className="episodes__episode-group-name">Season {season.season_number}</div>
-                {daysToNewSeason > 0 && (
-                  <div className="episodes__episode-group-days-to-air">{daysToNewSeason} days to air</div>
+                {isArrayIncludes(season.id, errors) ? (
+                  <div className="episodes__episode-group-days-to-air">Weird error occured wow</div>
+                ) : (
+                  daysToNewSeason > 0 && (
+                    <div className="episodes__episode-group-days-to-air">{daysToNewSeason} days to air</div>
+                  )
                 )}
 
-                {parentComponent === 'toWatchPage' && (
+                {/* {parentComponent === 'toWatchPage' && (
                   <div className="episodes__episode-group-episodes-left">
                     {seasonEpisodesNotWatched.length} episodes left
                     <span>
@@ -319,7 +280,7 @@ const ShowEpisodes: React.FC<Props> = ({ episodesData, showTitle, id, parentComp
                       {episodeNumber}
                     </span>
                   </div>
-                )}
+                )} */}
 
                 <div className="episodes__episode-group-date">{season.air_date && season.air_date.slice(0, 4)}</div>
               </div>
@@ -374,13 +335,11 @@ const ShowEpisodes: React.FC<Props> = ({ episodesData, showTitle, id, parentComp
                       />
                     </>
                   )
-                ) : !errorShowEpisodes ? (
-                  <Loader className="loader--small-pink" />
                 ) : (
-                  <div>{errorShowEpisodes}</div>
+                  <Loader className="loader--small-pink" />
                 ))}
 
-              {parentComponent === 'toWatchPage' &&
+              {/* {parentComponent === 'toWatchPage' &&
                 curOpen.includes(season.id) &&
                 (!loadingSeasons.includes(season.id) ? (
                   <>
@@ -415,7 +374,7 @@ const ShowEpisodes: React.FC<Props> = ({ episodesData, showTitle, id, parentComp
                 ) : (
                   // <div>{errorShowEpisodes}</div>
                   <></>
-                ))}
+                ))} */}
             </div>
           )
         })}

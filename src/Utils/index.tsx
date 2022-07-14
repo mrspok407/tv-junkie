@@ -139,3 +139,5 @@ export const artificialAsyncDelay = (timeout: number) =>
   new Promise((res) => {
     setTimeout(() => res(''), timeout)
   })
+
+export const isArrayIncludes = (id: string | number, data: Array<unknown>) => data.includes(id)

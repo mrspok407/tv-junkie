@@ -56,6 +56,7 @@ export const DetailesPage: React.FC<Props> = ({
 
         {mediaType === 'show' && (
           <ShowEpisodes
+            key={detailes.id}
             parentComponent="detailesPage"
             episodesData={detailes.seasons}
             showTitle={detailes.name}

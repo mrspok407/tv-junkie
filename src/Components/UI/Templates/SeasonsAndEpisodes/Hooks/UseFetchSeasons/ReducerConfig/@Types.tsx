@@ -14,7 +14,7 @@ export type ACTIONTYPES =
 export interface FetchSeasonsInt<DataType> {
   data: DataType[]
   fetchedData: number[]
-  loading: number[]
+  loadingData: number[]
   openData: number[]
   errors: number[]
 }
@@ -22,7 +22,7 @@ export interface FetchSeasonsInt<DataType> {
 export const FETCH_SEASONS_INITIAL_STATE = {
   data: [],
   fetchedData: [],
-  loading: [],
+  loadingData: [],
   openData: [],
   errors: [],
 }

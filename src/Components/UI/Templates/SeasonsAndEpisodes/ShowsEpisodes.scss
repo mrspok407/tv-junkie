@@ -1,6 +1,7 @@
 @import "../../../../styles/globals";
 
 $seasonInfoBgClr: #1d1d1d96;
+$seasonInfoBgClrError: rgba(132, 90, 90, 0.3);
 $seasonInfoBgClrHover: #252525;
 
 $colors: (
@@ -99,6 +100,14 @@ $font-sizes: (
         &:before {
           opacity: 1;
         }
+      }
+
+      &--error {
+        background-color: $seasonInfoBgClrError;
+      }
+
+      &--not-aired {
+        background-color: $seasonInfoBgClrError;
       }
 
       &:after {

@@ -4,7 +4,7 @@ interface GenericIdentityFn<ReturnType, ArgumentType> {
   (arg: ArgumentType): ReturnType
 }
 
-function useMemoized<ReturnType, ArgumentType>({ deps, callback }: { deps: any[]; callback: any }) {
+function useMemoized<ReturnType, ArgumentType>({ callback }: { callback: any }) {
   const memoized = () => {
     const cache = new Map()
     return (...args: any): ReturnType => {
@@ -22,7 +22,7 @@ function useMemoized<ReturnType, ArgumentType>({ deps, callback }: { deps: any[]
     }
   }
 
-  const memoizedCallback: GenericIdentityFn<ReturnType, ArgumentType> = useCallback(memoized(), deps)
+  const memoizedCallback: GenericIdentityFn<ReturnType, ArgumentType> = useCallback(memoized(), [])
   return memoizedCallback
 }
 

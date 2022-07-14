@@ -18,7 +18,7 @@ export interface SingleEpisodeTMDB {
   season_number?: number
 }
 
-export interface SeasonsTMDB {
+export interface SeasonTMDB {
   air_date?: string
   episode_count?: number
   id: number
@@ -64,7 +64,7 @@ export interface MainDataTMDB {
   profile_path: string | null
   release_date: string
   runtime: number | null
-  seasons: SeasonsTMDB[]
+  seasons: SeasonTMDB[]
   similar?: { results: Record<string, unknown>[] }[]
   similar_movies?: { results: Record<string, unknown>[] }[]
   status: string

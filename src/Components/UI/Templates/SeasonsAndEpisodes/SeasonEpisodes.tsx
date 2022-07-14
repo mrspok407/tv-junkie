@@ -1,6 +1,6 @@
 /* eslint-disable array-callback-return */
 import React, { useEffect, useRef, useState } from 'react'
-import { differenceBtwDatesInDays, todayDate } from 'Utils'
+import { differenceBtwDatesInDays, isArrayIncludes, todayDate } from 'Utils'
 import { Link } from 'react-router-dom'
 import classNames from 'classnames'
 import * as _get from 'lodash.get'
@@ -66,6 +66,8 @@ const SeasonEpisodes: React.FC<Props> = ({
   const registerWarningRef = useRef<HTMLDivElement>(null)
   const episodeFadeOutTimeout = useRef<number | null>()
   const [timedOut, setTimedOut] = useState(false)
+
+  const [openEpisodes, setOpenEpisodes] = useState<number[]>([])
 
   useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside as EventListener)
@@ -156,14 +158,22 @@ const SeasonEpisodes: React.FC<Props> = ({
               ref={episodeRef}
               key={episode.id}
               className={classNames('episodes__episode', {
-                'episodes__episode--open': detailEpisodeInfo.includes(episode.id as number),
+                // 'episodes__episode--open': detailEpisodeInfo.includes(episode.id),
+                'episodes__episode--open': openEpisodes.includes(episode.id),
                 'fade-out-episode':
                   parentComponent === 'toWatchPage' && fadeOutEpisodes.find((item: any) => item.id === episode.id),
               })}
             >
               <div
                 className="episodes__episode-wrapper"
-                onClick={() => parentComponent === 'detailesPage' && showEpisodeInfo(episode.id as number)}
+                // onClick={() => parentComponent === 'detailesPage' && showEpisodeInfo(episode.id as number)}
+                onClick={() =>
+                  setOpenEpisodes(
+                    isArrayIncludes(episode.id, openEpisodes)
+                      ? openEpisodes.filter((item) => item !== episode.id)
+                      : [...openEpisodes, episode.id],
+                  )
+                }
                 style={
                   daysToNewEpisode > 0 || !episode.air_date
                     ? {
@@ -252,7 +262,8 @@ const SeasonEpisodes: React.FC<Props> = ({
                 </div>
               )}
 
-              {detailEpisodeInfo.includes(episode.id as number) && (
+              {/* {detailEpisodeInfo.includes(episode.id) && ( */}
+              {openEpisodes.includes(episode.id) && (
                 <div
                   className={classNames('episodes__episode-detailes', {
                     'episodes__episode-detailes--no-image': !episode.still_path,

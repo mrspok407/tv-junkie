@@ -1,25 +1,17 @@
 import { useState, useEffect, useCallback } from 'react'
 import axios from 'axios'
-import useMemoized from './UseMemoized'
 import { tmdbTvSeasonURL } from 'Utils/APIUrls'
+import useMemoized from './UseMemoized'
 
 const { CancelToken } = require('axios')
 
 let cancelRequest: any
 
 type Props = {
-  // content: {
-  //   url: string | undefined
-  //   id: number | string
-  //   seasonNum: number
-  // }
   showId: number
-  fullRerenderDeps: number | string
 }
 
-const useAxiosPromise = ({ showId, fullRerenderDeps }: Props) => {
-  // const [promiseData, setPromiseData] = useState<{ promise: Promise<any>; id: number | string; seasonNum: number }>()
-
+const useAxiosPromise = ({ showId }: Props) => {
   const axiosGet = (url: string) =>
     axios.get(url, {
       cancelToken: new CancelToken((c: any) => {
@@ -27,7 +19,7 @@ const useAxiosPromise = ({ showId, fullRerenderDeps }: Props) => {
       }),
     })
 
-  const memoizedCallback = useMemoized<Promise<any>, string>({ deps: [fullRerenderDeps], callback: axiosGet })
+  const memoizedCallback = useMemoized<Promise<any>, string>({ callback: axiosGet })
 
   const getPromise = useCallback(
     (seasonNum: number) => {
@@ -38,22 +30,11 @@ const useAxiosPromise = ({ showId, fullRerenderDeps }: Props) => {
     [showId, memoizedCallback],
   )
 
-  // useEffect(() => {
-  //   if (content.url === undefined) return
-  //   const promise = memoizedCallback(content.url)
-  //   setPromiseData({
-  //     promise,
-  //     id: content.id,
-  //     seasonNum: content.seasonNum,
-  //   })
-  // }, [content.id, memoizedCallback]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    return () => {
       if (cancelRequest !== undefined) cancelRequest()
-    },
-    [fullRerenderDeps],
-  )
+    }
+  }, [])
 
   return getPromise
 }
