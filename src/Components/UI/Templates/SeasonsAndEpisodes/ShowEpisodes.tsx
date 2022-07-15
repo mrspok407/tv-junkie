@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable react/jsx-no-undef */
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { differenceBtwDatesInDays, isArrayIncludes, releasedEpisodesToOneArray, todayDate } from 'Utils'
 import * as _get from 'lodash.get'
 import Loader from 'Components/UI/Placeholders/Loader'
@@ -18,23 +18,32 @@ import SeasonEpisodes from './SeasonEpisodes'
 import isAllEpisodesWatched from './FirebaseHelpers/isAllEpisodesWatched'
 import { ShowEpisodesFromAPIInterface } from './@Types'
 import './ShowsEpisodes.scss'
+import { Link, useLocation } from 'react-router-dom'
 
 type Props = {
   episodesData: SeasonTMDB[]
   showTitle: string
   id: number
   parentComponent: string
+  episodesRef: any
 }
 
-const ShowEpisodes: React.FC<Props> = ({ episodesData, showTitle, id, parentComponent }) => {
+const ShowEpisodes: React.FC<Props> = ({ episodesData, showTitle, id, parentComponent, episodesRef }) => {
   const { firebase, authUser } = useFrequentVariables()
+
+  const { search } = useLocation()
+  const query = useMemo(() => new URLSearchParams(search), [search])
+
+  // const episodesRef = useRef<HTMLDivElement | null>(null)
+
+  console.log({ query: query.get('season') })
 
   const showInfo = useAppSelector((state) => selectShow(state, id))
   const episodesFromDatabase = useAppSelector((state) => selectShowEpisodes(state, id))
   const releasedEpisodes: SingleEpisodeFromFireDatabase[] = releasedEpisodesToOneArray({ data: episodesFromDatabase })
 
   const seasons = useMemo(() => episodesData.filter((item) => item.name !== 'Specials'), [episodesData])
-  const firstSeason = seasons[seasons.length - 1]
+  const firstSeason = seasons[seasons.length - Math.min(query.get('season') ?? 1, seasons.length)]
 
   const [detailEpisodeInfo, setDetailEpisodeInfo] = useState<number[]>([])
   const [errorShowEpisodes] = useState('')
@@ -231,7 +240,7 @@ const ShowEpisodes: React.FC<Props> = ({ episodesData, showTitle, id, parentComp
       ) : (
         ''
       )}
-      <div className="episodes">
+      <div ref={episodesRef} className="episodes">
         {episodesData.map((season) => {
           if (season.season_number === 0 || season.name === 'Specials' || season.episode_count === 0 || !season.id) {
             return null
@@ -255,7 +264,9 @@ const ShowEpisodes: React.FC<Props> = ({ episodesData, showTitle, id, parentComp
               })}
               style={!loadingSeasons.includes(season.id) ? { rowGap: '10px' } : { rowGap: '0px' }}
             >
-              <div
+              <Link
+                to={`/show/${id}/?season=${season.season_number}`}
+                id={`season-${season.season_number}`}
                 className={classNames('episodes__episode-group-info', {
                   'episodes__episode-group-info--open': currentlyOpenSeasons.includes(season.id),
                   'episodes__episode-group-info--error': isArrayIncludes(season.id, errors),
@@ -283,7 +294,7 @@ const ShowEpisodes: React.FC<Props> = ({ episodesData, showTitle, id, parentComp
                 )} */}
 
                 <div className="episodes__episode-group-date">{season.air_date && season.air_date.slice(0, 4)}</div>
-              </div>
+              </Link>
 
               {parentComponent === 'detailesPage' &&
                 (!loadingSeasons.includes(season.id) ? (
