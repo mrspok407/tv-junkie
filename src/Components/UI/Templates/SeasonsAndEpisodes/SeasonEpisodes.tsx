@@ -19,12 +19,10 @@ type Props = {
   episodesData: EpisodesDataInterface[]
   episodesDataFromAPI: ShowEpisodesFromAPIInterface[]
   showTitle: string
-  detailEpisodeInfo: number[]
   season: EpisodesDataInterface
   seasonId: number
   episodesFromDatabase: EpisodesFromFireDatabase[]
   showInfo: MainDataTMDB
-  showEpisodeInfo: (episodeId: number) => void
   toggleWatchedEpisode: (
     seasonNum: number,
     episodeNum: number,
@@ -47,12 +45,10 @@ const SeasonEpisodes: React.FC<Props> = ({
   episodesData,
   episodesDataFromAPI,
   showTitle,
-  detailEpisodeInfo,
   season,
   seasonId,
   episodesFromDatabase,
   showInfo,
-  showEpisodeInfo,
   toggleWatchedEpisode,
   checkMultipleEpisodes,
 }) => {

@@ -4,7 +4,7 @@ import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import { getAuthUidFromState } from 'Components/UserAuth/Session/Authentication/Helpers'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import { UserShowStatuses } from '../@Types'
-import { handleNewShowInDatabase, updateUserShowStatus } from '../DatabaseHandlers/PostData/postShowsData'
+import { handleNewShowInDatabase, updateUserShowStatus } from '../DatabaseHandlers/PostData/postShowData'
 import { selectShow } from '../userShowsSliceRed'
 
 type Props = {

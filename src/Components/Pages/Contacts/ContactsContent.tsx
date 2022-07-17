@@ -15,7 +15,7 @@ import ChatWindowPlaceHolder from './Components/ChatWindow/Placeholders/ChatWind
 import './Components/ContactList/ContactList.scss'
 
 const ContactsContent: React.FC = () => {
-  const { firebase, authUser, contactsContext, contactsState } = useFrequentVariables()
+  const { firebase, authUser, contactsState } = useFrequentVariables()
   const { activeChat, contacts, messages, confirmModal, groupCreation } = contactsState
   const contactListWrapperRef = useRef<HTMLDivElement>(null!)
   const contactsRef = useRef<{ [key: string]: ContactInfoInterface }>()
@@ -56,7 +56,7 @@ const ContactsContent: React.FC = () => {
     <div className="chat-container">
       <div
         className={classNames('contact-list-wrapper', {
-          'contact-list-wrapper--hide-mobile': contactsContext?.state.activeChat.chatKey,
+          'contact-list-wrapper--hide-mobile': activeChat.chatKey,
           'contact-list-wrapper--group-creation-active': groupCreation.isActive,
         })}
         ref={contactListWrapperRef}

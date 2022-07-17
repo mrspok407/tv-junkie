@@ -46,10 +46,10 @@ export interface UserShowsStoreState {
   data: {
     ids: number[]
     info: {
-      [key: string]: ShowFullDataStoreState
+      [key: string]: ShowFullDataStoreState | undefined
     }
     episodes: {
-      [key: string]: EpisodesStoreState[]
+      [key: string]: EpisodesStoreState[] | undefined
     }
     timeStamps: {
       [key: string]: number
@@ -58,4 +58,22 @@ export interface UserShowsStoreState {
   initialLoading: boolean
   loadingNewShow: UserShowStatuses | false
   error: ErrorInterface | null
+}
+
+export const USER_SHOWS_INITIAL_STATE: UserShowsStoreState = {
+  data: {
+    ids: [],
+    info: {},
+    episodes: {},
+    timeStamps: {},
+  },
+  initialLoading: true,
+  loadingNewShow: false,
+  error: null,
+}
+
+export const USER_SHOWS_RESET_STATE = {
+  ...USER_SHOWS_INITIAL_STATE,
+  initialLoading: false,
+  loadingNewShow: false as const,
 }

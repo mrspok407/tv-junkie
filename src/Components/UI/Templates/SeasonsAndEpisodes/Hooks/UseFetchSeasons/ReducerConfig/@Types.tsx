@@ -3,6 +3,7 @@ export enum ActionTypesEnum {
   HandleSuccess = 'handleSuccess',
   HandleOpenData = 'handleOpenData',
   HandleFailure = 'handleFailure',
+  HandleCloseAll = 'handleCloseAll',
 }
 
 export type ACTIONTYPES =
@@ -10,6 +11,7 @@ export type ACTIONTYPES =
   | { type: ActionTypesEnum.HandleSuccess; payload: { seasonId: number; data: any } }
   | { type: ActionTypesEnum.HandleOpenData; payload: { seasonId: number } }
   | { type: ActionTypesEnum.HandleFailure; payload: { seasonId: number } }
+  | { type: ActionTypesEnum.HandleCloseAll }
 
 export interface FetchSeasonsInt<DataType> {
   data: DataType[]

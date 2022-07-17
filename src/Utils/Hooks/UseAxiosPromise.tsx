@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useEffect, useCallback } from 'react'
 import axios from 'axios'
 import { tmdbTvSeasonURL } from 'Utils/APIUrls'
 import useMemoized from './UseMemoized'

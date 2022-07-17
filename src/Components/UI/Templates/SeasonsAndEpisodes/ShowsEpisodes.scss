@@ -33,12 +33,20 @@ $font-sizes: (
     grid-column: inherit;
   }
 
-  &__check-all-episodes {
+  &__check-all-episodes, &__close-all-open {
     grid-column: 1 / 2;
     margin-bottom: -30px;
 
     @include mediaMaxW(#{$mobileViewPort}) {
       margin-bottom: 0;
+    }
+  }
+
+  &__close-all-open {
+    grid-column-start: 2;
+
+    &--left {
+      grid-column: 1 / 2;
     }
   }
 

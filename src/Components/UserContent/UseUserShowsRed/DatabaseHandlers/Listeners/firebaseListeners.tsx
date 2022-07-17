@@ -32,7 +32,7 @@ export const userShowsListeners =
     // const showsEpisodesRef = firebase.showsEpisodesUserDatabase(authUserUid)
 
     const showsIds = selectShowsIds(getState())
-    const lastTimestamp = showsIds.length ? selectShow(getState(), showsIds[showsIds.length - 1])?.timeStamp : 0
+    const lastTimestamp = selectShow(getState(), showsIds[showsIds.length - 1])?.timeStamp ?? 0
     console.log({ lastTimestamp })
     showsInfoRef
       .orderByChild('timeStamp')

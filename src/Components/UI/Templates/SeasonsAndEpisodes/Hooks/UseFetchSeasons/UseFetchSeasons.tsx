@@ -7,7 +7,6 @@ import { ActionTypesEnum, FETCH_SEASONS_INITIAL_STATE } from './ReducerConfig/@T
 import reducer from './ReducerConfig'
 
 type Props = {
-  disable: boolean
   showId: number
   preloadSeason: SeasonTMDB
 }
@@ -43,12 +42,14 @@ function useFetchSeasons<DataType>({ showId, preloadSeason }: Props) {
   )
 
   useEffect(() => {
-    const { id } = preloadSeason
-    if (isArrayIncludes(id, loadingData) || isArrayIncludes(id, fetchedData) || isArrayIncludes(id, errors)) return
-    handleFetch({ seasonNum: preloadSeason.season_number, seasonId: preloadSeason.id })
+    const { id: seasonId } = preloadSeason
+    if (isArrayIncludes(seasonId, fetchedData) || isArrayIncludes(seasonId, errors)) return
+    if (isArrayIncludes(seasonId, loadingData)) return
+
+    handleFetch({ seasonNum: preloadSeason.season_number, seasonId })
   }, [handleFetch, preloadSeason, loadingData, fetchedData, errors])
 
-  return { state, handleFetch }
+  return { state, handleFetch, dispatch }
 }
 
 export default useFetchSeasons

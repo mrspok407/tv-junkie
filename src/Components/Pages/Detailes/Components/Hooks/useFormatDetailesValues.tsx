@@ -18,9 +18,10 @@ const useFormatDetailesValues = ({ detailes, isMediaTypeTV }: Props) => {
   const genres: string = useMemo(() => formatGenres(detailes.genres), [detailes.genres])
   const title: string = isMediaTypeTV ? detailes.name : detailes.title
 
-  const yearRelease: string = isMediaTypeTV ? detailes.first_air_date.slice(0, 4) : detailes.release_date.slice(0, 4)
-  const yearEnded: string = isMediaTypeTV ? detailes.last_air_date.slice(0, 4) : ''
-
+  const yearRelease: string = isMediaTypeTV
+    ? detailes.first_air_date?.slice(0, 4) ?? ''
+    : detailes.release_date?.slice(0, 4)
+  const yearEnded: string = isMediaTypeTV ? detailes.last_air_date?.slice(0, 4) ?? '' : ''
   const yearRange: string = ['Ended', 'Canceled'].includes(detailes.status)
     ? `${yearRelease} - ${yearEnded}`
     : `${yearRelease} - ...`

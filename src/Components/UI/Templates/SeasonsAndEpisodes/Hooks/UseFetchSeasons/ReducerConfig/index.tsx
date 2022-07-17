@@ -43,6 +43,11 @@ const reducer = <T,>(): React.Reducer<FetchSeasonsInt<T>, ACTIONTYPES> =>
         break
       }
 
+      case ActionTypesEnum.HandleCloseAll: {
+        draft.openData = []
+        break
+      }
+
       case ActionTypesEnum.HandleFailure: {
         const { seasonId } = action.payload
         draft.loadingData = loadingData.filter((item) => item !== seasonId)

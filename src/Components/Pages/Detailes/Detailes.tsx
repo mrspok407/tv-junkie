@@ -1,6 +1,4 @@
-/* eslint-disable max-len */
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import React, { useMemo } from 'react'
 import { Helmet } from 'react-helmet'
 import Header from 'Components/UI/Header/Header'
 import Slider from 'Components/UI/Slider/Slider'
@@ -28,32 +26,12 @@ export const DetailesPage: React.FC<Props> = ({
   },
 }) => {
   const [detailes, loadingTMDB, similarContent, error] = useGetDataTMDB({ id, mediaType })
+  const seasonsTMDB = useMemo(() => detailes.seasons.filter((item) => item.name !== 'Specials'), [detailes.seasons])
 
   const showsInitialLoading = useAppSelector(selectShowsLoading)
   const { loadingFireEpisodes } = useFetchShowEpisodes({ mediaType, id })
 
-  // const episodesRef = useRef<HTMLDivElement>(null)
-
   useGoogleRedirect()
-
-  const [episodesRef, setEpisodesRef] = useState<any>(null)
-  const episodesRefCallback = useCallback((node: any) => {
-    console.log({ node })
-    if (node !== null) {
-      setEpisodesRef(node)
-    }
-  }, [])
-
-  useLayoutEffect(() => {
-    // if (!currentlyOpenSeasons.length) return
-    console.log({ episodesRef })
-    const refTop = episodesRef?.getBoundingClientRect().top
-    console.log(refTop)
-    setTimeout(() => {
-      console.log('setTimeout')
-      episodesRef?.scrollIntoView({ block: 'start' })
-    }, 2500)
-  }, [episodesRef])
 
   const renderDetailes = () => {
     if (error) {
@@ -75,16 +53,7 @@ export const DetailesPage: React.FC<Props> = ({
 
         <div className="detailes-page__description">{detailes.overview}</div>
 
-        {mediaType === 'show' && (
-          <ShowEpisodes
-            key={detailes.id}
-            parentComponent="detailesPage"
-            episodesData={detailes.seasons}
-            showTitle={detailes.name}
-            id={Number(id)}
-            episodesRef={episodesRefCallback}
-          />
-        )}
+        {mediaType === 'show' && <ShowEpisodes key={detailes.id} seasonsTMDB={seasonsTMDB} showId={Number(id)} />}
         {similarContent.length && (
           <div className="detailes-page__slider">
             <div className="detailes-page__slider-title">
@@ -116,11 +85,10 @@ export const DetailesPage: React.FC<Props> = ({
         )}
       </Helmet>
       <Header isLogoVisible={false} />
-
       <div className="detailes-page-container">{renderDetailes()}</div>
       <Footer />
       <ScrollToTopBar />
-      {/* <ScrollToTopOnUpdate /> */}
+      <ScrollToTopOnUpdate />
     </>
   )
 }
