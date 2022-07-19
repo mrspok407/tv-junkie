@@ -6,14 +6,16 @@ import { SeasonTMDB } from 'Utils/@TypesTMDB'
 import { useAppSelector } from 'app/hooks'
 import { selectShow } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
 import Loader from 'Components/UI/Placeholders/Loader'
+import differenceInCalendarDays from 'date-fns/differenceInCalendarDays'
 import { FetchSeasonsInt } from '../Hooks/UseFetchSeasons/ReducerConfig/@Types'
-import { ShowEpisodesFromAPIInterface } from '../@Types'
+import { ShowEpisodesFromAPIInt } from '../@Types'
+import SeasonEpisodes from './SeasonEpisodes/SeasonEpisodes'
 
 type Props = {
   showId: number
   showCheckboxes: boolean
   seasonsTMDB: SeasonTMDB[]
-  gridState: FetchSeasonsInt<ShowEpisodesFromAPIInterface>
+  gridState: FetchSeasonsInt<ShowEpisodesFromAPIInt>
   handleOpenSeasonEpisodes: (seasonId: number, seasonNum: number) => void
 }
 
@@ -27,6 +29,14 @@ const SeasonsGrid: React.FC<Props> = ({ showId, seasonsTMDB, gridState, showChec
   }
 
   const renderEpisodes = (season: SeasonTMDB, daysToNewSeason: number) => {
+    const seasonEpisodes = data.find((item) => item.seasonId === season.id)
+
+    const seasonData = {
+      ...season,
+      episodes: seasonEpisodes?.episodes || [],
+      showTitle: seasonEpisodes?.showTitle || '',
+    }
+
     if (isArrayIncludes(season.id, loadingData)) {
       return <Loader className="loader--small-pink" />
     }
@@ -34,13 +44,13 @@ const SeasonsGrid: React.FC<Props> = ({ showId, seasonsTMDB, gridState, showChec
     if (isArrayIncludes(season.id, openData)) {
       return (
         <>
-          {season.poster_path && (
+          {seasonData.poster_path && (
             <div className="episodes__episode-group-poster-wrapper">
               {daysToNewSeason <= 0 && (
                 <UserRating
                   id={showId}
                   firebaseRef="userShowSeason"
-                  seasonNum={season.season_number}
+                  seasonNum={seasonData.season_number}
                   disableRating={!!(showInfoStore?.database === 'notWatchingShows')}
                 />
               )}
@@ -48,7 +58,7 @@ const SeasonsGrid: React.FC<Props> = ({ showId, seasonsTMDB, gridState, showChec
               <div
                 className="episodes__episode-group-poster"
                 style={{
-                  backgroundImage: `url(https://image.tmdb.org/t/p/w500/${season.poster_path})`,
+                  backgroundImage: `url(https://image.tmdb.org/t/p/w500/${seasonData.poster_path})`,
                 }}
               />
               {showCheckboxes && daysToNewSeason <= 0 && (
@@ -64,17 +74,7 @@ const SeasonsGrid: React.FC<Props> = ({ showId, seasonsTMDB, gridState, showChec
               )}
             </div>
           )}
-          {/* <SeasonEpisodes
-          episodesData={seasonsTMDB}
-          episodesDataFromAPI={data}
-          showTitle={showTitle}
-          season={season}
-          seasonId={season.id}
-          episodesFromDatabase={episodesFromDatabase}
-          showInfo={showInfoStore}
-          toggleWatchedEpisode={toggleWatchedEpisode}
-          checkMultipleEpisodes={checkMultipleEpisodes}
-        /> */}
+          <SeasonEpisodes seasonData={seasonData} showCheckboxes={showCheckboxes} showId={showId} />
         </>
       )
     }
@@ -85,7 +85,7 @@ const SeasonsGrid: React.FC<Props> = ({ showId, seasonsTMDB, gridState, showChec
       {seasonsTMDB.map((season) => {
         if (renderEdgeCase(season)) return null
 
-        const daysToNewSeason = differenceBtwDatesInDays(season.air_date, todayDate)
+        const daysToNewSeason = differenceInCalendarDays(new Date(season.air_date!), todayDate)
         return (
           <div
             key={season.id}

@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import * as ROUTES from 'Utils/Constants/routes'
 import { SingleEpisodeFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
-import { HandleFadeOutInterface } from '../Templates/SeasonsAndEpisodes/SeasonEpisodes'
+import { HandleFadeOutInterface } from '../Templates/SeasonsAndEpisodes/Components/SeasonEpisodes/SeasonEpisodes'
 import './UserRating.scss'
 
 const STAR_AMOUNT = 5

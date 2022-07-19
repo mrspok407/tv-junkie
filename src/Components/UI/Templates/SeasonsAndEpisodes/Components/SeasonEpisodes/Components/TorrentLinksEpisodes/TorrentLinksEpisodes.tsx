@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import React from 'react'
 import classNames from 'classnames'
 import './TorrentLinksEpisodes.scss'
@@ -9,7 +10,7 @@ type Props = {
   episodeNumber: number
 }
 
-const TorrentLinksEpisodes = React.memo<Props>(({ parentComponent = '', showTitle, seasonNumber, episodeNumber }) => {
+const TorrentLinksEpisodes = React.memo<Props>(({ parentComponent, showTitle, seasonNumber, episodeNumber }) => {
   const urlShowTitle = showTitle.split(' ').join('+')
 
   const seasonToString = seasonNumber.toString()

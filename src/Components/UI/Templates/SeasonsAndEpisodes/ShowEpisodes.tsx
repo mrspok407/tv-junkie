@@ -9,7 +9,7 @@ import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import { SeasonTMDB } from 'Utils/@TypesTMDB'
 import useFetchSeasons from './Hooks/UseFetchSeasons/UseFetchSeasons'
 import isAllEpisodesWatched from './FirebaseHelpers/isAllEpisodesWatched'
-import { ShowEpisodesFromAPIInterface } from './@Types'
+import { ShowEpisodesFromAPIInt } from './@Types'
 import SeasonsGrid from './Components/SeasonsGrid'
 import { ActionTypesEnum } from './Hooks/UseFetchSeasons/ReducerConfig/@Types'
 import './ShowsEpisodes.scss'
@@ -30,7 +30,7 @@ const ShowEpisodes: React.FC<Props> = ({ seasonsTMDB, showId }) => {
 
   const initialOpenedSeason = seasonsTMDB[seasonsTMDB.length - INITIAL_OPEN_SEASON]
 
-  const { state, handleFetch, dispatch } = useFetchSeasons<ShowEpisodesFromAPIInterface>({
+  const { state, handleFetch, dispatch } = useFetchSeasons<ShowEpisodesFromAPIInt>({
     showId,
     preloadSeason: initialOpenedSeason,
   })
@@ -197,8 +197,10 @@ const ShowEpisodes: React.FC<Props> = ({ seasonsTMDB, showId }) => {
     firebase.userShowAllEpisodes(authUser.uid, showId).set(episodesFromDatabase)
   }
 
-  const showCheckboxes = showInfoStore?.database !== 'notWatchingShows'
-  const showCheckAllEpisodes = showCheckboxes && !!releasedEpisodes.length && authUser?.uid
+  const showCheckboxes = !!(showInfoStore?.database !== 'notWatchingShows' && authUser?.uid)
+  const showCheckAllEpisodes = !!(showCheckboxes && !!releasedEpisodes.length)
+
+  console.log({ showCheckboxes, showCheckAllEpisodes })
   return (
     <>
       {showCheckAllEpisodes && (

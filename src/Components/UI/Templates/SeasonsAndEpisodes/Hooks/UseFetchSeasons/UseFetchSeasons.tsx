@@ -30,7 +30,7 @@ function useFetchSeasons<DataType>({ showId, preloadSeason }: Props) {
 
         dispatch({
           type: ActionTypesEnum.HandleSuccess,
-          payload: { seasonId, data: { seasonId, episodes } },
+          payload: { seasonId, data: { showTitle: data.name, seasonId, episodes } },
         })
       } catch (error) {
         if (axios.isCancel(error)) return

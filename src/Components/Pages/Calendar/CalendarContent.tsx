@@ -4,7 +4,7 @@ import { differenceBtwDatesInDays, todayDate } from 'Utils'
 import classNames from 'classnames'
 import Loader from 'Components/UI/Placeholders/Loader'
 import PlaceholderNoFutureEpisodes from 'Components/UI/Placeholders/PlaceholderNoFutureEpisodes'
-import TorrentLinksEpisodes from 'Components/UI/Templates/SeasonsAndEpisodes/Components/TorrentLinksEpisodes'
+import TorrentLinksEpisodes from 'Components/UI/Templates/SeasonsAndEpisodes/Components/SeasonEpisodes/Components/TorrentLinksEpisodes/TorrentLinksEpisodes'
 import { useAppSelector } from 'app/hooks'
 import {
   selectEpisodes,
