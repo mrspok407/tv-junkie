@@ -77,12 +77,17 @@ export const userShowsSliceRed = createSlice({
       state.data.episodes[action.payload.id] = action.payload.episodes
       state.data.info[action.payload.id]!.episodesFetched = true
     },
-    changeShowEpisodes: (state, action: PayloadAction<{ id: number; data: EpisodesFromUserDatabase }>) => {
-      const stateInfo = state.data.info[action.payload.id]
+    changeShowEpisodes: (
+      state,
+      action: PayloadAction<{ id: number; episodes: EpisodesFromUserDatabase['episodes'] }>,
+    ) => {
+      // const stateInfo = state.data.info[action.payload.id]
       const stateEpisodes = state.data.episodes[action.payload.id]
-      const { episodes, info } = action.payload.data
+      const { episodes } = action.payload
 
-      if (stateInfo?.database !== info.database) return
+      // console.log({ stateInfoDat: stateInfo?.database, payloadDatabase: info.database })
+
+      // if (stateInfo?.database !== info.database) return
       if (!stateEpisodes?.length) return
 
       console.log('changeShowEpisodes')

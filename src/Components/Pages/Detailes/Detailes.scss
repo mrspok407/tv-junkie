@@ -137,6 +137,10 @@ $font-sizes: (
     &-value {
       color: map-get($colors, infoValue);
       font-size: map-get($font-sizes, infoValue);
+
+      &--rating {
+        max-width: 200px;
+      }
     }
     &-no-info {
       color: map-get($colors, infoOption);

@@ -29,7 +29,7 @@ export const updateUserShowStatus =
   ({ id, database: userShowStatus, firebase }: HandleDatabaseChange): AppThunk =>
   async (dispatch, getState) => {
     const authUid = getAuthUidFromState(getState())
-    const showFromStore = selectShow(getState(), id)
+    const showFromStore = selectShow(getState(), id)!
 
     dispatch(optimisticChangeUserShowStatus({ id, userShowStatus }))
 

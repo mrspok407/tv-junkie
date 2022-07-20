@@ -2,7 +2,7 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import ShowEpisodes from 'Components/UI/Templates/SeasonsAndEpisodes/ShowEpisodes'
-import { todayDate, combineMergeObjects, releasedEpisodesToOneArray } from 'Utils'
+import { currentDate, combineMergeObjects, releasedEpisodesToOneArray } from 'Utils'
 import Loader from 'Components/UI/Placeholders/Loader'
 import PlaceholderNoToWatchEpisodes from 'Components/UI/Placeholders/PlaceholderNoToWatchEpisodes'
 import merge from 'deepmerge'
@@ -59,7 +59,7 @@ const ToWatchEpisodesContent: React.FC = () => {
           {watchingShows.map((show) => {
             const toWatchEpisodes = show.episodes.reduce((acc: EpisodesFromFireDatabase[], season) => {
               const seasonEpisodes = season.episodes.reduce((acc: SingleEpisodeFromFireDatabase[], episode, index) => {
-                if (episode.air_date && new Date(episode.air_date).getTime() < todayDate.getTime()) {
+                if (episode.air_date && new Date(episode.air_date).getTime() < currentDate.getTime()) {
                   acc.push({ ...episode, index })
                 }
                 return acc

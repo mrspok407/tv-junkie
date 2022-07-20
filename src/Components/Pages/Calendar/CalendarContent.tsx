@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { differenceBtwDatesInDays, todayDate } from 'Utils'
+import { differenceBtwDatesInDays, currentDate } from 'Utils'
 import classNames from 'classnames'
 import Loader from 'Components/UI/Placeholders/Loader'
 import PlaceholderNoFutureEpisodes from 'Components/UI/Placeholders/PlaceholderNoFutureEpisodes'
@@ -109,7 +109,7 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
                   onClick={() => showMonthEpisodes({ month: month.month })}
                 >
                   <div className="episodes__episode-group-name">
-                    {todayDate.getFullYear() !== date.getFullYear() ? (
+                    {currentDate.getFullYear() !== date.getFullYear() ? (
                       <>
                         {monthLongName}
                         <span>{date.getFullYear()}</span>
@@ -156,7 +156,7 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
                           episodeToString.length === 1 ? 'e0'.concat(episodeToString) : 'e'.concat(episodeToString)
                         // Format Seasons And Episode Numbers End //
 
-                        const daysToNewEpisode = differenceBtwDatesInDays(episode.air_date, todayDate)
+                        const daysToNewEpisode = differenceBtwDatesInDays(episode.air_date, currentDate)
                         const willAirToday = daysToNewEpisode === 0
 
                         const handleDaysToNewEpisode = () => {

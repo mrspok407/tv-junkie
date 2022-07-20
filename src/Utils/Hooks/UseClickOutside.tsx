@@ -2,7 +2,7 @@ import { useEffect, useCallback } from 'react'
 import * as _isFunction from 'lodash.isfunction'
 
 type Props = {
-  ref: { current: HTMLElement }
+  ref: { current: HTMLElement | null }
   callback: () => void
 }
 
@@ -18,6 +18,7 @@ const useClickOutside = ({ ref, callback }: Props) => {
   )
 
   useEffect(() => {
+    console.log('mousedown')
     document.addEventListener('mousedown', handleClickOutside as EventListener)
     return () => {
       document.removeEventListener('mousedown', handleClickOutside as EventListener)

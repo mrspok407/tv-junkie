@@ -55,7 +55,7 @@ export const updateUserShowStatusScheme = ({
   return {
     [`allShowsList/${id}/usersWatching`]: firebase.ServerValueIncrement(updateUsersWatching()),
     [`users/${authUid}/content/shows/${id}/database`]: userShowStatus,
-    [`users/${authUid}/content/episodes/${id}/info/database`]: userShowStatus,
-    [`users/${authUid}/content/episodes/${id}/info/isAllWatched_database`]: `${showFromStore.allEpisodesWatched}_${userShowStatus}`,
+    // [`users/${authUid}/content/episodes/${id}/info/database`]: userShowStatus,
+    // [`users/${authUid}/content/episodes/${id}/info/isAllWatched_database`]: `${showFromStore.allEpisodesWatched}_${userShowStatus}`,
   }
 }

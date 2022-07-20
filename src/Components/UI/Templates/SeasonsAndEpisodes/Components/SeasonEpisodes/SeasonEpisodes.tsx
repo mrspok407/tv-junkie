@@ -1,6 +1,6 @@
 /* eslint-disable array-callback-return */
 import React, { useEffect, useRef, useState } from 'react'
-import { differenceBtwDatesInDays, isArrayIncludes, todayDate } from 'Utils'
+import { differenceBtwDatesInDays, isArrayIncludes, currentDate } from 'Utils'
 import { Link } from 'react-router-dom'
 import classNames from 'classnames'
 import * as _get from 'lodash.get'
@@ -83,13 +83,13 @@ const SeasonEpisodes: React.FC<Props> = ({ seasonData, showCheckboxes, showId })
         const episodeNumberForFirebase = array.length - 1 - episodeIndex
         return (
           <Episode
+            key={episode.id}
             episodeData={episode}
             episodeNumberForFirebase={episodeNumberForFirebase}
             seasonNumber={seasonData.season_number}
-            showTitle={seasonData.showTitle}
             showCheckboxes={showCheckboxes}
             showId={showId}
-            key={episode.id}
+            showTitle={seasonData.showTitle}
           />
         )
       })}

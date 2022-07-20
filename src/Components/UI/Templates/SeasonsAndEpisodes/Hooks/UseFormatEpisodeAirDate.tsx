@@ -1,28 +1,22 @@
 import { SingleEpisodeFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
+import { differenceInCalendarDays } from 'date-fns'
+import format from 'date-fns/format'
+import { currentDate } from 'Utils'
 
 type Props = {
   episodeData: SingleEpisodeFromFireDatabase
 }
 
 const useFormatEpisodeAirDate = ({ episodeData }: Props) => {
-  const airDateISO = new Date(episodeData.air_date ?? '').toISOString()
-
-  const options: any = {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-  }
-
-  const formatedDate = new Date(airDateISO as string)
-
-  const episodeAirDate = episodeData.air_date
-    ? new Intl.DateTimeFormat('en-US', options).format(formatedDate as Date)
+  const airDateReadable = episodeData.air_date
+    ? format(new Date(episodeData.air_date), 'MMMM d, yyyy')
     : 'No date available'
-  // Format Date End //
 
-  const episodeAirDateAsDateObj = new Date(episodeData.air_date)
+  const daysToNewEpisode = differenceInCalendarDays(new Date(episodeData.air_date), currentDate)
+  const isEpisodeAired = daysToNewEpisode <= 0
+  const airDateUnavailable = !episodeData?.air_date
 
-  return [episodeAirDate, episodeAirDateAsDateObj] as const
+  return [airDateReadable, daysToNewEpisode, isEpisodeAired, airDateUnavailable] as const
 }
 
 export default useFormatEpisodeAirDate

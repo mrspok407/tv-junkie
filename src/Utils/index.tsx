@@ -9,7 +9,7 @@ import * as _isEqual from 'lodash.isequal'
 import * as _isObject from 'lodash.isobject'
 import releasedEpisodesToOneArray from './releasedEpisodesToOneArray'
 
-export const todayDate = new Date()
+export const currentDate = new Date()
 
 export const range = (start: any, stop: any, step: any) => {
   return Array.from({ length: (stop - start) / step + 1 }, (_, i) => start + i * step)

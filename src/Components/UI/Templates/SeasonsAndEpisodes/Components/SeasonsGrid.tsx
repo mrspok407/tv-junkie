@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import UserRating from 'Components/UI/UserRating/UserRating'
 import React from 'react'
-import { differenceBtwDatesInDays, isArrayIncludes, todayDate } from 'Utils'
+import { differenceBtwDatesInDays, isArrayIncludes, currentDate } from 'Utils'
 import { SeasonTMDB } from 'Utils/@TypesTMDB'
 import { useAppSelector } from 'app/hooks'
 import { selectShow } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
@@ -10,6 +10,7 @@ import differenceInCalendarDays from 'date-fns/differenceInCalendarDays'
 import { FetchSeasonsInt } from '../Hooks/UseFetchSeasons/ReducerConfig/@Types'
 import { ShowEpisodesFromAPIInt } from '../@Types'
 import SeasonEpisodes from './SeasonEpisodes/SeasonEpisodes'
+import UserRatingSeason from './SeasonEpisodes/Components/UserRatingSeason'
 
 type Props = {
   showId: number
@@ -20,16 +21,16 @@ type Props = {
 }
 
 const SeasonsGrid: React.FC<Props> = ({ showId, seasonsTMDB, gridState, showCheckboxes, handleOpenSeasonEpisodes }) => {
-  const showInfoStore = useAppSelector((state) => selectShow(state, showId))
   const { data, loadingData, openData, errors } = gridState
 
   console.log({ seasonsTMDB })
-  const renderEdgeCase = (season: SeasonTMDB) => {
+  const renderEdgeCases = (season: SeasonTMDB) => {
     return season.season_number === 0 || season.name === 'Specials' || season.episode_count === 0 || !season.id
   }
 
   const renderEpisodes = (season: SeasonTMDB, daysToNewSeason: number) => {
     const seasonEpisodes = data.find((item) => item.seasonId === season.id)
+    const isSeasonAired = daysToNewSeason <= 0
 
     const seasonData = {
       ...season,
@@ -46,13 +47,8 @@ const SeasonsGrid: React.FC<Props> = ({ showId, seasonsTMDB, gridState, showChec
         <>
           {seasonData.poster_path && (
             <div className="episodes__episode-group-poster-wrapper">
-              {daysToNewSeason <= 0 && (
-                <UserRating
-                  id={showId}
-                  firebaseRef="userShowSeason"
-                  seasonNum={seasonData.season_number}
-                  disableRating={!!(showInfoStore?.database === 'notWatchingShows')}
-                />
+              {isSeasonAired && (
+                <UserRatingSeason showRating={showCheckboxes} seasonNum={seasonData.season_number} showId={showId} />
               )}
 
               <div
@@ -61,7 +57,7 @@ const SeasonsGrid: React.FC<Props> = ({ showId, seasonsTMDB, gridState, showChec
                   backgroundImage: `url(https://image.tmdb.org/t/p/w500/${seasonData.poster_path})`,
                 }}
               />
-              {showCheckboxes && daysToNewSeason <= 0 && (
+              {showCheckboxes && isSeasonAired && (
                 <div className="episodes__episode-group-check-all-episodes">
                   <button
                     type="button"
@@ -83,9 +79,10 @@ const SeasonsGrid: React.FC<Props> = ({ showId, seasonsTMDB, gridState, showChec
   return (
     <div className="episodes">
       {seasonsTMDB.map((season) => {
-        if (renderEdgeCase(season)) return null
+        if (renderEdgeCases(season)) return null
 
-        const daysToNewSeason = differenceInCalendarDays(new Date(season.air_date!), todayDate)
+        const daysToNewSeason = differenceInCalendarDays(new Date(season.air_date!), currentDate)
+        const isSeasonAired = daysToNewSeason <= 0
         return (
           <div
             key={season.id}
@@ -98,7 +95,7 @@ const SeasonsGrid: React.FC<Props> = ({ showId, seasonsTMDB, gridState, showChec
               className={classNames('episodes__episode-group-info', {
                 'episodes__episode-group-info--open': isArrayIncludes(season.id, openData),
                 'episodes__episode-group-info--error': isArrayIncludes(season.id, errors),
-                'episodes__episode-group-info--not-aired': daysToNewSeason > 0,
+                'episodes__episode-group-info--not-aired': !isSeasonAired,
               })}
               onClick={() => handleOpenSeasonEpisodes(season.id, season.season_number)}
             >
@@ -107,11 +104,13 @@ const SeasonsGrid: React.FC<Props> = ({ showId, seasonsTMDB, gridState, showChec
               {isArrayIncludes(season.id, errors) ? (
                 <div className="episodes__episode-group-days-to-air">Weird error occured wow</div>
               ) : (
-                daysToNewSeason > 0 && (
-                  <div className="episodes__episode-group-days-to-air">{daysToNewSeason} days to air</div>
+                !isSeasonAired && (
+                  <div className="episodes__episode-group-days-to-air">
+                    {daysToNewSeason === 1 ? `${daysToNewSeason} day to air` : `${daysToNewSeason} days to air`}
+                  </div>
                 )
               )}
-              <div className="episodes__episode-group-date">{season.air_date && season.air_date.slice(0, 4)}</div>
+              <div className="episodes__episode-group-date">{season.air_date?.slice(0, 4)}</div>
             </div>
 
             {renderEpisodes(season, daysToNewSeason)}

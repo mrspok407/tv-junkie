@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
 import React, { useCallback, useEffect, useState } from 'react'
 import axios from 'axios'
-import { todayDate } from 'Utils'
+import { currentDate } from 'Utils'
 import Loader from 'Components/UI/Placeholders/Loader'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import { useAppSelector } from 'app/hooks'
@@ -98,7 +98,7 @@ const PosterWrapper = React.memo<Props>(({ detailes, mediaType }) => {
       )}
 
       {mediaType === 'movie' &&
-      new Date(detailes.release_date).getTime() < todayDate.getTime() &&
+      new Date(detailes.release_date).getTime() < currentDate.getTime() &&
       movieAvailable &&
       authUser?.email === process.env.REACT_APP_ADMIN_EMAIL ? (
         <div className="detailes-page__movie-links">

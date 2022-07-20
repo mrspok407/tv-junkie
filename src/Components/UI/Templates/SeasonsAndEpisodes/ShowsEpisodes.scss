@@ -45,6 +45,10 @@ $font-sizes: (
   &__close-all-open {
     grid-column-start: 2;
 
+    @include mediaMaxW(#{$mobileViewPort}) {
+      grid-column-start: 1;
+    }
+
     &--left {
       grid-column: 1 / 2;
     }
@@ -247,13 +251,18 @@ $font-sizes: (
     &-wrapper {
       position: relative;
       display: grid;
-      grid-column: 1 / 4;
+      grid-column: 1/4;
       column-gap: 8px;
-      grid-template-columns: minmax(110px, 1.55fr) 3fr 0.8fr;
+      grid-template-columns: 20px 1.20fr 3fr;
       grid-template-rows: minmax(34px, max-content);
-      padding: 3px 0 3px 0;
-      background-color: $seasonInfoBgClr;
+      padding: 3px 0 3px 5px;
+      background-color: rgba(29, 29, 29, 0.5882352941);
       cursor: pointer;
+
+      &--not-aired {
+        grid-template-columns:  minmax(200px, max-content) auto auto;
+        padding-left: 12px;
+      }
 
       &:before {
         content: "";
@@ -274,12 +283,12 @@ $font-sizes: (
     }
 
     &-date {
-      padding-left: 33px;
       align-self: center;
     }
 
     &-name {
       align-self: center;
+      padding-right: 30px;
     }
 
     &-number {
@@ -296,9 +305,8 @@ $font-sizes: (
     }
 
     &-checkbox {
-      position: absolute;
-      top: 10px;
-      left: 5px;
+      position: relative;
+      align-self: center;
       height: 20px;
       width: 20px;
 

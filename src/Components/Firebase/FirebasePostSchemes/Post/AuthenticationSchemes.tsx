@@ -52,6 +52,6 @@ export const postUserDataOnRegisterScheme = ({
     ...userData,
     [`users/${authUid}/content/episodes`]: episodesData,
     [`users/${authUid}/content/shows`]: showsInfo,
-    [`users/${authUid}/content/showsLastUpdatedList`]: showsLastUpdated,
+    [`users/${authUid}/content/showsLastUpdateList`]: showsLastUpdated,
   }
 }

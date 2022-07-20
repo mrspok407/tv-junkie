@@ -62,12 +62,12 @@ export const userShowsListeners =
       },
     )
 
-    showsEpisodesRef.once(
+    showsEpisodesRef.on(
       'child_changed',
       (snapshot: SnapshotVal<EpisodesFromUserDatabase>) => {
         console.log('child_change episodes listener')
         console.log(snapshot.val())
-        dispatch(changeShowEpisodes({ id: Number(snapshot.key), data: snapshot.val()! }))
+        dispatch(changeShowEpisodes({ id: Number(snapshot.key), episodes: snapshot.val()!.episodes }))
       },
       (err) => {
         console.log({ errEpisodesListener: err })

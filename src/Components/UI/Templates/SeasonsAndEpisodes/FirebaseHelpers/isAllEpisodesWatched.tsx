@@ -1,7 +1,7 @@
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import { EpisodesFromFireDatabase, SingleEpisodeFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
 import { AuthUserInterface } from 'Components/UserAuth/Session/Authentication/@Types'
-import { differenceBtwDatesInDays, todayDate } from 'Utils'
+import { differenceBtwDatesInDays, currentDate } from 'Utils'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
 
 interface Arguments {
@@ -47,7 +47,7 @@ const isAllEpisodesWatched = ({
         .filter((episode, index, array) => array.indexOf(episode) === index).length === 1
 
   const isAllEpisodesAired = allEpisodes.some((episode) => {
-    const daysToNewEpisode = differenceBtwDatesInDays(episode.air_date, todayDate)
+    const daysToNewEpisode = differenceBtwDatesInDays(episode.air_date, currentDate)
     return daysToNewEpisode > 0
   })
     ? allEpisodesWatched

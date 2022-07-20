@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { releasedEpisodesToOneArray } from 'Utils'
 import * as _get from 'lodash.get'
 import classNames from 'classnames'
@@ -24,7 +24,6 @@ const INITIAL_OPEN_SEASON = 1
 const ShowEpisodes: React.FC<Props> = ({ seasonsTMDB, showId }) => {
   const { firebase, authUser } = useFrequentVariables()
 
-  const showInfoStore = useAppSelector((state) => selectShow(state, showId))
   const episodesFromDatabase = useAppSelector((state) => selectShowEpisodes(state, showId))
   const releasedEpisodes = releasedEpisodesToOneArray({ data: episodesFromDatabase })
 
@@ -35,9 +34,12 @@ const ShowEpisodes: React.FC<Props> = ({ seasonsTMDB, showId }) => {
     preloadSeason: initialOpenedSeason,
   })
 
-  const handleOpenSeasonEpisodes = (seasonId: number, seasonNum: number) => {
-    handleFetch({ seasonNum, seasonId })
-  }
+  const handleOpenSeasonEpisodes = useCallback(
+    (seasonId: number, seasonNum: number) => {
+      handleFetch({ seasonNum, seasonId })
+    },
+    [handleFetch],
+  )
 
   const handleAllOpenSeasons = () => {
     dispatch({ type: ActionTypesEnum.HandleCloseAll })
@@ -197,10 +199,11 @@ const ShowEpisodes: React.FC<Props> = ({ seasonsTMDB, showId }) => {
     firebase.userShowAllEpisodes(authUser.uid, showId).set(episodesFromDatabase)
   }
 
-  const showCheckboxes = !!(showInfoStore?.database !== 'notWatchingShows' && authUser?.uid)
+  const showCheckboxes = useAppSelector((state) => {
+    const showInfo = selectShow(state, showId)
+    return !!(showInfo && showInfo?.database !== 'notWatchingShows' && authUser?.uid)
+  })
   const showCheckAllEpisodes = !!(showCheckboxes && !!releasedEpisodes.length)
-
-  console.log({ showCheckboxes, showCheckAllEpisodes })
   return (
     <>
       {showCheckAllEpisodes && (

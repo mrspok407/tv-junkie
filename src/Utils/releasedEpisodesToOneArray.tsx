@@ -1,6 +1,6 @@
 /* eslint-disable array-callback-return */
 import { EpisodesFromFireDatabase, SingleEpisodeFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
-import { differenceBtwDatesInDays, todayDate } from 'Utils'
+import { differenceBtwDatesInDays, currentDate } from 'Utils'
 
 export const releasedEpisodes = ({ data }: { data: EpisodesFromFireDatabase[] | undefined }) => {
   if (Array.isArray(data)) {
@@ -16,7 +16,7 @@ export const releasedEpisodes = ({ data }: { data: EpisodesFromFireDatabase[] | 
         return acc
       }, [] as SingleEpisodeFromFireDatabase[])
       .filter((episode) => {
-        const daysToNewEpisode = differenceBtwDatesInDays(episode.air_date, todayDate)
+        const daysToNewEpisode = differenceBtwDatesInDays(episode.air_date, currentDate)
         return daysToNewEpisode <= 0 && episode
       })
   }

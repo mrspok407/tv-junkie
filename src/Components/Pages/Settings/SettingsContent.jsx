@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import axios from 'axios'
 import SignOutButton from 'Components/UserAuth/SignOut/SignOutButton'
-import { todayDate } from 'Utils'
+import { currentDate } from 'Utils'
 import PasswordUpdate from 'Components/UserAuth/PasswordUpdate/PasswordUpdate'
 import classNames from 'classnames'
 import { LoremIpsum } from 'lorem-ipsum'
@@ -124,8 +124,8 @@ const SettingsContent = () => {
     //   // })
     // })
 
-    const todayConverted = `${todayDate.getDate()}-${todayDate.getMonth() + 1}-${todayDate.getFullYear()}`
-    const threeDaysBefore = new Date(todayDate.getTime() - 259200000)
+    const todayConverted = `${currentDate.getDate()}-${currentDate.getMonth() + 1}-${currentDate.getFullYear()}`
+    const threeDaysBefore = new Date(currentDate.getTime() - 259200000)
 
     // const threeDaysBeforeConverted = `${threeDaysBefore.getDate()}-${
     //   threeDaysBefore.getMonth() + 1
