@@ -1,5 +1,4 @@
 import { SingleEpisodeFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
-import { SeasonTMDB } from 'Utils/@TypesTMDB'
 
 export interface CurrentlyOpenSeasons {
   seasonId: number

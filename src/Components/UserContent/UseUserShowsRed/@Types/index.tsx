@@ -3,11 +3,12 @@ import { SeasonFromUserDatabase, SingleEpisodeFromUserDatabase } from 'Component
 import { EpisodesTMDB, MainDataTMDB, SingleEpisodeTMDB } from 'Utils/@TypesTMDB'
 
 export type UserShowStatuses = 'watchingShows' | 'droppedShows' | 'willWatchShows' | 'notWatchingShows' | ''
+export type UserShowStatusReadable = 'Watching' | 'Drop' | 'Will watch' | 'Not watching'
 export const showStatusMapper = {
-  watchingShows: 'Watching',
-  droppedShows: 'Drop',
-  willWatchShows: 'Will watch',
-  notWatchingShows: 'Not watching',
+  watchingShows: 'Watching' as const,
+  droppedShows: 'Drop' as const,
+  willWatchShows: 'Will watch' as const,
+  notWatchingShows: 'Not watching' as const,
 }
 
 export interface ShowFullDataStoreState extends MainDataTMDB {
@@ -20,10 +21,6 @@ export interface ShowFullDataStoreState extends MainDataTMDB {
   lastUpdatedInDatabase: number
   timeStamp: number
   userRating: string | undefined
-}
-
-export interface UserMoviesInterface extends MainDataTMDB {
-  timeStamp?: number
 }
 
 export interface SingleEpisodeByMonthInterface {
@@ -46,7 +43,7 @@ export interface UserShowsStoreState {
   data: {
     ids: number[]
     info: {
-      [key: string]: ShowFullDataStoreState | undefined
+      [key: string]: ShowFullDataStoreState
     }
     episodes: {
       [key: string]: EpisodesStoreState[] | undefined

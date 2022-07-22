@@ -33,7 +33,7 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
 
   const userShows = useAppSelectorArray<ShowFullDataStoreState>(selectShows)
   const userEpisodes = useAppSelector(selectEpisodes)
-  const watchingShows = userShows.filter((show) => show.database === 'watchingShows')
+  const watchingShows = userShows.filter((show) => show?.database === 'watchingShows')
   // const watchingShowsEpisodes = watchingShows.reduce((acc, show) => {
   //   acc.push({...show, episodes: userEpisodes[show.id]})
   //   return acc
@@ -47,29 +47,6 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
     const months = willAirEpisodes.map((item) => Object.values(item)[0])
     setOpenMonths(homePage ? [months[0]] : months)
   }, [userEpisodes, homePage]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  // const getContent = useCallback(() => {
-  //   if (context.userContent.userShows.length === 0) {
-  //     setLoading(false)
-  //     return
-  //   }
-
-  //   const willAirEpisodes = homePage
-  //     ? context.userContent.userWillAirEpisodes.slice(0, 2)
-  //     : context.userContent.userWillAirEpisodes
-
-  //   const months = willAirEpisodes.map((item: Object) => {
-  //     return Object.values(item)[0]
-  //   })
-
-  //   setWillAirEpisodes(willAirEpisodes)
-  //   setOpenMonths(homePage ? [months[0]] : months)
-  //   setLoading(false)
-  // }, [context.userContent, homePage])
-
-  // useEffect(() => {
-  //   getContent()
-  // }, [getContent])
 
   const showMonthEpisodes = ({ month }: { month: string }) => {
     if (openMonths.includes(month)) {

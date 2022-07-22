@@ -1,19 +1,19 @@
 import React from 'react'
-import UserRating from 'Components/UI/UserRating/UserRating'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import { formatMovieBudget } from 'Utils/FormatTMDBAPIData'
 import { CONTENT_INFO_NO_DATA } from 'Utils/Constants'
-import ShowsButtonsRed from './ShowsButtonsRed'
+import ShowsButtonsRed from './WatchingStatusButtons/WatchingStatusButtons'
 import useFormatDetailesValues from './Hooks/useFormatDetailesValues'
 import MovieButtons from './MovieButtons'
+import UserRatingShow from './UserRatingShow'
 
 type Props = {
   detailes: MainDataTMDB
   mediaType: string
-  id: number
+  showId: number
 }
 
-export const MainInfo: React.FC<Props> = ({ detailes, mediaType, id }) => {
+export const MainInfo: React.FC<Props> = ({ detailes, mediaType, showId }) => {
   const isMediaTypeTV = mediaType === 'show'
 
   const { companyName, genres, title, yearRelease, yearRange, runtime } = useFormatDetailesValues({
@@ -60,9 +60,7 @@ export const MainInfo: React.FC<Props> = ({ detailes, mediaType, id }) => {
       {isMediaTypeTV && (
         <div className="detailes-page__info-row">
           <div className="detailes-page__info-option">My rating</div>
-          <div className="detailes-page__info-value detailes-page__info-value--rating">
-            <UserRating id={id} firebaseRef="userShow" />
-          </div>
+          <UserRatingShow showId={showId} />
         </div>
       )}
 
@@ -91,8 +89,8 @@ export const MainInfo: React.FC<Props> = ({ detailes, mediaType, id }) => {
       )}
 
       <div className="detailes-page__info-row detailes-page__info--button">
-        {isMediaTypeTV && <ShowsButtonsRed id={id} detailes={detailes} />}
-        {!isMediaTypeTV && <MovieButtons id={id} detailes={detailes} />}
+        {isMediaTypeTV && <ShowsButtonsRed showId={showId} detailes={detailes} />}
+        {!isMediaTypeTV && <MovieButtons id={showId} detailes={detailes} />}
       </div>
     </div>
   )

@@ -18,7 +18,6 @@ const useClickOutside = ({ ref, callback }: Props) => {
   )
 
   useEffect(() => {
-    console.log('mousedown')
     document.addEventListener('mousedown', handleClickOutside as EventListener)
     return () => {
       document.removeEventListener('mousedown', handleClickOutside as EventListener)

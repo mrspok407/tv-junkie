@@ -7,7 +7,7 @@ import ScrollToTop from 'Utils/ScrollToTopBar'
 import Footer from 'Components/UI/Footer/Footer'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import useGoogleRedirect from 'Components/UserAuth/SignIn/UseGoogleRedirect'
-import MoviesContent from './MoviesContent'
+// import MoviesContent from './MoviesContent'
 
 const { CancelToken } = require('axios')
 

@@ -8,7 +8,7 @@ import { handleNewShowInDatabase, updateUserShowStatus } from '../DatabaseHandle
 import { selectShow } from '../userShowsSliceRed'
 
 type Props = {
-  id: number
+  showId: number
   database: UserShowStatuses
   showFullDetailes: MainDataTMDB
   firebase: FirebaseInterface
@@ -16,14 +16,14 @@ type Props = {
 }
 
 export const handleUserShowStatus =
-  ({ id, database, showFullDetailes, firebase, localStorageHandlers }: Props): AppThunk =>
+  ({ showId, database, showFullDetailes, firebase, localStorageHandlers }: Props): AppThunk =>
   async (dispatch, getState) => {
     const authUid = getAuthUidFromState(getState())
-    const showFromStore = selectShow(getState(), id)
+    const showFromStore = selectShow(getState(), showId)
 
     if (!authUid) {
       localStorageHandlers.toggleShow({
-        id: Number(id),
+        id: Number(showId),
         data: showFullDetailes,
         userShowStatus: database,
       })
@@ -31,14 +31,14 @@ export const handleUserShowStatus =
     }
 
     if (!showFromStore) {
-      dispatch(handleNewShowInDatabase({ id, database, showDetailesTMDB: showFullDetailes, firebase }))
+      dispatch(handleNewShowInDatabase({ id: showId, database, showDetailesTMDB: showFullDetailes, firebase }))
       return
     }
 
     if (showFromStore.database === database) return
     dispatch(
       updateUserShowStatus({
-        id,
+        id: showId,
         database,
         firebase,
       }),

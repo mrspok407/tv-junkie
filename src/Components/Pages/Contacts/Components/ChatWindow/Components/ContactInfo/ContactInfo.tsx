@@ -2,8 +2,9 @@
 import classNames from 'classnames'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import useTimestampFormater from 'Components/Pages/Contacts/Hooks/UseTimestampFormater'
-import React, { useRef } from 'react'
+import React, { useContext, useRef } from 'react'
 import { LoremIpsum } from 'lorem-ipsum'
+import { ContactsActivityContext } from 'Components/AppContext/Contexts/ContactsActivityContext'
 import Loader from 'Components/UI/Placeholders/Loader'
 import ContactOptionsPopup from '../../../ContactOptionsPopup/ContactOptionsPopup'
 import './ContactInfo.scss'
@@ -13,7 +14,9 @@ type Props = {
 }
 
 const ContactInfo: React.FC<Props> = ({ isScrollBottomRef }) => {
-  const { firebase, authUser, newContactsActivity, contactsState, contactsDispatch } = useFrequentVariables()
+  const { firebase, authUser, contactsState, contactsDispatch } = useFrequentVariables()
+  const newContactsActivity = useContext(ContactsActivityContext)
+
   const { activeChat, contacts, contactsStatus, optionsPopupChatWindow, chatMembersStatus } = contactsState
   const contactInfo = contacts[activeChat.contactKey] || {}
   const chatMembersStatusData = chatMembersStatus[contactInfo.chatKey] || []

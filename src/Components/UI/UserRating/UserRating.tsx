@@ -1,7 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import classNames from 'classnames'
-import { Link } from 'react-router-dom'
-import * as ROUTES from 'Utils/Constants/routes'
 import { SingleEpisodeFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import { HandleFadeOutInterface } from '../Templates/SeasonsAndEpisodes/Components/SeasonEpisodes/SeasonEpisodes'
@@ -37,21 +35,7 @@ const UserRating: React.FC<Props> = ({
   const { firebase, authUser } = useFrequentVariables()
 
   const [userRating, setUserRating] = useState(userRatingData || 0)
-  const [nonAuthWarning, setNonAuthWarning] = useState(false)
   const userRatingRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside as EventListener)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside as EventListener)
-    }
-  }, [])
-
-  const handleClickOutside = (e: CustomEvent) => {
-    if (!userRatingRef?.current?.contains(e.target as Node)) {
-      setNonAuthWarning(false)
-    }
-  }
 
   const getRating = useCallback(() => {
     if (firebase.auth.currentUser === null || parentComponent === 'toWatchPage' || firebaseRef === '') return
@@ -140,10 +124,6 @@ const UserRating: React.FC<Props> = ({
       className={classNames('user-rating', {
         'user-rating--user-profile': firebaseRef === '',
       })}
-      onClick={() => {
-        if (authUser?.uid) return
-        setNonAuthWarning(!nonAuthWarning)
-      }}
     >
       {[...Array(STAR_AMOUNT).keys()].map((n) => (
         <button
@@ -159,13 +139,6 @@ const UserRating: React.FC<Props> = ({
           onClick={!ratingDisabled ? onClickHandler : undefined}
         />
       ))}
-
-      {nonAuthWarning && (
-        <div className="user-rating__warning">
-          To use full features please <Link to={ROUTES.LOGIN_PAGE}>register</Link>. Your allready selected shows will be
-          saved.
-        </div>
-      )}
     </div>
   )
 }

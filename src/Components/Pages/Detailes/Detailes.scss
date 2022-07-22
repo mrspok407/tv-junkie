@@ -139,6 +139,7 @@ $font-sizes: (
       font-size: map-get($font-sizes, infoValue);
 
       &--rating {
+        position: relative;
         max-width: 200px;
       }
     }
@@ -438,5 +439,12 @@ $font-sizes: (
       font-size: 1.6rem;
       color: map-get($colors, similarContentTitle);
     }
+  }
+}
+
+
+@include mediaMaxW(#{$mobileViewPort}) {
+  .detailes-page .disable-warning:after {
+    left: 50%;
   }
 }

@@ -49,7 +49,7 @@ export const DetailesPage: React.FC<Props> = ({
     return (
       <div className="detailes-page">
         <PosterWrapper detailes={detailes} mediaType={mediaType} />
-        <MainInfo detailes={detailes} mediaType={mediaType} id={Number(id)} />
+        <MainInfo detailes={detailes} mediaType={mediaType} showId={Number(id)} />
 
         <div className="detailes-page__description">{detailes.overview}</div>
 

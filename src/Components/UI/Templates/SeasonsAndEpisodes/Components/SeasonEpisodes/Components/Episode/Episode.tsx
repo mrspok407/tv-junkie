@@ -1,17 +1,14 @@
 import classNames from 'classnames'
 import { SingleEpisodeFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
 import UserRating from 'Components/UI/UserRating/UserRating'
-import React, { useState, useEffect, useRef, useCallback } from 'react'
-import { differenceBtwDatesInDays, isArrayIncludes, currentDate } from 'Utils'
+import React, { useState } from 'react'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import differenceInCalendarDays from 'date-fns/differenceInCalendarDays'
 import useFormatEpisodeAirDate from '../../../../Hooks/UseFormatEpisodeAirDate'
 import TorrentLinksEpisodes from '../TorrentLinksEpisodes/TorrentLinksEpisodes'
 import UserRatingEpisode from './Components/UserRatingEpisode'
-import useClickOutside from 'Utils/Hooks/UseClickOutside'
-import { Link } from 'react-router-dom'
-import * as ROUTES from 'Utils/Constants/routes'
-import useDisableWarning from './Components/UseDisableWarning'
+import useDisableWarning from './Hooks/UseDisableWarning'
+import EpisodeCheckbox from './Components/EpisodeCheckbox/EpisodeCheckbox'
 
 type Props = {
   episodeData: SingleEpisodeFromFireDatabase
@@ -36,8 +33,6 @@ const Episode: React.FC<Props> = ({
   const [airDateReadable, daysToNewEpisode, isEpisodeAired, airDateUnavailable] = useFormatEpisodeAirDate({
     episodeData,
   })
-
-  const [checkboxDisableWarning, showDisableWarning, fadeOutStart, checkboxRef] = useDisableWarning()
 
   // const [checkboxDisableWarning, setCheckboxDisableWarning] = useState(false)
   // const checkboxRef = useRef<HTMLDivElement>(null)
@@ -74,45 +69,7 @@ const Episode: React.FC<Props> = ({
               }
         }
       >
-        {isEpisodeAired && !airDateUnavailable && (
-          <div
-            ref={checkboxRef}
-            className="episodes__episode-checkbox"
-            onClick={showDisableWarning}
-
-            // onClick={() => showDissableCheckboxWarning(episode.id as number)}
-          >
-            <label>
-              <input
-                type="checkbox"
-                // checked={_get(showSeason, `episodes.${indexOfEpisode}.watched`, false)}
-                // checked={*data from store*}
-                onChange={() => {
-                  // toggleWatchedEpisode(season.season_number, indexOfEpisode)
-                }}
-                disabled={!showCheckboxes || !authUser?.uid}
-              />
-              <span
-                className={classNames('custom-checkmark', {
-                  'custom-checkmark--disabled': !showCheckboxes || !authUser?.uid,
-                })}
-              />
-            </label>
-            {checkboxDisableWarning && (
-              <div
-                className={classNames('buttons__col-warning', {
-                  'buttons__col-warning--fade-out': fadeOutStart,
-                })}
-              >
-                To use full features please{' '}
-                <Link className="buttons__col-link" to={ROUTES.LOGIN_PAGE}>
-                  register
-                </Link>
-                . Your allready selected shows will be saved.
-              </div>
-            )}
-          </div>
-        )}
+        {isEpisodeAired && !airDateUnavailable && <EpisodeCheckbox isDisabled={!showCheckboxes || !authUser?.uid} />}
 
         <div className="episodes__episode-date">{airDateReadable}</div>
         <div className="episodes__episode-name">
@@ -126,7 +83,6 @@ const Episode: React.FC<Props> = ({
         )}
       </div>
 
-      {/* {detailEpisodeInfo.includes(episode.id) && ( */}
       {isEpisodeOpen && (
         <div
           className={classNames('episodes__episode-detailes', {
