@@ -11,6 +11,7 @@ import {
   USER_SHOWS_INITIAL_STATE,
   USER_SHOWS_RESET_STATE,
 } from './@Types'
+import { resetErrors, resetSlicesState, setInitialContentLoading } from '../SharedActions'
 
 export const userShowsSliceRed = createSlice({
   name: 'userShows',
@@ -18,7 +19,7 @@ export const userShowsSliceRed = createSlice({
   reducers: {
     setUserShows: {
       reducer(state, action: PayloadAction<UserShowsStoreState['data']>) {
-        console.log({ initialPayload: action.payload })
+        console.log({ initialPayloadShows: action.payload })
         state.data = action.payload
         state.initialLoading = false
       },
@@ -114,6 +115,18 @@ export const userShowsSliceRed = createSlice({
       state.initialLoading = false
       state.loadingNewShow = false
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(setInitialContentLoading, (state, action) => {
+        state.initialLoading = action.payload
+      })
+      .addCase(resetErrors, (state, action) => {
+        state.error = action.payload
+      })
+      .addCase(resetSlicesState, () => {
+        return USER_SHOWS_RESET_STATE
+      })
   },
 })
 

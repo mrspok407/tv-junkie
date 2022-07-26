@@ -89,6 +89,8 @@ const UserRating: React.FC<Props> = ({
     if (!authUser?.uid) return
     const rating = Number((e.target as HTMLButtonElement).dataset.rating)
 
+    console.log(firebaseRef)
+
     if (parentComponent === 'toWatchPage') {
       if (!seasonNum) return
       handleFadeOut({ episodeId, episodeIndex: episodeNum, seasonNum, rating })
@@ -110,6 +112,7 @@ const UserRating: React.FC<Props> = ({
           episodeNum,
         }).update({
           userRating: rating,
+          finished: firebaseRef === 'userMovie' ? true : null,
           watched: parentComponent === 'toWatchPage' ? snapshot.val().watched : episodeRating ? true : null,
         })
       })

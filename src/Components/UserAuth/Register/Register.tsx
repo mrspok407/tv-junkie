@@ -56,7 +56,7 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
   const initializeAuthUserListener = useAuthListenerSubscriber()
   const handleError = useContext(ErrorsHandlerContext)
 
-  const { watchingShows: watchingShowsLS } = useContext(LocalStorageValueContext)
+  const { watchingShows: watchingShowsLS, watchLaterMovies: watchLaterMoviesLS } = useContext(LocalStorageValueContext)
   const [requiredInputs, setRequiredInputs] = useState<RequiredInputsInterface>({
     login: '',
     email: '',
@@ -111,6 +111,7 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
         selectedShows: watchingShowsLS,
         episodes: episodesForUserDatabase,
         episodesInfo: episodesInfoForUserDatabase,
+        watchLaterMovies: watchLaterMoviesLS,
         firebase,
       })
       return firebase.rootRef().update(updateData, handleSuccessSubmit)

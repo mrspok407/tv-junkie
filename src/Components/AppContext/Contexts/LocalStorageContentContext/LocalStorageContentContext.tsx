@@ -37,7 +37,7 @@ const useLocalStorageContext = () => {
       if (movieExists) {
         newWatchLaterMovies = [...prevState.watchLaterMovies.filter((item: { id: number }) => item.id !== id)]
       } else {
-        newWatchLaterMovies = [...prevState.watchLaterMovies, { ...data, userWatching: !!data }]
+        newWatchLaterMovies = [...prevState.watchLaterMovies, { ...data }]
       }
 
       return {

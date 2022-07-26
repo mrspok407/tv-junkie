@@ -64,6 +64,21 @@ export interface ShowInfoFromUserDatabase {
   userRating: string
 }
 
+export interface MovieInfoFromUserDatabase {
+  backdrop_path: string | null
+  finished: boolean | undefined
+  genres: { id: number; name: string }[]
+  id: number
+  key: string
+  overview: string
+  release_date: string
+  timeStamp: number
+  title: string
+  userRating: string
+  vote_average: number
+  vote_count: number
+}
+
 export interface SnapshotVal<Type> {
   val(): Type | null
   key: string

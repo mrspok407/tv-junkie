@@ -1,5 +1,7 @@
 import { useAppDispatch, useAppSelector } from 'app/hooks'
-import { selectShowsError, setShowsError } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
+import { resetErrors } from 'Components/UserContent/SharedActions'
+import { selectMoviesError } from 'Components/UserContent/UseUserMoviesRed/userMoviesSliceRed'
+import { selectShowsError } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
 import React, { createContext, useCallback, useEffect, useRef, useState } from 'react'
 import { ERROR_MODAL_DURATION } from 'Utils/Constants'
 
@@ -36,6 +38,7 @@ export const ErrorsProvider = ({ error, handleError, children }: ErrorsProviderI
 const useErrorsContext = () => {
   const dispatch = useAppDispatch()
   const showsError = useAppSelector(selectShowsError)
+  const moviesError = useAppSelector(selectMoviesError)
 
   const [error, setError] = useState<ErrorInterface | null>(null)
   const modalContainerRef = useRef<HTMLDivElement>(null!)
@@ -56,9 +59,10 @@ const useErrorsContext = () => {
         modalContainerRef.current = modalContainer
         modalContainer?.classList.add('modal-fade-out')
       }, ERROR_MODAL_DURATION - 300)
+
       timeoutRef.current = window.setTimeout(() => {
         setError(null)
-        dispatch(setShowsError(null))
+        dispatch(resetErrors(null))
       }, ERROR_MODAL_DURATION)
     },
     [dispatch],
@@ -66,8 +70,19 @@ const useErrorsContext = () => {
 
   useEffect(() => {
     if (!showsError) return
-    handleError({ errorData: showsError, message: 'Error in the database occured. Please reload the page.' })
+    handleError({
+      errorData: showsError,
+      message: 'Error in the database occured. Please reload the page.',
+    })
   }, [showsError, handleError])
+
+  useEffect(() => {
+    if (!moviesError) return
+    handleError({
+      errorData: moviesError,
+      message: 'Error in the database occured. Please reload the page.',
+    })
+  }, [moviesError, handleError])
 
   return [error, handleError] as const
 }

@@ -5,10 +5,11 @@ import useDisableWarning from 'Components/UI/Templates/SeasonsAndEpisodes/Compon
 import DisableWarning from 'Components/UI/DisabledWarning/DisabledWarning'
 
 type Props = {
-  showId: number
+  contentId: number
+  firebaseRef: string
 }
 
-const UserRatingShow: React.FC<Props> = ({ showId }) => {
+const UserRatingWrapper: React.FC<Props> = ({ contentId, firebaseRef }) => {
   const { authUser } = useFrequentVariables()
   const [showDisableWarning, handleDisableWarning, fadeOutStart, ref] = useDisableWarning()
 
@@ -22,11 +23,11 @@ const UserRatingShow: React.FC<Props> = ({ showId }) => {
           handleDisableWarning(e)
         }}
       >
-        <UserRating id={showId} firebaseRef="userShow" />
+        <UserRating id={contentId} firebaseRef={firebaseRef} />
         {showDisableWarning && <DisableWarning fadeOutStart={fadeOutStart} />}
       </div>
     </>
   )
 }
 
-export default UserRatingShow
+export default UserRatingWrapper

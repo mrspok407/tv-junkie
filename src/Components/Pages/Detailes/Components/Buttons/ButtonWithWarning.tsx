@@ -10,18 +10,13 @@ import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import DisableWarning from 'Components/UI/DisabledWarning/DisabledWarning'
 
 type Props = {
-  showId: number
-  showDatabase: UserShowStatuses
-  detailes: MainDataTMDB
-  newShowStatus: UserShowStatuses
-  buttonTitle: UserShowStatusReadable | JSX.Element
+  children: React.ReactNode
+  onClick?: () => any
+  isPressed: boolean
 }
 
-const ButtonWithWarning: React.FC<Props> = ({ showId, showDatabase, newShowStatus, detailes, buttonTitle }) => {
-  const { firebase, authUser } = useFrequentVariables()
-  const dispatch = useAppDispatch()
-  const localStorageHandlers = useContext(LocalStorageHandlersContext)
-
+const ButtonWithWarning: React.FC<Props> = ({ isPressed, children, onClick }) => {
+  const { authUser } = useFrequentVariables()
   const [showDisableWarning, handleDisableWarning, fadeOutStart, ref] = useDisableWarning()
 
   return (
@@ -29,7 +24,7 @@ const ButtonWithWarning: React.FC<Props> = ({ showId, showDatabase, newShowStatu
       <button
         ref={ref}
         className={classNames('button', {
-          'button--pressed': showDatabase === newShowStatus,
+          'button--pressed': isPressed,
           'button--not-logged-in': !authUser?.uid,
         })}
         type="button"
@@ -39,18 +34,11 @@ const ButtonWithWarning: React.FC<Props> = ({ showId, showDatabase, newShowStatu
             handleDisableWarning(e)
             return
           }
-          dispatch(
-            handleUserShowStatus({
-              showId,
-              database: newShowStatus,
-              showFullDetailes: detailes,
-              firebase,
-              localStorageHandlers,
-            }),
-          )
+          if (!onClick) return
+          onClick()
         }}
       >
-        {buttonTitle}
+        {children}
       </button>
 
       {showDisableWarning && <DisableWarning fadeOutStart={fadeOutStart} />}

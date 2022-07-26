@@ -10,14 +10,14 @@ import {
   LocalStorageHandlersContext,
   LocalStorageValueContext,
 } from 'Components/AppContext/Contexts/LocalStorageContentContext/LocalStorageContentContext'
-import ButtonWithWarning from './ButtonWithWarning'
+import ButtonWithWarning from '../ButtonWithWarning'
 
 type Props = {
   showId: number
   detailes: MainDataTMDB
 }
 
-const ShowsButtons: React.FC<Props> = ({ showId, detailes }) => {
+const WatchingStatusButtons: React.FC<Props> = ({ showId, detailes }) => {
   const { firebase, authUser } = useFrequentVariables()
   const localStorageContent = useContext(LocalStorageValueContext)
   const localStorageHandlers = useContext(LocalStorageHandlersContext)
@@ -79,25 +79,43 @@ const ShowsButtons: React.FC<Props> = ({ showId, detailes }) => {
       <div className="buttons__col-wrapper">
         <div className="buttons__col">
           <ButtonWithWarning
-            showId={showId}
-            showDatabase={showDatabase}
-            newShowStatus="droppedShows"
-            detailes={detailes}
-            buttonTitle={buttonTitle('droppedShows')}
-          />
+            isPressed={showDatabase === 'droppedShows'}
+            onClick={() => {
+              dispatch(
+                handleUserShowStatus({
+                  showId,
+                  database: 'droppedShows',
+                  showFullDetailes: detailes,
+                  firebase,
+                  localStorageHandlers,
+                }),
+              )
+            }}
+          >
+            {buttonTitle('droppedShows')}
+          </ButtonWithWarning>
         </div>
         <div className="buttons__col">
           <ButtonWithWarning
-            showId={showId}
-            showDatabase={showDatabase}
-            newShowStatus="willWatchShows"
-            detailes={detailes}
-            buttonTitle={buttonTitle('willWatchShows')}
-          />
+            isPressed={showDatabase === 'willWatchShows'}
+            onClick={() => {
+              dispatch(
+                handleUserShowStatus({
+                  showId,
+                  database: 'willWatchShows',
+                  showFullDetailes: detailes,
+                  firebase,
+                  localStorageHandlers,
+                }),
+              )
+            }}
+          >
+            {buttonTitle('willWatchShows')}
+          </ButtonWithWarning>
         </div>
       </div>
     </div>
   )
 }
 
-export default ShowsButtons
+export default WatchingStatusButtons

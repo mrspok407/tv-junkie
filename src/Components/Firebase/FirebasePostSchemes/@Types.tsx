@@ -1,7 +1,12 @@
 import { AuthUserFirebaseInterface } from 'Components/UserAuth/Session/Authentication/@Types'
 import { ShowFullDataStoreState, UserShowStatuses } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
-import { EpisodesFromUserDatabase, SeasonFromUserDatabase, ShowInfoFromUserDatabase } from '../@TypesFirebase'
+import {
+  EpisodesFromUserDatabase,
+  MovieInfoFromUserDatabase,
+  SeasonFromUserDatabase,
+  ShowInfoFromUserDatabase,
+} from '../@TypesFirebase'
 import { FirebaseInterface } from '../FirebaseContext'
 
 export interface PostUserShowScheme {
@@ -9,6 +14,12 @@ export interface PostUserShowScheme {
   showDetailesTMDB: MainDataTMDB
   showEpisodes: EpisodesFromUserDatabase['episodes']
   showDatabase: UserShowStatuses
+  firebase: FirebaseInterface
+}
+
+export interface PostUserMovieScheme {
+  authUid: string
+  movieDetailesTMDB: MainDataTMDB
   firebase: FirebaseInterface
 }
 
@@ -32,6 +43,9 @@ export interface DataOnRegisterEpisodesFullData {
 export interface DataOnRegisterShowInfo {
   [key: string]: ShowInfoFromUserDatabase
 }
+export interface DataOnRegisterMovieInfo {
+  [key: string]: MovieInfoFromUserDatabase
+}
 export interface PostUserDataOnRegister {
   authUserFirebase: AuthUserFirebaseInterface
   userName: string
@@ -39,4 +53,5 @@ export interface PostUserDataOnRegister {
   selectedShows: MainDataTMDB[]
   episodes: DataOnRegisterEpisodes
   episodesInfo: DataOnRegisterEpisodesInfo
+  watchLaterMovies: MainDataTMDB[]
 }

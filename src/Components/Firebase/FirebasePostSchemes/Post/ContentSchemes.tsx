@@ -1,6 +1,7 @@
 /* eslint-disable max-len */
 
-import { PostUserShowScheme, UpdateUserShowStatusScheme } from '../@Types'
+import { PostUserMovieScheme, PostUserShowScheme, UpdateUserShowStatusScheme } from '../@Types'
+import { formatMovieForPostFirebase } from './Helpers'
 
 export const postUserShowScheme = ({
   authUid,
@@ -57,5 +58,14 @@ export const updateUserShowStatusScheme = ({
     [`users/${authUid}/content/shows/${id}/database`]: userShowStatus,
     // [`users/${authUid}/content/episodes/${id}/info/database`]: userShowStatus,
     // [`users/${authUid}/content/episodes/${id}/info/isAllWatched_database`]: `${showFromStore.allEpisodesWatched}_${userShowStatus}`,
+  }
+}
+
+export const postUserMovieScheme = ({ authUid, movieDetailesTMDB, firebase }: PostUserMovieScheme) => {
+  return {
+    [`users/${authUid}/content/movies/watchLaterMovies/${movieDetailesTMDB.id}`]: formatMovieForPostFirebase({
+      data: movieDetailesTMDB,
+      firebase,
+    }),
   }
 }

@@ -1,5 +1,6 @@
 import { createSlice, current, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from 'app/store'
+import { resetSlicesState } from 'Components/UserContent/SharedActions'
 import { AuthUserInterface } from './@Types'
 
 export const authUserInitialState: AuthUserInterface = {
@@ -22,6 +23,11 @@ export const authUserSlice = createSlice({
       console.log(current(state))
       return authUserInitialState
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(resetSlicesState, () => {
+      return authUserInitialState
+    })
   },
 })
 

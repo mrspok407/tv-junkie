@@ -17,7 +17,7 @@ const SignInWithGoogleForm = () => {
 
   const handleError = useContext(ErrorsHandlerContext)
 
-  const { watchingShows: watchingShowsLS } = useContext(LocalStorageValueContext)
+  const { watchingShows: watchingShowsLS, watchLaterMovies: watchLaterMoviesLS } = useContext(LocalStorageValueContext)
 
   const [windowSize, setWindowSize] = useState(window.innerWidth)
   const history = useHistory()
@@ -51,6 +51,7 @@ const SignInWithGoogleForm = () => {
         authUserFirebase: authUser,
         userName: authUser.user.displayName,
         selectedShows: watchingShowsLS,
+        watchLaterMovies: watchLaterMoviesLS,
         episodes: episodesForUserDatabase,
         episodesInfo: episodesInfoForUserDatabase,
         firebase,

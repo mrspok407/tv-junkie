@@ -5,9 +5,10 @@ import setupAuthUser from 'Components/UserAuth/Session/Authentication/AuthUserHa
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import { logoutAuthUser } from 'Components/UserAuth/Session/Authentication/AuthUserHandlers/logoutAuthUser'
 import { LocalStorageHandlersContext } from 'Components/AppContext/Contexts/LocalStorageContentContext/LocalStorageContentContext'
-import { updateLoadingShows } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
 import { fetchUserShows } from 'Components/UserContent/UseUserShowsRed/DatabaseHandlers/FetchData/fetchShowsData'
 import { userShowsListeners } from 'Components/UserContent/UseUserShowsRed/DatabaseHandlers/Listeners/firebaseListeners'
+import { setInitialContentLoading } from 'Components/UserContent/SharedActions'
+import { fetchUserMovies } from 'Components/UserContent/UseUserMoviesRed/DatabaseHandlers/FetchData/fetchMoviesData'
 
 const useAuthListenerSubscriber = () => {
   const { firebase } = useFrequentVariables()
@@ -21,9 +22,10 @@ const useAuthListenerSubscriber = () => {
       async (authUser: AuthUserInterface['authUser']) => {
         console.log('User logged in')
         // await updateUserEpisodesFromDatabase({ firebase })
-        dispatch(updateLoadingShows(true))
+        dispatch(setInitialContentLoading(true))
         await dispatch(setupAuthUser({ authUser, firebase, localStorageHandlers }))
         console.log('setupAuthUser END')
+        dispatch(fetchUserMovies(firebase))
         await dispatch(fetchUserShows(firebase))
         dispatch(userShowsListeners({ firebase }))
       },

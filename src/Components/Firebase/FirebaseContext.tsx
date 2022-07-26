@@ -8,6 +8,7 @@ import {
   ShowFullDataFireDatabase,
   ShowInfoFromUserDatabase,
   SnapshotVal,
+  MovieInfoFromUserDatabase,
 } from './@TypesFirebase'
 
 export interface FirebaseFetchMethods<T> {
@@ -52,6 +53,13 @@ export interface FirebaseInterface {
     authUid: string
     key: string | number
   }) => FirebaseReferenceProps<ShowInfoFromUserDatabase | null>
+  userMovie: ({
+    authUid,
+    key,
+  }: {
+    authUid: string
+    key: string | number
+  }) => FirebaseReferenceProps<MovieInfoFromUserDatabase | null>
   userShowId: ({ authUid, key }: { authUid: string; key: string | number }) => FirebaseReferenceProps<number | null>
   userShowAllEpisodesWatched: ({
     authUid,
@@ -60,6 +68,7 @@ export interface FirebaseInterface {
     authUid: string
     key: string | number
   }) => FirebaseReferenceProps<boolean | null>
+  moviesInfoUserDatabase: (authUid: string) => FirebaseReferenceProps<MovieInfoFromUserDatabase[]>
   ServerValueIncrement: (value: number) => any
   timeStamp?: any
   callback?: any
@@ -140,9 +149,11 @@ export const FIREBASE_INITIAL_STATE = {
   showFullDataFireDatabase: () => firebaseRefInitial(SHOW_FULL_DATA_FIRE_DATABASE_INITIAL),
   showInfoFireDatabase: () => firebaseRefInitial(SHOW_FULL_DATA_FIRE_DATABASE_INITIAL.info),
   showsInfoUserDatabase: () => firebaseRefInitial([]),
+  moviesInfoUserDatabase: () => firebaseRefInitial([]),
   showEpisodesUserDatabase: () => firebaseRefInitial([]),
   showsEpisodesUserDatabase: () => firebaseRefInitial([]),
   userShow: () => firebaseRefInitial(null),
+  userMovie: () => firebaseRefInitial(null),
   userShowId: () => firebaseRefInitial(null),
   userShowAllEpisodesWatched: () => firebaseRefInitial(null),
 }

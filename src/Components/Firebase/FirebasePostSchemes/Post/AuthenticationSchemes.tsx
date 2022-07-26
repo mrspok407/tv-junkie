@@ -1,5 +1,13 @@
+import { move } from 'formik'
+import { removeUndefinedNullFromObject } from 'Utils'
 import * as ROLES from 'Utils/Constants/roles'
-import { DataOnRegisterEpisodesFullData, DataOnRegisterShowInfo, PostUserDataOnRegister } from '../@Types'
+import {
+  DataOnRegisterEpisodesFullData,
+  DataOnRegisterMovieInfo,
+  DataOnRegisterShowInfo,
+  PostUserDataOnRegister,
+} from '../@Types'
+import { formatMovieForPostFirebase } from './Helpers'
 
 export const postUserDataOnRegisterScheme = ({
   authUserFirebase,
@@ -7,6 +15,7 @@ export const postUserDataOnRegisterScheme = ({
   selectedShows,
   episodes,
   episodesInfo,
+  watchLaterMovies,
   firebase,
 }: PostUserDataOnRegister) => {
   const authUid = authUserFirebase.user.uid
@@ -16,6 +25,8 @@ export const postUserDataOnRegisterScheme = ({
     [`users/${authUid}/email`]: authUserFirebase.user.email,
     [`users/${authUid}/role`]: ROLES.USER,
   }
+
+  const moviesData: DataOnRegisterMovieInfo = {}
 
   const episodesData: DataOnRegisterEpisodesFullData = {}
   const showsInfo: DataOnRegisterShowInfo = {}
@@ -47,11 +58,16 @@ export const postUserDataOnRegisterScheme = ({
     showsFireDatabaseUsersWatching[`allShowsList/${show.id}/usersWatching`] = firebase.ServerValueIncrement(1)
   })
 
+  watchLaterMovies.forEach((movie) => {
+    moviesData[movie.id] = formatMovieForPostFirebase({ data: movie, firebase })
+  })
+
   return {
     ...showsFireDatabaseUsersWatching,
     ...userData,
-    [`users/${authUid}/content/episodes`]: episodesData,
-    [`users/${authUid}/content/shows`]: showsInfo,
+    [`users/${authUid}/content/episodes`]: removeUndefinedNullFromObject(episodesData),
+    [`users/${authUid}/content/shows`]: removeUndefinedNullFromObject(showsInfo),
+    [`users/${authUid}/content/movies/watchLaterMovies`]: removeUndefinedNullFromObject(moviesData),
     [`users/${authUid}/content/showsLastUpdateList`]: showsLastUpdated,
   }
 }

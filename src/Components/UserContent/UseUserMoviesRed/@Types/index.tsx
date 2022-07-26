@@ -1,17 +1,14 @@
 import { ErrorInterface } from 'Components/AppContext/Contexts/ErrorsContext'
+import { MovieInfoFromUserDatabase } from 'Components/Firebase/@TypesFirebase'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
 
 export type UserMovieStatuses = 'watchLaterMovies' | 'finished'
-
-export interface MovieFullDataStoreState extends MainDataTMDB {
-  [key: string]: any
-}
 
 export interface UserMoviesStoreState {
   data: {
     ids: number[]
     info: {
-      [key: string]: MovieFullDataStoreState
+      [key: string]: MovieInfoFromUserDatabase
     }
     timeStamps: {
       [key: string]: number

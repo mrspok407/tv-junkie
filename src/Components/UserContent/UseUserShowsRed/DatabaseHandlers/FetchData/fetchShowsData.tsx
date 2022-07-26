@@ -20,7 +20,6 @@ export const fetchUserShows =
       console.log({ userShowsSnapshot: userShowsSnapshot.val() })
       const userShows = sortDataSnapshot<ReturnType<typeof userShowsSnapshot.val>>(userShowsSnapshot)!
       const showsFullData = await fetchShowsFullData({ userShows, firebase, authUserUid })
-
       dispatch(setUserShows(showsFullData))
     } catch (err) {
       console.log({ err })
