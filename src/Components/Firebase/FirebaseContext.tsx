@@ -60,6 +60,13 @@ export interface FirebaseInterface {
     authUid: string
     key: string | number
   }) => FirebaseReferenceProps<MovieInfoFromUserDatabase | null>
+  userMovieFinished: ({
+    authUid,
+    key,
+  }: {
+    authUid: string
+    key: string | number
+  }) => FirebaseReferenceProps<boolean | null>
   userShowId: ({ authUid, key }: { authUid: string; key: string | number }) => FirebaseReferenceProps<number | null>
   userShowAllEpisodesWatched: ({
     authUid,
@@ -154,6 +161,7 @@ export const FIREBASE_INITIAL_STATE = {
   showsEpisodesUserDatabase: () => firebaseRefInitial([]),
   userShow: () => firebaseRefInitial(null),
   userMovie: () => firebaseRefInitial(null),
+  userMovieFinished: () => firebaseRefInitial(null),
   userShowId: () => firebaseRefInitial(null),
   userShowAllEpisodesWatched: () => firebaseRefInitial(null),
 }

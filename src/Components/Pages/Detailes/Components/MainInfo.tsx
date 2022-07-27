@@ -83,7 +83,7 @@ export const MainInfo: React.FC<Props> = ({ detailes, mediaType, showId }) => {
 
       <div className="detailes-page__info-row">
         <div className="detailes-page__info-option">My rating</div>
-        <UserRatingWrapper contentId={showId} firebaseRef={isMediaTypeTV ? 'userShow' : 'userMovie'} />
+        <UserRatingWrapper contentId={showId} isMediaTypeTV={isMediaTypeTV} />
       </div>
 
       <div className="detailes-page__info-row detailes-page__info--button">

@@ -32,10 +32,27 @@ export const userMoviesSliceRed = createSlice({
         }
       },
     },
-    addNewMovie: (state, action: PayloadAction<MovieFullDataStoreState>) => {},
-    changeUserMovieStatus: (state, action: PayloadAction<{ id: number; userMovieStatus: UserMovieStatuses }>) => {},
-    updateLoadingMovies: (state, action: PayloadAction<UserMoviesStoreState['initialLoading']>) => {},
-    updateLoadingNewMovie: (state, action: PayloadAction<UserMoviesStoreState['loadingNewMovie']>) => {},
+    addNewMovie: (state, action: PayloadAction<MovieInfoFromUserDatabase>) => {
+      console.log(action.payload)
+
+      if (state.data.ids.includes(action.payload.id)) return
+      state.data.ids.push(action.payload.id)
+      state.data.info[action.payload.id] = action.payload
+      state.data.timeStamps[action.payload.id] = action.payload.timeStamp
+    },
+    removeMovie: (state, action: PayloadAction<number>) => {
+      const { ids } = state.data
+
+      state.data.ids = ids.filter((id) => id !== action.payload)
+      delete state.data.info[action.payload]
+      delete state.data.timeStamps[action.payload]
+    },
+    changeMovie: (state, action: PayloadAction<MovieInfoFromUserDatabase>) => {
+      state.data.info[action.payload.id] = action.payload
+    },
+    updateLoadingMovie: (state, action: PayloadAction<UserMoviesStoreState['loadingMovie']>) => {
+      state.loadingMovie = action.payload
+    },
     resetMovies: () => {
       return USER_MOVIES_RESET_STATE
     },
@@ -43,7 +60,6 @@ export const userMoviesSliceRed = createSlice({
       console.log(action.payload)
       state.error = action.payload
       state.initialLoading = false
-      state.loadingNewMovie = false
     },
   },
   extraReducers: (builder) => {
@@ -60,21 +76,14 @@ export const userMoviesSliceRed = createSlice({
   },
 })
 
-export const {
-  setUserMovies,
-  addNewMovie,
-  updateLoadingMovies,
-  updateLoadingNewMovie,
-  resetMovies,
-  setMoviesError,
-  changeUserMovieStatus,
-} = userMoviesSliceRed.actions
+export const { setUserMovies, addNewMovie, removeMovie, changeMovie, updateLoadingMovie, resetMovies, setMoviesError } =
+  userMoviesSliceRed.actions
 
 export const selectMovies = (state: RootState) => state.userMovies.data.info
 export const selectMoviesIds = (state: RootState) => state.userMovies.data.ids
 export const selectMovie = (state: RootState, id: number) => state.userMovies.data.info[id]
 export const selectMoviesLoading = (state: RootState) => state.userMovies.initialLoading
-export const selectLoadingNewMovie = (state: RootState) => state.userMovies.loadingNewMovie
+export const selectLoadingMovie = (state: RootState) => state.userMovies.loadingMovie
 
 export const selectMoviesError = (state: RootState) => state.userMovies.error
 

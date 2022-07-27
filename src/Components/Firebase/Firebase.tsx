@@ -252,6 +252,9 @@ class Firebase {
 
   userMovie = ({ authUid, key }: ReferenceInterface) =>
     this.db.ref(`users/${authUid}/content/movies/watchLaterMovies/${key}`)
+
+  userMovieFinished = ({ authUid, key }: ReferenceInterface) =>
+    this.db.ref(`users/${authUid}/content/movies/watchLaterMovies/${key}/finished`)
 }
 
 export default Firebase

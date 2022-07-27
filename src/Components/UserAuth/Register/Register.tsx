@@ -312,7 +312,7 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
 
       <button
         className={classNames('button button--auth__form', {
-          'button--disabled': !isFormValid(errors, requiredInputs) || !isEmailValid,
+          'button--auth__form--disabled': !isFormValid(errors, requiredInputs) || !isEmailValid,
         })}
         type="submit"
       >

@@ -15,7 +15,7 @@ export interface UserMoviesStoreState {
     }
   }
   initialLoading: boolean
-  loadingNewMovie: UserMovieStatuses | false
+  loadingMovie: boolean
   error: ErrorInterface | null
 }
 
@@ -26,12 +26,12 @@ export const USER_MOVIES_INITIAL_STATE: UserMoviesStoreState = {
     timeStamps: {},
   },
   initialLoading: true,
-  loadingNewMovie: false,
+  loadingMovie: false,
   error: null,
 }
 
 export const USER_MOVIES_RESET_STATE = {
   ...USER_MOVIES_INITIAL_STATE,
   initialLoading: false,
-  loadingNewMovie: false as const,
+  loadingMovie: false,
 }

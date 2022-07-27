@@ -23,6 +23,11 @@
           },
           "shows": {
             ".indexOn": ["timeStamp"]
+          },
+          "movies": {
+            "watchLaterMovies": {
+              ".indexOn": ["timeStamp"]
+            }
           }
         },
         "contactsDatabase": {

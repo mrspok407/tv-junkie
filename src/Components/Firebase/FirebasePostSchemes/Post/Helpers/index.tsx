@@ -1,3 +1,4 @@
+import { MovieInfoFromUserDatabase } from 'Components/Firebase/@TypesFirebase'
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import { removeUndefinedNullFromObject } from 'Utils'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
@@ -6,7 +7,10 @@ interface FormatMovieForPostFirebaseInt {
   data: MainDataTMDB
   firebase: FirebaseInterface
 }
-export const formatMovieForPostFirebase = ({ data, firebase }: FormatMovieForPostFirebaseInt) => {
+export const formatMovieForPostFirebase = ({
+  data,
+  firebase,
+}: FormatMovieForPostFirebaseInt): MovieInfoFromUserDatabase => {
   return removeUndefinedNullFromObject({
     backdrop_path: data.backdrop_path,
     genres: data.genres,

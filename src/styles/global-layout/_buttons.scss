@@ -62,12 +62,12 @@
   &:hover {
     background-color: #e89340;
   }
-}
 
-.button--disabled {
-  background-color: rgba(205, 133, 63, 0.7);
-  &:hover {
+  &--disabled {
     background-color: rgba(205, 133, 63, 0.7);
+    &:hover {
+      background-color: rgba(205, 133, 63, 0.7);
+    }
   }
 }
 
@@ -110,7 +110,7 @@
   }
 }
 
-.button--not-logged-in {
+.button--disable {
   background-color: #5f442a;
   color: #ffffff7a;
 

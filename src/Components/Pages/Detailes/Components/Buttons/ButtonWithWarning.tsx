@@ -1,31 +1,28 @@
-import { useAppDispatch } from 'app/hooks'
 import classNames from 'classnames'
 import useDisableWarning from 'Components/UI/Templates/SeasonsAndEpisodes/Components/SeasonEpisodes/Components/Episode/Hooks/UseDisableWarning'
-import { handleUserShowStatus } from 'Components/UserContent/UseUserShowsRed/ClientHandlers/showHandlers'
-import React, { useContext } from 'react'
+import React from 'react'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
-import { LocalStorageHandlersContext } from 'Components/AppContext/Contexts/LocalStorageContentContext/LocalStorageContentContext'
-import { UserShowStatuses, UserShowStatusReadable } from 'Components/UserContent/UseUserShowsRed/@Types'
-import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import DisableWarning from 'Components/UI/DisabledWarning/DisabledWarning'
 
 type Props = {
   children: React.ReactNode
   onClick?: () => any
   isPressed: boolean
+  isDisabled?: boolean
 }
 
-const ButtonWithWarning: React.FC<Props> = ({ isPressed, children, onClick }) => {
+const ButtonWithWarning: React.FC<Props> = ({ isPressed, children, onClick, isDisabled = false }) => {
   const { authUser } = useFrequentVariables()
   const [showDisableWarning, handleDisableWarning, fadeOutStart, ref] = useDisableWarning()
 
   return (
     <>
       <button
+        disabled={isDisabled}
         ref={ref}
         className={classNames('button', {
           'button--pressed': isPressed,
-          'button--not-logged-in': !authUser?.uid,
+          'button--disable': !authUser?.uid || isDisabled,
         })}
         type="button"
         onClick={(e) => {

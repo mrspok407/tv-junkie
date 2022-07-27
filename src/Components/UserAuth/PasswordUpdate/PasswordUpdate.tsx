@@ -138,7 +138,7 @@ const PasswordUpdate: React.FC = () => {
 
           <button
             className={classNames('button button--auth__form', {
-              'button--disabled': !isFormValid(errors, requiredInputs),
+              'button--auth__form--disabled': !isFormValid(errors, requiredInputs),
             })}
             type="submit"
           >

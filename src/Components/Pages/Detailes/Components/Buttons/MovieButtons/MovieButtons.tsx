@@ -5,6 +5,7 @@ import {
   LocalStorageValueContext,
 } from 'Components/AppContext/Contexts/LocalStorageContentContext/LocalStorageContentContext'
 import { handleMovie } from 'Components/UserContent/UseUserMoviesRed/ClientHandlers/movieHandlers'
+import { updateMovieFinished } from 'Components/UserContent/UseUserMoviesRed/DatabaseHandlers/PostData/postMovieData'
 import { selectMovie } from 'Components/UserContent/UseUserMoviesRed/userMoviesSliceRed'
 import React, { useContext } from 'react'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
@@ -55,7 +56,13 @@ const MovieButtons: React.FC<Props> = ({ id, detailes }: Props) => {
         </button>
       </div>
       <div className="buttons__col">
-        <ButtonWithWarning isPressed={!!(movieFromStore?.finished && authUser.uid)}>
+        <ButtonWithWarning
+          isDisabled={!movieFromStore}
+          isPressed={!!(movieFromStore?.finished && authUser.uid)}
+          onClick={() => {
+            dispatch(updateMovieFinished({ id, firebase }))
+          }}
+        >
           {renderIsFinishedTitle()}
         </ButtonWithWarning>
       </div>
