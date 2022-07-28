@@ -1,29 +1,39 @@
 import { LocalStorageValueContext } from 'Components/AppContext/Contexts/LocalStorageContentContext/LocalStorageContentContext'
-import { MovieFullDataStoreState } from 'Components/UserContent/UseUserMoviesRed/@Types'
+import { MovieInfoStoreState } from 'Components/UserContent/UseUserMoviesRed/@Types'
 import { useContext, useMemo } from 'react'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import { MovieSectionOptions } from '../ReducerConfig/@Types'
 
 type Props = {
-  moviesData: MovieFullDataStoreState[]
+  moviesData: MovieInfoStoreState[]
   activeSection: string
+  hideFinished?: boolean
 }
 
-const UseSectionFilteredMovies = ({ moviesData, activeSection }: Props): MovieFullDataStoreState[] | MainDataTMDB[] => {
+const useSectionFilteredMovies = ({
+  moviesData,
+  activeSection,
+  hideFinished = false,
+}: Props): MovieInfoStoreState[] | MainDataTMDB[] => {
   const { authUser } = useFrequentVariables()
   const localStorageContent = useContext(LocalStorageValueContext)
+
   const sectionFilteredMovies = useMemo(() => {
     if (!authUser.uid) {
       return localStorageContent.watchLaterMovies
     }
     return moviesData.filter((movie) => {
-      return activeSection === 'finishedMovies'
-        ? !!movie.finished
-        : !!(movie.database === activeSection && !movie.finished)
+      if (activeSection === MovieSectionOptions.Finished) {
+        return movie.finished
+      } else {
+        if (hideFinished) return !movie.finished
+        return movie
+      }
     })
-  }, [moviesData, activeSection, localStorageContent, authUser])
+  }, [moviesData, activeSection, hideFinished, localStorageContent, authUser])
 
   return sectionFilteredMovies
 }
 
-export default UseSectionFilteredMovies
+export default useSectionFilteredMovies

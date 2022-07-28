@@ -1,5 +1,11 @@
-import { MovieFullDataStoreState } from 'Components/UserContent/UseUserMoviesRed/@Types'
+import { MovieInfoStoreState } from 'Components/UserContent/UseUserMoviesRed/@Types'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
+
+export type SortByOptionsType = 'title' | 'timeStamp'
+export enum MovieSectionOptions {
+  WatchLater = 'watchLaterMovies',
+  Finished = 'finishedMovies',
+}
 
 export enum ActionTypesEnum {
   IncrementLoadedMovies = 'incrementLoadedMovies',
@@ -10,11 +16,13 @@ export enum ActionTypesEnum {
 export type ACTIONTYPES =
   | {
       type: ActionTypesEnum.IncrementLoadedMovies
-      payload: { sectionFilteredMovies: MovieFullDataStoreState[] | MainDataTMDB[] }
+      payload: {
+        sectionFilteredMovies: MovieInfoStoreState[] | MainDataTMDB[]
+      }
     }
   | {
       type: ActionTypesEnum.IncrementLoadedMoviesLS
-      payload: { sectionFilteredMovies: MovieFullDataStoreState[] | MainDataTMDB[] }
+      payload: { sectionFilteredMovies: MovieInfoStoreState[] | MainDataTMDB[] }
     }
   | { type: ActionTypesEnum.ChangeActiveSection; payload: { activeSection: string } }
 
@@ -27,7 +35,7 @@ export interface LoadedMoviesInterface {
 
 export interface MoviesContentState {
   loadedMovies: LoadedMoviesInterface
-  activeSection: string
+  activeSection: MovieSectionOptions
 }
 
 export const MOVIES_TO_LOAD_INITIAL = 8
@@ -38,5 +46,5 @@ export const INITIAL_STATE: MoviesContentState = {
     watchLaterMoviesLS: MOVIES_TO_LOAD_INITIAL,
     finishedMovies: MOVIES_TO_LOAD_INITIAL,
   },
-  activeSection: 'watchLaterMovies',
+  activeSection: MovieSectionOptions.WatchLater,
 }

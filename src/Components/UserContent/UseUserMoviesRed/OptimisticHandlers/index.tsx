@@ -1,6 +1,6 @@
 import { AppThunk } from 'app/store'
 import { MovieInfoFromUserDatabase } from 'Components/Firebase/@TypesFirebase'
-import { addNewMovie, changeMovie, removeMovie } from '../userMoviesSliceRed'
+import { addMovie, changeMovie, removeMovie } from '../userMoviesSliceRed'
 
 interface OptimisticAddNewMovieInt {
   data: MovieInfoFromUserDatabase
@@ -10,10 +10,10 @@ interface OptimisticRemoveMovieInt {
   movieId: number
 }
 
-export const optimisticAddNewMovie =
+export const optimisticAddMovie =
   ({ data }: OptimisticAddNewMovieInt): AppThunk =>
   async (dispatch) => {
-    dispatch(addNewMovie({ ...data }))
+    dispatch(addMovie({ ...data }))
   }
 
 export const optimisticRemoveMovie =

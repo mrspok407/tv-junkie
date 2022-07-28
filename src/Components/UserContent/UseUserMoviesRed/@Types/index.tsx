@@ -1,6 +1,5 @@
 import { ErrorInterface } from 'Components/AppContext/Contexts/ErrorsContext'
 import { MovieInfoFromUserDatabase } from 'Components/Firebase/@TypesFirebase'
-import { MainDataTMDB } from 'Utils/@TypesTMDB'
 
 export type UserMovieStatuses = 'watchLaterMovies' | 'finished'
 
@@ -18,6 +17,8 @@ export interface UserMoviesStoreState {
   loadingMovie: boolean
   error: ErrorInterface | null
 }
+
+export type MovieInfoStoreState = UserMoviesStoreState['data']['info'][keyof UserMoviesStoreState['data']['info']]
 
 export const USER_MOVIES_INITIAL_STATE: UserMoviesStoreState = {
   data: {

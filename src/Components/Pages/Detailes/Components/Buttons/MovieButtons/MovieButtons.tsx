@@ -14,19 +14,19 @@ import ButtonWithWarning from '../ButtonWithWarning'
 import './MovieButtons.scss'
 
 type Props = {
-  id: number
+  movieId: number
   detailes: MainDataTMDB
 }
 
-const MovieButtons: React.FC<Props> = ({ id, detailes }: Props) => {
+const MovieButtons: React.FC<Props> = ({ movieId, detailes }: Props) => {
   const { authUser, firebase } = useFrequentVariables()
   const dispatch = useAppDispatch()
 
   const localStorageContent = useContext(LocalStorageValueContext)
   const localStorageHandlers = useContext(LocalStorageHandlersContext)
 
-  const movieFromLS = localStorageContent.watchLaterMovies.find((item: { id: number }) => item.id === Number(id))
-  const movieFromStore = useAppSelector((state) => selectMovie(state, id))
+  const movieFromLS = localStorageContent.watchLaterMovies.find((item: { id: number }) => item.id === Number(movieId))
+  const movieFromStore = useAppSelector((state) => selectMovie(state, movieId))
 
   const isMovieSelected = movieFromStore || movieFromLS
 
@@ -48,7 +48,7 @@ const MovieButtons: React.FC<Props> = ({ id, detailes }: Props) => {
             'button--pressed': isMovieSelected,
           })}
           onClick={() => {
-            dispatch(handleMovie({ movieId: id, movieFullDetailes: detailes, firebase, localStorageHandlers }))
+            dispatch(handleMovie({ movieId, movieFullDetailes: detailes, firebase, localStorageHandlers }))
           }}
           type="button"
         >
@@ -57,10 +57,10 @@ const MovieButtons: React.FC<Props> = ({ id, detailes }: Props) => {
       </div>
       <div className="buttons__col">
         <ButtonWithWarning
-          isDisabled={!movieFromStore}
+          isDisabled={!movieFromStore && authUser.uid}
           isPressed={!!(movieFromStore?.finished && authUser.uid)}
           onClick={() => {
-            dispatch(updateMovieFinished({ id, firebase }))
+            dispatch(updateMovieFinished({ movieId, firebase }))
           }}
         >
           {renderIsFinishedTitle()}

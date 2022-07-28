@@ -3,7 +3,7 @@ import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import { MovieInfoFromUserDatabase, SnapshotVal } from 'Components/Firebase/@TypesFirebase'
 import { getAuthUidFromState } from 'Components/UserAuth/Session/Authentication/Helpers'
 import { AuthUserInterface } from 'Components/UserAuth/Session/Authentication/@Types'
-import { addNewMovie, changeMovie, removeMovie, selectMovie, selectMoviesIds } from '../../userMoviesSliceRed'
+import { addMovie, changeMovie, removeMovie, selectMovie, selectMoviesIds } from '../../userMoviesSliceRed'
 import { handleMoviesError } from '../../ErrorHandlers/handleMoviesError'
 
 interface UserShowsListeners {
@@ -36,7 +36,7 @@ export const userMoviesListeners =
         'child_added',
         async (snapshot: SnapshotVal<MovieInfoFromUserDatabase>) => {
           console.log('child_added')
-          dispatch(addNewMovie({ ...snapshot.val()!, key: snapshot.key }))
+          dispatch(addMovie({ ...snapshot.val()!, key: snapshot.key }))
         },
         (err) => {
           console.log({ errAddedListener: err })

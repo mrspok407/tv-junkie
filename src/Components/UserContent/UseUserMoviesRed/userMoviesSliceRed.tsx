@@ -32,7 +32,7 @@ export const userMoviesSliceRed = createSlice({
         }
       },
     },
-    addNewMovie: (state, action: PayloadAction<MovieInfoFromUserDatabase>) => {
+    addMovie: (state, action: PayloadAction<MovieInfoFromUserDatabase>) => {
       console.log(action.payload)
 
       if (state.data.ids.includes(action.payload.id)) return
@@ -76,7 +76,7 @@ export const userMoviesSliceRed = createSlice({
   },
 })
 
-export const { setUserMovies, addNewMovie, removeMovie, changeMovie, updateLoadingMovie, resetMovies, setMoviesError } =
+export const { setUserMovies, addMovie, removeMovie, changeMovie, updateLoadingMovie, resetMovies, setMoviesError } =
   userMoviesSliceRed.actions
 
 export const selectMovies = (state: RootState) => state.userMovies.data.info

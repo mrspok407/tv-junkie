@@ -11,6 +11,7 @@ export interface LocalStorageContentInt {
   }
   handlers: {
     toggleMovie: ({ id, data }: HandlersLocalStorageInt) => void
+    removeMovie: ({ movieId }: { movieId: number }) => void
     toggleShow: ({ id, data, userShowStatus }: HandlersLocalStorageInt) => void
     clearLocalStorageContent: () => void
   }
@@ -29,6 +30,7 @@ export const INITIAL_VALUE_LOCAL_STORAGE_CONTENT = {
   },
   handlers: {
     toggleMovie: () => {},
+    removeMovie: () => {},
     toggleShow: () => {},
     clearLocalStorageContent: () => {},
   },

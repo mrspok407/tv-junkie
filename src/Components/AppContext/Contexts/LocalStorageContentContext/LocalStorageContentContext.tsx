@@ -48,6 +48,13 @@ const useLocalStorageContext = () => {
     setLocalStorageContent(handleStateChange)
   }, [])
 
+  const removeMovie = useCallback(({ movieId }: { movieId: number }) => {
+    setLocalStorageContent((prevState) => ({
+      ...prevState,
+      watchLaterMovies: [...prevState.watchLaterMovies.filter((item: { id: number }) => item.id !== movieId)],
+    }))
+  }, [])
+
   const toggleShow = useCallback(({ id, data, userShowStatus }: HandlersLocalStorageInt) => {
     const handleStateChange = (prevState: LocalStorageContentInt['data']) => {
       const showsExists = prevState.watchingShows.find((item: { id: number }) => item.id === id)
@@ -85,10 +92,11 @@ const useLocalStorageContext = () => {
   const handlers = useMemo(
     () => ({
       toggleMovie,
+      removeMovie,
       toggleShow,
       clearLocalStorageContent,
     }),
-    [toggleMovie, toggleShow, clearLocalStorageContent],
+    [toggleMovie, removeMovie, toggleShow, clearLocalStorageContent],
   )
 
   return [localStorageContent, handlers] as const

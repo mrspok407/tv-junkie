@@ -1,24 +1,24 @@
 import { LocalStorageValueContext } from 'Components/AppContext/Contexts/LocalStorageContentContext/LocalStorageContentContext'
-import { MovieFullDataStoreState } from 'Components/UserContent/UseUserMoviesRed/@Types'
+import { MovieInfoStoreState } from 'Components/UserContent/UseUserMoviesRed/@Types'
 import { useContext, useMemo } from 'react'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
-import { LoadedMoviesInterface } from '../ReducerConfig/@Types'
+import { LoadedMoviesInterface, MovieSectionOptions } from '../ReducerConfig/@Types'
 
 type Props = {
-  moviesData: MovieFullDataStoreState[] | MainDataTMDB[]
+  moviesData: MovieInfoStoreState[] | MainDataTMDB[]
   activeSection: string
   sortByState: string
   loadedMovies: LoadedMoviesInterface
 }
 
-const UseSortSlicedMovies = ({ moviesData, activeSection, sortByState, loadedMovies }: Props) => {
+const useSortSlicedMovies = ({ moviesData, activeSection, sortByState, loadedMovies }: Props) => {
   const { authUser } = useFrequentVariables()
   const localStorageContent = useContext(LocalStorageValueContext)
 
   const sortSlicedMovies = useMemo(() => {
     if (!authUser?.uid) {
-      if (activeSection !== 'watchingShows') return []
+      if (activeSection === MovieSectionOptions.Finished) return []
       return localStorageContent.watchLaterMovies.slice(0, loadedMovies.watchLaterMoviesLS)
     }
     return moviesData
@@ -36,4 +36,4 @@ const UseSortSlicedMovies = ({ moviesData, activeSection, sortByState, loadedMov
   return sortSlicedMovies
 }
 
-export default UseSortSlicedMovies
+export default useSortSlicedMovies

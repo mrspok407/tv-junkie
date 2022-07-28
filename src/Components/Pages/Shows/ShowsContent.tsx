@@ -61,7 +61,6 @@ const ShowsContent: React.FC = () => {
 
   const renderContent = () => {
     const loadingShows = authUser?.uid ? showsInitialLoading : false
-    // if (loadingShows || context.userContentHandler.loadingShowsOnRegister) {
     if (loadingShows) {
       return <Loader className="loader--pink" />
     }

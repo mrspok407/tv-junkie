@@ -6,11 +6,11 @@ import { getAuthUidFromState } from 'Components/UserAuth/Session/Authentication/
 import { batch } from 'react-redux'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import { handleMoviesError } from '../../ErrorHandlers/handleMoviesError'
-import { optimisticAddNewMovie, optimisticRemoveMovie, optimisticUpdateMovieFinished } from '../../OptimisticHandlers'
+import { optimisticAddMovie, optimisticRemoveMovie, optimisticUpdateMovieFinished } from '../../OptimisticHandlers'
 import { selectMovie, updateLoadingMovie } from '../../userMoviesSliceRed'
 
 interface HandleMovieDatabase {
-  id: number
+  movieId: number
   firebase: FirebaseInterface
 }
 
@@ -19,12 +19,12 @@ interface HandleNewMovie extends HandleMovieDatabase {
 }
 
 export const handleAddMovieToDatabase =
-  ({ id, movieDetailesTMDB, firebase }: HandleNewMovie): AppThunk =>
+  ({ movieId, movieDetailesTMDB, firebase }: HandleNewMovie): AppThunk =>
   async (dispatch, getState) => {
     const authUid = getAuthUidFromState(getState())
 
     dispatch(
-      optimisticAddNewMovie({
+      optimisticAddMovie({
         data: formatMovieForPostFirebase({ data: movieDetailesTMDB, firebase }),
       }),
     )
@@ -34,7 +34,7 @@ export const handleAddMovieToDatabase =
       return firebase.rootRef().update(updateData)
     } catch (err) {
       batch(() => {
-        dispatch(optimisticRemoveMovie({ movieId: id }))
+        dispatch(optimisticRemoveMovie({ movieId }))
         dispatch(handleMoviesError(err))
       })
     } finally {
@@ -43,18 +43,18 @@ export const handleAddMovieToDatabase =
   }
 
 export const handleRemoveMovieFromDatabase =
-  ({ id, firebase }: HandleMovieDatabase): AppThunk =>
+  ({ movieId, firebase }: HandleMovieDatabase): AppThunk =>
   async (dispatch, getState) => {
     const authUid = getAuthUidFromState(getState())
-    const movieFromStore = selectMovie(getState(), id)
+    const movieFromStore = selectMovie(getState(), movieId)
 
-    dispatch(optimisticRemoveMovie({ movieId: id }))
+    dispatch(optimisticRemoveMovie({ movieId }))
 
     try {
-      return await firebase.userMovie({ authUid, key: id }).set(null)
+      return await firebase.userMovie({ authUid, key: movieId }).set(null)
     } catch (err) {
       batch(() => {
-        dispatch(optimisticAddNewMovie({ data: movieFromStore }))
+        dispatch(optimisticAddMovie({ data: movieFromStore }))
         dispatch(handleMoviesError(err))
       })
     } finally {
@@ -63,16 +63,16 @@ export const handleRemoveMovieFromDatabase =
   }
 
 export const updateMovieFinished =
-  ({ id, firebase }: HandleMovieDatabase): AppThunk =>
+  ({ movieId, firebase }: HandleMovieDatabase): AppThunk =>
   async (dispatch, getState) => {
     const authUid = getAuthUidFromState(getState())
-    const movieFromStore = selectMovie(getState(), id)
+    const movieFromStore = selectMovie(getState(), movieId)
 
     if (!movieFromStore) return
 
     dispatch(optimisticUpdateMovieFinished({ data: { ...movieFromStore, finished: !movieFromStore.finished } }))
     try {
-      return await firebase.userMovie({ authUid, key: id }).update({ finished: !movieFromStore.finished })
+      return await firebase.userMovie({ authUid, key: movieId }).update({ finished: !movieFromStore.finished })
     } catch (err) {
       batch(() => {
         dispatch(optimisticUpdateMovieFinished({ data: movieFromStore }))

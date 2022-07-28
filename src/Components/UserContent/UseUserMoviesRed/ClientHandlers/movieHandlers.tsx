@@ -3,6 +3,7 @@ import { LocalStorageContentInt } from 'Components/AppContext/Contexts/LocalStor
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import { getAuthUidFromState } from 'Components/UserAuth/Session/Authentication/Helpers'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
+import { MovieInfoStoreState } from '../@Types'
 import { handleAddMovieToDatabase, handleRemoveMovieFromDatabase } from '../DatabaseHandlers/PostData/postMovieData'
 import { selectLoadingMovie, selectMovie, updateLoadingMovie } from '../userMoviesSliceRed'
 
@@ -18,21 +19,22 @@ export const handleMovie =
   async (dispatch, getState) => {
     const authUid = getAuthUidFromState(getState())
     const movieFromStore = selectMovie(getState(), movieId)
+    const isLoadingMovie = selectLoadingMovie(getState())
 
     if (!authUid) {
       localStorageHandlers.toggleMovie({
-        id: Number(movieId),
+        id: movieId,
         data: movieFullDetailes,
       })
       return
     }
 
-    if (selectLoadingMovie(getState())) return
+    if (isLoadingMovie) return
     dispatch(updateLoadingMovie(true))
 
     if (movieFromStore) {
-      dispatch(handleRemoveMovieFromDatabase({ id: Number(movieId), firebase }))
+      dispatch(handleRemoveMovieFromDatabase({ movieId, firebase }))
     } else {
-      dispatch(handleAddMovieToDatabase({ id: Number(movieId), movieDetailesTMDB: movieFullDetailes, firebase }))
+      dispatch(handleAddMovieToDatabase({ movieId, movieDetailesTMDB: movieFullDetailes, firebase }))
     }
   }

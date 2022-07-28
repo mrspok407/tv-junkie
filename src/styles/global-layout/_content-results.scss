@@ -53,6 +53,13 @@ $font-sizes: (
     padding-bottom: 25px;
     color: #fff;
 
+    &--movies-grid {
+      grid-template-columns: max-content 1fr minmax(max-content, 200px);
+      @include mediaMaxW(#{$mobileViewPort}) {
+        grid-template-columns: max-content 1fr;
+      }
+    }
+
     &-text {
       display: flex;
       justify-content: center;
@@ -71,6 +78,11 @@ $font-sizes: (
           opacity: 1;
         }
       }
+    }
+  }
+  &__hide-finished-movies {
+    @include mediaMaxW(#{$mobileViewPort}) {
+      grid-column: 1 / 3;
     }
   }
 }

@@ -6,14 +6,21 @@ import { useAppSelector } from 'app/hooks'
 import { selectMovies, selectMoviesLoading } from 'Components/UserContent/UseUserMoviesRed/userMoviesSliceRed'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import useAppSelectorArray from 'Utils/Hooks/UseAppSelectorArray'
-import { MovieFullDataStoreState } from 'Components/UserContent/UseUserMoviesRed/@Types'
+import { MovieInfoStoreState } from 'Components/UserContent/UseUserMoviesRed/@Types'
 import useScrollEffect from 'Utils/Hooks/UseScrollEffect'
-import { INITIAL_STATE, MoviesContentState, ACTIONTYPES, ActionTypesEnum } from './ReducerConfig/@Types'
+import {
+  INITIAL_STATE,
+  MoviesContentState,
+  ACTIONTYPES,
+  ActionTypesEnum,
+  SortByOptionsType,
+  MovieSectionOptions,
+} from './ReducerConfig/@Types'
 import reducer from './ReducerConfig'
-import MoviesGrid from './Components/MoviesGrid'
+import MoviesGrid from './Components/MoviesGrid/MoviesGrid'
 import MoviesSectionButtons from './Components/MoviesSectionButtons'
-import UseSectionFilteredMovies from './Hooks/UseSectionFilteredMovies'
-import UseSortSlicedMovies from './Hooks/UseSortSlicedMovies'
+import useSectionFilteredMovies from './Hooks/UseSectionFilteredMovies'
+import useSortSlicedMovies from './Hooks/UseSortSlicedMovies'
 import SortByOptions from './Components/SortByOptions'
 
 const SCROLL_THRESHOLD = 800
@@ -23,17 +30,16 @@ const MAX_GRID_COLUMNS = 4
 const MoviesContent: React.FC = () => {
   const { authUser } = useFrequentVariables()
 
-  console.log('MoviesContent Rerender')
-
   const [{ activeSection, loadedMovies }, localDispatch] = useReducer<React.Reducer<MoviesContentState, ACTIONTYPES>>(
     reducer,
     INITIAL_STATE,
   )
-  const [sortBy, setSortBy] = useState('name')
+  const [sortBy, setSortBy] = useState<SortByOptionsType>('title')
+  const [hideFinished, setHideFinished] = useState(false)
 
-  const userMoviesStore = useAppSelectorArray<MovieFullDataStoreState>(selectMovies)
-  const sectionFilteredMovies = UseSectionFilteredMovies({ moviesData: userMoviesStore, activeSection })
-  const sortSlicedMovies = UseSortSlicedMovies({
+  const userMoviesStore = useAppSelectorArray<MovieInfoStoreState>(selectMovies)
+  const sectionFilteredMovies = useSectionFilteredMovies({ moviesData: userMoviesStore, activeSection, hideFinished })
+  const sortSlicedMovies = useSortSlicedMovies({
     moviesData: sectionFilteredMovies,
     activeSection,
     sortByState: sortBy,
@@ -51,23 +57,22 @@ const MoviesContent: React.FC = () => {
 
   useScrollEffect({ callback: loadNewContent, scrollThreshold: SCROLL_THRESHOLD, timeOut: THROTTLE_TIMEOUT })
 
-  const handleSortBy = (sortBy: string) => {
+  const handleSortBy = (sortBy: SortByOptionsType) => {
     setSortBy(sortBy)
   }
 
-  const handleToggleSection = (section: string) => {
+  const handleToggleSection = (section: MovieSectionOptions) => {
     localDispatch({ type: ActionTypesEnum.ChangeActiveSection, payload: { activeSection: section } })
   }
 
   const renderContent = () => {
     const loadingMovies = authUser?.uid ? moviesInitialLoading : false
-    // if (loadingMovies || context.userContentHandler.loadingMoviesOnRegister) {
     if (loadingMovies) {
       return <Loader className="loader--pink" />
     }
 
     if (!sortSlicedMovies.length) {
-      return <PlaceholderNoMovies />
+      return <PlaceholderNoMovies authUser={authUser} activeSection={activeSection} />
     }
 
     const currentNumOfColumns =
@@ -75,12 +80,17 @@ const MoviesContent: React.FC = () => {
 
     return (
       <>
-        {authUser.uid && <SortByOptions sortBy={sortBy} handleSortBy={handleSortBy} />}
+        {authUser.uid && (
+          <SortByOptions
+            sortBy={sortBy}
+            handleSortBy={handleSortBy}
+            handleHideFinished={setHideFinished}
+            section={activeSection}
+          />
+        )}
 
         <div
-          className={classNames('content-results__wrapper', {
-            'content-results__wrapper--finished-shows': activeSection === 'finishedMovies',
-          })}
+          className={classNames('content-results__wrapper')}
           style={
             currentNumOfColumns <= 3
               ? {

@@ -1,8 +1,9 @@
 import classNames from 'classnames'
 import React from 'react'
+import { MovieSectionOptions } from '../ReducerConfig/@Types'
 
 type Props = {
-  handleToggleSection: (section: string) => void
+  handleToggleSection: (section: MovieSectionOptions) => void
   activeSection: string
 }
 
@@ -11,21 +12,21 @@ const MoviesSectionButtons: React.FC<Props> = ({ handleToggleSection, activeSect
     <div className="buttons__col">
       <button
         className={classNames('button', {
-          'button--pressed': activeSection === 'watchingShows',
+          'button--pressed': activeSection === MovieSectionOptions.WatchLater,
         })}
         type="button"
-        onClick={() => handleToggleSection('watchingShows')}
+        onClick={() => handleToggleSection(MovieSectionOptions.WatchLater)}
       >
-        Watching
+        Watch later
       </button>
     </div>
     <div className="buttons__col">
       <button
         className={classNames('button', {
-          'button--pressed': activeSection === 'droppedShows',
+          'button--pressed': activeSection === MovieSectionOptions.Finished,
         })}
         type="button"
-        onClick={() => handleToggleSection('finishedMovies')}
+        onClick={() => handleToggleSection(MovieSectionOptions.Finished)}
       >
         Finished
       </button>
