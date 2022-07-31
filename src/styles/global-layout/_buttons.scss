@@ -179,7 +179,7 @@
       $dimensions: 10px;
       content: "";
       position: absolute;
-      top: -$dimensions / 2;
+      top: calc(-10px / 2);
       left: 50%;
       transform: translateX(-50%) rotate(45deg);
       width: $dimensions;
