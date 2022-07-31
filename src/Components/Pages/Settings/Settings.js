@@ -216,7 +216,8 @@ class Profile extends Component {
                       const mergedRowData = Object.assign({}, ...rowData)
                       Object.entries(mergedRowData).forEach(([key, value]) => {
                         if (!key.indexOf("season/")) {
-                          seasonsData.push({ [key]: { ...value } })
+                          seasonsData[value.season_number - 1] = { [key]: { ...value } }
+                          // seasonsData.push({ [key]: { ...value } })
                         }
                       })
                       const allEpisodes = []
