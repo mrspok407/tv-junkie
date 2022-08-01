@@ -35,8 +35,6 @@ const HomePage: React.FC = () => {
 
   const showsInitialLoading = useAppSelector(selectShowsLoading)
 
-  console.log('HomePage')
-
   useGoogleRedirect()
 
   const renderNonAuthUser = () => (

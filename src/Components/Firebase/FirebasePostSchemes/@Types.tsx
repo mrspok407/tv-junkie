@@ -6,6 +6,8 @@ import {
   MovieInfoFromUserDatabase,
   SeasonFromUserDatabase,
   ShowInfoFromUserDatabase,
+  SingleEpisodeFromFireDatabase,
+  SingleEpisodeFromUserDatabase,
 } from '../@TypesFirebase'
 import { FirebaseInterface } from '../FirebaseContext'
 
@@ -29,6 +31,16 @@ export interface UpdateUserShowStatusScheme {
   userShowStatus: string
   showFromStore: ShowFullDataStoreState
   firebase: FirebaseInterface
+}
+
+export interface PostCheckAllReleasedEpisodesScheme {
+  authUid: string
+  showId: number
+  releasedEpisodes: SingleEpisodeFromFireDatabase[]
+  isWatched: boolean
+}
+export interface DataCheckAllReleasedEpisodes {
+  [key: string]: SingleEpisodeFromUserDatabase['watched']
 }
 
 export interface DataOnRegisterEpisodes {

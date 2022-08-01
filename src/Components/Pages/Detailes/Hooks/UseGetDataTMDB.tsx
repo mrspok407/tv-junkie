@@ -3,7 +3,6 @@ import { useHistory } from 'react-router-dom'
 import axios from 'axios'
 import { MainDataTMDB, MAINDATA_TMDB_INITIAL } from 'Utils/@TypesTMDB'
 import * as ROUTES from 'Utils/Constants/routes'
-import * as _get from 'lodash.get'
 
 const { CancelToken } = require('axios')
 
@@ -80,7 +79,7 @@ const useGetDataTMDB = ({ id, mediaType }: Props) => {
       } catch (err) {
         const errorData: any = err
         if (axios.isCancel(errorData)) return
-        if (_get(errorData.response, 'status', '') === 404) {
+        if (errorData?.response?.status === 404) {
           history.push(ROUTES.PAGE_DOESNT_EXISTS)
           return
         }

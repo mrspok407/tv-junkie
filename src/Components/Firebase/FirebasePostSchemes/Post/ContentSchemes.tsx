@@ -1,6 +1,12 @@
 /* eslint-disable max-len */
 
-import { PostUserMovieScheme, PostUserShowScheme, UpdateUserShowStatusScheme } from '../@Types'
+import {
+  PostUserMovieScheme,
+  PostUserShowScheme,
+  UpdateUserShowStatusScheme,
+  PostCheckAllReleasedEpisodesScheme,
+  DataCheckAllReleasedEpisodes,
+} from '../@Types'
 import { formatMovieForPostFirebase } from './Helpers'
 
 export const postUserShowScheme = ({
@@ -59,6 +65,24 @@ export const updateUserShowStatusScheme = ({
     // [`users/${authUid}/content/episodes/${id}/info/database`]: userShowStatus,
     // [`users/${authUid}/content/episodes/${id}/info/isAllWatched_database`]: `${showFromStore.allEpisodesWatched}_${userShowStatus}`,
   }
+}
+
+export const postCheckAllReleasedEpisodesScheme = ({
+  authUid,
+  showId,
+  releasedEpisodes,
+  isWatched,
+}: PostCheckAllReleasedEpisodesScheme) => {
+  const updateData: DataCheckAllReleasedEpisodes = {}
+  releasedEpisodes.forEach((episode) => {
+    if (!episode.season_number || !episode.episode_number) return
+    const seasonNumber = episode.season_number - 1
+    const episodeNumber = episode.episode_number - 1
+    updateData[
+      `users/${authUid}/content/episodes/${showId}/episodes/${seasonNumber}/episodes/${episodeNumber}/watched`
+    ] = isWatched
+  })
+  return updateData
 }
 
 export const postUserMovieScheme = ({ authUid, movieDetailesTMDB, firebase }: PostUserMovieScheme) => {

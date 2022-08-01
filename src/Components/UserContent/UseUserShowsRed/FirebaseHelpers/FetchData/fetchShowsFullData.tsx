@@ -13,10 +13,10 @@ interface GetUserShowsFullInfoArg {
 const fetchShowsFullData = ({ userShows, firebase, authUserUid }: GetUserShowsFullInfoArg) =>
   Promise.all(
     userShows.map(async (show) => {
-      const showInfoSnapshot = await firebase.showInfoFireDatabase(show.id).once('value')
-      let showInfo = showInfoSnapshot.val()!
+      const showInfoFireSnapshot = await firebase.showInfoFireDatabase(show.id).once('value')
+      let showInfo = showInfoFireSnapshot.val()!
 
-      if (showInfoSnapshot.val() === null) {
+      if (showInfoFireSnapshot.val() === null) {
         const showDetailesTMDB = await fetchContentDetailesTMDB({ mediaType: 'show', id: show.id })
         const showData = await postShowFireDatabase({ showDetailesTMDB, database: show.database, firebase })
         showInfo = showData!.info

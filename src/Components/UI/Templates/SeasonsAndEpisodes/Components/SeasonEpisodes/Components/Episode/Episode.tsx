@@ -34,22 +34,10 @@ const Episode: React.FC<Props> = ({
     episodeData,
   })
 
-  // const [checkboxDisableWarning, setCheckboxDisableWarning] = useState(false)
-  // const checkboxRef = useRef<HTMLDivElement>(null)
-
-  // const showDisableWarning = (e: React.MouseEvent) => {
-  //   e.stopPropagation()
-  //   setCheckboxDisableWarning(true)
-  // }
-
-  // const handleClickOutside = useCallback(() => {
-  //   setCheckboxDisableWarning(false)
-  // }, [])
-  // useClickOutside({ ref: checkboxRef, callback: handleClickOutside })
+  console.log({ episodeData })
 
   return (
     <div
-      // ref={episodeRef}
       className={classNames('episodes__episode', {
         'episodes__episode--open': isEpisodeOpen,
       })}
@@ -69,7 +57,9 @@ const Episode: React.FC<Props> = ({
               }
         }
       >
-        {isEpisodeAired && !airDateUnavailable && <EpisodeCheckbox isDisabled={!showCheckboxes || !authUser?.uid} />}
+        {isEpisodeAired && !airDateUnavailable && (
+          <EpisodeCheckbox isDisabled={!showCheckboxes || !authUser?.uid} episodeData={episodeData} showId={showId} />
+        )}
 
         <div className="episodes__episode-date">{airDateReadable}</div>
         <div className="episodes__episode-name">

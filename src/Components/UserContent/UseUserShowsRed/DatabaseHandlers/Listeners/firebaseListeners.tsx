@@ -6,6 +6,7 @@ import { AuthUserInterface } from 'Components/UserAuth/Session/Authentication/@T
 import { handleNewShow, handleChangeShow } from '../HandleData/handleShowsData'
 import { changeShowEpisodes, selectShow, selectShowsIds } from '../../userShowsSliceRed'
 import { handleShowsError } from '../../ErrorHandlers/handleShowsError'
+import { EpisodesStoreState } from '../../@Types'
 
 interface UserShowsListeners {
   firebase: FirebaseInterface
@@ -64,14 +65,25 @@ export const userShowsListeners =
 
     showsEpisodesRef.on(
       'child_changed',
-      (snapshot: SnapshotVal<EpisodesFromUserDatabase>) => {
+      async (snapshot: SnapshotVal<EpisodesFromUserDatabase>) => {
         console.log('child_change episodes listener')
         console.log(snapshot.val())
-        dispatch(changeShowEpisodes({ id: Number(snapshot.key), episodes: snapshot.val()!.episodes }))
+        // await dispatch(changeShowEpisodes({ id: Number(snapshot.key), episodes: snapshot.val()!.episodes })).then(
+        dispatch(testThunk({ id: Number(snapshot.key), episodes: snapshot.val()!.episodes })).then((res: any) =>
+          console.log({ res }),
+        )
       },
       (err) => {
         console.log({ errEpisodesListener: err })
         dispatch(handleShowsError(err))
       },
     )
+  }
+
+export const testThunk =
+  ({ id, episodes }: { id: any; episodes: any }): AppThunk<Promise<EpisodesStoreState>> =>
+  async (dispatch, getState) => {
+    const authUid = getAuthUidFromState(getState())
+
+    return dispatch(changeShowEpisodes({ id, episodes }))
   }

@@ -1,5 +1,4 @@
 /// <reference types="react-scripts" />
-declare module 'lodash.get'
 declare module 'lodash.merge'
 declare module 'lodash.mergewith'
 declare module 'lodash.assign'
