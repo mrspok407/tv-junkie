@@ -7,7 +7,7 @@ import merge from 'deepmerge'
 import * as _transform from 'lodash.transform'
 import * as _isEqual from 'lodash.isequal'
 import * as _isObject from 'lodash.isobject'
-import releasedEpisodesToOneArray from './releasedEpisodesToOneArray'
+import releasedEpisodesToOneArray from './episodesToOneArray'
 
 export const currentDate = new Date()
 

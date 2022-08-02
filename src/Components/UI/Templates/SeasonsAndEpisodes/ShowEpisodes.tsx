@@ -25,7 +25,7 @@ const ShowEpisodes: React.FC<Props> = ({ seasonsTMDB, showId }) => {
 
   const isAnyEpisodeReleased = useAppSelector((state) => {
     const episodes = selectShowEpisodes(state, showId)
-    const releasedEpisodes = releasedEpisodesToOneArray({ data: episodes })
+    const releasedEpisodes = releasedEpisodesToOneArray(episodes)
     return releasedEpisodes.length
   })
 

@@ -3,10 +3,9 @@ import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import { EpisodesFromUserDatabase, ShowInfoFromUserDatabase, SnapshotVal } from 'Components/Firebase/@TypesFirebase'
 import { getAuthUidFromState } from 'Components/UserAuth/Session/Authentication/Helpers'
 import { AuthUserInterface } from 'Components/UserAuth/Session/Authentication/@Types'
-import { handleNewShow, handleChangeShow } from '../HandleData/handleShowsData'
-import { changeShowEpisodes, selectShow, selectShowsIds } from '../../userShowsSliceRed'
+import { handleNewShow, handleChangeShow, handleChangeEpisodes } from '../HandleData/handleShowsData'
+import { selectShow, selectShowsIds } from '../../userShowsSliceRed'
 import { handleShowsError } from '../../ErrorHandlers/handleShowsError'
-import { EpisodesStoreState } from '../../@Types'
 
 interface UserShowsListeners {
   firebase: FirebaseInterface
@@ -28,9 +27,6 @@ export const userShowsListeners =
     console.log('userShowsListeners')
     const authUserUid = getAuthUidFromState(getState())
     const { showsInfoRef, showsEpisodesRef } = userShowsListenersRefs(firebase, authUserUid)
-
-    // const showsInfoRef = firebase.showsInfoUserDatabase(authUserUid).orderByChild('timeStamp')
-    // const showsEpisodesRef = firebase.showsEpisodesUserDatabase(authUserUid)
 
     const showsIds = selectShowsIds(getState())
     const lastTimestamp = selectShow(getState(), showsIds[showsIds.length - 1])?.timeStamp ?? 0
@@ -68,22 +64,11 @@ export const userShowsListeners =
       async (snapshot: SnapshotVal<EpisodesFromUserDatabase>) => {
         console.log('child_change episodes listener')
         console.log(snapshot.val())
-        // await dispatch(changeShowEpisodes({ id: Number(snapshot.key), episodes: snapshot.val()!.episodes })).then(
-        dispatch(testThunk({ id: Number(snapshot.key), episodes: snapshot.val()!.episodes })).then((res: any) =>
-          console.log({ res }),
-        )
+        dispatch(handleChangeEpisodes(Number(snapshot.key), snapshot.val()!.episodes, firebase))
       },
       (err) => {
         console.log({ errEpisodesListener: err })
         dispatch(handleShowsError(err))
       },
     )
-  }
-
-export const testThunk =
-  ({ id, episodes }: { id: any; episodes: any }): AppThunk<Promise<EpisodesStoreState>> =>
-  async (dispatch, getState) => {
-    const authUid = getAuthUidFromState(getState())
-
-    return dispatch(changeShowEpisodes({ id, episodes }))
   }

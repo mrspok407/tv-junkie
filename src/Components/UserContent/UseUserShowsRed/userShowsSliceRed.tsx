@@ -80,10 +80,10 @@ export const userShowsSliceRed = createSlice({
     },
     changeShowEpisodes: (
       state,
-      action: PayloadAction<{ id: number; episodes: EpisodesFromUserDatabase['episodes'] }>,
+      action: PayloadAction<{ showId: number; episodes: EpisodesFromUserDatabase['episodes'] }>,
     ) => {
       // const stateInfo = state.data.info[action.payload.id]
-      const stateEpisodes = state.data.episodes[action.payload.id]
+      const stateEpisodes = state.data.episodes[action.payload.showId]
       const { episodes } = action.payload
 
       // console.log({ stateInfoDat: stateInfo?.database, payloadDatabase: info.database })
@@ -96,7 +96,7 @@ export const userShowsSliceRed = createSlice({
       const mergeEpisodes: EpisodesStoreState[] = merge(stateEpisodes, episodes, {
         arrayMerge: combineMergeObjects,
       })
-      state.data.episodes[action.payload.id] = mergeEpisodes
+      state.data.episodes[action.payload.showId] = mergeEpisodes
     },
     updateLoadingShows: (state, action: PayloadAction<UserShowsStoreState['initialLoading']>) => {
       console.log(action.payload)

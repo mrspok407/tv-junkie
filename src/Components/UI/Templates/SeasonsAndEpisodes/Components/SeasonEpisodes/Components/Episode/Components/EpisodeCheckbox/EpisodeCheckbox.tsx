@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import classNames from 'classnames'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import DisableWarning from 'Components/UI/DisabledWarning/DisabledWarning'
@@ -15,14 +15,15 @@ type Props = {
 
 const EpisodeCheckbox: React.FC<Props> = ({ isDisabled, episodeData, showId }: Props) => {
   const { authUser } = useFrequentVariables()
-
   const [showDisableWarning, handleDisableWarning, fadeOutStart, checkboxRef] = useDisableWarning()
 
   const isWatched = useAppSelector((state) => {
-    const episodesFromStore = selectShowEpisodes(state, showId)!
-    const season = episodesFromStore.find((season) => season.season_number === episodeData.season_number)
+    if (!authUser?.uid) return false
+
+    const episodesFromStore = selectShowEpisodes(state, showId)
+    const season = episodesFromStore?.find((season) => season.season_number === episodeData.season_number)
     const episode = season?.episodes.find((episode) => episode.id === episodeData.id)
-    return episode?.watched
+    return episode?.watched ?? false
   })
 
   return (

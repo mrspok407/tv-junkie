@@ -34,8 +34,6 @@ const Episode: React.FC<Props> = ({
     episodeData,
   })
 
-  console.log({ episodeData })
-
   return (
     <div
       className={classNames('episodes__episode', {

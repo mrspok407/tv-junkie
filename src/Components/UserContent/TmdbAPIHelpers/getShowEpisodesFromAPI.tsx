@@ -44,11 +44,11 @@ const getShowEpisodesTMDB = ({ id }: { id: number }) => {
           rowData.push(item.data)
         })
 
-        const mergedRowData: { value: Record<string, unknown> } = Object.assign({}, ...rowData)
+        const mergedRowData: { value: any } = Object.assign({}, ...rowData)
 
         Object.entries(mergedRowData).forEach(([key, value]) => {
           if (!key.indexOf('season/')) {
-            seasonsData.push({ [key]: value })
+            seasonsData[value.season_number - 1] = { [key]: { ...value } }
           }
         })
 
@@ -90,10 +90,13 @@ const getShowEpisodesTMDB = ({ id }: { id: number }) => {
           showId: id,
         }
 
+        console.log({ dataToPass })
+
         return dataToPass
       }),
     )
-    .catch(() => {
+    .catch((err) => {
+      console.log({ err })
       return { episodes: [], showId: id }
     })
 

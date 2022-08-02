@@ -75,9 +75,7 @@ const ToWatchEpisodesContent: React.FC = () => {
             }, [])
             toWatchEpisodes.reverse()
 
-            const releasedEpisodes: SingleEpisodeFromFireDatabase[] = releasedEpisodesToOneArray({
-              data: show.episodes,
-            })
+            const releasedEpisodes: SingleEpisodeFromFireDatabase[] = releasedEpisodesToOneArray(show.episodes)
 
             return (
               <div key={show.id} className="towatch__show">

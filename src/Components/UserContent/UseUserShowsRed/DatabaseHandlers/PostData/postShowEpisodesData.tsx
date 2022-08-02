@@ -17,7 +17,7 @@ export const postCheckAllReleasedEpisodes =
   async (dispatch, getState) => {
     const authUid = getAuthUidFromState(getState())
     const episodesFromStore = selectShowEpisodes(getState(), showId)
-    const releasedEpisodes = releasedEpisodesToOneArray({ data: episodesFromStore }) as SingleEpisodeStoreState[]
+    const releasedEpisodes = releasedEpisodesToOneArray<SingleEpisodeStoreState>(episodesFromStore)
 
     const isAnyEpisodeNotWatched = releasedEpisodes.some((episode) => !episode.watched)
 

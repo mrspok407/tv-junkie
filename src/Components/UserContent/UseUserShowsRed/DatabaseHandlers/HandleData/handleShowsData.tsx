@@ -1,10 +1,15 @@
 import { AppThunk } from 'app/store'
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import { throwErrorNoData } from 'Components/Firebase/Errors'
-import { ShowInfoFromUserDatabase } from 'Components/Firebase/@TypesFirebase'
+import {
+  EpisodesFromUserDatabase,
+  ShowInfoFromUserDatabase,
+  SingleEpisodeFromUserDatabase,
+} from 'Components/Firebase/@TypesFirebase'
 import { getAuthUidFromState } from 'Components/UserAuth/Session/Authentication/Helpers'
+import { episodesToOneArray } from 'Utils/episodesToOneArray'
 import { EpisodesStoreState } from '../../@Types'
-import { addNewShow, changeShow, selectShow } from '../../userShowsSliceRed'
+import { addNewShow, changeShow, changeShowEpisodes, selectShow } from '../../userShowsSliceRed'
 import { fetchEpisodesFullData } from '../../FirebaseHelpers/FetchData/fetchEpisodesFullData'
 import { handleShowsError } from '../../ErrorHandlers/handleShowsError'
 
@@ -61,4 +66,16 @@ export const handleChangeShow =
     } catch (err) {
       dispatch(handleShowsError(err))
     }
+  }
+
+export const handleChangeEpisodes =
+  (showId: number, episodes: EpisodesFromUserDatabase['episodes'], firebase: FirebaseInterface): AppThunk =>
+  async (dispatch, getState) => {
+    const authUid = getAuthUidFromState(getState())
+    const isAnyEpisodeNotWatched = episodesToOneArray<SingleEpisodeFromUserDatabase>(episodes).some(
+      (episode) => !episode.watched,
+    )
+
+    firebase.userShow({ authUid, key: showId }).update({ allEpisodesWatched: !isAnyEpisodeNotWatched })
+    return dispatch(changeShowEpisodes({ showId, episodes }))
   }

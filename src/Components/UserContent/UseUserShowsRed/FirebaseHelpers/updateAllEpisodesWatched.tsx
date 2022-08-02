@@ -37,9 +37,7 @@ const updateAllEpisodesWatched = async ({ firebase, authUser, key }: UpdateAllEp
   if (lastTwoSeasonsData === null) return
 
   const userEpisodes = Object.values(lastTwoSeasonsData).map((item: any) => item)
-  const releasedEpisodes: SingleEpisodeFromFireDatabase[] = releasedEpisodesToOneArray({
-    data: userEpisodes,
-  })
+  const releasedEpisodes: SingleEpisodeFromFireDatabase[] = releasedEpisodesToOneArray(userEpisodes)
 
   if (releasedEpisodes.length === 0) {
     const lastThreeSeasonsData = await firebase
@@ -50,9 +48,7 @@ const updateAllEpisodesWatched = async ({ firebase, authUser, key }: UpdateAllEp
       .then((snapshot: any) => snapshot.val())
 
     const userEpisodes = Object.values(lastThreeSeasonsData).map((item: any) => item)
-    const releasedEpisodes: SingleEpisodeFromFireDatabase[] = releasedEpisodesToOneArray({
-      data: userEpisodes,
-    })
+    const releasedEpisodes: SingleEpisodeFromFireDatabase[] = releasedEpisodesToOneArray(userEpisodes)
     const allEpisodesWatched = !releasedEpisodes.some((episode: any) => !episode.watched)
     return Promise.all([
       firebase.userShowAllEpisodesInfo(authUser.uid, key).update({
