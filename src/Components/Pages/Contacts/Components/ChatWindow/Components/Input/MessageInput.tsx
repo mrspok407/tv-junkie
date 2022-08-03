@@ -151,7 +151,9 @@ const MessageInput: React.FC<Props> = ({
       }
 
       const newMessageRef = document.querySelector(`.chat-window__message--${messageKey}`)
-      newMessageRef?.scrollIntoView({ block: 'start', inline: 'start' })
+      // setTimeout(() => {
+      newMessageRef?.scrollIntoView({ block: 'start', inline: 'start', behavior: 'smooth' })
+      // }, 150)
     } catch (error) {
       const timeStampEpoch = new Date().getTime()
       const newMessage: MessageInterface = {
@@ -168,7 +170,7 @@ const MessageInput: React.FC<Props> = ({
       })
 
       const newMessageRef = document.querySelector(`.chat-window__message--${timeStampEpoch.toString()}`)
-      newMessageRef?.scrollIntoView({ block: 'start', inline: 'start' })
+      // newMessageRef?.scrollIntoView({ block: 'start', inline: 'start' })
 
       handleError({
         message: 'Message hasn&apos;t been sent, because of the unexpected error. Please reload the page.',

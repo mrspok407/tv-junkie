@@ -1,3 +1,5 @@
+/* eslint-disable react/button-has-type */
+/* eslint-disable no-nested-ternary */
 import React, { useState, useEffect, useCallback } from 'react'
 import classNames from 'classnames'
 import Loader from 'Components/UI/Placeholders/Loader'

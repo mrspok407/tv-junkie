@@ -33,6 +33,8 @@ const throttleDebounceMap: any = {
   debounce,
 }
 
+let prevScrollTop: any
+
 const ChatWindow: React.FC = () => {
   const { firebase, authUser, contactsState, contactsDispatch } = useFrequentVariables()
   const firebaseRefs = useFirebaseReferences()
@@ -109,6 +111,24 @@ const ChatWindow: React.FC = () => {
   const renderedMessagesRef = useRef<MessageInterface[]>([])
   const loadingRef = useRef<boolean>()
 
+  const testRef = useRef<HTMLDivElement>()
+  const previousMessageListRect = useRef<any>()
+
+  useLayoutEffect(() => {
+    if (!testRef.current) return
+    const rect = testRef.current.getBoundingClientRect()
+    console.log({ rect: rect?.height, prevRect: previousMessageListRect.current?.height })
+
+    if (previousMessageListRect.current !== undefined) {
+      const heightDiff = rect?.height - previousMessageListRect.current?.height
+      console.log({ heightDiff })
+
+      chatContainerRef.scrollTop = Math.ceil(heightDiff)
+    }
+
+    previousMessageListRect.current = rect
+  }, [renderedMessagesList, chatWindowLoading])
+
   useEffect(() => {
     messagesRef.current = messagesData
     renderedMessagesRef.current = renderedMessages
@@ -131,10 +151,10 @@ const ChatWindow: React.FC = () => {
       if (scrollTop < 1) {
         if (firstRenderedMessageIndex === 0) {
           if (loadingRef.current) {
-            chatContainerRef.scrollTop = 1
+            // chatContainerRef.scrollTop = 1
           }
         } else {
-          chatContainerRef.scrollTop = 1
+          // chatContainerRef.scrollTop = 1
         }
       }
       if (scrollHeight <= scrollTop + height && lastRenderedMessageIndex !== messagesRef.current.length - 1) {
@@ -173,7 +193,6 @@ const ChatWindow: React.FC = () => {
     [activeChat, chatContainerRef],
   )
 
-  let prevScrollTop: any
   const handleScroll = useCallback(
     throttleDebounceMap[`${browser.getBrowserName() === 'Firefox' ? 'debounce' : 'throttle'}`](
       DEBOUNCE_THROTTLE_DELAY,
@@ -182,9 +201,18 @@ const ChatWindow: React.FC = () => {
         const { height, scrollHeight, scrollTop, thresholdTopRender, thresholdTopLoad, thresholdBottomRender } =
           getContainerRect()
 
+        console.log({ scrollHeight, scrollTop, height })
+
         if (scrollHeight <= height) return
         if (scrollTop < prevScrollTop || prevScrollTop === undefined) {
-          if (scrollTop <= thresholdTopRender) {
+          // if (scrollTop <= thresholdTopRender) {
+          // if (scrollTop === 0) {
+          //   console.log('scrollTop Zero')
+          //   return
+          // }
+          // if (scrollTop <= 10) {
+          if (scrollTop === 0) {
+            console.log('renderTopMessages')
             contactsDispatch({
               type: 'renderTopMessages',
               payload: { unreadMessagesAuthRef: unreadMessagesAuthRef.current, chatKey: activeChat.chatKey },
@@ -194,11 +222,13 @@ const ChatWindow: React.FC = () => {
             if (loadingTopMessages) return
             loadTopMessages()
           }
-        } else if (scrollHeight <= scrollTop + height + thresholdBottomRender) {
-          contactsDispatch({
-            type: 'renderBottomMessages',
-            payload: { unreadMessagesAuthRef: unreadMessagesAuthRef.current, chatKey: activeChat.chatKey },
-          })
+          // } else if (scrollHeight <= scrollTop + height + thresholdBottomRender) {
+        } else if (scrollHeight <= scrollTop + height + 10) {
+          console.log('renderBottomMessages')
+          // contactsDispatch({
+          //   type: 'renderBottomMessages',
+          //   payload: { unreadMessagesAuthRef: unreadMessagesAuthRef.current, chatKey: activeChat.chatKey },
+          // })
         }
         prevScrollTop = scrollTop
       },
@@ -364,7 +394,7 @@ const ChatWindow: React.FC = () => {
               The chat is very empty, <span>so sad</span>.
             </div>
           ) : (
-            <div className="chat-window__messages-list">
+            <div ref={testRef} className="chat-window__messages-list">
               {renderedMessages?.map((renderedMessage, index, array) => {
                 const nextMessage = array[index + 1]
                 const prevMessage = array[Math.max(index - 1, 0)]

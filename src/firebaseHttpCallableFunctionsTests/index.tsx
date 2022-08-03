@@ -208,7 +208,7 @@ export const newContactRequestTest = async ({
   database,
 }: {
   data: DataInterface
-  context: ContextInterface
+  context: any
   database: any
 }) => {
   const authUid = context?.authUser?.uid
@@ -217,6 +217,8 @@ export const newContactRequestTest = async ({
   if (!authUid) {
     throw new Error('The function must be called while authenticated.')
   }
+
+  console.log({ data, context, database })
 
   try {
     const updateData: any = {
@@ -239,7 +241,7 @@ export const newContactRequestTest = async ({
       },
     }
 
-    return database.ref().update(updateData)
+    return database.rootRef().update(updateData)
   } catch (error) {
     throw new Error(`There has been some error updating database: ${error}`)
   }
@@ -252,7 +254,7 @@ export const handleContactRequestTest = async ({
   timeStamp,
 }: {
   data: DataInterface
-  context: ContextInterface
+  context: any
   database: any
   timeStamp?: any
 }) => {
@@ -264,7 +266,7 @@ export const handleContactRequestTest = async ({
   }
 
   const chatKey = contactUid < authUid ? `${contactUid}_${authUid}` : `${authUid}_${contactUid}`
-  const newMessageRef = database.ref(`privateChats/${chatKey}/messages`).push()
+  const newMessageRef = database.rootRef(`privateChats/${chatKey}/messages`).push()
 
   const authPathToUpdate = status === 'accept' ? `${contactUid}/status` : contactUid
 
@@ -287,7 +289,7 @@ export const handleContactRequestTest = async ({
           : null,
     }
 
-    return database.ref().update(updateData)
+    return database.rootRef().update(updateData)
   } catch (error) {
     throw new Error(`There has been some error updating database: ${error}`)
   }

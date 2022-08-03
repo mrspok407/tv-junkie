@@ -295,15 +295,19 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
 
     case 'renderTopMessages': {
       if (messages[activeChat.chatKey][0]?.key === renderedMessagesList[activeChat.chatKey][0]?.key) {
+        console.log('Early Return renderTopMessages')
         return { ...state }
       }
 
       const indexStart = Math.max(
         messages[activeChat.chatKey].findIndex((item) => item.key === renderedMessagesList[activeChat.chatKey][0].key) -
-          (MESSAGES_TO_RENDER - (MESSAGES_TO_RENDER - 25)),
+          10,
         0,
       )
-      const indexEnd = indexStart + MESSAGES_TO_RENDER
+      // const indexEnd = indexStart + MESSAGES_TO_RENDER
+      const indexEnd = messages[activeChat.chatKey].length - 1
+
+      console.log({ indexStart, indexEnd })
 
       return {
         ...state,
@@ -328,6 +332,7 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
       const renderedMessages = renderedMessagesList[activeChat.chatKey]
 
       if (messagesData[messagesData.length - 1].key === renderedMessages[renderedMessages.length - 1].key) {
+        console.log('Early Return renderBottomMessages')
         return { ...state }
       }
 

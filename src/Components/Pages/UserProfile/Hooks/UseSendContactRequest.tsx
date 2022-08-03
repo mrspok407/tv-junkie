@@ -2,6 +2,9 @@ import { useContext, useState } from 'react'
 import { uniqueNamesGenerator, animals } from 'unique-names-generator'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import { ErrorsHandlerContext } from 'Components/AppContext/Contexts/ErrorsContext'
+import { newContactRequestTest } from 'firebaseHttpCallableFunctionsTests'
+import getTime from 'date-fns/getTime'
+import { currentDate } from 'Utils'
 
 type Props = {
   contactName: string
@@ -21,13 +24,23 @@ const useSendContactRequest = ({ contactName, contactUid }: Props) => {
         dictionaries: [animals],
         style: 'capital',
       })
-      const newContactRequestCloud = firebase.httpsCallable('newContactRequest')
-      await newContactRequestCloud({
-        contactUid,
-        contactName: contactName || randomUserName,
-        authUserName: authUser?.username,
+      await newContactRequestTest({
+        data: {
+          contactUid,
+          contactName: contactName || randomUserName,
+          timeStamp: getTime(currentDate),
+        },
+        context: { authUser },
+        database: firebase,
       })
+      // const newContactRequestCloud = firebase.httpsCallable('newContactRequest')
+      // await newContactRequestCloud({
+      //   contactUid,
+      //   contactName: contactName || randomUserName,
+      //   authUserName: authUser?.username,
+      // })
     } catch (error) {
+      console.log({ error })
       handleError({
         errorData: error,
         message: 'There has been some error updating database. Please try again.',
