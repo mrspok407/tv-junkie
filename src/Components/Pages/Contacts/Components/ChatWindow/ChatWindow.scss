@@ -148,7 +148,7 @@
       overflow-x: hidden;
       height: 100%;
       max-height: 100%;
-      // padding: 10px;
+       padding: 10px;
       @include scrollbar(5px, getColor(blueClr, $mainPalette), #c5bbb1);
     }
   }

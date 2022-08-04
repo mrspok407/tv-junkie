@@ -295,19 +295,15 @@ const reducer = (state: ContactsStateInterface, action: ACTIONTYPES) => {
 
     case 'renderTopMessages': {
       if (messages[activeChat.chatKey][0]?.key === renderedMessagesList[activeChat.chatKey][0]?.key) {
-        console.log('Early Return renderTopMessages')
         return { ...state }
       }
 
       const indexStart = Math.max(
         messages[activeChat.chatKey].findIndex((item) => item.key === renderedMessagesList[activeChat.chatKey][0].key) -
-          10,
+          (MESSAGES_TO_RENDER - (MESSAGES_TO_RENDER - 25)),
         0,
       )
-      // const indexEnd = indexStart + MESSAGES_TO_RENDER
-      const indexEnd = messages[activeChat.chatKey].length - 1
-
-      console.log({ indexStart, indexEnd })
+      const indexEnd = indexStart + MESSAGES_TO_RENDER
 
       return {
         ...state,
