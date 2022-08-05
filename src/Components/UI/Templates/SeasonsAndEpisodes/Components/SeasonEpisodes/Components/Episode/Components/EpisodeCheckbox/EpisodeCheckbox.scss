@@ -1,0 +1,74 @@
+@import "../../../../../../../../../../styles/globals";
+
+.episodes__episode-checkbox  {
+    position: relative;
+    align-self: center;
+    height: 20px;
+    width: 20px;
+
+    input {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .custom-checkmark {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 20px;
+      width: 20px;
+      background-color: #eee;
+      cursor: pointer;
+
+      &:after {
+        content: "";
+        position: absolute;
+        display: none;
+        left: 8px;
+        top: 3px;
+        width: 6px;
+        height: 11px;
+        border: solid white;
+        border-width: 0 3px 3px 0;
+        transform: rotate(45deg);
+      }
+
+      &--disabled {
+        background-color: #2f2f2f;
+      }
+    }
+
+    &:hover .custom-checkmark {
+      background-color: #9bc5e0;
+    }
+
+    &:hover .custom-checkmark--disabled {
+      background-color: #2f2f2f;
+    }
+
+    input:checked ~ .custom-checkmark {
+      background-color: getColor(blueClr, $mainPalette);
+
+      &:after {
+        display: block;
+      }
+    }
+
+    .disabled-warning {
+      width: 186px;
+      top: calc(100% + 8px);
+      left: -83px;
+      color: #000;
+      z-index: 9999;
+
+      @include mediaMaxW(#{$mobileViewPort}) {
+        left: -5px;
+
+        &:after {
+          left: 15px;
+        }
+      }
+    }
+  }

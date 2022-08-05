@@ -1,7 +1,7 @@
 import { currentDate } from 'Utils'
 import differenceInCalendarDays from 'date-fns/differenceInCalendarDays'
 
-type DataType = any
+type DataType = Array<any> | undefined
 
 export const episodesToOneArray = <T,>(data: DataType): T[] => {
   if (!Array.isArray(data)) return []

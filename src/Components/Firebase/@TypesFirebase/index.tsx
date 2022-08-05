@@ -27,7 +27,10 @@ export const SHOW_FULL_DATA_FIRE_DATABASE_INITIAL = {
 
 export interface EpisodesFromFireDatabase extends EpisodesTMDB {}
 
-export interface SingleEpisodeFromFireDatabase extends SingleEpisodeTMDB {}
+export interface SingleEpisodeFromFireDatabase extends SingleEpisodeTMDB {
+  episode_number: number
+  season_number: number
+}
 
 export interface EpisodesFromUserDatabase {
   episodes: SeasonFromUserDatabase[]

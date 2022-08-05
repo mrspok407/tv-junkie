@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import classNames from 'classnames'
 import { SingleEpisodeFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
-import { HandleFadeOutInterface } from '../Templates/SeasonsAndEpisodes/Components/SeasonEpisodes/SeasonEpisodes'
 import './UserRating.scss'
 
 const STAR_AMOUNT = 5
@@ -10,11 +9,11 @@ const STAR_AMOUNT = 5
 type Props = {
   id: number
   firebaseRef: string
-  seasonNum?: number
+  seasonNumber?: number
   episodeNum?: number
   episodeId?: number
   episodeRating?: boolean
-  handleFadeOut?: ({ episodeId, episodeIndex, seasonNum, rating }: HandleFadeOutInterface) => void
+  handleFadeOut?: ({ episodeId, episodeIndex, seasonNum, rating }: any) => void
   parentComponent?: string
   disableRating?: boolean
   userRatingData?: number | string
@@ -23,7 +22,7 @@ type Props = {
 const UserRating: React.FC<Props> = ({
   id,
   firebaseRef,
-  seasonNum,
+  seasonNumber,
   episodeNum = 0,
   episodeId = 0,
   episodeRating,
@@ -43,13 +42,13 @@ const UserRating: React.FC<Props> = ({
     firebase[firebaseRef]({
       authUid: firebase.auth.currentUser.uid,
       key: Number(id),
-      seasonNum,
+      seasonNumber,
       episodeNum,
     }).once('value', (snapshot: { val: () => { userRating: number } }) => {
       if (snapshot.val() === null) return
       setUserRating(snapshot.val().userRating)
     })
-  }, [firebase, firebaseRef, episodeNum, id, seasonNum, parentComponent])
+  }, [firebase, firebaseRef, episodeNum, id, seasonNumber, parentComponent])
 
   useEffect(() => {
     getRating()
@@ -89,16 +88,14 @@ const UserRating: React.FC<Props> = ({
     if (!authUser?.uid) return
     const rating = Number((e.target as HTMLButtonElement).dataset.rating)
 
-    console.log(firebaseRef)
-
     if (parentComponent === 'toWatchPage') {
-      if (!seasonNum) return
-      handleFadeOut({ episodeId, episodeIndex: episodeNum, seasonNum, rating })
+      if (!seasonNumber) return
+      handleFadeOut({ episodeId, episodeIndex: episodeNum, seasonNumber, rating })
     } else {
       firebase[firebaseRef]({
         authUid: authUser.uid,
         key: Number(id),
-        seasonNum,
+        seasonNumber,
         episodeNum,
       }).once('value', (snapshot: { val: () => SingleEpisodeFromFireDatabase }) => {
         if (snapshot.val() === null) return
@@ -108,7 +105,7 @@ const UserRating: React.FC<Props> = ({
         firebase[firebaseRef]({
           authUid: authUser.uid,
           key: Number(id),
-          seasonNum,
+          seasonNumber,
           episodeNum,
         }).update({
           userRating: rating,

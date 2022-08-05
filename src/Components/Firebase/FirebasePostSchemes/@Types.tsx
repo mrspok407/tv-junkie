@@ -1,5 +1,9 @@
 import { AuthUserFirebaseInterface } from 'Components/UserAuth/Session/Authentication/@Types'
-import { ShowFullDataStoreState, UserShowStatuses } from 'Components/UserContent/UseUserShowsRed/@Types'
+import {
+  ShowFullDataStoreState,
+  SingleEpisodeStoreState,
+  UserShowStatuses,
+} from 'Components/UserContent/UseUserShowsRed/@Types'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import {
   EpisodesFromUserDatabase,

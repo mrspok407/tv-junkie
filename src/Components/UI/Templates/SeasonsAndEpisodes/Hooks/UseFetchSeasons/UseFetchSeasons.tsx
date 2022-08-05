@@ -24,8 +24,6 @@ function useFetchSeasons<DataType>({ showId, preloadSeason }: Props) {
 
       try {
         const { data } = await getPromise(seasonNum)
-        // throw new Error('error test')
-        console.log({ data })
         const episodes = [...data[`season/${seasonNum}`].episodes].reverse()
 
         dispatch({

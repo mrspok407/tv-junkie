@@ -3,9 +3,11 @@ import classNames from 'classnames'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import DisableWarning from 'Components/UI/DisabledWarning/DisabledWarning'
 import { SingleEpisodeFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
-import { useAppSelector } from 'app/hooks'
-import { selectShowEpisodes } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
+import { useAppDispatch, useAppSelector } from 'app/hooks'
+import { selectShowEpisodes, selectSingleEpisode } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
+import { postCheckSingleEpisode } from 'Components/UserContent/UseUserShowsRed/DatabaseHandlers/PostData/postShowEpisodesData'
 import useDisableWarning from '../../Hooks/UseDisableWarning'
+import './EpisodeCheckbox.scss'
 
 type Props = {
   isDisabled: boolean
@@ -14,15 +16,12 @@ type Props = {
 }
 
 const EpisodeCheckbox: React.FC<Props> = ({ isDisabled, episodeData, showId }: Props) => {
-  const { authUser } = useFrequentVariables()
+  const { authUser, firebase } = useFrequentVariables()
+  const dispatch = useAppDispatch()
   const [showDisableWarning, handleDisableWarning, fadeOutStart, checkboxRef] = useDisableWarning()
 
   const isWatched = useAppSelector((state) => {
-    if (!authUser?.uid) return false
-
-    const episodesFromStore = selectShowEpisodes(state, showId)
-    const season = episodesFromStore?.find((season) => season.season_number === episodeData.season_number)
-    const episode = season?.episodes.find((episode) => episode.id === episodeData.id)
+    const episode = selectSingleEpisode(state, showId, episodeData.season_number, episodeData.episode_number)
     return episode?.watched ?? false
   })
 
@@ -40,7 +39,14 @@ const EpisodeCheckbox: React.FC<Props> = ({ isDisabled, episodeData, showId }: P
           type="checkbox"
           checked={isWatched}
           onChange={() => {
-            // toggleWatchedEpisode(season.season_number, indexOfEpisode)
+            dispatch(
+              postCheckSingleEpisode({
+                showId,
+                seasonNumber: episodeData.season_number,
+                episodeNumber: episodeData.episode_number,
+                firebase,
+              }),
+            )
           }}
           disabled={isDisabled}
         />

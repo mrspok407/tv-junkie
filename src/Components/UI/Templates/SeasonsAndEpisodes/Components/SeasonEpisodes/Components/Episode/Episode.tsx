@@ -1,31 +1,28 @@
+import React, { useState } from 'react'
 import classNames from 'classnames'
 import { SingleEpisodeFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
-import UserRating from 'Components/UI/UserRating/UserRating'
-import React, { useState } from 'react'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
-import differenceInCalendarDays from 'date-fns/differenceInCalendarDays'
 import useFormatEpisodeAirDate from '../../../../Hooks/UseFormatEpisodeAirDate'
 import TorrentLinksEpisodes from '../TorrentLinksEpisodes/TorrentLinksEpisodes'
 import UserRatingEpisode from './Components/UserRatingEpisode'
-import useDisableWarning from './Hooks/UseDisableWarning'
 import EpisodeCheckbox from './Components/EpisodeCheckbox/EpisodeCheckbox'
 
 type Props = {
   episodeData: SingleEpisodeFromFireDatabase
   episodeNumberForFirebase: number
   seasonNumber: number
-  showTitle: string
   showCheckboxes: boolean
   showId: number
+  showTitle: string
 }
 
 const Episode: React.FC<Props> = ({
   episodeData,
   episodeNumberForFirebase,
   seasonNumber,
-  showTitle,
   showCheckboxes,
   showId,
+  showTitle,
 }) => {
   const { authUser } = useFrequentVariables()
   const [isEpisodeOpen, setIsEpisodeOpen] = useState(false)
@@ -42,18 +39,9 @@ const Episode: React.FC<Props> = ({
     >
       <div
         className={classNames('episodes__episode-wrapper', {
-          'episodes__episode-wrapper--not-aired': !isEpisodeAired,
+          'episodes__episode-wrapper--not-aired': !isEpisodeAired || airDateUnavailable,
         })}
         onClick={() => setIsEpisodeOpen(!isEpisodeOpen)}
-        style={
-          !isEpisodeAired || airDateUnavailable
-            ? {
-                backgroundColor: 'rgba(132, 90, 90, 0.3)',
-              }
-            : {
-                backgroundColor: '#1d1d1d96',
-              }
-        }
       >
         {isEpisodeAired && !airDateUnavailable && (
           <EpisodeCheckbox isDisabled={!showCheckboxes || !authUser?.uid} episodeData={episodeData} showId={showId} />

@@ -9,6 +9,8 @@ import {
   ShowInfoFromUserDatabase,
   SnapshotVal,
   MovieInfoFromUserDatabase,
+  SingleEpisodeFromUserDatabase,
+  SeasonFromUserDatabase,
 } from './@TypesFirebase'
 
 export interface FirebaseFetchMethods<T> {
@@ -53,6 +55,26 @@ export interface FirebaseInterface {
     authUid: string
     key: string | number
   }) => FirebaseReferenceProps<ShowInfoFromUserDatabase | null>
+  userShowSingleSeason: ({
+    authUid,
+    key,
+    seasonNumber,
+  }: {
+    authUid: string
+    key: string | number
+    seasonNumber: number
+  }) => FirebaseReferenceProps<SeasonFromUserDatabase | null>
+  userShowSingleEpisode: ({
+    authUid,
+    key,
+    seasonNumber,
+    episodeNumber,
+  }: {
+    authUid: string
+    key: string | number
+    seasonNumber: number
+    episodeNumber: number
+  }) => FirebaseReferenceProps<SingleEpisodeFromUserDatabase | null>
   userMovie: ({
     authUid,
     key,
@@ -160,6 +182,8 @@ export const FIREBASE_INITIAL_STATE = {
   showEpisodesUserDatabase: () => firebaseRefInitial([]),
   showsEpisodesUserDatabase: () => firebaseRefInitial([]),
   userShow: () => firebaseRefInitial(null),
+  userShowSingleSeason: () => firebaseRefInitial(null),
+  userShowSingleEpisode: () => firebaseRefInitial(null),
   userMovie: () => firebaseRefInitial(null),
   userMovieFinished: () => firebaseRefInitial(null),
   userShowId: () => firebaseRefInitial(null),

@@ -37,8 +37,8 @@ if (window.location.hostname === 'localhost') {
 interface ReferenceInterface {
   authUid: string
   key: string
-  seasonNum: number
-  episodeNum: number
+  seasonNumber: number
+  episodeNumber: number
 }
 
 class Firebase {
@@ -236,17 +236,17 @@ class Firebase {
   userShowAllEpisodesInfo = (uid: string, showKey: string) =>
     this.db.ref(`users/${uid}/content/episodes/${showKey}/info`)
 
-  userShowSingleEpisode = ({ authUid, key, seasonNum, episodeNum }: ReferenceInterface) =>
-    this.db.ref(`users/${authUid}/content/episodes/${key}/episodes/${seasonNum - 1}/episodes/${episodeNum}`)
+  userShowSingleEpisode = ({ authUid, key, seasonNumber, episodeNumber }: ReferenceInterface) =>
+    this.db.ref(`users/${authUid}/content/episodes/${key}/episodes/${seasonNumber - 1}/episodes/${episodeNumber - 1}`)
 
-  userShowSeasonEpisodes = ({ authUid, key, seasonNum }: ReferenceInterface) =>
-    this.db.ref(`users/${authUid}/content/episodes/${key}/episodes/${seasonNum - 1}/episodes`)
+  userShowSeasonEpisodes = ({ authUid, key, seasonNumber }: ReferenceInterface) =>
+    this.db.ref(`users/${authUid}/content/episodes/${key}/episodes/${seasonNumber - 1}/episodes`)
 
-  userShowSeasonEpisodesNotFinished = ({ authUid, key, seasonNum }: ReferenceInterface) =>
-    this.db.ref(`users/${authUid}/content/episodes/notFinished/${key}/episodes/${seasonNum - 1}/episodes`)
+  userShowSeasonEpisodesNotFinished = ({ authUid, key, seasonNumber }: ReferenceInterface) =>
+    this.db.ref(`users/${authUid}/content/episodes/notFinished/${key}/episodes/${seasonNumber - 1}/episodes`)
 
-  userShowSeason = ({ authUid, key, seasonNum }: ReferenceInterface) =>
-    this.db.ref(`users/${authUid}/content/episodes/${key}/episodes/${seasonNum - 1}`)
+  userShowSingleSeason = ({ authUid, key, seasonNumber }: ReferenceInterface) =>
+    this.db.ref(`users/${authUid}/content/episodes/${key}/episodes/${seasonNumber - 1}`)
 
   moviesInfoUserDatabase = (uid: string) => this.db.ref(`users/${uid}/content/movies/watchLaterMovies`)
 

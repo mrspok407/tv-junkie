@@ -19,8 +19,8 @@ const UserRatingSeason: React.FC<Props> = ({ showId, seasonNum, showRating }) =>
   return (
     <UserRating
       id={showId}
-      firebaseRef="userShowSeason"
-      seasonNum={seasonNum}
+      firebaseRef="userShowSingleSeason"
+      seasonNumber={seasonNum}
       disableRating={!!(showFromStore?.database === 'notWatchingShows')}
     />
   )

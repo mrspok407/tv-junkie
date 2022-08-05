@@ -5,18 +5,21 @@ import { getAuthUidFromState } from 'Components/UserAuth/Session/Authentication/
 import { releasedEpisodesToOneArray } from 'Utils'
 import { SingleEpisodeStoreState } from '../../@Types'
 import { handleShowsError } from '../../ErrorHandlers/handleShowsError'
-import { selectShowEpisodes } from '../../userShowsSliceRed'
+import { selectShowEpisodes, selectSingleEpisode, selectSingleSeason } from '../../userShowsSliceRed'
 
-type Props = {
+type PostCheckAllReleasedEpisodesT = {
   showId: number
   firebase: FirebaseInterface
+  seasonNumber?: number
 }
 
-export const postCheckAllReleasedEpisodes =
-  ({ showId, firebase }: Props): AppThunk =>
+export const postCheckReleasedEpisodes =
+  ({ showId, seasonNumber, firebase }: PostCheckAllReleasedEpisodesT): AppThunk =>
   async (dispatch, getState) => {
     const authUid = getAuthUidFromState(getState())
-    const episodesFromStore = selectShowEpisodes(getState(), showId)
+    const episodesFromStore = seasonNumber
+      ? selectSingleSeason(getState(), showId, seasonNumber)
+      : selectShowEpisodes(getState(), showId)
     const releasedEpisodes = releasedEpisodesToOneArray<SingleEpisodeStoreState>(episodesFromStore)
 
     const isAnyEpisodeNotWatched = releasedEpisodes.some((episode) => !episode.watched)
@@ -30,6 +33,28 @@ export const postCheckAllReleasedEpisodes =
       })
 
       return firebase.rootRef().update(updateData)
+    } catch (error) {
+      dispatch(handleShowsError(error))
+    }
+  }
+
+type PostCheckSingleEpisodeT = {
+  showId: number
+  seasonNumber: number
+  episodeNumber: number
+  firebase: FirebaseInterface
+}
+
+export const postCheckSingleEpisode =
+  ({ showId, seasonNumber, episodeNumber, firebase }: PostCheckSingleEpisodeT): AppThunk =>
+  async (dispatch, getState) => {
+    const authUid = getAuthUidFromState(getState())
+    const episodeFromStore = selectSingleEpisode(getState(), showId, seasonNumber, episodeNumber)
+
+    try {
+      firebase.userShowSingleEpisode({ authUid, key: showId, seasonNumber, episodeNumber }).update({
+        watched: !episodeFromStore?.watched,
+      })
     } catch (error) {
       dispatch(handleShowsError(error))
     }

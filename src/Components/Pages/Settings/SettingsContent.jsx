@@ -137,13 +137,13 @@ const SettingsContent = () => {
       )
       .then(async ({ data }) => {
         // const tempData = [{ id: 1396 }]
-        // const allShowsIds = await this.context.firebase
+        // const allShowsIds = await firebase
         //   .allShowsList()
-        //   .once("value")
+        //   .once('value')
         //   .then((snapshot) =>
         //     Object.keys(snapshot.val()).map((id) => {
         //       return { id }
-        //     })
+        //     }),
         //   )
 
         data.results.forEach((show) => {
@@ -331,7 +331,6 @@ const SettingsContent = () => {
           </button>
         </>
       )}
-
       <div className="user-settings__signout">
         <SignOutButton />
       </div>

@@ -34,7 +34,10 @@ export interface UserWillAirEpisodesInterface {
   month: string
 }
 
-export interface SingleEpisodeStoreState extends SingleEpisodeTMDB, SingleEpisodeFromUserDatabase {}
+export interface SingleEpisodeStoreState extends SingleEpisodeTMDB, SingleEpisodeFromUserDatabase {
+  episode_number: number
+  season_number: number
+}
 export interface EpisodesStoreState extends EpisodesTMDB, SeasonFromUserDatabase {
   episodes: SingleEpisodeStoreState[]
 }

@@ -1,29 +1,29 @@
-import classNames from 'classnames'
 import React from 'react'
+import classNames from 'classnames'
 import { isArrayIncludes, currentDate } from 'Utils'
 import { SeasonTMDB } from 'Utils/@TypesTMDB'
 import Loader from 'Components/UI/Placeholders/Loader'
 import differenceInCalendarDays from 'date-fns/differenceInCalendarDays'
 import { FetchSeasonsInt } from '../Hooks/UseFetchSeasons/ReducerConfig/@Types'
 import { ShowEpisodesFromAPIInt } from '../@Types'
-import SeasonEpisodes from './SeasonEpisodes/SeasonEpisodes'
-import UserRatingSeason from './SeasonEpisodes/Components/UserRatingSeason'
+import Season from './SeasonEpisodes/Season'
 
 type Props = {
   showId: number
   showCheckboxes: boolean
   seasonsTMDB: SeasonTMDB[]
-  gridState: FetchSeasonsInt<ShowEpisodesFromAPIInt>
+  seasonsData: FetchSeasonsInt<ShowEpisodesFromAPIInt>
   handleOpenSeasonEpisodes: (seasonId: number, seasonNum: number) => void
 }
 
-const SeasonsGrid: React.FC<Props> = ({ showId, seasonsTMDB, gridState, showCheckboxes, handleOpenSeasonEpisodes }) => {
-  const { data, loadingData, openData, errors } = gridState
-
-  console.log({ seasonsTMDB })
-  const renderEdgeCases = (season: SeasonTMDB) => {
-    return season.season_number === 0 || season.name === 'Specials' || season.episode_count === 0 || !season.id
-  }
+const SeasonsGrid: React.FC<Props> = ({
+  showId,
+  seasonsTMDB,
+  seasonsData,
+  showCheckboxes,
+  handleOpenSeasonEpisodes,
+}) => {
+  const { data, loadingData, openData, errors } = seasonsData
 
   const renderEpisodes = (season: SeasonTMDB, daysToNewSeason: number) => {
     const seasonEpisodes = data.find((item) => item.seasonId === season.id)
@@ -41,36 +41,13 @@ const SeasonsGrid: React.FC<Props> = ({ showId, seasonsTMDB, gridState, showChec
 
     if (isArrayIncludes(season.id, openData)) {
       return (
-        <>
-          {seasonData.poster_path && (
-            <div className="episodes__episode-group-poster-wrapper">
-              {isSeasonAired && (
-                <UserRatingSeason showRating={showCheckboxes} seasonNum={seasonData.season_number} showId={showId} />
-              )}
-
-              <div
-                className="episodes__episode-group-poster"
-                style={{
-                  backgroundImage: `url(https://image.tmdb.org/t/p/w500/${seasonData.poster_path})`,
-                }}
-              />
-              {showCheckboxes && isSeasonAired && (
-                <div className="episodes__episode-group-check-all-episodes">
-                  <button
-                    type="button"
-                    className="button"
-                    // onClick={() => checkEverySeasonEpisode(season.season_number)}
-                  >
-                    Check all
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-          <SeasonEpisodes seasonData={seasonData} showCheckboxes={showCheckboxes} showId={showId} />
-        </>
+        <Season seasonData={seasonData} showCheckboxes={showCheckboxes} showId={showId} isSeasonAired={isSeasonAired} />
       )
     }
+  }
+
+  const renderEdgeCases = (season: SeasonTMDB) => {
+    return season.season_number === 0 || season.name === 'Specials' || season.episode_count === 0 || !season.id
   }
 
   return (
