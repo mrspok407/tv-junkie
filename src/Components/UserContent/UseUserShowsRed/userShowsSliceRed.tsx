@@ -148,18 +148,23 @@ export const selectEpisodes = (state: RootState) => state.userShows.data.episode
 export const selectShowsIds = (state: RootState) => state.userShows.data.ids
 export const selectShow = (state: RootState, showId: number) => state.userShows.data.info[showId]
 export const selectShowEpisodes = (state: RootState, showId: number) => state.userShows.data.episodes[showId]
+export const selectShowStatus = (state: RootState, showId: number) => selectShow(state, showId)?.database
+export const selectShowRating = (state: RootState, showId: number) => selectShow(state, showId)?.userRating
+
 export const selectSingleSeason = (state: RootState, id: number, seasonNum: number) => {
   const episodes = selectShowEpisodes(state, id)
   if (episodes === undefined) return undefined
   const singleSeason = episodes[seasonNum - 1]
-  return [singleSeason]
+  return singleSeason
 }
-export const selectSingleEpisode = (state: RootState, showId: number, seasonNum: number, episodeNum: number) => {
+
+export const selectSingleEpisode = (state: RootState, showId: number, seasonNum: number, episodeNumber: number) => {
   const episodes = selectShowEpisodes(state, showId)
   if (episodes === undefined) return undefined
-  const singleEpisode = episodes[seasonNum - 1]?.episodes[episodeNum - 1]
+  const singleEpisode = episodes[seasonNum - 1]?.episodes[episodeNumber - 1]
   return singleEpisode
 }
+
 export const selectShowDatabase = (state: RootState, showId: number) => state.userShows.data.info[showId]?.database
 export const selectShowsLoading = (state: RootState) => state.userShows.initialLoading
 export const selectLoadingNewShow = (state: RootState) => state.userShows.loadingNewShow

@@ -21,7 +21,7 @@ const Season: React.FC<Props> = ({ seasonData, showCheckboxes, isSeasonAired, sh
       {seasonData.poster_path && (
         <div className="episodes__episode-group-poster-wrapper">
           {isSeasonAired && (
-            <UserRatingSeason showRating={showCheckboxes} seasonNum={seasonData.season_number} showId={showId} />
+            <UserRatingSeason showRating={showCheckboxes} seasonNumber={seasonData.season_number} showId={showId} />
           )}
 
           <div
@@ -48,13 +48,10 @@ const Season: React.FC<Props> = ({ seasonData, showCheckboxes, isSeasonAired, sh
 
       <div className="episodes__episode-list">
         {seasonData.episodes.map((episode, episodeIndex, array) => {
-          const episodeNumberForFirebase = array.length - 1 - episodeIndex
           return (
             <Episode
               key={episode.id}
               episodeData={episode}
-              episodeNumberForFirebase={episodeNumberForFirebase}
-              seasonNumber={seasonData.season_number}
               showCheckboxes={showCheckboxes}
               showId={showId}
               showTitle={seasonData.showTitle}

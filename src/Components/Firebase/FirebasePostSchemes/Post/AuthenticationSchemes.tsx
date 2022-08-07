@@ -49,7 +49,7 @@ export const postUserDataOnRegisterScheme = ({
       name: show.name,
       status: show.status === 'Ended' || show.status === 'Canceled' ? 'ended' : 'ongoing',
       timeStamp: firebase.timeStamp(),
-      userRating: '',
+      userRating: 0,
       key: show.id.toString(),
     }
     showsLastUpdated[show.id] = {

@@ -20,7 +20,7 @@ export interface ShowFullDataStoreState extends MainDataTMDB {
   key: string
   lastUpdatedInDatabase: number
   timeStamp: number
-  userRating: string | undefined
+  userRating: number
 }
 
 export interface SingleEpisodeByMonthInterface {
@@ -46,7 +46,7 @@ export interface UserShowsStoreState {
   data: {
     ids: number[]
     info: {
-      [key: string]: ShowFullDataStoreState
+      [key: string]: ShowFullDataStoreState | undefined
     }
     episodes: {
       [key: string]: EpisodesStoreState[] | undefined

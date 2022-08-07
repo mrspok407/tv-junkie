@@ -22,7 +22,7 @@ export const formatMovieForPostFirebase = ({
     vote_count: data.vote_count,
     timeStamp: firebase.timeStamp(),
     finished: false,
-    userRating: '',
+    userRating: 0,
     key: data.id.toString(),
   })
 }

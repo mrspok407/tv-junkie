@@ -39,7 +39,7 @@ const ShowsGrid: React.FC<Props> = ({ data, section }) => {
                   </div>
                   {item.vote_average !== 0 && (
                     <div className="content-results__item-rating">
-                      {item.vote_average}
+                      {item.vote_average?.toFixed(1)}
                       <span>/10</span>
                       <span className="content-results__item-rating-vote-count">({item.vote_count})</span>
                     </div>

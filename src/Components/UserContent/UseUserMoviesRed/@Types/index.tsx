@@ -7,7 +7,7 @@ export interface UserMoviesStoreState {
   data: {
     ids: number[]
     info: {
-      [key: string]: MovieInfoFromUserDatabase
+      [key: string]: MovieInfoFromUserDatabase | undefined
     }
     timeStamps: {
       [key: string]: number

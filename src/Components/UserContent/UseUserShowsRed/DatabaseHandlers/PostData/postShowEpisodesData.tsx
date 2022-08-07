@@ -18,7 +18,7 @@ export const postCheckReleasedEpisodes =
   async (dispatch, getState) => {
     const authUid = getAuthUidFromState(getState())
     const episodesFromStore = seasonNumber
-      ? selectSingleSeason(getState(), showId, seasonNumber)
+      ? [selectSingleSeason(getState(), showId, seasonNumber)]
       : selectShowEpisodes(getState(), showId)
     const releasedEpisodes = releasedEpisodesToOneArray<SingleEpisodeStoreState>(episodesFromStore)
 

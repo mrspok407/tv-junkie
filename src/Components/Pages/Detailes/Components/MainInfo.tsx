@@ -50,7 +50,7 @@ export const MainInfo: React.FC<Props> = ({ detailes, mediaType, showId }) => {
       </div>
       <div className="detailes-page__info-row">
         <div className="detailes-page__info-option">Users rating</div>
-        <div className="detailes-page__info-value">{detailes.vote_average || noDataPlaceholder()}</div>
+        <div className="detailes-page__info-value">{detailes.vote_average?.toFixed(1) || noDataPlaceholder()}</div>
       </div>
       <div className="detailes-page__info-row">
         <div className="detailes-page__info-option">Runtime</div>

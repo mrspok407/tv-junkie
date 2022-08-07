@@ -236,6 +236,9 @@ class Firebase {
   userShowAllEpisodesInfo = (uid: string, showKey: string) =>
     this.db.ref(`users/${uid}/content/episodes/${showKey}/info`)
 
+  userShowSingleSeason = ({ authUid, key, seasonNumber }: ReferenceInterface) =>
+    this.db.ref(`users/${authUid}/content/episodes/${key}/episodes/${seasonNumber - 1}`)
+
   userShowSingleEpisode = ({ authUid, key, seasonNumber, episodeNumber }: ReferenceInterface) =>
     this.db.ref(`users/${authUid}/content/episodes/${key}/episodes/${seasonNumber - 1}/episodes/${episodeNumber - 1}`)
 
@@ -244,9 +247,6 @@ class Firebase {
 
   userShowSeasonEpisodesNotFinished = ({ authUid, key, seasonNumber }: ReferenceInterface) =>
     this.db.ref(`users/${authUid}/content/episodes/notFinished/${key}/episodes/${seasonNumber - 1}/episodes`)
-
-  userShowSingleSeason = ({ authUid, key, seasonNumber }: ReferenceInterface) =>
-    this.db.ref(`users/${authUid}/content/episodes/${key}/episodes/${seasonNumber - 1}`)
 
   moviesInfoUserDatabase = (uid: string) => this.db.ref(`users/${uid}/content/movies/watchLaterMovies`)
 

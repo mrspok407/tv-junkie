@@ -82,6 +82,8 @@ export const { setUserMovies, addMovie, removeMovie, changeMovie, updateLoadingM
 export const selectMovies = (state: RootState) => state.userMovies.data.info
 export const selectMoviesIds = (state: RootState) => state.userMovies.data.ids
 export const selectMovie = (state: RootState, id: number) => state.userMovies.data.info[id]
+export const selectMovieRating = (state: RootState, id: number) => selectMovie(state, id)?.userRating
+
 export const selectMoviesLoading = (state: RootState) => state.userMovies.initialLoading
 export const selectLoadingMovie = (state: RootState) => state.userMovies.loadingMovie
 

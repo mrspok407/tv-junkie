@@ -1,29 +1,42 @@
 import React from 'react'
-import { useAppSelector } from 'app/hooks'
+import { useAppDispatch, useAppSelector } from 'app/hooks'
 import UserRating from 'Components/UI/UserRating/UserRating'
-import { selectShow } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
+import { selectShowStatus, selectSingleSeason } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import { handleShowsError } from 'Components/UserContent/UseUserShowsRed/ErrorHandlers/handleShowsError'
+import useUnmountRef from 'Utils/Hooks/UseUnmountRef'
 
 type Props = {
   showRating: boolean
   showId: number
-  seasonNum: number
+  seasonNumber: number
 }
 
-const UserRatingSeason: React.FC<Props> = ({ showId, seasonNum, showRating }) => {
-  const { authUser } = useFrequentVariables()
-  const showFromStore = useAppSelector((state) => selectShow(state, showId))
+const UserRatingSeason: React.FC<Props> = ({ showId, seasonNumber, showRating }) => {
+  const { firebase, authUser } = useFrequentVariables()
+  const dispatch = useAppDispatch()
+
+  const isUnmountedRef = useUnmountRef()
+
+  const showStatus = useAppSelector((state) => selectShowStatus(state, showId))
+  const currentRating = useAppSelector((state) => selectSingleSeason(state, showId, seasonNumber)?.userRating) ?? 0
+
+  const handlePostData = (rating: number) => {
+    try {
+      firebase
+        .userShowSingleSeason({ authUid: authUser?.uid, key: showId, seasonNumber })
+        .update({ userRating: rating })
+    } catch (error) {
+      if (isUnmountedRef.current) return
+      dispatch(handleShowsError(error))
+    }
+  }
+
+  const disableRating = showStatus === 'notWatchingShows'
 
   if (!showRating || !authUser?.uid) return null
 
-  return (
-    <UserRating
-      id={showId}
-      firebaseRef="userShowSingleSeason"
-      seasonNumber={seasonNum}
-      disableRating={!!(showFromStore?.database === 'notWatchingShows')}
-    />
-  )
+  return <UserRating currentRating={currentRating} isDisabled={disableRating} onClick={handlePostData} />
 }
 
 export default UserRatingSeason

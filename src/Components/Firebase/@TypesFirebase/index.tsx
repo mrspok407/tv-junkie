@@ -64,7 +64,7 @@ export interface ShowInfoFromUserDatabase {
   name: string
   status: string
   timeStamp: number
-  userRating: string
+  userRating: number
 }
 
 export interface MovieInfoFromUserDatabase {
@@ -77,7 +77,7 @@ export interface MovieInfoFromUserDatabase {
   release_date: string
   timeStamp: number
   title: string
-  userRating: string
+  userRating: number
   vote_average: number
   vote_count: number
 }

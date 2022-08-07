@@ -9,21 +9,12 @@ import EpisodeCheckbox from './Components/EpisodeCheckbox/EpisodeCheckbox'
 
 type Props = {
   episodeData: SingleEpisodeFromFireDatabase
-  episodeNumberForFirebase: number
-  seasonNumber: number
   showCheckboxes: boolean
   showId: number
   showTitle: string
 }
 
-const Episode: React.FC<Props> = ({
-  episodeData,
-  episodeNumberForFirebase,
-  seasonNumber,
-  showCheckboxes,
-  showId,
-  showTitle,
-}) => {
+const Episode: React.FC<Props> = ({ episodeData, showCheckboxes, showId, showTitle }) => {
   const { authUser } = useFrequentVariables()
   const [isEpisodeOpen, setIsEpisodeOpen] = useState(false)
 
@@ -79,14 +70,14 @@ const Episode: React.FC<Props> = ({
             <>
               <UserRatingEpisode
                 showRating={showCheckboxes}
-                seasonNum={seasonNumber}
-                episodeNum={episodeNumberForFirebase}
+                seasonNumber={episodeData.season_number}
+                episodeNumber={episodeData.episode_number}
                 showId={showId}
               />
               {authUser?.email !== process.env.REACT_APP_ADMIN_EMAIL && (
                 <TorrentLinksEpisodes
                   showTitle={showTitle}
-                  seasonNumber={seasonNumber}
+                  seasonNumber={episodeData.season_number}
                   episodeNumber={episodeData.episode_number as number}
                 />
               )}

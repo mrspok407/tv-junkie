@@ -57,7 +57,7 @@ const MovieButtons: React.FC<Props> = ({ movieId, detailes }: Props) => {
       </div>
       <div className="buttons__col">
         <ButtonWithWarning
-          isDisabled={!movieFromStore && authUser.uid}
+          isDisabled={!movieFromStore && !!authUser.uid}
           isPressed={!!(movieFromStore?.finished && authUser.uid)}
           onClick={() => {
             dispatch(updateMovieFinished({ movieId, firebase }))

@@ -1,61 +1,27 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useRef } from 'react'
 import classNames from 'classnames'
-import { SingleEpisodeFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
-import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import './UserRating.scss'
 
-const STAR_AMOUNT = 5
+const STAR_AMOUNT_DEFAULT = 5
 
 type Props = {
-  id: number
-  firebaseRef: string
-  seasonNumber?: number
-  episodeNum?: number
-  episodeId?: number
-  episodeRating?: boolean
-  handleFadeOut?: ({ episodeId, episodeIndex, seasonNum, rating }: any) => void
-  parentComponent?: string
-  disableRating?: boolean
-  userRatingData?: number | string
+  currentRating: number
+  isDisabled: boolean
+  isUserProfile?: boolean
+  starAmount?: number
+  onClick: (rating: number) => void
 }
 
 const UserRating: React.FC<Props> = ({
-  id,
-  firebaseRef,
-  seasonNumber,
-  episodeNum = 0,
-  episodeId = 0,
-  episodeRating,
-  parentComponent,
-  disableRating,
-  userRatingData,
-  handleFadeOut = () => {},
+  currentRating,
+  isDisabled,
+  isUserProfile = false,
+  starAmount = STAR_AMOUNT_DEFAULT,
+  onClick,
 }) => {
-  const { firebase, authUser } = useFrequentVariables()
-
-  const [userRating, setUserRating] = useState(userRatingData || 0)
   const userRatingRef = useRef<HTMLDivElement>(null)
 
-  const getRating = useCallback(() => {
-    if (firebase.auth.currentUser === null || parentComponent === 'toWatchPage' || firebaseRef === '') return
-
-    firebase[firebaseRef]({
-      authUid: firebase.auth.currentUser.uid,
-      key: Number(id),
-      seasonNumber,
-      episodeNum,
-    }).once('value', (snapshot: { val: () => { userRating: number } }) => {
-      if (snapshot.val() === null) return
-      setUserRating(snapshot.val().userRating)
-    })
-  }, [firebase, firebaseRef, episodeNum, id, seasonNumber, parentComponent])
-
-  useEffect(() => {
-    getRating()
-  }, [getRating])
-
   const onMouseMoveHandler = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (!authUser?.uid) return
     const target = e.target as HTMLButtonElement
     const buttonsNodeList = (target.parentElement as HTMLElement).getElementsByClassName('user-rating__button')
     const currentRating = Number((e.target as HTMLButtonElement).dataset.rating)
@@ -71,72 +37,42 @@ const UserRating: React.FC<Props> = ({
   }
 
   const onMouseLeaveHandler = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (!authUser?.uid) return
     const target = e.target as HTMLButtonElement
     const buttonsNodeList = (target.parentElement as HTMLElement).getElementsByClassName('user-rating__button')
 
     Array.from(buttonsNodeList).forEach((star, index) => {
       star.classList.remove('user-rating__button-hovered')
 
-      if (index + 1 <= userRating) {
+      if (index + 1 <= currentRating) {
         star.classList.add('user-rating__button-rated')
       }
     })
   }
 
   const onClickHandler = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (!authUser?.uid) return
     const rating = Number((e.target as HTMLButtonElement).dataset.rating)
-
-    if (parentComponent === 'toWatchPage') {
-      if (!seasonNumber) return
-      handleFadeOut({ episodeId, episodeIndex: episodeNum, seasonNumber, rating })
-    } else {
-      firebase[firebaseRef]({
-        authUid: authUser.uid,
-        key: Number(id),
-        seasonNumber,
-        episodeNum,
-      }).once('value', (snapshot: { val: () => SingleEpisodeFromFireDatabase }) => {
-        if (snapshot.val() === null) return
-
-        setUserRating(rating)
-
-        firebase[firebaseRef]({
-          authUid: authUser.uid,
-          key: Number(id),
-          seasonNumber,
-          episodeNum,
-        }).update({
-          userRating: rating,
-          finished: firebaseRef === 'userMovie' ? true : null,
-          watched: parentComponent === 'toWatchPage' ? snapshot.val().watched : episodeRating ? true : null,
-        })
-      })
-    }
+    onClick(rating)
   }
-
-  const ratingDisabled = !authUser?.uid || disableRating
 
   return (
     <div
       ref={userRatingRef}
       className={classNames('user-rating', {
-        'user-rating--user-profile': firebaseRef === '',
+        'user-rating--user-profile': isUserProfile,
       })}
     >
-      {[...Array(STAR_AMOUNT).keys()].map((n) => (
+      {[...Array(starAmount).keys()].map((n) => (
         <button
           key={n}
           data-rating={n + 1}
           type="button"
           className={classNames('user-rating__button', {
-            'user-rating__button-rated': n + 1 <= userRating,
-            'user-rating__button--disabled': ratingDisabled,
+            'user-rating__button-rated': n + 1 <= currentRating,
+            'user-rating__button--disabled': isDisabled,
           })}
-          onMouseMove={!ratingDisabled ? onMouseMoveHandler : undefined}
-          onMouseLeave={!ratingDisabled ? onMouseLeaveHandler : undefined}
-          onClick={!ratingDisabled ? onClickHandler : undefined}
+          onMouseMove={!isDisabled ? onMouseMoveHandler : undefined}
+          onMouseLeave={!isDisabled ? onMouseLeaveHandler : undefined}
+          onClick={!isDisabled ? onClickHandler : undefined}
         />
       ))}
     </div>
