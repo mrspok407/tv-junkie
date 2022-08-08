@@ -21,24 +21,23 @@ const UserRating: React.FC<Props> = ({
 }) => {
   const userRatingRef = useRef<HTMLDivElement>(null)
 
-  const onMouseMoveHandler = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleMouseEnter = (e: React.MouseEvent<HTMLButtonElement>) => {
     const target = e.target as HTMLButtonElement
-    const buttonsNodeList = (target.parentElement as HTMLElement).getElementsByClassName('user-rating__button')
-    const currentRating = Number((e.target as HTMLButtonElement).dataset.rating)
+    const buttonsNodeList = userRatingRef.current?.getElementsByClassName('user-rating__button')!
+    const rating = Number(target.dataset.rating)
 
     Array.from(buttonsNodeList).forEach((star, index) => {
-      if (index + 1 <= currentRating) {
+      if (index + 1 <= rating) {
         star.classList.add('user-rating__button-hovered')
       }
-      if (index + 1 > currentRating) {
+      if (index + 1 > rating) {
         star.classList.remove('user-rating__button-rated')
       }
     })
   }
 
-  const onMouseLeaveHandler = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const target = e.target as HTMLButtonElement
-    const buttonsNodeList = (target.parentElement as HTMLElement).getElementsByClassName('user-rating__button')
+  const handleMouseLeave = () => {
+    const buttonsNodeList = userRatingRef.current?.getElementsByClassName('user-rating__button')!
 
     Array.from(buttonsNodeList).forEach((star, index) => {
       star.classList.remove('user-rating__button-hovered')
@@ -49,7 +48,7 @@ const UserRating: React.FC<Props> = ({
     })
   }
 
-  const onClickHandler = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     const rating = Number((e.target as HTMLButtonElement).dataset.rating)
     onClick(rating)
   }
@@ -70,9 +69,9 @@ const UserRating: React.FC<Props> = ({
             'user-rating__button-rated': n + 1 <= currentRating,
             'user-rating__button--disabled': isDisabled,
           })}
-          onMouseMove={!isDisabled ? onMouseMoveHandler : undefined}
-          onMouseLeave={!isDisabled ? onMouseLeaveHandler : undefined}
-          onClick={!isDisabled ? onClickHandler : undefined}
+          onMouseEnter={!isDisabled ? handleMouseEnter : undefined}
+          onMouseLeave={!isDisabled ? handleMouseLeave : undefined}
+          onClick={!isDisabled ? handleClick : undefined}
         />
       ))}
     </div>

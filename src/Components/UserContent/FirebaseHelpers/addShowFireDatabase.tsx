@@ -8,15 +8,9 @@ type AddShowToFireDatabase = {
   firebase: FirebaseInterface
   showDetailesTMDB: MainDataTMDB
   showEpisodesTMDB: ShowEpisodesTMDB
-  database: UserShowStatuses
 }
 
-const addShowToFireDatabase = async ({
-  showDetailesTMDB,
-  showEpisodesTMDB,
-  database,
-  firebase,
-}: AddShowToFireDatabase) =>
+const addShowToFireDatabase = async ({ showDetailesTMDB, showEpisodesTMDB, firebase }: AddShowToFireDatabase) =>
   firebase.showFullDataFireDatabase(showDetailesTMDB.id).transaction((snapshot) => {
     if (snapshot !== null) {
       return
@@ -30,7 +24,6 @@ const addShowToFireDatabase = async ({
       episodes: showEpisodesTMDB.episodes,
       id: showDetailesTMDB.id.toString(),
       status: showDetailesTMDB.status,
-      usersWatching: database === 'watchingShows' ? 1 : 0,
     }
   })
 

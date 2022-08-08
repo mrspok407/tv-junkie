@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable max-len */
 import React, { useEffect, useRef, useState } from 'react'
@@ -7,8 +8,9 @@ import { currentDate } from 'Utils'
 import PasswordUpdate from 'Components/UserAuth/PasswordUpdate/PasswordUpdate'
 import classNames from 'classnames'
 import { LoremIpsum } from 'lorem-ipsum'
-import './Settings.scss'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import sub from 'date-fns/sub'
+import './Settings.scss'
 
 let startTimeStampGroupChats = 1311011245000
 
@@ -112,140 +114,122 @@ const SettingsContent = () => {
     })
   }
 
-  const databaseModify = () => {
-    // this.context.firebase.userAllShows("I9OcmC25eKfieOWppn6Pqr1sVj02").once("value", (snapshot) => {
-    //   const modified = Object.entries(snapshot.val()).reduce((acc, [key, value]) => {
-    //     return { ...acc, [key]: { lastUpdatedInUser: value.timeStamp } }
-    //   }, {})
-    //   this.context.firebase.userShowsLastUpdateList("I9OcmC25eKfieOWppn6Pqr1sVj02").set(modified)
+  const updataShowsDataInDatabase = async () => {
+    const startDate = sub(currentDate, {
+      days: 3,
+    })
 
-    //   // Object.keys(snapshot.val()).forEach((key) => {
-    //   //   this.context.firebase.userShow({ uid: this.context.authUser.uid, key }).update({ lastUpdatedInUser: null })
-    //   // })
-    // })
-
-    const todayConverted = `${currentDate.getDate()}-${currentDate.getMonth() + 1}-${currentDate.getFullYear()}`
-    const threeDaysBefore = new Date(currentDate.getTime() - 259200000)
-
-    // const threeDaysBeforeConverted = `${threeDaysBefore.getDate()}-${
-    //   threeDaysBefore.getMonth() + 1
-    // }-${threeDaysBefore.getFullYear()}`
-
-    axios
-      .get(
-        `https://api.themoviedb.org/3/tv/changes?api_key=${process.env.REACT_APP_TMDB_API}&end_date=${todayConverted}&start_date=${threeDaysBefore}`,
+    try {
+      const { data: recentlyUpdatedShows } = await axios.get(
+        `https://api.themoviedb.org/3/tv/changes?api_key=${process.env.REACT_APP_TMDB_API}&start_date=${startDate}`,
       )
-      .then(async ({ data }) => {
-        // const tempData = [{ id: 1396 }]
-        // const allShowsIds = await firebase
-        //   .allShowsList()
-        //   .once('value')
-        //   .then((snapshot) =>
-        //     Object.keys(snapshot.val()).map((id) => {
-        //       return { id }
-        //     }),
-        //   )
 
-        data.results.forEach((show) => {
-          firebase
-            .showFullDataFireDatabase(show.id)
-            .child('id')
-            .once('value', (snapshot) => {
-              if (snapshot.val() !== null) {
-                axios
-                  .get(
-                    `https://api.themoviedb.org/3/tv/${show.id}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US`,
-                  )
-                  .then(({ data: { number_of_seasons } }) => {
-                    console.log(show.id)
-                    const maxSeasonsInChunk = 20
-                    const allSeasons = []
-                    const seasonChunks = []
-                    const apiRequests = []
-                    for (let i = 1; i <= number_of_seasons; i += 1) {
-                      allSeasons.push(`season/${i}`)
-                    }
-                    for (let i = 0; i <= allSeasons.length; i += maxSeasonsInChunk) {
-                      const chunk = allSeasons.slice(i, i + maxSeasonsInChunk)
-                      seasonChunks.push(chunk.join())
-                    }
-                    seasonChunks.forEach((item) => {
-                      const request = axios.get(
-                        `https://api.themoviedb.org/3/tv/${show.id}?api_key=${process.env.REACT_APP_TMDB_API}&append_to_response=${item}`,
-                      )
-                      apiRequests.push(request)
-                    })
-                    return axios.all([...apiRequests])
-                  })
-                  .then(
-                    axios.spread((...responses) => {
-                      const rowData = []
-                      const seasonsData = []
-                      responses.forEach((item) => {
-                        rowData.push(item.data)
-                      })
-                      const mergedRowData = Object.assign({}, ...rowData)
-                      Object.entries(mergedRowData).forEach(([key, value]) => {
-                        if (!key.indexOf('season/')) {
-                          seasonsData[value.season_number - 1] = { [key]: { ...value } }
-                        }
-                      })
-                      const allEpisodes = []
-                      seasonsData.forEach((data, index) => {
-                        const season = data[`season/${index + 1}`]
-                        if (!Array.isArray(season.episodes) || season.episodes.length === 0) return
-                        const episodes = []
-                        season.episodes.forEach((item) => {
-                          const updatedEpisode = {
-                            air_date: item.air_date || '',
-                            episode_number: item.episode_number || null,
-                            name: item.name || null,
-                            season_number: item.season_number || null,
-                            id: item.id,
-                          }
-                          episodes.push(updatedEpisode)
-                        })
-                        const updatedSeason = {
-                          air_date: season.air_date || '',
-                          season_number: season.season_number || null,
-                          id: season._id,
-                          poster_path: season.poster_path || null,
-                          name: season.name || null,
-                          episodes,
-                        }
-                        allEpisodes.push(updatedSeason)
-                      })
-                      const dataToPass = {
-                        episodes: allEpisodes,
-                        status: mergedRowData.status,
-                        name: mergedRowData.name,
-                      }
-                      return dataToPass
-                    }),
-                  )
-                  .then((data) => {
-                    firebase
-                      .showFullDataFireDatabase(show.id)
-                      .update({
-                        episodes: data.episodes,
-                        status: data.status,
-                      })
-                      .catch((err) => {
-                        console.log(err)
-                      })
-                    firebase.showInfoFireDatabase(show.id).update({
-                      status: data.status,
-                      name: data.name,
-                    })
-                    firebase.showInfoFireDatabase(show.id).child('lastUpdatedInDatabase').set(firebase.timeStamp())
-                  })
-                  .catch((err) => {
-                    console.log(err)
-                  })
+      const showsToUpdateSnapshots = await Promise.all(
+        recentlyUpdatedShows.results.map(({ id: showId }) => {
+          return firebase.showFullDataFireDatabase(showId).child('id').once('value')
+        }),
+      )
+
+      const showsToUpdateIds = showsToUpdateSnapshots.reduce((acc, snapshot) => {
+        if (snapshot.exists() && Number(snapshot.val()) === 1399) {
+          acc.push(snapshot.val())
+        }
+        return acc
+      }, [])
+
+      const updateData = await Promise.all(
+        showsToUpdateIds.map(async (showId) => {
+          const {
+            data: { number_of_seasons },
+          } = await axios.get(
+            `https://api.themoviedb.org/3/tv/${showId}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US`,
+          )
+
+          const maxSeasonsInChunk = 20
+          const allSeasons = []
+          const seasonChunks = []
+          const apiRequests = []
+          for (let i = 1; i <= number_of_seasons; i += 1) {
+            allSeasons.push(`season/${i}`)
+          }
+          for (let i = 0; i <= allSeasons.length; i += maxSeasonsInChunk) {
+            const chunk = allSeasons.slice(i, i + maxSeasonsInChunk)
+            seasonChunks.push(chunk.join())
+          }
+          seasonChunks.forEach((item) => {
+            const request = axios.get(
+              `https://api.themoviedb.org/3/tv/${showId}?api_key=${process.env.REACT_APP_TMDB_API}&append_to_response=${item}`,
+            )
+            apiRequests.push(request)
+          })
+
+          return axios.all([...apiRequests]).then(
+            axios.spread((...responses) => {
+              const rowData = []
+              const seasonsData = []
+              responses.forEach((item) => {
+                rowData.push(item.data)
+              })
+              const mergedRowData = Object.assign({}, ...rowData)
+              Object.entries(mergedRowData).forEach(([key, value]) => {
+                if (!key.indexOf('season/')) {
+                  seasonsData[value.season_number - 1] = { [key]: { ...value } }
+                }
+              })
+              const allEpisodes = []
+              seasonsData.forEach((data, index) => {
+                const season = data[`season/${index + 1}`]
+                if (!Array.isArray(season.episodes) || season.episodes.length === 0) return
+                const episodes = []
+                season.episodes.forEach((item) => {
+                  const updatedEpisode = {
+                    air_date: item.air_date || '',
+                    episode_number: item.episode_number || null,
+                    name: item.name || null,
+                    season_number: item.season_number || null,
+                    id: item.id,
+                  }
+                  episodes.push(updatedEpisode)
+                })
+                const updatedSeason = {
+                  air_date: season.air_date || '',
+                  season_number: season.season_number || null,
+                  id: season._id,
+                  poster_path: season.poster_path || null,
+                  name: season.name || null,
+                  episodes,
+                }
+                allEpisodes.push(updatedSeason)
+              })
+              const finalData = {
+                episodes: allEpisodes,
+                status: mergedRowData.status,
+                name: mergedRowData.name,
+                vote_average: mergedRowData.vote_average,
+                vote_count: mergedRowData.vote_count,
+                showId,
               }
-            })
-        })
+              return finalData
+            }),
+          )
+        }),
+      )
+
+      const updataDataFirebase = {}
+      updateData.forEach((showData) => {
+        updataDataFirebase[`allShowsList/${showData.showId}/episodes`] = showData.episodes
+        updataDataFirebase[`allShowsList/${showData.showId}/status`] = showData.status
+        updataDataFirebase[`allShowsList/${showData.showId}/info/status`] = showData.status
+        updataDataFirebase[`allShowsList/${showData.showId}/info/name`] = showData.name
+        updataDataFirebase[`allShowsList/${showData.showId}/info/vote_average`] = showData.vote_average
+        updataDataFirebase[`allShowsList/${showData.showId}/info/vote_count`] = showData.vote_average
       })
+
+      console.log({ updateData })
+      firebase.rootRef().update(updataDataFirebase)
+    } catch (error) {
+      console.log({ error })
+    }
   }
 
   const copyToClipboard = (text) => {
@@ -282,9 +266,14 @@ const SettingsContent = () => {
       )} */}
       </div>
       <PasswordUpdate />
+      <div className="update-database">
+        <button onClick={() => updataShowsDataInDatabase()} className="button button--profile" type="button">
+          Update Database
+        </button>
+      </div>
       {[process.env.REACT_APP_TEST_EMAIL, process.env.REACT_APP_ADMIN_EMAIL].includes(authUser?.email) && (
         <div className="update-database">
-          <button onClick={() => databaseModify()} className="button button--profile" type="button">
+          <button onClick={() => updataShowsDataInDatabase()} className="button button--profile" type="button">
             Update Database
           </button>
         </div>

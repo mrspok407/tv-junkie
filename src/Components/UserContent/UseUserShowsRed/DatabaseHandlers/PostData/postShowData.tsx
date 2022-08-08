@@ -59,7 +59,7 @@ export const handleNewShowInDatabase =
       if (existsInFireDatabase) {
         episodesFromFireDatabase = showFullDataFireDatabase.val()?.episodes!
       } else {
-        const showData = await postShowFireDatabase({ firebase, database, showDetailesTMDB })
+        const showData = await postShowFireDatabase({ firebase, showDetailesTMDB })
         episodesFromFireDatabase = showData?.episodes!
       }
 

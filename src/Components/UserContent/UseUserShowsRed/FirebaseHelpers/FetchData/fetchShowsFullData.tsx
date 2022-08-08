@@ -18,7 +18,7 @@ const fetchShowsFullData = ({ userShows, firebase, authUserUid }: GetUserShowsFu
 
       if (showInfoFireSnapshot.val() === null) {
         const showDetailesTMDB = await fetchContentDetailesTMDB({ mediaType: 'show', id: show.id })
-        const showData = await postShowFireDatabase({ showDetailesTMDB, database: show.database, firebase })
+        const showData = await postShowFireDatabase({ showDetailesTMDB, firebase })
         showInfo = showData!.info
       }
 

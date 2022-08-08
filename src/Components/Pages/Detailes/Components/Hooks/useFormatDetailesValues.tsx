@@ -22,9 +22,13 @@ const useFormatDetailesValues = ({ detailes, isMediaTypeTV }: Props) => {
     ? detailes.first_air_date?.slice(0, 4) ?? ''
     : detailes.release_date?.slice(0, 4)
   const yearEnded: string = isMediaTypeTV ? detailes.last_air_date?.slice(0, 4) ?? '' : ''
-  const yearRange: string = ['Ended', 'Canceled'].includes(detailes.status)
-    ? `${yearRelease} - ${yearEnded}`
-    : `${yearRelease} - ...`
+
+  let yearRange: string
+  if (['Ended', 'Canceled'].includes(detailes.status)) {
+    yearRange = yearRelease === yearEnded ? yearRelease : `${yearRelease} - ${yearEnded}`
+  } else {
+    yearRange = `${yearRelease} - ...`
+  }
 
   const runtime: number = isMediaTypeTV ? detailes.episode_run_time[0] : detailes.runtime || 0
 
