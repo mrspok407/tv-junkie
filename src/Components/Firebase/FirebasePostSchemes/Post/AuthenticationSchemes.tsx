@@ -33,6 +33,7 @@ export const postUserDataOnRegisterScheme = ({
   const showsLastUpdated: { [key: string]: { lastUpdatedInUser: number } } = {}
 
   const showsFireDatabaseUsersWatching: { [key: string]: number } = {}
+  const usersWatchingList: { [key: string]: boolean } = {}
 
   selectedShows.forEach((show) => {
     episodesData[show.id] = {
@@ -56,6 +57,7 @@ export const postUserDataOnRegisterScheme = ({
       lastUpdatedInUser: firebase.timeStamp(),
     }
     showsFireDatabaseUsersWatching[`allShowsList/${show.id}/usersWatching`] = firebase.ServerValueIncrement(1)
+    usersWatchingList[`allShowsList/${show.id}/usersWatchingList/${authUid}`] = true
   })
 
   watchLaterMovies.forEach((movie) => {
@@ -63,6 +65,7 @@ export const postUserDataOnRegisterScheme = ({
   })
 
   return {
+    ...usersWatchingList,
     ...showsFireDatabaseUsersWatching,
     ...userData,
     [`users/${authUid}/content/episodes`]: removeUndefinedNullFromObject(episodesData),

@@ -23,9 +23,10 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.handleContactRequest = exports.newContactRequest = exports.createNewGroup = exports.removeMemberFromGroup = exports.addNewGroupMembers = exports.updateLastSeenGroupChats = exports.updateLastSeenPrivateChats = exports.decrementContacts = exports.incrementContacts = exports.removeNewContactsActivityGroupChat = exports.removeNewContactsActivity = exports.addNewContactsActivityGroupChat = exports.addNewContactsActivity = exports.updatePinnedTimeStamp = void 0;
+exports.handleContactRequest = exports.newContactRequest = exports.createNewGroup = exports.removeMemberFromGroup = exports.addNewGroupMembers = exports.updateLastSeenGroupChats = exports.updateLastSeenPrivateChats = exports.decrementContacts = exports.incrementContacts = exports.removeNewContactsActivityGroupChat = exports.removeNewContactsActivity = exports.addNewContactsActivityGroupChat = exports.addNewContactsActivity = exports.updatePinnedTimeStamp = exports.updateAllEpisodesWatchedUserDatabase = exports.updateShowEpisodesForUserDatabase = void 0;
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
+const helpers_1 = require("./helpers");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 // const admin = require("firebase-admin");
 // Cloud Functions interesting points:
@@ -53,6 +54,44 @@ const isApiError = (x) => {
     return typeof x.message === "string";
 };
 const contactsDatabaseRef = (uid) => `${uid}/contactsDatabase`;
+exports.updateShowEpisodesForUserDatabase = functions.database
+    .ref("allShowsList/{showId}/episodes")
+    .onUpdate(async (change, context) => {
+    var _a, _b;
+    const { showId } = context.params;
+    const afterData = change.after;
+    const timeStamp = admin.database.ServerValue.TIMESTAMP;
+    const showEpisodesFireData = (_a = afterData.val()) !== null && _a !== void 0 ? _a : [];
+    const usersWatchingSnapshot = await ((_b = afterData.ref.parent) === null || _b === void 0 ? void 0 : _b.child("usersWatchingList").once("value"));
+    const usersWatchingKeys = Object.keys(usersWatchingSnapshot === null || usersWatchingSnapshot === void 0 ? void 0 : usersWatchingSnapshot.val());
+    const updateData = {};
+    const usersEpisodesSnapshot = await Promise.all(usersWatchingKeys.map(async (userUid) => {
+        return database.ref(`users/${userUid}/content/episodes/${showId}/episodes`).once("value");
+    }));
+    usersEpisodesSnapshot.forEach(async (episodesSnapshot, index) => {
+        var _a;
+        const showEpisodesUserData = (_a = episodesSnapshot.val()) !== null && _a !== void 0 ? _a : [];
+        const mergedEpisodes = (0, helpers_1.mergeEpisodesFromFireDBwithUserDB)(showEpisodesFireData, showEpisodesUserData);
+        updateData[`users/${usersWatchingKeys[index]}/content/episodes/${showId}/episodes`] = mergedEpisodes;
+        updateData[`users/${usersWatchingKeys[index]}/content/showsLastUpdateList/${showId}/lastUpdatedInUser`] =
+            timeStamp;
+    });
+    return database.ref().update(updateData);
+});
+exports.updateAllEpisodesWatchedUserDatabase = functions.database
+    .ref("users/{uid}/content/showsLastUpdateList/{showId}")
+    .onUpdate(async (change, context) => {
+    var _a;
+    const { showId } = context.params;
+    const afterData = change.after;
+    const contentRef = (_a = afterData.ref.parent) === null || _a === void 0 ? void 0 : _a.parent;
+    const showsRef = contentRef === null || contentRef === void 0 ? void 0 : contentRef.child("shows");
+    const showEpisodesUserSnapshot = await (contentRef === null || contentRef === void 0 ? void 0 : contentRef.child(`episodes/${showId}/episodes`).once("value"));
+    const showEpisodesUserData = showEpisodesUserSnapshot === null || showEpisodesUserSnapshot === void 0 ? void 0 : showEpisodesUserSnapshot.val();
+    console.log({ oneArray: (0, helpers_1.episodesToOneArray)(showEpisodesUserData) });
+    const isAnyEpisodeNotWatched = (0, helpers_1.episodesToOneArray)(showEpisodesUserData).some((episode) => !episode.watched);
+    return showsRef === null || showsRef === void 0 ? void 0 : showsRef.child(`${showId}`).update({ allEpisodesWatched: !isAnyEpisodeNotWatched });
+});
 exports.updatePinnedTimeStamp = functions.database
     .ref("users/{authUid}/contactsDatabase/contactsLastActivity/{contactUid}")
     .onWrite(async (change, context) => {

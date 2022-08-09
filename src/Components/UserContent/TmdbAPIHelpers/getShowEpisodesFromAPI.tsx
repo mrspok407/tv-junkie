@@ -64,22 +64,22 @@ const getShowEpisodesTMDB = ({ id }: { id: number }) => {
 
           season.episodes.forEach((item: any) => {
             const updatedEpisode = {
-              air_date: item.air_date,
-              episode_number: item.episode_number,
-              name: item.name,
-              season_number: item.season_number,
+              air_date: item.air_date || '',
+              episode_number: item.episode_number || null,
               id: item.id,
+              name: item.name || null,
+              season_number: item.season_number || null,
             }
             episodes.push(updatedEpisode)
           })
 
           const updatedSeason = {
-            air_date: season.air_date,
-            season_number: season.season_number,
-            id: season._id,
-            poster_path: season.poster_path,
-            name: season.name,
+            air_date: season.air_date || '',
             episodes,
+            id: season._id,
+            name: season.name || null,
+            poster_path: season.poster_path || null,
+            season_number: season.season_number || null,
           }
 
           allEpisodes.push(updatedSeason)

@@ -43,6 +43,7 @@ export const postUserShowScheme = ({
     [`allShowsList/${showDetailesTMDB.id}/usersWatching`]: firebase.ServerValueIncrement(
       showDatabase === 'watchingShows' ? 1 : 0,
     ),
+    [`allShowsList/${showDetailesTMDB.id}/usersWatchingList/${authUid}`]: true,
   }
 }
 

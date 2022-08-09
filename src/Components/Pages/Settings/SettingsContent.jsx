@@ -57,11 +57,6 @@ const SettingsContent = () => {
     })
     const fourHoursInMS = 14400000
 
-    // firebase.groupChats().once("value", (snapshot) => {
-    //   // console.log(snapshot.val())
-    //   console.log(JSON.stringify(snapshot.val()))
-    // })
-
     firebase.contactsList({ uid: authUserUid }).once('value', (snapshot) => {
       Object.entries(snapshot.val()).forEach(async ([contactKey, contactValue]) => {
         if (contactValue.status !== true) return
@@ -131,7 +126,7 @@ const SettingsContent = () => {
       )
 
       const showsToUpdateIds = showsToUpdateSnapshots.reduce((acc, snapshot) => {
-        if (snapshot.exists() && Number(snapshot.val()) === 1399) {
+        if (snapshot.exists()) {
           acc.push(snapshot.val())
         }
         return acc
@@ -185,19 +180,19 @@ const SettingsContent = () => {
                   const updatedEpisode = {
                     air_date: item.air_date || '',
                     episode_number: item.episode_number || null,
+                    id: item.id,
                     name: item.name || null,
                     season_number: item.season_number || null,
-                    id: item.id,
                   }
                   episodes.push(updatedEpisode)
                 })
                 const updatedSeason = {
                   air_date: season.air_date || '',
-                  season_number: season.season_number || null,
-                  id: season._id,
-                  poster_path: season.poster_path || null,
-                  name: season.name || null,
                   episodes,
+                  id: season._id,
+                  name: season.name || null,
+                  poster_path: season.poster_path || null,
+                  season_number: season.season_number || null,
                 }
                 allEpisodes.push(updatedSeason)
               })
@@ -230,6 +225,21 @@ const SettingsContent = () => {
     } catch (error) {
       console.log({ error })
     }
+  }
+
+  const setUsersWatchingShow = async () => {
+    const usersListSnapshot = await firebase.rootRef().child('users').once('value')
+    console.log({ usersListSnapshot: usersListSnapshot.val() })
+
+    Object.entries(usersListSnapshot.val()).forEach(([userKey, value]) => {
+      const userShows = value?.content?.shows
+      if (!userShows) return
+      const showsKeys = Object.keys(userShows)
+
+      showsKeys.forEach((showKey) => {
+        firebase.rootRef().child(`allShowsList/${showKey}/usersWatchingList/${userKey}`).set(true)
+      })
+    })
   }
 
   const copyToClipboard = (text) => {
@@ -269,6 +279,11 @@ const SettingsContent = () => {
       <div className="update-database">
         <button onClick={() => updataShowsDataInDatabase()} className="button button--profile" type="button">
           Update Database
+        </button>
+      </div>
+      <div className="update-database">
+        <button onClick={() => setUsersWatchingShow()} className="button button--profile" type="button">
+          Set users watching show
         </button>
       </div>
       {[process.env.REACT_APP_TEST_EMAIL, process.env.REACT_APP_ADMIN_EMAIL].includes(authUser?.email) && (

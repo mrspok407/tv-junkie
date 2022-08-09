@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import classNames from 'classnames'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import DisableWarning from 'Components/UI/DisabledWarning/DisabledWarning'
@@ -37,7 +37,7 @@ const EpisodeCheckbox: React.FC<Props> = ({ isDisabled, episodeData, showId }: P
       <label>
         <input
           type="checkbox"
-          checked={isWatched}
+          checked={isWatched && !isDisabled}
           onChange={() => {
             dispatch(
               postCheckSingleEpisode({

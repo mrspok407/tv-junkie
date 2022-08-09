@@ -1,6 +1,5 @@
 import { LIST_OF_GENRES } from 'Utils/Constants'
 import { EpisodesTMDB, MainDataTMDB } from 'Utils/@TypesTMDB'
-import { ShowEpisodesTMDB } from 'Components/UserContent/TmdbAPIHelpers/getShowEpisodesFromAPI'
 import { EpisodesFromUserDatabase } from 'Components/Firebase/@TypesFirebase'
 
 export const formatMovieBudget = (budget: number) => {

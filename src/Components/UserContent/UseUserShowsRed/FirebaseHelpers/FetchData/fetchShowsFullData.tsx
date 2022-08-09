@@ -22,7 +22,7 @@ const fetchShowsFullData = ({ userShows, firebase, authUserUid }: GetUserShowsFu
         showInfo = showData!.info
       }
 
-      if (show.database === 'watchingShows' && !show.finished) {
+      if (show.database === 'watchingShows' && !show.allEpisodesWatched) {
         const episodes = await fetchEpisodesFullData({ authUserUid, showKey: show.id, firebase })
         return { ...showInfo, ...show, episodes, episodesFetched: true }
       }

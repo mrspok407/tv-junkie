@@ -64,7 +64,12 @@
       ".read": "root.child('users').child(auth.uid).child('role').val() === 'ADMIN'",
       // ".write": false,
       "$id": {
-       ".write": true
+       ".write": true,
+       "usersWatchingList": {
+        "$uid": {
+          ".validate": "!data.exists()"
+        }
+       }
         // ".read": "auth != null",
         // // ".write": "(auth != null && !data.exists()) || root.child('users').child(auth.uid).child('role').val() === 'ADMIN'",
         // ".write": "(auth != null && !data.exists())",
