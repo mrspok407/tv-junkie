@@ -17,7 +17,8 @@ const UseSectionFilteredShows = ({ showsData, activeSection }: Props): ShowFullD
       return localStorageContent.watchingShows
     }
     return showsData.filter((show) => {
-      return activeSection === 'finishedShows' ? !!show.finished : !!(show.database === activeSection && !show.finished)
+      const isShowFinished = show.allEpisodesWatched && show.status === 'ended'
+      return activeSection === 'finishedShows' ? isShowFinished : !!(show.database === activeSection && !isShowFinished)
     })
   }, [showsData, activeSection, localStorageContent, authUser])
 

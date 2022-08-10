@@ -1,7 +1,5 @@
 import { useAppSelector } from 'app/hooks'
 import { RootState } from 'app/store'
-import { AuthUserInterface } from 'Components/UserAuth/Session/Authentication/@Types'
-import { UserShowsStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { useMemo } from 'react'
 
 type UseAppSelectorArray<Type> = (state: RootState) => {

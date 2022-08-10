@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React, { useState, useEffect, useCallback, useReducer } from 'react'
 import { combineMergeObjects } from 'Utils'
 import { LIST_OF_GENRES } from 'Utils/Constants'
@@ -11,6 +12,7 @@ import PlaceholderNoShowsUser from 'Components/UI/Placeholders/PlaceholderNoShow
 import UserRating from 'Components/UI/UserRating/UserRating'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import useScrollEffect from 'Utils/Hooks/UseScrollEffect'
+import { ShowInfoFireDatabase } from 'Components/Firebase/@TypesFirebase'
 import reducer, { INITIAL_STATE, ShowsContentState, ActionInterface, ActionTypes } from './_reducerConfig'
 
 const SCROLL_THRESHOLD = 800
@@ -44,20 +46,17 @@ const UserProfileContent: React.FC<Props> = ({ userUid }) => {
     }
     const userShows = Object.values(userShowsData.val()!).map((show: any) => show)
 
-    const showsFromDatabase = await Promise.all(
-      userShows.map((show) =>
-        firebase
-          .showInfo(show.id)
-          .once('value')
-          .then((snapshot: any) => {
-            if (snapshot.val() === null) return
-            const info = snapshot.val()
-            return { ...info }
-          }),
-      ),
+    const showsFromDatabaseSnapshots = await Promise.all(
+      userShows.map((show) => firebase.showInfoFireDatabase(show.id).once('value')),
     )
+    const showsFromDatabaseData = showsFromDatabaseSnapshots.reduce((acc, snapshot) => {
+      if (snapshot.val() !== null) {
+        acc.push(snapshot.val()!)
+      }
+      return acc
+    }, [] as ShowInfoFireDatabase[])
 
-    const mergedShows: ShowFullDataStoreState[] = merge(userShows, showsFromDatabase, {
+    const mergedShows: ShowFullDataStoreState[] = merge(showsFromDatabaseData, userShows, {
       arrayMerge: combineMergeObjects,
     })
 
@@ -89,10 +88,11 @@ const UserProfileContent: React.FC<Props> = ({ userUid }) => {
   const renderContent = (section: string) => {
     const content = state.content
       .filter((show) => {
+        const isShowFinished = show.allEpisodesWatched && show.status === 'ended'
         if (section === 'finishedShows') {
-          return show.finished
+          return isShowFinished
         }
-        return show.database === section && !show.finished
+        return !!(show.database === section && !isShowFinished)
       })
       // @ts-ignore
       // eslint-disable-next-line
@@ -154,7 +154,7 @@ const UserProfileContent: React.FC<Props> = ({ userUid }) => {
                       {item.overview.length > 150 ? `${item.overview.substring(0, 150)}...` : item.overview}
                     </div>
                   </div>
-                  <UserRating userRatingData={item.userRating} id={item.id} firebaseRef="" disableRating />
+                  <UserRating currentRating={item.userRating} isUserProfile isDisabled />
                 </Link>
               </div>
             </div>
@@ -165,10 +165,11 @@ const UserProfileContent: React.FC<Props> = ({ userUid }) => {
   }
 
   const activeSectionContent = state.content.filter((show) => {
+    const isShowFinished = show.allEpisodesWatched && show.status === 'ended'
     if (state.activeSection === 'finishedShows') {
-      return show.finished
+      return isShowFinished
     }
-    return show.database === state.activeSection && !show.finished
+    return show.database === state.activeSection && !isShowFinished
   })
 
   const maxColumns = 4

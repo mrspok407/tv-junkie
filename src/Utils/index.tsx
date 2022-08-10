@@ -7,7 +7,7 @@ import merge from 'deepmerge'
 import * as _transform from 'lodash.transform'
 import * as _isEqual from 'lodash.isequal'
 import * as _isObject from 'lodash.isobject'
-import releasedEpisodesToOneArray from './episodesToOneArray'
+import { StringifyOptions } from 'querystring'
 
 export const currentDate = new Date()
 
@@ -112,8 +112,6 @@ export const textToUrl = ({ text }: { text: any }) => {
   return textWithUrls
 }
 
-export { releasedEpisodesToOneArray }
-
 export const isScrollNearBottom = ({ scrollThreshold }: { scrollThreshold: number }) => {
   return window.innerHeight + window.scrollY >= document.body.scrollHeight - scrollThreshold
 }
@@ -141,3 +139,9 @@ export const artificialAsyncDelay = (timeout: number) =>
   })
 
 export const isArrayIncludes = (id: string | number, data: Array<unknown>) => data.includes(id)
+
+export const getPropertyValueCSS = (property: string, ref: Element) => {
+  if (!ref) return null
+  const value = getComputedStyle(ref as Element).getPropertyValue(property)
+  return value
+}

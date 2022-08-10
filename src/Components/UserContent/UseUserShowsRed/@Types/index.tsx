@@ -24,8 +24,10 @@ export interface ShowFullDataStoreState extends MainDataTMDB {
 }
 
 export interface SingleEpisodeByMonthInterface {
-  air_date: any
+  air_date: string
   episode_number?: number
+  id: number
+  season_number?: number
   show: string
   showId: number
 }
@@ -46,10 +48,10 @@ export interface UserShowsStoreState {
   data: {
     ids: number[]
     info: {
-      [key: string]: ShowFullDataStoreState | undefined
+      [key: string]: ShowFullDataStoreState
     }
     episodes: {
-      [key: string]: EpisodesStoreState[] | undefined
+      [key: string]: EpisodesStoreState[]
     }
     timeStamps: {
       [key: string]: number

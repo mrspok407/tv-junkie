@@ -78,6 +78,27 @@ export const updateShowEpisodesForUserDatabase = functions.database
     return database.ref().update(updateData);
   });
 
+export const updateShowStatusForUserDatabase = functions.database
+  .ref("allShowsList/{showId}/status")
+  .onUpdate(async (change, context) => {
+    const {showId} = context.params;
+    const afterData = change.after;
+
+    const showStatusLowerCase = afterData.val().toLowerCase();
+    const showStatusForUserDatabase =
+      showStatusLowerCase === "ended" || showStatusLowerCase === "canceled" ? "ended" : "ongoing";
+
+    const usersWatchingSnapshot = await afterData.ref.parent?.child("usersWatchingList").once("value");
+    const usersWatchingKeys = Object.keys(usersWatchingSnapshot?.val());
+
+    const updateData: {[key: string]: any} = {};
+    usersWatchingKeys.forEach((userUid) => {
+      updateData[`users/${userUid}/content/shows/${showId}/status`] = showStatusForUserDatabase;
+    });
+
+    return database.ref().update(updateData);
+  });
+
 export const updateAllEpisodesWatchedUserDatabase = functions.database
   .ref("users/{uid}/content/showsLastUpdateList/{showId}")
   .onUpdate(async (change, context) => {

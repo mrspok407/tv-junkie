@@ -2,12 +2,13 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import ShowEpisodes from 'Components/UI/Templates/SeasonsAndEpisodes/ShowEpisodes'
-import { currentDate, combineMergeObjects, releasedEpisodesToOneArray } from 'Utils'
+import { currentDate, combineMergeObjects } from 'Utils'
 import Loader from 'Components/UI/Placeholders/Loader'
 import PlaceholderNoToWatchEpisodes from 'Components/UI/Placeholders/PlaceholderNoToWatchEpisodes'
 import merge from 'deepmerge'
 import { EpisodesFromFireDatabase, SingleEpisodeFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
 import { ShowFullDataStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
+import releasedEpisodesToOneArray from 'Utils/episodesToOneArray'
 
 const ToWatchEpisodesContent: React.FC = () => {
   const [watchingShows, setWatchingShows] = useState<ShowFullDataStoreState[]>([])

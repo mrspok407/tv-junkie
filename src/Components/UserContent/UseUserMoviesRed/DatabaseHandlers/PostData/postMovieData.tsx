@@ -47,6 +47,7 @@ export const handleRemoveMovieFromDatabase =
   async (dispatch, getState) => {
     const authUid = getAuthUidFromState(getState())
     const movieFromStore = selectMovie(getState(), movieId)
+    if (!movieFromStore) return
 
     dispatch(optimisticRemoveMovie({ movieId }))
 

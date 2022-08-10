@@ -146,8 +146,10 @@ export const {
 export const selectShows = (state: RootState) => state.userShows.data.info
 export const selectEpisodes = (state: RootState) => state.userShows.data.episodes
 export const selectShowsIds = (state: RootState) => state.userShows.data.ids
-export const selectShow = (state: RootState, showId: number) => state.userShows.data.info[showId]
-export const selectShowEpisodes = (state: RootState, showId: number) => state.userShows.data.episodes[showId]
+export const selectShow = (state: RootState, showId: number): ShowFullDataStoreState | undefined =>
+  state.userShows.data.info[showId]
+export const selectShowEpisodes = (state: RootState, showId: number): EpisodesStoreState[] | undefined =>
+  state.userShows.data.episodes[showId]
 export const selectShowStatus = (state: RootState, showId: number) => selectShow(state, showId)?.database
 export const selectShowRating = (state: RootState, showId: number) => selectShow(state, showId)?.userRating
 
