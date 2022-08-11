@@ -13,7 +13,7 @@ type Props = {
   mediaType: string
 }
 
-export const fetchContentDetailesTMDB = async ({ mediaType, id }: { mediaType: string; id: string | number }) => {
+export const fetchContentDetailsTMDB = async ({ mediaType, id }: { mediaType: string; id: string | number }) => {
   const { data } = await axios.get<MainDataTMDB>(
     `https://api.themoviedb.org/3/${mediaType === 'show' ? 'tv' : 'movie'}/${id}?api_key=${
       process.env.REACT_APP_TMDB_API
@@ -58,7 +58,7 @@ export const fetchContentDetailesTMDB = async ({ mediaType, id }: { mediaType: s
 const useGetDataTMDB = ({ id, mediaType }: Props) => {
   const history = useHistory()
   const [loading, setLoading] = useState(false)
-  const [detailes, setDetailes] = useState<MainDataTMDB>(MAINDATA_TMDB_INITIAL)
+  const [details, setDetails] = useState<MainDataTMDB>(MAINDATA_TMDB_INITIAL)
   const [similarContent, setSimilarContent] = useState<MainDataTMDB[]>([])
   const [error, setError] = useState('')
 
@@ -66,7 +66,7 @@ const useGetDataTMDB = ({ id, mediaType }: Props) => {
     const getContent = async () => {
       setLoading(true)
       try {
-        const data = await fetchContentDetailesTMDB({ mediaType, id })
+        const data = await fetchContentDetailsTMDB({ mediaType, id })
 
         const similarType: any = data.similar || data.similar_movies
         const similarContentData = similarType.results.filter((item: { poster_path: string }) => item.poster_path)
@@ -74,7 +74,7 @@ const useGetDataTMDB = ({ id, mediaType }: Props) => {
           (a: { vote_count: number }, b: { vote_count: number }) => b.vote_count - a.vote_count,
         )
 
-        setDetailes(data)
+        setDetails(data)
         setSimilarContent(similarContentSortByVotes)
       } catch (err) {
         const errorData: any = err
@@ -95,7 +95,7 @@ const useGetDataTMDB = ({ id, mediaType }: Props) => {
     }
   }, [mediaType, id, history])
 
-  return [detailes, loading, similarContent, error] as [MainDataTMDB, boolean, MainDataTMDB[], string]
+  return [details, loading, similarContent, error] as [MainDataTMDB, boolean, MainDataTMDB[], string]
 }
 
 export default useGetDataTMDB

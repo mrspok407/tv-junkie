@@ -11,26 +11,26 @@ import { formatMovieForPostFirebase } from './Helpers'
 
 export const postUserShowScheme = ({
   authUid,
-  showDetailesTMDB,
+  showDetailsTMDB,
   showEpisodes,
   showDatabase,
   firebase,
 }: PostUserShowScheme) => {
   const showsSubDatabase =
-    showDetailesTMDB.status === 'Ended' || showDetailesTMDB.status === 'Canceled' ? 'ended' : 'ongoing'
+    showDetailsTMDB.status === 'Ended' || showDetailsTMDB.status === 'Canceled' ? 'ended' : 'ongoing'
 
   return {
-    [`users/${authUid}/content/shows/${showDetailesTMDB.id}`]: {
+    [`users/${authUid}/content/shows/${showDetailsTMDB.id}`]: {
       allEpisodesWatched: false,
       database: showDatabase,
       finished: false,
-      firstAirDate: showDetailesTMDB.first_air_date,
-      id: showDetailesTMDB.id,
-      name: showDetailesTMDB.name,
+      firstAirDate: showDetailsTMDB.first_air_date,
+      id: showDetailsTMDB.id,
+      name: showDetailsTMDB.name,
       status: showsSubDatabase,
       timeStamp: firebase.timeStamp(),
     },
-    [`users/${authUid}/content/episodes/${showDetailesTMDB.id}`]: {
+    [`users/${authUid}/content/episodes/${showDetailsTMDB.id}`]: {
       episodes: showEpisodes,
       info: {
         database: showDatabase,
@@ -39,11 +39,11 @@ export const postUserShowScheme = ({
         finished: false,
       },
     },
-    [`users/${authUid}/content/showsLastUpdateList/${showDetailesTMDB.id}/lastUpdatedInUser`]: firebase.timeStamp(),
-    [`allShowsList/${showDetailesTMDB.id}/usersWatching`]: firebase.ServerValueIncrement(
+    [`users/${authUid}/content/showsLastUpdateList/${showDetailsTMDB.id}/lastUpdatedInUser`]: firebase.timeStamp(),
+    [`allShowsList/${showDetailsTMDB.id}/usersWatching`]: firebase.ServerValueIncrement(
       showDatabase === 'watchingShows' ? 1 : 0,
     ),
-    [`allShowsList/${showDetailesTMDB.id}/usersWatchingList/${authUid}`]: true,
+    [`allShowsList/${showDetailsTMDB.id}/usersWatchingList/${authUid}`]: true,
   }
 }
 
@@ -86,10 +86,10 @@ export const postCheckAllReleasedEpisodesScheme = ({
   return updateData
 }
 
-export const postUserMovieScheme = ({ authUid, movieDetailesTMDB, firebase }: PostUserMovieScheme) => {
+export const postUserMovieScheme = ({ authUid, movieDetailsTMDB, firebase }: PostUserMovieScheme) => {
   return {
-    [`users/${authUid}/content/movies/watchLaterMovies/${movieDetailesTMDB.id}`]: formatMovieForPostFirebase({
-      data: movieDetailesTMDB,
+    [`users/${authUid}/content/movies/watchLaterMovies/${movieDetailsTMDB.id}`]: formatMovieForPostFirebase({
+      data: movieDetailsTMDB,
       firebase,
     }),
   }

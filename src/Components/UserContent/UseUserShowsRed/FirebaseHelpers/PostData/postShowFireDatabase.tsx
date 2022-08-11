@@ -5,14 +5,14 @@ import addShowToFireDatabase from 'Components/UserContent/FirebaseHelpers/addSho
 
 type PostShowFireDatabase = {
   firebase: FirebaseInterface
-  showDetailesTMDB: MainDataTMDB
+  showDetailsTMDB: MainDataTMDB
 }
 
-const postShowFireDatabase = async ({ showDetailesTMDB, firebase }: PostShowFireDatabase) => {
-  const showEpisodesTMDB = await getShowEpisodesTMDB({ id: showDetailesTMDB.id })
+const postShowFireDatabase = async ({ showDetailsTMDB, firebase }: PostShowFireDatabase) => {
+  const showEpisodesTMDB = await getShowEpisodesTMDB({ id: showDetailsTMDB.id })
   const { snapshot } = await addShowToFireDatabase({
     firebase,
-    showDetailesTMDB,
+    showDetailsTMDB,
     showEpisodesTMDB,
   })
 

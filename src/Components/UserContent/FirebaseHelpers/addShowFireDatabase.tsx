@@ -5,24 +5,24 @@ import { ShowEpisodesTMDB } from '../TmdbAPIHelpers/getShowEpisodesFromAPI'
 
 type AddShowToFireDatabase = {
   firebase: FirebaseInterface
-  showDetailesTMDB: MainDataTMDB
+  showDetailsTMDB: MainDataTMDB
   showEpisodesTMDB: ShowEpisodesTMDB
 }
 
-const addShowToFireDatabase = async ({ showDetailesTMDB, showEpisodesTMDB, firebase }: AddShowToFireDatabase) =>
-  firebase.showFullDataFireDatabase(showDetailesTMDB.id).transaction((snapshot) => {
+const addShowToFireDatabase = async ({ showDetailsTMDB, showEpisodesTMDB, firebase }: AddShowToFireDatabase) =>
+  firebase.showFullDataFireDatabase(showDetailsTMDB.id).transaction((snapshot) => {
     if (snapshot !== null) {
       return
     }
 
-    const shotDetailesNoUndefined: MainDataTMDB = removeUndefinedNullFromObject(showDetailesTMDB)
+    const shotDetailsNoUndefined: MainDataTMDB = removeUndefinedNullFromObject(showDetailsTMDB)
     return {
       info: {
-        ...shotDetailesNoUndefined,
+        ...shotDetailsNoUndefined,
       },
       episodes: showEpisodesTMDB.episodes,
-      id: showDetailesTMDB.id.toString(),
-      status: showDetailesTMDB.status,
+      id: showDetailsTMDB.id.toString(),
+      status: showDetailsTMDB.status,
     }
   })
 

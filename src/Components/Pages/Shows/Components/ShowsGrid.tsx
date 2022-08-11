@@ -76,7 +76,7 @@ const ShowsGrid: React.FC<Props> = ({ data, section }) => {
                         handleUserShowStatus({
                           showId: item.id,
                           database: 'notWatchingShows',
-                          showFullDetailes: userShows[item.id],
+                          showFullDetails: userShows[item.id],
                           firebase,
                           localStorageHandlers,
                         }),
@@ -97,7 +97,7 @@ const ShowsGrid: React.FC<Props> = ({ data, section }) => {
                           handleUserShowStatus({
                             showId: item.id,
                             database: 'watchingShows',
-                            showFullDetailes: userShows[item.id],
+                            showFullDetails: userShows[item.id],
                             firebase,
                             localStorageHandlers,
                           }),

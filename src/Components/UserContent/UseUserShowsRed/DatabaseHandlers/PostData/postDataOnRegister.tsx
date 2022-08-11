@@ -18,7 +18,7 @@ export const postMultiplyShowsFireDatabase = async ({
     shows.map((show) => {
       return addShowToFireDatabase({
         firebase,
-        showDetailesTMDB: show,
+        showDetailsTMDB: show,
         showEpisodesTMDB: episodesData.find((item) => item.showId === show.id)!,
       })
     }),

@@ -4,7 +4,7 @@ import classNames from 'classnames'
 import { MainDataTMDB, MAINDATA_TMDB_INITIAL } from 'Utils/@TypesTMDB'
 
 type Props = {
-  detailes: MainDataTMDB
+  details: MainDataTMDB
   index: number
   currentListItem: number
   mediaTypeSearching: string
@@ -12,7 +12,7 @@ type Props = {
 }
 
 const SearchCard: React.FC<Props> = ({
-  detailes: {
+  details: {
     title,
     original_title,
     name,

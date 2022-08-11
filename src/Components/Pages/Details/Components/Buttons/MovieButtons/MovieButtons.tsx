@@ -15,10 +15,10 @@ import './MovieButtons.scss'
 
 type Props = {
   movieId: number
-  detailes: MainDataTMDB
+  details: MainDataTMDB
 }
 
-const MovieButtons: React.FC<Props> = ({ movieId, detailes }: Props) => {
+const MovieButtons: React.FC<Props> = ({ movieId, details }: Props) => {
   const { authUser, firebase } = useFrequentVariables()
   const dispatch = useAppDispatch()
 
@@ -48,7 +48,7 @@ const MovieButtons: React.FC<Props> = ({ movieId, detailes }: Props) => {
             'button--pressed': isMovieSelected,
           })}
           onClick={() => {
-            dispatch(handleMovie({ movieId, movieFullDetailes: detailes, firebase, localStorageHandlers }))
+            dispatch(handleMovie({ movieId, movieFullDetails: details, firebase, localStorageHandlers }))
           }}
           type="button"
         >

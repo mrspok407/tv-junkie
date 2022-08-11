@@ -12,7 +12,7 @@ const { CancelToken } = require('axios')
 let cancelRequest: any
 
 type Props = {
-  detailes: MainDataTMDB
+  details: MainDataTMDB
   mediaType: string
 }
 
@@ -22,7 +22,7 @@ interface APIData {
   }
 }
 
-const PosterWrapper = React.memo<Props>(({ detailes, mediaType }) => {
+const PosterWrapper = React.memo<Props>(({ details, mediaType }) => {
   const { authUser } = useAppSelector(selectAuthUser)
 
   const [movieTitle, setMovieTitle] = useState('')
@@ -35,7 +35,7 @@ const PosterWrapper = React.memo<Props>(({ detailes, mediaType }) => {
   const getMovieTorrents = useCallback(() => {
     setLoadingTorrentLinks(true)
     axios
-      .get<APIData>(`https://yts.mx/api/v2/list_movies.json?query_term=${detailes.imdb_id}`, {
+      .get<APIData>(`https://yts.mx/api/v2/list_movies.json?query_term=${details.imdb_id}`, {
         cancelToken: new CancelToken((c: any) => {
           cancelRequest = c
         }),
@@ -61,7 +61,7 @@ const PosterWrapper = React.memo<Props>(({ detailes, mediaType }) => {
         if (axios.isCancel(err)) return
         setError('Something went wrong, sorry')
       })
-  }, [detailes])
+  }, [details])
 
   useEffect(() => {
     if (mediaType === 'movie') {
@@ -75,33 +75,33 @@ const PosterWrapper = React.memo<Props>(({ detailes, mediaType }) => {
   }, [mediaType, getMovieTorrents])
 
   return (
-    <div className="detailes-page__poster-wrapper">
+    <div className="details-page__poster-wrapper">
       <div
-        className="detailes-page__poster"
+        className="details-page__poster"
         style={
-          detailes.poster_path
+          details.poster_path
             ? {
-                backgroundImage: `url(https://image.tmdb.org/t/p/w500/${detailes.poster_path})`,
+                backgroundImage: `url(https://image.tmdb.org/t/p/w500/${details.poster_path})`,
               }
             : {
                 backgroundImage: 'url(https://homestaymatch.com/images/no-image-available.png)',
               }
         }
       />
-      {detailes.backdrop_path && (
+      {details.backdrop_path && (
         <div
-          className="detailes-page__poster detailes-page__poster--mobile"
+          className="details-page__poster details-page__poster--mobile"
           style={{
-            backgroundImage: `url(https://image.tmdb.org/t/p/w500/${detailes.backdrop_path})`,
+            backgroundImage: `url(https://image.tmdb.org/t/p/w500/${details.backdrop_path})`,
           }}
         />
       )}
 
       {mediaType === 'movie' &&
-      new Date(detailes.release_date).getTime() < currentDate.getTime() &&
+      new Date(details.release_date).getTime() < currentDate.getTime() &&
       movieAvailable &&
       authUser?.email === process.env.REACT_APP_ADMIN_EMAIL ? (
-        <div className="detailes-page__movie-links">
+        <div className="details-page__movie-links">
           {!loadingTorrentLinks ? (
             <div className="torrent-links">
               {movieHash1080p && (

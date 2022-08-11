@@ -9,13 +9,13 @@ import { selectLoadingMovie, selectMovie, updateLoadingMovie } from '../userMovi
 
 type Props = {
   movieId: number
-  movieFullDetailes: MainDataTMDB
+  movieFullDetails: MainDataTMDB
   firebase: FirebaseInterface
   localStorageHandlers: LocalStorageContentInt['handlers']
 }
 
 export const handleMovie =
-  ({ movieId, movieFullDetailes, firebase, localStorageHandlers }: Props): AppThunk =>
+  ({ movieId, movieFullDetails, firebase, localStorageHandlers }: Props): AppThunk =>
   async (dispatch, getState) => {
     const authUid = getAuthUidFromState(getState())
     const movieFromStore = selectMovie(getState(), movieId)
@@ -24,7 +24,7 @@ export const handleMovie =
     if (!authUid) {
       localStorageHandlers.toggleMovie({
         id: movieId,
-        data: movieFullDetailes,
+        data: movieFullDetails,
       })
       return
     }
@@ -35,6 +35,6 @@ export const handleMovie =
     if (movieFromStore) {
       dispatch(handleRemoveMovieFromDatabase({ movieId, firebase }))
     } else {
-      dispatch(handleAddMovieToDatabase({ movieId, movieDetailesTMDB: movieFullDetailes, firebase }))
+      dispatch(handleAddMovieToDatabase({ movieId, movieDetailsTMDB: movieFullDetails, firebase }))
     }
   }

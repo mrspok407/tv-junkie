@@ -14,10 +14,10 @@ import ButtonWithWarning from '../ButtonWithWarning'
 
 type Props = {
   showId: number
-  detailes: MainDataTMDB
+  details: MainDataTMDB
 }
 
-const WatchingStatusButtons: React.FC<Props> = ({ showId, detailes }) => {
+const WatchingStatusButtons: React.FC<Props> = ({ showId, details }) => {
   const { firebase, authUser } = useFrequentVariables()
   const localStorageContent = useContext(LocalStorageValueContext)
   const localStorageHandlers = useContext(LocalStorageHandlersContext)
@@ -44,7 +44,7 @@ const WatchingStatusButtons: React.FC<Props> = ({ showId, detailes }) => {
               handleUserShowStatus({
                 showId,
                 database: 'watchingShows',
-                showFullDetailes: detailes,
+                showFullDetails: details,
                 firebase,
                 localStorageHandlers,
               }),
@@ -66,7 +66,7 @@ const WatchingStatusButtons: React.FC<Props> = ({ showId, detailes }) => {
               handleUserShowStatus({
                 showId,
                 database: 'notWatchingShows',
-                showFullDetailes: detailes,
+                showFullDetails: details,
                 firebase,
                 localStorageHandlers,
               }),
@@ -85,7 +85,7 @@ const WatchingStatusButtons: React.FC<Props> = ({ showId, detailes }) => {
                 handleUserShowStatus({
                   showId,
                   database: 'droppedShows',
-                  showFullDetailes: detailes,
+                  showFullDetails: details,
                   firebase,
                   localStorageHandlers,
                 }),
@@ -103,7 +103,7 @@ const WatchingStatusButtons: React.FC<Props> = ({ showId, detailes }) => {
                 handleUserShowStatus({
                   showId,
                   database: 'willWatchShows',
-                  showFullDetailes: detailes,
+                  showFullDetails: details,
                   firebase,
                   localStorageHandlers,
                 }),

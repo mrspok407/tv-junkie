@@ -8,7 +8,7 @@ import ShowsPage from 'Components/Pages/Shows/Shows'
 import ToWatchEpisodesPage from 'Components/Pages/ToWatchEpisodes/ToWatchEpisodes'
 import CalendarPage from 'Components/Pages/Calendar/Calendar'
 import MoviesPage from 'Components/Pages/Movies/Movies'
-import DetailesPage from 'Components/Pages/Detailes/Detailes'
+import DetailsPage from 'Components/Pages/Details/Details'
 import UserProfile from 'Components/Pages/UserProfile/UserProfile'
 import * as ROUTES from 'Utils/Constants/routes'
 import PageNotFound from 'Components/Pages/PageNotFound/PageNotFound'
@@ -31,7 +31,7 @@ const App = () => {
           <Route path={ROUTES.CALENDAR} exact component={CalendarPage} />
           <Route path={ROUTES.MOVIES} exact component={MoviesPage} />
           <Route path={ROUTES.USER_PROFILE} exact component={UserProfile} />
-          <Route path={ROUTES.DETAILES_PAGE} exact component={DetailesPage} />
+          <Route path={ROUTES.DETAILES_PAGE} exact component={DetailsPage} />
           <Route path={ROUTES.SETTINGS} exact component={SettingsPage} />
           <Route path={ROUTES.CONTACTS_PAGE} exact component={ContactsPage} />
           <Route path={ROUTES.LOGIN_PAGE} exact component={LoginPage} />

@@ -15,22 +15,22 @@ interface HandleMovieDatabase {
 }
 
 interface HandleNewMovie extends HandleMovieDatabase {
-  movieDetailesTMDB: MainDataTMDB
+  movieDetailsTMDB: MainDataTMDB
 }
 
 export const handleAddMovieToDatabase =
-  ({ movieId, movieDetailesTMDB, firebase }: HandleNewMovie): AppThunk =>
+  ({ movieId, movieDetailsTMDB, firebase }: HandleNewMovie): AppThunk =>
   async (dispatch, getState) => {
     const authUid = getAuthUidFromState(getState())
 
     dispatch(
       optimisticAddMovie({
-        data: formatMovieForPostFirebase({ data: movieDetailesTMDB, firebase }),
+        data: formatMovieForPostFirebase({ data: movieDetailsTMDB, firebase }),
       }),
     )
 
     try {
-      const updateData = postUserMovieScheme({ authUid, movieDetailesTMDB, firebase })
+      const updateData = postUserMovieScheme({ authUid, movieDetailsTMDB, firebase })
       return firebase.rootRef().update(updateData)
     } catch (err) {
       batch(() => {

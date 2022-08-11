@@ -50,7 +50,7 @@ const SearchList: React.FC<Props> = ({
     return searchResults.map((item, index) => (
       <SearchCard
         key={item.id}
-        detailes={item}
+        details={item}
         closeList={closeList}
         currentListItem={currentListItem}
         index={index}

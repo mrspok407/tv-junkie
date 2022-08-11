@@ -14,29 +14,29 @@ import PosterWrapper from './Components/PosterWrapper'
 import { MainInfo } from './Components/MainInfo'
 import useGetDataTMDB from './Hooks/UseGetDataTMDB'
 import useFetchShowEpisodes from './Hooks/UseFetchShowEpisodes'
-import './Detailes.scss'
+import './Details.scss'
 
 type Props = {
   match: { params: { id: string; mediaType: string } }
 }
 
-export const DetailesPage: React.FC<Props> = ({
+export const DetailsPage: React.FC<Props> = ({
   match: {
     params: { id, mediaType },
   },
 }) => {
-  const [detailes, loadingTMDB, similarContent, error] = useGetDataTMDB({ id, mediaType })
-  const seasonsTMDB = useMemo(() => detailes.seasons.filter((item) => item.name !== 'Specials'), [detailes.seasons])
+  const [details, loadingTMDB, similarContent, error] = useGetDataTMDB({ id, mediaType })
+  const seasonsTMDB = useMemo(() => details.seasons.filter((item) => item.name !== 'Specials'), [details.seasons])
 
   const showsInitialLoading = useAppSelector(selectShowsLoading)
   const { loadingFireEpisodes } = useFetchShowEpisodes({ mediaType, id })
 
   useGoogleRedirect()
 
-  const renderDetailes = () => {
+  const renderDetails = () => {
     if (error) {
       return (
-        <div className="detailes-page__error">
+        <div className="details-page__error">
           <h1>{error}</h1>
         </div>
       )
@@ -47,16 +47,16 @@ export const DetailesPage: React.FC<Props> = ({
     }
 
     return (
-      <div className="detailes-page">
-        <PosterWrapper detailes={detailes} mediaType={mediaType} />
-        <MainInfo detailes={detailes} mediaType={mediaType} showId={Number(id)} />
+      <div className="details-page">
+        <PosterWrapper details={details} mediaType={mediaType} />
+        <MainInfo details={details} mediaType={mediaType} showId={Number(id)} />
 
-        <div className="detailes-page__description">{detailes.overview}</div>
+        <div className="details-page__description">{details.overview}</div>
 
-        {mediaType === 'show' && <ShowEpisodes key={detailes.id} seasonsTMDB={seasonsTMDB} showId={Number(id)} />}
+        {mediaType === 'show' && <ShowEpisodes key={details.id} seasonsTMDB={seasonsTMDB} showId={Number(id)} />}
         {similarContent.length && (
-          <div className="detailes-page__slider">
-            <div className="detailes-page__slider-title">
+          <div className="details-page__slider">
+            <div className="details-page__slider-title">
               {mediaType === 'movie' ? 'Similar movies' : 'Similar shows'}
             </div>
 
@@ -70,26 +70,26 @@ export const DetailesPage: React.FC<Props> = ({
   return (
     <>
       <Helmet>
-        {detailes && (
+        {details && (
           <title>
             {mediaType === 'show'
               ? `
-                ${detailes.name}
-                ${detailes.first_air_date?.slice(0, 4)} | TV Junkie
+                ${details.name}
+                ${details.first_air_date?.slice(0, 4)} | TV Junkie
               `
               : `
-              ${detailes.title}
-              ${detailes.release_date?.slice(0, 4)} | TV Junkie
+              ${details.title}
+              ${details.release_date?.slice(0, 4)} | TV Junkie
               `}
           </title>
         )}
       </Helmet>
       <Header isLogoVisible={false} />
-      <div className="detailes-page-container">{renderDetailes()}</div>
+      <div className="details-page-container">{renderDetails()}</div>
       <Footer />
       <ScrollToTopBar />
       <ScrollToTopOnUpdate />
     </>
   )
 }
-export default DetailesPage
+export default DetailsPage

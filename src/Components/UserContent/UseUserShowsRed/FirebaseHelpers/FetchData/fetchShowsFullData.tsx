@@ -1,6 +1,6 @@
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import { ShowInfoFromUserDatabase } from 'Components/Firebase/@TypesFirebase'
-import { fetchContentDetailesTMDB } from 'Components/Pages/Detailes/Hooks/UseGetDataTMDB'
+import { fetchContentDetailsTMDB } from 'Components/Pages/Details/Hooks/UseGetDataTMDB'
 import { fetchEpisodesFullData } from './fetchEpisodesFullData'
 import postShowFireDatabase from '../PostData/postShowFireDatabase'
 
@@ -17,8 +17,8 @@ const fetchShowsFullData = ({ userShows, firebase, authUserUid }: GetUserShowsFu
       let showInfo = showInfoFireSnapshot.val()!
 
       if (showInfoFireSnapshot.val() === null) {
-        const showDetailesTMDB = await fetchContentDetailesTMDB({ mediaType: 'show', id: show.id })
-        const showData = await postShowFireDatabase({ showDetailesTMDB, firebase })
+        const showDetailsTMDB = await fetchContentDetailsTMDB({ mediaType: 'show', id: show.id })
+        const showData = await postShowFireDatabase({ showDetailsTMDB, firebase })
         showInfo = showData!.info
       }
 

@@ -22,7 +22,7 @@ interface HandleDatabaseChange {
 }
 
 interface HandleNewShow extends HandleDatabaseChange {
-  showDetailesTMDB: MainDataTMDB
+  showDetailsTMDB: MainDataTMDB
 }
 
 export const updateUserShowStatus =
@@ -46,7 +46,7 @@ export const updateUserShowStatus =
   }
 
 export const handleNewShowInDatabase =
-  ({ id, database, showDetailesTMDB, firebase }: HandleNewShow): AppThunk =>
+  ({ id, database, showDetailsTMDB, firebase }: HandleNewShow): AppThunk =>
   async (dispatch, getState) => {
     const authUid = getAuthUidFromState(getState())
     let episodesFromFireDatabase: EpisodesTMDB[] = []
@@ -59,7 +59,7 @@ export const handleNewShowInDatabase =
       if (existsInFireDatabase) {
         episodesFromFireDatabase = showFullDataFireDatabase.val()?.episodes!
       } else {
-        const showData = await postShowFireDatabase({ firebase, showDetailesTMDB })
+        const showData = await postShowFireDatabase({ firebase, showDetailsTMDB })
         episodesFromFireDatabase = showData?.episodes!
       }
 
@@ -67,7 +67,7 @@ export const handleNewShowInDatabase =
       const showEpisodesUserDatabase = formatShowEpisodesForUserDatabase(episodesFromFireDatabase)
       const updateData = postUserShowScheme({
         authUid,
-        showDetailesTMDB,
+        showDetailsTMDB,
         showEpisodes: showEpisodesUserDatabase,
         showDatabase: database,
         firebase,

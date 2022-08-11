@@ -10,13 +10,13 @@ import { selectShow } from '../userShowsSliceRed'
 type Props = {
   showId: number
   database: UserShowStatuses
-  showFullDetailes: MainDataTMDB
+  showFullDetails: MainDataTMDB
   firebase: FirebaseInterface
   localStorageHandlers: LocalStorageContentInt['handlers']
 }
 
 export const handleUserShowStatus =
-  ({ showId, database, showFullDetailes, firebase, localStorageHandlers }: Props): AppThunk =>
+  ({ showId, database, showFullDetails, firebase, localStorageHandlers }: Props): AppThunk =>
   async (dispatch, getState) => {
     const authUid = getAuthUidFromState(getState())
     const showFromStore = selectShow(getState(), showId)
@@ -24,14 +24,14 @@ export const handleUserShowStatus =
     if (!authUid) {
       localStorageHandlers.toggleShow({
         id: Number(showId),
-        data: showFullDetailes,
+        data: showFullDetails,
         userShowStatus: database,
       })
       return
     }
 
     if (!showFromStore) {
-      dispatch(handleNewShowInDatabase({ id: showId, database, showDetailesTMDB: showFullDetailes, firebase }))
+      dispatch(handleNewShowInDatabase({ id: showId, database, showDetailsTMDB: showFullDetails, firebase }))
       return
     }
 

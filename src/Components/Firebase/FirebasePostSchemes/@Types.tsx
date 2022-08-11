@@ -17,7 +17,7 @@ import { FirebaseInterface } from '../FirebaseContext'
 
 export interface PostUserShowScheme {
   authUid: string
-  showDetailesTMDB: MainDataTMDB
+  showDetailsTMDB: MainDataTMDB
   showEpisodes: EpisodesFromUserDatabase['episodes']
   showDatabase: UserShowStatuses
   firebase: FirebaseInterface
@@ -25,7 +25,7 @@ export interface PostUserShowScheme {
 
 export interface PostUserMovieScheme {
   authUid: string
-  movieDetailesTMDB: MainDataTMDB
+  movieDetailsTMDB: MainDataTMDB
   firebase: FirebaseInterface
 }
 

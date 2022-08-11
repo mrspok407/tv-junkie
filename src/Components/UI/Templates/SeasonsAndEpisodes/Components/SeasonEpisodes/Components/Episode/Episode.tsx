@@ -52,19 +52,19 @@ const Episode: React.FC<Props> = ({ episodeData, showCheckboxes, showId, showTit
 
       {isEpisodeOpen && (
         <div
-          className={classNames('episodes__episode-detailes', {
-            'episodes__episode-detailes--no-image': !episodeData.still_path,
+          className={classNames('episodes__episode-details', {
+            'episodes__episode-details--no-image': !episodeData.still_path,
           })}
         >
           {episodeData.still_path && (
             <div
-              className="episodes__episode-detailes-image"
+              className="episodes__episode-details-image"
               style={{
                 backgroundImage: `url(https://image.tmdb.org/t/p/w500${episodeData.still_path})`,
               }}
             />
           )}
-          {episodeData.overview && <div className="episodes__episode-detailes-overview">{episodeData.overview}</div>}
+          {episodeData.overview && <div className="episodes__episode-details-overview">{episodeData.overview}</div>}
 
           {isEpisodeAired && !airDateUnavailable && (
             <>

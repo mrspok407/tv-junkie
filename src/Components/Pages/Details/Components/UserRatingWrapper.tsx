@@ -47,7 +47,7 @@ const UserRatingWrapper: React.FC<Props> = ({ contentId, isMediaTypeTV }) => {
   return (
     <>
       <div
-        className="detailes-page__info-value detailes-page__info-value--rating"
+        className="details-page__info-value details-page__info-value--rating"
         ref={ref}
         onClick={(e) => {
           if (authUser?.uid) return
