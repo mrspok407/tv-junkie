@@ -9,7 +9,7 @@ import {
 } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
 import { ShowFullDataStoreState, UserWillAirEpisodesInterface } from 'Components/UserContent/UseUserShowsRed/@Types'
 import useAppSelectorArray from 'Utils/Hooks/UseAppSelectorArray'
-import { organiseFutureEpisodesByMonth } from './CalendarHelpers'
+import { organizeFutureEpisodesByMonth } from './CalendarHelpers'
 import MonthEpisodes from './Components/MonthEpisodes/MonthEpisodes'
 
 type Props = {
@@ -24,7 +24,7 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
   const watchingShows = userShows.filter((show) => show?.database === 'watchingShows')
 
   const willAirEpisodesData: UserWillAirEpisodesInterface[] = useMemo(() => {
-    return organiseFutureEpisodesByMonth(watchingShows, userEpisodes)
+    return organizeFutureEpisodesByMonth(watchingShows, userEpisodes)
   }, [watchingShows, userEpisodes])
   const willAirEpisodes = homePage ? willAirEpisodesData.slice(0, 2) : willAirEpisodesData
 

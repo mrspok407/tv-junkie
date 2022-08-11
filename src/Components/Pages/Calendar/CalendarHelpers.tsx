@@ -6,7 +6,7 @@ import {
 } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { differenceBtwDatesInDays, currentDate } from 'Utils'
 
-export const organiseFutureEpisodesByMonth = (
+export const organizeFutureEpisodesByMonth = (
   data: ShowFullDataStoreState[],
   episodes: {
     [key: string]: EpisodesStoreState[]

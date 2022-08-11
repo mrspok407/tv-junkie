@@ -20,7 +20,7 @@ import {
 import { useAppSelector } from 'app/hooks'
 import PlaceholderHomePageNoFutureEpisodes from 'Components/UI/Placeholders/PlaceholderHomePageNoFutureEpisodes'
 import useGetSlidersContent from './Hooks/UseGetSlidersContent'
-import { organiseFutureEpisodesByMonth } from '../Calendar/CalendarHelpers'
+import { organizeFutureEpisodesByMonth } from '../Calendar/CalendarHelpers'
 import './Home.scss'
 
 const HomePage: React.FC = () => {
@@ -30,7 +30,7 @@ const HomePage: React.FC = () => {
   const userShows = useAppSelectorArray<ShowFullDataStoreState>(selectShows)
   const userEpisodes = useAppSelector(selectEpisodes)
   const watchingShows = userShows.filter((show) => show.database === 'watchingShows')
-  const willAirEpisodesData: UserWillAirEpisodesInterface[] = organiseFutureEpisodesByMonth(watchingShows, userEpisodes)
+  const willAirEpisodesData: UserWillAirEpisodesInterface[] = organizeFutureEpisodesByMonth(watchingShows, userEpisodes)
   const willAirEpisodes = willAirEpisodesData.slice(0, 2)
 
   const showsInitialLoading = useAppSelector(selectShowsLoading)
