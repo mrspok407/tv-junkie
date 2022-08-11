@@ -27,6 +27,7 @@ export interface SingleEpisodeByMonthInterface {
   air_date: string
   episode_number?: number
   id: number
+  name?: string
   season_number?: number
   show: string
   showId: number
