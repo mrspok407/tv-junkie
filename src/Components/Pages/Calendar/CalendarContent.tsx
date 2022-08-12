@@ -21,11 +21,11 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
 
   const userShows = useAppSelectorArray<ShowFullDataStoreState>(selectShows)
   const userEpisodes = useAppSelector(selectEpisodes)
-  const watchingShows = userShows.filter((show) => show?.database === 'watchingShows')
 
   const willAirEpisodesData: UserWillAirEpisodesInterface[] = useMemo(() => {
+    const watchingShows = userShows.filter((show) => show?.database === 'watchingShows')
     return organizeFutureEpisodesByMonth(watchingShows, userEpisodes)
-  }, [watchingShows, userEpisodes])
+  }, [userShows, userEpisodes])
   const willAirEpisodes = homePage ? willAirEpisodesData.slice(0, 2) : willAirEpisodesData
 
   if (showsInitialLoading) {

@@ -17,14 +17,15 @@ type Props = {
 
 const MonthEpisodes: React.FC<Props> = ({ monthEpisodesData, isMonthOpen }) => {
   const [isOpen, setIsOpen] = useState(isMonthOpen)
-  const monthDate = new Date(monthEpisodesData.month)
 
   const monthEpisodes: SingleEpisodeByMonthInterface[] = useMemo(
     () => organizeMonthEpisodesByEpisodeNumber(monthEpisodesData.episodes),
     [monthEpisodesData],
   )
 
+  const monthDate = new Date(monthEpisodesData.month)
   const monthName = format(monthDate, 'LLLL')
+
   const episodesPluralHandler = () => {
     if (monthEpisodesData.episodes.length > 1) return 'episodes'
     return 'episode'

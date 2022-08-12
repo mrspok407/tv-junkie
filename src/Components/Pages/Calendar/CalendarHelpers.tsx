@@ -4,7 +4,8 @@ import {
   UserWillAirEpisodesInterface,
   EpisodesStoreState,
 } from 'Components/UserContent/UseUserShowsRed/@Types'
-import { differenceBtwDatesInDays, currentDate } from 'Utils'
+import { differenceInCalendarDays } from 'date-fns'
+import { currentDate } from 'Utils'
 
 export const organizeFutureEpisodesByMonth = (
   data: ShowFullDataStoreState[],
@@ -14,22 +15,19 @@ export const organizeFutureEpisodesByMonth = (
 ) => {
   const sortedAndFiltered = data
     .flatMap((show) =>
-      episodes[show.id].flatMap((season: any) =>
-        season.episodes.reduce(
-          (acc: { show: string; showId: number; episode_number?: number; air_date: any }[], episode: any) => {
-            if (differenceBtwDatesInDays(episode.air_date, currentDate) >= 0) {
-              acc.push({
-                ...episode,
-                show: show.name || show.original_name,
-                showId: show.id,
-                episode_number: episode?.episode_number,
-              })
-            }
+      episodes[show.id].flatMap((season) =>
+        season.episodes.reduce((acc: any[], episode) => {
+          if (differenceInCalendarDays(new Date(episode.air_date), currentDate) >= 0) {
+            acc.push({
+              ...episode,
+              show: show.name || show.original_name,
+              showId: show.id,
+              episode_number: episode?.episode_number,
+            })
+          }
 
-            return acc
-          },
-          [],
-        ),
+          return acc
+        }, []),
       ),
     )
     .sort((a, b) => (a.air_date > b.air_date ? 1 : -1))

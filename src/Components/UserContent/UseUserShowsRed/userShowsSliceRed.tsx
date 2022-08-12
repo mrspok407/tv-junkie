@@ -3,6 +3,10 @@ import merge from 'deepmerge'
 import { createSlice, current, PayloadAction } from '@reduxjs/toolkit'
 import { combineMergeObjects } from 'Utils'
 import { EpisodesFromUserDatabase } from 'Components/Firebase/@TypesFirebase'
+import * as _isEqual from 'lodash.isequal'
+import * as _keys from 'lodash.keys'
+import * as _union from 'lodash.union'
+import * as _differenceWith from 'lodash.differencewith'
 import {
   UserShowsStoreState,
   ShowFullDataStoreState,
@@ -90,6 +94,21 @@ export const userShowsSliceRed = createSlice({
 
       // if (stateInfo?.database !== info.database) return
       if (!stateEpisodes?.length) return
+
+      console.log({ stateEpisodes: current(stateEpisodes), episodes })
+
+      console.log({ isEqual: _isEqual(stateEpisodes, episodes) })
+
+      console.log(_differenceWith(current(stateEpisodes), episodes, !_isEqual))
+
+      // const changedKeys = (o1, o2) => {
+      //   const keys = _union(_keys(o1), _keys(o2))
+      //   return keys.filter((key) => {
+      //     return o1[key] !== o2[key]
+      //   })
+      // }
+
+      // console.log(changedKeys(stateEpisodes, episodes))
 
       console.log('changeShowEpisodes')
 

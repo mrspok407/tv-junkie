@@ -47,7 +47,7 @@ const Season: React.FC<Props> = ({ seasonData, showCheckboxes, isSeasonAired, sh
       )}
 
       <div className="episodes__episode-list">
-        {seasonData.episodes.map((episode, episodeIndex, array) => {
+        {seasonData.episodes.map((episode) => {
           return (
             <Episode
               key={episode.id}

@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, { useCallback, useContext, useEffect, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import ShowEpisodes from 'Components/UI/Templates/SeasonsAndEpisodes/ShowEpisodes'
 import { currentDate, combineMergeObjects } from 'Utils'
@@ -7,93 +7,56 @@ import Loader from 'Components/UI/Placeholders/Loader'
 import PlaceholderNoToWatchEpisodes from 'Components/UI/Placeholders/PlaceholderNoToWatchEpisodes'
 import merge from 'deepmerge'
 import { EpisodesFromFireDatabase, SingleEpisodeFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
-import { ShowFullDataStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
+import { EpisodesStoreState, ShowFullDataStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
 import releasedEpisodesToOneArray from 'Utils/episodesToOneArray'
+import { useAppDispatch, useAppSelector } from 'app/hooks'
+import {
+  selectEpisodes,
+  selectShowEpisodes,
+  selectShows,
+  selectShowsLoading,
+} from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
+import useAppSelectorArray from 'Utils/Hooks/UseAppSelectorArray'
+import ToWatchShow from './Components/ToWatchShow'
+import ToWatchEpisode from './Components/ToWatchEpisode'
+import { getSeasonEpisodes, getSeasons } from './Helpers'
+import ToWatchSeason from './Components/ToWatchSeason'
 
 const ToWatchEpisodesContent: React.FC = () => {
-  const [watchingShows, setWatchingShows] = useState<ShowFullDataStoreState[]>([])
-  const [loading, setLoading] = useState(true)
+  const showsInitialLoading = useAppSelector(selectShowsLoading)
 
-  const context = {}
+  const userShows = useAppSelectorArray<ShowFullDataStoreState>(selectShows)
+  const userShowsToWatch = useMemo(() => {
+    return userShows.filter((show) => show.database === 'watchingShows' && !show.allEpisodesWatched)
+  }, [userShows])
 
-  // const getContent = useCallback(() => {
-  //   const watchingShows = context.userContent.userShows.filter(
-  //     (show) => show.database === 'watchingShows' && !show.allEpisodesWatched,
-  //   )
-  //   const toWatchEpisodes: any = context.userContent.userToWatchShows
+  const dispatch = useAppDispatch()
 
-  //   if (toWatchEpisodes.length === 0) {
-  //     setWatchingShows([])
-  //     setLoading(false)
-  //     return
-  //   }
-
-  //   const watchingShowsModified = watchingShows
-  //     .reduce((acc: ShowFullDataStoreState[], show) => {
-  //       const showToWatch = toWatchEpisodes.find((item: any) => item.id === show.id)
-  //       if (showToWatch) {
-  //         const showMerged = merge(show, showToWatch, {
-  //           arrayMerge: combineMergeObjects,
-  //         })
-  //         acc.push(showMerged)
-  //       }
-  //       return acc
-  //     }, [])
-  //     .sort((a, b) => (a.first_air_date > b.first_air_date ? -1 : 1))
-
-  //   setWatchingShows(watchingShowsModified)
-  //   setLoading(false)
-  // }, [context.userContent])
+  // const seasonsLength = useAppSelector((state) => {
+  //   return selectShowEpisodes(state, showData.id)?.length
+  // })
+  // const [test, setTest] = useState(0)
 
   // useEffect(() => {
-  //   getContent()
-  // }, [getContent])
+  //   setTimeout(() => {
+  //     setTest((prev) => prev + 1)
+  //   }, 3000)
+  // }, [])
+
+  console.log({ userShowsToWatch })
+  if (showsInitialLoading) {
+    return (
+      <div className="content-results content-results--calendar">
+        <Loader className="loader--pink" />
+      </div>
+    )
+  }
 
   return (
     <div className="content-results content-results--to-watch-page">
-      {context.userContent.loadingShows || context.userContent.loadingNotFinishedShows ? (
-        <Loader className="loader--pink" />
-      ) : watchingShows.length === 0 && !loading ? (
-        <PlaceholderNoToWatchEpisodes />
-      ) : (
-        <>
-          {watchingShows.map((show) => {
-            const toWatchEpisodes = show.episodes.reduce((acc: EpisodesFromFireDatabase[], season) => {
-              const seasonEpisodes = season.episodes.reduce((acc: SingleEpisodeFromFireDatabase[], episode, index) => {
-                if (episode.air_date && new Date(episode.air_date).getTime() < currentDate.getTime()) {
-                  acc.push({ ...episode, index })
-                }
-                return acc
-              }, [])
-
-              seasonEpisodes.reverse()
-
-              if (seasonEpisodes.length !== 0 && seasonEpisodes.some((item) => !item.watched)) {
-                acc.push({ ...season, episodes: seasonEpisodes })
-              }
-
-              return acc
-            }, [])
-            toWatchEpisodes.reverse()
-
-            const releasedEpisodes: SingleEpisodeFromFireDatabase[] = releasedEpisodesToOneArray(show.episodes)
-
-            return (
-              <div key={show.id} className="towatch__show">
-                <Link className="towatch__show-name" to={`/show/${show.id}`}>
-                  {show.name}
-                </Link>
-                <ShowEpisodes
-                  parentComponent="toWatchPage"
-                  seasonsTMDB={toWatchEpisodes}
-                  showTitle={show.name || show.original_name}
-                  showId={show.id}
-                />
-              </div>
-            )
-          })}
-        </>
-      )}
+      {userShowsToWatch.map((show) => {
+        return <ToWatchShow key={show.id} showData={show} />
+      })}
     </div>
   )
 }

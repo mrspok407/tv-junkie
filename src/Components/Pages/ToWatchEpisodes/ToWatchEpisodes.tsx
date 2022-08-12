@@ -17,7 +17,7 @@ const ToWatchEpisodesPage: React.FC = () => {
         <title>Shows to watch | TV Junkie</title>
       </Helmet>
       <Header />
-      {/* <ToWatchEpisodesContent /> */}
+      <ToWatchEpisodesContent />
       <Footer />
       <ScrollToTop />
     </>

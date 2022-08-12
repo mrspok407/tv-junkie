@@ -50,7 +50,7 @@ export const handleChangeShow =
     console.log({ showFromStore })
     if (!showFromStore) return
     if (showFromStore.episodesFetched) {
-      console.log('allready fetched')
+      console.log('already fetched')
       console.log({ showData })
       const show = { info: { ...showFromStore, ...showData } }
       dispatch(changeShow(show))
@@ -72,6 +72,7 @@ export const handleChangeEpisodes =
   (showId: number, episodes: EpisodesFromUserDatabase['episodes'], firebase: FirebaseInterface): AppThunk =>
   async (dispatch, getState) => {
     const authUid = getAuthUidFromState(getState())
+
     const isAnyEpisodeNotWatched = episodesToOneArray<SingleEpisodeFromUserDatabase>(episodes).some(
       (episode) => !episode.watched,
     )

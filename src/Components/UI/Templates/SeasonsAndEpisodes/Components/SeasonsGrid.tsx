@@ -76,7 +76,7 @@ const SeasonsGrid: React.FC<Props> = ({
               <div className="episodes__episode-group-name">Season {season.season_number}</div>
 
               {isArrayIncludes(season.id, errors) ? (
-                <div className="episodes__episode-group-days-to-air">Weird error occured wow</div>
+                <div className="episodes__episode-group-days-to-air">Weird error occurred wow</div>
               ) : (
                 !isSeasonAired && (
                   <div className="episodes__episode-group-days-to-air">
