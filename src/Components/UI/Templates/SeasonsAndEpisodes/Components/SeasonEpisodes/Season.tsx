@@ -1,21 +1,30 @@
 import { useAppDispatch } from 'app/hooks'
 import { postCheckReleasedEpisodes } from 'Components/UserContent/UseUserShowsRed/DatabaseHandlers/PostData/postShowEpisodesData'
 import React from 'react'
+import { SeasonTMDB } from 'Utils/@TypesTMDB'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
-import { SeasonFullData } from '../../@Types'
+import { ShowEpisodesFromAPIInt } from '../../@Types'
 import Episode from './Components/Episode/Episode'
 import UserRatingSeason from './Components/UserRatingSeason'
 
 type Props = {
-  seasonData: SeasonFullData
+  isSeasonAired: boolean
+  seasonEpisodes: ShowEpisodesFromAPIInt | undefined
+  seasonTMDB: SeasonTMDB
   showCheckboxes: boolean
   showId: number
-  isSeasonAired: boolean
 }
 
-const Season: React.FC<Props> = ({ seasonData, showCheckboxes, isSeasonAired, showId }) => {
+const Season: React.FC<Props> = React.memo(({ seasonTMDB, seasonEpisodes, showCheckboxes, isSeasonAired, showId }) => {
   const { firebase } = useFrequentVariables()
   const dispatch = useAppDispatch()
+
+  const seasonData = {
+    ...seasonTMDB,
+    episodes: seasonEpisodes?.episodes || [],
+    showTitle: seasonEpisodes?.showTitle || '',
+  }
+
   return (
     <>
       {seasonData.poster_path && (
@@ -61,6 +70,6 @@ const Season: React.FC<Props> = ({ seasonData, showCheckboxes, isSeasonAired, sh
       </div>
     </>
   )
-}
+})
 
 export default Season

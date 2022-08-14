@@ -16,16 +16,22 @@ const ToWatchShow: React.FC<Props> = ({ showData }) => {
   const dispatch = useAppDispatch()
   // const seasons = useAppSelector((state) => selectShowEpisodes(state, showData.id).length)
 
-  const seasons = dispatch(getSeasons({ showId: showData.id }))
+  // const seasons = dispatch(getSeasons({ showId: showData.id }))
 
-  const isAnyEpisodeNotWatched = useAppSelector((state) => {
-    const episodes = selectShowEpisodes(state, showData.id)
-    return releasedEpisodesToOneArray<SingleEpisodeStoreState>(episodes).some((episode) => !episode.watched)
+  const seasons = useAppSelector((state) => {
+    const episodes = selectShowEpisodes(state, showData.id)?.filter((season) => {
+      return season.episodes.some((episode) => !episode.watched)
+    })
+    return episodes
+    // return releasedEpisodesToOneArray<SingleEpisodeStoreState>(episodes).some((episode) => !episode.watched)
   })
-  console.log({ isAnyEpisodeNotWatched })
-  if (!isAnyEpisodeNotWatched) {
-    return null
+  if (showData.id === 60059) {
+    console.log({ seasons })
   }
+  // console.log({ isAnyEpisodeNotWatched })
+  // if (!isAnyEpisodeNotWatched) {
+  //   return null
+  // }
   console.log('ToWatchShow rerender')
 
   return (
@@ -35,13 +41,13 @@ const ToWatchShow: React.FC<Props> = ({ showData }) => {
       </Link>
       <div className="episodes">
         {seasons?.map((season) => {
-          const episodes = dispatch(getSeasonEpisodes({ showId: showData.id, seasonNumber: season.season_number }))
+          // const episodes = dispatch(getSeasonEpisodes({ showId: showData.id, seasonNumber: season.season_number }))
 
           return (
             <ToWatchSeason showData={showData} seasonData={season} key={season.season_number}>
-              {episodes?.map((episode) => {
+              {/* {episodes?.map((episode) => {
                 return <ToWatchEpisode key={episode.id} showId={showData.id} episodeData={episode} />
-              })}
+              })} */}
             </ToWatchSeason>
           )
         })}

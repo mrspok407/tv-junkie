@@ -68,15 +68,24 @@ export const handleChangeShow =
     }
   }
 
+export const testThunk =
+  ({ showId, episodes }: any): AppThunk<Promise<any>> =>
+  async (dispatch, getState) => {
+    dispatch(changeShowEpisodes({ showId, episodes }))
+    return 'opa'
+  }
+
 export const handleChangeEpisodes =
   (showId: number, episodes: EpisodesFromUserDatabase['episodes'], firebase: FirebaseInterface): AppThunk =>
   async (dispatch, getState) => {
     const authUid = getAuthUidFromState(getState())
 
+    console.time('test')
     const isAnyEpisodeNotWatched = episodesToOneArray<SingleEpisodeFromUserDatabase>(episodes).some(
       (episode) => !episode.watched,
     )
+    console.timeEnd('test')
 
     firebase.userShow({ authUid, key: showId }).update({ allEpisodesWatched: !isAnyEpisodeNotWatched })
-    return dispatch(changeShowEpisodes({ showId, episodes }))
+    return dispatch(testThunk({ showId, episodes })).then((res) => console.log({ res }))
   }

@@ -29,19 +29,19 @@ const SeasonsGrid: React.FC<Props> = ({
     const seasonEpisodes = data.find((item) => item.seasonId === season.id)
     const isSeasonAired = daysToNewSeason <= 0
 
-    const seasonData = {
-      ...season,
-      episodes: seasonEpisodes?.episodes || [],
-      showTitle: seasonEpisodes?.showTitle || '',
-    }
-
     if (isArrayIncludes(season.id, loadingData)) {
       return <Loader className="loader--small-pink" />
     }
 
     if (isArrayIncludes(season.id, openData)) {
       return (
-        <Season seasonData={seasonData} showCheckboxes={showCheckboxes} showId={showId} isSeasonAired={isSeasonAired} />
+        <Season
+          seasonTMDB={season}
+          seasonEpisodes={seasonEpisodes}
+          showCheckboxes={showCheckboxes}
+          showId={showId}
+          isSeasonAired={isSeasonAired}
+        />
       )
     }
   }

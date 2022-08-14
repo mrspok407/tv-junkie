@@ -5,6 +5,9 @@ import { selectShowEpisodes, selectSingleSeason } from 'Components/UserContent/U
 import React, { useState, useEffect, Children, useMemo } from 'react'
 import { differenceInCalendarDays } from 'date-fns'
 import { currentDate } from 'Utils'
+import { shallowEqual } from 'react-redux'
+import * as _isEqual from 'lodash.isequal'
+import ToWatchEpisode from './ToWatchEpisode'
 
 type Props = {
   seasonData: EpisodesStoreState
@@ -13,18 +16,30 @@ type Props = {
 }
 
 const ToWatchSeason: React.FC<Props> = ({ showData, seasonData, children }) => {
-  const seasonDataStore = useAppSelector((state) => selectSingleSeason(state, showData.id, seasonData.season_number))
-  const seasonEpisodesNotWatched = useMemo(() => {
-    return seasonDataStore?.episodes.filter(
+  const seasonDataStore = useAppSelector((state) => {
+    return selectSingleSeason(state, showData.id, seasonData.season_number)?.episodes.filter(
       (episode) => !episode.watched && differenceInCalendarDays(new Date(episode.air_date), currentDate) <= 0,
     )
-  }, [seasonDataStore])
+  }, _isEqual)
 
-  const earliestNotWatched = seasonEpisodesNotWatched && seasonEpisodesNotWatched[0]
+  // useEffect(() => {
+  //   console.log({ curr: seasonDataStore })
 
-  console.log('rerender SEASON')
+  //   return () => {
+  //     console.log({ prev: seasonDataStore })
+  //   }
+  // }, [seasonDataStore])
+  // const seasonEpisodesNotWatched = useMemo(() => {
+  // return seasonDataStore?.episodes.filter(
+  //   (episode) => !episode.watched && differenceInCalendarDays(new Date(episode.air_date), currentDate) <= 0,
+  // )
+  // }, [seasonDataStore])
 
-  if (!seasonEpisodesNotWatched?.length) {
+  // const earliestNotWatched = seasonEpisodesNotWatched && seasonEpisodesNotWatched[0]
+
+  console.log(`rerender SEASON ${seasonData.season_number}`)
+
+  if (!seasonDataStore?.length) {
     return null
   }
 
@@ -37,10 +52,14 @@ const ToWatchSeason: React.FC<Props> = ({ showData, seasonData, children }) => {
       >
         <div className="episodes__episode-group-name">Season {seasonData.season_number}</div>
         <div className="episodes__episode-group-episodes-left">
-          {seasonEpisodesNotWatched?.length} episodes left <span>from {earliestNotWatched?.episode_number}</span>
+          {/* {seasonEpisodesNotWatched?.length} episodes left <span>from {earliestNotWatched?.episode_number}</span> */}
         </div>
       </div>
-      <div className="episodes__episode-list">{children}</div>
+      <div className="episodes__episode-list">
+        {seasonDataStore?.map((episode) => {
+          return <ToWatchEpisode key={episode.id} showId={showData.id} episodeData={episode} />
+        })}
+      </div>
     </div>
   )
 }
