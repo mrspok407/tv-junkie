@@ -7,11 +7,12 @@ import {
   SingleEpisodeFromUserDatabase,
 } from 'Components/Firebase/@TypesFirebase'
 import { getAuthUidFromState } from 'Components/UserAuth/Session/Authentication/Helpers'
-import { episodesToOneArray } from 'Utils/episodesToOneArray'
 import { EpisodesStoreState } from '../../@Types'
 import { addNewShow, changeShow, changeShowEpisodes, selectShow } from '../../userShowsSliceRed'
 import { fetchEpisodesFullData } from '../../FirebaseHelpers/FetchData/fetchEpisodesFullData'
 import { handleShowsError } from '../../ErrorHandlers/handleShowsError'
+import { episodesToOneArray } from '../../Utils/episodesOneArrayModifiers'
+import { updateIsEpisodesWatched } from '../../Utils'
 
 export const handleNewShow =
   (showData: ShowInfoFromUserDatabase, firebase: FirebaseInterface): AppThunk =>
@@ -20,19 +21,22 @@ export const handleNewShow =
     const shouldFetchEpisodes = showData.database !== 'notWatchingShows'
 
     try {
-      let episodes: EpisodesStoreState[] = []
+      let episodesRawData: EpisodesStoreState[] = []
       const showInfoFireSnapshot = await firebase.showInfoFireDatabase(showData.id).once('value')
       if (showInfoFireSnapshot.val() === null) {
         throwErrorNoData()
       }
 
       if (shouldFetchEpisodes) {
-        episodes = await fetchEpisodesFullData({ authUserUid, showKey: showData.id, firebase })
+        episodesRawData = await fetchEpisodesFullData({ authUserUid, showKey: showData.id, firebase })
       }
+
+      const [episodesFinalData, allReleasedEpisodesWatched] = updateIsEpisodesWatched(episodesRawData)
       const show = {
         ...showInfoFireSnapshot.val()!,
         ...showData,
-        episodes,
+        allReleasedEpisodesWatched,
+        episodes: episodesFinalData,
         episodesFetched: shouldFetchEpisodes,
       }
       dispatch(addNewShow(show))
@@ -58,10 +62,15 @@ export const handleChangeShow =
     }
 
     try {
-      const episodes = await fetchEpisodesFullData({ authUserUid, showKey: showData.id, firebase })
+      const episodesRawData = await fetchEpisodesFullData({ authUserUid, showKey: showData.id, firebase })
+      const [episodesFinalData, allReleasedEpisodesWatched] = updateIsEpisodesWatched(episodesRawData)
+
       console.log('handleChangeShow after AWAIT')
 
-      const show = { info: { ...showFromStore, ...showData, episodesFetched: true }, episodes }
+      const show = {
+        info: { ...showFromStore, ...showData, allReleasedEpisodesWatched, episodesFetched: true },
+        episodes: episodesFinalData,
+      }
       dispatch(changeShow(show))
     } catch (err) {
       dispatch(handleShowsError(err))
@@ -71,7 +80,9 @@ export const handleChangeShow =
 export const testThunk =
   ({ showId, episodes }: any): AppThunk<Promise<any>> =>
   async (dispatch, getState) => {
-    dispatch(changeShowEpisodes({ showId, episodes }))
+    const [episodesFinalData, allReleasedEpisodesWatched] = updateIsEpisodesWatched(episodes)
+
+    dispatch(changeShowEpisodes({ showId, episodes: episodesFinalData, allReleasedEpisodesWatched }))
     return 'opa'
   }
 

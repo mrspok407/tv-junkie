@@ -12,20 +12,20 @@ type Props = {
   showId: number
 }
 
-const ToWatchEpisode: React.FC<Props> = React.memo(({ episodeData, showId }) => {
+const ToWatchEpisode: React.FC<Props> = ({ episodeData, showId }) => {
   console.log('rerender ToWatchEpisode')
-  // const isWatched = useAppSelector((state) => {
-  //   const episode = selectSingleEpisode(state, showId, episodeData.season_number, episodeData.episode_number)
-  //   return episode?.watched ?? false
-  // })
+  const isWatched = useAppSelector((state) => {
+    const episode = selectSingleEpisode(state, showId, episodeData.season_number, episodeData.episode_number)
+    return episode?.watched ?? false
+  })
 
-  // if (isWatched || differenceInCalendarDays(new Date(episodeData.air_date), currentDate) > 0) return null
+  if (isWatched || differenceInCalendarDays(new Date(episodeData.air_date), currentDate) > 0) return null
 
   return (
     <>
       <EpisodeCheckbox isDisabled={false} episodeData={episodeData} showId={showId} />
     </>
   )
-}, _isEqual)
+}
 
 export default ToWatchEpisode

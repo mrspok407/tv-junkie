@@ -78,6 +78,7 @@ export interface MainDataTMDB {
 
 const MAINDATA_TMDB_INITIAL: MainDataTMDB = {
   allEpisodesWatched: false,
+  allReleasedEpisodesWatched: null,
   backdrop_path: '-',
   budget: 0,
   database: '',

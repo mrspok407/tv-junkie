@@ -84,7 +84,11 @@ export const userShowsSliceRed = createSlice({
     },
     changeShowEpisodes: (
       state,
-      action: PayloadAction<{ showId: number; episodes: EpisodesFromUserDatabase['episodes'] }>,
+      action: PayloadAction<{
+        showId: number
+        episodes: EpisodesFromUserDatabase['episodes']
+        allReleasedEpisodesWatched: boolean | null
+      }>,
     ) => {
       // const stateInfo = state.data.info[action.payload.id]
       const stateEpisodes = state.data.episodes[action.payload.showId]
@@ -116,6 +120,7 @@ export const userShowsSliceRed = createSlice({
         arrayMerge: combineMergeObjects,
       })
       state.data.episodes[action.payload.showId] = mergeEpisodes
+      state.data.info[action.payload.showId].allReleasedEpisodesWatched = action.payload.allReleasedEpisodesWatched
     },
     updateLoadingShows: (state, action: PayloadAction<UserShowsStoreState['initialLoading']>) => {
       console.log(action.payload)
@@ -172,8 +177,8 @@ export const selectShowEpisodes = (state: RootState, showId: number): EpisodesSt
 export const selectShowStatus = (state: RootState, showId: number) => selectShow(state, showId)?.database
 export const selectShowRating = (state: RootState, showId: number) => selectShow(state, showId)?.userRating
 
-export const selectSingleSeason = (state: RootState, id: number, seasonNum: number) => {
-  const episodes = selectShowEpisodes(state, id)
+export const selectSingleSeason = (state: RootState, showId: number, seasonNum: number) => {
+  const episodes = selectShowEpisodes(state, showId)
   if (episodes === undefined) return undefined
   const singleSeason = episodes[seasonNum - 1]
   return singleSeason

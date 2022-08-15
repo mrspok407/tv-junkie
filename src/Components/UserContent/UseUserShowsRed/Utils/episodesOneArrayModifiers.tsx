@@ -1,7 +1,11 @@
 import { currentDate } from 'Utils'
 import differenceInCalendarDays from 'date-fns/differenceInCalendarDays'
 
-type DataType = Array<any> | undefined
+interface SeasonInt {
+  episodes: Array<any>
+}
+
+type DataType = Array<Partial<SeasonInt> | undefined> | undefined
 
 export const episodesToOneArray = <T,>(data: DataType): T[] => {
   if (!Array.isArray(data)) return []
@@ -24,5 +28,3 @@ export const releasedEpisodesToOneArray = <T,>(data: DataType) => {
     return daysToNewEpisode <= 0
   })
 }
-
-export default releasedEpisodesToOneArray

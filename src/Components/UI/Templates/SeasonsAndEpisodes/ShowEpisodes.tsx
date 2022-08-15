@@ -5,7 +5,7 @@ import { selectShow, selectShowEpisodes } from 'Components/UserContent/UseUserSh
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import { SeasonTMDB } from 'Utils/@TypesTMDB'
 import { postCheckReleasedEpisodes } from 'Components/UserContent/UseUserShowsRed/DatabaseHandlers/PostData/postShowEpisodesData'
-import releasedEpisodesToOneArray from 'Utils/episodesToOneArray'
+import { releasedEpisodesToOneArray } from 'Components/UserContent/UseUserShowsRed/Utils/episodesOneArrayModifiers'
 import useFetchSeasons from './Hooks/UseFetchSeasons/UseFetchSeasons'
 import { ShowEpisodesFromAPIInt } from './@Types'
 import SeasonsGrid from './Components/SeasonsGrid'

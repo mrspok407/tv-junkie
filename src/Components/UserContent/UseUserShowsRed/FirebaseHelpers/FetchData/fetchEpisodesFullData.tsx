@@ -13,12 +13,13 @@ export const fetchEpisodesFullData = async ({ authUserUid, showKey, firebase }: 
     firebase.showEpisodesFireDatabase(showKey).once('value'),
     firebase.showEpisodesUserDatabase(authUserUid, showKey).once('value'),
   ])
-  const episodesFullData: EpisodesStoreState[] = merge(
+  const episodesUserFireMerge: EpisodesStoreState[] = merge(
     episodesFireDatabase.val() || [],
     episodesUserDatabase.val() || [],
     {
       arrayMerge: combineMergeObjects,
     },
   )
-  return episodesFullData
+
+  return episodesUserFireMerge
 }

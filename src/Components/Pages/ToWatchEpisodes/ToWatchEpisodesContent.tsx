@@ -8,12 +8,14 @@ import PlaceholderNoToWatchEpisodes from 'Components/UI/Placeholders/Placeholder
 import merge from 'deepmerge'
 import { EpisodesFromFireDatabase, SingleEpisodeFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
 import { EpisodesStoreState, ShowFullDataStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
-import releasedEpisodesToOneArray from 'Utils/episodesToOneArray'
+import { releasedEpisodesToOneArray } from 'Components/UserContent/UseUserShowsRed/Utils/episodesOneArrayModifiers'
 import { useAppDispatch, useAppSelector } from 'app/hooks'
 import {
   selectEpisodes,
+  selectShow,
   selectShowEpisodes,
   selectShows,
+  selectShowsIds,
   selectShowsLoading,
 } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
 import useAppSelectorArray from 'Utils/Hooks/UseAppSelectorArray'
@@ -25,12 +27,35 @@ import ToWatchSeason from './Components/ToWatchSeason'
 const ToWatchEpisodesContent: React.FC = () => {
   const showsInitialLoading = useAppSelector(selectShowsLoading)
 
-  const userShows = useAppSelectorArray<ShowFullDataStoreState>(selectShows)
-  const userShowsToWatch = useMemo(() => {
-    return userShows.filter((show) => show.database === 'watchingShows' && !show.allEpisodesWatched)
-  }, [userShows])
+  const userShowsIds = useAppSelector(selectShowsIds)
+  const userShowsIdsReverse = useMemo(() => {
+    return [...userShowsIds].reverse()
+  }, [userShowsIds])
 
-  const dispatch = useAppDispatch()
+  const test = useAppSelector((state) => {
+    const idsNotAllWatched = userShowsIds.filter((id) => {
+      const showStore = selectShow(state, id)
+      console.log({ isAllReleasedEpisodesWatched: showStore })
+      return showStore?.allReleasedEpisodesWatched === false && showStore.database === 'watchingShows'
+    })
+    return !!idsNotAllWatched.length
+  })
+
+  console.log({ test })
+
+  // const userShowsIds = useAppSelector((state) => {
+  //   const ids = selectShowsIds(state)
+  // const idsNotAllWatched = ids.filter((id) => {
+  //   const isAllReleasedEpisodesWatched = selectShow(state, id)?.allReleasedEpisodesWatched
+  //   return !isAllReleasedEpisodesWatched
+  // })
+  //   return idsNotAllWatched
+  // })
+  // const userShowsToWatch = useMemo(() => {
+  //   return userShows.filter((show) => show.database === 'watchingShows' && !show.allEpisodesWatched)
+  // }, [userShows])
+
+  // const dispatch = useAppDispatch()
 
   // const seasonsLength = useAppSelector((state) => {
   //   return selectShowEpisodes(state, showData.id)?.length
@@ -43,7 +68,7 @@ const ToWatchEpisodesContent: React.FC = () => {
   //   }, 3000)
   // }, [])
 
-  console.log({ userShowsToWatch })
+  console.log({ userShowsIds })
   if (showsInitialLoading) {
     return (
       <div className="content-results content-results--calendar">
@@ -52,10 +77,18 @@ const ToWatchEpisodesContent: React.FC = () => {
     )
   }
 
+  if (!test) {
+    return (
+      <div className="content-results content-results--calendar">
+        <PlaceholderNoToWatchEpisodes />
+      </div>
+    )
+  }
+
   return (
     <div className="content-results content-results--to-watch-page">
-      {userShowsToWatch.map((show) => {
-        return <ToWatchShow key={show.id} showData={show} />
+      {userShowsIdsReverse.map((showId) => {
+        return <ToWatchShow key={showId} showId={showId} />
       })}
     </div>
   )

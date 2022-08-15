@@ -13,6 +13,7 @@ export const showStatusMapper = {
 
 export interface ShowFullDataStoreState extends MainDataTMDB {
   allEpisodesWatched: boolean
+  allReleasedEpisodesWatched: boolean | null
   database: UserShowStatuses
   episodes: EpisodesStoreState[]
   episodesFetched: boolean | undefined
@@ -43,6 +44,7 @@ export interface SingleEpisodeStoreState extends SingleEpisodeTMDB, SingleEpisod
 }
 export interface EpisodesStoreState extends EpisodesTMDB, SeasonFromUserDatabase {
   episodes: SingleEpisodeStoreState[]
+  allReleasedEpisodesWatched: boolean | null
 }
 
 export interface UserShowsStoreState {

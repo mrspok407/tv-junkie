@@ -3,6 +3,7 @@ import { ShowInfoFromUserDatabase } from 'Components/Firebase/@TypesFirebase'
 import { fetchContentDetailsTMDB } from 'Components/Pages/Details/Hooks/UseGetDataTMDB'
 import { fetchEpisodesFullData } from './fetchEpisodesFullData'
 import postShowFireDatabase from '../PostData/postShowFireDatabase'
+import { updateIsEpisodesWatched } from '../../Utils'
 
 interface GetUserShowsFullInfoArg {
   userShows: ShowInfoFromUserDatabase[]
@@ -23,10 +24,11 @@ const fetchShowsFullData = ({ userShows, firebase, authUserUid }: GetUserShowsFu
       }
 
       if (show.database === 'watchingShows' && !show.allEpisodesWatched) {
-        const episodes = await fetchEpisodesFullData({ authUserUid, showKey: show.id, firebase })
-        return { ...showInfo, ...show, episodes, episodesFetched: true }
+        const episodesRawData = await fetchEpisodesFullData({ authUserUid, showKey: show.id, firebase })
+        const [episodesFinalData, allReleasedEpisodesWatched] = updateIsEpisodesWatched(episodesRawData)
+        return { ...showInfo, ...show, allReleasedEpisodesWatched, episodes: episodesFinalData, episodesFetched: true }
       }
-      return { ...showInfo, ...show, episodes: [], episodesFetched: false }
+      return { ...showInfo, ...show, allReleasedEpisodesWatched: null, episodes: [], episodesFetched: false }
     }),
   )
 

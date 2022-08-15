@@ -2,7 +2,7 @@ import { AppThunk } from 'app/store'
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import { postCheckAllReleasedEpisodesScheme } from 'Components/Firebase/FirebasePostSchemes/Post/ContentSchemes'
 import { getAuthUidFromState } from 'Components/UserAuth/Session/Authentication/Helpers'
-import releasedEpisodesToOneArray from 'Utils/episodesToOneArray'
+import { releasedEpisodesToOneArray } from 'Components/UserContent/UseUserShowsRed/Utils/episodesOneArrayModifiers'
 import { SingleEpisodeStoreState } from '../../@Types'
 import { handleShowsError } from '../../ErrorHandlers/handleShowsError'
 import { selectShowEpisodes, selectSingleEpisode, selectSingleSeason } from '../../userShowsSliceRed'
@@ -21,7 +21,6 @@ export const postCheckReleasedEpisodes =
       ? [selectSingleSeason(getState(), showId, seasonNumber)]
       : selectShowEpisodes(getState(), showId)
     const releasedEpisodes = releasedEpisodesToOneArray<SingleEpisodeStoreState>(episodesFromStore)
-
     const isAnyEpisodeNotWatched = releasedEpisodes.some((episode) => !episode.watched)
 
     try {
