@@ -3,6 +3,7 @@ import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import { throwErrorNoData } from 'Components/Firebase/Errors'
 import {
   EpisodesFromUserDatabase,
+  SeasonFromUserDatabase,
   ShowInfoFromUserDatabase,
   SingleEpisodeFromUserDatabase,
 } from 'Components/Firebase/@TypesFirebase'
@@ -31,7 +32,8 @@ export const handleNewShow =
         episodesRawData = await fetchEpisodesFullData({ authUserUid, showKey: showData.id, firebase })
       }
 
-      const [episodesFinalData, allReleasedEpisodesWatched] = updateIsEpisodesWatched(episodesRawData)
+      const [episodesFinalData, allReleasedEpisodesWatched] =
+        updateIsEpisodesWatched<EpisodesStoreState>(episodesRawData)
       const show = {
         ...showInfoFireSnapshot.val()!,
         ...showData,
@@ -63,7 +65,8 @@ export const handleChangeShow =
 
     try {
       const episodesRawData = await fetchEpisodesFullData({ authUserUid, showKey: showData.id, firebase })
-      const [episodesFinalData, allReleasedEpisodesWatched] = updateIsEpisodesWatched(episodesRawData)
+      const [episodesFinalData, allReleasedEpisodesWatched] =
+        updateIsEpisodesWatched<EpisodesStoreState>(episodesRawData)
 
       console.log('handleChangeShow after AWAIT')
 
@@ -77,26 +80,16 @@ export const handleChangeShow =
     }
   }
 
-export const testThunk =
-  ({ showId, episodes }: any): AppThunk<Promise<any>> =>
-  async (dispatch, getState) => {
-    const [episodesFinalData, allReleasedEpisodesWatched] = updateIsEpisodesWatched(episodes)
-
-    dispatch(changeShowEpisodes({ showId, episodes: episodesFinalData, allReleasedEpisodesWatched }))
-    return 'opa'
-  }
-
 export const handleChangeEpisodes =
   (showId: number, episodes: EpisodesFromUserDatabase['episodes'], firebase: FirebaseInterface): AppThunk =>
   async (dispatch, getState) => {
     const authUid = getAuthUidFromState(getState())
 
-    console.time('test')
     const isAnyEpisodeNotWatched = episodesToOneArray<SingleEpisodeFromUserDatabase>(episodes).some(
       (episode) => !episode.watched,
     )
-    console.timeEnd('test')
+    const [episodesFinalData, allReleasedEpisodesWatched] = updateIsEpisodesWatched<SeasonFromUserDatabase>(episodes)
 
     firebase.userShow({ authUid, key: showId }).update({ allEpisodesWatched: !isAnyEpisodeNotWatched })
-    return dispatch(testThunk({ showId, episodes })).then((res) => console.log({ res }))
+    return dispatch(changeShowEpisodes({ showId, episodes: episodesFinalData, allReleasedEpisodesWatched }))
   }

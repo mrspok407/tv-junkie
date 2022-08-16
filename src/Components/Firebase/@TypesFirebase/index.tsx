@@ -49,7 +49,9 @@ export interface SingleEpisodeFromUserDatabase {
 }
 
 export interface SeasonFromUserDatabase {
+  [key: string]: any
   episodes: SingleEpisodeFromUserDatabase[]
+  allReleasedEpisodesWatched?: boolean | null
   season_number: number
   userRating: number
 }

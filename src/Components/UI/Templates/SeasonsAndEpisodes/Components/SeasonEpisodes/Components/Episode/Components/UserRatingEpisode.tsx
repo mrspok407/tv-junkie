@@ -24,6 +24,7 @@ const UserRatingEpisode: React.FC<Props> = ({ showId, seasonNumber, episodeNumbe
     useAppSelector((state) => selectSingleEpisode(state, showId, seasonNumber, episodeNumber)?.userRating) ?? 0
 
   const handlePostData = (rating: number) => {
+    console.log({ rating })
     try {
       firebase
         .userShowSingleEpisode({ authUid: authUser?.uid, key: showId, seasonNumber, episodeNumber })

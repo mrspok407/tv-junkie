@@ -68,7 +68,7 @@ export const updateUserShowStatusScheme = ({
   }
 }
 
-export const postCheckAllReleasedEpisodesScheme = ({
+export const postCheckReleasedEpisodesScheme = ({
   authUid,
   showId,
   releasedEpisodes,

@@ -1,12 +1,6 @@
 import { RootState } from 'app/store'
-import merge from 'deepmerge'
-import { createSlice, current, PayloadAction } from '@reduxjs/toolkit'
-import { combineMergeObjects } from 'Utils'
+import { createSelector, createSlice, current, PayloadAction } from '@reduxjs/toolkit'
 import { EpisodesFromUserDatabase } from 'Components/Firebase/@TypesFirebase'
-import * as _isEqual from 'lodash.isequal'
-import * as _keys from 'lodash.keys'
-import * as _union from 'lodash.union'
-import * as _differenceWith from 'lodash.differencewith'
 import {
   UserShowsStoreState,
   ShowFullDataStoreState,
@@ -16,6 +10,7 @@ import {
   USER_SHOWS_RESET_STATE,
 } from './@Types'
 import { resetErrors, resetSlicesState, setInitialContentLoading } from '../SharedActions'
+import { compareEpisodesAndWriteDraft } from './Utils'
 
 export const userShowsSliceRed = createSlice({
   name: 'userShows',
@@ -90,36 +85,10 @@ export const userShowsSliceRed = createSlice({
         allReleasedEpisodesWatched: boolean | null
       }>,
     ) => {
-      // const stateInfo = state.data.info[action.payload.id]
-      const stateEpisodes = state.data.episodes[action.payload.showId]
-      const { episodes } = action.payload
+      const episodesStore = state.data.episodes[action.payload.showId]
+      const { episodes: episodesPayload } = action.payload
 
-      // console.log({ stateInfoDat: stateInfo?.database, payloadDatabase: info.database })
-
-      // if (stateInfo?.database !== info.database) return
-      if (!stateEpisodes?.length) return
-
-      console.log({ stateEpisodes: current(stateEpisodes), episodes })
-
-      console.log({ isEqual: _isEqual(stateEpisodes, episodes) })
-
-      console.log(_differenceWith(current(stateEpisodes), episodes, !_isEqual))
-
-      // const changedKeys = (o1, o2) => {
-      //   const keys = _union(_keys(o1), _keys(o2))
-      //   return keys.filter((key) => {
-      //     return o1[key] !== o2[key]
-      //   })
-      // }
-
-      // console.log(changedKeys(stateEpisodes, episodes))
-
-      console.log('changeShowEpisodes')
-
-      const mergeEpisodes: EpisodesStoreState[] = merge(stateEpisodes, episodes, {
-        arrayMerge: combineMergeObjects,
-      })
-      state.data.episodes[action.payload.showId] = mergeEpisodes
+      compareEpisodesAndWriteDraft(episodesStore, episodesPayload)
       state.data.info[action.payload.showId].allReleasedEpisodesWatched = action.payload.allReleasedEpisodesWatched
     },
     updateLoadingShows: (state, action: PayloadAction<UserShowsStoreState['initialLoading']>) => {
@@ -169,7 +138,15 @@ export const {
 
 export const selectShows = (state: RootState) => state.userShows.data.info
 export const selectEpisodes = (state: RootState) => state.userShows.data.episodes
+
 export const selectShowsIds = (state: RootState) => state.userShows.data.ids
+export const selectShowsIdsReverse = () => {
+  const selector = createSelector(selectShowsIds, (ids) => {
+    return [...ids].reverse()
+  })
+  return selector
+}
+
 export const selectShow = (state: RootState, showId: number): ShowFullDataStoreState | undefined =>
   state.userShows.data.info[showId]
 export const selectShowEpisodes = (state: RootState, showId: number): EpisodesStoreState[] | undefined =>

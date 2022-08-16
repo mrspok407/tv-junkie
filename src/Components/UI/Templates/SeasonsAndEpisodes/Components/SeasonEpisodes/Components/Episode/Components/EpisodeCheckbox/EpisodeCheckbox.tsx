@@ -22,7 +22,8 @@ const EpisodeCheckbox: React.FC<Props> = ({ isDisabled, episodeData, showId }: P
 
   const isWatched = useAppSelector((state) => {
     const episode = selectSingleEpisode(state, showId, episodeData.season_number, episodeData.episode_number)
-    return episode?.watched ?? false
+    // return episode?.watched ?? false
+    return episode
   })
 
   return (
@@ -37,7 +38,7 @@ const EpisodeCheckbox: React.FC<Props> = ({ isDisabled, episodeData, showId }: P
       <label>
         <input
           type="checkbox"
-          checked={isWatched && !isDisabled}
+          checked={isWatched?.watched && !isDisabled}
           onChange={() => {
             dispatch(
               postCheckSingleEpisode({
