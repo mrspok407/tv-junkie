@@ -139,3 +139,5 @@ export const LIST_OF_GENRES = [
 ]
 
 export const CONTENT_INFO_NO_DATA = '-'
+
+export const TO_WATCH_ANIMATION_DURATION = 3000

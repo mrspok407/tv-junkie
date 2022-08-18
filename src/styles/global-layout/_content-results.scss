@@ -8,7 +8,7 @@ $font-sizes: (
   show-links-button: 1.35rem,
   top-button: 1rem,
   last-episode: 1.2rem,
-  error: 1.5rem
+  error: 1.5rem,
 );
 
 .content-results {
@@ -195,7 +195,8 @@ $font-sizes: (
       font-size: map-get($font-sizes, vote-count);
       color: rgb(218, 218, 218);
     }
-    span:first-child {
+    span:first-child,
+    span:nth-child(2) {
       font-size: map-get($font-sizes, rating) * 0.6;
       color: rgb(177, 177, 177);
     }

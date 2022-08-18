@@ -6,6 +6,7 @@ import { SingleEpisodeFromFireDatabase } from 'Components/Firebase/@TypesFirebas
 import { useAppDispatch, useAppSelector } from 'app/hooks'
 import { selectSingleEpisode } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
 import { postCheckSingleEpisode } from 'Components/UserContent/UseUserShowsRed/DatabaseHandlers/PostData/postShowEpisodesData'
+import { TO_WATCH_ANIMATION_DURATION } from 'Utils/Constants'
 import useDisableWarning from '../../Hooks/UseDisableWarning'
 import './EpisodeCheckbox.scss'
 
@@ -13,16 +14,16 @@ type Props = {
   isDisabled: boolean
   episodeData: SingleEpisodeFromFireDatabase
   showId: number
+  handleEpisodeCheck: (data: any) => void
 }
 
-const EpisodeCheckbox: React.FC<Props> = ({ isDisabled, episodeData, showId }: Props) => {
+const EpisodeCheckbox: React.FC<Props> = ({ isDisabled, episodeData, showId, handleEpisodeCheck }: Props) => {
   const { authUser, firebase } = useFrequentVariables()
   const dispatch = useAppDispatch()
   const [showDisableWarning, handleDisableWarning, fadeOutStart, checkboxRef] = useDisableWarning()
 
   const isWatched = useAppSelector((state) => {
     const episode = selectSingleEpisode(state, showId, episodeData.season_number, episodeData.episode_number)
-    // return episode?.watched ?? false
     return episode
   })
 
@@ -40,14 +41,18 @@ const EpisodeCheckbox: React.FC<Props> = ({ isDisabled, episodeData, showId }: P
           type="checkbox"
           checked={isWatched?.watched && !isDisabled}
           onChange={() => {
-            dispatch(
-              postCheckSingleEpisode({
-                showId,
-                seasonNumber: episodeData.season_number,
-                episodeNumber: episodeData.episode_number,
-                firebase,
-              }),
-            )
+            handleEpisodeCheck(episodeData)
+
+            setTimeout(() => {
+              dispatch(
+                postCheckSingleEpisode({
+                  showId,
+                  seasonNumber: episodeData.season_number,
+                  episodeNumber: episodeData.episode_number,
+                  firebase,
+                }),
+              )
+            }, TO_WATCH_ANIMATION_DURATION)
           }}
           disabled={isDisabled}
         />

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useRef } from 'react'
 import { useAppDispatch, useAppSelector } from 'app/hooks'
 import { selectShow } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
 import { Link } from 'react-router-dom'
@@ -12,6 +12,8 @@ type Props = {
 const ToWatchShow: React.FC<Props> = ({ showId }) => {
   const dispatch = useAppDispatch()
   const userShow = useAppSelector((state) => selectShow(state, showId))!
+
+  const seasonsListRef = useRef<HTMLDivElement>(null!)
 
   const seasonsRef = dispatch(getSeasons({ showId }))
 
@@ -29,7 +31,7 @@ const ToWatchShow: React.FC<Props> = ({ showId }) => {
       <div className="towatch__show-name">
         <Link to={`/show/${showId}`}>{userShow.name}</Link>
       </div>
-      <div className="episodes">
+      <div ref={seasonsListRef} className="episodes">
         {seasonsRef?.map((season) => {
           return (
             <ToWatchSeason
@@ -37,6 +39,7 @@ const ToWatchShow: React.FC<Props> = ({ showId }) => {
               seasonData={season}
               key={season.season_number}
               initialOpenSeasonNumber={initialOpenSeasonNumber}
+              seasonsListRef={seasonsListRef}
             />
           )
         })}

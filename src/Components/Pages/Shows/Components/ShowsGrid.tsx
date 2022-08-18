@@ -28,6 +28,8 @@ const ShowsGrid: React.FC<Props> = ({ data, section }) => {
         const filteredGenres =
           item.genre_ids?.map((genreId) => LIST_OF_GENRES.filter((item) => item.id === genreId)) || []
 
+        console.log({ item })
+
         return (
           <div key={item.id} className="content-results__item content-results__item--shows">
             <div className="content-results__item--shows-wrapper">
@@ -39,7 +41,7 @@ const ShowsGrid: React.FC<Props> = ({ data, section }) => {
                   </div>
                   {item.vote_average !== 0 && (
                     <div className="content-results__item-rating">
-                      {item.vote_average?.toFixed(1)}
+                      {Number(item.vote_average)?.toFixed(1) || <span>?</span>}
                       <span>/10</span>
                       <span className="content-results__item-rating-vote-count">({item.vote_count})</span>
                     </div>

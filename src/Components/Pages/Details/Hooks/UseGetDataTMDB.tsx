@@ -25,6 +25,8 @@ export const fetchContentDetailsTMDB = async ({ mediaType, id }: { mediaType: st
     },
   )
 
+  console.log({ data })
+
   return {
     ...data,
     backdrop_path: data.backdrop_path,
