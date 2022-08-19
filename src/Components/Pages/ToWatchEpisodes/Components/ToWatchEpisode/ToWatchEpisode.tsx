@@ -33,7 +33,7 @@ const ToWatchEpisode: React.FC<Props> = ({ episodeData, showId, episodesListRef,
   if (isWatched || differenceInCalendarDays(new Date(episodeData.air_date), currentDate) > 0) return null
 
   return (
-    <div className="episodes__episode" data-episodenumber={episodeData.episode_number}>
+    <div className="episodes__episode" data-episodenumber={episodeData.episode_number} data-id={episodeData.id}>
       <div
         className={classNames('episodes__episode-wrapper', {
           'episodes__episode-wrapper--torrent-links': showTorrentLinks,

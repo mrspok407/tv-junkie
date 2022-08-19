@@ -44,14 +44,14 @@ const EpisodeCheckbox: React.FC<Props> = ({ isDisabled, episodeData, showId, han
             handleEpisodeCheck(episodeData)
 
             setTimeout(() => {
-              dispatch(
-                postCheckSingleEpisode({
-                  showId,
-                  seasonNumber: episodeData.season_number,
-                  episodeNumber: episodeData.episode_number,
-                  firebase,
-                }),
-              )
+              // dispatch(
+              //   postCheckSingleEpisode({
+              //     showId,
+              //     seasonNumber: episodeData.season_number,
+              //     episodeNumber: episodeData.episode_number,
+              //     firebase,
+              //   }),
+              // )
             }, TO_WATCH_ANIMATION_DURATION)
           }}
           disabled={isDisabled}
