@@ -12,8 +12,9 @@ import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import {
   postCheckMultiplyEpisodes,
   postCheckReleasedEpisodes,
+  postCheckSingleEpisode,
 } from 'Components/UserContent/UseUserShowsRed/DatabaseHandlers/PostData/postShowEpisodesData'
-import { TO_WATCH_ANIMATION_DURATION, TO_WATCH_TRANSLATE_UP_VALUE } from 'Utils/Constants'
+import { TO_WATCH_FADEOUT_DURATION, TO_WATCH_TRANSLATE_DURATION, TO_WATCH_TRANSLATE_UP_VALUE } from 'Utils/Constants'
 import ToWatchEpisode from '../ToWatchEpisode/ToWatchEpisode'
 import { getSeasonEpisodes } from '../../Helpers'
 import EpisodesLeft from './Components/EpisodesLeft'
@@ -30,10 +31,10 @@ const ToWatchSeason: React.FC<Props> = ({ showData, seasonData, initialOpenSeaso
   const dispatch = useAppDispatch()
 
   const root = document.documentElement
-  const queueOfTrans = useRef<any>({})
+  const queueOfTrans = useRef<{ [key: string | number]: { transInProgress: boolean; amountTrans: number } }>({})
   const tranEventOn = useRef(false)
 
-  const episodesWatched = useRef<any>([])
+  const episodesWatched = useRef<SingleEpisodeStoreState[]>([])
 
   const episodesListRef = useRef<HTMLDivElement>(null!)
   const checkAllButtonRef = useRef<HTMLDivElement>(null!)
@@ -47,10 +48,7 @@ const ToWatchSeason: React.FC<Props> = ({ showData, seasonData, initialOpenSeaso
 
   const seasonEpisodes = dispatch(getSeasonEpisodes({ showId: showData.id, seasonNumber: seasonData.season_number }))
 
-  const test = () => {
-    console.log('test')
-    console.log(queueOfTrans.current)
-  }
+  const transitions = useRef<number[]>([])
 
   const handleTransEnd = useCallback((e: any) => {
     const propName = e.propertyName
@@ -59,33 +57,48 @@ const ToWatchSeason: React.FC<Props> = ({ showData, seasonData, initialOpenSeaso
     const styles = window.getComputedStyle(e.target)
     const translateUpValue = Math.abs(Number.parseFloat(styles.getPropertyValue('--translateUpValue')))
     // const translateUpDuration = Math.abs(Number.parseFloat(styles.getPropertyValue('--translateUpDuration')))
-    console.log(queueOfTrans.current)
+
+    console.log('trans END')
+    const { episodesArrayList } = getNodeLists()
+    episodesArrayList.forEach((item) => {
+      const nodeEpisodeNumber = Number(item.dataset.episodenumber)
+
+      item.classList.remove('to-watch-translate-up')
+      item.style.setProperty('--translateUpValue', `-${TO_WATCH_TRANSLATE_UP_VALUE}px`)
+
+      const index = transitions.current.indexOf(nodeEpisodeNumber)
+      if (index > -1) {
+        transitions.current.splice(index, 1)
+      }
+      // item.style.setProperty('--translateUpDuration', `${TO_WATCH_ANIMATION_DURATION}ms`)
+    })
+
+    console.log(transitions.current)
+    if (!transitions.current.length && episodesWatched.current.length) {
+      console.log('postCheckMultiplyEpisodes')
+      dispatch(postCheckMultiplyEpisodes({ showId: showData.id, episodes: episodesWatched.current, firebase }))
+      episodesWatched.current = []
+    }
+
+    // if (propName === 'opacity') {
+    //   if (!transitions.current.length) {
+    //     console.log('OPACITY postCheckMultiplyEpisodes')
+    //     dispatch(postCheckMultiplyEpisodes({ showId: showData.id, episodes: episodesWatched.current, firebase }))
+    //     episodesWatched.current = []
+    //   }
+    // }
+
+    return
     if (queueOfTrans.current[dataset.id!].amountTrans === 1) {
       queueOfTrans.current[dataset.id!] = {
         transInProgress: false,
         amountTrans: 0,
       }
 
-      let isAnyTransInProgress = false
-
-      Object.values(queueOfTrans.current).forEach((item: any) => {
-        if (item.transInProgress === true) {
-          isAnyTransInProgress = true
-        }
-      })
+      const isAnyTransInProgress = Object.values(queueOfTrans.current).some((item) => item.transInProgress === true)
 
       if (!isAnyTransInProgress) {
-        console.log('dispatch')
-
-        const episodesNodeList = episodesListRef.current?.getElementsByClassName(
-          'episodes__episode',
-        ) as HTMLCollectionOf<HTMLElement>
-
-        // const seasonsNodeList = seasonsListRef.current?.getElementsByClassName(
-        //   'episodes__episode-group',
-        // ) as HTMLCollectionOf<HTMLElement>
-
-        const episodesArrayList = Array.from(episodesNodeList)
+        const { episodesArrayList } = getNodeLists()
         // const seasonsArrayList = Array.from(seasonsNodeList)
 
         episodesArrayList.forEach((item) => {
@@ -110,44 +123,74 @@ const ToWatchSeason: React.FC<Props> = ({ showData, seasonData, initialOpenSeaso
   }, [])
 
   const handleEpisodeCheck = (episodeData: SingleEpisodeStoreState) => {
+    if (episodesWatched.current.find((item) => item.id === episodeData.id)) return
+
+    const { episodesArrayList, seasonsArrayList } = getNodeLists()
+
     episodesWatched.current.push(episodeData)
 
-    const seasonsNodeList = seasonsListRef.current?.getElementsByClassName(
-      'episodes__episode-group',
-    ) as HTMLCollectionOf<HTMLElement>
-    const episodesNodeList = episodesListRef.current?.getElementsByClassName(
-      'episodes__episode',
-    ) as HTMLCollectionOf<HTMLElement>
+    console.log({ episodesArrayList })
 
-    const episodesArrayList = Array.from(episodesNodeList)
-    const seasonsArrayList = Array.from(seasonsNodeList)
+    let isTransitions = false
 
     episodesArrayList.forEach((item) => {
-      if (Number(item.dataset.episodenumber) === episodeData.episode_number) {
+      const styles = window.getComputedStyle(item)
+      const translateUpValue = Math.abs(Number.parseFloat(styles.getPropertyValue('--translateUpValue')))
+
+      const nodeEpisodeNumber = Number(item.dataset.episodenumber)
+
+      if (nodeEpisodeNumber === episodeData.episode_number) {
         item.classList.add('episodes__episode--fade-out')
       }
-      if (Number(item.dataset.episodenumber) < episodeData.episode_number) {
-        item.classList.add('to-watch-translate-up')
 
-        if (queueOfTrans.current[item.dataset.id!] === undefined) {
-          console.log(queueOfTrans.current[item.id!])
-          queueOfTrans.current[item.dataset.id!] = {
-            transInProgress: true,
-            amountTrans: 1,
-          }
-        } else {
-          console.log(queueOfTrans.current[item.dataset.id!])
-          queueOfTrans.current[item.dataset.id!] = {
-            transInProgress: true,
-            amountTrans: queueOfTrans.current[item.dataset.id!]?.amountTrans + 1,
-          }
+      if (nodeEpisodeNumber < episodeData.episode_number) {
+        if (item.className.indexOf('episodes__episode--fade-out') > -1) {
+          console.log('episode fading out')
+          return
         }
+
+        isTransitions = true
+        if (!transitions.current.includes(nodeEpisodeNumber)) {
+          transitions.current.push(nodeEpisodeNumber)
+        }
+
+        if (item.className.indexOf('to-watch-translate-up') === -1) {
+          console.log('add class up')
+          item.classList.add('to-watch-translate-up')
+        } else {
+          console.log('change var up value')
+          // if (translateUpValue === TO_WATCH_TRANSLATE_UP_VALUE) {
+          item.style.setProperty('--translateUpValue', `-${translateUpValue + TO_WATCH_TRANSLATE_UP_VALUE}px`)
+          // }
+        }
+
+        // if (queueOfTrans.current[item.dataset.id!] === undefined) {
+        //   queueOfTrans.current[item.dataset.id!] = {
+        //     transInProgress: true,
+        //     amountTrans: 1,
+        //   }
+        // } else {
+        //   queueOfTrans.current[item.dataset.id!] = {
+        //     transInProgress: true,
+        //     amountTrans: queueOfTrans.current[item.dataset.id!]?.amountTrans + 1,
+        //   }
+        // }
       }
+
+      console.log(transitions.current)
 
       if (!tranEventOn.current) {
-        //   item.addEventListener('transitionend', handleTransEnd)
+        item.addEventListener('transitionend', handleTransEnd)
       }
     })
+
+    if (!isTransitions) {
+      setTimeout(() => {
+        console.log('SINGLE postCheckMultiplyEpisodes')
+        dispatch(postCheckMultiplyEpisodes({ showId: showData.id, episodes: [episodeData], firebase }))
+        episodesWatched.current = []
+      }, TO_WATCH_FADEOUT_DURATION)
+    }
     // checkAllButtonRef.current.classList.add('to-watch-translate-up')
 
     // seasonsArrayList.forEach((item) => {
@@ -180,6 +223,18 @@ const ToWatchSeason: React.FC<Props> = ({ showData, seasonData, initialOpenSeaso
     // })
 
     tranEventOn.current = true
+  }
+
+  const getNodeLists = () => {
+    const seasonsNodeList = seasonsListRef.current?.getElementsByClassName(
+      'episodes__episode-group',
+    ) as HTMLCollectionOf<HTMLElement>
+    const episodesNodeList = episodesListRef.current?.getElementsByClassName(
+      'episodes__episode',
+    ) as HTMLCollectionOf<HTMLElement>
+    const episodesArrayList = Array.from(episodesNodeList)
+    const seasonsArrayList = Array.from(seasonsNodeList)
+    return { episodesArrayList, seasonsArrayList }
   }
 
   if (isAllReleasedEpisodesWatched) {

@@ -6,7 +6,7 @@ import { SingleEpisodeFromFireDatabase } from 'Components/Firebase/@TypesFirebas
 import { useAppDispatch, useAppSelector } from 'app/hooks'
 import { selectSingleEpisode } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
 import { postCheckSingleEpisode } from 'Components/UserContent/UseUserShowsRed/DatabaseHandlers/PostData/postShowEpisodesData'
-import { TO_WATCH_ANIMATION_DURATION } from 'Utils/Constants'
+import { TO_WATCH_TRANSLATE_DURATION } from 'Utils/Constants'
 import useDisableWarning from '../../Hooks/UseDisableWarning'
 import './EpisodeCheckbox.scss'
 
@@ -52,7 +52,7 @@ const EpisodeCheckbox: React.FC<Props> = ({ isDisabled, episodeData, showId, han
               //     firebase,
               //   }),
               // )
-            }, TO_WATCH_ANIMATION_DURATION)
+            }, TO_WATCH_TRANSLATE_DURATION)
           }}
           disabled={isDisabled}
         />

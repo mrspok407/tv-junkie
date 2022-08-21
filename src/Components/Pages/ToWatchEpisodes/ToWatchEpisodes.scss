@@ -13,7 +13,7 @@ $seasonInfoBgClr: #1d1d1d96;
 
   --dateMinWidth: 175px;
   --ratingMinWidth: 206px;
-  --fadeOutDuration: 0ms;
+  --fadeOutDuration: 200ms;
 
   // --translateUpValue: -51px;
   // --translateUpDuration: 3000ms;
@@ -60,12 +60,15 @@ $seasonInfoBgClr: #1d1d1d96;
     }
 
     &--fade-out {
-      animation: toWatchEpisodeFadeOut var(--fadeOutDuration) forwards;
-      @keyframes toWatchEpisodeFadeOut {
-        to {
-          opacity: 0;
-        }
-      }
+      opacity: 0;
+      transition-duration: var(--fadeOutDuration);
+      transition-timing-function: linear;
+      // animation: toWatchEpisodeFadeOut var(--fadeOutDuration) forwards;
+      // @keyframes toWatchEpisodeFadeOut {
+      //   to {
+      //     opacity: 0;
+      //   }
+      // }
     }
 
     // &--translate-up {
