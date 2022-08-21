@@ -1,7 +1,9 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import classNames from 'classnames'
 import { SingleEpisodeFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import { postCheckSingleEpisode } from 'Components/UserContent/UseUserShowsRed/DatabaseHandlers/PostData/postShowEpisodesData'
+import { useAppDispatch } from 'app/hooks'
 import useFormatEpisodeAirDate from '../../../../Hooks/UseFormatEpisodeAirDate'
 import TorrentLinksEpisodes from '../TorrentLinksEpisodes/TorrentLinksEpisodes'
 import UserRatingEpisode from './Components/UserRatingEpisode'
@@ -15,12 +17,24 @@ type Props = {
 }
 
 const Episode: React.FC<Props> = ({ episodeData, showCheckboxes, showId, showTitle }) => {
-  const { authUser } = useFrequentVariables()
+  const { authUser, firebase } = useFrequentVariables()
+  const dispatch = useAppDispatch()
   const [isEpisodeOpen, setIsEpisodeOpen] = useState(false)
 
   const [airDateReadable, daysToNewEpisode, isEpisodeAired, airDateUnavailable] = useFormatEpisodeAirDate({
     episodeData,
   })
+
+  const handleEpisodeCheck = () => {
+    dispatch(
+      postCheckSingleEpisode({
+        showId,
+        seasonNumber: episodeData.season_number,
+        episodeNumber: episodeData.episode_number,
+        firebase,
+      }),
+    )
+  }
 
   return (
     <div
@@ -35,7 +49,12 @@ const Episode: React.FC<Props> = ({ episodeData, showCheckboxes, showId, showTit
         onClick={() => setIsEpisodeOpen(!isEpisodeOpen)}
       >
         {isEpisodeAired && !airDateUnavailable && (
-          <EpisodeCheckbox isDisabled={!showCheckboxes || !authUser?.uid} episodeData={episodeData} showId={showId} />
+          <EpisodeCheckbox
+            isDisabled={!showCheckboxes || !authUser?.uid}
+            episodeData={episodeData}
+            showId={showId}
+            handleEpisodeCheck={handleEpisodeCheck}
+          />
         )}
 
         <div className="episodes__episode-date">{airDateReadable}</div>

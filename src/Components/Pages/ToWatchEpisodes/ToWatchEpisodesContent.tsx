@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, { useMemo } from 'react'
+import React, { useMemo, useRef } from 'react'
 import Loader from 'Components/UI/Placeholders/Loader'
 import PlaceholderNoToWatchEpisodes from 'Components/UI/Placeholders/PlaceholderNoToWatchEpisodes'
 import { useAppSelector } from 'app/hooks'
@@ -15,6 +15,9 @@ const ToWatchEpisodesContent: React.FC = () => {
 
   const selectUserShowIdsReverse = useMemo(selectShowsIdsReverse, [])
   const userShowsIds = useAppSelector(selectUserShowIdsReverse)
+
+  const showsListRef = useRef<HTMLDivElement>(null!)
+  const isCheckEpisodeAnimationRunning = useRef(false)
 
   const noToWatchEpisodes = useAppSelector((state) => {
     const idsNotAllWatched = userShowsIds.filter((id) => {
@@ -41,9 +44,17 @@ const ToWatchEpisodesContent: React.FC = () => {
   }
 
   return (
-    <div className="content-results content-results--to-watch-page">
-      {userShowsIds.map((showId) => {
-        return <ToWatchShow key={showId} showId={showId} />
+    <div ref={showsListRef} className="content-results content-results--to-watch-page">
+      {userShowsIds.map((showId, index) => {
+        return (
+          <ToWatchShow
+            key={showId}
+            showId={showId}
+            showsListRef={showsListRef}
+            isCheckEpisodeAnimationRunning={isCheckEpisodeAnimationRunning}
+            showIndex={index}
+          />
+        )
       })}
     </div>
   )

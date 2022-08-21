@@ -7,9 +7,12 @@ import ToWatchSeason from './ToWatchSeason/ToWatchSeason'
 
 type Props = {
   showId: number
+  showsListRef: React.MutableRefObject<HTMLDivElement>
+  isCheckEpisodeAnimationRunning: React.MutableRefObject<boolean>
+  showIndex: number
 }
 
-const ToWatchShow: React.FC<Props> = ({ showId }) => {
+const ToWatchShow: React.FC<Props> = ({ showId, showsListRef, isCheckEpisodeAnimationRunning, showIndex }) => {
   const dispatch = useAppDispatch()
   const userShow = useAppSelector((state) => selectShow(state, showId))!
 
@@ -27,7 +30,7 @@ const ToWatchShow: React.FC<Props> = ({ showId }) => {
   }
 
   return (
-    <div className="towatch__show">
+    <div className="towatch__show" data-index={showIndex}>
       <div className="towatch__show-name">
         <Link to={`/show/${showId}`}>{userShow.name}</Link>
       </div>
@@ -40,6 +43,9 @@ const ToWatchShow: React.FC<Props> = ({ showId }) => {
               key={season.season_number}
               initialOpenSeasonNumber={initialOpenSeasonNumber}
               seasonsListRef={seasonsListRef}
+              showsListRef={showsListRef}
+              isCheckEpisodeAnimationRunning={isCheckEpisodeAnimationRunning}
+              showIndex={showIndex}
             />
           )
         })}

@@ -11,16 +11,9 @@ type Props = {
   showId: number
   seasonNumber: number
   episodeNumber: number
-  isToWatchPage: boolean
 }
 
-const UserRatingEpisode: React.FC<Props> = ({
-  showId,
-  seasonNumber,
-  episodeNumber,
-  showRating,
-  isToWatchPage = false,
-}) => {
+const UserRatingEpisode: React.FC<Props> = ({ showId, seasonNumber, episodeNumber, showRating }) => {
   const { firebase, authUser } = useFrequentVariables()
   const dispatch = useAppDispatch()
 
@@ -47,13 +40,7 @@ const UserRatingEpisode: React.FC<Props> = ({
 
   if (!showRating || !authUser?.uid) return null
 
-  return (
-    <UserRating
-      currentRating={!isToWatchPage ? currentRating : 0}
-      isDisabled={disableRating}
-      onClick={handlePostData}
-    />
-  )
+  return <UserRating currentRating={currentRating} isDisabled={disableRating} onClick={handlePostData} />
 }
 
 export default UserRatingEpisode

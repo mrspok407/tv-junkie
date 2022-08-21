@@ -24,7 +24,7 @@ export type ACTIONTYPES =
       type: ActionTypesEnum.IncrementLoadedMoviesLS
       payload: { sectionFilteredMovies: MovieInfoStoreState[] | MainDataTMDB[] }
     }
-  | { type: ActionTypesEnum.ChangeActiveSection; payload: { activeSection: string } }
+  | { type: ActionTypesEnum.ChangeActiveSection; payload: { activeSection: MovieSectionOptions } }
 
 export interface LoadedMoviesInterface {
   [key: string]: number

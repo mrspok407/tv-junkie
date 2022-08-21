@@ -3,10 +3,8 @@ import classNames from 'classnames'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import DisableWarning from 'Components/UI/DisabledWarning/DisabledWarning'
 import { SingleEpisodeFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
-import { useAppDispatch, useAppSelector } from 'app/hooks'
+import { useAppSelector } from 'app/hooks'
 import { selectSingleEpisode } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
-import { postCheckSingleEpisode } from 'Components/UserContent/UseUserShowsRed/DatabaseHandlers/PostData/postShowEpisodesData'
-import { TO_WATCH_TRANSLATE_DURATION } from 'Utils/Constants'
 import useDisableWarning from '../../Hooks/UseDisableWarning'
 import './EpisodeCheckbox.scss'
 
@@ -14,12 +12,11 @@ type Props = {
   isDisabled: boolean
   episodeData: SingleEpisodeFromFireDatabase
   showId: number
-  handleEpisodeCheck: (data: any) => void
+  handleEpisodeCheck: (rating?: number) => void
 }
 
 const EpisodeCheckbox: React.FC<Props> = ({ isDisabled, episodeData, showId, handleEpisodeCheck }: Props) => {
-  const { authUser, firebase } = useFrequentVariables()
-  const dispatch = useAppDispatch()
+  const { authUser } = useFrequentVariables()
   const [showDisableWarning, handleDisableWarning, fadeOutStart, checkboxRef] = useDisableWarning()
 
   const isWatched = useAppSelector((state) => {
@@ -40,20 +37,7 @@ const EpisodeCheckbox: React.FC<Props> = ({ isDisabled, episodeData, showId, han
         <input
           type="checkbox"
           checked={isWatched?.watched && !isDisabled}
-          onChange={() => {
-            handleEpisodeCheck(episodeData)
-
-            setTimeout(() => {
-              // dispatch(
-              //   postCheckSingleEpisode({
-              //     showId,
-              //     seasonNumber: episodeData.season_number,
-              //     episodeNumber: episodeData.episode_number,
-              //     firebase,
-              //   }),
-              // )
-            }, TO_WATCH_TRANSLATE_DURATION)
-          }}
+          onChange={() => handleEpisodeCheck()}
           disabled={isDisabled}
         />
         <span

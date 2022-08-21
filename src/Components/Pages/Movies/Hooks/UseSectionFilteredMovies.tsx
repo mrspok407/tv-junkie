@@ -25,9 +25,9 @@ const useSectionFilteredMovies = ({
     }
     return moviesData.filter((movie) => {
       if (activeSection === MovieSectionOptions.Finished) {
-        return movie.finished
+        return movie?.finished
       } else {
-        if (hideFinished) return !movie.finished
+        if (hideFinished) return !movie?.finished
         return movie
       }
     })

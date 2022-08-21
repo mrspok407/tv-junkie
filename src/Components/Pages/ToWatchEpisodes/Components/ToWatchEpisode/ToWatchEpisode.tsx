@@ -1,23 +1,37 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { useAppSelector } from 'app/hooks'
 import EpisodeCheckbox from 'Components/UI/Templates/SeasonsAndEpisodes/Components/SeasonEpisodes/Components/Episode/Components/EpisodeCheckbox/EpisodeCheckbox'
 import { SingleEpisodeStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { selectSingleEpisode } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
 import { differenceInCalendarDays, format } from 'date-fns'
 import { currentDate } from 'Utils'
-import UserRatingEpisode from 'Components/UI/Templates/SeasonsAndEpisodes/Components/SeasonEpisodes/Components/Episode/Components/UserRatingEpisode'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import classNames from 'classnames'
 import TorrentLinsToWatchPage from './Components/TorrentLinksToWatchPage'
+import useHandleEpisodeCheck from './Hooks/UseHandleEpisodeCheck'
+import UserRatingEpisodeToWatch from './Components/UserRatingEpisodeToWatch'
 
 type Props = {
   episodeData: SingleEpisodeStoreState
   showId: number
   episodesListRef: React.MutableRefObject<HTMLDivElement>
-  handleEpisodeCheck: (data: any) => void
+  seasonsListRef: React.MutableRefObject<HTMLDivElement>
+  showsListRef: React.MutableRefObject<HTMLDivElement>
+  checkAllButtonRef: React.MutableRefObject<HTMLDivElement>
+  isCheckEpisodeAnimationRunning: React.MutableRefObject<boolean>
+  showIndex: number
 }
 
-const ToWatchEpisode: React.FC<Props> = ({ episodeData, showId, episodesListRef, handleEpisodeCheck }) => {
+const ToWatchEpisode: React.FC<Props> = ({
+  episodeData,
+  showId,
+  showsListRef,
+  seasonsListRef,
+  episodesListRef,
+  checkAllButtonRef,
+  isCheckEpisodeAnimationRunning,
+  showIndex,
+}) => {
   const { authUser } = useFrequentVariables()
   const isWatched = useAppSelector((state) => {
     const episode = selectSingleEpisode(state, showId, episodeData.season_number, episodeData.episode_number)
@@ -29,6 +43,17 @@ const ToWatchEpisode: React.FC<Props> = ({ episodeData, showId, episodesListRef,
     : 'No date available'
 
   const showTorrentLinks = authUser?.email === process.env.REACT_APP_ADMIN_EMAIL
+
+  const handleEpisodeCheck = useHandleEpisodeCheck({
+    episodeData,
+    showsListRef,
+    seasonsListRef,
+    episodesListRef,
+    checkAllButtonRef,
+    isCheckEpisodeAnimationRunning,
+    showIndex,
+    showId,
+  })
 
   if (isWatched || differenceInCalendarDays(new Date(episodeData.air_date), currentDate) > 0) return null
 
@@ -46,13 +71,8 @@ const ToWatchEpisode: React.FC<Props> = ({ episodeData, showId, episodesListRef,
           handleEpisodeCheck={handleEpisodeCheck}
         />
 
-        <UserRatingEpisode
-          showRating
-          showId={showId}
-          episodeNumber={episodeData.episode_number}
-          seasonNumber={episodeData.season_number}
-          isToWatchPage
-        />
+        <UserRatingEpisodeToWatch handleEpisodeCheck={handleEpisodeCheck} />
+
         <div className="episodes__episode-date">{airDateReadable}</div>
         <div className="episodes__episode-name">
           <span className="episodes__episode-number">{episodeData.episode_number}.</span>
