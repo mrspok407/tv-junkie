@@ -31,15 +31,17 @@ export const compareEpisodesAndWriteDraft = (
   episodesStore: WritableDraft<EpisodesStoreState>[],
   episodesPayload: SeasonFromUserDatabase[],
 ) => {
-  episodesPayload.forEach((season, seasonIndex) => {
-    const seasonKeys = Object.keys(season)
+  episodesPayload.forEach((seasonPayload, seasonIndex) => {
+    const seasonPayloadKeys = Object.keys(seasonPayload)
 
-    seasonKeys.forEach((key) => {
+    seasonPayloadKeys.forEach((key) => {
       const seasonStore = episodesStore[seasonIndex]
+      if (!seasonStore) return
 
       if (key === 'episodes') {
-        season.episodes.forEach((episodePayload, episodeIndex) => {
+        seasonPayload.episodes.forEach((episodePayload, episodeIndex) => {
           const episodeStore = episodesStore[seasonIndex].episodes[episodeIndex]
+          if (!episodeStore) return
 
           const keysToCompare = Object.keys(episodePayload)
           const isEpisodePayloadEqual = _isEqual(episodePayload, _pick(episodeStore, keysToCompare))
@@ -49,8 +51,8 @@ export const compareEpisodesAndWriteDraft = (
           }
         })
       } else {
-        if (season[key] !== seasonStore[key]) {
-          episodesStore[seasonIndex][key] = season[key]
+        if (seasonPayload[key] !== seasonStore[key]) {
+          episodesStore[seasonIndex][key] = seasonPayload[key]
         }
       }
     })

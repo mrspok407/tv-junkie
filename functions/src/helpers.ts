@@ -4,7 +4,7 @@ export const mergeEpisodesFromFireDBwithUserDB = (showEpisodesFire: any, showEpi
   showEpisodesFire.forEach((season: any, seasonIndex: any) => {
     const newEpisodes = season.episodes.map((episode: any, episodeIndex: any) => {
       const newEpisode = {
-        air_data: episode.air_date,
+        air_date: episode.air_date,
         userRating: showEpisodesUser[seasonIndex]?.episodes[episodeIndex]?.userRating ?? 0,
         watched: showEpisodesUser[seasonIndex]?.episodes[episodeIndex]?.watched ?? false
       };

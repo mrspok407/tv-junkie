@@ -11,6 +11,7 @@ import { LoremIpsum } from 'lorem-ipsum'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import sub from 'date-fns/sub'
 import './Settings.scss'
+import sortDataSnapshot from 'Components/UserContent/FirebaseHelpers/sortDataSnapshot'
 
 let startTimeStampGroupChats = 1311011245000
 
@@ -109,30 +110,52 @@ const SettingsContent = () => {
     })
   }
 
-  const updataShowsDataInDatabase = async () => {
+  const createAllShowsListIds = async () => {
+    const updateData = {}
+    try {
+      const allShowsListSnapshot = await firebase.allShowsList().once('value')
+
+      allShowsListSnapshot.forEach((snapshot) => {
+        updateData[`allShowsListIds/${snapshot.key}`] = true
+      })
+      console.log({ updateData })
+      firebase.rootRef().update(updateData)
+    } catch (error) {
+      console.log({ error })
+    }
+  }
+
+  const updateShowsDataInDatabase = async ({ isUpdateAll = false }) => {
     const startDate = sub(currentDate, {
       days: 3,
     })
 
+    let showsToUpdateIds = []
+
     try {
-      const { data: recentlyUpdatedShows } = await axios.get(
-        `https://api.themoviedb.org/3/tv/changes?api_key=${process.env.REACT_APP_TMDB_API}&start_date=${startDate}`,
-      )
+      if (isUpdateAll) {
+        const allShowsIdsSnapshot = await firebase.allShowsListIds().once('value')
+        showsToUpdateIds = sortDataSnapshot(allShowsIdsSnapshot).map((item) => item.key)
+      } else {
+        const { data: recentlyUpdatedShows } = await axios.get(
+          `https://api.themoviedb.org/3/tv/changes?api_key=${process.env.REACT_APP_TMDB_API}&start_date=${startDate}`,
+        )
 
-      const showsToUpdateSnapshots = await Promise.all(
-        recentlyUpdatedShows.results.map(({ id: showId }) => {
-          return firebase.showFullDataFireDatabase(showId).child('id').once('value')
-        }),
-      )
+        const showsToUpdateSnapshots = await Promise.all(
+          recentlyUpdatedShows.results.map(({ id: showId }) => {
+            return firebase.showFullDataFireDatabase(showId).child('id').once('value')
+          }),
+        )
 
-      const showsToUpdateIds = showsToUpdateSnapshots.reduce((acc, snapshot) => {
-        if (snapshot.exists()) {
-          acc.push(snapshot.val())
-        }
-        return acc
-      }, [])
+        showsToUpdateIds = showsToUpdateSnapshots.reduce((acc, snapshot) => {
+          if (snapshot.exists()) {
+            acc.push(snapshot.val())
+          }
+          return acc
+        }, [])
+      }
 
-      const updateData = await Promise.all(
+      const updateData = await Promise.allSettled(
         showsToUpdateIds.map(async (showId) => {
           const {
             data: { number_of_seasons },
@@ -210,18 +233,21 @@ const SettingsContent = () => {
         }),
       )
 
-      const updataDataFirebase = {}
-      updateData.forEach((showData) => {
-        updataDataFirebase[`allShowsList/${showData.showId}/episodes`] = showData.episodes
-        updataDataFirebase[`allShowsList/${showData.showId}/status`] = showData.status
-        updataDataFirebase[`allShowsList/${showData.showId}/info/status`] = showData.status
-        updataDataFirebase[`allShowsList/${showData.showId}/info/name`] = showData.name
-        updataDataFirebase[`allShowsList/${showData.showId}/info/vote_average`] = showData.vote_average
-        updataDataFirebase[`allShowsList/${showData.showId}/info/vote_count`] = showData.vote_average
+      const updateDataFirebase = {}
+      updateData.forEach((promiseResult) => {
+        if (promiseResult.status !== 'fulfilled') return
+        const showData = promiseResult.value
+        updateDataFirebase[`allShowsList/${showData.showId}/episodes`] = showData.episodes
+        updateDataFirebase[`allShowsList/${showData.showId}/status`] = showData.status
+        updateDataFirebase[`allShowsList/${showData.showId}/info/status`] = showData.status
+        updateDataFirebase[`allShowsList/${showData.showId}/info/name`] = showData.name
+        updateDataFirebase[`allShowsList/${showData.showId}/info/vote_average`] = showData.vote_average
+        updateDataFirebase[`allShowsList/${showData.showId}/info/vote_count`] = showData.vote_average
       })
 
       console.log({ updateData })
-      firebase.rootRef().update(updataDataFirebase)
+      console.log({ updateDataFirebase })
+      firebase.rootRef().update(updateDataFirebase)
     } catch (error) {
       console.log({ error })
     }
@@ -277,18 +303,35 @@ const SettingsContent = () => {
       </div>
       <PasswordUpdate />
       <div className="update-database">
-        <button onClick={() => updataShowsDataInDatabase()} className="button button--profile" type="button">
-          Update Database
+        <button onClick={updateShowsDataInDatabase} className="button button--profile" type="button">
+          Update Recent Shows In Database
         </button>
       </div>
+
       <div className="update-database">
-        <button onClick={() => setUsersWatchingShow()} className="button button--profile" type="button">
+        <button
+          onClick={() => updateShowsDataInDatabase({ isUpdateAll: true })}
+          className="button button--profile"
+          type="button"
+        >
+          Update All Shows In Database
+        </button>
+      </div>
+
+      <div>
+        <button onClick={createAllShowsListIds} className="button button--profile" type="button">
+          Create all shows ids
+        </button>
+      </div>
+
+      <div className="update-database">
+        <button onClick={setUsersWatchingShow} className="button button--profile" type="button">
           Set users watching show
         </button>
       </div>
       {[process.env.REACT_APP_TEST_EMAIL, process.env.REACT_APP_ADMIN_EMAIL].includes(authUser?.email) && (
         <div className="update-database">
-          <button onClick={() => updataShowsDataInDatabase()} className="button button--profile" type="button">
+          <button onClick={() => updateShowsDataInDatabase()} className="button button--profile" type="button">
             Update Database
           </button>
         </div>

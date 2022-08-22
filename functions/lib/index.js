@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.handleContactRequest = exports.newContactRequest = exports.createNewGroup = exports.removeMemberFromGroup = exports.addNewGroupMembers = exports.updateLastSeenGroupChats = exports.updateLastSeenPrivateChats = exports.decrementContacts = exports.incrementContacts = exports.removeNewContactsActivityGroupChat = exports.removeNewContactsActivity = exports.addNewContactsActivityGroupChat = exports.addNewContactsActivity = exports.updatePinnedTimeStamp = exports.updateAllEpisodesWatchedUserDatabase = exports.updateShowStatusForUserDatabase = exports.updateShowEpisodesForUserDatabase = void 0;
+exports.handleContactRequest = exports.newContactRequest = exports.createNewGroup = exports.removeMemberFromGroup = exports.addNewGroupMembers = exports.updateLastSeenGroupChats = exports.updateLastSeenPrivateChats = exports.decrementContacts = exports.incrementContacts = exports.removeNewContactsActivityGroupChat = exports.removeNewContactsActivity = exports.addNewContactsActivityGroupChat = exports.addNewContactsActivity = exports.updatePinnedTimeStamp = exports.updateAllShowsListIdsDelete = exports.updateAllShowsListIdsCreate = exports.updateAllEpisodesWatchedUserDatabase = exports.updateShowStatusForUserDatabase = exports.updateShowEpisodesForUserDatabase = void 0;
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
 const helpers_1 = require("./helpers");
@@ -106,6 +106,18 @@ exports.updateAllEpisodesWatchedUserDatabase = functions.database
     const showEpisodesUserData = showEpisodesUserSnapshot === null || showEpisodesUserSnapshot === void 0 ? void 0 : showEpisodesUserSnapshot.val();
     const isAnyEpisodeNotWatched = (0, helpers_1.episodesToOneArray)(showEpisodesUserData).some((episode) => !episode.watched);
     return showsRef === null || showsRef === void 0 ? void 0 : showsRef.child(`${showId}`).update({ allEpisodesWatched: !isAnyEpisodeNotWatched });
+});
+exports.updateAllShowsListIdsCreate = functions.database
+    .ref("allShowsList/{showId}/id")
+    .onCreate(async (snapshot, context) => {
+    const { showId } = context.params;
+    database.ref(`allShowsListIds/${showId}`).set(true);
+});
+exports.updateAllShowsListIdsDelete = functions.database
+    .ref("allShowsList/{showId}/id")
+    .onDelete(async (snapshot, context) => {
+    const { showId } = context.params;
+    database.ref(`allShowsListIds/${showId}`).set(null);
 });
 exports.updatePinnedTimeStamp = functions.database
     .ref("users/{authUid}/contactsDatabase/contactsLastActivity/{contactUid}")

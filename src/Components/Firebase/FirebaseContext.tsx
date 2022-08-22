@@ -16,7 +16,7 @@ import {
 export interface FirebaseFetchMethods<T> {
   once: (value: string, callback?: any, errorCallback?: (err: unknown) => any) => Promise<SnapshotVal<T>>
   on: (value: string, callback: (snapshot: any) => void, errorCallback?: (err: unknown) => any) => void
-  off: (value?: string, callbackcallback?: (snapshot: any) => void) => void
+  off: (value?: string, callback?: (snapshot: any) => void) => void
 }
 
 export interface FirebaseReferenceProps<T> {
@@ -99,6 +99,8 @@ export interface FirebaseInterface {
   }) => FirebaseReferenceProps<boolean | null>
   moviesInfoUserDatabase: (authUid: string) => FirebaseReferenceProps<MovieInfoFromUserDatabase[]>
   ServerValueIncrement: (value: number) => any
+  allShowsList: () => FirebaseReferenceProps<any>
+  allShowsListIds: () => FirebaseReferenceProps<number[] | null>
   timeStamp?: any
   callback?: any
   userShowAllEpisodesInfo?: any
@@ -188,6 +190,8 @@ export const FIREBASE_INITIAL_STATE = {
   userMovieFinished: () => firebaseRefInitial(null),
   userShowId: () => firebaseRefInitial(null),
   userShowAllEpisodesWatched: () => firebaseRefInitial(null),
+  allShowsList: () => firebaseRefInitial(null),
+  allShowsListIds: () => firebaseRefInitial(null),
 }
 
 export const FirebaseContext = createContext<FirebaseInterface>(FIREBASE_INITIAL_STATE)

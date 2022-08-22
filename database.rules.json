@@ -64,12 +64,12 @@
       ".read": "root.child('users').child(auth.uid).child('role').val() === 'ADMIN'",
       // ".write": false,
       "$id": {
-       ".write": true,
-       "usersWatchingList": {
-        "$uid": {
-          ".validate": "!data.exists()"
+        ".write": true,
+        "usersWatchingList": {
+          "$uid": {
+            ".validate": "!data.exists()"
+          }
         }
-       }
         // ".read": "auth != null",
         // // ".write": "(auth != null && !data.exists()) || root.child('users').child(auth.uid).child('role').val() === 'ADMIN'",
         // ".write": "(auth != null && !data.exists())",
@@ -78,6 +78,11 @@
         // },
         // "info": { ".read": true },
         // ".validate": "newData.hasChildren(['id', 'info'])"
+      }
+    },
+    "allShowsListIds": {
+      "$id": {
+        ".write": true
       }
     }
   }

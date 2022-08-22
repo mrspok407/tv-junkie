@@ -115,6 +115,20 @@ export const updateAllEpisodesWatchedUserDatabase = functions.database
     return showsRef?.child(`${showId}`).update({allEpisodesWatched: !isAnyEpisodeNotWatched});
   });
 
+export const updateAllShowsListIdsCreate = functions.database
+  .ref("allShowsList/{showId}/id")
+  .onCreate(async (snapshot, context) => {
+    const {showId} = context.params;
+    database.ref(`allShowsListIds/${showId}`).set(true);
+  });
+
+export const updateAllShowsListIdsDelete = functions.database
+  .ref("allShowsList/{showId}/id")
+  .onDelete(async (snapshot, context) => {
+    const {showId} = context.params;
+    database.ref(`allShowsListIds/${showId}`).set(null);
+  });
+
 export const updatePinnedTimeStamp = functions.database
   .ref("users/{authUid}/contactsDatabase/contactsLastActivity/{contactUid}")
   .onWrite(async (change, context) => {
