@@ -22,7 +22,7 @@ const ContactInfo: React.FC<Props> = ({ isScrollBottomRef }) => {
   const chatMembersStatusData = chatMembersStatus[contactInfo.chatKey] || []
   const contactOptionsRef = useRef<HTMLDivElement>(null!)
 
-  const formatedLastSeen = useTimestampFormater({ timeStamp: contactsStatus[activeChat.chatKey]?.lastSeen! })
+  const formattedLastSeen = useTimestampFormater({ timeStamp: contactsStatus[activeChat.chatKey]?.lastSeen! })
   const chatMembersTyping = chatMembersStatusData?.filter((member) => member.isTyping && member.key !== authUser?.uid)
 
   const chatMembersOnline = chatMembersStatusData.filter((member) => member.isOnline).length
@@ -149,8 +149,8 @@ const ContactInfo: React.FC<Props> = ({ isScrollBottomRef }) => {
           </>
         ) : contactsStatus[activeChat.chatKey]?.isOnline ? (
           'Online'
-        ) : formatedLastSeen ? (
-          `Last seen ${formatedLastSeen}`
+        ) : formattedLastSeen ? (
+          `Last seen ${formattedLastSeen}`
         ) : (
           ''
         )}

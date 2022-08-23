@@ -35,7 +35,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
   const lastMessage =
     messagesData === undefined ? contactInfo.lastMessage : messagesData[messagesData?.length - 1] || {}
 
-  const formatedDate = useTimestampFormater({ timeStamp: lastMessage?.timeStamp! })
+  const formattedDate = useTimestampFormater({ timeStamp: lastMessage?.timeStamp! })
   const contactOptionsRef = useRef<HTMLDivElement>(null!)
 
   const { chatKey } = contactInfo
@@ -150,7 +150,7 @@ const Contact: React.FC<Props> = React.memo(({ contactInfo, allContactsAmount })
               })}
             />
           )}
-        {lastMessage?.timeStamp && <div className="contact-item__timestamp">{formatedDate}</div>}
+        {lastMessage?.timeStamp && <div className="contact-item__timestamp">{formattedDate}</div>}
       </div>
 
       <div className="contact-item__row contact-item__row--bottom">

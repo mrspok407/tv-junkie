@@ -5,8 +5,8 @@ import logo from 'assets/images/main-page-logo.png'
 import * as ROUTES from 'Utils/Constants/routes'
 import Search from 'Components/Pages/SearchPage/Search/Search'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
-import './Header.scss'
 import ProfileMenu from './Components/ProfileMenu'
+import './Header.scss'
 
 type Props = {
   isLogoVisible?: boolean
@@ -46,90 +46,93 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false, cont
         'header--contacts-page': contactsPage,
       })}
     >
-      <nav
-        ref={navRef}
-        className={classNames('nav', {
-          'nav--mobile-open': navMobileOpen,
-        })}
-      >
-        <ul
-          className={classNames('nav__list', {
-            'nav__list--not-auth': !authUser?.uid,
+      <div className="nav-container">
+        <nav
+          ref={navRef}
+          className={classNames('nav', {
+            'nav--mobile-open': navMobileOpen,
           })}
         >
-          <NavLink
-            exact
-            to={ROUTES.HOME_PAGE}
-            activeClassName="nav__item--active"
-            className="nav__link--logo"
-            onClick={() => closeNavMobile()}
-          >
-            <li className="nav__item nav__item--logo" />
-          </NavLink>
-
-          {authUser?.uid && (
-            <>
-              <NavLink
-                exact
-                to={ROUTES.CALENDAR}
-                className={classNames('nav__link', {
-                  'nav__link--non-auth': !authUser?.uid,
-                })}
-                activeClassName="nav__item--active"
-                onClick={() => closeNavMobile()}
-              >
-                <li className="nav__item">Calendar</li>
-              </NavLink>
-
-              <NavLink
-                exact
-                to={ROUTES.TO_WATCH}
-                className={classNames('nav__link', {
-                  'nav__link--non-auth': !authUser?.uid,
-                })}
-                activeClassName="nav__item--active"
-                onClick={() => closeNavMobile()}
-              >
-                <li className="nav__item">To Watch</li>
-              </NavLink>
-            </>
-          )}
-
-          <NavLink
-            exact
-            to={ROUTES.SHOWS}
-            className={classNames('nav__link', {
-              'nav__link--non-auth': !authUser?.uid,
-            })}
-            activeClassName="nav__item--active"
-            onClick={() => closeNavMobile()}
-          >
-            <li className="nav__item">Shows</li>
-          </NavLink>
-
-          <NavLink
-            exact
-            to={ROUTES.MOVIES}
-            className={classNames('nav__link', {
-              'nav__link--non-auth': !authUser?.uid,
-            })}
-            activeClassName="nav__item--active"
-            onClick={() => closeNavMobile()}
-          >
-            <li className="nav__item">Movies</li>
-          </NavLink>
-
-          <ProfileMenu closeNavMobile={closeNavMobile} hideLogin={hideLogin} />
-
-          <li
-            className={classNames('nav__item nav__item--nav-search', {
-              'nav__item--nav-search__non-auth': !authUser?.uid,
+          <ul
+            className={classNames('nav__list', {
+              'nav__list--not-auth': !authUser?.uid,
             })}
           >
-            <Search navSearch closeNavMobile={closeNavMobile} />
-          </li>
-        </ul>
-      </nav>
+            <NavLink
+              exact
+              to={ROUTES.HOME_PAGE}
+              activeClassName="nav__item--active"
+              className="nav__link--logo"
+              onClick={() => closeNavMobile()}
+            >
+              <li className="nav__item nav__item--logo" />
+            </NavLink>
+
+            {authUser?.uid && (
+              <>
+                <NavLink
+                  exact
+                  to={ROUTES.CALENDAR}
+                  className={classNames('nav__link', {
+                    'nav__link--non-auth': !authUser?.uid,
+                  })}
+                  activeClassName="nav__item--active"
+                  onClick={() => closeNavMobile()}
+                >
+                  <li className="nav__item">Calendar</li>
+                </NavLink>
+
+                <NavLink
+                  exact
+                  to={ROUTES.TO_WATCH}
+                  className={classNames('nav__link', {
+                    'nav__link--non-auth': !authUser?.uid,
+                  })}
+                  activeClassName="nav__item--active"
+                  onClick={() => closeNavMobile()}
+                >
+                  <li className="nav__item">To Watch</li>
+                </NavLink>
+              </>
+            )}
+
+            <NavLink
+              exact
+              to={ROUTES.SHOWS}
+              className={classNames('nav__link', {
+                'nav__link--non-auth': !authUser?.uid,
+              })}
+              activeClassName="nav__item--active"
+              onClick={() => closeNavMobile()}
+            >
+              <li className="nav__item">Shows</li>
+            </NavLink>
+
+            <NavLink
+              exact
+              to={ROUTES.MOVIES}
+              className={classNames('nav__link', {
+                'nav__link--non-auth': !authUser?.uid,
+              })}
+              activeClassName="nav__item--active"
+              onClick={() => closeNavMobile()}
+            >
+              <li className="nav__item">Movies</li>
+            </NavLink>
+
+            <ProfileMenu closeNavMobile={closeNavMobile} hideLogin={hideLogin} />
+
+            <li
+              className={classNames('nav__item nav__item--nav-search', {
+                'nav__item--nav-search__non-auth': !authUser?.uid,
+              })}
+            >
+              <Search navSearch closeNavMobile={closeNavMobile} />
+            </li>
+          </ul>
+        </nav>
+      </div>
+
       <button
         type="button"
         ref={toggleNavButtonRef}

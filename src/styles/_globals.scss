@@ -15,19 +15,19 @@ $newActivityClr: #ec4444;
 
 $mainPalette: (
   orangeClr: peru,
-  blueClr: #66b4e6
+  blueClr: #66b4e6,
 );
 
 $btnPalette: (
   textColor: #fff,
   bgColor: getColor(orangeClr, $mainPalette),
   pressedBgColor: #66b4e6,
-  hoverEffectBgColor: #fff
+  hoverEffectBgColor: #fff,
 );
 
 $inputPalette: (
   textColor: #efefef,
-  placeholderColor: #cececea6
+  placeholderColor: #cececea6,
 );
 
 $searchCardPalette: (
@@ -40,7 +40,15 @@ $searchCardPalette: (
   countryColor: #e0e0e0,
   ratingColor: #e0e0e0,
   typeColor: getColor(orangeClr, $mainPalette),
-  linkColor: #4ba9f9
+  linkColor: #4ba9f9,
 );
 
-@import "mixins";
+:root {
+  --translateUpValue: -51px;
+  --fadeOutDuration: 150ms;
+  --translateUpDuration: 200ms;
+
+  --nav-width: 340px;
+}
+
+@import 'mixins';

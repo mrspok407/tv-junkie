@@ -8,6 +8,14 @@ $seasonInfoBgClr: #1d1d1d96;
   transform: translateY(var(--translateUpValue));
 }
 
+.to-watch-fade-out {
+  transform: scale(0.9) translateY(25px);
+  opacity: 0;
+  transition: opacity var(--fadeOutDuration) linear, transform 100ms linear;
+  // transition-duration: opacity var(--fadeOutDuration), transform 100ms;
+  // transition-timing-function: linear;
+}
+
 .towatch__show {
   display: flex;
   flex-direction: column;
@@ -15,11 +23,7 @@ $seasonInfoBgClr: #1d1d1d96;
   --dateMinWidth: 175px;
   --ratingMinWidth: 206px;
 
-  --fadeOutDuration: 150ms;
-  --translateUpValue: -51px;
-  --translateUpDuration: 200ms;
-
-  will-change: transform;
+  will-change: transform, opacity;
 
   &-name {
     padding-bottom: 5px;
@@ -35,7 +39,7 @@ $seasonInfoBgClr: #1d1d1d96;
   }
 
   .episodes__episode-group {
-    will-change: transform;
+    will-change: transform, opacity;
   }
 
   .episodes__episode-checkbox {
@@ -50,21 +54,21 @@ $seasonInfoBgClr: #1d1d1d96;
     --translateUpValue: -51px;
 
     height: 46px;
-    will-change: transform;
+    will-change: transform, opacity;
 
     &:after {
       display: none;
     }
 
-    &--fade-out {
-      opacity: 0;
-      transition-duration: var(--fadeOutDuration);
-      transition-timing-function: linear;
-    }
+    // &--fade-out {
+    //   opacity: 0;
+    //   transition-duration: var(--fadeOutDuration);
+    //   transition-timing-function: linear;
+    // }
   }
 
   .episodes__episode-group-check-all-episodes {
-    will-change: transform;
+    will-change: transform, opacity;
   }
 
   .episodes__episode-group-name {

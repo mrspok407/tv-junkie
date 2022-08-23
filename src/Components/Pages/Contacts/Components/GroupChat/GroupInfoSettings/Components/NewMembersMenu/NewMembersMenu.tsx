@@ -29,7 +29,7 @@ const NewMembersMenu: React.FC = () => {
   const [selectedMembers, setSelectedMembers] = useState<GroupCreationNewMemberInterface[]>([])
   const [isSearching, setIsSearching] = useState(false)
   const [allContactsLoaded, setAllContactsLoaded] = useState(false)
-  const [loadingNewContacts, setLoadingNewcontacts] = useState(false)
+  const [loadingNewContacts, setLoadingNewContacts] = useState(false)
   const [initialLoading, setInitialLoading] = useState(true)
 
   const { newMembersLoading, addNewMembers } = useAddNewMembers()
@@ -40,15 +40,15 @@ const NewMembersMenu: React.FC = () => {
 
   const handleNewMembers = ({
     contact,
-    formatedDate,
+    formattedDate,
   }: {
     contact: ContactInfoInterface
-    formatedDate: string | number | null
+    formattedDate: string | number | null
   }) => {
     const newMember = {
       key: contact.key,
       userName: contact.userName,
-      lastSeen: formatedDate,
+      lastSeen: formattedDate,
       chatKey: contact.chatKey,
     }
     setSelectedMembers((prevState) => {
@@ -62,7 +62,7 @@ const NewMembersMenu: React.FC = () => {
   const getContactsData = async ({ snapshot, isSearchedData = false }: { snapshot: any; isSearchedData?: boolean }) => {
     if (snapshot.val() === null) {
       setAllContactsLoaded(true)
-      setLoadingNewcontacts(false)
+      setLoadingNewContacts(false)
       return
     }
 
@@ -73,6 +73,7 @@ const NewMembersMenu: React.FC = () => {
         !contact.val().isGroupChat
       ) {
         handleError({
+          errorData: { message: 'Some of your contacts were not loaded correctly. Try to reload the page.' },
           message: 'Some of your contacts were not loaded correctly. Try to reload the page.',
         })
         return
@@ -104,7 +105,7 @@ const NewMembersMenu: React.FC = () => {
         ...contactWithStatus.filter((contact) => contact.status === true && !contact.isGroupChat),
       ])
       setInitialLoading(false)
-      setLoadingNewcontacts(false)
+      setLoadingNewContacts(false)
     }
   }
 
@@ -136,6 +137,7 @@ const NewMembersMenu: React.FC = () => {
         getContactsData({ snapshot: contactsData, isSearchedData: true })
       } catch (error) {
         handleError({
+          errorData: { message: 'Some of your contacts were not loaded correctly. Try to reload the page.' },
           message: 'Some of your contacts were not loaded correctly. Try to reload the page.',
         })
         setIsSearching(false)
@@ -176,6 +178,7 @@ const NewMembersMenu: React.FC = () => {
         getContactsData({ snapshot: contacts })
       } catch (error) {
         handleError({
+          errorData: { message: 'Some of your contacts were not loaded correctly. Try to reload the page.' },
           message: 'Some of your contacts were not loaded correctly. Try to reload the page.',
         })
         setInitialLoading(false)
@@ -189,7 +192,7 @@ const NewMembersMenu: React.FC = () => {
     if (allContactsLoaded) return
     ;(async () => {
       try {
-        setLoadingNewcontacts(true)
+        setLoadingNewContacts(true)
         const contactsData = await contactsListRef
           .orderByChild('userNameLowerCase')
           .startAfter(contactsList[contactsList.length - 1].userNameLowerCase)
@@ -198,9 +201,10 @@ const NewMembersMenu: React.FC = () => {
         getContactsData({ snapshot: contactsData })
       } catch (error) {
         handleError({
+          errorData: { message: 'Some of your contacts were not loaded correctly. Try to reload the page.' },
           message: 'Some of your contacts were not loaded correctly. Try to reload the page.',
         })
-        setLoadingNewcontacts(false)
+        setLoadingNewContacts(false)
       }
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps

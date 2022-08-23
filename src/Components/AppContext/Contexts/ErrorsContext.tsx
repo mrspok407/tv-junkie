@@ -6,7 +6,7 @@ import React, { createContext, useCallback, useEffect, useRef, useState } from '
 import { ERROR_MODAL_DURATION } from 'Utils/Constants'
 
 export interface ErrorInterface {
-  errorData?: unknown
+  errorData: { code?: string; message: string }
   message: string
 }
 
@@ -19,6 +19,8 @@ const INITIAL_VALUE_ERRORS = {
   error: null,
   handleError: () => {},
 }
+
+export const IGNORED_ERROR_CODES = ['auth/popup-closed-by-user']
 
 export const ErrorsValueContext = createContext<ErrorContextInt['error']>(INITIAL_VALUE_ERRORS.error)
 export const ErrorsHandlerContext = createContext<ErrorContextInt['handleError']>(INITIAL_VALUE_ERRORS.handleError)
@@ -48,6 +50,11 @@ const useErrorsContext = () => {
 
   const handleError = useCallback(
     ({ errorData, message }: ErrorInterface) => {
+      if (IGNORED_ERROR_CODES.includes(errorData?.code!)) {
+        console.log('ignored code')
+        return
+      }
+
       setError({ errorData, message })
 
       modalContainerRef.current?.classList.remove('modal-fade-out')
@@ -64,6 +71,8 @@ const useErrorsContext = () => {
         setError(null)
         dispatch(resetErrors(null))
       }, ERROR_MODAL_DURATION)
+
+      console.table(errorData)
     },
     [dispatch],
   )
@@ -72,7 +81,7 @@ const useErrorsContext = () => {
     if (!showsError) return
     handleError({
       errorData: showsError,
-      message: 'Error in the database occured. Please reload the page.',
+      message: 'Error in the database occurred. Please reload the page.',
     })
   }, [showsError, handleError])
 
@@ -80,7 +89,7 @@ const useErrorsContext = () => {
     if (!moviesError) return
     handleError({
       errorData: moviesError,
-      message: 'Error in the database occured. Please reload the page.',
+      message: 'Error in the database occurred. Please reload the page.',
     })
   }, [moviesError, handleError])
 

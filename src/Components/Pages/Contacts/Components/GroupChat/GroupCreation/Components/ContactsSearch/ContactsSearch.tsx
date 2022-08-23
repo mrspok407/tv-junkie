@@ -43,6 +43,7 @@ const ContactsSearch: React.FC<Props> = ({ wrapperRef }) => {
         !contact.val().isGroupChat
       ) {
         handleError({
+          errorData: { message: 'Some of your contacts were not loaded correctly. Try to reload the page.' },
           message: 'Some of your contacts were not loaded correctly. Try to reload the page.',
         })
         return
@@ -106,6 +107,7 @@ const ContactsSearch: React.FC<Props> = ({ wrapperRef }) => {
         getContactsData({ snapshot: contactsData, isSearchedData: true })
       } catch (error) {
         handleError({
+          errorData: { message: 'Some of your contacts were not loaded correctly. Try to reload the page.' },
           message: 'Some of your contacts were not loaded correctly. Try to reload the page.',
         })
         setIsSearching(false)
@@ -146,6 +148,7 @@ const ContactsSearch: React.FC<Props> = ({ wrapperRef }) => {
         getContactsData({ snapshot: contacts })
       } catch (error) {
         handleError({
+          errorData: { message: 'Some of your contacts were not loaded correctly. Try to reload the page.' },
           message: 'Some of your contacts were not loaded correctly. Try to reload the page.',
         })
         setInitialLoading(false)
@@ -168,6 +171,7 @@ const ContactsSearch: React.FC<Props> = ({ wrapperRef }) => {
         getContactsData({ snapshot: contactsData })
       } catch (error) {
         handleError({
+          errorData: { message: 'Some of your contacts were not loaded correctly. Try to reload the page.' },
           message: 'Some of your contacts were not loaded correctly. Try to reload the page.',
         })
         setLoading(false)

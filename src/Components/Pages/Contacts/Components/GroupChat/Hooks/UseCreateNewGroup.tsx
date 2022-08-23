@@ -1,7 +1,7 @@
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
-import { ErrorsHandlerContext } from 'Components/AppContext/Contexts/ErrorsContext'
-import { INITIAL_STATE } from '../../@Context/_reducerConfig'
+import { ErrorInterface, ErrorsHandlerContext } from 'Components/AppContext/Contexts/ErrorsContext'
 import { useContext } from 'react'
+import { INITIAL_STATE } from '../../@Context/_reducerConfig'
 
 const useCreateNewGroup = () => {
   const { firebase, authUser, contactsState, contactsDispatch } = useFrequentVariables()
@@ -22,7 +22,8 @@ const useCreateNewGroup = () => {
         type: 'finishGroupCreation',
         payload: { newGroupChatKey: result.data.newGroupChatKey, groupName: groupCreation.groupName },
       })
-    } catch (error) {
+    } catch (err) {
+      const error = err as ErrorInterface['errorData']
       handleError({
         errorData: error,
         message: 'There has been some error creating a group. Please reload the page.',

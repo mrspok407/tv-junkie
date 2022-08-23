@@ -4,7 +4,7 @@ import * as ROUTES from 'Utils/Constants/routes'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import { LocalStorageValueContext } from 'Components/AppContext/Contexts/LocalStorageContentContext/LocalStorageContentContext'
 import { postUserDataOnRegisterScheme } from 'Components/Firebase/FirebasePostSchemes/Post/AuthenticationSchemes'
-import { ErrorInterface, ErrorsHandlerContext } from 'Components/AppContext/Contexts/ErrorsContext'
+import { ErrorInterface, ErrorsHandlerContext, IGNORED_ERROR_CODES } from 'Components/AppContext/Contexts/ErrorsContext'
 import { AuthUserGoogleSignInInterface } from '../Session/Authentication/@Types'
 import { formatEpisodesForUserDatabaseOnRegister, handleContentOnRegister } from '../Register/Helpers'
 import useAuthListenerSubscriber from '../Session/Authentication/Hooks/useAuthListenerSubscriber'
@@ -33,6 +33,8 @@ const SignInWithGoogleForm = () => {
   const onSubmit = async (provider: any) => {
     const signInType = windowSize < mobileLayout ? 'signInWithRedirect' : 'signInWithPopup'
 
+    let error: ErrorInterface['errorData'] = { message: '' }
+
     try {
       const authUser: AuthUserGoogleSignInInterface = await firebase.app.auth()[signInType](provider)
 
@@ -58,10 +60,12 @@ const SignInWithGoogleForm = () => {
       })
       return firebase.rootRef().update(updateData, handleSuccessSubmit)
     } catch (err) {
-      const error = err as ErrorInterface
-      handleError({ errorData: error, message: 'Error occured durring register process. Please try again.' })
+      error = err as ErrorInterface['errorData']
+      handleError({ errorData: error, message: 'Error occurred during register process. Please try again.' })
     } finally {
-      history.push(ROUTES.HOME_PAGE)
+      if (!IGNORED_ERROR_CODES.includes(error?.code!)) {
+        history.push(ROUTES.HOME_PAGE)
+      }
     }
   }
 

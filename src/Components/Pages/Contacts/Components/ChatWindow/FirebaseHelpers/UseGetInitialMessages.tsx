@@ -48,6 +48,7 @@ const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGr
           firstUnreadMessageKey.val() === null ? false : Object.keys(firstUnreadMessageKey.val()!)[0]
       } catch (error) {
         handleError({
+          errorData: { message: 'There were a problem loading messages. Please try to reload the page.' },
           message: 'There were a problem loading messages. Please try to reload the page.',
         })
         contactsDispatch({ type: 'setInitialMessages', payload: { messagesData: [], chatKey } })

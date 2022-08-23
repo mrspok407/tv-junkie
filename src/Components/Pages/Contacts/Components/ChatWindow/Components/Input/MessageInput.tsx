@@ -6,7 +6,7 @@ import striptags from 'striptags'
 import { textToUrl } from 'Utils'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import useFirebaseReferences from 'Components/Pages/Contacts/Hooks/UseFirebaseReferences'
-import { ErrorsHandlerContext } from 'Components/AppContext/Contexts/ErrorsContext'
+import { ErrorInterface, ErrorsHandlerContext } from 'Components/AppContext/Contexts/ErrorsContext'
 import { MESSAGE_LINE_HEIGHT, MOBILE_LAYOUT_THRESHOLD } from '../../../@Context/Constants'
 import GoDown from '../GoDown/GoDown'
 import { updateTyping } from './FirebaseHelpers/UpdateTyping'
@@ -171,6 +171,9 @@ const MessageInput: React.FC<Props> = ({
       newMessageRef?.scrollIntoView({ block: 'start', inline: 'start' })
 
       handleError({
+        errorData: {
+          message: 'Message hasn&apos;t been sent, because of the unexpected error. Please reload the page.',
+        },
         message: 'Message hasn&apos;t been sent, because of the unexpected error. Please reload the page.',
       })
     }
@@ -195,9 +198,11 @@ const MessageInput: React.FC<Props> = ({
       } else {
         await editMessagePrivateChat({ message: editedMessageText, originalMessage })
       }
-    } catch (error) {
+    } catch (err) {
+      const error = err as ErrorInterface['errorData']
       handleError({
-        message: 'Message hasn&apos;t been edited, because of the unexpected error. Please reload the page.',
+        errorData: error,
+        message: 'Message hasn&apos;t been sent, because of the unexpected error. Please reload the page.',
       })
     }
   }

@@ -1,5 +1,5 @@
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
-import { ErrorsHandlerContext } from 'Components/AppContext/Contexts/ErrorsContext'
+import { ErrorInterface, ErrorsHandlerContext } from 'Components/AppContext/Contexts/ErrorsContext'
 import { useContext, useEffect, useLayoutEffect, useRef } from 'react'
 
 type Props = {
@@ -50,10 +50,11 @@ const useIntersectionObserver = ({
                   })
                   .child(key)
                   .set(null)
-              } catch (error) {
+              } catch (err) {
+                const error = err as ErrorInterface['errorData']
                 handleError({
                   errorData: error,
-                  message: 'There has been some error updating database. Tye to realod the page.',
+                  message: 'There has been some error updating database. Tye to reload the page.',
                 })
 
                 throw new Error(`There has been some error updating database: ${error}`)

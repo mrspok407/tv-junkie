@@ -12,13 +12,13 @@ type Props = {
 
 const Contact: React.FC<Props> = ({ member, contactInfo }) => {
   const { authUser } = useFrequentVariables()
-  const formatedDate = useTimestampFormater({ timeStamp: member.lastSeen! })
+  const formattedDate = useTimestampFormater({ timeStamp: member.lastSeen! })
 
   const { removeMember, removeMemberLoading } = useRemoveMember()
 
   const renderStatus = () => {
     if (member.isOnline) return 'Online in chat'
-    if (formatedDate) return `Last seen: ${formatedDate}`
+    if (formattedDate) return `Last seen: ${formattedDate}`
     return 'Long time ago'
   }
 

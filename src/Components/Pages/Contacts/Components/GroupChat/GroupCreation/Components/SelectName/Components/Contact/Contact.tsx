@@ -9,10 +9,10 @@ type Props = {
 }
 
 const Contact: React.FC<Props> = ({ member }) => {
-  const formatedDate = useTimestampFormater({ timeStamp: member.lastSeen! })
+  const formattedDate = useTimestampFormater({ timeStamp: member.lastSeen! })
   const renderStatus = () => {
     if (member.isOnline) return 'Online'
-    if (formatedDate) return `Last seen: ${formatedDate}`
+    if (formattedDate) return `Last seen: ${formattedDate}`
     return 'Long time ago'
   }
   return (

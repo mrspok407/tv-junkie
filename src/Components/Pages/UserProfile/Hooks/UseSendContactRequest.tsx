@@ -1,7 +1,7 @@
 import { useContext, useState } from 'react'
 import { uniqueNamesGenerator, animals } from 'unique-names-generator'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
-import { ErrorsHandlerContext } from 'Components/AppContext/Contexts/ErrorsContext'
+import { ErrorInterface, ErrorsHandlerContext } from 'Components/AppContext/Contexts/ErrorsContext'
 
 type Props = {
   contactName: string
@@ -27,7 +27,8 @@ const useSendContactRequest = ({ contactName, contactUid }: Props) => {
         contactName: contactName || randomUserName,
         authUserName: authUser?.username,
       })
-    } catch (error) {
+    } catch (err) {
+      const error = err as ErrorInterface['errorData']
       handleError({
         errorData: error,
         message: 'There has been some error updating database. Please try again.',

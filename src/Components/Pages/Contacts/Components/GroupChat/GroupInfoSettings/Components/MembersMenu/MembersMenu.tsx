@@ -79,6 +79,7 @@ const GroupCreation: React.FC = () => {
         getContactsData({ snapshot: membersData })
       } catch (error) {
         handleError({
+          errorData: { message: 'Some of your contacts were not loaded correctly. Try to reload the page.' },
           message: 'Some of your contacts were not loaded correctly. Try to reload the page.',
         })
         setIsSearching(false)

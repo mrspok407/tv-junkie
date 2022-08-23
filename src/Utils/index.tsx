@@ -96,8 +96,8 @@ export const convertTimeStampToDate = ({ timeStamp }: { timeStamp: any }) => {
     day: 'numeric',
     year: 'numeric',
   } as const
-  const formatedTimeStamp = new Date(timeStampISO)
-  return new Intl.DateTimeFormat('en-US', options).format(formatedTimeStamp)
+  const formattedTimeStamp = new Date(timeStampISO)
+  return new Intl.DateTimeFormat('en-US', options).format(formattedTimeStamp)
 }
 
 export const textToUrl = ({ text }: { text: any }) => {

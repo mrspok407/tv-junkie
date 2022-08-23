@@ -1,7 +1,7 @@
 import { MessageInterface } from 'Components/Pages/Contacts/@Types'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import striptags from 'striptags'
-import { ErrorsHandlerContext } from 'Components/AppContext/Contexts/ErrorsContext'
+import { ErrorInterface, ErrorsHandlerContext } from 'Components/AppContext/Contexts/ErrorsContext'
 import { useContext } from 'react'
 import { MESSAGE_LINE_HEIGHT } from '../../../../@Context/Constants'
 
@@ -58,7 +58,8 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
       })
 
       await firebase.rootRef().update(updateData)
-    } catch (error) {
+    } catch (err) {
+      const error = err as ErrorInterface['errorData']
       handleError({
         errorData: error,
         message: 'Message hasn&apos;t been deleted, because of the unexpected error.',
@@ -123,7 +124,8 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
       }
 
       await firebase.rootRef().update(updateData)
-    } catch (error) {
+    } catch (err) {
+      const error = err as ErrorInterface['errorData']
       handleError({
         errorData: error,
         message: 'Message hasn&apos;t been deleted, because of the unexpected error.',

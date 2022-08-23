@@ -95,16 +95,16 @@ const Search: React.FC<Props> = ({ navSearch, closeNavMobile }) => {
   }
 
   const onFocus = () => {
-    if (navSearch) {
-      const navItem = document.querySelectorAll('.nav__link')
-      const input = document.querySelector('.search__input')!
+    // if (navSearch) {
+    //   const navItem = document.querySelectorAll('.nav__link')
+    //   const input = document.querySelector('.search__input')!
 
-      input.classList.add('search__input--focus')
-      navItem.forEach((item) => {
-        item.classList.remove('nav__link-move-back')
-        item.classList.add('nav__link-move')
-      })
-    }
+    //   input.classList.add('search__input--focus')
+    //   navItem.forEach((item) => {
+    //     item.classList.remove('nav__link-move-back')
+    //     item.classList.add('nav__link-move')
+    //   })
+    // }
 
     setListIsOpen(true)
   }

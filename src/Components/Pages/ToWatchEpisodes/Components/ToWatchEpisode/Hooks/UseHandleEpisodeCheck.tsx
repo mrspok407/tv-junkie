@@ -3,8 +3,18 @@ import { useAppDispatch } from 'app/hooks'
 import { SingleEpisodeStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { postCheckSingleEpisode } from 'Components/UserContent/UseUserShowsRed/DatabaseHandlers/PostData/postShowEpisodesData'
 import { handleShowsError } from 'Components/UserContent/UseUserShowsRed/ErrorHandlers/handleShowsError'
-import { TO_WATCH_TRANSLATE_DURATION } from 'Utils/Constants'
+import {
+  CHECK_ALL_EPISODES_BUTTON_CLASS,
+  TO_WATCH_FADE_OUT_CLASS,
+  TO_WATCH_TRANSLATE_DURATION,
+  TO_WATCH_TRANSLATE_UP_CLASS,
+  TO_WATCH_TRANSLATE_UP_VALUE_DEFAULT,
+  TO_WATCH_TRANSLATE_UP_VALUE_SEASON_FADE_OUT,
+  TO_WATCH_TRANSLATE_UP_VALUE_SHOW_FADE_OUT,
+  TO_WATCH_TRANSLATE_UP_VAR,
+} from 'Utils/Constants'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import { getSeasonEpisodes, getSeasons } from 'Components/Pages/ToWatchEpisodes/Helpers'
 
 type Props = {
   episodeData: SingleEpisodeStoreState
@@ -16,6 +26,15 @@ type Props = {
   showIndex: number
   showId: number
 }
+
+interface HandleAnimationFinishT {
+  episodesArrayList: HTMLElement[]
+  seasonsArrayList: HTMLElement[]
+  showsArrayList: HTMLElement[]
+  rating?: number
+}
+
+const root = document.documentElement
 
 const useHandleEpisodeCheck = ({
   episodeData,
@@ -35,50 +54,51 @@ const useHandleEpisodeCheck = ({
 
     const { episodesArrayList, seasonsArrayList, showsArrayList } = getNodeLists()
 
-    episodesArrayList.forEach((item) => {
-      const nodeEpisodeNumber = Number(item.dataset.episodenumber)
-      if (nodeEpisodeNumber === episodeData.episode_number) {
-        item.classList.add('episodes__episode--fade-out')
-      }
-      if (nodeEpisodeNumber < episodeData.episode_number) {
-        item.classList.add('to-watch-translate-up')
-      }
-    })
+    const seasonEpisodesStore = dispatch(getSeasonEpisodes({ showId, seasonNumber: episodeData.season_number }))
+    const showEpisodesStore = dispatch(getSeasons({ showId }))
 
-    seasonsArrayList.forEach((item) => {
-      const nodeCheckAll = item.querySelector('.episodes__episode-group-check-all-episodes')
-      console.log({ nodeCheckAll })
-      const nodeSeasonNumber = Number(item.dataset.seasonnumber)
-      if (nodeSeasonNumber === episodeData.season_number) {
-        nodeCheckAll?.classList.add('to-watch-translate-up')
-      }
-      if (nodeSeasonNumber < episodeData.season_number) {
-        item.classList.add('to-watch-translate-up')
-      }
-    })
+    const isLastEpisodeInSeason = seasonEpisodesStore?.filter((episode) => !episode.watched).length === 1
+    const isLastSeasonInShow = showEpisodesStore?.filter((season) => !season.allReleasedEpisodesWatched).length === 1
+    const isLastEpisodeInShow = isLastEpisodeInSeason && isLastSeasonInShow
 
-    showsArrayList.forEach((item) => {
-      const nodeShowIndex = Number(item.dataset.index)
-      if (nodeShowIndex > showIndex) {
-        item.classList.add('to-watch-translate-up')
-      }
-    })
+    if (isLastEpisodeInSeason) {
+      const translateValue = isLastSeasonInShow
+        ? TO_WATCH_TRANSLATE_UP_VALUE_SHOW_FADE_OUT
+        : TO_WATCH_TRANSLATE_UP_VALUE_SEASON_FADE_OUT
+      root.style.setProperty(TO_WATCH_TRANSLATE_UP_VAR, `-${translateValue}px`)
+    }
 
+    handleEpisodeNodes(episodesArrayList)
+
+    handleSeasonNodes(seasonsArrayList, isLastEpisodeInSeason)
+
+    handleShowNodes(showsArrayList, isLastEpisodeInShow)
+
+    handleAnimationFinish({ episodesArrayList, seasonsArrayList, showsArrayList, rating })
+  }
+
+  const handleAnimationFinish = ({
+    episodesArrayList,
+    seasonsArrayList,
+    showsArrayList,
+    rating,
+  }: HandleAnimationFinishT) => {
     setTimeout(() => {
       isCheckEpisodeAnimationRunning.current = false
 
       episodesArrayList.forEach((item) => {
-        item.classList.remove('episodes__episode--fade-out')
-        item.classList.remove('to-watch-translate-up')
+        item.classList.remove(TO_WATCH_FADE_OUT_CLASS, TO_WATCH_TRANSLATE_UP_CLASS)
       })
       seasonsArrayList.forEach((item) => {
-        const nodeCheckAll = item.querySelector('.episodes__episode-group-check-all-episodes')
-        item.classList.remove('to-watch-translate-up')
-        nodeCheckAll?.classList.remove('to-watch-translate-up')
+        const nodeCheckAll = item.querySelector(CHECK_ALL_EPISODES_BUTTON_CLASS)
+        item.classList.remove(TO_WATCH_TRANSLATE_UP_CLASS, TO_WATCH_FADE_OUT_CLASS)
+        nodeCheckAll?.classList.remove(TO_WATCH_TRANSLATE_UP_CLASS, TO_WATCH_FADE_OUT_CLASS)
       })
       showsArrayList.forEach((item) => {
-        item.classList.remove('to-watch-translate-up')
+        item.classList.remove(TO_WATCH_TRANSLATE_UP_CLASS, TO_WATCH_FADE_OUT_CLASS)
       })
+
+      document.documentElement.style.setProperty(TO_WATCH_TRANSLATE_UP_VAR, `-${TO_WATCH_TRANSLATE_UP_VALUE_DEFAULT}px`)
 
       if (rating === undefined) {
         dispatch(
@@ -93,6 +113,49 @@ const useHandleEpisodeCheck = ({
         handleCheckWithRating(rating)
       }
     }, TO_WATCH_TRANSLATE_DURATION)
+  }
+
+  const handleEpisodeNodes = (elementsArray: HTMLElement[]) => {
+    elementsArray.forEach((item) => {
+      const nodeEpisodeNumber = Number(item.dataset.episodenumber)
+      if (nodeEpisodeNumber === episodeData.episode_number) {
+        item.classList.add(TO_WATCH_FADE_OUT_CLASS)
+      }
+      if (nodeEpisodeNumber < episodeData.episode_number) {
+        item.classList.add(TO_WATCH_TRANSLATE_UP_CLASS)
+      }
+    })
+  }
+
+  const handleSeasonNodes = (elementsArray: HTMLElement[], isLastEpisodeInSeason: boolean) => {
+    elementsArray.forEach((item) => {
+      const nodeCheckAll = item.querySelector(CHECK_ALL_EPISODES_BUTTON_CLASS)
+      const nodeSeasonNumber = Number(item.dataset.seasonnumber)
+
+      if (nodeSeasonNumber === episodeData.season_number) {
+        if (isLastEpisodeInSeason) {
+          item.classList.add(TO_WATCH_FADE_OUT_CLASS)
+          nodeCheckAll?.classList.add(TO_WATCH_FADE_OUT_CLASS)
+        } else {
+          nodeCheckAll?.classList.add(TO_WATCH_TRANSLATE_UP_CLASS)
+        }
+      }
+      if (nodeSeasonNumber < episodeData.season_number) {
+        item.classList.add(TO_WATCH_TRANSLATE_UP_CLASS)
+      }
+    })
+  }
+
+  const handleShowNodes = (elementsArray: HTMLElement[], isLastEpisodeInShow: boolean) => {
+    elementsArray.forEach((item) => {
+      const nodeShowIndex = Number(item.dataset.index)
+      if (nodeShowIndex === showIndex && isLastEpisodeInShow) {
+        item.classList.add(TO_WATCH_FADE_OUT_CLASS)
+      }
+      if (nodeShowIndex > showIndex) {
+        item.classList.add(TO_WATCH_TRANSLATE_UP_CLASS)
+      }
+    })
   }
 
   const handleCheckWithRating = (rating: number) => {

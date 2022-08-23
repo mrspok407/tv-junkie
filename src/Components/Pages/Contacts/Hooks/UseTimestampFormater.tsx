@@ -5,7 +5,7 @@ type Props = {
 }
 
 const useTimestampFormater = ({ timeStamp }: Props) => {
-  const [formatedDate, setFormatedDate] = useState<number | string | null>(timeStamp)
+  const [formattedDate, setFormatedDate] = useState<number | string | null>(timeStamp)
 
   useMemo(() => {
     if (!timeStamp) {
@@ -30,7 +30,7 @@ const useTimestampFormater = ({ timeStamp }: Props) => {
     }
   }, [timeStamp])
 
-  return formatedDate
+  return formattedDate
 }
 
 export default useTimestampFormater

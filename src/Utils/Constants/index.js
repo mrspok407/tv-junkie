@@ -142,4 +142,10 @@ export const CONTENT_INFO_NO_DATA = '-'
 
 export const TO_WATCH_TRANSLATE_DURATION = 200
 export const TO_WATCH_FADEOUT_DURATION = 200
-export const TO_WATCH_TRANSLATE_UP_VALUE = 51
+export const TO_WATCH_TRANSLATE_UP_VALUE_DEFAULT = 51
+export const TO_WATCH_TRANSLATE_UP_VALUE_SEASON_FADE_OUT = 154
+export const TO_WATCH_TRANSLATE_UP_VALUE_SHOW_FADE_OUT = 236
+export const TO_WATCH_TRANSLATE_UP_VAR = '--translateUpValue'
+export const TO_WATCH_TRANSLATE_UP_CLASS = 'to-watch-translate-up'
+export const TO_WATCH_FADE_OUT_CLASS = 'to-watch-fade-out'
+export const CHECK_ALL_EPISODES_BUTTON_CLASS = '.episodes__episode-group-check-all-episodes'

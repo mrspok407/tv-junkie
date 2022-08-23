@@ -1,6 +1,6 @@
 import { GroupCreationNewMemberInterface } from 'Components/Pages/Contacts/@Types'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
-import { ErrorsHandlerContext } from 'Components/AppContext/Contexts/ErrorsContext'
+import { ErrorInterface, ErrorsHandlerContext } from 'Components/AppContext/Contexts/ErrorsContext'
 import { useContext, useState } from 'react'
 
 const useAddNewMembers = () => {
@@ -22,7 +22,8 @@ const useAddNewMembers = () => {
       await addNewGroupMembersCloud({ members, groupInfo })
       setNewMembersLoading(false)
       contactsDispatch({ type: 'updateGroupInfoSettings', payload: { isActive: false } })
-    } catch (error) {
+    } catch (err) {
+      const error = err as ErrorInterface['errorData']
       handleError({
         errorData: error,
         message: 'There has been some error adding new members. Please reload the page.',

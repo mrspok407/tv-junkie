@@ -11,10 +11,10 @@ type Props = {
   selectedMembers: GroupCreationNewMemberInterface[]
   handleNewMembers: ({
     contact,
-    formatedDate,
+    formattedDate,
   }: {
     contact: ContactInfoInterface
-    formatedDate: string | number | null
+    formattedDate: string | number | null
   }) => void
 }
 
@@ -25,12 +25,12 @@ const Contact: React.FC<Props> = ({ contact, selectedMembers, handleNewMembers }
     () => chatParticipants[activeChat.chatKey] || [],
     [activeChat.chatKey, chatParticipants],
   )
-  const formatedDate = useTimestampFormater({ timeStamp: contact.lastSeen! })
+  const formattedDate = useTimestampFormater({ timeStamp: contact.lastSeen! })
 
   const renderStatus = () => {
     if (chatParticipantsMemo.includes(contact.key)) return 'Allready a member'
     if (contact.isOnline) return 'Online'
-    if (formatedDate) return `Last seen: ${formatedDate}`
+    if (formattedDate) return `Last seen: ${formattedDate}`
     return 'Long time ago'
   }
 
@@ -43,7 +43,7 @@ const Contact: React.FC<Props> = ({ contact, selectedMembers, handleNewMembers }
       key={contact.key}
       onClick={() => {
         if (chatParticipantsMemo.includes(contact.key)) return
-        handleNewMembers({ contact, formatedDate })
+        handleNewMembers({ contact, formattedDate })
       }}
     >
       <div className="contact-item__select">

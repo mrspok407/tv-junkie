@@ -58,6 +58,7 @@ const ContactList: React.FC<Props> = ({ contactListWrapperRef }) => {
         !contact.val().isGroupChat
       ) {
         handleError({
+          errorData: { message: 'Some of your contacts were not loaded correctly. Try to reload the page.' },
           message: 'Some of your contacts were not loaded correctly. Try to reload the page.',
         })
         return

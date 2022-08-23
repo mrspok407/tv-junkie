@@ -1,4 +1,4 @@
-@import "../../../styles/globals";
+@import '../../../styles/globals';
 
 $navBackground: #352424;
 
@@ -62,28 +62,51 @@ $navBackground: #352424;
   }
 }
 
+.nav-container {
+  position: fixed;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  width: 100px;
+  border: 1px solid peru;
+  z-index: 9999;
+
+  &:hover .nav {
+    transform: translateX(var(--nav-width));
+  }
+}
+
 .nav {
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: calc(var(--nav-width) * -1);
   display: flex;
   justify-content: center;
   z-index: 9999;
 
-  &:after {
-    content: "";
-    display: block;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    background: rgb(0, 0, 0);
-    background: radial-gradient(circle, $navBackground 60%, rgba(84, 81, 73, 0) 100%);
-    z-index: -10;
+  background: #000;
+  height: 100vh;
+  width: var(--nav-width);
 
-    @include mediaMaxW(#{$mobileViewPort}) {
-      background: #000;
-    }
-  }
+  will-change: transform;
+  transition: 200ms;
+
+  // &:after {
+  //   content: '';
+  //   display: block;
+  //   position: absolute;
+  //   width: 100%;
+  //   height: 100%;
+  //   top: 0;
+  //   left: 0;
+  //   background: rgb(0, 0, 0);
+  //   background: radial-gradient(circle, $navBackground 60%, rgba(84, 81, 73, 0) 100%);
+  //   z-index: -10;
+
+  //   @include mediaMaxW(#{$mobileViewPort}) {
+  //     background: #000;
+  //   }
+  // }
 
   @include mediaMaxW(#{$mobileViewPort}) {
     position: absolute;
@@ -110,6 +133,11 @@ $navBackground: #352424;
     width: 100%;
     list-style-type: none;
     color: #fff;
+
+    // position: absolute;
+    align-items: center;
+    flex-direction: column;
+    justify-content: start;
 
     @include mediaMaxW(#{$mobileViewPort}) {
       align-items: center;
@@ -234,7 +262,7 @@ $navBackground: #352424;
 
     &--new-activity {
       &:after {
-        content: "";
+        content: '';
         position: absolute;
         right: 10px;
         top: 10px;
@@ -254,7 +282,7 @@ $navBackground: #352424;
     }
 
     &:before {
-      content: "";
+      content: '';
       position: absolute;
       bottom: -3px;
       left: 0;
@@ -275,7 +303,6 @@ $navBackground: #352424;
     }
 
     @include mediaMaxW(#{$mobileViewPort}) {
-      // width: 100px;
       padding: 14px 5px 14px 5px;
       font-size: 0.95rem;
     }
@@ -290,7 +317,7 @@ $navBackground: #352424;
 
     &--logo {
       width: 150px;
-      background-image: url("../../../assets/images/icons/logo-icon.png");
+      background-image: url('../../../assets/images/icons/logo-icon.png');
       background-size: cover;
       background-repeat: no-repeat;
 
@@ -305,6 +332,7 @@ $navBackground: #352424;
     }
 
     &--nav-search {
+      width: 100%;
       cursor: initial;
       z-index: 9999;
 
@@ -323,7 +351,7 @@ $navBackground: #352424;
 
       .search__input {
         height: 27px;
-        width: 126px;
+        width: 100%;
         padding-left: 34px;
         padding-right: 32px;
         padding-bottom: 8px;
@@ -511,7 +539,7 @@ $navBackground: #352424;
   }
   &:after,
   &:before {
-    content: "";
+    content: '';
     position: absolute;
     top: 0;
     left: 0;

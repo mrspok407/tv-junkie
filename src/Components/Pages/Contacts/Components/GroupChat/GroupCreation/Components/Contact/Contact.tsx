@@ -15,11 +15,11 @@ const Contact: React.FC<Props> = ({ contact, isGroupInfoSearch = false }) => {
   const { groupCreation } = context?.state!
   const membersKeys = groupCreation.members.map((member) => member.key)
 
-  const formatedDate = useTimestampFormater({ timeStamp: contact.lastSeen! })
+  const formattedDate = useTimestampFormater({ timeStamp: contact.lastSeen! })
 
   const renderStatus = () => {
     if (contact.isOnline) return 'Online'
-    if (formatedDate) return `Last seen: ${formatedDate}`
+    if (formattedDate) return `Last seen: ${formattedDate}`
     return 'Long time ago'
   }
 
@@ -38,7 +38,7 @@ const Contact: React.FC<Props> = ({ contact, isGroupInfoSearch = false }) => {
             newMember: {
               key: contact.key,
               userName: contact.userName,
-              lastSeen: formatedDate,
+              lastSeen: formattedDate,
               chatKey: contact.chatKey,
             },
           },

@@ -116,9 +116,9 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
       })
       return firebase.rootRef().update(updateData, handleSuccessSubmit)
     } catch (err) {
-      const error = err as ErrorInterface
+      const error = err as ErrorInterface['errorData']
       setErrors({ ...errorsOnSubmit, error: { message: error.message } })
-      handleError({ errorData: error, message: 'Error occured durring register process. Please try again.' })
+      handleError({ errorData: error, message: 'Error occurred during register process. Please try again.' })
     } finally {
       if (closeNavMobile) closeNavMobile()
       setSubmitRequestLoading(false)
