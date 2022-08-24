@@ -61,7 +61,7 @@ const ToWatchEpisode: React.FC<Props> = ({
     <div className="episodes__episode" data-episodenumber={episodeData.episode_number} data-id={episodeData.id}>
       <div
         className={classNames('episodes__episode-wrapper', {
-          'episodes__episode-wrapper--torrent-links': showTorrentLinks,
+          // 'episodes__episode-wrapper--torrent-links': !showTorrentLinks,
         })}
       >
         <EpisodeCheckbox
@@ -79,13 +79,13 @@ const ToWatchEpisode: React.FC<Props> = ({
           {episodeData.name}
         </div>
 
-        {showTorrentLinks && (
+        {/* {!showTorrentLinks && (
           <TorrentLinsToWatchPage
             showId={showId}
             seasonNumber={episodeData.season_number}
             episodeNumber={episodeData.episode_number}
           />
-        )}
+        )} */}
       </div>
     </div>
   )

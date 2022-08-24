@@ -24,7 +24,7 @@ export interface HandleSearchArg {
   mediatype: { type: string; icon: string }
 }
 
-const Search: React.FC<Props> = ({ navSearch, closeNavMobile }) => {
+const Search: React.FC<Props> = ({ navSearch = false, closeNavMobile }) => {
   const [query, setQuery] = useState('')
   const [searchResults, setSearchResults] = useState<MainDataTMDB[]>([])
   const [isSearchingList, setIsSearchingList] = useState(false)
@@ -188,6 +188,20 @@ const Search: React.FC<Props> = ({ navSearch, closeNavMobile }) => {
             </div>
           )}
         </div>
+
+        {/* {navSearch && listIsOpen && (
+          <SearchList
+            searchResults={searchResults}
+            closeList={closeList}
+            currentListItem={currentListItem}
+            mediaTypeSearching={mediaTypeSearching}
+            listIsOpen={listIsOpen}
+            query={query}
+            handleClickOutside={handleClickOutside}
+            isSearchingList={isSearchingList}
+            error={error}
+          />
+        )} */}
       </div>
     </div>
   )

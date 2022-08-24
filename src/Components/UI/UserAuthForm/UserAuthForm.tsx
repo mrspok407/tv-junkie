@@ -13,30 +13,31 @@ type Props = {
 
 const UserAuthForm: React.FC<Props> = ({ closeNavMobile = () => {}, loginPage, authContRef }) => {
   const [activeSection, setActiveSection] = useState(loginPage ? 'register' : 'signIn')
-  const [passwordForgetFormOpen, setPasswordforgetFormOpen] = useState(false)
+  const [passwordForgetFormOpen, setPasswordForgetFormOpen] = useState(false)
 
   const togglePasswordForget = () => {
-    setPasswordforgetFormOpen(!passwordForgetFormOpen)
+    setPasswordForgetFormOpen(!passwordForgetFormOpen)
   }
 
-  const renderSection = () => (activeSection === 'signIn' ? (
-    <>
-      <div className="auth__section">
-        <SignInForm togglePasswordForget={togglePasswordForget} closeNavMobile={closeNavMobile} />
-      </div>
-      {passwordForgetFormOpen && (
-      <div className="auth__section">
-        <PasswordForget />
-      </div>
+  const renderSection = () =>
+    activeSection === 'signIn' ? (
+      <>
+        <div className="auth__section">
+          <SignInForm togglePasswordForget={togglePasswordForget} closeNavMobile={closeNavMobile} />
+        </div>
+        {passwordForgetFormOpen && (
+          <div className="auth__section">
+            <PasswordForget />
+          </div>
         )}
-    </>
+      </>
     ) : (
       activeSection === 'register' && (
         <div className="auth__section">
           <Register closeNavMobile={closeNavMobile} />
         </div>
       )
-    ))
+    )
 
   return (
     <div

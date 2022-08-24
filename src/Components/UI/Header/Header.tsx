@@ -46,13 +46,12 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false, cont
         'header--contacts-page': contactsPage,
       })}
     >
-      <div className="nav-container">
-        <nav
-          ref={navRef}
-          className={classNames('nav', {
-            'nav--mobile-open': navMobileOpen,
-          })}
-        >
+      <div
+        className={classNames('nav-container', {
+          'nav-container--mobile-open': navMobileOpen,
+        })}
+      >
+        <nav ref={navRef} className={classNames('nav')}>
           <ul
             className={classNames('nav__list', {
               'nav__list--not-auth': !authUser?.uid,
@@ -157,7 +156,9 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false, cont
               }
         }
       >
-        <img width="517" height="190" className="logo__img" src={logo} alt="logo" />
+        <NavLink to={ROUTES.HOME_PAGE} onClick={() => closeNavMobile()}>
+          <img width="517" height="190" className="logo__img" src={logo} alt="logo" />
+        </NavLink>
       </div>
     </header>
   )

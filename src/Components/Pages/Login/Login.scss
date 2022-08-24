@@ -1,4 +1,4 @@
-@import "../../../styles/globals";
+@import '../../../styles/globals';
 
 .login-page {
   position: relative;
@@ -9,6 +9,8 @@
     position: absolute;
     top: 20%;
     left: 50%;
+    color: var(--auth-form-login-page-text-color);
+    background-color: var(--auth-container-login-page-bg-color);
     transform: translateX(-50%);
     box-shadow: 0px 0px 100px -5px #66b4e682;
     opacity: 1;

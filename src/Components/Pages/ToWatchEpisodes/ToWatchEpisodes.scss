@@ -12,8 +12,6 @@ $seasonInfoBgClr: #1d1d1d96;
   transform: scale(0.9) translateY(25px);
   opacity: 0;
   transition: opacity var(--fadeOutDuration) linear, transform 100ms linear;
-  // transition-duration: opacity var(--fadeOutDuration), transform 100ms;
-  // transition-timing-function: linear;
 }
 
 .towatch__show {
@@ -59,12 +57,6 @@ $seasonInfoBgClr: #1d1d1d96;
     &:after {
       display: none;
     }
-
-    // &--fade-out {
-    //   opacity: 0;
-    //   transition-duration: var(--fadeOutDuration);
-    //   transition-timing-function: linear;
-    // }
   }
 
   .episodes__episode-group-check-all-episodes {
@@ -78,6 +70,9 @@ $seasonInfoBgClr: #1d1d1d96;
   .episodes__episode-name {
     align-self: initial;
     padding-right: 0px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .episodes__episode-date {
@@ -105,19 +100,20 @@ $seasonInfoBgClr: #1d1d1d96;
   }
 
   .episodes__episode-wrapper {
+    height: 100%;
     grid-template-columns: max-content var(--ratingMinWidth) minmax(var(--dateMinWidth), max-content) 1fr;
     background-color: $seasonInfoBgClr;
     align-items: center;
     cursor: initial;
 
     @include mediaMaxW(#{$mobileViewPort}) {
-      grid-template-columns: max-content minmax(var(--ratingMinWidth), max-content);
-      grid-template-rows: 1fr 1fr;
+      grid-template-columns: max-content 140px 1fr;
+      grid-template-rows: 1fr;
     }
 
     .user-rating {
       @include mediaMaxW(#{$mobileViewPort}) {
-        grid-column: 2 / -1;
+        display: none;
       }
     }
 

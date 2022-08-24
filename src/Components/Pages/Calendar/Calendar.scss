@@ -1,184 +1,174 @@
-@import "../../../styles/globals";
+@import '../../../styles/globals';
 
-.episodes--calendar {
-  row-gap: 0px;
-  opacity: 0;
-  animation: showCalendar 200ms forwards;
-  @keyframes showCalendar {
-    to {
-      opacity: 1;
-    }
-  }
-
-  .episodes__episode-group {
+.content-results--calendar {
+  .episodes--calendar {
     row-gap: 0px;
-  }
-
-  .episodes__episode-group-info {
-    display: grid;
-    grid-template-columns: 0.8fr 3fr;
-    background-color: transparent;
-    border-bottom: 1px solid #333;
-    align-items: initial;
-
-    &:after {
-      top: 30px;
+    opacity: 0;
+    animation: showCalendar 200ms forwards;
+    @keyframes showCalendar {
+      to {
+        opacity: 1;
+      }
     }
-  }
 
-  .episodes__episode-group-name {
-    font-size: 1.8rem;
-    letter-spacing: 1px;
-
-    &--next-year {
-      font-size: 1.4rem;
-      padding-left: 10px;
+    .episodes__episode-group {
+      row-gap: 0px;
     }
-  }
 
-  .episodes__episode-group-episodes-left {
-    display: flex;
-    align-items: flex-end;
-    padding: 10px;
-  }
+    .episodes__episode-group-info {
+      display: grid;
+      grid-template-columns: 0.8fr 3fr;
+      background-color: transparent;
+      border-bottom: 1px solid #333;
+      align-items: initial;
 
-  .episodes__episode-list {
-    grid-column: 1 / 3;
-
-    @include mediaMaxW(#{$mobileViewPort}) {
-      grid-column: initial;
+      &:after {
+        top: 30px;
+      }
     }
-  }
 
-  .episodes__episode {
-    &-date {
-      @include mediaMaxW(#{$mobileViewPort}) {
+    .episodes__episode-group-name {
+      font-size: 1.8rem;
+      letter-spacing: 1px;
+
+      &--next-year {
+        font-size: 1.4rem;
         padding-left: 10px;
       }
     }
 
-    &-days-to-air {
-      padding-right: 10px;
+    .episodes__episode-group-episodes-left {
+      display: flex;
+      align-items: flex-end;
+      padding: 10px;
+    }
+
+    .episodes__episode-list {
+      grid-column: 1 / 3;
 
       @include mediaMaxW(#{$mobileViewPort}) {
-        grid-column: 3 / 4;
-        grid-row: 1 /2;
+        grid-column: initial;
+      }
+    }
+
+    .episodes__episode {
+      &-date {
+        @include mediaMaxW(#{$mobileViewPort}) {
+          padding-left: 10px;
+        }
       }
 
-      .torrent-links--episodes {
-        * {
-          height: 25px;
-          border-radius: 5px;
-          font-size: 1rem;
+      &-days-to-air {
+        padding-right: 10px;
 
-          &:after,
-          &:before {
-            border-radius: 6px;
+        @include mediaMaxW(#{$mobileViewPort}) {
+          grid-column: 3 / 4;
+          grid-row: 1 /2;
+        }
+
+        .torrent-links--episodes {
+          * {
+            height: 25px;
+            border-radius: 5px;
+            font-size: 1rem;
+
+            &:after,
+            &:before {
+              border-radius: 6px;
+            }
           }
         }
       }
-    }
 
-    &-wrapper--calendar {
-      display: grid;
-      grid-template-columns: minmax(50px, 170px) max-content 1fr;
-      column-gap: 15px;
-      align-items: center;
+      &-wrapper--calendar {
+        display: grid;
+        grid-template-columns: minmax(50px, 170px) max-content 1fr;
+        column-gap: 15px;
+        align-items: center;
 
-      @include mediaMaxW(#{$mobileViewPort}) {
-        grid-column: 1 / 4;
-        grid-template-columns: minmax(50px, 100px) max-content 1fr;
-      }
-    }
-
-    &-show-name {
-      a {
-        color: getColor(orangeClr, $mainPalette);
-
-        &:hover {
-          text-decoration: underline;
+        @include mediaMaxW(#{$mobileViewPort}) {
+          grid-column: 1 / 4;
+          grid-template-columns: minmax(50px, 100px) max-content 1fr;
         }
       }
 
-      @include mediaMaxW(#{$mobileViewPort}) {
-        padding-left: 10px;
-      }
-    }
+      &-show-name {
+        a {
+          color: getColor(orangeClr, $mainPalette);
 
-    .episodes__episode-wrapper {
-      grid-template-columns: minmax(75px, 1.05fr) 3fr 1.5fr;
-      cursor: initial;
-      @include mediaMaxW(#{$mobileViewPort}) {
-        grid-template-columns: minmax(60px, 0.5fr) 3fr 1.5fr;
-      }
-    }
+          &:hover {
+            text-decoration: underline;
+          }
+        }
 
-    .episodes__episode-wrapper {
-      &:before {
+        @include mediaMaxW(#{$mobileViewPort}) {
+          padding-left: 10px;
+        }
+      }
+
+      .episodes__episode-wrapper {
+        grid-template-columns: minmax(75px, 1.05fr) 3fr 1.5fr;
+        cursor: initial;
+        @include mediaMaxW(#{$mobileViewPort}) {
+          grid-template-columns: minmax(60px, 0.5fr) 3fr 1.5fr;
+        }
+      }
+
+      .episodes__episode-wrapper {
+        &:before {
+          display: none;
+        }
+      }
+
+      &:after {
         display: none;
       }
-    }
 
-    &:after {
-      display: none;
-    }
-
-    &:nth-child(odd) {
-      .episodes__episode-wrapper {
-        background-color: #7b7b7b14;
-        padding-bottom: 6px;
+      &:nth-child(odd) {
+        .episodes__episode-wrapper {
+          background-color: #7b7b7b14;
+          padding-bottom: 6px;
+        }
       }
-    }
-    &:nth-child(even) {
-      .episodes__episode-wrapper {
-        background-color: transparent;
-      }
-    }
-  }
-
-  .episodes__episode--today {
-    .episodes__episode-days-to-air {
-      display: grid;
-      column-gap: 10px;
-      grid-template-columns: 1fr max-content;
-      color: getColor(orangeClr, $mainPalette);
-      justify-self: end;
-      font: {
-        size: 1.2rem;
-        weight: 600;
-      }
-
-      // @include mediaMaxW(#{$mobileViewPort}) {
-      //   grid-row: 2 / 2;
-      //   grid-column: 1 / 4;
-      // }
-
-      span {
-        align-self: center;
-      }
-    }
-    // .episodes__episode-wrapper--calendar {
-    //   @include mediaMaxW(#{$mobileViewPort}) {
-    //     grid-column: 2 / 4;
-    //     grid-template-columns: minmax(50px, 100px) max-content 1fr;
-    //   }
-    // }
-  }
-
-  .episodes__episode--today-admin {
-    .episodes__episode-days-to-air {
-      justify-self: initial;
-
-      @include mediaMaxW(#{$mobileViewPort}) {
-        grid-row: 2 / 2;
-        grid-column: 1 / 4;
+      &:nth-child(even) {
+        .episodes__episode-wrapper {
+          background-color: transparent;
+        }
       }
     }
 
-    .episodes__episode-wrapper--calendar {
-      @include mediaMaxW(#{$mobileViewPort}) {
-        grid-column: 2 / 4;
-        grid-template-columns: minmax(50px, 100px) max-content 1fr;
+    .episodes__episode--today {
+      .episodes__episode-days-to-air {
+        display: grid;
+        column-gap: 10px;
+        grid-template-columns: 1fr max-content;
+        color: getColor(orangeClr, $mainPalette);
+        justify-self: end;
+        font: {
+          size: 1.2rem;
+          weight: 600;
+        }
+        span {
+          align-self: center;
+        }
+      }
+    }
+
+    .episodes__episode--today-admin {
+      .episodes__episode-days-to-air {
+        justify-self: initial;
+
+        @include mediaMaxW(#{$mobileViewPort}) {
+          grid-row: 2 / 2;
+          grid-column: 1 / 4;
+        }
+      }
+
+      .episodes__episode-wrapper--calendar {
+        @include mediaMaxW(#{$mobileViewPort}) {
+          grid-column: 2 / 4;
+          grid-template-columns: minmax(50px, 100px) max-content 1fr;
+        }
       }
     }
   }

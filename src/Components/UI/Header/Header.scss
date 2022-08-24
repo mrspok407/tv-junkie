@@ -1,7 +1,5 @@
 @import '../../../styles/globals';
 
-$navBackground: #352424;
-
 .header {
   position: relative;
   display: flex;
@@ -67,46 +65,9 @@ $navBackground: #352424;
   height: 100vh;
   top: 0;
   left: 0;
-  width: 100px;
-  border: 1px solid peru;
+  perspective: 700px;
+  perspective-origin: left;
   z-index: 9999;
-
-  &:hover .nav {
-    transform: translateX(var(--nav-width));
-  }
-}
-
-.nav {
-  position: absolute;
-  top: 0;
-  left: calc(var(--nav-width) * -1);
-  display: flex;
-  justify-content: center;
-  z-index: 9999;
-
-  background: #000;
-  height: 100vh;
-  width: var(--nav-width);
-
-  will-change: transform;
-  transition: 200ms;
-
-  // &:after {
-  //   content: '';
-  //   display: block;
-  //   position: absolute;
-  //   width: 100%;
-  //   height: 100%;
-  //   top: 0;
-  //   left: 0;
-  //   background: rgb(0, 0, 0);
-  //   background: radial-gradient(circle, $navBackground 60%, rgba(84, 81, 73, 0) 100%);
-  //   z-index: -10;
-
-  //   @include mediaMaxW(#{$mobileViewPort}) {
-  //     background: #000;
-  //   }
-  // }
 
   @include mediaMaxW(#{$mobileViewPort}) {
     position: absolute;
@@ -115,8 +76,57 @@ $navBackground: #352424;
     width: 100%;
     padding-top: 5px;
     padding-bottom: 20px;
-    transform: translate(0, 0);
+    background-color: var(--nav-bg-color);
     z-index: 100;
+  }
+
+  &--mobile-open {
+    @include mediaMaxW(#{$mobileViewPort}) {
+      transform: translate(100%, 0);
+      transition: transform 0.25s;
+    }
+  }
+
+  @include mediaMinW(#{$mobileViewPort}) {
+    &:hover .nav {
+      opacity: 1;
+      transform: rotateY(0) translateX(0);
+    }
+    &:hover .nav__list {
+      transform: translateX(0);
+    }
+  }
+}
+
+.nav {
+  position: absolute;
+  top: 0;
+  display: flex;
+  justify-content: center;
+  height: 100vh;
+  width: var(--nav-width);
+  background-color: var(--nav-bg-color);
+  will-change: transform;
+  transition: 150ms;
+  overflow-y: auto;
+  overflow-x: hidden;
+  transform-origin: left;
+  transform-style: preserve-3d;
+  transform: rotateY(45deg) translateX(-219px);
+  opacity: 0.2;
+  will-change: transform, opacity;
+  z-index: 9999;
+
+  border-top-right-radius: 62px;
+  border-bottom-right-radius: 62px;
+
+  @include scrollbar(5px, getColor(blueClr, $mainPalette), #c5bbb1);
+
+  @include mediaMaxW(#{$mobileViewPort}) {
+    position: initial;
+    width: 100%;
+    opacity: 1;
+    transform: rotateY(0) translateX(0);
   }
 
   &--mobile-open {
@@ -129,26 +139,24 @@ $navBackground: #352424;
   &__list {
     position: relative;
     display: inline-flex;
-    justify-content: center;
     width: 100%;
     list-style-type: none;
     color: #fff;
-
-    // position: absolute;
     align-items: center;
     flex-direction: column;
-    justify-content: start;
+    justify-content: flex-start;
+    transform: translateX(102px);
+    transition: 100ms;
+    will-change: transform;
 
     @include mediaMaxW(#{$mobileViewPort}) {
       align-items: center;
       flex-direction: column;
-      justify-content: start;
+      justify-content: flex-start;
+      transform: translate(0);
     }
 
     &--not-auth {
-      justify-content: center;
-      padding-left: 118px;
-
       @include mediaMaxW(#{$mobileViewPort}) {
         padding-left: 0;
       }
@@ -503,9 +511,10 @@ $navBackground: #352424;
 }
 
 .login__container {
-  position: absolute;
-  right: 0;
-  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: var(--login-form-container-width);
   color: #fff;
 
   @include mediaMaxW(#{$mobileViewPort}) {
