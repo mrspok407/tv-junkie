@@ -15,13 +15,17 @@ export const updateIsEpisodesWatched = <T,>(showEpisodes: any) => {
   }
 
   modifiedData = showEpisodes.reduce((acc, season) => {
-    const isAnyReleasedEpisodeNotWatched = releasedEpisodesToOneArray<SingleEpisodeStoreState>([season]).some(
-      (episode) => !episode.watched,
-    )
-    if (isAnyReleasedEpisodeNotWatched) {
+    const seasonReleasedEpisodes = releasedEpisodesToOneArray<SingleEpisodeStoreState>([season])
+    if (!seasonReleasedEpisodes.length) {
+      acc.push({ ...season, allReleasedEpisodesWatched: false })
+      return acc
+    }
+    const isAnySeasonReleasedEpisodeNotWatched = seasonReleasedEpisodes.some((episode) => !episode.watched)
+    if (isAnySeasonReleasedEpisodeNotWatched) {
       allReleasedEpisodesWatched = false
     }
-    acc.push({ ...season, allReleasedEpisodesWatched: !isAnyReleasedEpisodeNotWatched })
+    console.log({ isAnyReleasedEpisodeNotWatched: isAnySeasonReleasedEpisodeNotWatched })
+    acc.push({ ...season, allReleasedEpisodesWatched: !isAnySeasonReleasedEpisodeNotWatched })
     return acc
   }, [] as T[])
   return [modifiedData, allReleasedEpisodesWatched] as const

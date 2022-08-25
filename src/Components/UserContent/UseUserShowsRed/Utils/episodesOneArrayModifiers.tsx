@@ -9,7 +9,6 @@ interface SeasonInt {
 type DataType = Array<Partial<SeasonInt> | undefined> | undefined
 
 export const episodesToOneArray = <T,>(data: DataType): T[] => {
-  console.log({ data2: data })
   if (!Array.isArray(data)) return []
   return data.reduce((acc, season) => {
     const seasonEpisodes = season?.episodes?.filter(Boolean)
@@ -24,7 +23,6 @@ export const episodesToOneArray = <T,>(data: DataType): T[] => {
 }
 
 export const releasedEpisodesToOneArray = <T,>(data: DataType) => {
-  console.log({ data })
   if (!Array.isArray(data)) return []
   return episodesToOneArray<T>(data).filter((episode: any) => {
     const episodeDate = new Date(episode.air_date)

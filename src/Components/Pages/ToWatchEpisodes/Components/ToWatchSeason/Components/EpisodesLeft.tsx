@@ -22,8 +22,6 @@ const EpisodesLeft: React.FC<Props> = ({ showId, seasonNumber }) => {
 
   const fromEpisodeNumber = seasonEpisodesNotWatched[0]?.episode_number
 
-  console.log({ seasonEpisodesNotWatched })
-
   return (
     <div className="episodes__episode-group-episodes-left">
       {seasonEpisodesNotWatched?.length} episodes left <span>from episode {fromEpisodeNumber}</span>

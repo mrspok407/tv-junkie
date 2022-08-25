@@ -127,6 +127,10 @@ $seasonInfoBgClr: #1d1d1d96;
     .torrent-links--to-watch-page {
       padding: 5px;
 
+      @include mediaMaxW(#{$mobileViewPort}) {
+        display: none;
+      }
+
       @include mediaMaxW(550px) {
         grid-column: 1 / 4;
       }

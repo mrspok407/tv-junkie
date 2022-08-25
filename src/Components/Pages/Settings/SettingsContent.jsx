@@ -157,9 +157,7 @@ const SettingsContent = () => {
 
       const updateData = await Promise.allSettled(
         showsToUpdateIds.map(async (showId) => {
-          const {
-            data: { number_of_seasons },
-          } = await axios.get(
+          const { data: showInfo } = await axios.get(
             `https://api.themoviedb.org/3/tv/${showId}?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US`,
           )
 
@@ -167,7 +165,7 @@ const SettingsContent = () => {
           const allSeasons = []
           const seasonChunks = []
           const apiRequests = []
-          for (let i = 1; i <= number_of_seasons; i += 1) {
+          for (let i = 1; i <= showInfo.number_of_seasons; i += 1) {
             allSeasons.push(`season/${i}`)
           }
           for (let i = 0; i <= allSeasons.length; i += maxSeasonsInChunk) {
@@ -221,6 +219,7 @@ const SettingsContent = () => {
               })
               const finalData = {
                 episodes: allEpisodes,
+                info: showInfo,
                 status: mergedRowData.status,
                 name: mergedRowData.name,
                 vote_average: mergedRowData.vote_average,
@@ -239,10 +238,7 @@ const SettingsContent = () => {
         const showData = promiseResult.value
         updateDataFirebase[`allShowsList/${showData.showId}/episodes`] = showData.episodes
         updateDataFirebase[`allShowsList/${showData.showId}/status`] = showData.status
-        updateDataFirebase[`allShowsList/${showData.showId}/info/status`] = showData.status
-        updateDataFirebase[`allShowsList/${showData.showId}/info/name`] = showData.name
-        updateDataFirebase[`allShowsList/${showData.showId}/info/vote_average`] = showData.vote_average
-        updateDataFirebase[`allShowsList/${showData.showId}/info/vote_count`] = showData.vote_average
+        updateDataFirebase[`allShowsList/${showData.showId}/info`] = showData.info
       })
 
       console.log({ updateData })

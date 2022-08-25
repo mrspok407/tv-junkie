@@ -18,7 +18,6 @@ export const userShowsSliceRed = createSlice({
   reducers: {
     setUserShows: {
       reducer(state, action: PayloadAction<UserShowsStoreState['data']>) {
-        console.log({ initialPayloadShows: action.payload })
         state.data = action.payload
         state.initialLoading = false
       },

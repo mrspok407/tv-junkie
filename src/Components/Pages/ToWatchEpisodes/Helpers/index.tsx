@@ -5,6 +5,8 @@ import {
   SingleEpisodeStoreState,
 } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { selectShowEpisodes, selectSingleSeason } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
+import { differenceInCalendarDays } from 'date-fns'
+import { currentDate } from 'Utils'
 
 interface GetSeasonsType {
   showId: number
@@ -29,5 +31,9 @@ export const getSeasonEpisodes =
   }
 
 export const shouldToWatchShowRender = (showData: ShowFullDataStoreState) => {
-  return showData?.allReleasedEpisodesWatched === false && showData?.database === 'watchingShows'
+  return (
+    showData?.allReleasedEpisodesWatched === false &&
+    showData?.database === 'watchingShows' &&
+    differenceInCalendarDays(new Date(showData.first_air_date), currentDate) <= 0
+  )
 }

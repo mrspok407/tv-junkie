@@ -15,6 +15,8 @@ import {
 } from 'Utils/Constants'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import { getSeasonEpisodes, getSeasons } from 'Components/Pages/ToWatchEpisodes/Helpers'
+import { differenceInCalendarDays } from 'date-fns'
+import { currentDate } from 'Utils'
 
 type Props = {
   episodeData: SingleEpisodeStoreState
@@ -57,9 +59,20 @@ const useHandleEpisodeCheck = ({
     const seasonEpisodesStore = dispatch(getSeasonEpisodes({ showId, seasonNumber: episodeData.season_number }))
     const showEpisodesStore = dispatch(getSeasons({ showId }))
 
-    const isLastEpisodeInSeason = seasonEpisodesStore?.filter((episode) => !episode.watched).length === 1
-    const isLastSeasonInShow = showEpisodesStore?.filter((season) => !season.allReleasedEpisodesWatched).length === 1
+    console.log(seasonEpisodesStore)
+
+    const isLastEpisodeInSeason =
+      seasonEpisodesStore?.filter(
+        (episode) => !episode.watched && differenceInCalendarDays(new Date(episode.air_date), currentDate) <= 0,
+      ).length === 1
+    const isLastSeasonInShow =
+      showEpisodesStore?.filter(
+        (season) =>
+          !season.allReleasedEpisodesWatched && differenceInCalendarDays(new Date(season.air_date), currentDate) <= 0,
+      ).length === 1
     const isLastEpisodeInShow = isLastEpisodeInSeason && isLastSeasonInShow
+
+    console.log({ isLastSeasonInShow, isLastEpisodeInSeason, isLastEpisodeInShow })
 
     if (isLastEpisodeInSeason) {
       const translateValue = isLastSeasonInShow

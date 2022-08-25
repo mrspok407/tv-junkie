@@ -3,9 +3,10 @@ import { useAppDispatch, useAppSelector } from 'app/hooks'
 import classNames from 'classnames'
 import { EpisodesStoreState, ShowFullDataStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { selectSingleSeason } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
-import { format } from 'date-fns'
+import { differenceInCalendarDays, format } from 'date-fns'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import { postCheckReleasedEpisodes } from 'Components/UserContent/UseUserShowsRed/DatabaseHandlers/PostData/postShowEpisodesData'
+import { currentDate } from 'Utils'
 import ToWatchEpisode from '../ToWatchEpisode/ToWatchEpisode'
 import { getSeasonEpisodes } from '../../Helpers'
 import EpisodesLeft from './Components/EpisodesLeft'
@@ -44,7 +45,7 @@ const ToWatchSeason: React.FC<Props> = ({
 
   const seasonEpisodes = dispatch(getSeasonEpisodes({ showId: showData.id, seasonNumber: seasonData.season_number }))
 
-  if (isAllReleasedEpisodesWatched) {
+  if (isAllReleasedEpisodesWatched || differenceInCalendarDays(new Date(seasonData.air_date), currentDate) > 0) {
     return null
   }
 

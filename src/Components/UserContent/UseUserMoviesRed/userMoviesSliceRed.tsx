@@ -12,7 +12,6 @@ export const userMoviesSliceRed = createSlice({
   reducers: {
     setUserMovies: {
       reducer(state, action: PayloadAction<UserMoviesStoreState['data']>) {
-        console.log({ initialPayloadMovies: action.payload })
         state.data = action.payload
         state.initialLoading = false
       },
