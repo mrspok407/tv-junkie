@@ -20,7 +20,8 @@ const EpisodeCheckbox: React.FC<Props> = ({ isDisabled, episodeData, showId, han
   const [showDisableWarning, handleDisableWarning, fadeOutStart, checkboxRef] = useDisableWarning()
 
   const isWatched = useAppSelector((state) => {
-    const episode = selectSingleEpisode(state, showId, episodeData.season_number, episodeData.episode_number)
+    // const episode = selectSingleEpisode(state, showId, episodeData.season_number, episodeData.episode_number)
+    const episode = selectSingleEpisode(state, showId, episodeData.season_number, episodeData.originalIndex + 1)
     return episode
   })
 
@@ -36,7 +37,7 @@ const EpisodeCheckbox: React.FC<Props> = ({ isDisabled, episodeData, showId, han
       <label>
         <input
           type="checkbox"
-          checked={isWatched?.watched && !isDisabled}
+          checked={!!(isWatched?.watched && !isDisabled)}
           onChange={() => handleEpisodeCheck()}
           disabled={isDisabled}
         />

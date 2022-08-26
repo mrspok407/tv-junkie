@@ -29,7 +29,7 @@ export const DetailsPage: React.FC<Props> = ({
   const seasonsTMDB = useMemo(() => details.seasons.filter((item) => item.name !== 'Specials'), [details.seasons])
 
   const showsInitialLoading = useAppSelector(selectShowsLoading)
-  const { loadingFireEpisodes } = useFetchShowEpisodes({ mediaType, id })
+  const { loadingFireEpisodes } = useFetchShowEpisodes({ mediaType: details.mediaType, id: details.id })
 
   useGoogleRedirect()
 
@@ -48,16 +48,18 @@ export const DetailsPage: React.FC<Props> = ({
 
     return (
       <div className="details-page">
-        <PosterWrapper details={details} mediaType={mediaType} />
-        <MainInfo details={details} mediaType={mediaType} showId={Number(id)} />
+        <PosterWrapper details={details} />
+        <MainInfo details={details} showId={Number(details.id)} />
 
         <div className="details-page__description">{details.overview}</div>
 
-        {mediaType === 'show' && <ShowEpisodes key={details.id} seasonsTMDB={seasonsTMDB} showId={Number(id)} />}
+        {details.mediaType === 'show' && (
+          <ShowEpisodes key={details.id} seasonsTMDB={seasonsTMDB} showId={Number(details.id)} />
+        )}
         {similarContent.length && (
           <div className="details-page__slider">
             <div className="details-page__slider-title">
-              {mediaType === 'movie' ? 'Similar movies' : 'Similar shows'}
+              {details.mediaType === 'movie' ? 'Similar movies' : 'Similar shows'}
             </div>
 
             <Slider sliderData={similarContent} />
@@ -72,7 +74,7 @@ export const DetailsPage: React.FC<Props> = ({
       <Helmet>
         {details && (
           <title>
-            {mediaType === 'show'
+            {details.mediaType === 'show'
               ? `
                 ${details.name}
                 ${details.first_air_date?.slice(0, 4)} | TV Junkie

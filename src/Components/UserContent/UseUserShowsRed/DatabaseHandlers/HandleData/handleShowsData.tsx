@@ -53,11 +53,8 @@ export const handleChangeShow =
     const authUserUid = getAuthUidFromState(getState())
     const showFromStore = selectShow(getState(), showData.id)
 
-    console.log({ showFromStore })
     if (!showFromStore) return
     if (showFromStore.episodesFetched) {
-      console.log('already fetched')
-      console.log({ showData })
       const show = { info: { ...showFromStore, ...showData } }
       dispatch(changeShow(show))
       return
@@ -67,8 +64,6 @@ export const handleChangeShow =
       const episodesRawData = await fetchEpisodesFullData({ authUserUid, showKey: showData.id, firebase })
       const [episodesFinalData, allReleasedEpisodesWatched] =
         updateIsEpisodesWatched<EpisodesStoreState>(episodesRawData)
-
-      console.log('handleChangeShow after AWAIT')
 
       const show = {
         info: { ...showFromStore, ...showData, allReleasedEpisodesWatched, episodesFetched: true },

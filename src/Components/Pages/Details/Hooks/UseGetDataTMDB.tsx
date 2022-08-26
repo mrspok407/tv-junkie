@@ -25,8 +25,6 @@ export const fetchContentDetailsTMDB = async ({ mediaType, id }: { mediaType: st
     },
   )
 
-  console.log({ data })
-
   return {
     ...data,
     backdrop_path: data.backdrop_path,
@@ -54,6 +52,7 @@ export const fetchContentDetailsTMDB = async ({ mediaType, id }: { mediaType: st
     vote_count: data.vote_count,
     similar: data.similar,
     similar_movies: data.similar_movies,
+    mediaType,
   }
 }
 

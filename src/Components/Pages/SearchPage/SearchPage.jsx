@@ -10,6 +10,7 @@ import PlaceholderNoResults from 'Components/UI/Placeholders/PlaceholderNoResult
 import Header from 'Components/UI/Header/Header'
 import Footer from 'Components/UI/Footer/Footer'
 import googleRedirectHOC from 'Components/UserAuth/SignIn/GoogleRedirectHOC'
+import ScrollToTopOnMount from 'Utils/ScrollToTopOnMount'
 import SearchResults from './SearchResults/SearchResults'
 import Search from './Search/Search'
 import './SearchPage.scss'
@@ -310,6 +311,7 @@ vote_count.gte=${voteCountMoreThan}&sort_by=${sortBy}&with_people=${getActors}`
         </div>
         {this.renderAdvMovies()}
         <ScrollToTopBar />
+        <ScrollToTopOnMount />
         <Footer />
       </>
     )

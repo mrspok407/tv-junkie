@@ -25,6 +25,8 @@ const Season: React.FC<Props> = React.memo(({ seasonTMDB, seasonEpisodes, showCh
     showTitle: seasonEpisodes?.showTitle || '',
   }
 
+  console.log({ seasonData })
+
   return (
     <>
       {seasonData.poster_path && (

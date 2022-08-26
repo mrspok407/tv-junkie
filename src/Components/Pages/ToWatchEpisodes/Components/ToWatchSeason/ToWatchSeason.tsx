@@ -10,6 +10,7 @@ import { currentDate } from 'Utils'
 import ToWatchEpisode from '../ToWatchEpisode/ToWatchEpisode'
 import { getSeasonEpisodes } from '../../Helpers'
 import EpisodesLeft from './Components/EpisodesLeft'
+import useShouldToWatchSeasonRender from './Hooks/UseShouldToWatchSeasonRender'
 
 type Props = {
   seasonData: EpisodesStoreState
@@ -38,18 +39,13 @@ const ToWatchSeason: React.FC<Props> = ({
 
   const [isEpisodesOpen, setIsEpisodesOpen] = useState(seasonData.season_number === initialOpenSeasonNumber)
 
-  const isAllReleasedEpisodesWatched = useAppSelector((state) => {
-    const season = selectSingleSeason(state, showData.id, seasonData.season_number)
-    return season?.allReleasedEpisodesWatched
-  })!
-
   const seasonEpisodes = dispatch(getSeasonEpisodes({ showId: showData.id, seasonNumber: seasonData.season_number }))
+  const seasonYearRelease = format(new Date(seasonData?.air_date ?? ''), 'yyyy')
 
-  if (isAllReleasedEpisodesWatched || differenceInCalendarDays(new Date(seasonData.air_date), currentDate) > 0) {
+  const shouldSeasonRender = useShouldToWatchSeasonRender({ seasonData, showData })
+  if (!shouldSeasonRender) {
     return null
   }
-
-  const seasonYearRelease = format(new Date(seasonData?.air_date ?? ''), 'yyyy')
 
   return (
     <div className="episodes__episode-group" data-seasonnumber={seasonData.season_number} data-id={seasonData.id}>

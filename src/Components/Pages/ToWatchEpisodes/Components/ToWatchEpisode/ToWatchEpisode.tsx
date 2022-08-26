@@ -1,15 +1,13 @@
 import React from 'react'
-import { useAppSelector } from 'app/hooks'
 import EpisodeCheckbox from 'Components/UI/Templates/SeasonsAndEpisodes/Components/SeasonEpisodes/Components/Episode/Components/EpisodeCheckbox/EpisodeCheckbox'
 import { SingleEpisodeStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
-import { selectSingleEpisode } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
-import { differenceInCalendarDays, format } from 'date-fns'
-import { currentDate } from 'Utils'
+import { format } from 'date-fns'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import classNames from 'classnames'
 import TorrentLinsToWatchPage from './Components/TorrentLinksToWatchPage'
 import useHandleEpisodeCheck from './Hooks/UseHandleEpisodeCheck'
 import UserRatingEpisodeToWatch from './Components/UserRatingEpisodeToWatch'
+import useShouldToWatchEpisodeRender from './Hooks/UseShouldToWatchEpisodeRender'
 
 type Props = {
   episodeData: SingleEpisodeStoreState
@@ -33,16 +31,10 @@ const ToWatchEpisode: React.FC<Props> = ({
   showIndex,
 }) => {
   const { authUser } = useFrequentVariables()
-  const isWatched = useAppSelector((state) => {
-    const episode = selectSingleEpisode(state, showId, episodeData.season_number, episodeData.episode_number)
-    return episode?.watched ?? false
-  })
 
   const airDateReadable = episodeData.air_date
     ? format(new Date(episodeData.air_date), 'MMMM d, yyyy')
     : 'No date available'
-
-  const showTorrentLinks = authUser?.email === process.env.REACT_APP_ADMIN_EMAIL
 
   const handleEpisodeCheck = useHandleEpisodeCheck({
     episodeData,
@@ -55,8 +47,10 @@ const ToWatchEpisode: React.FC<Props> = ({
     showId,
   })
 
-  if (isWatched || differenceInCalendarDays(new Date(episodeData.air_date), currentDate) > 0) return null
+  const shouldEpisodeRender = useShouldToWatchEpisodeRender({ episodeData, showId })
+  if (!shouldEpisodeRender) return null
 
+  const showTorrentLinks = authUser?.email === process.env.REACT_APP_ADMIN_EMAIL
   return (
     <div className="episodes__episode" data-episodenumber={episodeData.episode_number} data-id={episodeData.id}>
       <div

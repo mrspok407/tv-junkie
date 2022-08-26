@@ -9,12 +9,11 @@ import useFormatDetailsValues from './Hooks/useFormatDetailsValues'
 
 type Props = {
   details: MainDataTMDB
-  mediaType: string
   showId: number
 }
 
-export const MainInfo: React.FC<Props> = ({ details, mediaType, showId }) => {
-  const isMediaTypeTV = mediaType === 'show'
+export const MainInfo: React.FC<Props> = ({ details, showId }) => {
+  const isMediaTypeTV = details.mediaType === 'show'
 
   const { companyName, genres, title, yearRelease, yearRange, runtime } = useFormatDetailsValues({
     details,

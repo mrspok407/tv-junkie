@@ -1,8 +1,9 @@
 import React from 'react'
 import { Helmet } from 'react-helmet'
-import ScrollToTop from 'Utils/ScrollToTopBar'
+import ScrollToTopBar from 'Utils/ScrollToTopBar'
 import Header from 'Components/UI/Header/Header'
 import Footer from 'Components/UI/Footer/Footer'
+import ScrollToTopOnMount from 'Utils/ScrollToTopOnMount'
 import useAuthorization from 'Components/UserAuth/Session/Authentication/Hooks/useAuthorization'
 import ToWatchEpisodesContent from './ToWatchEpisodesContent'
 import './ToWatchEpisodes.scss'
@@ -19,7 +20,8 @@ const ToWatchEpisodesPage: React.FC = () => {
       <Header />
       <ToWatchEpisodesContent />
       <Footer />
-      <ScrollToTop />
+      <ScrollToTopBar />
+      <ScrollToTopOnMount />
     </>
   )
 }

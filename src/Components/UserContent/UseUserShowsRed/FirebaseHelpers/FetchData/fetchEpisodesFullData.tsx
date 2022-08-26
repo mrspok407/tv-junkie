@@ -21,5 +21,16 @@ export const fetchEpisodesFullData = async ({ authUserUid, showKey, firebase }: 
     },
   )
 
-  return episodesUserFireMerge
+  const episodesUserFireMergeWithIndexes = addOriginalIndexesToEpisodesFullData(episodesUserFireMerge)
+  return episodesUserFireMergeWithIndexes
+}
+
+export const addOriginalIndexesToEpisodesFullData = (episodesFullInfo: EpisodesStoreState[]) => {
+  return episodesFullInfo.map((season, seasonIndex) => {
+    const episodesWithIndexes = season.episodes.map((episode, episodeIndex) => ({
+      ...episode,
+      originalIndex: episodeIndex,
+    }))
+    return { ...season, episodes: episodesWithIndexes, originalIndex: seasonIndex }
+  })
 }

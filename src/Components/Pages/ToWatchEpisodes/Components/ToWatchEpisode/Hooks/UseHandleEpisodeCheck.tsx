@@ -59,23 +59,19 @@ const useHandleEpisodeCheck = ({
     const seasonEpisodesStore = dispatch(getSeasonEpisodes({ showId, seasonNumber: episodeData.season_number }))
     const showEpisodesStore = dispatch(getSeasons({ showId }))
 
-    console.log(seasonEpisodesStore)
-
-    const isLastEpisodeInSeason =
+    const isLastReleasedEpisodeInSeason =
       seasonEpisodesStore?.filter(
         (episode) => !episode.watched && differenceInCalendarDays(new Date(episode.air_date), currentDate) <= 0,
       ).length === 1
-    const isLastSeasonInShow =
+    const isLastReleasedSeasonInShow =
       showEpisodesStore?.filter(
         (season) =>
           !season.allReleasedEpisodesWatched && differenceInCalendarDays(new Date(season.air_date), currentDate) <= 0,
       ).length === 1
-    const isLastEpisodeInShow = isLastEpisodeInSeason && isLastSeasonInShow
+    const isLastReleasedEpisodeInShow = isLastReleasedEpisodeInSeason && isLastReleasedSeasonInShow
 
-    console.log({ isLastSeasonInShow, isLastEpisodeInSeason, isLastEpisodeInShow })
-
-    if (isLastEpisodeInSeason) {
-      const translateValue = isLastSeasonInShow
+    if (isLastReleasedEpisodeInSeason) {
+      const translateValue = isLastReleasedSeasonInShow
         ? TO_WATCH_TRANSLATE_UP_VALUE_SHOW_FADE_OUT
         : TO_WATCH_TRANSLATE_UP_VALUE_SEASON_FADE_OUT
       root.style.setProperty(TO_WATCH_TRANSLATE_UP_VAR, `-${translateValue}px`)
@@ -83,9 +79,9 @@ const useHandleEpisodeCheck = ({
 
     handleEpisodeNodes(episodesArrayList)
 
-    handleSeasonNodes(seasonsArrayList, isLastEpisodeInSeason)
+    handleSeasonNodes(seasonsArrayList, isLastReleasedEpisodeInSeason)
 
-    handleShowNodes(showsArrayList, isLastEpisodeInShow)
+    handleShowNodes(showsArrayList, isLastReleasedEpisodeInShow)
 
     handleAnimationFinish({ episodesArrayList, seasonsArrayList, showsArrayList, rating })
   }

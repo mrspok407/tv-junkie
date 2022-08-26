@@ -13,7 +13,6 @@ let cancelRequest: any
 
 type Props = {
   details: MainDataTMDB
-  mediaType: string
 }
 
 interface APIData {
@@ -22,7 +21,7 @@ interface APIData {
   }
 }
 
-const PosterWrapper = React.memo<Props>(({ details, mediaType }) => {
+const PosterWrapper = React.memo<Props>(({ details }) => {
   const { authUser } = useAppSelector(selectAuthUser)
 
   const [movieTitle, setMovieTitle] = useState('')
@@ -64,7 +63,7 @@ const PosterWrapper = React.memo<Props>(({ details, mediaType }) => {
   }, [details])
 
   useEffect(() => {
-    if (mediaType === 'movie') {
+    if (details.mediaType === 'movie') {
       getMovieTorrents()
     }
     return () => {
@@ -72,7 +71,7 @@ const PosterWrapper = React.memo<Props>(({ details, mediaType }) => {
         cancelRequest()
       }
     }
-  }, [mediaType, getMovieTorrents])
+  }, [details.mediaType, getMovieTorrents])
 
   return (
     <div className="details-page__poster-wrapper">
@@ -97,7 +96,7 @@ const PosterWrapper = React.memo<Props>(({ details, mediaType }) => {
         />
       )}
 
-      {mediaType === 'movie' &&
+      {details.mediaType === 'movie' &&
       new Date(details.release_date).getTime() < currentDate.getTime() &&
       movieAvailable &&
       authUser?.email === process.env.REACT_APP_ADMIN_EMAIL ? (

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useState } from 'react'
 import classNames from 'classnames'
 import { SingleEpisodeFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
@@ -26,11 +26,12 @@ const Episode: React.FC<Props> = ({ episodeData, showCheckboxes, showId, showTit
   })
 
   const handleEpisodeCheck = () => {
+    console.log({ episodeData })
     dispatch(
       postCheckSingleEpisode({
         showId,
         seasonNumber: episodeData.season_number,
-        episodeNumber: episodeData.episode_number,
+        episodeNumber: episodeData.originalIndex + 1,
         firebase,
       }),
     )

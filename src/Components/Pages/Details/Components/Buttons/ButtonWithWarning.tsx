@@ -26,7 +26,6 @@ const ButtonWithWarning: React.FC<Props> = ({ isPressed, children, onClick, isDi
         })}
         type="button"
         onClick={(e) => {
-          console.log({ authUser })
           if (!authUser?.uid) {
             handleDisableWarning(e)
             return

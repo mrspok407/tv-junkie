@@ -27,7 +27,8 @@ export const releasedEpisodesToOneArray = <T,>(data: DataType) => {
   return episodesToOneArray<T>(data).filter((episode: any) => {
     const episodeDate = new Date(episode.air_date)
     if (!isValid(episodeDate)) {
-      throw new Error('Date from episode.air_date should be a valid date.')
+      console.error({ invalidDateInThisEpisode: episode })
+      return true
     }
     const daysToNewEpisode = differenceInCalendarDays(episodeDate, currentDate)
     return daysToNewEpisode <= 0

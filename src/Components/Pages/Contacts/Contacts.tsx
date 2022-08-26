@@ -2,6 +2,7 @@ import Header from 'Components/UI/Header/Header'
 import useAuthorization from 'Components/UserAuth/Session/Authentication/Hooks/useAuthorization'
 import React from 'react'
 import { Helmet } from 'react-helmet'
+import ScrollToTopOnMount from 'Utils/ScrollToTopOnMount'
 import ContactsContent from './ContactsContent'
 import './styles/index.scss'
 
@@ -15,6 +16,7 @@ const Contacts: React.FC = () => {
       </Helmet>
       <Header contactsPage isLogoVisible={false} />
       <ContactsContent />
+      <ScrollToTopOnMount />
     </>
   )
 }

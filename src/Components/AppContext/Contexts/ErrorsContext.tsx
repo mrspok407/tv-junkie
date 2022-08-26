@@ -50,10 +50,7 @@ const useErrorsContext = () => {
 
   const handleError = useCallback(
     ({ errorData, message }: ErrorInterface) => {
-      if (IGNORED_ERROR_CODES.includes(errorData?.code!)) {
-        console.log('ignored code')
-        return
-      }
+      if (IGNORED_ERROR_CODES.includes(errorData?.code!)) return
 
       setError({ errorData, message })
 

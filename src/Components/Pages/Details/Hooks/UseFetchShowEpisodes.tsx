@@ -21,7 +21,6 @@ const useFetchShowEpisodes = ({ mediaType, id }: Props) => {
     try {
       if (mediaType !== 'show' || showsInitialLoading) return
       dispatch(fetchShowEpisodes(Number(id), firebase))
-      console.log('test')
     } catch (err) {
       dispatch(handleShowsError(err))
     } finally {

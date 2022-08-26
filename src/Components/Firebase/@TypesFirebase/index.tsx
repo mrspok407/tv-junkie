@@ -30,6 +30,7 @@ export interface EpisodesFromFireDatabase extends EpisodesTMDB {}
 export interface SingleEpisodeFromFireDatabase extends SingleEpisodeTMDB {
   episode_number: number
   season_number: number
+  originalIndex: number
 }
 
 export interface EpisodesFromUserDatabase {
@@ -43,7 +44,7 @@ export interface EpisodesFromUserDatabase {
 }
 
 export interface SingleEpisodeFromUserDatabase {
-  air_date: string
+  air_date: string | null | undefined
   userRating: number
   watched: boolean
 }

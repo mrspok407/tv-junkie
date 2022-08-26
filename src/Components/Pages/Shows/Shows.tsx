@@ -1,7 +1,8 @@
 import React from 'react'
 import { Helmet } from 'react-helmet'
-import ScrollToTop from 'Utils/ScrollToTopBar'
+import ScrollToTopBar from 'Utils/ScrollToTopBar'
 import Header from 'Components/UI/Header/Header'
+import ScrollToTopOnMount from 'Utils/ScrollToTopOnMount'
 import Footer from 'Components/UI/Footer/Footer'
 import useGoogleRedirect from 'Components/UserAuth/SignIn/UseGoogleRedirect'
 import ShowsContent from './ShowsContent'
@@ -16,7 +17,8 @@ const Shows: React.FC = () => {
       <Header />
       <ShowsContent />
       <Footer />
-      <ScrollToTop />
+      <ScrollToTopBar />
+      <ScrollToTopOnMount />
     </>
   )
 }

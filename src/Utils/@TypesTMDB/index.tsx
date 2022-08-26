@@ -11,7 +11,7 @@ export interface EpisodesTMDB {
 
 export interface SingleEpisodeTMDB {
   [key: string]: number | string | boolean | null | undefined
-  air_date: string
+  air_date: string | '' | null | undefined
   episode_number?: number
   id: number
   name?: string
@@ -19,7 +19,7 @@ export interface SingleEpisodeTMDB {
 }
 
 export interface SeasonTMDB {
-  air_date?: string
+  air_date?: string | '' | null | undefined
   episode_count?: number
   id: number
   name?: string
@@ -50,7 +50,7 @@ export interface MainDataTMDB {
   }[]
   known_for_department: string
   last_air_date: string
-  media_type?: string
+  mediaType: string
   name: string
   networks: { name: string; id: number; logo_path: string | null; origin_country: string }[]
   number_of_seasons: number
@@ -91,7 +91,7 @@ const MAINDATA_TMDB_INITIAL: MainDataTMDB = {
   known_for: [],
   known_for_department: '-',
   last_air_date: '-',
-  media_type: '-',
+  mediaType: '-',
   name: '-',
   networks: [],
   number_of_seasons: 0,

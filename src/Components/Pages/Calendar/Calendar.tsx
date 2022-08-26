@@ -1,9 +1,10 @@
 import React from 'react'
 import { Helmet } from 'react-helmet'
-import ScrollToTop from 'Utils/ScrollToTopBar'
+import ScrollToTopBar from 'Utils/ScrollToTopBar'
 import Header from 'Components/UI/Header/Header'
 import useAuthorization from 'Components/UserAuth/Session/Authentication/Hooks/useAuthorization'
 import Footer from 'Components/UI/Footer/Footer'
+import ScrollToTopOnMount from 'Utils/ScrollToTopOnMount'
 import CalendarContent from './CalendarContent'
 import './Calendar.scss'
 
@@ -18,7 +19,8 @@ const CalendarPage: React.FC = () => {
       <Header />
       <CalendarContent />
       <Footer />
-      <ScrollToTop />
+      <ScrollToTopBar />
+      <ScrollToTopOnMount />
     </>
   )
 }

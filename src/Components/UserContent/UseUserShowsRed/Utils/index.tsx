@@ -24,7 +24,6 @@ export const updateIsEpisodesWatched = <T,>(showEpisodes: any) => {
     if (isAnySeasonReleasedEpisodeNotWatched) {
       allReleasedEpisodesWatched = false
     }
-    console.log({ isAnyReleasedEpisodeNotWatched: isAnySeasonReleasedEpisodeNotWatched })
     acc.push({ ...season, allReleasedEpisodesWatched: !isAnySeasonReleasedEpisodeNotWatched })
     return acc
   }, [] as T[])
