@@ -156,14 +156,14 @@ export const selectShowRating = (state: RootState, showId: number) => selectShow
 export const selectSingleSeason = (state: RootState, showId: number, seasonNum: number) => {
   const episodes = selectShowEpisodes(state, showId)
   if (episodes === undefined) return undefined
-  const singleSeason = episodes[seasonNum - 1]
+  const singleSeason = episodes[seasonNum]
   return singleSeason
 }
 
 export const selectSingleEpisode = (state: RootState, showId: number, seasonNum: number, episodeNumber: number) => {
   const episodes = selectShowEpisodes(state, showId)
   if (episodes === undefined) return undefined
-  const singleEpisode = episodes[seasonNum - 1]?.episodes[episodeNumber - 1]
+  const singleEpisode = episodes[seasonNum]?.episodes[episodeNumber]
   return singleEpisode
 }
 

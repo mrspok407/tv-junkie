@@ -7,6 +7,7 @@ import { differenceInCalendarDays, format } from 'date-fns'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import { postCheckReleasedEpisodes } from 'Components/UserContent/UseUserShowsRed/DatabaseHandlers/PostData/postShowEpisodesData'
 import { currentDate } from 'Utils'
+import { isValid } from 'date-fns'
 import ToWatchEpisode from '../ToWatchEpisode/ToWatchEpisode'
 import { getSeasonEpisodes } from '../../Helpers'
 import EpisodesLeft from './Components/EpisodesLeft'
@@ -39,8 +40,12 @@ const ToWatchSeason: React.FC<Props> = ({
 
   const [isEpisodesOpen, setIsEpisodesOpen] = useState(seasonData.season_number === initialOpenSeasonNumber)
 
-  const seasonEpisodes = dispatch(getSeasonEpisodes({ showId: showData.id, seasonNumber: seasonData.season_number }))
-  const seasonYearRelease = format(new Date(seasonData?.air_date ?? ''), 'yyyy')
+  const seasonEpisodes = dispatch(
+    getSeasonEpisodes({ showId: showData.id, seasonNumber: seasonData.originalSeasonIndex }),
+  )
+
+  const seasonReleaseDate = new Date(seasonData?.air_date ?? '')
+  const seasonYearRelease = isValid(seasonReleaseDate) ? format(seasonReleaseDate, 'yyyy') : 'No date available'
 
   const shouldSeasonRender = useShouldToWatchSeasonRender({ seasonData, showData })
   if (!shouldSeasonRender) {
@@ -56,8 +61,14 @@ const ToWatchSeason: React.FC<Props> = ({
         })}
       >
         <div className="episodes__episode-group-name">Season {seasonData.season_number}</div>
-        <EpisodesLeft showId={showData.id} seasonNumber={seasonData.season_number} />
-        <div className="episodes__episode-group-date">{seasonYearRelease}</div>
+        <EpisodesLeft showId={showData.id} seasonData={seasonData} />
+        <div
+          className={classNames('episodes__episode-group-date', {
+            'episodes__episode-group-date--no-date': seasonYearRelease === 'No date available',
+          })}
+        >
+          {seasonYearRelease}
+        </div>
       </div>
 
       {isEpisodesOpen && (
@@ -86,7 +97,11 @@ const ToWatchSeason: React.FC<Props> = ({
               className="button"
               onClick={() => {
                 dispatch(
-                  postCheckReleasedEpisodes({ showId: showData.id, seasonNumber: seasonData.season_number, firebase }),
+                  postCheckReleasedEpisodes({
+                    showId: showData.id,
+                    seasonNumber: seasonData.originalSeasonIndex,
+                    firebase,
+                  }),
                 )
               }}
             >

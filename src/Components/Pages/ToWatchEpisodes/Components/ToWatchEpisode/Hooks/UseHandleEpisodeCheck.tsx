@@ -56,7 +56,7 @@ const useHandleEpisodeCheck = ({
 
     const { episodesArrayList, seasonsArrayList, showsArrayList } = getNodeLists()
 
-    const seasonEpisodesStore = dispatch(getSeasonEpisodes({ showId, seasonNumber: episodeData.season_number }))
+    const seasonEpisodesStore = dispatch(getSeasonEpisodes({ showId, seasonNumber: episodeData.originalSeasonIndex }))
     const showEpisodesStore = dispatch(getSeasons({ showId }))
 
     const isLastReleasedEpisodeInSeason =
@@ -113,8 +113,8 @@ const useHandleEpisodeCheck = ({
         dispatch(
           postCheckSingleEpisode({
             showId,
-            seasonNumber: episodeData.season_number,
-            episodeNumber: episodeData.episode_number,
+            seasonNumber: episodeData.originalSeasonIndex,
+            episodeNumber: episodeData.originalEpisodeIndex,
             firebase,
           }),
         )
@@ -173,8 +173,8 @@ const useHandleEpisodeCheck = ({
         .userShowSingleEpisode({
           authUid: authUser?.uid,
           key: showId,
-          seasonNumber: episodeData.season_number,
-          episodeNumber: episodeData.episode_number,
+          seasonNumber: episodeData.originalSeasonIndex,
+          episodeNumber: episodeData.originalEpisodeIndex,
         })
         .update({ userRating: rating, watched: true })
     } catch (error) {

@@ -22,38 +22,12 @@ export const postCheckReleasedEpisodes =
       : selectShowEpisodes(getState(), showId)
     const releasedEpisodes = releasedEpisodesToOneArray<SingleEpisodeStoreState>(episodesFromStore)
     const isAnyEpisodeNotWatched = releasedEpisodes.some((episode) => !episode.watched)
-
     try {
       const updateData = postCheckReleasedEpisodesScheme({
         showId,
         authUid,
         releasedEpisodes,
         isWatched: isAnyEpisodeNotWatched,
-      })
-
-      return firebase.rootRef().update(updateData)
-    } catch (error) {
-      dispatch(handleShowsError(error))
-    }
-  }
-
-type PostCheckMultiplyEpisodesT = {
-  showId: number
-  firebase: FirebaseInterface
-  episodes: SingleEpisodeStoreState[]
-}
-
-export const postCheckMultiplyEpisodes =
-  ({ showId, episodes, firebase }: PostCheckMultiplyEpisodesT): AppThunk =>
-  async (dispatch, getState) => {
-    const authUid = getAuthUidFromState(getState())
-
-    try {
-      const updateData = postCheckReleasedEpisodesScheme({
-        showId,
-        authUid,
-        releasedEpisodes: episodes,
-        isWatched: true,
       })
 
       return firebase.rootRef().update(updateData)

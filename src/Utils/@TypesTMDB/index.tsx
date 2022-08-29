@@ -1,7 +1,7 @@
 import { UserShowStatuses } from 'Components/UserContent/UseUserShowsRed/@Types'
 
 export interface EpisodesTMDB {
-  air_date: string
+  air_date?: string
   episodes: SingleEpisodeTMDB[]
   id: number
   name?: string

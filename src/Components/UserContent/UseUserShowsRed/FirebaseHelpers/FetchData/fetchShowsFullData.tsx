@@ -29,7 +29,6 @@ const fetchShowsFullData = ({ userShows, firebase, authUserUid }: GetUserShowsFu
 
       if (show.database === 'watchingShows' && !show.allEpisodesWatched) {
         const episodesRawData = await fetchEpisodesFullData({ authUserUid, showKey: show.id, firebase })
-        console.log({ episodesRawData })
         const [episodesFinalData, allReleasedEpisodesWatched] =
           updateIsEpisodesWatched<EpisodesStoreState>(episodesRawData)
         return { ...showInfo, ...show, allReleasedEpisodesWatched, episodes: episodesFinalData, episodesFetched: true }

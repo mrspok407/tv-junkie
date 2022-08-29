@@ -26,8 +26,19 @@ function useFetchSeasons<DataType>({ showId, preloadSeason }: Props) {
         const { data } = await getPromise(seasonNum)
         const episodesWithOriginalIndex = [...data[`season/${seasonNum}`].episodes].map((episode, index) => ({
           ...episode,
-          originalIndex: index,
+          originalEpisodeIndex: index,
+          originalSeasonIndex: seasonNum - 1,
         }))
+
+        console.log({ episodesWithOriginalIndex })
+
+        // const episodesWithOriginalIndex = [...data[`season/${seasonNum}`].episodes].map((season, seasonIndex) => {
+        //   const episodesWithIndexes = season.episodes.map((episode, episodeIndex) => ({
+        //     ...episode,
+        //     originalEpisodeIndex: episodeIndex,
+        //     originalSeasonIndex: seasonIndex,
+        //   }))
+
         const episodes = episodesWithOriginalIndex.reverse()
 
         dispatch({

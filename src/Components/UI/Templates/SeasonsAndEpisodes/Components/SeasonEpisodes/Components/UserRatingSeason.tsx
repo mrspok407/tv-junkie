@@ -16,15 +16,17 @@ const UserRatingSeason: React.FC<Props> = ({ showId, seasonNumber, showRating })
   const { firebase, authUser } = useFrequentVariables()
   const dispatch = useAppDispatch()
 
+  const seasonIndex = seasonNumber - 1
+
   const isUnmountedRef = useUnmountRef()
 
   const showStatus = useAppSelector((state) => selectShowStatus(state, showId))
-  const currentRating = useAppSelector((state) => selectSingleSeason(state, showId, seasonNumber)?.userRating) ?? 0
+  const currentRating = useAppSelector((state) => selectSingleSeason(state, showId, seasonIndex)?.userRating) ?? 0
 
   const handlePostData = (rating: number) => {
     try {
       firebase
-        .userShowSingleSeason({ authUid: authUser?.uid, key: showId, seasonNumber })
+        .userShowSingleSeason({ authUid: authUser?.uid, key: showId, seasonNumber: seasonIndex })
         .update({ userRating: rating })
     } catch (error) {
       if (isUnmountedRef.current) return

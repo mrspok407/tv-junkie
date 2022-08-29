@@ -29,8 +29,9 @@ export const addOriginalIndexesToEpisodesFullData = (episodesFullInfo: EpisodesS
   return episodesFullInfo.map((season, seasonIndex) => {
     const episodesWithIndexes = season.episodes.map((episode, episodeIndex) => ({
       ...episode,
-      originalIndex: episodeIndex,
+      originalEpisodeIndex: episodeIndex,
+      originalSeasonIndex: seasonIndex,
     }))
-    return { ...season, episodes: episodesWithIndexes, originalIndex: seasonIndex }
+    return { ...season, episodes: episodesWithIndexes, originalSeasonIndex: seasonIndex }
   })
 }

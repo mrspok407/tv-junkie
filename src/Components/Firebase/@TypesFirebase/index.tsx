@@ -30,7 +30,8 @@ export interface EpisodesFromFireDatabase extends EpisodesTMDB {}
 export interface SingleEpisodeFromFireDatabase extends SingleEpisodeTMDB {
   episode_number: number
   season_number: number
-  originalIndex: number
+  originalEpisodeIndex: number
+  originalSeasonIndex: number
 }
 
 export interface EpisodesFromUserDatabase {

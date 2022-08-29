@@ -76,9 +76,8 @@ export const postCheckReleasedEpisodesScheme = ({
 }: PostCheckAllReleasedEpisodesScheme) => {
   const updateData: DataCheckAllReleasedEpisodes = {}
   releasedEpisodes.forEach((episode) => {
-    if (!episode.season_number || !episode.episode_number) return
-    const seasonNumber = episode.season_number - 1
-    const episodeNumber = episode.episode_number - 1
+    const seasonNumber = episode.originalSeasonIndex
+    const episodeNumber = episode.originalEpisodeIndex
     updateData[
       `users/${authUid}/content/episodes/${showId}/episodes/${seasonNumber}/episodes/${episodeNumber}/watched`
     ] = isWatched

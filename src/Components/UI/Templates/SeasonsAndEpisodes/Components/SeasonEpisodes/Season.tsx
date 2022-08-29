@@ -25,6 +25,8 @@ const Season: React.FC<Props> = React.memo(({ seasonTMDB, seasonEpisodes, showCh
     showTitle: seasonEpisodes?.showTitle || '',
   }
 
+  const seasonIndex = seasonData.season_number - 1
+
   console.log({ seasonData })
 
   return (
@@ -47,7 +49,7 @@ const Season: React.FC<Props> = React.memo(({ seasonTMDB, seasonEpisodes, showCh
                 type="button"
                 className="button"
                 onClick={() => {
-                  dispatch(postCheckReleasedEpisodes({ showId, seasonNumber: seasonData.season_number, firebase }))
+                  dispatch(postCheckReleasedEpisodes({ showId, seasonNumber: seasonIndex, firebase }))
                 }}
               >
                 Check all

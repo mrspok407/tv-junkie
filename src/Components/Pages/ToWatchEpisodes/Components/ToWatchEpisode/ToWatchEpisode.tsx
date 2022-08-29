@@ -1,7 +1,7 @@
 import React from 'react'
 import EpisodeCheckbox from 'Components/UI/Templates/SeasonsAndEpisodes/Components/SeasonEpisodes/Components/Episode/Components/EpisodeCheckbox/EpisodeCheckbox'
 import { SingleEpisodeStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
-import { format } from 'date-fns'
+import { format, isValid } from 'date-fns'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import classNames from 'classnames'
 import TorrentLinsToWatchPage from './Components/TorrentLinksToWatchPage'
@@ -32,9 +32,8 @@ const ToWatchEpisode: React.FC<Props> = ({
 }) => {
   const { authUser } = useFrequentVariables()
 
-  const airDateReadable = episodeData.air_date
-    ? format(new Date(episodeData.air_date), 'MMMM d, yyyy')
-    : 'No date available'
+  const episodeReleaseDate = new Date(episodeData.air_date ?? '')
+  const airDateReadable = isValid(episodeReleaseDate) ? format(episodeReleaseDate, 'MMMM d, yyyy') : 'No date available'
 
   const handleEpisodeCheck = useHandleEpisodeCheck({
     episodeData,

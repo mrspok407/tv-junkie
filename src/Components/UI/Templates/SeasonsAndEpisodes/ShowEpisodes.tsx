@@ -51,6 +51,7 @@ const ShowEpisodes: React.FC<Props> = ({ seasonsTMDB, showId }) => {
     fetchSeasonsDispatch({ type: ActionTypesEnum.HandleCloseAll })
   }
 
+  console.log({ seasonsData })
   const showCheckboxes = useAppSelector((state) => {
     const showInfo = selectShow(state, showId)
     return !!(showInfo && showInfo?.database !== 'notWatchingShows' && authUser?.uid)

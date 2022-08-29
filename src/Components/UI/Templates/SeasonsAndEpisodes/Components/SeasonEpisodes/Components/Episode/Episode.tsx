@@ -6,8 +6,8 @@ import { postCheckSingleEpisode } from 'Components/UserContent/UseUserShowsRed/D
 import { useAppDispatch } from 'app/hooks'
 import useFormatEpisodeAirDate from '../../../../Hooks/UseFormatEpisodeAirDate'
 import TorrentLinksEpisodes from '../TorrentLinksEpisodes/TorrentLinksEpisodes'
-import UserRatingEpisode from './Components/UserRatingEpisode'
 import EpisodeCheckbox from './Components/EpisodeCheckbox/EpisodeCheckbox'
+import UserRatingEpisode from './Components/UserRatingEpisode'
 
 type Props = {
   episodeData: SingleEpisodeFromFireDatabase
@@ -30,8 +30,8 @@ const Episode: React.FC<Props> = ({ episodeData, showCheckboxes, showId, showTit
     dispatch(
       postCheckSingleEpisode({
         showId,
-        seasonNumber: episodeData.season_number,
-        episodeNumber: episodeData.originalIndex + 1,
+        seasonNumber: episodeData.originalSeasonIndex,
+        episodeNumber: episodeData.originalEpisodeIndex,
         firebase,
       }),
     )
@@ -88,12 +88,7 @@ const Episode: React.FC<Props> = ({ episodeData, showCheckboxes, showId, showTit
 
           {isEpisodeAired && !airDateUnavailable && (
             <>
-              <UserRatingEpisode
-                showRating={showCheckboxes}
-                seasonNumber={episodeData.season_number}
-                episodeNumber={episodeData.episode_number}
-                showId={showId}
-              />
+              <UserRatingEpisode showRating={showCheckboxes} episodeData={episodeData} showId={showId} />
               {authUser?.email !== process.env.REACT_APP_ADMIN_EMAIL && (
                 <TorrentLinksEpisodes
                   showTitle={showTitle}

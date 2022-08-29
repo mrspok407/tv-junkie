@@ -41,12 +41,13 @@ export interface UserWillAirEpisodesInterface {
 export interface SingleEpisodeStoreState extends SingleEpisodeTMDB, SingleEpisodeFromUserDatabase {
   episode_number: number
   season_number: number
-  originalIndex: number
+  originalEpisodeIndex: number
+  originalSeasonIndex: number
 }
 export interface EpisodesStoreState extends EpisodesTMDB, SeasonFromUserDatabase {
   episodes: SingleEpisodeStoreState[]
   allReleasedEpisodesWatched: boolean | null
-  originalIndex: number
+  originalSeasonIndex: number
 }
 
 export interface UserShowsStoreState {
