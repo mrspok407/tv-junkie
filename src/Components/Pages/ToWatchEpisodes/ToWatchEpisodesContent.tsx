@@ -1,4 +1,3 @@
-/* eslint-disable no-nested-ternary */
 import React, { useMemo, useRef } from 'react'
 import Loader from 'Components/UI/Placeholders/Loader'
 import PlaceholderNoToWatchEpisodes from 'Components/UI/Placeholders/PlaceholderNoToWatchEpisodes'

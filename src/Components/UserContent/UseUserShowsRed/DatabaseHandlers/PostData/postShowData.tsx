@@ -6,7 +6,6 @@ import {
 } from 'Components/Firebase/FirebasePostSchemes/Post/ContentSchemes'
 import { getAuthUidFromState } from 'Components/UserAuth/Session/Authentication/Helpers'
 import { batch } from 'react-redux'
-import { artificialAsyncDelay } from 'Utils'
 import { EpisodesTMDB, MainDataTMDB } from 'Utils/@TypesTMDB'
 import { formatShowEpisodesForUserDatabase } from 'Utils/FormatTMDBAPIData'
 import { UserShowStatuses } from '../../@Types'
@@ -37,7 +36,7 @@ export const updateUserShowStatus =
       const updateData = updateUserShowStatusScheme({ authUid, id, userShowStatus, showFromStore, firebase })
       return firebase.rootRef().update(updateData)
     } catch (err) {
-      console.log({ errThunk: err })
+      console.log({ err })
       batch(() => {
         dispatch(optimisticChangeUserShowStatus({ id, userShowStatus: showFromStore.database }))
         dispatch(handleShowsError(err))
@@ -63,7 +62,6 @@ export const handleNewShowInDatabase =
         episodesFromFireDatabase = showData?.episodes!
       }
 
-      // await artificialAsyncDelay(2500)
       const showEpisodesUserDatabase = formatShowEpisodesForUserDatabase(episodesFromFireDatabase)
       const updateData = postUserShowScheme({
         authUid,

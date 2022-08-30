@@ -24,24 +24,21 @@ export const userShowsListenersRefs = (
 export const userShowsListeners =
   ({ firebase }: UserShowsListeners): AppThunk =>
   async (dispatch, getState) => {
-    console.log('userShowsListeners')
     const authUserUid = getAuthUidFromState(getState())
     const { showsInfoRef, showsEpisodesRef } = userShowsListenersRefs(firebase, authUserUid)
 
     const showsIds = selectShowsIds(getState())
     const lastTimestamp = selectShow(getState(), showsIds[showsIds.length - 1])?.timeStamp ?? 0
-    console.log({ lastTimestamp })
     showsInfoRef
       .orderByChild('timeStamp')
       .startAfter(lastTimestamp)
       .on(
         'child_added',
         async (snapshot: SnapshotVal<ShowInfoFromUserDatabase>) => {
-          console.log('child_added')
           dispatch(handleNewShow({ ...snapshot.val()!, key: snapshot.key }, firebase))
         },
         (err) => {
-          console.log({ errAddedListener: err })
+          console.log({ err })
           dispatch(handleShowsError(err))
         },
       )
@@ -49,12 +46,10 @@ export const userShowsListeners =
     showsInfoRef.orderByChild('timeStamp').on(
       'child_changed',
       (snapshot: SnapshotVal<ShowInfoFromUserDatabase>) => {
-        console.log('child_changed info listener')
-        console.log(snapshot.val())
         dispatch(handleChangeShow({ ...snapshot.val()!, key: snapshot.key }, firebase))
       },
       (err) => {
-        console.log({ errInfoListener: err })
+        console.log({ err })
         dispatch(handleShowsError(err))
       },
     )
@@ -62,12 +57,10 @@ export const userShowsListeners =
     showsEpisodesRef.on(
       'child_changed',
       async (snapshot: SnapshotVal<EpisodesFromUserDatabase>) => {
-        console.log('child_change episodes listener')
-        console.log(snapshot.val())
         dispatch(handleChangeEpisodes(Number(snapshot.key), snapshot.val()!.episodes, firebase))
       },
       (err) => {
-        console.log({ errEpisodesListener: err })
+        console.log({ err })
         dispatch(handleShowsError(err))
       },
     )

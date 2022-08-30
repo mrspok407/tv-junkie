@@ -1,4 +1,4 @@
-import { createSlice, current, PayloadAction } from '@reduxjs/toolkit'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from 'app/store'
 import { resetSlicesState } from 'Components/UserContent/SharedActions'
 import { AuthUserInterface } from './@Types'
@@ -19,8 +19,7 @@ export const authUserSlice = createSlice({
     setAuthUser: (state, action: PayloadAction<AuthUserInterface['authUser']>) => {
       state.authUser = action.payload
     },
-    resetAuthUser: (state) => {
-      console.log(current(state))
+    resetAuthUser: () => {
       return authUserInitialState
     },
   },

@@ -21,7 +21,6 @@ const useDisableWarning = () => {
     if (fadeOutTimerRef.current !== null) return
     if (!disableWarningRef.current) return
     setFadeOutStart(true)
-    console.log('handleClickOutside')
 
     fadeOutTimerRef.current = window.setTimeout(() => {
       setDisableWarning(false)

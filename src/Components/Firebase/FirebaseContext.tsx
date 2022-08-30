@@ -1,6 +1,5 @@
 /* eslint-disable max-len */
 import { createContext } from 'react'
-import { MAINDATA_TMDB_INITIAL } from 'Utils/@TypesTMDB'
 import {
   EpisodesFromUserDatabase,
   SHOW_FULL_DATA_FIRE_DATABASE_INITIAL,
@@ -30,7 +29,7 @@ export interface FirebaseReferenceProps<T> {
   transaction: (
     callback: (snapshot: T) => any,
     onComplete?: any,
-  ) => Promise<{ commited: boolean; snapshot: SnapshotVal<T> }>
+  ) => Promise<{ committed: boolean; snapshot: SnapshotVal<T> }>
   startAfter: (value: string | number) => FirebaseFetchMethods<T>
 }
 
@@ -101,6 +100,7 @@ export interface FirebaseInterface {
   ServerValueIncrement: (value: number) => any
   allShowsList: () => FirebaseReferenceProps<any>
   allShowsListIds: () => FirebaseReferenceProps<number[] | null>
+  usersWatchingShowList: (showKey: string | number) => FirebaseReferenceProps<number | null>
   timeStamp?: any
   callback?: any
   userShowAllEpisodesInfo?: any
@@ -143,6 +143,7 @@ const firebaseOnceInitial = <T,>(initialState: T) =>
       return initialState
     },
     key: '',
+    numChildren: () => null,
   })
 
 const firebaseRefInitial = <T,>(initialState: T) => {
@@ -154,7 +155,7 @@ const firebaseRefInitial = <T,>(initialState: T) => {
     orderByChild: () => firebaseRefInitial(initialState),
     update: () => Promise.resolve(),
     set: () => Promise.resolve(),
-    transaction: () => Promise.resolve({ commited: false, snapshot: setSnapshotValInitial(initialState) }),
+    transaction: () => Promise.resolve({ committed: false, snapshot: setSnapshotValInitial(initialState) }),
     startAfter: () => firebaseRefInitial(initialState),
   }
 }
@@ -192,6 +193,7 @@ export const FIREBASE_INITIAL_STATE = {
   userShowAllEpisodesWatched: () => firebaseRefInitial(null),
   allShowsList: () => firebaseRefInitial(null),
   allShowsListIds: () => firebaseRefInitial(null),
+  usersWatchingShowList: () => firebaseRefInitial(null),
 }
 
 export const FirebaseContext = createContext<FirebaseInterface>(FIREBASE_INITIAL_STATE)

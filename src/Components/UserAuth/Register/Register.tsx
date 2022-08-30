@@ -2,7 +2,6 @@
 import React, { useContext, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import { validEmailRegex } from 'Utils'
-import * as ROLES from 'Utils/Constants/roles'
 import * as ROUTES from 'Utils/Constants/routes'
 import classNames from 'classnames'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
@@ -164,7 +163,6 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
 
     setErrors(errorsOnChange)
     setRequiredInputs({ ...requiredInputs, [name]: value })
-    // setInputs({ ...inputs, [name]: value })
   }
 
   const handleValidationOnblur = (event: React.FocusEvent<HTMLInputElement>) => {
@@ -208,7 +206,6 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
 
   const resetInput = (name: string) => {
     setRequiredInputs({ ...requiredInputs, [`${name}`]: '' })
-    // setInputs({ ...inputs, [`${name}`]: "" })
     setErrors({ ...errors, [`${name}Error`]: '' })
   }
 

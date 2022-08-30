@@ -22,9 +22,6 @@ const MAX_GRID_COLUMNS = 4
 
 const ShowsContent: React.FC = () => {
   const { authUser } = useFrequentVariables()
-
-  console.log('ShowsContent Rerender')
-
   const [{ activeSection, loadedShows }, localDispatch] = useReducer<React.Reducer<ShowsContentState, ACTIONTYPES>>(
     reducer,
     INITIAL_STATE,

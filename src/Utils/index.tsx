@@ -7,7 +7,7 @@ import merge from 'deepmerge'
 import * as _transform from 'lodash.transform'
 import * as _isEqual from 'lodash.isequal'
 import * as _isObject from 'lodash.isobject'
-import { StringifyOptions } from 'querystring'
+import { differenceInCalendarDays, isValid } from 'date-fns'
 
 export const currentDate = new Date()
 
@@ -144,4 +144,12 @@ export const getPropertyValueCSS = (property: string, ref: Element) => {
   if (!ref) return null
   const value = getComputedStyle(ref as Element).getPropertyValue(property)
   return value
+}
+
+export const isContentReleased = (contentReleasedValue: Date | string | number | undefined | null) => {
+  const contentReleasedDate = new Date(contentReleasedValue ?? '')
+  const isReleased = isValid(contentReleasedDate)
+    ? differenceInCalendarDays(contentReleasedDate, currentDate) <= 0
+    : true
+  return isReleased
 }

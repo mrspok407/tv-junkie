@@ -123,20 +123,6 @@ class SearchPage extends Component {
       },
     })
 
-    // const sortMapping = {
-    //   vote_count: "vote_count",
-    //   vote_average: "vote_average",
-    //   popularity: "popularity",
-    //   primary_release_date: ["release_date", "first_air_date"]
-    // }
-
-    // const getSortField = (item, sortKey) => {
-    //   const fieldAccessor = sortMapping[sortKey]
-    //   return Array.isArray(fieldAccessor)
-    //     ? fieldAccessor.reduce((acc, a) => item[a] || acc, 0)
-    //     : item[fieldAccessor]
-    // }
-
     const getMovies =
       mediaType === 'movie' &&
       `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.REACT_APP_TMDB_API}&language=en-US\

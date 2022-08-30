@@ -1,22 +1,28 @@
-import { SingleEpisodeFromFireDatabase } from 'Components/Firebase/@TypesFirebase'
-import { differenceInCalendarDays } from 'date-fns'
+import { differenceInCalendarDays, isValid } from 'date-fns'
 import format from 'date-fns/format'
-import { currentDate } from 'Utils'
+import { currentDate, isContentReleased } from 'Utils'
 
 type Props = {
-  episodeData: SingleEpisodeFromFireDatabase
+  contentReleasedValue: Date | string | number | undefined | null
+  formatSettings: string
 }
 
-const useFormatEpisodeAirDate = ({ episodeData }: Props) => {
-  const airDateReadable = episodeData.air_date
-    ? format(new Date(episodeData.air_date), 'MMMM d, yyyy')
-    : 'No date available'
+const useFormatContentDate = ({ contentReleasedValue, formatSettings }: Props) => {
+  const contentReleasedDate = new Date(contentReleasedValue ?? '')
+  const isDateNotValid = !isValid(contentReleasedDate)
 
-  const daysToNewEpisode = differenceInCalendarDays(new Date(episodeData.air_date), currentDate)
-  const isEpisodeAired = daysToNewEpisode <= 0
-  const airDateUnavailable = !episodeData?.air_date
+  const dateReadableFormat = isDateNotValid ? 'No date available' : format(contentReleasedDate, formatSettings)
+  const daysToRelease = isDateNotValid
+    ? 'No date available'
+    : differenceInCalendarDays(contentReleasedDate, currentDate)
+  const isContentAired = isContentReleased(contentReleasedValue)
 
-  return [airDateReadable, daysToNewEpisode, isEpisodeAired, airDateUnavailable] as const
+  return {
+    dateReadableFormat,
+    daysToRelease,
+    isContentAired,
+    isDateNotValid,
+  }
 }
 
-export default useFormatEpisodeAirDate
+export default useFormatContentDate

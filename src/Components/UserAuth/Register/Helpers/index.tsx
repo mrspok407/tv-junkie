@@ -10,7 +10,6 @@ import { formatEpisodesInfoForUserDatabase, formatShowEpisodesForUserDatabase } 
 
 export const handleContentOnRegister = async (shows: MainDataTMDB[], firebase: FirebaseInterface) => {
   const episodesData = await getEpisodesFullData(shows)
-  console.log({ episodesData })
   await postMultiplyShowsFireDatabase({ shows, episodesData, firebase })
   return episodesData
 }

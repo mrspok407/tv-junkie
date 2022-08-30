@@ -17,7 +17,6 @@ const reducer = <T,>(): React.Reducer<FetchSeasonsInt<T>, ACTIONTYPES> =>
       }
 
       case ActionTypesEnum.HandleSuccess: {
-        console.log('HandleSuccess')
         const { data, seasonId } = action.payload
 
         if (fetchedData.includes(seasonId)) {

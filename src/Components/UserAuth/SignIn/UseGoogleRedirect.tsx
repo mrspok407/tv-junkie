@@ -1,72 +1,66 @@
 import { useEffect, useContext } from 'react'
-import * as ROLES from 'Utils/Constants/roles'
 import * as ROUTES from 'Utils/Constants/routes'
 import { useHistory } from 'react-router-dom'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
-import { LocalStorageHandlersContext } from 'Components/AppContext/Contexts/LocalStorageContentContext/LocalStorageContentContext'
-import {
-  LOCAL_STORAGE_KEY_WATCHING_SHOWS,
-  LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES,
-} from 'Components/AppContext/Contexts/LocalStorageContentContext/@Types'
+import { LocalStorageValueContext } from 'Components/AppContext/Contexts/LocalStorageContentContext/LocalStorageContentContext'
+import { ErrorInterface, ErrorsHandlerContext, IGNORED_ERROR_CODES } from 'Components/AppContext/Contexts/ErrorsContext'
+import { postUserDataOnRegisterScheme } from 'Components/Firebase/FirebasePostSchemes/Post/AuthenticationSchemes'
+import useAuthListenerSubscriber from '../Session/Authentication/Hooks/useAuthListenerSubscriber'
+import { formatEpisodesForUserDatabaseOnRegister, handleContentOnRegister } from '../Register/Helpers'
+import { AuthUserGoogleSignInInterface } from '../Session/Authentication/@Types'
 
 const useGoogleRedirect = () => {
   const { firebase } = useFrequentVariables()
-  const localStorageHandlers = useContext(LocalStorageHandlersContext)
+  const handleError = useContext(ErrorsHandlerContext)
+
   const history = useHistory()
+  const initializeAuthUserListener = useAuthListenerSubscriber()
+
+  const { watchingShows: watchingShowsLS, watchLaterMovies: watchLaterMoviesLS } = useContext(LocalStorageValueContext)
 
   useEffect(() => {
-    // context.userContentHandler.handleLoadingShowsOnRegister(true)
-    firebase.app
-      .auth()
-      .getRedirectResult()
-      .then((result: any) => {
-        if (!result.user) {
-          // context.userContentHandler.handleLoadingShowsOnRegister(false)
+    const handleGoogleRedirectAuth = async () => {
+      let error: ErrorInterface['errorData'] = { message: '' }
+      let authData: AuthUserGoogleSignInInterface | null = null
+      try {
+        authData = await firebase.app.auth().getRedirectResult()
+        if (authData === null) return
+        if (authData.user === null) return
+        if (!authData.additionalUserInfo.isNewUser) {
+          initializeAuthUserListener()
           return
         }
 
-        const authUserGoogle: any = result
+        const episodesData = await handleContentOnRegister(watchingShowsLS, firebase)
+        const { episodesForUserDatabase, episodesInfoForUserDatabase } = formatEpisodesForUserDatabaseOnRegister(
+          watchingShowsLS,
+          episodesData,
+        )
 
-        firebase
-          .user(authUserGoogle.user.uid)
-          .update({
-            username: authUserGoogle.user.displayName,
-            userNameLowerCase: authUserGoogle.user.displayName.toLowerCase(),
-            email: authUserGoogle.user.email,
-            role: authUserGoogle.user.email === process.env.REACT_APP_ADMIN_EMAIL ? ROLES.ADMIN : ROLES.USER,
-          })
-          .then(() => {
-            if (!authUserGoogle.additionalUserInfo.isNewUser) {
-              // context.userContentHandler.handleLoadingShowsOnRegister(false)
-              return
-            }
-
-            const watchingShows = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)!) || []
-            const watchLaterMovies = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)!) || []
-
-            // context.userContentHandler.addShowsToDatabaseOnRegister({
-            //   shows: watchingShows,
-            //   uid: authUserGoogle.user.uid,
-            // })
-
-            // watchLaterMovies.forEach((item: MovieInterface) => {
-            //   context.userContentHandler.handleMovieInDatabases({
-            //     id: item.id,
-            //     data: item,
-            //     onRegister: true,
-            //     userOnRegister: authUserGoogle.user,
-            //   })
-            // })
-          })
-          .then(() => {
+        const updateData = postUserDataOnRegisterScheme({
+          authUserFirebase: authData,
+          userName: authData.user.displayName,
+          selectedShows: watchingShowsLS,
+          watchLaterMovies: watchLaterMoviesLS,
+          episodes: episodesForUserDatabase,
+          episodesInfo: episodesInfoForUserDatabase,
+          firebase,
+        })
+        return firebase.rootRef().update(updateData, initializeAuthUserListener)
+      } catch (err) {
+        error = err as ErrorInterface['errorData']
+        handleError({ errorData: error, message: 'Error occurred during register process. Please try again.' })
+      } finally {
+        if (authData?.user !== null) {
+          if (!IGNORED_ERROR_CODES.includes(error?.code!)) {
             history.push(ROUTES.HOME_PAGE)
-          })
-      })
-      .catch((error: any) => {
-        // context.userContentHandler.handleLoadingShowsOnRegister(false)
-        console.log(error)
-      })
-  }, [firebase]) // eslint-disable-line react-hooks/exhaustive-deps
+          }
+        }
+      }
+    }
+
+    handleGoogleRedirectAuth()
+  }, [firebase, handleError, history, initializeAuthUserListener, watchLaterMoviesLS, watchingShowsLS])
 }
 
 export default useGoogleRedirect

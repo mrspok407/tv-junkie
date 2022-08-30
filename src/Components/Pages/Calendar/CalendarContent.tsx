@@ -26,6 +26,7 @@ const CalendarContent: React.FC<Props> = ({ homePage }) => {
     const watchingShows = userShows.filter((show) => show?.database === 'watchingShows')
     return organizeFutureEpisodesByMonth(watchingShows, userEpisodes)
   }, [userShows, userEpisodes])
+
   const willAirEpisodes = homePage ? willAirEpisodesData.slice(0, 2) : willAirEpisodesData
 
   if (showsInitialLoading) {

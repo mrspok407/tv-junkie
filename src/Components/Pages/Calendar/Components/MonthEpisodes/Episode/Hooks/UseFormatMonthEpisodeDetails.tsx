@@ -1,5 +1,5 @@
 import { SingleEpisodeByMonthInterface } from 'Components/UserContent/UseUserShowsRed/@Types'
-import { differenceInCalendarDays, format } from 'date-fns'
+import { differenceInCalendarDays, format, isValid } from 'date-fns'
 import { currentDate } from 'Utils'
 
 type Props = {
@@ -7,7 +7,8 @@ type Props = {
 }
 
 const useFormatMonthEpisodeDetails = ({ episodeData }: Props) => {
-  const episodeAirDate = episodeData.air_date ? format(new Date(episodeData.air_date), 'd, EEE') : 'No date available'
+  const episodeReleaseDate = new Date(episodeData.air_date ?? '')
+  const episodeAirDate = isValid(episodeReleaseDate) ? format(episodeReleaseDate, 'd, EEE') : 'No date available'
 
   const seasonAsString = episodeData.season_number?.toString() ?? ''
   const episodeAsString = episodeData.episode_number?.toString() ?? ''
@@ -15,7 +16,7 @@ const useFormatMonthEpisodeDetails = ({ episodeData }: Props) => {
   const seasonNumber = 's'.concat(seasonAsString)
   const episodeNumber = episodeAsString.length === 1 ? 'e0'.concat(episodeAsString) : 'e'.concat(episodeAsString)
 
-  const daysToNewEpisode = differenceInCalendarDays(new Date(episodeData.air_date), currentDate)
+  const daysToNewEpisode = differenceInCalendarDays(episodeReleaseDate, currentDate)
   const willAirToday = daysToNewEpisode === 0
 
   const handleDaysToNewEpisode = () => {

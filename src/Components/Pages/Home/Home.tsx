@@ -51,7 +51,7 @@ const HomePage: React.FC = () => {
           <ul className="home-page__heading-list">
             <li className="home-page__heading-item">See dates of upcoming episodes</li>
             <li className="home-page__heading-item">Also, you can add some movies to watch later</li>
-            <li className="home-page__heading-item">Made with React + Firebase</li>
+            <li className="home-page__heading-item">Made with React, Redux and Firebase</li>
           </ul>
         </div>
         <div className="home-page__heading-register">
@@ -77,7 +77,6 @@ const HomePage: React.FC = () => {
 
   const renderAuthUser = () => (
     <>
-      {/* {!showsInitialLoading && !userContentHandler.loadingShowsOnRegister && ( */}
       {!showsInitialLoading && (
         <>
           {willAirEpisodes.length > 0 ? (

@@ -1,4 +1,4 @@
-@import "../globals";
+@import '../globals';
 
 .button {
   position: relative;
@@ -23,7 +23,7 @@
   color: getColor(textColor, $btnPalette);
   &:after,
   &:before {
-    content: "";
+    content: '';
     position: absolute;
     width: 50%;
     height: 50%;
@@ -73,7 +73,6 @@
 
 .button--pressed {
   background-color: getColor(pressedBgColor, $btnPalette);
-  /// transition: 0.5s;
   &:after,
   &:before {
     top: 0;
@@ -179,7 +178,7 @@
 
     &:after {
       $dimensions: 10px;
-      content: "";
+      content: '';
       position: absolute;
       top: -$dimensions / 2;
       left: 50%;
@@ -188,7 +187,7 @@
       height: $dimensions;
       background-color: #fff;
     }
-    
+
     &--fade-out {
       opacity: 1;
       animation: fadeOutNotAuthWarning 0.5s forwards;
@@ -196,7 +195,7 @@
         to {
           opacity: 0;
         }
-    }
+      }
     }
   }
 

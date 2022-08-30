@@ -37,7 +37,6 @@ const SignInWithGoogleForm = () => {
 
     try {
       const authUser: AuthUserGoogleSignInInterface = await firebase.app.auth()[signInType](provider)
-
       if (!authUser.additionalUserInfo.isNewUser) {
         handleSuccessSubmit()
         return

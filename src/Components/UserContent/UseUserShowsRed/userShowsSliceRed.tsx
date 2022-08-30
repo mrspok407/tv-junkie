@@ -1,5 +1,5 @@
 import { RootState } from 'app/store'
-import { createSelector, createSlice, current, PayloadAction } from '@reduxjs/toolkit'
+import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { EpisodesFromUserDatabase } from 'Components/Firebase/@TypesFirebase'
 import {
   UserShowsStoreState,
@@ -40,7 +40,6 @@ export const userShowsSliceRed = createSlice({
       },
     },
     addNewShow: (state, action: PayloadAction<ShowFullDataStoreState>) => {
-      console.log(action.payload)
       state.loadingNewShow = false
 
       if (state.data.ids.includes(action.payload.id)) return
@@ -62,8 +61,6 @@ export const userShowsSliceRed = createSlice({
       state.data.info[action.payload.info.id] = action.payload.info
       state.data.timeStamps[action.payload.info.id] = action.payload.info.timeStamp
 
-      console.log({ changeShowsPay: action.payload, showFromStore: current(showFromStore) })
-
       if (!showFromStore?.episodesFetched) {
         state.data.episodes[action.payload.info.id] = action.payload.episodes || []
       }
@@ -72,7 +69,6 @@ export const userShowsSliceRed = createSlice({
       state.data.info[action.payload.id]!.database = action.payload.userShowStatus
     },
     setShowEpisodes: (state, action: PayloadAction<{ id: number; episodes: EpisodesStoreState[] }>) => {
-      console.log(action.payload.episodes)
       state.data.episodes[action.payload.id] = action.payload.episodes
       state.data.info[action.payload.id]!.episodesFetched = true
     },
@@ -91,18 +87,15 @@ export const userShowsSliceRed = createSlice({
       state.data.info[action.payload.showId].allReleasedEpisodesWatched = action.payload.allReleasedEpisodesWatched
     },
     updateLoadingShows: (state, action: PayloadAction<UserShowsStoreState['initialLoading']>) => {
-      console.log(action.payload)
       state.initialLoading = action.payload
     },
     updateLoadingNewShow: (state, action: PayloadAction<UserShowsStoreState['loadingNewShow']>) => {
-      console.log(action.payload)
       state.loadingNewShow = action.payload
     },
     resetShows: () => {
       return USER_SHOWS_RESET_STATE
     },
     setShowsError: (state, action: PayloadAction<UserShowsStoreState['error']>) => {
-      console.log(action.payload)
       state.error = action.payload
       state.initialLoading = false
       state.loadingNewShow = false

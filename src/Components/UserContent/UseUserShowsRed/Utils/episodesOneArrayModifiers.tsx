@@ -1,6 +1,4 @@
-import { currentDate } from 'Utils'
-import differenceInCalendarDays from 'date-fns/differenceInCalendarDays'
-import { isValid } from 'date-fns'
+import { isContentReleased } from 'Utils'
 
 interface SeasonInt {
   episodes: Array<any>
@@ -25,12 +23,7 @@ export const episodesToOneArray = <T,>(data: DataType): T[] => {
 export const releasedEpisodesToOneArray = <T,>(data: DataType) => {
   if (!Array.isArray(data)) return []
   return episodesToOneArray<T>(data).filter((episode: any) => {
-    const episodeDate = new Date(episode.air_date)
-    if (!isValid(episodeDate)) {
-      console.error({ invalidDateInThisEpisode: episode })
-      return true
-    }
-    const daysToNewEpisode = differenceInCalendarDays(episodeDate, currentDate)
-    return daysToNewEpisode <= 0
+    const isEpisodeReleased = isContentReleased(episode.air_date)
+    return isEpisodeReleased
   })
 }

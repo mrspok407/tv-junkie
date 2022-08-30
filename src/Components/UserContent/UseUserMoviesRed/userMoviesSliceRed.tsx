@@ -1,9 +1,7 @@
 import { RootState } from 'app/store'
-import merge from 'deepmerge'
-import { createAction, createSlice, current, PayloadAction } from '@reduxjs/toolkit'
-import { combineMergeObjects } from 'Utils'
-import { EpisodesFromUserDatabase, MovieInfoFromUserDatabase } from 'Components/Firebase/@TypesFirebase'
-import { UserMoviesStoreState, UserMovieStatuses, USER_MOVIES_INITIAL_STATE, USER_MOVIES_RESET_STATE } from './@Types'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { MovieInfoFromUserDatabase } from 'Components/Firebase/@TypesFirebase'
+import { UserMoviesStoreState, USER_MOVIES_INITIAL_STATE, USER_MOVIES_RESET_STATE } from './@Types'
 import { resetErrors, resetSlicesState, setInitialContentLoading } from '../SharedActions'
 
 export const userMoviesSliceRed = createSlice({
@@ -32,8 +30,6 @@ export const userMoviesSliceRed = createSlice({
       },
     },
     addMovie: (state, action: PayloadAction<MovieInfoFromUserDatabase>) => {
-      console.log(action.payload)
-
       if (state.data.ids.includes(action.payload.id)) return
       state.data.ids.push(action.payload.id)
       state.data.info[action.payload.id] = action.payload
@@ -56,7 +52,6 @@ export const userMoviesSliceRed = createSlice({
       return USER_MOVIES_RESET_STATE
     },
     setMoviesError: (state, action: PayloadAction<UserMoviesStoreState['error']>) => {
-      console.log(action.payload)
       state.error = action.payload
       state.initialLoading = false
     },

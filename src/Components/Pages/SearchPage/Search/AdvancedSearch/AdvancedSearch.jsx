@@ -3,7 +3,6 @@
 import React, { useState } from 'react'
 import { Formik, Form } from 'formik'
 import { Persist } from 'formik-persist'
-import * as Yup from 'yup'
 import classNames from 'classnames'
 import Loader from 'Components/UI/Placeholders/Loader'
 import { LIST_OF_GENRES } from 'Utils/Constants'
@@ -57,9 +56,6 @@ const AdvancedSearch = ({ advancedSearch, searchingAdvancedSearch, withActors, t
         sortBy: 'vote_count.desc',
         mediaType: 'movie',
       }}
-      validationSchema={Yup.object({
-        // year: Yup.mixed().required("Required")
-      })}
       onSubmit={(values, { setSubmitting, setFieldValue }) => {
         let yearTo
         if (values.yearTo < values.yearFrom && values.yearTo !== '') {
@@ -94,12 +90,7 @@ const AdvancedSearch = ({ advancedSearch, searchingAdvancedSearch, withActors, t
               <Form>
                 <div className="inputs__cont">
                   <div className="inputs__dates">
-                    <DatesInputs
-                      setFieldValue={setFieldValue}
-                      handleChange={handleChange}
-                      // year={year}
-                      // changeYear={changeYear}
-                    />
+                    <DatesInputs setFieldValue={setFieldValue} handleChange={handleChange} />
                   </div>
                   <div className="inputs__genres-wrapper">
                     <GenreInputs toggleGenre={toggleGenre} genres={genres} />

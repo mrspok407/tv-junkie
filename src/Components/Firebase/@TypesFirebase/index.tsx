@@ -89,8 +89,9 @@ export interface MovieInfoFromUserDatabase {
 export interface SnapshotVal<Type> {
   val(): Type | null
   key: string
+  numChildren: () => number | null
 }
 
 export const setSnapshotValInitial = <T,>(initialState: T) => {
-  return { val: () => initialState, key: '' }
+  return { val: () => initialState, key: '', numChildren: () => null }
 }

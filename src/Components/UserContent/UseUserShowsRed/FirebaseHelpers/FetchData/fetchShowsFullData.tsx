@@ -15,9 +15,6 @@ interface GetUserShowsFullInfoArg {
 const fetchShowsFullData = ({ userShows, firebase, authUserUid }: GetUserShowsFullInfoArg) =>
   Promise.all(
     userShows.map(async (show) => {
-      // if (show.id !== 46260) {
-      //   return {}
-      // }
       const showInfoFireSnapshot = await firebase.showInfoFireDatabase(show.id).once('value')
       let showInfo = showInfoFireSnapshot.val()!
 

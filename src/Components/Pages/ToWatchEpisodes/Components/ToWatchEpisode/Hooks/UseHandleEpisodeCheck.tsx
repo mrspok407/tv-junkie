@@ -16,7 +16,7 @@ import {
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import { getSeasonEpisodes, getSeasons } from 'Components/Pages/ToWatchEpisodes/Helpers'
 import { differenceInCalendarDays } from 'date-fns'
-import { currentDate } from 'Utils'
+import { currentDate, isContentReleased } from 'Utils'
 
 type Props = {
   episodeData: SingleEpisodeStoreState
@@ -60,14 +60,17 @@ const useHandleEpisodeCheck = ({
     const showEpisodesStore = dispatch(getSeasons({ showId }))
 
     const isLastReleasedEpisodeInSeason =
-      seasonEpisodesStore?.filter(
-        (episode) => !episode.watched && differenceInCalendarDays(new Date(episode.air_date), currentDate) <= 0,
-      ).length === 1
+      seasonEpisodesStore?.filter((episode) => {
+        const isEpisodeReleased = isContentReleased(episode.air_date)
+        return !episode.watched && isEpisodeReleased
+      }).length === 1
+
     const isLastReleasedSeasonInShow =
-      showEpisodesStore?.filter(
-        (season) =>
-          !season.allReleasedEpisodesWatched && differenceInCalendarDays(new Date(season.air_date), currentDate) <= 0,
-      ).length === 1
+      showEpisodesStore?.filter((season) => {
+        const isSeasonReleased = isContentReleased(season.air_date)
+        return !season.allReleasedEpisodesWatched && isSeasonReleased
+      }).length === 1
+
     const isLastReleasedEpisodeInShow = isLastReleasedEpisodeInSeason && isLastReleasedSeasonInShow
 
     if (isLastReleasedEpisodeInSeason) {

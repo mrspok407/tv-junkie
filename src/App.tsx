@@ -18,8 +18,6 @@ import ErrorPopupGlobal from 'Components/UI/ErrorPopupGlobal/ErrorPopupGlobal'
 
 const App = () => {
   useInitializeApp()
-
-  console.log('App Rerender')
   return (
     <Router basename="/">
       <div className="container">

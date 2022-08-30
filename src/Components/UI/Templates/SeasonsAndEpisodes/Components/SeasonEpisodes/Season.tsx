@@ -26,9 +26,6 @@ const Season: React.FC<Props> = React.memo(({ seasonTMDB, seasonEpisodes, showCh
   }
 
   const seasonIndex = seasonData.season_number - 1
-
-  console.log({ seasonData })
-
   return (
     <>
       {seasonData.poster_path && (

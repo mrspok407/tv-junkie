@@ -4,7 +4,7 @@ import { SingleEpisodeFromFireDatabase } from 'Components/Firebase/@TypesFirebas
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import { postCheckSingleEpisode } from 'Components/UserContent/UseUserShowsRed/DatabaseHandlers/PostData/postShowEpisodesData'
 import { useAppDispatch } from 'app/hooks'
-import useFormatEpisodeAirDate from '../../../../Hooks/UseFormatEpisodeAirDate'
+import useFormatContentDate from '../../../../Hooks/UseFormatEpisodeAirDate'
 import TorrentLinksEpisodes from '../TorrentLinksEpisodes/TorrentLinksEpisodes'
 import EpisodeCheckbox from './Components/EpisodeCheckbox/EpisodeCheckbox'
 import UserRatingEpisode from './Components/UserRatingEpisode'
@@ -21,12 +21,17 @@ const Episode: React.FC<Props> = ({ episodeData, showCheckboxes, showId, showTit
   const dispatch = useAppDispatch()
   const [isEpisodeOpen, setIsEpisodeOpen] = useState(false)
 
-  const [airDateReadable, daysToNewEpisode, isEpisodeAired, airDateUnavailable] = useFormatEpisodeAirDate({
-    episodeData,
+  const episodeDateTest = { ...episodeData, air_date: episodeData.episode_number === 500 ? '' : episodeData.air_date }
+  const {
+    dateReadableFormat,
+    daysToRelease,
+    isContentAired: isEpisodeReleased,
+  } = useFormatContentDate({
+    contentReleasedValue: episodeDateTest.air_date,
+    formatSettings: 'MMMM d, yyyy',
   })
 
   const handleEpisodeCheck = () => {
-    console.log({ episodeData })
     dispatch(
       postCheckSingleEpisode({
         showId,
@@ -45,11 +50,11 @@ const Episode: React.FC<Props> = ({ episodeData, showCheckboxes, showId, showTit
     >
       <div
         className={classNames('episodes__episode-wrapper', {
-          'episodes__episode-wrapper--not-aired': !isEpisodeAired || airDateUnavailable,
+          'episodes__episode-wrapper--not-aired': !isEpisodeReleased,
         })}
         onClick={() => setIsEpisodeOpen(!isEpisodeOpen)}
       >
-        {isEpisodeAired && !airDateUnavailable && (
+        {isEpisodeReleased && (
           <EpisodeCheckbox
             isDisabled={!showCheckboxes || !authUser?.uid}
             episodeData={episodeData}
@@ -58,14 +63,14 @@ const Episode: React.FC<Props> = ({ episodeData, showCheckboxes, showId, showTit
           />
         )}
 
-        <div className="episodes__episode-date">{airDateReadable}</div>
+        <div className="episodes__episode-date">{dateReadableFormat}</div>
         <div className="episodes__episode-name">
           <span className="episodes__episode-number">{episodeData.episode_number}.</span>
           {episodeData.name}
         </div>
-        {!isEpisodeAired && (
+        {!isEpisodeReleased && (
           <div className="episodes__episode-days-to-air">
-            {daysToNewEpisode === 1 ? `${daysToNewEpisode} day` : `${daysToNewEpisode} days`}
+            {daysToRelease === 1 ? `${daysToRelease} day` : `${daysToRelease} days`}
           </div>
         )}
       </div>
@@ -86,7 +91,7 @@ const Episode: React.FC<Props> = ({ episodeData, showCheckboxes, showId, showTit
           )}
           {episodeData.overview && <div className="episodes__episode-details-overview">{episodeData.overview}</div>}
 
-          {isEpisodeAired && !airDateUnavailable && (
+          {isEpisodeReleased && (
             <>
               <UserRatingEpisode showRating={showCheckboxes} episodeData={episodeData} showId={showId} />
               {authUser?.email !== process.env.REACT_APP_ADMIN_EMAIL && (

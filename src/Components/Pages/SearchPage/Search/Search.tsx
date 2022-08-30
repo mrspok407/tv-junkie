@@ -33,7 +33,7 @@ const Search: React.FC<Props> = ({ navSearch = false, closeNavMobile }) => {
   const [mediaTypeSearching, setMediaTypeSearching] = useState('')
   const [error, setError] = useState('')
 
-  const searchContRef = useRef<HTMLDivElement>(null)
+  const searchContRef = useRef<HTMLDivElement>(null!)
   const history = useHistory()
 
   useEffect(
@@ -87,25 +87,12 @@ const Search: React.FC<Props> = ({ navSearch = false, closeNavMobile }) => {
       })
   }
 
-  const handleClickOutside = (e: CustomEvent) => {
-    if (!searchContRef?.current?.contains(e.target as Node)) {
-      setListIsOpen(false)
-      onBlur()
-    }
+  const handleClickOutside = () => {
+    setListIsOpen(false)
+    onBlur()
   }
 
   const onFocus = () => {
-    // if (navSearch) {
-    //   const navItem = document.querySelectorAll('.nav__link')
-    //   const input = document.querySelector('.search__input')!
-
-    //   input.classList.add('search__input--focus')
-    //   navItem.forEach((item) => {
-    //     item.classList.remove('nav__link-move-back')
-    //     item.classList.add('nav__link-move')
-    //   })
-    // }
-
     setListIsOpen(true)
   }
 
@@ -169,6 +156,7 @@ const Search: React.FC<Props> = ({ navSearch = false, closeNavMobile }) => {
 
           {listIsOpen && (
             <SearchList
+              searchContRef={searchContRef}
               searchResults={searchResults}
               closeList={closeList}
               currentListItem={currentListItem}
@@ -188,20 +176,6 @@ const Search: React.FC<Props> = ({ navSearch = false, closeNavMobile }) => {
             </div>
           )}
         </div>
-
-        {/* {navSearch && listIsOpen && (
-          <SearchList
-            searchResults={searchResults}
-            closeList={closeList}
-            currentListItem={currentListItem}
-            mediaTypeSearching={mediaTypeSearching}
-            listIsOpen={listIsOpen}
-            query={query}
-            handleClickOutside={handleClickOutside}
-            isSearchingList={isSearchingList}
-            error={error}
-          />
-        )} */}
       </div>
     </div>
   )

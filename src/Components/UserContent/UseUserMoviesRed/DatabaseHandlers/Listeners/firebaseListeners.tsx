@@ -22,7 +22,6 @@ export const userMoviesListenersRefs = (
 export const userMoviesListeners =
   ({ firebase }: UserShowsListeners): AppThunk =>
   async (dispatch, getState) => {
-    console.log('userMoviesListeners')
     const authUserUid = getAuthUidFromState(getState())
     const { moviesInfoRef } = userMoviesListenersRefs(firebase, authUserUid)
 
@@ -35,11 +34,10 @@ export const userMoviesListeners =
       .on(
         'child_added',
         async (snapshot: SnapshotVal<MovieInfoFromUserDatabase>) => {
-          console.log('child_added')
           dispatch(addMovie({ ...snapshot.val()!, key: snapshot.key }))
         },
         (err) => {
-          console.log({ errAddedListener: err })
+          console.log({ err })
           dispatch(handleMoviesError(err))
         },
       )
@@ -47,11 +45,10 @@ export const userMoviesListeners =
     moviesInfoRef.orderByChild('timeStamp').on(
       'child_removed',
       async (snapshot: SnapshotVal<MovieInfoFromUserDatabase>) => {
-        console.log('child_removed')
         dispatch(removeMovie(Number(snapshot.key)))
       },
       (err) => {
-        console.log({ errAddedListener: err })
+        console.log({ err })
         dispatch(handleMoviesError(err))
       },
     )
@@ -59,12 +56,10 @@ export const userMoviesListeners =
     moviesInfoRef.orderByChild('timeStamp').on(
       'child_changed',
       (snapshot: SnapshotVal<MovieInfoFromUserDatabase>) => {
-        console.log('child_changed info listener')
-        console.log(snapshot.val())
         dispatch(changeMovie({ ...snapshot.val()!, key: snapshot.key }))
       },
       (err) => {
-        console.log({ errInfoListener: err })
+        console.log({ err })
         dispatch(handleMoviesError(err))
       },
     )

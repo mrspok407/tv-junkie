@@ -89,9 +89,6 @@ const getShowEpisodesTMDB = ({ id }: { id: number }) => {
           episodes: allEpisodes,
           showId: id,
         }
-
-        console.log({ dataToPass })
-
         return dataToPass
       }),
     )

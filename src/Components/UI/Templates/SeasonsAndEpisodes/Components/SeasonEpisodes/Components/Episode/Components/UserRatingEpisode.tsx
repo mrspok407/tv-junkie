@@ -27,7 +27,6 @@ const UserRatingEpisode: React.FC<Props> = ({ showId, episodeData, showRating })
   )
 
   const handlePostData = (rating: number) => {
-    console.log({ rating })
     try {
       firebase
         .userShowSingleEpisode({

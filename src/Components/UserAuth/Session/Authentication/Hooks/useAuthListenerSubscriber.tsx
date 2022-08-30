@@ -9,10 +9,7 @@ import { fetchUserShows } from 'Components/UserContent/UseUserShowsRed/DatabaseH
 import { userShowsListeners } from 'Components/UserContent/UseUserShowsRed/DatabaseHandlers/Listeners/firebaseListeners'
 import { setInitialContentLoading } from 'Components/UserContent/SharedActions'
 import { fetchUserMovies } from 'Components/UserContent/UseUserMoviesRed/DatabaseHandlers/FetchData/fetchMoviesData'
-import {
-  userMoviesListeners,
-  userMoviesListenersRefs,
-} from 'Components/UserContent/UseUserMoviesRed/DatabaseHandlers/Listeners/firebaseListeners'
+import { userMoviesListeners } from 'Components/UserContent/UseUserMoviesRed/DatabaseHandlers/Listeners/firebaseListeners'
 
 const useAuthListenerSubscriber = () => {
   const { firebase } = useFrequentVariables()
@@ -24,18 +21,14 @@ const useAuthListenerSubscriber = () => {
   const initializeAuthUserListener = useCallback(() => {
     authSubscriber.current = firebase.onAuthUserListener(
       async (authUser: AuthUserInterface['authUser']) => {
-        console.log('User logged in')
-        // await updateUserEpisodesFromDatabase({ firebase })
         dispatch(setInitialContentLoading(true))
         await dispatch(setupAuthUser({ authUser, firebase, localStorageHandlers }))
-        console.log('setupAuthUser END')
         await Promise.all([dispatch(fetchUserShows(firebase)), dispatch(fetchUserMovies(firebase))])
         dispatch(userShowsListeners({ firebase }))
         dispatch(userMoviesListeners({ firebase }))
       },
       () => {
         authSubscriber.current()
-        console.log('User logged out')
         dispatch(logoutAuthUser())
       },
     )

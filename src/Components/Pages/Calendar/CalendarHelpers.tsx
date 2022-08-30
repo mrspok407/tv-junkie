@@ -4,8 +4,7 @@ import {
   UserWillAirEpisodesInterface,
   EpisodesStoreState,
 } from 'Components/UserContent/UseUserShowsRed/@Types'
-import { differenceInCalendarDays } from 'date-fns'
-import { currentDate } from 'Utils'
+import { isContentReleased } from 'Utils'
 
 export const organizeFutureEpisodesByMonth = (
   data: ShowFullDataStoreState[],
@@ -17,7 +16,8 @@ export const organizeFutureEpisodesByMonth = (
     .flatMap((show) =>
       episodes[show.id].flatMap((season) =>
         season.episodes.reduce((acc: any[], episode) => {
-          if (differenceInCalendarDays(new Date(episode.air_date), currentDate) >= 0) {
+          const isEpisodeReleased = isContentReleased(episode.air_date)
+          if (!isEpisodeReleased) {
             acc.push({
               ...episode,
               show: show.name || show.original_name,
@@ -25,7 +25,6 @@ export const organizeFutureEpisodesByMonth = (
               episode_number: episode?.episode_number,
             })
           }
-
           return acc
         }, []),
       ),

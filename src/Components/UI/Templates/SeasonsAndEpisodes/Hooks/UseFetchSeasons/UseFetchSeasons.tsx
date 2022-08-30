@@ -30,15 +30,6 @@ function useFetchSeasons<DataType>({ showId, preloadSeason }: Props) {
           originalSeasonIndex: seasonNum - 1,
         }))
 
-        console.log({ episodesWithOriginalIndex })
-
-        // const episodesWithOriginalIndex = [...data[`season/${seasonNum}`].episodes].map((season, seasonIndex) => {
-        //   const episodesWithIndexes = season.episodes.map((episode, episodeIndex) => ({
-        //     ...episode,
-        //     originalEpisodeIndex: episodeIndex,
-        //     originalSeasonIndex: seasonIndex,
-        //   }))
-
         const episodes = episodesWithOriginalIndex.reverse()
 
         dispatch({
@@ -47,7 +38,6 @@ function useFetchSeasons<DataType>({ showId, preloadSeason }: Props) {
         })
       } catch (error) {
         if (axios.isCancel(error)) return
-        console.log({ error })
         dispatch({ type: ActionTypesEnum.HandleFailure, payload: { seasonId } })
       }
     },

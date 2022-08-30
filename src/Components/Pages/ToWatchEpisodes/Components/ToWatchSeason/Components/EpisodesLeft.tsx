@@ -1,8 +1,7 @@
 import React, { useMemo } from 'react'
 import { useAppSelector } from 'app/hooks'
 import { selectSingleSeason } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
-import { differenceInCalendarDays, isValid } from 'date-fns'
-import { currentDate } from 'Utils'
+import { isContentReleased } from 'Utils'
 import { EpisodesStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
 
 type Props = {
@@ -15,10 +14,7 @@ const EpisodesLeft: React.FC<Props> = ({ showId, seasonData }) => {
   const seasonEpisodesNotWatched = useMemo(() => {
     return (
       seasonDataStore?.episodes.filter((episode) => {
-        const episodeReleaseDate = new Date(episode.air_date ?? '')
-        const isEpisodeReleased = isValid(episodeReleaseDate)
-          ? differenceInCalendarDays(episodeReleaseDate, currentDate) <= 0
-          : true
+        const isEpisodeReleased = isContentReleased(episode.air_date)
         return !episode.watched && isEpisodeReleased
       }) || []
     )

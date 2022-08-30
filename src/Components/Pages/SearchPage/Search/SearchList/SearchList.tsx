@@ -1,13 +1,14 @@
 /* eslint-disable jsx-a11y/mouse-events-have-key-events */
 import PlaceholderNoResults from 'Components/UI/Placeholders/PlaceholderNoResults'
-import React, { useEffect } from 'react'
+import React from 'react'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
+import useClickOutside from 'Utils/Hooks/UseClickOutside'
 import SearchCard from './SearchCard'
 import './SearchList.scss'
 
 type Props = {
   searchResults: MainDataTMDB[]
-  handleClickOutside: (e: CustomEvent) => void
+  handleClickOutside: () => void
   closeList: () => void
   currentListItem: number
   mediaTypeSearching: string
@@ -15,6 +16,7 @@ type Props = {
   query: string
   isSearchingList: boolean
   error: string
+  searchContRef: React.MutableRefObject<HTMLDivElement>
 }
 
 const SearchList: React.FC<Props> = ({
@@ -26,16 +28,10 @@ const SearchList: React.FC<Props> = ({
   listIsOpen,
   query,
   isSearchingList,
+  searchContRef,
   error,
 }) => {
-  useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside as EventListener)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside as EventListener)
-    }
-    // eslint-disable-next-line
-  }, [])
-
+  useClickOutside({ ref: searchContRef, callback: handleClickOutside })
   const renderData = () => {
     if (error) {
       return (

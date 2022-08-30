@@ -5,7 +5,8 @@ import { CONTENT_INFO_NO_DATA } from 'Utils/Constants'
 import WatchingStatusButtons from './Buttons/WatchingStatusButtons/WatchingStatusButtons'
 import MovieButtons from './Buttons/MovieButtons/MovieButtons'
 import UserRatingWrapper from './UserRatingWrapper'
-import useFormatDetailsValues from './Hooks/useFormatDetailsValues'
+import UsersWatching from './UsersWatching'
+import useFormatDetailsValues from './Hooks/UseFormatDetailsValues'
 
 type Props = {
   details: MainDataTMDB
@@ -51,6 +52,8 @@ export const MainInfo: React.FC<Props> = ({ details, showId }) => {
         <div className="details-page__info-option">Users rating</div>
         <div className="details-page__info-value">{details.vote_average?.toFixed(1) || noDataPlaceholder()}</div>
       </div>
+      <UsersWatching showId={showId} />
+
       <div className="details-page__info-row">
         <div className="details-page__info-option">Runtime</div>
         <div className="details-page__info-value">{runtime ? `${runtime} min` : noDataPlaceholder()}</div>

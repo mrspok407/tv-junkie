@@ -8,16 +8,13 @@ import { setUserMovies } from '../../userMoviesSliceRed'
 export const fetchUserMovies =
   (firebase: FirebaseInterface): AppThunk =>
   async (dispatch, getState) => {
-    console.log('fetchUserMovies')
     const authUserUid = getAuthUidFromState(getState())
     try {
       const userMoviesSnapshot = await firebase
         .moviesInfoUserDatabase(authUserUid)
         .orderByChild('timeStamp')
         .once('value')
-      console.log({ userShowsSnapshot: userMoviesSnapshot.val() })
       const userMovies = sortDataSnapshot<ReturnType<typeof userMoviesSnapshot.val>>(userMoviesSnapshot)!
-      console.log({ userMovies })
       dispatch(setUserMovies(userMovies))
     } catch (err) {
       console.log({ err })

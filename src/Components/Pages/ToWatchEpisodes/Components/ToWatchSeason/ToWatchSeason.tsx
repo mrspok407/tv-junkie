@@ -1,13 +1,10 @@
 import React, { useRef, useState } from 'react'
-import { useAppDispatch, useAppSelector } from 'app/hooks'
+import { useAppDispatch } from 'app/hooks'
 import classNames from 'classnames'
 import { EpisodesStoreState, ShowFullDataStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
-import { selectSingleSeason } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
-import { differenceInCalendarDays, format } from 'date-fns'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import { postCheckReleasedEpisodes } from 'Components/UserContent/UseUserShowsRed/DatabaseHandlers/PostData/postShowEpisodesData'
-import { currentDate } from 'Utils'
-import { isValid } from 'date-fns'
+import useFormatContentDate from 'Components/UI/Templates/SeasonsAndEpisodes/Hooks/UseFormatEpisodeAirDate'
 import ToWatchEpisode from '../ToWatchEpisode/ToWatchEpisode'
 import { getSeasonEpisodes } from '../../Helpers'
 import EpisodesLeft from './Components/EpisodesLeft'
@@ -44,8 +41,10 @@ const ToWatchSeason: React.FC<Props> = ({
     getSeasonEpisodes({ showId: showData.id, seasonNumber: seasonData.originalSeasonIndex }),
   )
 
-  const seasonReleaseDate = new Date(seasonData?.air_date ?? '')
-  const seasonYearRelease = isValid(seasonReleaseDate) ? format(seasonReleaseDate, 'yyyy') : 'No date available'
+  const { dateReadableFormat: seasonYearRelease, isDateNotValid } = useFormatContentDate({
+    contentReleasedValue: seasonData.air_date,
+    formatSettings: 'yyyy',
+  })
 
   const shouldSeasonRender = useShouldToWatchSeasonRender({ seasonData, showData })
   if (!shouldSeasonRender) {
@@ -64,7 +63,7 @@ const ToWatchSeason: React.FC<Props> = ({
         <EpisodesLeft showId={showData.id} seasonData={seasonData} />
         <div
           className={classNames('episodes__episode-group-date', {
-            'episodes__episode-group-date--no-date': seasonYearRelease === 'No date available',
+            'episodes__episode-group-date--no-date': isDateNotValid,
           })}
         >
           {seasonYearRelease}

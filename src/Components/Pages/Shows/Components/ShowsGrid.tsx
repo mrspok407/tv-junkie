@@ -20,15 +20,11 @@ const ShowsGrid: React.FC<Props> = ({ data, section }) => {
 
   const dispatch = useAppDispatch()
   const userShows = useAppSelector(selectShows)
-
-  console.log('ShowsGrid Rerender')
   return (
     <>
       {data.map((item) => {
         const filteredGenres =
           item.genre_ids?.map((genreId) => LIST_OF_GENRES.filter((item) => item.id === genreId)) || []
-
-        console.log({ item })
 
         return (
           <div key={item.id} className="content-results__item content-results__item--shows">
