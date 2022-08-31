@@ -31,7 +31,7 @@ module.exports = {
     '@typescript-eslint/no-non-null-assertion': 0,
     // 'no-param-reassign': ['error', { props: true, ignorePropertyModificationsFor: ['state', 'action'] }],
     'react/function-component-definition': [2, { namedComponents: 'arrow-function' }],
-    'linebreak-style': ['error', process.env.NODE_ENV === 'prod' ? 'unix' : 'windows'],
+    'linebreak-style': 0,
     '@typescript-eslint/indent': 0,
     'import/no-unresolved': 0,
     '@typescript-eslint/no-var-requires': 0,
