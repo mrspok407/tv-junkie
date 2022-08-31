@@ -12,6 +12,7 @@ import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import sub from 'date-fns/sub'
 import './Settings.scss'
 import sortDataSnapshot from 'Components/UserContent/FirebaseHelpers/sortDataSnapshot'
+import { episodesToOneArray } from 'Components/UserContent/UseUserShowsRed/Utils/episodesOneArrayModifiers'
 
 let startTimeStampGroupChats = 1311011245000
 
@@ -108,6 +109,32 @@ const SettingsContent = () => {
         })
       })
     })
+  }
+
+  const updateAllEpisodesWatchedUserShows = async () => {
+    const promises = []
+    const usersKeys = []
+    try {
+      const usersSnapshot = await firebase.users().once('value')
+
+      usersSnapshot.forEach((snapshot) => {
+        promises.push(firebase.showsEpisodesUserDatabase(snapshot.key).once('value'))
+        usersKeys.push(snapshot.key)
+      })
+
+      const usersEpisodes = await Promise.all(promises)
+
+      usersEpisodes.forEach((snapshot, index) => {
+        if (snapshot.val() === null) return
+
+        Object.entries(snapshot.val()).forEach(([key, value]) => {
+          const isAnyEpisodeNotWatched = episodesToOneArray(value.episodes).some((episode) => !episode.watched)
+          firebase.userShow({ authUid: usersKeys[index], key }).update({ allEpisodesWatched: !isAnyEpisodeNotWatched })
+        })
+      })
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   const createAllShowsListIds = async () => {
@@ -294,42 +321,53 @@ const SettingsContent = () => {
         )}
       </div>
       <PasswordUpdate />
-      {[process.env.REACT_APP_TEST_EMAIL, process.env.REACT_APP_ADMIN_EMAIL].includes(authUser?.email) && (
-        <>
-          <div className="update-database">
-            <button onClick={updateShowsDataInDatabase} className="button button--profile" type="button">
-              Update Recent Shows In Database
-            </button>
-          </div>
+      {[process.env.REACT_APP_TEST_EMAIL, process.env.REACT_APP_ADMIN_EMAIL].includes(authUser?.email) ||
+        (process.env.NODE_ENV !== 'production' && (
+          <>
+            <div className="update-database">
+              <button onClick={updateShowsDataInDatabase} className="button button--profile" type="button">
+                Update Recent Shows In Database
+              </button>
+            </div>
 
-          <div className="update-database">
-            <button
-              onClick={() => updateShowsDataInDatabase({ isUpdateAll: true })}
-              className="button button--profile"
-              type="button"
-            >
-              Update All Shows In Database
-            </button>
-          </div>
+            <div className="update-database">
+              <button
+                onClick={() => updateShowsDataInDatabase({ isUpdateAll: true })}
+                className="button button--profile"
+                type="button"
+              >
+                Update All Shows In Database
+              </button>
+            </div>
 
-          <div>
-            <button onClick={createAllShowsListIds} className="button button--profile" type="button">
-              Create all shows ids
-            </button>
-          </div>
+            <div>
+              <button onClick={createAllShowsListIds} className="button button--profile" type="button">
+                Create all shows ids
+              </button>
+            </div>
 
-          <div className="update-database">
-            <button onClick={setUsersWatchingShow} className="button button--profile" type="button">
-              Set users watching show
-            </button>
-          </div>
-          <div className="update-database">
-            <button onClick={() => updateShowsDataInDatabase()} className="button button--profile" type="button">
-              Update Database
-            </button>
-          </div>
-        </>
-      )}
+            <div className="update-database">
+              <button onClick={setUsersWatchingShow} className="button button--profile" type="button">
+                Set users watching show
+              </button>
+            </div>
+            <div className="update-database">
+              <button onClick={() => updateShowsDataInDatabase()} className="button button--profile" type="button">
+                Update Database
+              </button>
+            </div>
+            <div className="update-database">
+              <button
+                onClick={() => updateAllEpisodesWatchedUserShows()}
+                className="button button--profile"
+                type="button"
+              >
+                Update all episodes watched
+              </button>
+            </div>
+          </>
+        ))}
+
       <div className="user-settings__copy-user-link">
         <div
           className={classNames('button', {
