@@ -1,22 +1,23 @@
-import React, { useState, useEffect, useRef } from "react"
-import Contact from "./Contact/Contact"
-import ContactRemovedFromGroup from "./ContactRemovedFromGroup/ContactRemovedFromGroup"
-import useElementScrolledDown from "Components/Pages/Contacts/Hooks/useElementScrolledDown"
-import { ContactInfoInterface, CONTACT_INFO_INITIAL_DATA } from "../../@Types"
-import classNames from "classnames"
-import { isUnexpectedObject } from "Utils"
-import CreatePortal from "Components/UI/Modal/CreatePortal"
-import ModalContent from "Components/UI/Modal/ModalContent"
-import { CONTACTS_TO_LOAD } from "../@Context/Constants"
-import useGetInitialContactInfo from "./Hooks/UseGetInitialContactInfo"
-import useFrequentVariables from "../../Hooks/UseFrequentVariables"
+import React, { useState, useEffect, useRef, useContext } from 'react'
+import useElementScrolledDown from 'Components/Pages/Contacts/Hooks/useElementScrolledDown'
+import classNames from 'classnames'
+import { isUnexpectedObject } from 'Utils'
+import { ErrorsHandlerContext } from 'Components/AppContext/Contexts/ErrorsContext'
+import { CONTACTS_TO_LOAD } from '../@Context/Constants'
+import useGetInitialContactInfo from './Hooks/UseGetInitialContactInfo'
+import useFrequentVariables from '../../../../../Utils/Hooks/UseFrequentVariables'
+import { ContactInfoInterface, CONTACT_INFO_INITIAL_DATA } from '../../@Types'
+import ContactRemovedFromGroup from './ContactRemovedFromGroup/ContactRemovedFromGroup'
+import Contact from './Contact/Contact'
 
 type Props = {
   contactListWrapperRef: HTMLDivElement
 }
 
 const ContactList: React.FC<Props> = ({ contactListWrapperRef }) => {
-  const { firebase, authUser, errors, contactsState, contactsDispatch } = useFrequentVariables()
+  const { firebase, authUser, contactsState, contactsDispatch } = useFrequentVariables()
+
+  const handleError = useContext(ErrorsHandlerContext)
   const { contacts, groupCreation } = contactsState
   const contactsData = Object.values(contacts)?.map((contact) => contact)
 
@@ -44,28 +45,29 @@ const ContactList: React.FC<Props> = ({ contactListWrapperRef }) => {
     if (snapshot.val() === null) {
       setInitialLoading(false)
       contactsDispatch({
-        type: "updateContactsInitial",
-        payload: { contacts: {}, unreadMessages: {}, unreadMessagesContacts: {} }
+        type: 'updateContactsInitial',
+        payload: { contacts: {}, unreadMessages: {}, unreadMessagesContacts: {} },
       })
       return
     }
 
-    let contactsData: ContactInfoInterface[] = []
+    const contactsData: ContactInfoInterface[] = []
     snapshot.forEach((contact: { val: () => ContactInfoInterface; key: string }) => {
       if (
         isUnexpectedObject({ exampleObject: CONTACT_INFO_INITIAL_DATA, targetObject: contact.val() }) &&
         !contact.val().isGroupChat
       ) {
-        errors.handleError({
-          message: "Some of your contacts were not loaded correctly. Try to reload the page."
+        handleError({
+          errorData: { message: 'Some of your contacts were not loaded correctly. Try to reload the page.' },
+          message: 'Some of your contacts were not loaded correctly. Try to reload the page.',
         })
         return
       }
-      let chatKey: string = ""
+      let chatKey = ''
       if (contact.val().isGroupChat) {
         chatKey = contact.key
       } else {
-        chatKey = contact.key < authUser?.uid! ? `${contact.key}_${authUser?.uid}` : `${authUser?.uid}_${contact.key}`
+        chatKey = contact.key < authUser?.uid ? `${contact.key}_${authUser?.uid}` : `${authUser?.uid}_${contact.key}`
       }
       contactsData.push({ ...contact.val(), isGroupChat: !!contact.val().isGroupChat, key: contact.key, chatKey })
     })
@@ -88,33 +90,33 @@ const ContactList: React.FC<Props> = ({ contactListWrapperRef }) => {
       }, {})
 
       contactsDispatch({
-        type: "updateContactsInitial",
-        payload: { contacts: contactsToDispatch, unreadMessages, unreadMessagesContacts }
+        type: 'updateContactsInitial',
+        payload: { contacts: contactsToDispatch, unreadMessages, unreadMessagesContacts },
       })
 
       newLoad.current = false
       setInitialLoading(false)
     } else {
       contactsDispatch({
-        type: "updateContacts",
-        payload: { contacts: contactsData }
+        type: 'updateContacts',
+        payload: { contacts: contactsData },
       })
     }
   }
 
   useEffect(() => {
     contactsListRef
-      .orderByChild("pinned_lastActivityTS")
+      .orderByChild('pinned_lastActivityTS')
       .limitToLast(CONTACTS_TO_LOAD)
-      .on("value", (snapshot: any) => getContactsList(snapshot))
+      .on('value', (snapshot: any) => getContactsList(snapshot))
 
-    const contactsAmountListener = contactsDatabaseRef.child("contactsAmount").on("value", (snapshot: any) => {
+    const contactsAmountListener = contactsDatabaseRef.child('contactsAmount').on('value', (snapshot: any) => {
       setAllContactsAmount(snapshot.val())
     })
 
     return () => {
       contactsListRef.off()
-      contactsDatabaseRef.child("contactsAmount").off("value", contactsAmountListener)
+      contactsDatabaseRef.child('contactsAmount').off('value', contactsAmountListener)
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -126,35 +128,35 @@ const ContactList: React.FC<Props> = ({ contactListWrapperRef }) => {
     contactsListRef.off()
     newLoad.current = true
     contactsListRef
-      .orderByChild("pinned_lastActivityTS")
+      .orderByChild('pinned_lastActivityTS')
       .limitToLast(loadedContacts + CONTACTS_TO_LOAD)
-      .on("value", (snapshot: any) => getContactsList(snapshot))
+      .on('value', (snapshot: any) => getContactsList(snapshot))
   }, [isScrolledDown, groupCreation]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div
-      className={classNames("contact-list", {
-        "contact-list--no-contacts": !initialLoadingRef.current && !contactsData?.length,
-        "contact-list--group-creation-active": groupCreation.isActive
+      className={classNames('contact-list', {
+        'contact-list--no-contacts': !initialLoadingRef.current && !contactsData?.length,
+        'contact-list--group-creation-active': groupCreation.isActive,
       })}
     >
-      {initialLoading ? (
+      {initialLoading && (
         <div className="contact-list__loader-wrapper">
-          <span className="contact-list__loader"></span>
+          <span className="contact-list__loader" />
         </div>
-      ) : !contactsData?.length ? (
-        <div className="contact-list--no-contacts-text">You don't have any contacts</div>
+      )}
+
+      {!contactsData?.length && !initialLoading ? (
+        <div className="contact-list--no-contacts-text">You don&apos;t have any contacts</div>
       ) : (
-        contactsData?.map((contact) =>
-          contact.removedFromGroup ? (
+        contactsData?.map((contact) => {
+          return contact.removedFromGroup ? (
             <ContactRemovedFromGroup key={contact.key} contactInfo={contact} allContactsAmount={allContactsAmount} />
           ) : (
             <Contact key={contact.key} contactInfo={contact} allContactsAmount={allContactsAmount} />
           )
-        )
+        })
       )}
-
-      {errors.error && <CreatePortal element={<ModalContent message={errors.error.message} />}></CreatePortal>}
     </div>
   )
 }

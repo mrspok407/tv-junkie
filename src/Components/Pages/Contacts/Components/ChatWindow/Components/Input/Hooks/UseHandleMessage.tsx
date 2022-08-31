@@ -1,5 +1,5 @@
-import { MessageInterface } from "Components/Pages/Contacts/@Types"
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
+import { MessageInterface } from 'Components/Pages/Contacts/@Types'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 
 const useHandleMessage = ({ contactLastActivity }: { contactLastActivity: { timeStamp: number; key: string } }) => {
   const { firebase, authUser, contactsState, contactsDispatch } = useFrequentVariables()
@@ -10,7 +10,7 @@ const useHandleMessage = ({ contactLastActivity }: { contactLastActivity: { time
 
   const sendMessageGroupChat = async ({ message }: { message: string }) => {
     const firstUnpinnedContactIndex = contactsData.findIndex(
-      (contact) => contact.pinned_lastActivityTS.slice(0, 4) !== "true"
+      (contact) => contact.pinned_lastActivityTS.slice(0, 4) !== 'true',
     )
     const activeContactIndex = contactsData.findIndex((contact) => contact.key === activeChat.contactKey)
     const updateContactLastActivityInAuth = Math.max(firstUnpinnedContactIndex, 0) < activeContactIndex
@@ -23,9 +23,9 @@ const useHandleMessage = ({ contactLastActivity }: { contactLastActivity: { time
         sender: authUser?.uid,
         userName: authUser?.username,
         message,
-        timeStamp: timeStampEpoch
+        timeStamp: timeStampEpoch,
       },
-      [`groupChats/${activeChat.chatKey}/members/status/${authUser?.uid}/isTyping`]: null
+      [`groupChats/${activeChat.chatKey}/members/status/${authUser?.uid}/isTyping`]: null,
     }
     if (updateContactLastActivityInAuth) {
       updateData[`users/${authUser?.uid}/contactsDatabase/contactsLastActivity/${activeChat.chatKey}`] = timeStampEpoch
@@ -37,7 +37,7 @@ const useHandleMessage = ({ contactLastActivity }: { contactLastActivity: { time
       }
     })
 
-    contactsDispatch({ type: "updateRerenderUnreadMessagesStart" })
+    contactsDispatch({ type: 'updateRerenderUnreadMessagesStart' })
     await firebase
       .database()
       .ref()
@@ -48,35 +48,35 @@ const useHandleMessage = ({ contactLastActivity }: { contactLastActivity: { time
               .contactsLastActivity({ uid: member.key })
               .orderByValue()
               .limitToLast(1)
-              .once("value")
+              .once('value')
 
             if (lastActivityContactSnapshot.val() === null) {
               return {
                 memberKey: member.key,
-                lastActivityContact: null
+                lastActivityContact: null,
               }
             }
 
-            let lastActivityMember: { timeStamp: number; memberKey: string; lastActivityContact: string }[] = []
+            const lastActivityMember: { timeStamp: number; memberKey: string; lastActivityContact: string }[] = []
             lastActivityContactSnapshot.forEach((snapshot: { val: () => number; key: string }) => {
               lastActivityMember.push({
                 timeStamp: snapshot.val(),
                 memberKey: member.key,
-                lastActivityContact: snapshot.key
+                lastActivityContact: snapshot.key,
               })
             })
             return lastActivityMember[0]
-          })
+          }),
         )
 
-        let updateData: any = {}
+        const updateData: any = {}
         membersLastActivity.forEach((member) => {
           if (member?.lastActivityContact !== activeChat.chatKey) {
             updateData[`users/${member.memberKey}/contactsDatabase/contactsLastActivity/${activeChat.chatKey}`] =
               timeStampEpoch
           }
         })
-        return firebase.database().ref().update(updateData)
+        return firebase.rootRef().update(updateData)
       })
 
     return messageKey
@@ -84,7 +84,7 @@ const useHandleMessage = ({ contactLastActivity }: { contactLastActivity: { time
 
   const sendMessage = async ({ message }: { message: string }) => {
     const firstUnpinnedContactIndex = contactsData.findIndex(
-      (contact) => contact.pinned_lastActivityTS.slice(0, 4) !== "true"
+      (contact) => contact.pinned_lastActivityTS.slice(0, 4) !== 'true',
     )
     const activeContactIndex = contactsData.findIndex((contact) => contact.key === activeChat.contactKey)
     const updateContactLastActivityInAuth = Math.max(firstUnpinnedContactIndex, 0) < activeContactIndex
@@ -97,11 +97,11 @@ const useHandleMessage = ({ contactLastActivity }: { contactLastActivity: { time
       [`privateChats/${activeChat.chatKey}/messages/${messageKey}`]: {
         sender: authUser?.uid,
         message,
-        timeStamp: timeStampEpoch
+        timeStamp: timeStampEpoch,
       },
       [`privateChats/${activeChat.chatKey}/members/${activeChat.contactKey}/unreadMessages/${messageKey}`]:
         !contactStatusData?.isOnline || !contactStatusData?.chatBottom || !contactStatusData?.pageInFocus ? true : null,
-      [`privateChats/${activeChat.chatKey}/members/${authUser?.uid}/status/isTyping`]: null
+      [`privateChats/${activeChat.chatKey}/members/${authUser?.uid}/status/isTyping`]: null,
     }
     if (updateContactLastActivityInAuth) {
       updateData[`users/${authUser?.uid}/contactsDatabase/contactsLastActivity/${activeChat.contactKey}`] =
@@ -112,15 +112,15 @@ const useHandleMessage = ({ contactLastActivity }: { contactLastActivity: { time
         timeStampEpoch
     }
 
-    contactsDispatch({ type: "updateRerenderUnreadMessagesStart" })
-    await firebase.database().ref().update(updateData)
+    contactsDispatch({ type: 'updateRerenderUnreadMessagesStart' })
+    await firebase.rootRef().update(updateData)
 
     return messageKey
   }
 
-  const editMessagePrivateChat = async ({
+  const editMessagePrivateChat = ({
     message,
-    originalMessage
+    originalMessage,
   }: {
     message: string
     originalMessage: MessageInterface
@@ -131,16 +131,16 @@ const useHandleMessage = ({ contactLastActivity }: { contactLastActivity: { time
         sender: originalMessage.sender,
         timeStamp: originalMessage.timeStamp,
         message,
-        isEdited: true
+        isEdited: true,
       },
-      [`members/${authUser?.uid}/status/isTyping`]: null
+      [`members/${authUser?.uid}/status/isTyping`]: null,
     }
-    return await firebase.privateChats().child(activeChat.chatKey).update(updateData)
+    return firebase.privateChats().child(activeChat.chatKey).update(updateData)
   }
 
-  const editMessageGroupChat = async ({
+  const editMessageGroupChat = ({
     message,
-    originalMessage
+    originalMessage,
   }: {
     message: string
     originalMessage: MessageInterface
@@ -152,11 +152,11 @@ const useHandleMessage = ({ contactLastActivity }: { contactLastActivity: { time
         timeStamp: originalMessage.timeStamp,
         userName: originalMessage.userName,
         message,
-        isEdited: true
+        isEdited: true,
       },
-      [`members/status/${authUser?.uid}/isTyping`]: null
+      [`members/status/${authUser?.uid}/isTyping`]: null,
     }
-    return await firebase.groupChats().child(activeChat.chatKey).update(updateData)
+    return firebase.groupChats().child(activeChat.chatKey).update(updateData)
   }
 
   return { sendMessage, sendMessageGroupChat, editMessagePrivateChat, editMessageGroupChat }

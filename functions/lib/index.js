@@ -1,8 +1,34 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.handleContactRequest = exports.newContactRequest = exports.createNewGroup = exports.removeMemberFromGroup = exports.addNewGroupMembers = exports.updateLastSeenGroupChats = exports.updateLastSeenPrivateChats = exports.decrementContacts = exports.incrementContacts = exports.removeNewContactsActivityGroupChat = exports.removeNewContactsActivity = exports.addNewContactsActivityGroupChat = exports.addNewContactsActivity = exports.updatePinnedTimeStamp = void 0;
-const functions = require("firebase-functions");
-const admin = require("firebase-admin");
+exports.handleContactRequest = exports.newContactRequest = exports.createNewGroup = exports.removeMemberFromGroup = exports.addNewGroupMembers = exports.updateLastSeenGroupChats = exports.updateLastSeenPrivateChats = exports.decrementContacts = exports.incrementContacts = exports.removeNewContactsActivityGroupChat = exports.removeNewContactsActivity = exports.addNewContactsActivityGroupChat = exports.addNewContactsActivity = exports.updatePinnedTimeStamp = exports.updateAllShowsListIdsDelete = exports.updateAllShowsListIdsCreate = exports.updateAllEpisodesWatchedUserDatabase = exports.updateShowStatusForUserDatabase = exports.updateShowEpisodesForUserDatabase = void 0;
+const functions = __importStar(require("firebase-functions"));
+const admin = __importStar(require("firebase-admin"));
+const helpers_1 = require("./helpers");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+// const admin = require("firebase-admin");
 // Cloud Functions interesting points:
 //
 // It should always return a promise. So the function will know when it's finished (resolved or rejected).
@@ -24,7 +50,75 @@ const admin = require("firebase-admin");
 // More info: https://firebase.google.com/docs/functions/callable#web https://youtu.be/8mL1VuiL5Kk?t=593
 admin.initializeApp();
 const database = admin.database();
+const isApiError = (x) => {
+    return typeof x.message === "string";
+};
 const contactsDatabaseRef = (uid) => `${uid}/contactsDatabase`;
+exports.updateShowEpisodesForUserDatabase = functions.database
+    .ref("allShowsList/{showId}/episodes")
+    .onUpdate(async (change, context) => {
+    var _a, _b;
+    const { showId } = context.params;
+    const afterData = change.after;
+    const timeStamp = admin.database.ServerValue.TIMESTAMP;
+    const showEpisodesFireData = (_a = afterData.val()) !== null && _a !== void 0 ? _a : [];
+    const usersWatchingSnapshot = await ((_b = afterData.ref.parent) === null || _b === void 0 ? void 0 : _b.child("usersWatchingList").once("value"));
+    const usersWatchingKeys = Object.keys(usersWatchingSnapshot === null || usersWatchingSnapshot === void 0 ? void 0 : usersWatchingSnapshot.val());
+    const updateData = {};
+    const usersEpisodesSnapshot = await Promise.all(usersWatchingKeys.map(async (userUid) => {
+        return database.ref(`users/${userUid}/content/episodes/${showId}/episodes`).once("value");
+    }));
+    usersEpisodesSnapshot.forEach(async (episodesSnapshot, index) => {
+        var _a;
+        const showEpisodesUserData = (_a = episodesSnapshot.val()) !== null && _a !== void 0 ? _a : [];
+        const mergedEpisodes = (0, helpers_1.mergeEpisodesFromFireDBwithUserDB)(showEpisodesFireData, showEpisodesUserData);
+        updateData[`users/${usersWatchingKeys[index]}/content/episodes/${showId}/episodes`] = mergedEpisodes;
+        updateData[`users/${usersWatchingKeys[index]}/content/showsLastUpdateList/${showId}/lastUpdatedInUser`] =
+            timeStamp;
+    });
+    return database.ref().update(updateData);
+});
+exports.updateShowStatusForUserDatabase = functions.database
+    .ref("allShowsList/{showId}/status")
+    .onUpdate(async (change, context) => {
+    var _a;
+    const { showId } = context.params;
+    const afterData = change.after;
+    const showStatusLowerCase = afterData.val().toLowerCase();
+    const showStatusForUserDatabase = showStatusLowerCase === "ended" || showStatusLowerCase === "canceled" ? "ended" : "ongoing";
+    const usersWatchingSnapshot = await ((_a = afterData.ref.parent) === null || _a === void 0 ? void 0 : _a.child("usersWatchingList").once("value"));
+    const usersWatchingKeys = Object.keys(usersWatchingSnapshot === null || usersWatchingSnapshot === void 0 ? void 0 : usersWatchingSnapshot.val());
+    const updateData = {};
+    usersWatchingKeys.forEach((userUid) => {
+        updateData[`users/${userUid}/content/shows/${showId}/status`] = showStatusForUserDatabase;
+    });
+    return database.ref().update(updateData);
+});
+exports.updateAllEpisodesWatchedUserDatabase = functions.database
+    .ref("users/{uid}/content/showsLastUpdateList/{showId}")
+    .onUpdate(async (change, context) => {
+    var _a;
+    const { showId } = context.params;
+    const afterData = change.after;
+    const contentRef = (_a = afterData.ref.parent) === null || _a === void 0 ? void 0 : _a.parent;
+    const showsRef = contentRef === null || contentRef === void 0 ? void 0 : contentRef.child("shows");
+    const showEpisodesUserSnapshot = await (contentRef === null || contentRef === void 0 ? void 0 : contentRef.child(`episodes/${showId}/episodes`).once("value"));
+    const showEpisodesUserData = showEpisodesUserSnapshot === null || showEpisodesUserSnapshot === void 0 ? void 0 : showEpisodesUserSnapshot.val();
+    const isAnyEpisodeNotWatched = (0, helpers_1.episodesToOneArray)(showEpisodesUserData).some((episode) => !episode.watched);
+    return showsRef === null || showsRef === void 0 ? void 0 : showsRef.child(`${showId}`).update({ allEpisodesWatched: !isAnyEpisodeNotWatched });
+});
+exports.updateAllShowsListIdsCreate = functions.database
+    .ref("allShowsList/{showId}/id")
+    .onCreate(async (snapshot, context) => {
+    const { showId } = context.params;
+    database.ref(`allShowsListIds/${showId}`).set(true);
+});
+exports.updateAllShowsListIdsDelete = functions.database
+    .ref("allShowsList/{showId}/id")
+    .onDelete(async (snapshot, context) => {
+    const { showId } = context.params;
+    database.ref(`allShowsListIds/${showId}`).set(null);
+});
 exports.updatePinnedTimeStamp = functions.database
     .ref("users/{authUid}/contactsDatabase/contactsLastActivity/{contactUid}")
     .onWrite(async (change, context) => {
@@ -174,7 +268,9 @@ exports.addNewGroupMembers = functions.https.onCall(async (data, context) => {
         return database.ref().update(updateData);
     }
     catch (error) {
-        throw new functions.https.HttpsError("unknown", error.message, error);
+        if (isApiError(error)) {
+            throw new functions.https.HttpsError("unknown", error.message, error);
+        }
     }
 });
 exports.removeMemberFromGroup = functions.https.onCall(async (data, context) => {
@@ -206,7 +302,9 @@ exports.removeMemberFromGroup = functions.https.onCall(async (data, context) => 
         return database.ref().update(updateData);
     }
     catch (error) {
-        throw new functions.https.HttpsError("unknown", error.message, error);
+        if (isApiError(error)) {
+            throw new functions.https.HttpsError("unknown", error.message, error);
+        }
     }
 });
 exports.createNewGroup = functions.https.onCall(async (data, context) => {
@@ -265,7 +363,12 @@ exports.createNewGroup = functions.https.onCall(async (data, context) => {
         });
     }
     catch (error) {
-        throw new functions.https.HttpsError("unknown", error.message, error);
+        if (isApiError(error)) {
+            throw new functions.https.HttpsError("unknown", error.message, error);
+        }
+        else {
+            return;
+        }
     }
 });
 exports.newContactRequest = functions.https.onCall(async (data, context) => {
@@ -299,7 +402,9 @@ exports.newContactRequest = functions.https.onCall(async (data, context) => {
         return database.ref("users").update(updateData);
     }
     catch (error) {
-        throw new functions.https.HttpsError("unknown", error.message, error);
+        if (isApiError(error)) {
+            throw new functions.https.HttpsError("unknown", error.message, error);
+        }
     }
 });
 exports.handleContactRequest = functions.https.onCall(async (data, context) => {
@@ -331,7 +436,9 @@ exports.handleContactRequest = functions.https.onCall(async (data, context) => {
         return database.ref().update(updateData);
     }
     catch (error) {
-        throw new functions.https.HttpsError("unknown", error.message, error);
+        if (isApiError(error)) {
+            throw new functions.https.HttpsError("unknown", error.message, error);
+        }
     }
 });
 //# sourceMappingURL=index.js.map

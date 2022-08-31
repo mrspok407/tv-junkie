@@ -1,5 +1,6 @@
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
-import { useEffect, useLayoutEffect, useRef } from "react"
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import { ErrorInterface, ErrorsHandlerContext } from 'Components/AppContext/Contexts/ErrorsContext'
+import { useContext, useEffect, useLayoutEffect, useRef } from 'react'
 
 type Props = {
   chatContainerRef: HTMLDivElement
@@ -14,9 +15,10 @@ const useIntersectionObserver = ({
   unreadMessagesAuth,
   unreadMsgsListenerChatKey,
   pageInFocus,
-  chatWindowLoading
+  chatWindowLoading,
 }: Props) => {
-  const { firebase, authUser, errors, contactsState } = useFrequentVariables()
+  const { firebase, authUser, contactsState } = useFrequentVariables()
+  const handleError = useContext(ErrorsHandlerContext)
   const { activeChat, renderedMessagesList, contacts } = contactsState
   const renderedMessages = renderedMessagesList[activeChat.chatKey]
   const contactInfo = contacts[activeChat.contactKey] || {}
@@ -36,7 +38,7 @@ const useIntersectionObserver = ({
           .unreadMessages({ uid: authUser?.uid!, chatKey: activeChat.chatKey, isGroupChat: contactInfo.isGroupChat })
           .orderByKey()
           .endAt(`${messageKey}`)
-          .once("value", (snapshot: any) => {
+          .once('value', (snapshot: any) => {
             if (snapshot.val() === null) return
             Object.keys(snapshot.val()).forEach(async (key: string) => {
               try {
@@ -44,14 +46,15 @@ const useIntersectionObserver = ({
                   .unreadMessages({
                     uid: authUser?.uid!,
                     chatKey: activeChat.chatKey,
-                    isGroupChat: contactInfo.isGroupChat
+                    isGroupChat: contactInfo.isGroupChat,
                   })
                   .child(key)
                   .set(null)
-              } catch (error) {
-                errors.handleError({
+              } catch (err) {
+                const error = err as ErrorInterface['errorData']
+                handleError({
                   errorData: error,
-                  message: "There has been some error updating database. Tye to realod the page."
+                  message: 'There has been some error updating database. Tye to reload the page.',
                 })
 
                 throw new Error(`There has been some error updating database: ${error}`)
@@ -64,15 +67,15 @@ const useIntersectionObserver = ({
 
   const observerOptions: any = {
     root: chatContainerRef && chatContainerRef,
-    rootMargin: "0px",
-    threshold: 1.0
+    rootMargin: '0px',
+    threshold: 1.0,
   }
   observerRef = new IntersectionObserver(observerCallback, observerOptions)
 
   useLayoutEffect(() => {
     if (!unreadMsgsListenerChatKey) return
     if (!renderedMessages?.length || !unreadMessagesAuth?.length) return
-    if (![true, "removed"].includes(contactInfo.status) && !contactInfo.isGroupChat) return
+    if (![true, 'removed'].includes(contactInfo.status) && !contactInfo.isGroupChat) return
     if (!observerRef || !pageInFocus || chatWindowLoading) return
 
     renderedMessages.forEach((message) => {
@@ -82,11 +85,12 @@ const useIntersectionObserver = ({
       observedMessages.current = [...observedMessages.current, message.key]
       observerRef?.observe(unreadMessage)
     })
-  }, [activeChat, renderedMessages, unreadMsgsListenerChatKey, contactInfo, pageInFocus, chatWindowLoading]) // eslint-disable-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeChat, renderedMessages, unreadMsgsListenerChatKey, contactInfo, pageInFocus, chatWindowLoading])
 
   const onMouseEnter = () => {
     if (!renderedMessages?.length || !unreadMessagesAuth?.length) return
-    if (![true, "removed"].includes(contactInfo.status) && !contactInfo.isGroupChat) return
+    if (![true, 'removed'].includes(contactInfo.status) && !contactInfo.isGroupChat) return
     if (!observerRef || pageInFocus || chatWindowLoading) return
 
     renderedMessages.forEach((message) => {
@@ -101,16 +105,17 @@ const useIntersectionObserver = ({
   useEffect(() => {
     if (!renderedMessages?.length) return
     observedMessages.current = [
-      ...observedMessages.current.filter((message) => renderedMessages.map((message) => message.key).includes(message))
+      ...observedMessages.current.filter((message) => renderedMessages.map((message) => message.key).includes(message)),
     ]
   }, [renderedMessages]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => () => {
       observerRef.disconnect()
       observedMessages.current = []
-    }
-  }, [activeChat]) // eslint-disable-line react-hooks/exhaustive-deps
+    },
+    [activeChat], // eslint-disable-line react-hooks/exhaustive-deps
+  )
 
   return { onMouseEnter }
 }

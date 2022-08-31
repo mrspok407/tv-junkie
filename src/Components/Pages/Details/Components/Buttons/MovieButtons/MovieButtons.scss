@@ -1,0 +1,9 @@
+@import "../../../../../../styles/globals";
+
+.buttons__row.buttons__row--movies {
+    grid-template-columns: 1fr 1fr;
+
+    @include mediaMaxW(#{$mobileViewPort}) {
+        grid-template-columns: 1fr;
+      }
+}

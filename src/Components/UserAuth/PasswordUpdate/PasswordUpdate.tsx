@@ -1,12 +1,12 @@
 /* eslint-disable react/no-access-state-in-setstate */
-import React, { useContext, useState } from "react"
-import classNames from "classnames"
-import Input from "../Input/Input"
-import { FirebaseContext } from "Components/Firebase"
-import "./PasswordUpdate.scss"
+import React, { useState } from 'react'
+import classNames from 'classnames'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import Input from '../Input/Input'
+import './PasswordUpdate.scss'
 
 interface ErrorsInterface {
-  [key: string]: string | {}
+  [key: string]: string | Record<string, unknown>
   passwordError: string
   error: { message: string }
 }
@@ -16,19 +16,19 @@ interface RequiredInputsInterface {
 }
 
 const ERROR_DEFAULT_VALUES = {
-  passwordError: "",
-  error: { message: "" }
+  passwordError: '',
+  error: { message: '' },
 }
 
 const PasswordUpdate: React.FC = () => {
-  const [requiredInputs, setRequiredInputs] = useState<RequiredInputsInterface>({ password: "" })
+  const { firebase } = useFrequentVariables()
+
+  const [requiredInputs, setRequiredInputs] = useState<RequiredInputsInterface>({ password: '' })
   const [errors, setErrors] = useState<ErrorsInterface>(ERROR_DEFAULT_VALUES)
   const [submitClicked, setSubmitClicked] = useState(false)
   const [submitRequestLoading, setSubmitRequestLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [passwordUpdated, setPasswordUpdated] = useState(false)
-
-  const firebase = useContext(FirebaseContext)
 
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     setSubmitRequestLoading(true)
@@ -39,7 +39,7 @@ const PasswordUpdate: React.FC = () => {
     if (!isFormValid(errorsOnSubmit, requiredInputs)) {
       for (const [key, value] of Object.entries(requiredInputs)) {
         if (value.length === 0) {
-          errorsOnSubmit[`${key}Error`] = "Required"
+          errorsOnSubmit[`${key}Error`] = 'Required'
         }
       }
       setErrors(errorsOnSubmit)
@@ -63,28 +63,28 @@ const PasswordUpdate: React.FC = () => {
 
   const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault()
-    const value = event.target.value
-    const name = event.target.name === "new-password" ? "password" : event.target.name
+    const { value } = event.target
+    const name = event.target.name === 'new-password' ? 'password' : event.target.name
     let errorsOnChange = { ...errors }
 
     if (errorsOnChange[`${name}OnBlur`] || submitClicked) {
-      if (name === "password") {
-        errorsOnChange.passwordError = ""
+      if (name === 'password') {
+        errorsOnChange.passwordError = ''
       }
     }
-    if (value === "") errorsOnChange = ERROR_DEFAULT_VALUES
+    if (value === '') errorsOnChange = ERROR_DEFAULT_VALUES
 
     setErrors(errorsOnChange)
     setRequiredInputs({ ...requiredInputs, [name]: value })
   }
 
   const handleKeyDown = (e: any) => {
-    e.which === 27 && resetInput(e.target.name)
+    if (e.which === 27) resetInput(e.target.name)
   }
 
   const resetInput = (name: string) => {
-    setRequiredInputs({ ...requiredInputs, [`${name}`]: "" })
-    setErrors({ ...errors, [`${name}Error`]: "" })
+    setRequiredInputs({ ...requiredInputs, [`${name}`]: '' })
+    setErrors({ ...errors, [`${name}Error`]: '' })
   }
 
   const isFormValid = (errors: ErrorsInterface, requiredInputs: RequiredInputsInterface) => {
@@ -117,8 +117,8 @@ const PasswordUpdate: React.FC = () => {
       ) : (
         <>
           <Input
-            classNameInput={classNames("auth__form-input auth__form-input--password", {
-              "auth__form-input--error": errors.passwordError
+            classNameInput={classNames('auth__form-input auth__form-input--password', {
+              'auth__form-input--error': errors.passwordError,
             })}
             classNameLabel="auth__form-label"
             name="new-password"
@@ -126,9 +126,9 @@ const PasswordUpdate: React.FC = () => {
             value={requiredInputs.password}
             handleOnChange={handleOnChange}
             handleKeyDown={handleKeyDown}
-            type={!showPassword ? "password" : "text"}
+            type={!showPassword ? 'password' : 'text'}
             placeholder="Update password"
-            hidePasswordBtn={true}
+            hidePasswordBtn
             toggleShowPassword={toggleShowPassword}
           />
 
@@ -137,12 +137,12 @@ const PasswordUpdate: React.FC = () => {
           {errors.error && <div className="auth__form-error">{errors.error.message}</div>}
 
           <button
-            className={classNames("button button--auth__form", {
-              "button--disabled": !isFormValid(errors, requiredInputs)
+            className={classNames('button button--auth__form', {
+              'button--auth__form--disabled': !isFormValid(errors, requiredInputs),
             })}
             type="submit"
           >
-            {submitRequestLoading ? <span className="auth__form-loading"></span> : "Update Password"}
+            {submitRequestLoading ? <span className="button-loader-circle" /> : 'Update Password'}
           </button>
         </>
       )}

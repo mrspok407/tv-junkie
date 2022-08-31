@@ -1,4 +1,4 @@
-@import "../globals";
+@import '../globals';
 
 .button {
   position: relative;
@@ -23,7 +23,7 @@
   color: getColor(textColor, $btnPalette);
   &:after,
   &:before {
-    content: "";
+    content: '';
     position: absolute;
     width: 50%;
     height: 50%;
@@ -62,18 +62,17 @@
   &:hover {
     background-color: #e89340;
   }
-}
 
-.button--disabled {
-  background-color: rgba(205, 133, 63, 0.7);
-  &:hover {
+  &--disabled {
     background-color: rgba(205, 133, 63, 0.7);
+    &:hover {
+      background-color: rgba(205, 133, 63, 0.7);
+    }
   }
 }
 
 .button--pressed {
   background-color: getColor(pressedBgColor, $btnPalette);
-  /// transition: 0.5s;
   &:after,
   &:before {
     top: 0;
@@ -110,7 +109,7 @@
   }
 }
 
-.button--not-logged-in {
+.button--disable {
   background-color: #5f442a;
   color: #ffffff7a;
 
@@ -155,42 +154,6 @@
     column-gap: 5px;
     @include mediaMaxW(#{$mobileViewPort}) {
       grid-column: 1 / 3;
-    }
-  }
-
-  &-warning {
-    position: absolute;
-    top: calc(100% + 8px);
-    left: 0;
-    padding: 5px;
-    text-align: center;
-    font-size: 0.9rem;
-    background-color: #fff;
-    border-radius: 5px;
-    opacity: 0;
-    animation: showNotAuthWarning 0.5s forwards;
-    @keyframes showNotAuthWarning {
-      to {
-        opacity: 1;
-      }
-    }
-
-    &:after {
-      $dimensions: 10px;
-      content: "";
-      position: absolute;
-      top: calc(-10px / 2);
-      left: 50%;
-      transform: translateX(-50%) rotate(45deg);
-      width: $dimensions;
-      height: $dimensions;
-      background-color: #fff;
-    }
-
-    @include mediaMaxW(#{$mobileViewPort}) {
-      .detailes-page .buttons__col-warning:after {
-        left: 50%;
-      }
     }
   }
 

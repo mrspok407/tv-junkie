@@ -1,11 +1,12 @@
-import { ContactInfoInterface, CONTACT_INFO_INITIAL_DATA } from "Components/Pages/Contacts/@Types"
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
-import useElementScrolledDown from "Components/Pages/Contacts/Hooks/useElementScrolledDown"
-import React, { useState, useEffect, useCallback } from "react"
-import { isUnexpectedObject } from "Utils"
-import Contact from "../Contact/Contact"
-import SearchInput from "../SearchInput/SearchInput"
-import "./ContactsSearch.scss"
+import { ContactInfoInterface, CONTACT_INFO_INITIAL_DATA } from 'Components/Pages/Contacts/@Types'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import useElementScrolledDown from 'Components/Pages/Contacts/Hooks/useElementScrolledDown'
+import { ErrorsHandlerContext } from 'Components/AppContext/Contexts/ErrorsContext'
+import React, { useState, useEffect, useCallback, useContext } from 'react'
+import { isUnexpectedObject } from 'Utils'
+import Contact from '../Contact/Contact'
+import SearchInput from '../SearchInput/SearchInput'
+import './ContactsSearch.scss'
 
 type Props = {
   wrapperRef: HTMLDivElement
@@ -14,7 +15,8 @@ type Props = {
 const CONTACTS_TO_LOAD = 20
 
 const ContactsSearch: React.FC<Props> = ({ wrapperRef }) => {
-  const { firebase, authUser, errors, contactsState, contactsDispatch } = useFrequentVariables()
+  const { firebase, authUser, contactsState, contactsDispatch } = useFrequentVariables()
+  const handleError = useContext(ErrorsHandlerContext)
   const { groupCreation } = contactsState
 
   const [contactsList, setContactsList] = useState<ContactInfoInterface[]>([])
@@ -34,14 +36,15 @@ const ContactsSearch: React.FC<Props> = ({ wrapperRef }) => {
       return
     }
 
-    let contacts: ContactInfoInterface[] = []
+    const contacts: ContactInfoInterface[] = []
     snapshot.forEach((contact: { val: () => ContactInfoInterface; key: string }) => {
       if (
         isUnexpectedObject({ exampleObject: CONTACT_INFO_INITIAL_DATA, targetObject: contact.val() }) &&
         !contact.val().isGroupChat
       ) {
-        errors.handleError({
-          message: "Some of your contacts were not loaded correctly. Try to reload the page."
+        handleError({
+          errorData: { message: 'Some of your contacts were not loaded correctly. Try to reload the page.' },
+          message: 'Some of your contacts were not loaded correctly. Try to reload the page.',
         })
         return
       }
@@ -53,14 +56,14 @@ const ContactsSearch: React.FC<Props> = ({ wrapperRef }) => {
     const contactWithStatus = await Promise.all(
       contacts.map(async (contact) => {
         const contactStatus = await Promise.all([
-          firebase.contactsDatabase({ uid: contact.key }).child("pageIsOpen").once("value"),
+          firebase.contactsDatabase({ uid: contact.key }).child('pageIsOpen').once('value'),
           firebase
             .chatMemberStatus({ chatKey: contact.chatKey, memberKey: contact.key, isGroupChat: false })
-            .child("lastSeen")
-            .once("value")
+            .child('lastSeen')
+            .once('value'),
         ])
         return { ...contact, isOnline: contactStatus[0].val(), lastSeen: contactStatus[1].val() }
-      })
+      }),
     )
 
     if (isSearchedData) {
@@ -69,7 +72,7 @@ const ContactsSearch: React.FC<Props> = ({ wrapperRef }) => {
     } else {
       setContactsList((prevState) => [
         ...prevState,
-        ...contactWithStatus.filter((contact) => contact.status === true && !contact.isGroupChat)
+        ...contactWithStatus.filter((contact) => contact.status === true && !contact.isGroupChat),
       ])
       setInitialLoading(false)
       setLoading(false)
@@ -88,10 +91,10 @@ const ContactsSearch: React.FC<Props> = ({ wrapperRef }) => {
 
       try {
         const contactsData = await contactsListRef
-          .orderByChild("userNameLowerCase")
+          .orderByChild('userNameLowerCase')
           .startAt(query.toLowerCase())
-          .endAt(query.toLowerCase() + "\uf8ff")
-          .once("value")
+          .endAt(`${query.toLowerCase()}\uf8ff`)
+          .once('value')
         if (
           !Object.values(contactsData.val() || {}).filter((item: any) => item.status === true && !item.isGroupChat)
             .length
@@ -103,13 +106,14 @@ const ContactsSearch: React.FC<Props> = ({ wrapperRef }) => {
 
         getContactsData({ snapshot: contactsData, isSearchedData: true })
       } catch (error) {
-        errors.handleError({
-          message: "Some of your contacts were not loaded correctly. Try to reload the page."
+        handleError({
+          errorData: { message: 'Some of your contacts were not loaded correctly. Try to reload the page.' },
+          message: 'Some of your contacts were not loaded correctly. Try to reload the page.',
         })
         setIsSearching(false)
       }
     },
-    [contactsList, errors] // eslint-disable-line react-hooks/exhaustive-deps
+    [contactsList, handleError], // eslint-disable-line react-hooks/exhaustive-deps
   )
 
   useEffect(() => {
@@ -120,12 +124,12 @@ const ContactsSearch: React.FC<Props> = ({ wrapperRef }) => {
         let contacts: any = []
         const getInitialContacts = async () => {
           const contactsData = await contactsListRef
-            .orderByChild("userNameLowerCase")
+            .orderByChild('userNameLowerCase')
             .limitToFirst(CONTACTS_TO_LOAD + additionalContactsToLoad)
-            .once("value")
+            .once('value')
           const contactsLength = Object.keys(contactsData.val() || {}).length
           const contactsDataFiltered = Object.values(contactsData.val() || {}).filter(
-            (contact: any) => contact.status === true && !contact.isGroupChat
+            (contact: any) => contact.status === true && !contact.isGroupChat,
           )
 
           if (contactsLength < 20 || contactsDataFiltered.length >= 20) {
@@ -134,7 +138,7 @@ const ContactsSearch: React.FC<Props> = ({ wrapperRef }) => {
           }
 
           if (contactsLength >= 20 && contactsLength !== contactsDataFiltered.length) {
-            additionalContactsToLoad = additionalContactsToLoad + CONTACTS_TO_LOAD
+            additionalContactsToLoad += CONTACTS_TO_LOAD
             await getInitialContacts()
           } else {
             contacts = contactsData
@@ -143,13 +147,14 @@ const ContactsSearch: React.FC<Props> = ({ wrapperRef }) => {
         await getInitialContacts()
         getContactsData({ snapshot: contacts })
       } catch (error) {
-        errors.handleError({
-          message: "Some of your contacts were not loaded correctly. Try to reload the page."
+        handleError({
+          errorData: { message: 'Some of your contacts were not loaded correctly. Try to reload the page.' },
+          message: 'Some of your contacts were not loaded correctly. Try to reload the page.',
         })
         setInitialLoading(false)
       }
     })()
-  }, [firebase, authUser, errors]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [firebase, authUser, handleError]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!isScrolledDown) return
@@ -159,66 +164,73 @@ const ContactsSearch: React.FC<Props> = ({ wrapperRef }) => {
       try {
         setLoading(true)
         const contactsData = await contactsListRef
-          .orderByChild("userNameLowerCase")
+          .orderByChild('userNameLowerCase')
           .startAfter(contactsList[contactsList.length - 1].userNameLowerCase)
           .limitToFirst(CONTACTS_TO_LOAD)
-          .once("value")
+          .once('value')
         getContactsData({ snapshot: contactsData })
       } catch (error) {
-        errors.handleError({
-          message: "Some of your contacts were not loaded correctly. Try to reload the page."
+        handleError({
+          errorData: { message: 'Some of your contacts were not loaded correctly. Try to reload the page.' },
+          message: 'Some of your contacts were not loaded correctly. Try to reload the page.',
         })
         setLoading(false)
       }
     })()
-  }, [isScrolledDown, allContactsLoaded, errors, loading, contactsList]) // eslint-disable-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isScrolledDown, allContactsLoaded, handleError, loading, contactsList])
 
   const contactsToRender = !searchedContacts?.length ? contactsList : searchedContacts
-  return (
-    <>
-      <div className="contacts-search">
-        <div className="contacts-search__selected-members">
-          {groupCreation.members.map((member) => (
-            <div
-              key={member.key}
-              className="contacts-search__selected-contact"
-              onClick={() =>
-                contactsDispatch({
-                  type: "updateGroupMembers",
-                  payload: { removeMember: true, newMember: { key: member.key } }
-                })
-              }
-            >
-              <div className="contacts-search__selected-contact-name">{member.userName}</div>
-              <div className="contacts-search__selected-contact-remove">
-                <button type="button"></button>
-              </div>
-            </div>
-          ))}
+
+  const renderContactList = () => {
+    if (initialLoading) {
+      return (
+        <div className="contact-list__loader-wrapper">
+          <span className="contact-list__loader" />
         </div>
-        <SearchInput onSearch={handleSearch} isSearching={isSearching} contactsList={contactsList} />
-        {!groupCreation.selectNameActive && (
-          <div className="contact-list">
-            {initialLoading ? (
-              <div className="contact-list__loader-wrapper">
-                <span className="contact-list__loader"></span>
-              </div>
-            ) : !contactsList.length ? (
-              <div className="contact-list--no-contacts-text">You don't have any contacts</div>
-            ) : searchedContacts === null ? (
-              <div className="contact-list--no-contacts-text">No contacts found</div>
-            ) : (
-              contactsToRender.map((contact) => <Contact key={contact.key} contact={contact} />)
-            )}
-            {loading && (
-              <div className="contact-list__loader-wrapper">
-                <span className="contact-list__loader"></span>
-              </div>
-            )}
+      )
+    }
+    if (!contactsList.length) {
+      return <div className="contact-list--no-contacts-text">You don&lsquo;t have any contacts</div>
+    }
+    if (searchedContacts === null) {
+      return <div className="contact-list--no-contacts-text">No contacts found</div>
+    }
+    return contactsToRender.map((contact) => <Contact key={contact.key} contact={contact} />)
+  }
+  return (
+    <div className="contacts-search">
+      <div className="contacts-search__selected-members">
+        {groupCreation.members.map((member) => (
+          <div
+            key={member.key}
+            className="contacts-search__selected-contact"
+            onClick={() =>
+              contactsDispatch({
+                type: 'updateGroupMembers',
+                payload: { removeMember: true, newMember: { key: member.key } },
+              })
+            }
+          >
+            <div className="contacts-search__selected-contact-name">{member.userName}</div>
+            <div className="contacts-search__selected-contact-remove">
+              <button type="button" />
+            </div>
           </div>
-        )}
+        ))}
       </div>
-    </>
+      <SearchInput onSearch={handleSearch} isSearching={isSearching} contactsList={contactsList} />
+      {!groupCreation.selectNameActive && (
+        <div className="contact-list">
+          {renderContactList()}
+          {loading && (
+            <div className="contact-list__loader-wrapper">
+              <span className="contact-list__loader" />
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   )
 }
 

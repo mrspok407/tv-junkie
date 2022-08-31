@@ -1,8 +1,8 @@
-import { GroupCreationNewMemberInterface } from "Components/Pages/Contacts/@Types"
-import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
+import { GroupCreationNewMemberInterface } from 'Components/Pages/Contacts/@Types'
+import { AuthUserInterface } from 'Components/UserAuth/Session/Authentication/@Types'
 
 interface ContextInterface {
-  authUser: AuthUserInterface
+  authUser: AuthUserInterface['authUser']
 }
 
 interface DataInterface {
@@ -23,10 +23,10 @@ interface GroupChatMemberStatusInterface {
 
 const contactsDatabaseRef = (uid: string) => `${uid}/contactsDatabase`
 
-export const _removeMemberFromGroup = async ({
+export const removeMemberFromGroupTest = async ({
   data,
   context,
-  database
+  database,
 }: {
   data: {
     member: any
@@ -40,7 +40,7 @@ export const _removeMemberFromGroup = async ({
   const { member, groupChatKey, timeStampData } = data
 
   if (!authUid) {
-    throw new Error("The function must be called while authenticated.")
+    throw new Error('The function must be called while authenticated.')
   }
 
   const newMessageRef = database.ref(`groupChats/${groupChatKey}/messages`).push()
@@ -49,20 +49,22 @@ export const _removeMemberFromGroup = async ({
       [`groupChats/${groupChatKey}/messages/${newMessageRef.key}`]: {
         removedMember: {
           key: member.key,
-          userName: member.userName
+          userName: member.userName,
         },
         isRemovedMember: true,
-        timeStamp: timeStampData
+        timeStamp: timeStampData,
       },
       [`groupChats/${groupChatKey}/members/participants/${member.key}`]: null,
       [`groupChats/${groupChatKey}/members/status/${member.key}`]: null,
       [`groupChats/${groupChatKey}/members/unreadMessages/${member.key}`]: null,
       [`users/${member.key}/contactsDatabase/contactsList/${groupChatKey}/removedFromGroup`]: true,
       [`users/${member.key}/contactsDatabase/newContactsActivity/${groupChatKey}`]: true,
-      [`users/${member.key}/contactsDatabase/contactsLastActivity/${groupChatKey}`]: timeStampData
+      [`users/${member.key}/contactsDatabase/contactsLastActivity/${groupChatKey}`]: timeStampData,
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+    await new Promise((resolve) => {
+      setTimeout(resolve, 1500)
+    })
 
     return database.ref().update(updateData)
   } catch (error) {
@@ -70,10 +72,10 @@ export const _removeMemberFromGroup = async ({
   }
 }
 
-export const _addNewGroupMembers = async ({
+export const addNewGroupMembersTest = async ({
   data,
   context,
-  database
+  database,
 }: {
   data: {
     members: GroupCreationNewMemberInterface[]
@@ -87,7 +89,7 @@ export const _addNewGroupMembers = async ({
   const { members, groupInfo, timeStamp } = data
 
   if (!authUid) {
-    throw new Error("The function must be called while authenticated.")
+    throw new Error('The function must be called while authenticated.')
   }
   const membersUpdateData: any = {}
   const newMessageRef = database.ref(`groupChats/${groupInfo.key}/messages`).push()
@@ -98,12 +100,12 @@ export const _addNewGroupMembers = async ({
       isOnline: false,
       userName: member.userName,
       userNameLowerCase: member.userName?.toLowerCase(),
-      role: "USER"
+      role: 'USER',
     }
     membersUpdateData[`users/${member.key}/contactsDatabase/contactsList/${groupInfo.key}/isGroupChat`] = true
     membersUpdateData[`users/${member.key}/contactsDatabase/contactsList/${groupInfo.key}/groupName`] =
       groupInfo.groupName
-    membersUpdateData[`users/${member.key}/contactsDatabase/contactsList/${groupInfo.key}/role`] = "USER"
+    membersUpdateData[`users/${member.key}/contactsDatabase/contactsList/${groupInfo.key}/role`] = 'USER'
     membersUpdateData[`users/${member.key}/contactsDatabase/contactsList/${groupInfo.key}/removedFromGroup`] = false
     membersUpdateData[`users/${member.key}/contactsDatabase/contactsLastActivity/${groupInfo.key}`] = timeStamp
     membersUpdateData[`users/${member.key}/contactsDatabase/newContactsActivity/${groupInfo.key}`] = true
@@ -115,20 +117,22 @@ export const _addNewGroupMembers = async ({
       [`groupChats/${groupInfo.key}/messages/${newMessageRef.key}`]: {
         newMembers: members,
         isNewMembers: true,
-        timeStamp
-      }
+        timeStamp,
+      },
     }
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+    await new Promise((resolve) => {
+      setTimeout(resolve, 1500)
+    })
     return database.ref().update(updateData)
   } catch (error) {
     throw new Error(`There has been some error updating database: ${error}`)
   }
 }
 
-export const _createNewGroup = async ({
+export const createNewGroupTest = async ({
   data,
   context,
-  database
+  database,
 }: {
   data: { members: GroupCreationNewMemberInterface[]; groupName: string; timeStamp?: number }
   context: ContextInterface
@@ -138,10 +142,10 @@ export const _createNewGroup = async ({
   const { members, groupName, timeStamp } = data
 
   if (!authUid) {
-    throw new Error("The function must be called while authenticated.")
+    throw new Error('The function must be called while authenticated.')
   }
   const membersUpdateData: any = {}
-  const groupChatRef = database.ref("groupChats").push()
+  const groupChatRef = database.ref('groupChats').push()
   const newMessageRef = database.ref(`groupChats/${groupChatRef.key}/messages`).push()
 
   members.forEach((member) => {
@@ -150,13 +154,13 @@ export const _createNewGroup = async ({
       isOnline: false,
       userName: member.userName,
       userNameLowerCase: member.userName?.toLowerCase(),
-      role: "USER"
+      role: 'USER',
     }
     membersUpdateData[`users/${member.key}/contactsDatabase/contactsList/${groupChatRef.key}`] = {
-      pinned_lastActivityTS: "false",
+      pinned_lastActivityTS: 'false',
       isGroupChat: true,
-      groupName: groupName || "Nameless group wow",
-      role: "USER"
+      groupName: groupName || 'Nameless group wow',
+      role: 'USER',
     }
     membersUpdateData[`users/${member.key}/contactsDatabase/contactsLastActivity/${groupChatRef.key}`] = timeStamp
     membersUpdateData[`users/${member.key}/contactsDatabase/newContactsActivity/${groupChatRef.key}`] = true
@@ -170,40 +174,38 @@ export const _createNewGroup = async ({
         isOnline: false,
         userName: context?.authUser?.username,
         userNameLowerCase: context?.authUser?.username?.toLowerCase(),
-        role: "ADMIN"
+        role: 'ADMIN',
       },
       [`users/${authUid}/contactsDatabase/contactsList/${groupChatRef.key}`]: {
-        pinned_lastActivityTS: "false",
+        pinned_lastActivityTS: 'false',
         isGroupChat: true,
-        groupName: groupName || "Nameless group wow",
-        role: "ADMIN"
+        groupName: groupName || 'Nameless group wow',
+        role: 'ADMIN',
       },
       [`users/${authUid}/contactsDatabase/contactsLastActivity/${groupChatRef.key}`]: timeStamp,
       [`groupChats/${groupChatRef.key}/messages/${newMessageRef.key}`]: {
         newMembers: members,
         isNewMembers: true,
-        timeStamp
+        timeStamp,
       },
       [`groupChats/${groupChatRef.key}/info`]: {
-        groupName: groupName || "Nameless group wow"
-      }
+        groupName: groupName || 'Nameless group wow',
+      },
     }
 
     return database
       .ref()
       .update(updateData)
-      .then(() => {
-        return { newGroupChatKey: groupChatRef.key }
-      })
+      .then(() => ({ newGroupChatKey: groupChatRef.key }))
   } catch (error) {
     throw new Error(`There has been some error updating database: ${error}`)
   }
 }
 
-export const _newContactRequest = async ({
+export const newContactRequestTest = async ({
   data,
   context,
-  database
+  database,
 }: {
   data: DataInterface
   context: ContextInterface
@@ -213,7 +215,7 @@ export const _newContactRequest = async ({
   const { contactUid, contactName, timeStamp } = data
 
   if (!authUid) {
-    throw new Error("The function must be called while authenticated.")
+    throw new Error('The function must be called while authenticated.')
   }
 
   try {
@@ -223,7 +225,7 @@ export const _newContactRequest = async ({
         receiver: true,
         userName: contactName,
         userNameLowerCase: contactName?.toLowerCase(),
-        pinned_lastActivityTS: "false"
+        pinned_lastActivityTS: 'false',
       },
       [`users/${contactsDatabaseRef(authUid)}/contactsLastActivity/${contactUid}`]: timeStamp,
       [`users/${contactsDatabaseRef(contactUid)}/newContactsRequests/${authUid}`]: true,
@@ -233,8 +235,8 @@ export const _newContactRequest = async ({
         receiver: false,
         userName: context?.authUser?.username,
         userNameLowerCase: context?.authUser?.username?.toLowerCase(),
-        pinned_lastActivityTS: "false"
-      }
+        pinned_lastActivityTS: 'false',
+      },
     }
 
     return database.ref().update(updateData)
@@ -243,11 +245,11 @@ export const _newContactRequest = async ({
   }
 }
 
-export const _handleContactRequest = async ({
+export const handleContactRequestTest = async ({
   data,
   context,
   database,
-  timeStamp
+  timeStamp,
 }: {
   data: DataInterface
   context: ContextInterface
@@ -258,31 +260,31 @@ export const _handleContactRequest = async ({
   const { contactUid, status } = data
 
   if (!authUid) {
-    throw new Error("The function must be called while authenticated.")
+    throw new Error('The function must be called while authenticated.')
   }
 
   const chatKey = contactUid < authUid ? `${contactUid}_${authUid}` : `${authUid}_${contactUid}`
   const newMessageRef = database.ref(`privateChats/${chatKey}/messages`).push()
 
-  const authPathToUpdate = status === "accept" ? `${contactUid}/status` : contactUid
+  const authPathToUpdate = status === 'accept' ? `${contactUid}/status` : contactUid
 
   try {
     const updateData = {
-      [`users/${contactsDatabaseRef(authUid)}/contactsList/${authPathToUpdate}`]: status === "accept" ? true : null,
+      [`users/${contactsDatabaseRef(authUid)}/contactsList/${authPathToUpdate}`]: status === 'accept' ? true : null,
       [`users/${contactsDatabaseRef(authUid)}/newContactsRequests/${contactUid}`]: null,
       [`users/${contactsDatabaseRef(authUid)}/contactsLastActivity/${contactUid}`]:
-        status === "accept" ? timeStamp : null,
+        status === 'accept' ? timeStamp : null,
       [`users/${contactsDatabaseRef(contactUid)}/contactsList/${authUid}/status`]:
-        status === "accept" ? true : "rejected",
+        status === 'accept' ? true : 'rejected',
       [`users/${contactsDatabaseRef(contactUid)}/newContactsActivity/${authUid}`]: true,
       [`users/${contactsDatabaseRef(contactUid)}/contactsLastActivity/${authUid}`]: timeStamp,
       [`privateChats/${chatKey}/messages/${newMessageRef.key}`]:
-        status === "accept"
+        status === 'accept'
           ? {
               isNowContacts: true,
-              timeStamp
+              timeStamp,
             }
-          : null
+          : null,
     }
 
     return database.ref().update(updateData)

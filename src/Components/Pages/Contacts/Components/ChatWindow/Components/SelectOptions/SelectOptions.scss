@@ -6,7 +6,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   column-gap: 10px;
-  top: -70px;
+  top: calc((var(--height) * -1) - 20px);
   left: 50%;
   width: getDimm(width, $selectOptionsDimm);
   padding: 10px;
@@ -52,7 +52,7 @@
 
       @include mediaMinW(#{$mobileViewPort}) {
         &:hover {
-         background-color: getColor(btnCancelBgHover, $selectOptionsPalette);
+          background-color: getColor(btnCancelBgHover, $selectOptionsPalette);
         }
       }
     }

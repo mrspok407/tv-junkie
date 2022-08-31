@@ -1,8 +1,9 @@
-import classNames from "classnames"
-import { MessageInterface } from "Components/Pages/Contacts/@Types"
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
-import React from "react"
-import "./InfoMessage.scss"
+/* eslint-disable no-nested-ternary */
+import classNames from 'classnames'
+import { MessageInterface } from 'Components/Pages/Contacts/@Types'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import React from 'react'
+import './InfoMessage.scss'
 
 type Props = {
   renderedMessage: MessageInterface
@@ -15,7 +16,7 @@ const InfoMessage: React.FC<Props> = ({ renderedMessage, privateChat = false }) 
   const contactInfo = contacts[activeChat.contactKey]
   const newMembers = Object.values(renderedMessage.newMembers || {})
     .map((member) => member.userName)
-    .join(", ")
+    .join(', ')
 
   const { removedMember, leftMember, isRemovedFromContacts, isNowContacts } = renderedMessage
   const isAuthUser = removedMember?.key === authUser?.uid
@@ -31,8 +32,8 @@ const InfoMessage: React.FC<Props> = ({ renderedMessage, privateChat = false }) 
             <div className="chat-window__message-inner">
               {removedMember ? (
                 <div className="chat-window__message-text">
-                  {isAuthUser ? "You" : `${removedMember.userName}`}{" "}
-                  <span>{isAuthUser ? "were" : "was"} removed from this group</span>
+                  {isAuthUser ? 'You' : `${removedMember.userName}`}{' '}
+                  <span>{isAuthUser ? 'were' : 'was'} removed from this group</span>
                 </div>
               ) : leftMember ? (
                 <div className="chat-window__message-text">

@@ -1,8 +1,8 @@
-@import "./styles/globals";
-@import "./styles/global-layout/global-layout.scss";
+@import './styles/globals';
+@import './styles/global-layout/global-layout.scss';
 
 body {
-  font-family: "Open Sans", sans-serif;
+  font-family: 'Open Sans', sans-serif;
   background-color: $bodyBackgroundClr;
   @include scrollbar(5px, getColor(blueClr, $mainPalette), #c5bbb1);
 }
@@ -40,13 +40,13 @@ a {
   width: 35px;
   height: 100vh;
   top: 0;
-  left: 0;
+  right: 0;
   @include mediaMaxW(#{$mobileViewPort + 80px}) {
     display: none;
   }
   &:after,
   &:before {
-    content: "";
+    content: '';
     position: absolute;
     bottom: 170px;
     left: 14px;
@@ -100,6 +100,6 @@ input::-webkit-inner-spin-button {
 }
 
 /* Firefox */
-input[type="number"] {
+input[type='number'] {
   -moz-appearance: textfield;
 }

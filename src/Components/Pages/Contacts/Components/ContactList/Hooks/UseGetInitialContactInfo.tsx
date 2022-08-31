@@ -1,20 +1,18 @@
-import { AppContext } from "Components/AppContext/AppContextHOC"
-import { FirebaseContext } from "Components/Firebase/FirebaseContext"
-import { ContactInfoInterface, MessageInterface } from "Components/Pages/Contacts/@Types"
-import { useContext, useRef } from "react"
+import { ContactInfoInterface, MessageInterface } from 'Components/Pages/Contacts/@Types'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import { useRef } from 'react'
 
 const useGetInitialContactInfo = () => {
-  const { authUser } = useContext(AppContext)
-  const firebase = useContext(FirebaseContext)
+  const { authUser, firebase } = useFrequentVariables()
   const loadedContactsRef = useRef<{ [key: string]: ContactInfoInterface }>({})
 
-  const getContactsInfo = async ({ contactsData }: { contactsData: ContactInfoInterface[] }) => {
-    return await Promise.all(
+  const getContactsInfo = async ({ contactsData }: { contactsData: ContactInfoInterface[] }) =>
+    Promise.all(
       contactsData.map(async (contact) => {
         if (loadedContactsRef.current[contact.key]) {
           return {
             ...loadedContactsRef.current[contact.key],
-            ...contact
+            ...contact,
           }
         }
 
@@ -23,27 +21,27 @@ const useGetInitialContactInfo = () => {
           newContactsRequests,
           unreadMessagesAuthData,
           unreadMessagesContactData,
-          lastMessage
+          lastMessage,
         ]: [
           { val: () => boolean | null },
           { val: () => boolean | null },
           { val: () => { [key: string]: boolean } },
           { val: () => { [key: string]: boolean } },
-          { val: () => MessageInterface | null }
+          { val: () => MessageInterface | null },
         ] = await Promise.all([
-          firebase.newContactsActivity({ uid: authUser?.uid! }).child(`${contact.key}`).once("value"),
-          firebase.newContactsRequests({ uid: authUser?.uid! }).child(`${contact.key}`).once("value"),
+          firebase.newContactsActivity({ uid: authUser?.uid! }).child(`${contact.key}`).once('value'),
+          firebase.newContactsRequests({ uid: authUser?.uid! }).child(`${contact.key}`).once('value'),
           firebase
             .unreadMessages({ uid: authUser?.uid!, chatKey: contact.chatKey, isGroupChat: contact.isGroupChat })
-            .once("value"),
+            .once('value'),
           firebase
             .unreadMessages({ uid: contact.key, chatKey: contact.chatKey, isGroupChat: contact.isGroupChat })
-            .once("value"),
+            .once('value'),
           firebase
             .messages({ chatKey: contact.chatKey, isGroupChat: contact.isGroupChat })
-            .orderByChild("timeStamp")
+            .orderByChild('timeStamp')
             .limitToLast(1)
-            .once("value")
+            .once('value'),
         ])
 
         const unreadMessages = !unreadMessagesAuthData.val() ? [] : Object.keys(unreadMessagesAuthData.val())
@@ -58,18 +56,17 @@ const useGetInitialContactInfo = () => {
           newContactsRequests: !!newContactsRequests.val(),
           unreadMessages,
           unreadMessagesContact,
-          lastMessage: lastMessage.val() !== null ? Object.values(lastMessage.val() || []).map((item) => item)[0] : {}
+          lastMessage: lastMessage.val() !== null ? Object.values(lastMessage.val()!).map((item) => item)[0] : {},
         }
 
         loadedContactsRef.current = {
           ...loadedContactsRef.current,
-          [contact.key]: contactInfo
+          [contact.key]: contactInfo,
         }
 
         return contactInfo
-      })
+      }),
     )
-  }
 
   return { getContactsInfo }
 }

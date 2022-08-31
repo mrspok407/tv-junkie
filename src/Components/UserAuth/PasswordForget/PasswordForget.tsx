@@ -1,15 +1,15 @@
 /* eslint-disable react/no-access-state-in-setstate */
-import React, { useContext, useState } from "react"
-import { validEmailRegex } from "Utils"
-import classNames from "classnames"
-import Input from "../Input/Input"
-import { FirebaseContext } from "Components/Firebase"
+import React, { useState } from 'react'
+import { validEmailRegex } from 'Utils'
+import classNames from 'classnames'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import Input from '../Input/Input'
 
 interface ErrorsInterface {
   emailError: string
   emailOnBlur: boolean
   error: { message: string }
-  [key: string]: string | boolean | {}
+  [key: string]: string | boolean | Record<string, unknown>
 }
 
 interface RequiredInputsInterface {
@@ -17,20 +17,20 @@ interface RequiredInputsInterface {
 }
 
 const ERROR_DEFAULT_VALUES = {
-  emailError: "",
+  emailError: '',
   emailOnBlur: false,
-  error: { message: "" }
+  error: { message: '' },
 }
 
 const PasswordForget: React.FC = () => {
-  const [requiredInputs, setRequiredInputs] = useState<RequiredInputsInterface>({ email: "" })
+  const { firebase } = useFrequentVariables()
+
+  const [requiredInputs, setRequiredInputs] = useState<RequiredInputsInterface>({ email: '' })
   const [errors, setErrors] = useState<ErrorsInterface>(ERROR_DEFAULT_VALUES)
   const [submitClicked, setSubmitClicked] = useState(false)
   const [submitRequestLoading, setSubmitRequestLoading] = useState(false)
   const [emailSentSuccess, setEmailSentSuccess] = useState(false)
   const [isEmailValid, setIsEmailValid] = useState(false)
-
-  const firebase = useContext(FirebaseContext)
 
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     setSubmitRequestLoading(true)
@@ -41,7 +41,7 @@ const PasswordForget: React.FC = () => {
     if (!isFormValid(errors, requiredInputs)) {
       for (const [key, value] of Object.entries(requiredInputs)) {
         if (value.length === 0) {
-          errorsOnSubmit[`${key}Error`] = "Required"
+          errorsOnSubmit[`${key}Error`] = 'Required'
         }
       }
       setErrors(errorsOnSubmit)
@@ -53,7 +53,7 @@ const PasswordForget: React.FC = () => {
     firebase
       .passwordReset(email)
       .then(() => {
-        setRequiredInputs({ email: "" })
+        setRequiredInputs({ email: '' })
         setEmailSentSuccess(true)
         setSubmitRequestLoading(false)
       })
@@ -70,14 +70,14 @@ const PasswordForget: React.FC = () => {
     let errorsOnChange = { ...errors }
 
     if (errorsOnChange[`${name}OnBlur`] || submitClicked) {
-      if (name === "email") {
-        errorsOnChange[`${name}Error`] = validEmailRegex.test(value) ? "" : "Invalid email"
+      if (name === 'email') {
+        errorsOnChange[`${name}Error`] = validEmailRegex.test(value) ? '' : 'Invalid email'
       }
     }
 
     setIsEmailValid(validEmailRegex.test(value))
 
-    if (value === "") errorsOnChange = ERROR_DEFAULT_VALUES
+    if (value === '') errorsOnChange = ERROR_DEFAULT_VALUES
 
     setErrors(errorsOnChange)
     setRequiredInputs({ ...requiredInputs, [name]: value })
@@ -93,12 +93,12 @@ const PasswordForget: React.FC = () => {
     errorsOnBlur[`${name}OnBlur`] = true
 
     if (!submitClicked) {
-      if (name === "email") {
-        errorsOnBlur[`${name}Error`] = validEmailRegex.test(email) ? "" : "Invalid email"
+      if (name === 'email') {
+        errorsOnBlur[`${name}Error`] = validEmailRegex.test(email) ? '' : 'Invalid email'
       }
 
-      if (value === "") {
-        errorsOnBlur[`${name}Error`] = ""
+      if (value === '') {
+        errorsOnBlur[`${name}Error`] = ''
         errorsOnBlur[`${name}OnBlur`] = false
       }
     }
@@ -109,8 +109,8 @@ const PasswordForget: React.FC = () => {
   const handleKeyDown = (e: any) => e.which === 27 && resetInput(e.target.name)
 
   const resetInput = (name: string) => {
-    setRequiredInputs({ ...requiredInputs, [`${name}`]: "" })
-    setErrors({ ...errors, [`${name}Error`]: "" })
+    setRequiredInputs({ ...requiredInputs, [`${name}`]: '' })
+    setErrors({ ...errors, [`${name}Error`]: '' })
   }
 
   const isFormValid = (errors: ErrorsInterface, requiredInputs: RequiredInputsInterface) => {
@@ -124,8 +124,8 @@ const PasswordForget: React.FC = () => {
   return (
     <form className="auth__form" onSubmit={onSubmit}>
       <Input
-        classNameInput={classNames("auth__form-input", {
-          "auth__form-input--error": errors.emailError
+        classNameInput={classNames('auth__form-input', {
+          'auth__form-input--error': errors.emailError,
         })}
         classNameLabel="auth__form-label"
         name="email"
@@ -143,12 +143,12 @@ const PasswordForget: React.FC = () => {
       {errors.error && <div className="auth__form-error">{errors.error.message}</div>}
 
       <button
-        className={classNames("button button--auth__form", {
-          "button--disabled": !isFormValid(errors, requiredInputs) || !isEmailValid
+        className={classNames('button button--auth__form', {
+          'button--auth__form--disabled': !isFormValid(errors, requiredInputs) || !isEmailValid,
         })}
         type="submit"
       >
-        {submitRequestLoading ? <span className="auth__form-loading"></span> : "Reset Password"}
+        {submitRequestLoading ? <span className="button-loader-circle" /> : 'Reset Password'}
       </button>
     </form>
   )

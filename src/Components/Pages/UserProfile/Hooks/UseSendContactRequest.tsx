@@ -1,7 +1,7 @@
-import { useContext, useState } from "react"
-import { FirebaseContext } from "Components/Firebase"
-import { AppContext } from "Components/AppContext/AppContextHOC"
-import { uniqueNamesGenerator, animals } from "unique-names-generator"
+import { useContext, useState } from 'react'
+import { uniqueNamesGenerator, animals } from 'unique-names-generator'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import { ErrorInterface, ErrorsHandlerContext } from 'Components/AppContext/Contexts/ErrorsContext'
 
 type Props = {
   contactName: string
@@ -9,8 +9,8 @@ type Props = {
 }
 
 const useSendContactRequest = ({ contactName, contactUid }: Props) => {
-  const { authUser, errors } = useContext(AppContext)
-  const firebase = useContext(FirebaseContext)
+  const { firebase, authUser } = useFrequentVariables()
+  const handleError = useContext(ErrorsHandlerContext)
   const [contactRequestLoading, setContactRequestLoading] = useState(false)
 
   const sendContactRequest = async () => {
@@ -19,18 +19,19 @@ const useSendContactRequest = ({ contactName, contactUid }: Props) => {
       setContactRequestLoading(true)
       const randomUserName = uniqueNamesGenerator({
         dictionaries: [animals],
-        style: "capital"
+        style: 'capital',
       })
-      const newContactRequestCloud = firebase.httpsCallable("newContactRequest")
+      const newContactRequestCloud = firebase.httpsCallable('newContactRequest')
       await newContactRequestCloud({
         contactUid,
         contactName: contactName || randomUserName,
-        authUserName: authUser?.username
+        authUserName: authUser?.username,
       })
-    } catch (error) {
-      errors.handleError({
+    } catch (err) {
+      const error = err as ErrorInterface['errorData']
+      handleError({
         errorData: error,
-        message: "There has been some error updating database. Please try again."
+        message: 'There has been some error updating database. Please try again.',
       })
 
       throw new Error(`There has been some error updating database: ${error}`)

@@ -1,8 +1,8 @@
-import classNames from "classnames"
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
-import React from "react"
-import useCreateNewGroup from "../Hooks/UseCreateNewGroup"
-import "./HandleNewMembers.scss"
+import classNames from 'classnames'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import React from 'react'
+import useCreateNewGroup from '../Hooks/UseCreateNewGroup'
+import './HandleNewMembers.scss'
 
 const HandleNewMembers: React.FC = () => {
   const { contactsState, contactsDispatch } = useFrequentVariables()
@@ -12,26 +12,24 @@ const HandleNewMembers: React.FC = () => {
 
   return (
     <div
-      className={classNames("handle-new-members", {
-        "handle-new-members--arrow": groupCreation.isActive,
-        "handle-new-members--loading": groupCreation.loading
+      className={classNames('handle-new-members', {
+        'handle-new-members--arrow': groupCreation.isActive,
+        'handle-new-members--loading': groupCreation.loading,
       })}
     >
       <button
         type="button"
         onClick={() => {
           if (!groupCreation.isActive) {
-            contactsDispatch({ type: "updateGroupCreation", payload: { isActive: true } })
-          } else {
-            if (!groupCreation.selectNameActive) {
-              contactsDispatch({ type: "updateGroupCreation", payload: { selectNameActive: true } })
+            contactsDispatch({ type: 'updateGroupCreation', payload: { isActive: true } })
+          } else if (!groupCreation.selectNameActive) {
+              contactsDispatch({ type: 'updateGroupCreation', payload: { selectNameActive: true } })
             } else {
               if (groupCreation.loading) return
               createNewGroup()
             }
-          }
         }}
-      ></button>
+      />
     </div>
   )
 }

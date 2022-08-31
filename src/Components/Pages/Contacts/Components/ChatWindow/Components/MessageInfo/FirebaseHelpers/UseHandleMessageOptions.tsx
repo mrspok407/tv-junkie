@@ -1,14 +1,17 @@
-import { MessageInterface } from "Components/Pages/Contacts/@Types"
-import { MESSAGE_LINE_HEIGHT } from "../../../../@Context/Constants"
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
-import striptags from "striptags"
+import { MessageInterface } from 'Components/Pages/Contacts/@Types'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import striptags from 'striptags'
+import { ErrorInterface, ErrorsHandlerContext } from 'Components/AppContext/Contexts/ErrorsContext'
+import { useContext } from 'react'
+import { MESSAGE_LINE_HEIGHT } from '../../../../@Context/Constants'
 
 type Props = {
   messageData?: MessageInterface
 }
 
 const useHandleMessageOptions = ({ messageData }: Props) => {
-  const { firebase, authUser, errors, contactsState, contactsDispatch } = useFrequentVariables()
+  const { firebase, authUser, contactsState, contactsDispatch } = useFrequentVariables()
+  const handleError = useContext(ErrorsHandlerContext)
   const { activeChat, messages, contacts, chatMembersStatus, contactsUnreadMessages } = contactsState
   const contactInfo = contacts[activeChat.contactKey]
   const contactsUnreadMessagesData = contactsUnreadMessages[activeChat.chatKey]
@@ -18,15 +21,15 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
   const selectMessage = async () => {
     if ((contactInfo.status !== undefined && contactInfo.status !== true) || contactInfo.removedFromGroup) return
     contactsDispatch({
-      type: "updateSelectedMessages",
-      payload: { messageKey: messageData?.key!, chatKey: activeChat.chatKey }
+      type: 'updateSelectedMessages',
+      payload: { messageKey: messageData?.key!, chatKey: activeChat.chatKey },
     })
   }
 
   const deleteMessageGroupChat = async ({ deleteMessagesKeys }: { deleteMessagesKeys: string[] }) => {
     if (contactInfo.removedFromGroup) return
 
-    contactsDispatch({ type: "updateMsgDeletionProcessLoading", payload: { messageDeletionProcess: true } })
+    contactsDispatch({ type: 'updateMsgDeletionProcessLoading', payload: { messageDeletionProcess: true } })
     const deletedMessagesData = messagesData.reduce((deletedMessagesData: MessageInterface[], message) => {
       if (deleteMessagesKeys.includes(message.key)) {
         deletedMessagesData.push(message)
@@ -39,13 +42,13 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
 
     if (failedDeliverMessages.length) {
       contactsDispatch({
-        type: "removeMessages",
-        payload: { removedMessages: failedDeliverMessages, chatKey: activeChat.chatKey }
+        type: 'removeMessages',
+        payload: { removedMessages: failedDeliverMessages, chatKey: activeChat.chatKey },
       })
     }
 
     try {
-      let updateData: { [key: string]: any } = {}
+      const updateData: { [key: string]: any } = {}
 
       successDeliverMessages.forEach((messageData) => {
         updateData[`groupChats/${activeChat.chatKey}/messages/${messageData.key}`] = null
@@ -54,24 +57,25 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
         })
       })
 
-      await firebase.database().ref().update(updateData)
-    } catch (error) {
-      errors.handleError({
+      await firebase.rootRef().update(updateData)
+    } catch (err) {
+      const error = err as ErrorInterface['errorData']
+      handleError({
         errorData: error,
-        message: "Message hasn't been deleted, because of the unexpected error."
+        message: 'Message hasn&apos;t been deleted, because of the unexpected error.',
       })
       throw new Error(`There has been some error updating database: ${error}`)
     } finally {
       contactsDispatch({
-        type: "updateMsgDeletionProcess",
-        payload: { messageDeletionProcess: false, deletedMessages: deletedMessagesData }
+        type: 'updateMsgDeletionProcess',
+        payload: { messageDeletionProcess: false, deletedMessages: deletedMessagesData },
       })
     }
   }
 
   const deleteMessagePrivateChat = async ({ deleteMessagesKeys }: { deleteMessagesKeys: string[] }) => {
     if (contactInfo.status !== true) return
-    contactsDispatch({ type: "updateMsgDeletionProcessLoading", payload: { messageDeletionProcess: true } })
+    contactsDispatch({ type: 'updateMsgDeletionProcessLoading', payload: { messageDeletionProcess: true } })
 
     const deletedMessagesData = messagesData.reduce((deletedMessagesData: MessageInterface[], message) => {
       if (deleteMessagesKeys.includes(message.key)) {
@@ -85,19 +89,19 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
 
     if (failedDeliverMessages.length) {
       contactsDispatch({
-        type: "removeMessages",
-        payload: { removedMessages: failedDeliverMessages, chatKey: activeChat.chatKey }
+        type: 'removeMessages',
+        payload: { removedMessages: failedDeliverMessages, chatKey: activeChat.chatKey },
       })
     }
 
     try {
-      let updateData: { [key: string]: any } = {}
+      const updateData: { [key: string]: any } = {}
       const unreadMsgsDataAfterDeletion = contactsUnreadMessagesData.filter(
-        (message) => !deleteMessagesKeys.includes(message)
+        (message) => !deleteMessagesKeys.includes(message),
       )
 
       const lastUnreadMsgAfterDeletion = messagesData.find(
-        (message) => message.key === unreadMsgsDataAfterDeletion[unreadMsgsDataAfterDeletion.length - 1]
+        (message) => message.key === unreadMsgsDataAfterDeletion[unreadMsgsDataAfterDeletion.length - 1],
       )
 
       const lastUnreadMsgBeforeDeletion = contactsUnreadMessagesData[contactsUnreadMessagesData.length - 1]
@@ -119,25 +123,26 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
           lastReadMessage?.timeStamp
       }
 
-      await firebase.database().ref().update(updateData)
-    } catch (error) {
-      errors.handleError({
+      await firebase.rootRef().update(updateData)
+    } catch (err) {
+      const error = err as ErrorInterface['errorData']
+      handleError({
         errorData: error,
-        message: "Message hasn't been deleted, because of the unexpected error."
+        message: 'Message hasn&apos;t been deleted, because of the unexpected error.',
       })
       throw new Error(`There has been some error updating database: ${error}`)
     } finally {
       contactsDispatch({
-        type: "updateMsgDeletionProcess",
-        payload: { messageDeletionProcess: false, deletedMessages: deletedMessagesData }
+        type: 'updateMsgDeletionProcess',
+        payload: { messageDeletionProcess: false, deletedMessages: deletedMessagesData },
       })
     }
   }
 
   const editMessage = async () => {
     if ((!contactInfo.isGroupChat && contactInfo.status !== true) || contactInfo.removedFromGroup) return
-    const inputRef = document.querySelector(".chat-window__input-message") as HTMLElement
-    const chatContainerRef = document.querySelector(".chat-window__messages-list-container") as HTMLElement
+    const inputRef = document.querySelector('.chat-window__input-message') as HTMLElement
+    const chatContainerRef = document.querySelector('.chat-window__messages-list-container') as HTMLElement
     const message = messagesData.find((message) => message.key === messageData?.key)
 
     inputRef.innerHTML = striptags(message?.message!)
@@ -147,8 +152,8 @@ const useHandleMessageOptions = ({ messageData }: Props) => {
     chatContainerRef.scrollTop = chatContainerRef?.scrollTop! + (inputHeight - MESSAGE_LINE_HEIGHT)!
 
     contactsDispatch({
-      type: "updateMessageInput",
-      payload: { message: message?.message!, editingMsgKey: messageData?.key }
+      type: 'updateMessageInput',
+      payload: { message: message?.message!, editingMsgKey: messageData?.key },
     })
   }
 

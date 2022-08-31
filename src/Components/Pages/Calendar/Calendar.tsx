@@ -1,14 +1,16 @@
-import React from "react"
-import { Helmet } from "react-helmet"
-import ScrollToTop from "Utils/ScrollToTopBar"
-import Header from "Components/UI/Header/Header"
-import CalendarContent from "./CalendarContent"
-import WithAuthorization from "Components/UserAuth/Session/WithAuthorization/WithAuthorization"
-import Footer from "Components/UI/Footer/Footer"
-import { AuthUserInterface } from "Utils/Interfaces/UserAuth"
-import "./Calendar.scss"
+import React from 'react'
+import { Helmet } from 'react-helmet'
+import ScrollToTopBar from 'Utils/ScrollToTopBar'
+import Header from 'Components/UI/Header/Header'
+import useAuthorization from 'Components/UserAuth/Session/Authentication/Hooks/useAuthorization'
+import Footer from 'Components/UI/Footer/Footer'
+import ScrollToTopOnMount from 'Utils/ScrollToTopOnMount'
+import CalendarContent from './CalendarContent'
+import './Calendar.scss'
 
 const CalendarPage: React.FC = () => {
+  const isAuthorize = useAuthorization({})
+  if (!isAuthorize) return null
   return (
     <>
       <Helmet>
@@ -17,11 +19,10 @@ const CalendarPage: React.FC = () => {
       <Header />
       <CalendarContent />
       <Footer />
-      <ScrollToTop />
+      <ScrollToTopBar />
+      <ScrollToTopOnMount />
     </>
   )
 }
 
-const condition = (authUser: AuthUserInterface) => authUser !== null
-
-export default WithAuthorization(condition)(CalendarPage)
+export default CalendarPage

@@ -1,12 +1,14 @@
+/* eslint-disable import/no-cycle */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState, useEffect, useRef, useCallback } from "react"
-import { useHistory } from "react-router-dom"
-import debounce from "debounce"
-import classNames from "classnames"
-import Loader from "Components/UI/Placeholders/Loader"
-import { mediaTypesArr } from "Utils"
-import { HandleSearchArg } from "../Search"
-import "./Input.scss"
+import React, { useState, useEffect, useRef, useCallback } from 'react'
+import { useHistory } from 'react-router-dom'
+import debounce from 'debounce'
+import classNames from 'classnames'
+import Loader from 'Components/UI/Placeholders/Loader'
+import { mediaTypesArr } from 'Utils'
+import useClickOutside from 'Utils/Hooks/UseClickOutside'
+import { HandleSearchArg } from '../Search'
+import './Input.scss'
 
 const MOBILE_LAYOUT = 1000
 
@@ -32,46 +34,39 @@ const Input: React.FC<Props> = ({
   listIsOpen,
   navSearch,
   linkOnKeyPress,
-  navigateSearchListByArrows
+  navigateSearchListByArrows,
 }) => {
-  const [query, setQuery] = useState<string>("")
-  const [mediaType, setMediaType] = useState<MediaType>({ type: "Multi", icon: mediaTypesArr[0].icon })
+  const [query, setQuery] = useState<string>('')
+  const [mediaType, setMediaType] = useState<MediaType>({ type: 'Multi', icon: mediaTypesArr[0].icon })
   const [mediaTypesIsOpen, setMediaTypesIsOpen] = useState(false)
   const [searchReset, setSearchReset] = useState(false)
 
-  const mediaTypeRef = useRef<HTMLDivElement>(null)
+  const mediaTypeRef = useRef<HTMLDivElement>(null!)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const history = useHistory()
 
   useEffect(() => {
     const windowWidth = window.innerWidth
-    if (history.action === "PUSH" && !navSearch && windowWidth > MOBILE_LAYOUT && inputRef?.current) {
+    if (history.action === 'PUSH' && !navSearch && windowWidth > MOBILE_LAYOUT && inputRef?.current) {
       inputRef.current.focus()
-    }
-
-    document.addEventListener("mousedown", handleClickOutside as EventListener)
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside as EventListener)
     }
   }, [])
 
+  const handleCloseMediaTypes = useCallback(() => {
+    setMediaTypesIsOpen(false)
+  }, [])
+  useClickOutside({ ref: mediaTypeRef, callback: handleCloseMediaTypes })
+
   useEffect(() => {
-    _runSearch(query, mediaType)
+    runSearch(query, mediaType)
   }, [mediaType])
 
   useEffect(() => {
-    _runSearch(query, mediaType)
+    runSearch(query, mediaType)
   }, [searchReset])
 
-  const handleClickOutside = (e: CustomEvent) => {
-    if (mediaTypeRef && mediaTypeRef.current && !mediaTypeRef.current.contains(e.target as Node)) {
-      setMediaTypesIsOpen(false)
-    }
-  }
-
-  const _runSearch = (query: string, mediatype: MediaType) => {
+  const runSearch = (query: string, mediatype: MediaType) => {
     onSearch({ query, mediatype })
   }
 
@@ -79,7 +74,7 @@ const Input: React.FC<Props> = ({
     debounce((query: string, mediatype: MediaType) => {
       onSearch({ query, mediatype })
     }, 300),
-    []
+    [],
   )
 
   const handleChange = (e: any) => {
@@ -93,12 +88,12 @@ const Input: React.FC<Props> = ({
   }, 300)
 
   const resetSearch = () => {
-    setQuery("")
+    setQuery('')
     setSearchReset(!searchReset)
   }
 
   const handleKeyDown = (e: any) => {
-    if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+    if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
       e.preventDefault()
     }
 
@@ -111,11 +106,11 @@ const Input: React.FC<Props> = ({
     <>
       <div
         ref={mediaTypeRef}
-        className={classNames("search__media-type", {
-          "search__media-type--is-open": mediaTypesIsOpen
+        className={classNames('search__media-type', {
+          'search__media-type--is-open': mediaTypesIsOpen,
         })}
         style={{
-          backgroundImage: `url(${mediaType.icon})`
+          backgroundImage: `url(${mediaType.icon})`,
         }}
       >
         <button
@@ -123,18 +118,18 @@ const Input: React.FC<Props> = ({
           onClick={() => setMediaTypesIsOpen(!mediaTypesIsOpen)}
           className="media-type__button media-type__selected-value"
         >
-          <span>{mediaType.type === "Multi" ? "All" : mediaType.type}</span>
+          <span>{mediaType.type === 'Multi' ? 'All' : mediaType.type}</span>
         </button>
         {mediaTypesIsOpen && (
           <div className="media-type__options">
             <ul className="media-type__list">
               {mediaTypesArr.map((item) => {
-                const type = item.type === "Multi" ? "All" : item.type
+                const type = item.type === 'Multi' ? 'All' : item.type
                 return (
                   <li
                     key={item.id}
-                    className={classNames("media-type__item", {
-                      "media-type__item--selected": item.type === mediaType.type
+                    className={classNames('media-type__item', {
+                      'media-type__item--selected': item.type === mediaType.type,
                     })}
                     style={{ backgroundImage: `url(${item.icon})` }}
                   >
@@ -142,7 +137,7 @@ const Input: React.FC<Props> = ({
                       type="button"
                       className="media-type__button"
                       value={item.type}
-                      onClick={(e: any) => {
+                      onClick={() => {
                         if (listIsOpen && inputRef.current) {
                           inputRef.current.focus()
                         }

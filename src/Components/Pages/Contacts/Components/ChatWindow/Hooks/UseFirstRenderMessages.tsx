@@ -1,7 +1,7 @@
-import { MessageInterface } from "Components/Pages/Contacts/@Types"
-import { useEffect, useContext, useRef } from "react"
-import { MESSAGES_TO_RENDER, UNREAD_MESSAGES_TO_RENDER } from "../../@Context/Constants"
-import { ContactsContext } from "../../@Context/ContactsContext"
+import { MessageInterface } from 'Components/Pages/Contacts/@Types'
+import { useEffect, useContext, useRef } from 'react'
+import { MESSAGES_TO_RENDER, UNREAD_MESSAGES_TO_RENDER } from '../../@Context/Constants'
+import { ContactsContext } from '../../@Context/ContactsContext'
 
 type Props = {
   messages: MessageInterface[]
@@ -21,29 +21,27 @@ const useFirstRenderMessages = ({ messages, renderedMessages, unreadMessages, ch
     }
     if (isRenderedRef.current) return
 
-    let startIndexRender: number = 0
-    let endIndexRender: number = 0
+    let startIndexRender = 0
+    let endIndexRender = 0
 
     if (messages.length <= MESSAGES_TO_RENDER) {
       startIndexRender = 0
       endIndexRender = messages.length
-    } else {
-      if (unreadMessages.length <= UNREAD_MESSAGES_TO_RENDER) {
+    } else if (unreadMessages.length <= UNREAD_MESSAGES_TO_RENDER) {
         startIndexRender = Math.max(messages.length - MESSAGES_TO_RENDER, 0)
         endIndexRender = messages.length
       } else {
         endIndexRender = messages.length - (unreadMessages.length! - UNREAD_MESSAGES_TO_RENDER)
         startIndexRender = Math.max(endIndexRender - MESSAGES_TO_RENDER, 0)
       }
-    }
 
     context?.dispatch({
-      type: "renderMessagesOnLoad",
+      type: 'renderMessagesOnLoad',
       payload: {
         startIndex: startIndexRender,
         endIndex: endIndexRender,
-        chatKey
-      }
+        chatKey,
+      },
     })
   }, [messages, chatKey]) // eslint-disable-line react-hooks/exhaustive-deps
 

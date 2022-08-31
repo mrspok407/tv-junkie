@@ -1,6 +1,6 @@
-import useFirebaseReferences from "Components/Pages/Contacts/Hooks/UseFirebaseReferences"
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
-import { useLayoutEffect, useCallback } from "react"
+import useFirebaseReferences from 'Components/Pages/Contacts/Hooks/UseFirebaseReferences'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import { useLayoutEffect, useCallback } from 'react'
 
 type Props = {
   chatContainerRef: HTMLDivElement
@@ -14,8 +14,8 @@ const useResizeObserver = ({ chatContainerRef, isScrollBottomRef }: Props) => {
 
   const handleResize = useCallback(() => {
     if (!chatContainerRef) return
-    const height = chatContainerRef.getBoundingClientRect().height
-    const scrollHeight = chatContainerRef.scrollHeight
+    const { height } = chatContainerRef.getBoundingClientRect()
+    const { scrollHeight } = chatContainerRef
 
     if (scrollHeight <= height) {
       isScrollBottomRef.current = true
@@ -26,20 +26,19 @@ const useResizeObserver = ({ chatContainerRef, isScrollBottomRef }: Props) => {
   useLayoutEffect(() => {
     if (!chatContainerRef) return
     if (window.ResizeObserver) {
-      let resizeObserver = new ResizeObserver(() => handleResize())
+      const resizeObserver = new ResizeObserver(() => handleResize())
       resizeObserver.observe(chatContainerRef)
 
       return () => {
         if (!resizeObserver) return
         resizeObserver.disconnect()
       }
-    } else {
-      window.addEventListener("resize", handleResize)
+    }
+      window.addEventListener('resize', handleResize)
 
       return () => {
-        window.removeEventListener("resize", handleResize)
+        window.removeEventListener('resize', handleResize)
       }
-    }
   }, [chatContainerRef, handleResize])
 }
 

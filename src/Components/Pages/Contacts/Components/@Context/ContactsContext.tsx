@@ -1,6 +1,7 @@
-import React, { useReducer, createContext } from "react"
-import { ContactsStateInterface } from "../../@Types"
-import reducer, { INITIAL_STATE, ACTIONTYPES } from "./_reducerConfig"
+/* eslint-disable react/jsx-no-constructed-context-values */
+import React, { useReducer, createContext } from 'react'
+import { ContactsStateInterface } from '../../@Types'
+import reducer, { INITIAL_STATE, ACTIONTYPES } from './_reducerConfig'
 
 export interface ContextInterface {
   state: ContactsStateInterface

@@ -1,16 +1,12 @@
-/* eslint-disable react/no-access-state-in-setstate */
-import React, { useContext, useState } from "react"
-import { useHistory } from "react-router-dom"
-import { validEmailRegex } from "Utils"
-import SignInWithGoogleForm from "./SignInWithGoogle"
-import * as ROUTES from "Utils/Constants/routes"
-import classNames from "classnames"
-import Input from "../Input/Input"
-import { AppContext } from "Components/AppContext/AppContextHOC"
-import { FirebaseContext } from "Components/Firebase"
-
-const LOCAL_STORAGE_KEY_WATCHING_SHOWS = "watchingShowsLocalS"
-const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = "watchLaterMoviesLocalS"
+import React, { useState } from 'react'
+import { useHistory } from 'react-router-dom'
+import { validEmailRegex } from 'Utils'
+import * as ROUTES from 'Utils/Constants/routes'
+import classNames from 'classnames'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import Input from '../Input/Input'
+import SignInWithGoogleForm from './SignInWithGoogle'
+import useAuthListenerSubscriber from '../Session/Authentication/Hooks/useAuthListenerSubscriber'
 
 type Props = {
   closeNavMobile: () => void
@@ -22,7 +18,7 @@ interface ErrorsInterface {
   emailOnBlur: boolean
   passwordError: string
   error: { message: string }
-  [key: string]: string | boolean | {}
+  [key: string]: string | boolean | Record<string, unknown>
 }
 
 interface RequiredInputsInterface {
@@ -31,22 +27,23 @@ interface RequiredInputsInterface {
 }
 
 const ERROR_DEFAULT_VALUES = {
-  emailError: "",
+  emailError: '',
   emailOnBlur: false,
-  passwordError: "",
-  error: { message: "" }
+  passwordError: '',
+  error: { message: '' },
 }
 
 const SignInFormBase: React.FC<Props> = ({ closeNavMobile, togglePasswordForget }) => {
-  const [requiredInputs, setRequiredInputs] = useState<RequiredInputsInterface>({ email: "", password: "" })
+  const { firebase } = useFrequentVariables()
+  const initializeAuthUserListener = useAuthListenerSubscriber()
+
+  const [requiredInputs, setRequiredInputs] = useState<RequiredInputsInterface>({ email: '', password: '' })
   const [errors, setErrors] = useState<ErrorsInterface>(ERROR_DEFAULT_VALUES)
   const [submitClicked, setSubmitClicked] = useState(false)
   const [submitRequestLoading, setSubmitRequestLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [isEmailValid, setIsEmailValid] = useState(false)
 
-  const context = useContext(AppContext)
-  const firebase = useContext(FirebaseContext)
   const history = useHistory()
 
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -58,7 +55,7 @@ const SignInFormBase: React.FC<Props> = ({ closeNavMobile, togglePasswordForget 
     if (!isFormValid(errorsOnSubmit, requiredInputs)) {
       for (const [key, value] of Object.entries(requiredInputs)) {
         if (value.length === 0) {
-          errorsOnSubmit[`${key}Error`] = "Required"
+          errorsOnSubmit[`${key}Error`] = 'Required'
         }
       }
       setErrors(errorsOnSubmit)
@@ -69,39 +66,34 @@ const SignInFormBase: React.FC<Props> = ({ closeNavMobile, togglePasswordForget 
 
     firebase
       .signInWithEmailAndPassword(email, password)
-      .then(() => {
-        localStorage.removeItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)
-        localStorage.removeItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)
-
-        context.userContentLocalStorage.clearContentState()
-        if (closeNavMobile) closeNavMobile()
-
-        setSubmitRequestLoading(false)
-        history.push(ROUTES.HOME_PAGE)
-      })
       .catch((error: any) => {
         errorsOnSubmit.error = error
         setErrors(errorsOnSubmit)
+      })
+      .finally(() => {
+        if (closeNavMobile) closeNavMobile()
+        history.push(ROUTES.HOME_PAGE)
         setSubmitRequestLoading(false)
+        initializeAuthUserListener()
       })
   }
 
   const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault()
-    const value = event.target.value
-    const name = event.target.name === "current-password" ? "password" : event.target.name
+    const { value } = event.target
+    const name = event.target.name === 'current-password' ? 'password' : event.target.name
     let errorsOnChange = { ...errors }
 
     if (errorsOnChange[`${name}OnBlur`] || submitClicked) {
-      if (name === "email") {
-        errorsOnChange[`${name}Error`] = validEmailRegex.test(value) ? "" : "Invalid email"
+      if (name === 'email') {
+        errorsOnChange[`${name}Error`] = validEmailRegex.test(value) ? '' : 'Invalid email'
       }
-      if (name === "password") {
-        errorsOnChange.passwordError = ""
+      if (name === 'password') {
+        errorsOnChange.passwordError = ''
       }
     }
-    if (name === "email") setIsEmailValid(validEmailRegex.test(value))
-    if (value === "") errorsOnChange = ERROR_DEFAULT_VALUES
+    if (name === 'email') setIsEmailValid(validEmailRegex.test(value))
+    if (value === '') errorsOnChange = ERROR_DEFAULT_VALUES
 
     setErrors(errorsOnChange)
     setRequiredInputs({ ...requiredInputs, [name]: value })
@@ -117,16 +109,16 @@ const SignInFormBase: React.FC<Props> = ({ closeNavMobile, togglePasswordForget 
     errorsOnBlur[`${name}OnBlur`] = true
 
     if (!submitClicked) {
-      if (name === "email") {
-        errorsOnBlur[`${name}Error`] = validEmailRegex.test(email) ? "" : "Invalid email"
+      if (name === 'email') {
+        errorsOnBlur[`${name}Error`] = validEmailRegex.test(email) ? '' : 'Invalid email'
       }
 
-      if (name === "password") {
-        errorsOnBlur.passwordError = ""
+      if (name === 'password') {
+        errorsOnBlur.passwordError = ''
       }
 
-      if (value === "") {
-        errorsOnBlur[`${name}Error`] = ""
+      if (value === '') {
+        errorsOnBlur[`${name}Error`] = ''
         errorsOnBlur[`${name}OnBlur`] = false
       }
     }
@@ -135,12 +127,12 @@ const SignInFormBase: React.FC<Props> = ({ closeNavMobile, togglePasswordForget 
   }
 
   const handleKeyDown = (e: any) => {
-    e.which === 27 && resetInput(e.target.name)
+    if (e.which === 27) resetInput(e.target.name)
   }
 
   const resetInput = (name: string) => {
-    setRequiredInputs({ ...requiredInputs, [`${name}`]: "" })
-    setErrors({ ...errors, [`${name}Error`]: "" })
+    setRequiredInputs({ ...requiredInputs, [`${name}`]: '' })
+    setErrors({ ...errors, [`${name}Error`]: '' })
   }
 
   const isFormValid = (errors: ErrorsInterface, requiredInputs: RequiredInputsInterface) => {
@@ -169,8 +161,8 @@ const SignInFormBase: React.FC<Props> = ({ closeNavMobile, togglePasswordForget 
   return (
     <form className="auth__form" onSubmit={onSubmit}>
       <Input
-        classNameInput={classNames("auth__form-input", {
-          "auth__form-input--error": errors.emailError
+        classNameInput={classNames('auth__form-input', {
+          'auth__form-input--error': errors.emailError,
         })}
         classNameLabel="auth__form-label"
         name="email"
@@ -186,8 +178,8 @@ const SignInFormBase: React.FC<Props> = ({ closeNavMobile, togglePasswordForget 
       <div className="auth__form-error">{errors.emailError}</div>
 
       <Input
-        classNameInput={classNames("auth__form-input auth__form-input--password", {
-          "auth__form-input--error": errors.passwordError
+        classNameInput={classNames('auth__form-input auth__form-input--password', {
+          'auth__form-input--error': errors.passwordError,
         })}
         classNameLabel="auth__form-label"
         name="current-password"
@@ -195,10 +187,10 @@ const SignInFormBase: React.FC<Props> = ({ closeNavMobile, togglePasswordForget 
         value={requiredInputs.password}
         handleOnChange={handleOnChange}
         handleKeyDown={handleKeyDown}
-        type={!showPassword ? "password" : "text"}
+        type={!showPassword ? 'password' : 'text'}
         placeholder="Password"
         labelText="Password"
-        hidePasswordBtn={true}
+        hidePasswordBtn
         toggleShowPassword={toggleShowPassword}
         withLabel
       />
@@ -212,12 +204,12 @@ const SignInFormBase: React.FC<Props> = ({ closeNavMobile, togglePasswordForget 
       </span>
 
       <button
-        className={classNames("button button--auth__form", {
-          "button--disabled": !isFormValid(errors, requiredInputs) || !isEmailValid
+        className={classNames('button button--auth__form', {
+          'button--auth__form--disabled': !isFormValid(errors, requiredInputs) || !isEmailValid,
         })}
         type="submit"
       >
-        {submitRequestLoading ? <span className="auth__form-loading"></span> : "Sign In"}
+        {submitRequestLoading ? <span className="button-loader-circle" /> : 'Sign In'}
       </button>
       <SignInWithGoogleForm />
     </form>

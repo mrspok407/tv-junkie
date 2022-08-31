@@ -1,13 +1,14 @@
 /* eslint-disable jsx-a11y/mouse-events-have-key-events */
-import PlaceholderNoResults from "Components/UI/Placeholders/PlaceholderNoResults"
-import React, { useEffect } from "react"
-import { ContentDetailes } from "Utils/Interfaces/ContentDetails"
-import SearchCard from "./SearchCard"
-import "./SearchList.scss"
+import PlaceholderNoResults from 'Components/UI/Placeholders/PlaceholderNoResults'
+import React from 'react'
+import { MainDataTMDB } from 'Utils/@TypesTMDB'
+import useClickOutside from 'Utils/Hooks/UseClickOutside'
+import SearchCard from './SearchCard'
+import './SearchList.scss'
 
 type Props = {
-  searchResults: ContentDetailes[]
-  handleClickOutside: (e: CustomEvent) => void
+  searchResults: MainDataTMDB[]
+  handleClickOutside: () => void
   closeList: () => void
   currentListItem: number
   mediaTypeSearching: string
@@ -15,6 +16,7 @@ type Props = {
   query: string
   isSearchingList: boolean
   error: string
+  searchContRef: React.MutableRefObject<HTMLDivElement>
 }
 
 const SearchList: React.FC<Props> = ({
@@ -26,41 +28,34 @@ const SearchList: React.FC<Props> = ({
   listIsOpen,
   query,
   isSearchingList,
-  error
+  searchContRef,
+  error,
 }) => {
-  useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside as EventListener)
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside as EventListener)
-    }
-    // eslint-disable-next-line
-  }, [])
-
-  return (
-    <div className="search-list">
-      {error ? (
+  useClickOutside({ ref: searchContRef, callback: handleClickOutside })
+  const renderData = () => {
+    if (error) {
+      return (
         <div className="error">
-          <p>{error || "Something gone terrible wrong"}</p>
+          <p>{error || 'Something gone terrible wrong'}</p>
         </div>
-      ) : searchResults.length === 0 && query !== "" && listIsOpen && !isSearchingList ? (
-        <PlaceholderNoResults message="No results found" />
-      ) : (
-        searchResults.map((item, index) => {
-          return (
-            <SearchCard
-              key={item.id}
-              detailes={item}
-              closeList={closeList}
-              currentListItem={currentListItem}
-              index={index}
-              mediaTypeSearching={mediaTypeSearching}
-            />
-          )
-        })
-      )}
-    </div>
-  )
+      )
+    }
+    if (searchResults.length === 0 && query !== '' && listIsOpen && !isSearchingList) {
+      return <PlaceholderNoResults message="No results found" />
+    }
+    return searchResults.map((item, index) => (
+      <SearchCard
+        key={item.id}
+        details={item}
+        closeList={closeList}
+        currentListItem={currentListItem}
+        index={index}
+        mediaTypeSearching={mediaTypeSearching}
+      />
+    ))
+  }
+
+  return <div className="search-list">{renderData()}</div>
 }
 
 export default SearchList

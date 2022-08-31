@@ -1,0 +1,42 @@
+.disabled-warning {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  padding: 5px;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #000;
+  background-color: #fff;
+  border-radius: 5px;
+  opacity: 0;
+  animation: showNotAuthWarning 0.5s forwards;
+  z-index: 9999;
+  @keyframes showNotAuthWarning {
+    to {
+      opacity: 1;
+    }
+  }
+
+  &:after {
+    $dimensions: 10px;
+    --dimensions: 10px;
+    content: '';
+    position: absolute;
+    top: calc(var(--dimensions) * -1 / 2);
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+    width: var(--dimensions);
+    height: var(--dimensions);
+    background-color: #fff;
+  }
+
+  &--fade-out {
+    opacity: 1;
+    animation: fadeOutNotAuthWarning 0.5s forwards;
+    @keyframes fadeOutNotAuthWarning {
+      to {
+        opacity: 0;
+      }
+    }
+  }
+}

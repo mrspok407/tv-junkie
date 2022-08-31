@@ -1,31 +1,34 @@
 import {
-  UserShowsInterface,
+  SingleEpisodeByMonthInterface,
+  ShowFullDataStoreState,
   UserWillAirEpisodesInterface,
-  SingleEpisodeByMonthInterface
-} from "Components/UserContent/UseUserShows/UseUserShows"
-import { differenceBtwDatesInDays, todayDate } from "Utils"
+  EpisodesStoreState,
+} from 'Components/UserContent/UseUserShowsRed/@Types'
+import { isContentReleased } from 'Utils'
 
-export const organiseFutureEpisodesByMonth = (data: UserShowsInterface[]) => {
+export const organizeFutureEpisodesByMonth = (
+  data: ShowFullDataStoreState[],
+  episodes: {
+    [key: string]: EpisodesStoreState[]
+  },
+) => {
   const sortedAndFiltered = data
-    .flatMap((show) => {
-      return show.episodes.flatMap((season) =>
-        season.episodes.reduce(
-          (acc: { show: string; showId: number; episode_number?: number; air_date: any }[], episode) => {
-            if (differenceBtwDatesInDays(episode.air_date, todayDate) >= 0) {
-              acc.push({
-                ...episode,
-                show: show.name || show.original_name,
-                showId: show.id,
-                episode_number: episode?.episode_number
-              })
-            }
-
-            return acc
-          },
-          []
-        )
-      )
-    })
+    .flatMap((show) =>
+      episodes[show.id].flatMap((season) =>
+        season.episodes.reduce((acc: any[], episode) => {
+          const isEpisodeReleased = isContentReleased(episode.air_date)
+          if (!isEpisodeReleased) {
+            acc.push({
+              ...episode,
+              show: show.name || show.original_name,
+              showId: show.id,
+              episode_number: episode?.episode_number,
+            })
+          }
+          return acc
+        }, []),
+      ),
+    )
     .sort((a, b) => (a.air_date > b.air_date ? 1 : -1))
 
   const uniqueMonths = sortedAndFiltered
@@ -34,7 +37,7 @@ export const organiseFutureEpisodesByMonth = (data: UserShowsInterface[]) => {
 
   const episodesByMonths: UserWillAirEpisodesInterface[] = uniqueMonths.reduce(
     (acc: { month: string; episodes: SingleEpisodeByMonthInterface[] }[], month) => {
-      const monthNew = month.concat("-01")
+      const monthNew = month.concat('-01')
       const episodes = sortedAndFiltered.reduce((acc: SingleEpisodeByMonthInterface[], episode) => {
         if (episode.air_date && episode.air_date.slice(0, 7) === month) {
           acc.push(episode)
@@ -46,7 +49,7 @@ export const organiseFutureEpisodesByMonth = (data: UserShowsInterface[]) => {
 
       return acc
     },
-    []
+    [],
   )
 
   return episodesByMonths
@@ -70,9 +73,8 @@ export const organizeMonthEpisodesByEpisodeNumber = (data: SingleEpisodeByMonthI
         .sort((a, b) => {
           if (a.episode_number && b.episode_number) {
             return a.episode_number > b.episode_number ? 1 : -1
-          } else {
-            return 1
           }
+          return 1
         })
 
       acc.push(...filteredByShows)

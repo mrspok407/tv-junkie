@@ -1,5 +1,5 @@
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
-import { useState, useEffect } from "react"
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import { useState, useEffect } from 'react'
 
 const useContactListeners = () => {
   const { firebase, contactsState, contactsDispatch } = useFrequentVariables()
@@ -12,14 +12,14 @@ const useContactListeners = () => {
     if (isUnreadMessagesListenerOn) return
     firebase
       .unreadMessages({ uid: activeChat.contactKey, chatKey: activeChat.chatKey, isGroupChat: false })
-      .on("value", (snapshot: any) => {
+      .on('value', (snapshot: any) => {
         const unreadMessagesContact = !snapshot.val() ? [] : Object.keys(snapshot.val())
         contactsDispatch({
-          type: "updateContactUnreadMessages",
+          type: 'updateContactUnreadMessages',
           payload: {
             unreadMessages: unreadMessagesContact,
-            chatKey: activeChat.chatKey
-          }
+            chatKey: activeChat.chatKey,
+          },
         })
       })
   }, [activeChat, firebase, contactsDispatch, isUnreadMessagesListenerOn])
@@ -27,11 +27,11 @@ const useContactListeners = () => {
   useEffect(() => {
     firebase
       .contactsDatabase({ uid: activeChat.contactKey })
-      .child("pageIsOpen")
-      .on("value", (snapshot: any) => {
+      .child('pageIsOpen')
+      .on('value', (snapshot: any) => {
         contactsDispatch({
-          type: "updateContactsPageIsOpen",
-          payload: { isPageOpen: snapshot.val(), chatKey: activeChat.chatKey }
+          type: 'updateContactsPageIsOpen',
+          payload: { isPageOpen: snapshot.val(), chatKey: activeChat.chatKey },
         })
       })
 
@@ -39,8 +39,8 @@ const useContactListeners = () => {
       .contactsLastActivity({ uid: activeChat.contactKey })
       .orderByValue()
       .limitToLast(1)
-      .on("value", (snapshot: any) => {
-        let lastActivityData: { timeStamp: number; key: string }[] = []
+      .on('value', (snapshot: any) => {
+        const lastActivityData: { timeStamp: number; key: string }[] = []
         snapshot.forEach((snapshot: { val: () => number; key: string }) => {
           lastActivityData.push({ timeStamp: snapshot.val(), key: snapshot.key })
         })
@@ -48,7 +48,7 @@ const useContactListeners = () => {
       })
 
     return () => {
-      firebase.contactsDatabase({ uid: activeChat.contactKey }).child("pageIsOpen").off()
+      firebase.contactsDatabase({ uid: activeChat.contactKey }).child('pageIsOpen').off()
       firebase.contactsLastActivity({ uid: activeChat.contactKey }).off()
     }
   }, [activeChat, firebase, contactsDispatch])

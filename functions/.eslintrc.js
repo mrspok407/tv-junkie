@@ -1,4 +1,3 @@
-/* eslint comma-dangle: ["error", "never"]*/
 module.exports = {
   root: true,
   env: {
@@ -15,7 +14,8 @@ module.exports = {
   ],
   parser: "@typescript-eslint/parser",
   parserOptions: {
-    project: ["tsconfig.json", "tsconfig.dev.json"],
+    project: "./tsconfig.eslint.json",
+    tsconfigRootDir: __dirname,
     sourceType: "module"
   },
   ignorePatterns: [

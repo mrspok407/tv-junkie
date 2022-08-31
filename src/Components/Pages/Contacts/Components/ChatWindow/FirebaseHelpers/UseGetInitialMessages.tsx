@@ -1,12 +1,15 @@
-import { useState, useEffect, useRef, useCallback } from "react"
-import { MessageInterface } from "Components/Pages/Contacts/@Types"
-import { setMessagesSnapshot } from "./setMessagesSnapshot"
-import { MESSAGES_TO_RENDER, UNREAD_MESSAGES_TO_RENDER } from "../../@Context/Constants"
-import debounce from "debounce"
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
+/* eslint-disable @typescript-eslint/no-extra-semi */
+import { useState, useEffect, useRef, useCallback, useContext } from 'react'
+import { MessageInterface } from 'Components/Pages/Contacts/@Types'
+import debounce from 'debounce'
+import { ErrorsHandlerContext } from 'Components/AppContext/Contexts/ErrorsContext'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import { setMessagesSnapshot } from './setMessagesSnapshot'
+import { MESSAGES_TO_RENDER, UNREAD_MESSAGES_TO_RENDER } from '../../@Context/Constants'
 
 const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGroupChat: boolean }) => {
-  const { firebase, authUser, errors, contactsState, contactsDispatch } = useFrequentVariables()
+  const { firebase, authUser, contactsState, contactsDispatch } = useFrequentVariables()
+  const handleError = useContext(ErrorsHandlerContext)
   const { messages } = contactsState
   const messagesData = messages[chatKey]
 
@@ -14,12 +17,13 @@ const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGr
   const messagesRef = firebase.messages({ chatKey, isGroupChat })
 
   const messagesToDelete = useRef<MessageInterface[]>([])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const removeMessagesDebounce = useCallback(
     debounce((removedMessages: any) => {
-      contactsDispatch({ type: "removeMessages", payload: { removedMessages, chatKey } })
+      contactsDispatch({ type: 'removeMessages', payload: { removedMessages, chatKey } })
       messagesToDelete.current = []
     }, 0),
-    [chatKey]
+    [chatKey],
   )
 
   useEffect(() => {
@@ -37,22 +41,23 @@ const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGr
           isGroupChat,
           authUser,
           messagesRef,
-          firebase
+          firebase,
         })
 
         firstUnreadMessageKey =
           firstUnreadMessageKey.val() === null ? false : Object.keys(firstUnreadMessageKey.val()!)[0]
       } catch (error) {
-        errors.handleError({
-          message: "There were a problem loading messages. Please try to reload the page."
+        handleError({
+          errorData: { message: 'There were a problem loading messages. Please try to reload the page.' },
+          message: 'There were a problem loading messages. Please try to reload the page.',
         })
-        contactsDispatch({ type: "setInitialMessages", payload: { messagesData: [], chatKey } })
+        contactsDispatch({ type: 'setInitialMessages', payload: { messagesData: [], chatKey } })
         setLoading(false)
-        throw new Error("There were a problem loading messages. Please try to reload the page.")
+        throw new Error('There were a problem loading messages. Please try to reload the page.')
       }
 
       if (messagesSnapshot.val() === null) {
-        contactsDispatch({ type: "setInitialMessages", payload: { messagesData: [], chatKey } })
+        contactsDispatch({ type: 'setInitialMessages', payload: { messagesData: [], chatKey } })
         setLoading(false)
       }
 
@@ -60,7 +65,7 @@ const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGr
       let lastMessageTimeStamp = 0
 
       if (messagesSnapshot.val() !== null) {
-        let messagesData: MessageInterface[] = []
+        const messagesData: MessageInterface[] = []
         messagesSnapshot.forEach((message: any) => {
           messagesData.push({ ...message.val(), key: message.key })
         })
@@ -72,54 +77,52 @@ const useGetInitialMessages = ({ chatKey, isGroupChat }: { chatKey: string; isGr
         firstMessageTimeStamp = messagesData[0].timeStamp
         lastMessageTimeStamp = messagesData[messagesData.length - 1].timeStamp
 
-        let startIndexRender: number = 0
-        let endIndexRender: number = 0
+        let startIndexRender = 0
+        let endIndexRender = 0
 
         if (messagesData.length <= MESSAGES_TO_RENDER) {
           startIndexRender = 0
           endIndexRender = messagesData.length
+        } else if (authUnreadMessages.length <= UNREAD_MESSAGES_TO_RENDER) {
+          startIndexRender = Math.max(messagesData.length - MESSAGES_TO_RENDER, 0)
+          endIndexRender = messagesData.length
         } else {
-          if (authUnreadMessages.length <= UNREAD_MESSAGES_TO_RENDER) {
-            startIndexRender = Math.max(messagesData.length - MESSAGES_TO_RENDER, 0)
-            endIndexRender = messagesData.length
-          } else {
-            endIndexRender = messagesData.length - (authUnreadMessages.length! - UNREAD_MESSAGES_TO_RENDER)
-            startIndexRender = Math.max(endIndexRender - MESSAGES_TO_RENDER, 0)
-          }
+          endIndexRender = messagesData.length - (authUnreadMessages.length! - UNREAD_MESSAGES_TO_RENDER)
+          startIndexRender = Math.max(endIndexRender - MESSAGES_TO_RENDER, 0)
         }
 
         contactsDispatch({
-          type: "setInitialMessages",
+          type: 'setInitialMessages',
           payload: {
             messagesData,
             startIndex: startIndexRender,
             endIndex: endIndexRender,
-            chatKey
-          }
+            chatKey,
+          },
         })
         setLoading(false)
       }
 
       messagesRef
-        .orderByChild("timeStamp")
+        .orderByChild('timeStamp')
         .startAfter(lastMessageTimeStamp)
-        .on("child_added", (snapshot: { val: () => MessageInterface; key: string }) => {
+        .on('child_added', (snapshot: { val: () => MessageInterface; key: string }) => {
           const newMessage = { ...snapshot.val(), key: snapshot.key }
-          contactsDispatch({ type: "addNewMessage", payload: { newMessage, chatKey, authUser } })
+          contactsDispatch({ type: 'addNewMessage', payload: { newMessage, chatKey, authUser } })
         })
 
       messagesRef
-        .orderByChild("timeStamp")
+        .orderByChild('timeStamp')
         .startAt(firstMessageTimeStamp)
-        .on("child_changed", (snapshot: { val: () => MessageInterface; key: string }) => {
+        .on('child_changed', (snapshot: { val: () => MessageInterface; key: string }) => {
           const editedMessage = { ...snapshot.val(), key: snapshot.key }
-          contactsDispatch({ type: "editMessage", payload: { editedMessage, chatKey } })
+          contactsDispatch({ type: 'editMessage', payload: { editedMessage, chatKey } })
         })
 
       messagesRef
-        .orderByChild("timeStamp")
+        .orderByChild('timeStamp')
         .startAt(firstMessageTimeStamp)
-        .on("child_removed", (snapshot: { val: () => MessageInterface; key: string }) => {
+        .on('child_removed', (snapshot: { val: () => MessageInterface; key: string }) => {
           const removedMessage = { ...snapshot.val(), key: snapshot.key }
           messagesToDelete.current.push(removedMessage)
           removeMessagesDebounce(messagesToDelete.current)

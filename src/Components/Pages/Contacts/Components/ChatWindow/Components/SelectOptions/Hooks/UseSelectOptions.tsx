@@ -1,5 +1,5 @@
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
-import useHandleMessageOptions from "../../MessageInfo/FirebaseHelpers/UseHandleMessageOptions"
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import useHandleMessageOptions from '../../MessageInfo/FirebaseHelpers/UseHandleMessageOptions'
 
 const useSelectOptions = () => {
   const { contactsState, contactsDispatch } = useFrequentVariables()
@@ -11,12 +11,12 @@ const useSelectOptions = () => {
 
   const deleteSelectedMessages = async () => {
     await deleteMessagePrivateChat({ deleteMessagesKeys: selectedMessagesData })
-    contactsDispatch({ type: "clearSelectedMessages", payload: { chatKey: activeChat.chatKey } })
+    contactsDispatch({ type: 'clearSelectedMessages', payload: { chatKey: activeChat.chatKey } })
   }
 
   const deleteSelectedMessagesGroupChat = async () => {
     await deleteMessageGroupChat({ deleteMessagesKeys: selectedMessagesData })
-    contactsDispatch({ type: "clearSelectedMessages", payload: { chatKey: activeChat.chatKey } })
+    contactsDispatch({ type: 'clearSelectedMessages', payload: { chatKey: activeChat.chatKey } })
   }
 
   return { deleteSelectedMessages, deleteSelectedMessagesGroupChat }

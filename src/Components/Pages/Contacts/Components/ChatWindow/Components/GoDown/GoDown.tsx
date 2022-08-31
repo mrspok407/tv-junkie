@@ -1,9 +1,11 @@
-import classNames from "classnames"
-import { ContainerRectInterface, MessageInterface } from "Components/Pages/Contacts/@Types"
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
-import React, { useState, useEffect, useCallback, useLayoutEffect, useRef } from "react"
-import { throttle } from "throttle-debounce"
-import "./GoDown.scss"
+/* eslint-disable no-nested-ternary */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import classNames from 'classnames'
+import { ContainerRectInterface, MessageInterface } from 'Components/Pages/Contacts/@Types'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import React, { useState, useEffect, useCallback, useLayoutEffect, useRef } from 'react'
+import { throttle } from 'throttle-debounce'
+import './GoDown.scss'
 
 type Props = {
   chatContainerRef: HTMLDivElement
@@ -35,16 +37,16 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
 
   useEffect(() => {
     const unreadMessagesListener = firebase
-      .unreadMessages({ uid: authUser?.uid!, chatKey, isGroupChat: contactInfo.isGroupChat })
-      .on("value", (snapshot: any) => {
+      .unreadMessages({ uid: authUser?.uid, chatKey, isGroupChat: contactInfo.isGroupChat })
+      .on('value', (snapshot: any) => {
         const unreadMessagesData = !snapshot.val() ? [] : Object.keys(snapshot.val())
         setUnreadMessages(unreadMessagesData)
       })
 
     return () => {
       firebase
-        .unreadMessages({ uid: authUser?.uid!, chatKey, isGroupChat: contactInfo.isGroupChat })
-        .off("value", unreadMessagesListener)
+        .unreadMessages({ uid: authUser?.uid, chatKey, isGroupChat: contactInfo.isGroupChat })
+        .off('value', unreadMessagesListener)
     }
   }, [chatKey, authUser, firebase]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -52,13 +54,13 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
     const renderedMessagesArray = renderedMessages.map((message) => message.key)
     if (!unreadMessages?.length) {
       contactsDispatch({
-        type: "handleGoDown",
-        payload: { unreadMessages }
+        type: 'handleGoDown',
+        payload: { unreadMessages },
       })
       setWentToLastMessage(true)
     } else {
       if (unreadMessages.some((message) => renderedMessagesArray.includes(message))) {
-        firebase.unreadMessages({ uid: authUser?.uid!, chatKey, isGroupChat: contactInfo.isGroupChat }).set(null)
+        firebase.unreadMessages({ uid: authUser?.uid, chatKey, isGroupChat: contactInfo.isGroupChat }).set(null)
         setUnreadMessages([])
         unreadMessagesAuthRef = []
         setWentToLastMessage(true)
@@ -66,8 +68,8 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
         setWentToFirstUnread(true)
       }
       contactsDispatch({
-        type: "handleGoDown",
-        payload: { unreadMessages }
+        type: 'handleGoDown',
+        payload: { unreadMessages },
       })
     }
   }
@@ -91,11 +93,12 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
     }
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleScroll = useCallback(
     throttle(150, () => {
       handleFadeIn()
     }),
-    [chatContainerRef, chatKey]
+    [chatContainerRef, chatKey],
   )
 
   useLayoutEffect(() => {
@@ -103,7 +106,7 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
     if (!wentToFirstUnread) return
     const firstUnreadMessage = unreadMessages[0]
     const firstUnreadMessageRef = document.querySelector(`.chat-window__message--${firstUnreadMessage}`)
-    firstUnreadMessageRef?.parentElement?.scrollIntoView({ block: "start", inline: "start" })
+    firstUnreadMessageRef?.parentElement?.scrollIntoView({ block: 'start', inline: 'start' })
     setWentToFirstUnread(false)
   }, [renderedMessages, wentToFirstUnread, unreadMessages])
 
@@ -133,9 +136,9 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
   useEffect(() => {
     if (!chatContainerRef) return
     const chatContainer = chatContainerRef
-    chatContainer.addEventListener("scroll", handleScroll)
+    chatContainer.addEventListener('scroll', handleScroll)
     return () => {
-      chatContainer.removeEventListener("scroll", handleScroll)
+      chatContainer.removeEventListener('scroll', handleScroll)
     }
   }, [handleScroll, chatContainerRef])
 
@@ -143,15 +146,15 @@ const GoDown: React.FC<Props> = ({ chatContainerRef, chatKey, unreadMessagesAuth
     <>
       {fadeInButton && (
         <div
-          className={classNames("chat-window__go-down", {
-            "chat-window__to-last-message--unread": !!unreadMessages,
-            "chat-window__go-down--fadein": fadeInButton
+          className={classNames('chat-window__go-down', {
+            'chat-window__to-last-message--unread': !!unreadMessages,
+            'chat-window__go-down--fadein': fadeInButton,
           })}
         >
-          <button type="button" onClick={() => onGoDown()}></button>
+          <button type="button" onClick={() => onGoDown()} />
           {unreadMessages.length !== 0 && (
             <span className="unread-messages">
-              {unreadMessages ? (unreadMessages.length >= 99 ? "99+" : unreadMessages.length) : ""}
+              {unreadMessages ? (unreadMessages.length >= 99 ? '99+' : unreadMessages.length) : ''}
             </span>
           )}
         </div>

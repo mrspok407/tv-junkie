@@ -1,25 +1,28 @@
-import classNames from "classnames"
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
-import useTimestampFormater from "Components/Pages/Contacts/Hooks/UseTimestampFormater"
-import React, { useRef } from "react"
-import ContactOptionsPopup from "../../../ContactOptionsPopup/ContactOptionsPopup"
-import Loader from "Components/UI/Placeholders/Loader"
-import "./ContactInfo.scss"
-
-import { LoremIpsum } from "lorem-ipsum"
+/* eslint-disable no-nested-ternary */
+import classNames from 'classnames'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import useTimestampFormater from 'Components/Pages/Contacts/Hooks/UseTimestampFormater'
+import React, { useContext, useRef } from 'react'
+import { LoremIpsum } from 'lorem-ipsum'
+import { ContactsActivityContext } from 'Components/AppContext/Contexts/ContactsActivityContext'
+import Loader from 'Components/UI/Placeholders/Loader'
+import ContactOptionsPopup from '../../../ContactOptionsPopup/ContactOptionsPopup'
+import './ContactInfo.scss'
 
 type Props = {
   isScrollBottomRef: any
 }
 
 const ContactInfo: React.FC<Props> = ({ isScrollBottomRef }) => {
-  const { firebase, authUser, newContactsActivity, contactsState, contactsDispatch } = useFrequentVariables()
+  const { firebase, authUser, contactsState, contactsDispatch } = useFrequentVariables()
+  const newContactsActivity = useContext(ContactsActivityContext)
+
   const { activeChat, contacts, contactsStatus, optionsPopupChatWindow, chatMembersStatus } = contactsState
   const contactInfo = contacts[activeChat.contactKey] || {}
   const chatMembersStatusData = chatMembersStatus[contactInfo.chatKey] || []
   const contactOptionsRef = useRef<HTMLDivElement>(null!)
 
-  const formatedLastSeen = useTimestampFormater({ timeStamp: contactsStatus[activeChat.chatKey]?.lastSeen! })
+  const formattedLastSeen = useTimestampFormater({ timeStamp: contactsStatus[activeChat.chatKey]?.lastSeen! })
   const chatMembersTyping = chatMembersStatusData?.filter((member) => member.isTyping && member.key !== authUser?.uid)
 
   const chatMembersOnline = chatMembersStatusData.filter((member) => member.isOnline).length
@@ -27,12 +30,12 @@ const ContactInfo: React.FC<Props> = ({ isScrollBottomRef }) => {
   const lorem = new LoremIpsum({
     sentencesPerParagraph: {
       max: 8,
-      min: 4
+      min: 4,
     },
     wordsPerSentence: {
       max: 8,
-      min: 4
-    }
+      min: 4,
+    },
   })
 
   const sendMessageCurrentContactPrivate = async () => {
@@ -44,13 +47,13 @@ const ContactInfo: React.FC<Props> = ({ isScrollBottomRef }) => {
       [`privateChats/${activeChat.chatKey}/messages/${messageKey}`]: {
         sender: contactInfo.key,
         message: lorem.generateSentences(2),
-        timeStamp: timeStampEpoch
+        timeStamp: timeStampEpoch,
       },
       [`privateChats/${activeChat.chatKey}/members/${authUser?.uid}/unreadMessages/${messageKey}`]: !isScrollBottomRef
         ? true
-        : null
+        : null,
     }
-    return firebase.database().ref().update(updateData)
+    return firebase.rootRef().update(updateData)
   }
 
   const sendMessageCurrentContactGroup = () => {
@@ -66,29 +69,29 @@ const ContactInfo: React.FC<Props> = ({ isScrollBottomRef }) => {
         sender: sender.key,
         userName: sender.userName,
         message: lorem.generateSentences(2),
-        timeStamp: timeStampEpoch
+        timeStamp: timeStampEpoch,
       },
       [`groupChats/${activeChat.chatKey}/members/unreadMessages/${authUser?.uid}/${messageKey}`]: !isScrollBottomRef
         ? true
-        : null
+        : null,
     }
-    return firebase.database().ref().update(updateData)
+    return firebase.rootRef().update(updateData)
   }
 
   return (
     <div
-      className={classNames("chat-window__contact-info", {
-        "chat-window__contact-info--group-chat": contactInfo.isGroupChat,
-        "chat-window__contact-info--test-msg": ["testchat@gmail.com", "test2@test.com"].includes(authUser?.email!)
+      className={classNames('chat-window__contact-info', {
+        'chat-window__contact-info--group-chat': contactInfo.isGroupChat,
+        'chat-window__contact-info--test-msg': ['testchat@gmail.com', 'test2@test.com'].includes(authUser?.email!),
       })}
       onClick={() => {
         if (!contactInfo.isGroupChat) return
-        contactsDispatch({ type: "updateGroupInfoSettings" })
+        contactsDispatch({ type: 'updateGroupInfoSettings' })
       }}
     >
       <div
-        className={classNames("contact-info__close-chat", {
-          "contact-info__close-chat--new-activity": newContactsActivity
+        className={classNames('contact-info__close-chat', {
+          'contact-info__close-chat--new-activity': newContactsActivity,
         })}
       >
         <button
@@ -96,29 +99,29 @@ const ContactInfo: React.FC<Props> = ({ isScrollBottomRef }) => {
           type="button"
           onClick={(e) => {
             e.stopPropagation()
-            contactsDispatch({ type: "updateActiveChat", payload: { chatKey: "", contactKey: "" } })
+            contactsDispatch({ type: 'updateActiveChat', payload: { chatKey: '', contactKey: '' } })
           }}
-        ></button>
+        />
       </div>
       <div className="contact-info__name">{contactInfo.userName || contactInfo.groupName}</div>
       <div ref={contactOptionsRef} className="contact-item__options contact-info__options">
         <button
           type="button"
-          className={classNames("contact-item__open-popup-btn", {
-            "contact-item__open-popup-btn--open": optionsPopupChatWindow
+          className={classNames('contact-item__open-popup-btn', {
+            'contact-item__open-popup-btn--open': optionsPopupChatWindow,
           })}
           onClick={(e) => {
             e.stopPropagation()
-            contactsDispatch({ type: "updateOptionsPopupChatWindow", payload: activeChat.contactKey })
+            contactsDispatch({ type: 'updateOptionsPopupChatWindow', payload: activeChat.contactKey })
           }}
         >
-          <span></span>
-          <span></span>
-          <span></span>
+          <span />
+          <span />
+          <span />
         </button>
 
         {optionsPopupChatWindow && (
-          <ContactOptionsPopup contactOptionsRef={contactOptionsRef.current} contactInfo={contactInfo} />
+          <ContactOptionsPopup contactOptionsRef={contactOptionsRef} contactInfo={contactInfo} />
         )}
       </div>
       <div className="contact-info__status">
@@ -134,25 +137,25 @@ const ContactInfo: React.FC<Props> = ({ isScrollBottomRef }) => {
               </>
             )
           ) : !chatMembersStatusData.length ? (
-            ""
+            ''
           ) : chatMembersStatusData.length === 1 ? (
-            "1 member"
+            '1 member'
           ) : (
-            `${chatMembersStatusData.length} members${chatMembersOnline ? `, ${chatMembersOnline} online` : ""}`
+            `${chatMembersStatusData.length} members${chatMembersOnline ? `, ${chatMembersOnline} online` : ''}`
           )
         ) : contactsStatus[activeChat.chatKey]?.isTyping ? (
           <>
             <div>Typing</div> <Loader className="loader--typing" />
           </>
         ) : contactsStatus[activeChat.chatKey]?.isOnline ? (
-          "Online"
-        ) : formatedLastSeen ? (
-          `Last seen ${formatedLastSeen}`
+          'Online'
+        ) : formattedLastSeen ? (
+          `Last seen ${formattedLastSeen}`
         ) : (
-          ""
+          ''
         )}
       </div>
-      {["testchat@gmail.com", "test2@test.com"].includes(authUser?.email!) && (
+      {['testchat@gmail.com', 'test2@test.com'].includes(authUser?.email!) && (
         <div className="contact-info__send-message-current">
           <button
             type="button"

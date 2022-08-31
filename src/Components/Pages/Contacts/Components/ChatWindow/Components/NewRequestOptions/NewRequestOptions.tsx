@@ -1,7 +1,7 @@
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
-import useResponseContactRequest from "Components/Pages/UserProfile/Hooks/UseResponseContactRequest"
-import React from "react"
-import "./NewRequestOptions.scss"
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import useResponseContactRequest from 'Components/Pages/UserProfile/Hooks/UseResponseContactRequest'
+import React from 'react'
+import './NewRequestOptions.scss'
 
 const NewRequestOptions: React.FC = () => {
   const { contactsState, contactsDispatch } = useFrequentVariables()
@@ -9,7 +9,7 @@ const NewRequestOptions: React.FC = () => {
   const contactInfo = contacts[activeChat.contactKey]
 
   const { handleContactRequest, responseContactRequestLoading } = useResponseContactRequest({
-    contactUid: activeChat.contactKey
+    contactUid: activeChat.contactKey,
   })
 
   const renderMarkup = () => {
@@ -23,18 +23,19 @@ const NewRequestOptions: React.FC = () => {
               </div>
 
               <div className="new-request__actions--receiver">
-                <button className="button" onClick={() => handleContactRequest({ status: "accept" })}>
-                  {responseContactRequestLoading.accept ? <span className="button-loader-circle"></span> : "Accept"}
+                <button type="button" className="button" onClick={() => handleContactRequest({ status: 'accept' })}>
+                  {responseContactRequestLoading.accept ? <span className="button-loader-circle" /> : 'Accept'}
                 </button>
                 <button
                   className="button"
+                  type="button"
                   onClick={() => {
                     if (Object.values(responseContactRequestLoading).some((item) => item)) return
-                    handleContactRequest({ status: "rejected" })
-                    contactsDispatch({ type: "updateActiveChat", payload: { chatKey: "", contactKey: "" } })
+                    handleContactRequest({ status: 'rejected' })
+                    contactsDispatch({ type: 'updateActiveChat', payload: { chatKey: '', contactKey: '' } })
                   }}
                 >
-                  {responseContactRequestLoading.rejected ? <span className="button-loader-circle"></span> : "Reject"}
+                  {responseContactRequestLoading.rejected ? <span className="button-loader-circle" /> : 'Reject'}
                 </button>
               </div>
             </>
@@ -45,17 +46,18 @@ const NewRequestOptions: React.FC = () => {
       case true: {
         return contactInfo.status === false ? (
           <div className="new-request__message">
-            The invitation to connect has been sent to{" "}
-            {<span className="new-request__name">{contactInfo.userName}</span>}
+            The invitation to connect has been sent to <span className="new-request__name">{contactInfo.userName}</span>
           </div>
         ) : (
-          contactInfo.status === "rejected" && (
+          contactInfo.status === 'rejected' && (
             <div className="new-request__message">
-              {<span className="new-request__name">{contactInfo.userName}</span>} rejected you connect request{" "}
+              <span className="new-request__name">{contactInfo.userName}</span> rejected you connect request{' '}
             </div>
           )
         )
       }
+      default:
+        break
     }
   }
 

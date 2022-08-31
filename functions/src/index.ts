@@ -1,5 +1,8 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import {episodesToOneArray, mergeEpisodesFromFireDBwithUserDB} from "./helpers";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+// const admin = require("firebase-admin");
 
 // Cloud Functions interesting points:
 //
@@ -33,7 +36,98 @@ interface GroupChatMemberStatusInterface {
   [key: string]: string | boolean;
 }
 
+interface ApiError {
+  message: string;
+}
+
+const isApiError = (x: any): x is ApiError => {
+  return typeof x.message === "string";
+};
+
 const contactsDatabaseRef = (uid: string) => `${uid}/contactsDatabase`;
+
+export const updateShowEpisodesForUserDatabase = functions.database
+  .ref("allShowsList/{showId}/episodes")
+  .onUpdate(async (change, context) => {
+    const {showId} = context.params;
+    const afterData = change.after;
+
+    const timeStamp = admin.database.ServerValue.TIMESTAMP;
+
+    const showEpisodesFireData = afterData.val() ?? [];
+    const usersWatchingSnapshot = await afterData.ref.parent?.child("usersWatchingList").once("value");
+    const usersWatchingKeys = Object.keys(usersWatchingSnapshot?.val());
+
+    const updateData: {[key: string]: any} = {};
+
+    const usersEpisodesSnapshot = await Promise.all(
+      usersWatchingKeys.map(async (userUid) => {
+        return database.ref(`users/${userUid}/content/episodes/${showId}/episodes`).once("value");
+      })
+    );
+
+    usersEpisodesSnapshot.forEach(async (episodesSnapshot, index) => {
+      const showEpisodesUserData = episodesSnapshot.val() ?? [];
+      const mergedEpisodes = mergeEpisodesFromFireDBwithUserDB(showEpisodesFireData, showEpisodesUserData);
+
+      updateData[`users/${usersWatchingKeys[index]}/content/episodes/${showId}/episodes`] = mergedEpisodes;
+      updateData[`users/${usersWatchingKeys[index]}/content/showsLastUpdateList/${showId}/lastUpdatedInUser`] =
+        timeStamp;
+    });
+
+    return database.ref().update(updateData);
+  });
+
+export const updateShowStatusForUserDatabase = functions.database
+  .ref("allShowsList/{showId}/status")
+  .onUpdate(async (change, context) => {
+    const {showId} = context.params;
+    const afterData = change.after;
+
+    const showStatusLowerCase = afterData.val().toLowerCase();
+    const showStatusForUserDatabase =
+      showStatusLowerCase === "ended" || showStatusLowerCase === "canceled" ? "ended" : "ongoing";
+
+    const usersWatchingSnapshot = await afterData.ref.parent?.child("usersWatchingList").once("value");
+    const usersWatchingKeys = Object.keys(usersWatchingSnapshot?.val());
+
+    const updateData: {[key: string]: any} = {};
+    usersWatchingKeys.forEach((userUid) => {
+      updateData[`users/${userUid}/content/shows/${showId}/status`] = showStatusForUserDatabase;
+    });
+
+    return database.ref().update(updateData);
+  });
+
+export const updateAllEpisodesWatchedUserDatabase = functions.database
+  .ref("users/{uid}/content/showsLastUpdateList/{showId}")
+  .onUpdate(async (change, context) => {
+    const {showId} = context.params;
+    const afterData = change.after;
+
+    const contentRef = afterData.ref.parent?.parent;
+    const showsRef = contentRef?.child("shows");
+
+    const showEpisodesUserSnapshot = await contentRef?.child(`episodes/${showId}/episodes`).once("value");
+    const showEpisodesUserData = showEpisodesUserSnapshot?.val();
+    const isAnyEpisodeNotWatched = episodesToOneArray(showEpisodesUserData).some((episode: any) => !episode.watched);
+
+    return showsRef?.child(`${showId}`).update({allEpisodesWatched: !isAnyEpisodeNotWatched});
+  });
+
+export const updateAllShowsListIdsCreate = functions.database
+  .ref("allShowsList/{showId}/id")
+  .onCreate(async (snapshot, context) => {
+    const {showId} = context.params;
+    database.ref(`allShowsListIds/${showId}`).set(true);
+  });
+
+export const updateAllShowsListIdsDelete = functions.database
+  .ref("allShowsList/{showId}/id")
+  .onDelete(async (snapshot, context) => {
+    const {showId} = context.params;
+    database.ref(`allShowsListIds/${showId}`).set(null);
+  });
 
 export const updatePinnedTimeStamp = functions.database
   .ref("users/{authUid}/contactsDatabase/contactsLastActivity/{contactUid}")
@@ -207,7 +301,9 @@ export const addNewGroupMembers = functions.https.onCall(
       };
       return database.ref().update(updateData);
     } catch (error) {
-      throw new functions.https.HttpsError("unknown", error.message, error);
+      if (isApiError(error)) {
+        throw new functions.https.HttpsError("unknown", error.message, error);
+      }
     }
   }
 );
@@ -243,7 +339,9 @@ export const removeMemberFromGroup = functions.https.onCall(async (data, context
 
     return database.ref().update(updateData);
   } catch (error) {
-    throw new functions.https.HttpsError("unknown", error.message, error);
+    if (isApiError(error)) {
+      throw new functions.https.HttpsError("unknown", error.message, error);
+    }
   }
 });
 
@@ -313,7 +411,11 @@ export const createNewGroup = functions.https.onCall(
           return {newGroupChatKey: groupChatRef.key};
         });
     } catch (error) {
-      throw new functions.https.HttpsError("unknown", error.message, error);
+      if (isApiError(error)) {
+        throw new functions.https.HttpsError("unknown", error.message, error);
+      } else {
+        return;
+      }
     }
   }
 );
@@ -351,7 +453,9 @@ export const newContactRequest = functions.https.onCall(async (data, context) =>
 
     return database.ref("users").update(updateData);
   } catch (error) {
-    throw new functions.https.HttpsError("unknown", error.message, error);
+    if (isApiError(error)) {
+      throw new functions.https.HttpsError("unknown", error.message, error);
+    }
   }
 });
 
@@ -390,6 +494,8 @@ export const handleContactRequest = functions.https.onCall(async (data, context)
 
     return database.ref().update(updateData);
   } catch (error) {
-    throw new functions.https.HttpsError("unknown", error.message, error);
+    if (isApiError(error)) {
+      throw new functions.https.HttpsError("unknown", error.message, error);
+    }
   }
 });

@@ -9,25 +9,25 @@
 $bodyBackgroundClr: #131313;
 $mainContainerMaxWidth: 1350px;
 
-$mobileViewPort: 1000px;
+$mobileViewPort: 1160px;
 
 $newActivityClr: #ec4444;
 
 $mainPalette: (
   orangeClr: peru,
-  blueClr: #66b4e6
+  blueClr: #66b4e6,
 );
 
 $btnPalette: (
   textColor: #fff,
   bgColor: getColor(orangeClr, $mainPalette),
   pressedBgColor: #66b4e6,
-  hoverEffectBgColor: #fff
+  hoverEffectBgColor: #fff,
 );
 
 $inputPalette: (
   textColor: #efefef,
-  placeholderColor: #cececea6
+  placeholderColor: #cececea6,
 );
 
 $searchCardPalette: (
@@ -40,7 +40,26 @@ $searchCardPalette: (
   countryColor: #e0e0e0,
   ratingColor: #e0e0e0,
   typeColor: getColor(orangeClr, $mainPalette),
-  linkColor: #4ba9f9
+  linkColor: #4ba9f9,
 );
 
-@import "mixins";
+:root {
+  --translateUpValue: -51px;
+  --fadeOutDuration: 150ms;
+  --translateUpDuration: 200ms;
+
+  --nav-bg-color: #000;
+  --nav-width: 340px;
+
+  --auth-container-menu-bg-color: #1a1919;
+  --auth-form-text-color: #fff;
+  --auth-form-navigation-color: #fff;
+
+  --auth-container-login-page-bg-color: #fff;
+  --auth-form-login-page-text-color: #1a1919;
+  --auth-form-login-page-navigation-color: #1a1919;
+
+  --login-form-container-width: var(--nav-width);
+}
+
+@import 'mixins';

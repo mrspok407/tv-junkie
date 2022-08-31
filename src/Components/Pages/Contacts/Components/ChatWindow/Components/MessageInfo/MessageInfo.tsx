@@ -1,9 +1,9 @@
-import classNames from "classnames"
-import React, { useRef } from "react"
-import { MessageInterface } from "../../../../@Types"
-import MessagePopup from "./MessagePopup"
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
-import "./MessageInfo.scss"
+import classNames from 'classnames'
+import React, { useRef } from 'react'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import { MessageInterface } from '../../../../@Types'
+import MessagePopup from './MessagePopup'
+import './MessageInfo.scss'
 
 type Props = { messageData: MessageInterface }
 
@@ -20,76 +20,76 @@ const MessageInfo: React.FC<Props> = ({ messageData }) => {
       {contactInfo.isGroupChat ? (
         <div
           ref={messageOptionsRef}
-          className={classNames("chat-window__message-options", {
-            "chat-window__message-options--hide": messageData.sender !== authUser?.uid || contactInfo.removedFromGroup
+          className={classNames('chat-window__message-options', {
+            'chat-window__message-options--hide': messageData.sender !== authUser?.uid || contactInfo.removedFromGroup,
           })}
         >
           <button
             type="button"
-            className={classNames("chat-window__open-popup-btn", {
-              "chat-window__open-popup-btn--open": messagePopup === messageData.key
+            className={classNames('chat-window__open-popup-btn', {
+              'chat-window__open-popup-btn--open': messagePopup === messageData.key,
             })}
             onClick={(e) => {
               e.stopPropagation()
-              contactsDispatch({ type: "updateMessagePopup", payload: messageData.key })
+              contactsDispatch({ type: 'updateMessagePopup', payload: messageData.key })
             }}
           >
-            <span></span>
-            <span></span>
-            <span></span>
+            <span />
+            <span />
+            <span />
           </button>
 
           {messagePopup === messageData.key && (
-            <MessagePopup messageOptionsRef={messageOptionsRef.current} messageData={messageData} />
+            <MessagePopup messageOptionsRef={messageOptionsRef} messageData={messageData} />
           )}
         </div>
       ) : (
         <div
           ref={messageOptionsRef}
-          className={classNames("chat-window__message-options", {
-            "chat-window__message-options--hide": contactInfo.status !== true
+          className={classNames('chat-window__message-options', {
+            'chat-window__message-options--hide': contactInfo.status !== true,
           })}
         >
           <button
             type="button"
-            className={classNames("chat-window__open-popup-btn", {
-              "chat-window__open-popup-btn--open": messagePopup === messageData.key
+            className={classNames('chat-window__open-popup-btn', {
+              'chat-window__open-popup-btn--open': messagePopup === messageData.key,
             })}
             onClick={(e) => {
               e.stopPropagation()
-              contactsDispatch({ type: "updateMessagePopup", payload: messageData.key })
+              contactsDispatch({ type: 'updateMessagePopup', payload: messageData.key })
             }}
           >
-            <span></span>
-            <span></span>
-            <span></span>
+            <span />
+            <span />
+            <span />
           </button>
 
           {messagePopup === messageData.key && (
-            <MessagePopup messageOptionsRef={messageOptionsRef.current} messageData={messageData} />
+            <MessagePopup messageOptionsRef={messageOptionsRef} messageData={messageData} />
           )}
         </div>
       )}
 
       {messageData.sender === authUser?.uid && !contactInfo.isGroupChat && (
         <div
-          className={classNames("chat-window__message-status", {
-            "chat-window__message-status--read": !contactsUnreadMessagesData?.includes(messageData.key),
-            "chat-window__message-status--deliver-failed": messageData.isDelivered === false,
-            "chat-window__message-status--loading": contactsUnreadMessagesData === null
+          className={classNames('chat-window__message-status', {
+            'chat-window__message-status--read': !contactsUnreadMessagesData?.includes(messageData.key),
+            'chat-window__message-status--deliver-failed': messageData.isDelivered === false,
+            'chat-window__message-status--loading': contactsUnreadMessagesData === null,
           })}
-        ></div>
+        />
       )}
       {messageData.isDelivered === false && contactInfo.isGroupChat && (
         <div
-          className={classNames("chat-window__message-status", {
-            "chat-window__message-status--deliver-failed": messageData.isDelivered === false
+          className={classNames('chat-window__message-status', {
+            'chat-window__message-status--deliver-failed': messageData.isDelivered === false,
           })}
-        ></div>
+        />
       )}
       <div className="chat-window__message-timestamp">
         <div> {new Date(Number(messageData.timeStamp)).toLocaleTimeString().slice(0, -3)}</div>
-        <div className="chat-window__message-edited">{messageData.isEdited && "edited"}</div>
+        <div className="chat-window__message-edited">{messageData.isEdited && 'edited'}</div>
       </div>
     </div>
   )

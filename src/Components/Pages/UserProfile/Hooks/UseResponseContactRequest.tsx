@@ -1,6 +1,6 @@
-import { useContext, useState } from "react"
-import { FirebaseContext } from "Components/Firebase"
-import { AppContext } from "Components/AppContext/AppContextHOC"
+import { useContext, useState } from 'react'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import { ErrorInterface, ErrorsHandlerContext } from 'Components/AppContext/Contexts/ErrorsContext'
 
 type Props = {
   contactUid: string
@@ -9,8 +9,8 @@ type Props = {
 const INITIAL_LOADING_STATE = { accept: false, rejected: false }
 
 const useResponseContactRequest = ({ contactUid }: Props) => {
-  const { errors } = useContext(AppContext)
-  const firebase = useContext(FirebaseContext)
+  const { firebase } = useFrequentVariables()
+  const handleError = useContext(ErrorsHandlerContext)
 
   const [responseContactRequestLoading, setResponseContactRequestLoading] = useState(INITIAL_LOADING_STATE)
 
@@ -18,12 +18,13 @@ const useResponseContactRequest = ({ contactUid }: Props) => {
     if (responseContactRequestLoading.accept || responseContactRequestLoading.rejected) return
     try {
       setResponseContactRequestLoading((prevState) => ({ ...prevState, [status]: true }))
-      const handleContactRequestCloud = firebase.httpsCallable("handleContactRequest")
+      const handleContactRequestCloud = firebase.httpsCallable('handleContactRequest')
       await handleContactRequestCloud({ contactUid, status })
-    } catch (error) {
-      errors.handleError({
+    } catch (err) {
+      const error = err as ErrorInterface['errorData']
+      handleError({
         errorData: error,
-        message: "There has been some error handling contact request. Please try again."
+        message: 'There has been some error handling contact request. Please try again.',
       })
 
       throw new Error(`There has been some error handling contact request: ${error}`)

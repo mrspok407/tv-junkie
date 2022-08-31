@@ -3,6 +3,9 @@
     "pet-project": "pet-project-8d5fd",
     "pet-project-development": "pet-project-development",
     "default": "pet-project-8d5fd",
-    "pet-project-live-production": "pet-project-8d5fd"
-  }
+    "pet-project-live-production": "pet-project-8d5fd",
+    "pet-dev": "pet-project-development",
+    "pet": "pet-project-8d5fd"
+  },
+  "targets": {}
 }

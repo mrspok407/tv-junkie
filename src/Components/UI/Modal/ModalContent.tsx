@@ -1,12 +1,10 @@
-import React from "react"
-import "./Modal.scss"
+import React from 'react'
+import './Modal.scss'
 
 type Props = {
   message: string
 }
 
-const ModalContent: React.FC<Props> = ({ message }) => {
-  return <div className="modal-message">{message}</div>
-}
+const ModalContent: React.FC<Props> = ({ message }) => <div className="modal-message">{message}</div>
 
 export default ModalContent

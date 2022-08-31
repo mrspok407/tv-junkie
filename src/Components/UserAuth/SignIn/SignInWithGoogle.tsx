@@ -1,86 +1,71 @@
-import React, { useState, useEffect, useContext } from "react"
-import { useHistory } from "react-router-dom"
-import { AppContext, MovieInterface } from "Components/AppContext/AppContextHOC"
-import * as ROLES from "Utils/Constants/roles"
-import * as ROUTES from "Utils/Constants/routes"
-import { AuthUserGoogleSignInInterface } from "Utils/Interfaces/UserAuth"
-
-const LOCAL_STORAGE_KEY_WATCHING_SHOWS = "watchingShowsLocalS"
-const LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES = "watchLaterMoviesLocalS"
+import React, { useState, useEffect, useContext } from 'react'
+import { useHistory } from 'react-router-dom'
+import * as ROUTES from 'Utils/Constants/routes'
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import { LocalStorageValueContext } from 'Components/AppContext/Contexts/LocalStorageContentContext/LocalStorageContentContext'
+import { postUserDataOnRegisterScheme } from 'Components/Firebase/FirebasePostSchemes/Post/AuthenticationSchemes'
+import { ErrorInterface, ErrorsHandlerContext, IGNORED_ERROR_CODES } from 'Components/AppContext/Contexts/ErrorsContext'
+import { AuthUserGoogleSignInInterface } from '../Session/Authentication/@Types'
+import { formatEpisodesForUserDatabaseOnRegister, handleContentOnRegister } from '../Register/Helpers'
+import useAuthListenerSubscriber from '../Session/Authentication/Hooks/useAuthListenerSubscriber'
 
 const mobileLayout = 1000
 
 const SignInWithGoogleForm = () => {
+  const { firebase } = useFrequentVariables()
+  const initializeAuthUserListener = useAuthListenerSubscriber()
+
+  const handleError = useContext(ErrorsHandlerContext)
+
+  const { watchingShows: watchingShowsLS, watchLaterMovies: watchLaterMoviesLS } = useContext(LocalStorageValueContext)
+
   const [windowSize, setWindowSize] = useState(window.innerWidth)
-  const context = useContext(AppContext)
   const history = useHistory()
 
   useEffect(() => {
     setWindowSize(window.innerWidth)
   }, [])
 
-  const clearLocalStorage = () => {
-    localStorage.removeItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)
-    localStorage.removeItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)
-
-    context.userContentLocalStorage.clearContentState()
+  const handleSuccessSubmit = () => {
+    initializeAuthUserListener()
   }
 
-  const onSubmit = (provider: any) => {
-    const signInType = windowSize < mobileLayout ? "signInWithRedirect" : "signInWithPopup"
+  const onSubmit = async (provider: any) => {
+    const signInType = windowSize < mobileLayout ? 'signInWithRedirect' : 'signInWithPopup'
 
-    context.firebase.app
-      .auth()
-      [signInType](provider)
-      .then((authUser: AuthUserGoogleSignInInterface) => {
-        context.userContentHandler.handleLoadingShowsOnRegister(true)
+    let error: ErrorInterface['errorData'] = { message: '' }
 
-        context.firebase
-          .user(authUser.user.uid)
-          .update({
-            username: authUser.user.displayName,
-            userNameLowerCase: authUser.user.displayName.toLowerCase(),
-            email: authUser.user.email,
-            role: authUser.user.email === process.env.REACT_APP_ADMIN_EMAIL ? ROLES.ADMIN : ROLES.USER
-          })
-          .then(() => {
-            if (!authUser.additionalUserInfo.isNewUser) {
-              context.userContentHandler.handleLoadingShowsOnRegister(false)
-              return
-            }
+    try {
+      const authUser: AuthUserGoogleSignInInterface = await firebase.app.auth()[signInType](provider)
+      if (!authUser.additionalUserInfo.isNewUser) {
+        handleSuccessSubmit()
+        return
+      }
 
-            const watchingShows = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCHING_SHOWS)!) || []
-            const watchLaterMovies = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY_WATCH_LATER_MOVIES)!) || []
+      const episodesData = await handleContentOnRegister(watchingShowsLS, firebase)
+      const { episodesForUserDatabase, episodesInfoForUserDatabase } = formatEpisodesForUserDatabaseOnRegister(
+        watchingShowsLS,
+        episodesData,
+      )
 
-            context.userContentHandler.addShowsToDatabaseOnRegister({
-              shows: watchingShows,
-              uid: authUser.user.uid
-            })
-
-            watchLaterMovies.forEach((item: MovieInterface) => {
-              context.userContentHandler.handleMovieInDatabases({
-                id: item.id,
-                data: item,
-                onRegister: true,
-                userOnRegister: authUser.user
-              })
-            })
-          })
-          .then(() => {
-            clearLocalStorage()
-          })
-          .catch(() => {
-            clearLocalStorage()
-            context.userContentHandler.handleLoadingShowsOnRegister(false)
-          })
+      const updateData = postUserDataOnRegisterScheme({
+        authUserFirebase: authUser,
+        userName: authUser.user.displayName,
+        selectedShows: watchingShowsLS,
+        watchLaterMovies: watchLaterMoviesLS,
+        episodes: episodesForUserDatabase,
+        episodesInfo: episodesInfoForUserDatabase,
+        firebase,
       })
-      .then(() => {
+      return firebase.rootRef().update(updateData, handleSuccessSubmit)
+    } catch (err) {
+      error = err as ErrorInterface['errorData']
+      handleError({ errorData: error, message: 'Error occurred during register process. Please try again.' })
+    } finally {
+      if (!IGNORED_ERROR_CODES.includes(error?.code!)) {
         history.push(ROUTES.HOME_PAGE)
-      })
-      .catch((error: any) => {
-        context.userContentHandler.handleLoadingShowsOnRegister(false)
-        console.log(error)
-      })
+      }
+    }
   }
 
   return (
@@ -88,9 +73,9 @@ const SignInWithGoogleForm = () => {
       <button
         className="button button--auth__form"
         type="button"
-        onClick={() => onSubmit(new context.firebase.app.auth.GoogleAuthProvider())}
+        onClick={() => onSubmit(new firebase.app.auth.GoogleAuthProvider())}
       >
-        <div className="auth__form--google-icon"></div>
+        <div className="auth__form--google-icon" />
         <div className="auth__form--google-title">Google Sign In</div>
       </button>
     </div>

@@ -1,15 +1,15 @@
-import * as React from "react"
-import { UserShowsInterface } from "Components/UserContent/UseUserShows/UseUserShows"
+import * as React from 'react'
+import { ShowFullDataStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
 
 const SHOWS_TO_LOAD_INITIAL = 16
 
 export enum ActionTypes {
-  IncrementLoadedShows = "incrementLoadedShows",
-  IncrementLoadedShowsLS = "incrementLoadedShowsLS",
-  DisableLoad = "disableLoad",
-  DisableLoadLS = "disableLoadLS",
-  ChangeActiveSection = "changeActiveSection",
-  UpdateContent = "updateContent"
+  IncrementLoadedShows = 'incrementLoadedShows',
+  IncrementLoadedShowsLS = 'incrementLoadedShowsLS',
+  DisableLoad = 'disableLoad',
+  DisableLoadLS = 'disableLoadLS',
+  ChangeActiveSection = 'changeActiveSection',
+  UpdateContent = 'updateContent',
 }
 
 const reducer: React.Reducer<ShowsContentState, ActionInterface> = (state, action) => {
@@ -21,10 +21,11 @@ const reducer: React.Reducer<ShowsContentState, ActionInterface> = (state, actio
         ...loadedShows,
         [activeSection]: !disableLoad[activeSection]
           ? loadedShows[activeSection] + SHOWS_TO_LOAD_INITIAL
-          : loadedShows[activeSection]
-      }
+          : loadedShows[activeSection],
+      },
     }
-  } else if (action.type === ActionTypes.DisableLoad) {
+  }
+  if (action.type === ActionTypes.DisableLoad) {
     return {
       ...state,
       disableLoad: {
@@ -32,24 +33,25 @@ const reducer: React.Reducer<ShowsContentState, ActionInterface> = (state, actio
         [activeSection]: !!(
           loadedShows[activeSection] >=
           content.filter((show: any) =>
-            activeSection === "finishedShows" ? !!show.finished : !!(show.database === activeSection && !show.finished)
+            activeSection === 'finishedShows' ? !!show.finished : !!(show.database === activeSection && !show.finished),
           ).length
-        )
-      }
+        ),
+      },
     }
-  } else if (action.type === ActionTypes.ChangeActiveSection) {
-    return {
-      ...state,
-      activeSection: action.payload
-    }
-  } else if (action.type === ActionTypes.UpdateContent) {
-    return {
-      ...state,
-      content: action.payload
-    }
-  } else {
-    throw new Error()
   }
+  if (action.type === ActionTypes.ChangeActiveSection) {
+    return {
+      ...state,
+      activeSection: action.payload,
+    }
+  }
+  if (action.type === ActionTypes.UpdateContent) {
+    return {
+      ...state,
+      content: action.payload,
+    }
+  }
+  throw new Error()
 }
 
 export default reducer
@@ -82,7 +84,7 @@ export interface ShowsContentState {
   loadedShows: LoadedShowsInterface
   disableLoad: DisableLoadInterface
   activeSection: string
-  content: UserShowsInterface[]
+  content: ShowFullDataStoreState[]
 }
 
 const INITIAL_STATE: ShowsContentState = {
@@ -91,15 +93,15 @@ const INITIAL_STATE: ShowsContentState = {
     droppedShows: false,
     willWatchShows: false,
     finishedShows: false,
-    watchingShowsLS: false
+    watchingShowsLS: false,
   },
   loadedShows: {
     watchingShows: SHOWS_TO_LOAD_INITIAL,
     watchingShowsLS: SHOWS_TO_LOAD_INITIAL,
     droppedShows: SHOWS_TO_LOAD_INITIAL,
     willWatchShows: SHOWS_TO_LOAD_INITIAL,
-    finishedShows: SHOWS_TO_LOAD_INITIAL
+    finishedShows: SHOWS_TO_LOAD_INITIAL,
   },
-  activeSection: "watchingShows",
-  content: []
+  activeSection: 'watchingShows',
+  content: [],
 }

@@ -1,13 +1,11 @@
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
-import React, { useState, useEffect } from "react"
-import Contact from "./Components/Contact/Contact"
-import "./SelectName.scss"
-
-type Props = {}
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import React, { useState, useEffect } from 'react'
+import Contact from './Components/Contact/Contact'
+import './SelectName.scss'
 
 const NAME_LENGTH_LIMIT = 45
 
-const SelectName: React.FC<Props> = () => {
+const SelectName: React.FC = () => {
   const { firebase, contactsState, contactsDispatch } = useFrequentVariables()
   const { groupCreation } = contactsState
   const selectedMembersData = groupCreation.members
@@ -19,14 +17,14 @@ const SelectName: React.FC<Props> = () => {
       const membersStatus = await Promise.all(
         selectedMembersData.map(async (member) => {
           const contactStatus = await Promise.all([
-            firebase.contactsDatabase({ uid: member.key }).child("pageIsOpen").once("value"),
+            firebase.contactsDatabase({ uid: member.key }).child('pageIsOpen').once('value'),
             firebase
               .chatMemberStatus({ chatKey: member.chatKey!, memberKey: member.key, isGroupChat: false })
-              .child("lastSeen")
-              .once("value")
+              .child('lastSeen')
+              .once('value'),
           ])
           return { ...member, isOnline: contactStatus[0].val(), lastSeen: contactStatus[1].val() }
-        })
+        }),
       )
       setMembersWithStatus(membersStatus)
     })()
@@ -34,16 +32,16 @@ const SelectName: React.FC<Props> = () => {
 
   const handleChange = (e: any) => {
     contactsDispatch({
-      type: "updateGroupCreation",
+      type: 'updateGroupCreation',
       payload: {
         groupName: e.target.value,
-        error: `${e.target.value?.length >= NAME_LENGTH_LIMIT ? "Name can't be more than 45 characters" : ""}`
-      }
+        error: `${e.target.value?.length >= NAME_LENGTH_LIMIT ? "Name can't be more than 45 characters" : ''}`,
+      },
     })
   }
 
   const resetSearch = () => {
-    contactsDispatch({ type: "updateGroupCreation", payload: { groupName: "", error: "" } })
+    contactsDispatch({ type: 'updateGroupCreation', payload: { groupName: '', error: '' } })
   }
 
   const handleKeyDown = (e: any) => {
@@ -58,11 +56,11 @@ const SelectName: React.FC<Props> = () => {
             type="button"
             onClick={() =>
               contactsDispatch({
-                type: "updateGroupCreation",
-                payload: { selectNameActive: false, error: "" }
+                type: 'updateGroupCreation',
+                payload: { selectNameActive: false, error: '' },
               })
             }
-          ></button>
+          />
         </div>
         <div className="group-creation__heading-text">New group</div>
       </div>

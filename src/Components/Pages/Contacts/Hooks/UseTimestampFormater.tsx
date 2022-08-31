@@ -1,11 +1,11 @@
-import { useState, useMemo } from "react"
+import { useState, useMemo } from 'react'
 
 type Props = {
   timeStamp: number | string | null
 }
 
 const useTimestampFormater = ({ timeStamp }: Props) => {
-  const [formatedDate, setFormatedDate] = useState<number | string | null>(timeStamp)
+  const [formattedDate, setFormatedDate] = useState<number | string | null>(timeStamp)
 
   useMemo(() => {
     if (!timeStamp) {
@@ -24,13 +24,13 @@ const useTimestampFormater = ({ timeStamp }: Props) => {
     if (timeStampDay === todayDay) {
       setFormatedDate(timeStampTime)
     } else if (timeStampDay === yesterdayDay) {
-      setFormatedDate("Yesterday")
+      setFormatedDate('Yesterday')
     } else {
       setFormatedDate(timeStampDay!)
     }
   }, [timeStamp])
 
-  return formatedDate
+  return formattedDate
 }
 
 export default useTimestampFormater

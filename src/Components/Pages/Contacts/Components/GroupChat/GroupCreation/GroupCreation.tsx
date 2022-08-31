@@ -1,8 +1,8 @@
-import useFrequentVariables from "Components/Pages/Contacts/Hooks/UseFrequentVariables"
-import React, { useState, useLayoutEffect, useCallback } from "react"
-import ContactsSearch from "./Components/ContactsSearch/ContactsSearch"
-import SelectName from "./Components/SelectName/SelectName"
-import "./GroupCreation.scss"
+import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import React, { useState, useLayoutEffect, useCallback } from 'react'
+import ContactsSearch from './Components/ContactsSearch/ContactsSearch'
+import SelectName from './Components/SelectName/SelectName'
+import './GroupCreation.scss'
 
 type Props = {
   contactListWrapperRef: HTMLDivElement
@@ -14,7 +14,7 @@ const GroupCreation: React.FC<Props> = ({ contactListWrapperRef }) => {
 
   const [createGroupWrapperNode, setCreateGroupWrapperNode] = useState<HTMLDivElement>(null!)
 
-  const createGroupWrapperRef = useCallback((node) => {
+  const createGroupWrapperRef = useCallback((node: any) => {
     if (node !== null) {
       setCreateGroupWrapperNode(node)
     }
@@ -31,8 +31,8 @@ const GroupCreation: React.FC<Props> = ({ contactListWrapperRef }) => {
         <div className="group-creation__heading-go-back">
           <button
             type="button"
-            onClick={() => contactsDispatch({ type: "updateGroupCreation", payload: { isActive: false, error: "" } })}
-          ></button>
+            onClick={() => contactsDispatch({ type: 'updateGroupCreation', payload: { isActive: false, error: '' } })}
+          />
         </div>
         <div className="group-creation__heading-text">Add members</div>
       </div>
