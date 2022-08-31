@@ -28,7 +28,6 @@ const configDevelopment = {
 }
 
 const config: any = process.env.NODE_ENV === 'production' ? configProduction : configDevelopment
-// let config: any = configDevelopment
 
 if (window.location.hostname === 'localhost') {
   config.databaseURL = 'http://localhost:9000/?ns=pet-project-development-default-rtdb'

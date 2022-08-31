@@ -19,7 +19,7 @@ const DisableWarning: React.FC<Props> = ({ fadeOutStart }) => {
       <Link className="buttons__col-link" to={ROUTES.LOGIN_PAGE}>
         register
       </Link>
-      . Your allready selected shows will be saved.
+      . Your already selected shows will be saved.
     </div>
   )
 }

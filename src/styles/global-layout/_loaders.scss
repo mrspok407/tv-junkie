@@ -1,4 +1,4 @@
-@import "../../Components/Pages/Contacts/styles/globalsContacts";
+@import '../../Components/Pages/Contacts/styles/globalsContacts';
 
 .loader {
   position: relative;
@@ -90,6 +90,12 @@
       box-shadow: 0px 0px 15px 3px rgb(238, 54, 106);
     }
   }
+}
+
+.loader--lazy-load {
+  animation-delay: 350ms;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .loader--typing {

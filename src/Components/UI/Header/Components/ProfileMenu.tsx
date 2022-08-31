@@ -3,7 +3,6 @@ import { ContactsActivityContext } from 'Components/AppContext/Contexts/Contacts
 import React, { useContext } from 'react'
 import { NavLink } from 'react-router-dom'
 import * as ROUTES from 'Utils/Constants/routes'
-
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import Login from '../Login'
 
