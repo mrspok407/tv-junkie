@@ -30,6 +30,11 @@ export const getSeasonEpisodes =
   }
 
 export const shouldToWatchShowRender = (showData: ShowFullDataStoreState) => {
-  const isShowReleased = isContentReleased(showData.first_air_date)
-  return showData?.allReleasedEpisodesWatched === false && showData?.database === 'watchingShows' && isShowReleased
+  const [isShowReleased, isShowDateValid] = isContentReleased(showData.first_air_date)
+  return (
+    showData?.allReleasedEpisodesWatched === false &&
+    showData?.database === 'watchingShows' &&
+    isShowReleased &&
+    isShowDateValid
+  )
 }

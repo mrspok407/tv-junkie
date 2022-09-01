@@ -47,26 +47,28 @@ const isApiError = (x: any): x is ApiError => {
 const contactsDatabaseRef = (uid: string) => `${uid}/contactsDatabase`;
 
 export const updateShowEpisodesForUserDatabase = functions.database
-  .ref("allShowsList/{showId}/episodes")
+  .ref("allShowsList/{showId}/lastUpdatedTimestamp")
   .onUpdate(async (change, context) => {
     const {showId} = context.params;
     const afterData = change.after;
 
+    const episodesRef = await afterData.ref.parent?.child("episodes").once("value");
+
     const timeStamp = admin.database.ServerValue.TIMESTAMP;
 
-    const showEpisodesFireData = afterData.val() ?? [];
+    const showEpisodesFireData = episodesRef?.val() ?? [];
     const usersWatchingSnapshot = await afterData.ref.parent?.child("usersWatchingList").once("value");
     const usersWatchingKeys = Object.keys(usersWatchingSnapshot?.val());
 
     const updateData: {[key: string]: any} = {};
 
     const usersEpisodesSnapshot = await Promise.all(
-      usersWatchingKeys.map(async (userUid) => {
+      usersWatchingKeys.map((userUid) => {
         return database.ref(`users/${userUid}/content/episodes/${showId}/episodes`).once("value");
       })
     );
 
-    usersEpisodesSnapshot.forEach(async (episodesSnapshot, index) => {
+    usersEpisodesSnapshot.forEach((episodesSnapshot, index) => {
       const showEpisodesUserData = episodesSnapshot.val() ?? [];
       const mergedEpisodes = mergeEpisodesFromFireDBwithUserDB(showEpisodesFireData, showEpisodesUserData);
 

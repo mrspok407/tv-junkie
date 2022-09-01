@@ -23,6 +23,7 @@ const addShowToFireDatabase = async ({ showDetailsTMDB, showEpisodesTMDB, fireba
       episodes: showEpisodesTMDB.episodes,
       id: showDetailsTMDB.id.toString(),
       status: showDetailsTMDB.status,
+      lastUpdatedTimestamp: firebase.timeStamp(),
     }
   })
 

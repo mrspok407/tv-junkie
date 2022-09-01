@@ -16,8 +16,8 @@ export const organizeFutureEpisodesByMonth = (
     .flatMap((show) =>
       episodes[show.id].flatMap((season) =>
         season.episodes.reduce((acc: any[], episode) => {
-          const isEpisodeReleased = isContentReleased(episode.air_date)
-          if (!isEpisodeReleased) {
+          const [isEpisodeReleased, isEpisodeDateValid] = isContentReleased(episode.air_date)
+          if (!isEpisodeReleased && isEpisodeDateValid) {
             acc.push({
               ...episode,
               show: show.name || show.original_name,

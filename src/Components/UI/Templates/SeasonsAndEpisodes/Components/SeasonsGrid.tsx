@@ -56,17 +56,16 @@ const SeasonsGrid: React.FC<Props> = ({
         if (renderEdgeCases(season)) return null
 
         const seasonDate = new Date(season.air_date ?? '')
-        const isValidSeasonDate = isValid(seasonDate)
 
         const daysToNewSeason = differenceInCalendarDays(seasonDate, currentDate)
-        const isSeasonReleased = isContentReleased(seasonDate)
+        const [isSeasonReleased, isSeasonDateValid] = isContentReleased(seasonDate)
 
         const renderSeasonDate = () => {
           if (isArrayIncludes(season.id, errors)) {
             return <div className="episodes__episode-group-days-to-air">Weird error occurred wow</div>
           }
 
-          if (!isValidSeasonDate) {
+          if (!isSeasonDateValid) {
             return (
               <div className="episodes__episode-group-date episodes__episode-group-date--no-date">
                 No date available
@@ -97,7 +96,7 @@ const SeasonsGrid: React.FC<Props> = ({
               className={classNames('episodes__episode-group-info', {
                 'episodes__episode-group-info--open': isArrayIncludes(season.id, openData),
                 'episodes__episode-group-info--error': isArrayIncludes(season.id, errors),
-                'episodes__episode-group-info--not-aired': !isSeasonReleased && isValidSeasonDate,
+                'episodes__episode-group-info--not-aired': !isSeasonReleased && isSeasonDateValid,
               })}
               onClick={() => handleOpenSeasonEpisodes(season.id, season.season_number)}
             >

@@ -19,8 +19,8 @@ const useShouldToWatchEpisodeRender = ({ episodeData, showId }: Props) => {
     return episode?.watched ?? false
   })
 
-  const isEpisodeReleased = isContentReleased(episodeData.air_date)
-  const shouldEpisodeRender = !isWatched && isEpisodeReleased
+  const [isEpisodeReleased, isEpisodeDateValid] = isContentReleased(episodeData.air_date)
+  const shouldEpisodeRender = !isWatched && isEpisodeReleased && isEpisodeDateValid
 
   return shouldEpisodeRender
 }

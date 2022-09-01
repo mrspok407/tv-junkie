@@ -55,20 +55,21 @@ const isApiError = (x) => {
 };
 const contactsDatabaseRef = (uid) => `${uid}/contactsDatabase`;
 exports.updateShowEpisodesForUserDatabase = functions.database
-    .ref("allShowsList/{showId}/episodes")
+    .ref("allShowsList/{showId}/lastUpdatedTimestamp")
     .onUpdate(async (change, context) => {
-    var _a, _b;
+    var _a, _b, _c;
     const { showId } = context.params;
     const afterData = change.after;
+    const episodesRef = await ((_a = afterData.ref.parent) === null || _a === void 0 ? void 0 : _a.child("episodes").once("value"));
     const timeStamp = admin.database.ServerValue.TIMESTAMP;
-    const showEpisodesFireData = (_a = afterData.val()) !== null && _a !== void 0 ? _a : [];
-    const usersWatchingSnapshot = await ((_b = afterData.ref.parent) === null || _b === void 0 ? void 0 : _b.child("usersWatchingList").once("value"));
+    const showEpisodesFireData = (_b = episodesRef === null || episodesRef === void 0 ? void 0 : episodesRef.val()) !== null && _b !== void 0 ? _b : [];
+    const usersWatchingSnapshot = await ((_c = afterData.ref.parent) === null || _c === void 0 ? void 0 : _c.child("usersWatchingList").once("value"));
     const usersWatchingKeys = Object.keys(usersWatchingSnapshot === null || usersWatchingSnapshot === void 0 ? void 0 : usersWatchingSnapshot.val());
     const updateData = {};
-    const usersEpisodesSnapshot = await Promise.all(usersWatchingKeys.map(async (userUid) => {
+    const usersEpisodesSnapshot = await Promise.all(usersWatchingKeys.map((userUid) => {
         return database.ref(`users/${userUid}/content/episodes/${showId}/episodes`).once("value");
     }));
-    usersEpisodesSnapshot.forEach(async (episodesSnapshot, index) => {
+    usersEpisodesSnapshot.forEach((episodesSnapshot, index) => {
         var _a;
         const showEpisodesUserData = (_a = episodesSnapshot.val()) !== null && _a !== void 0 ? _a : [];
         const mergedEpisodes = (0, helpers_1.mergeEpisodesFromFireDBwithUserDB)(showEpisodesFireData, showEpisodesUserData);

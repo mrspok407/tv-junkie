@@ -162,7 +162,9 @@ const SettingsContent = () => {
     try {
       if (isUpdateAll) {
         const allShowsIdsSnapshot = await firebase.allShowsListIds().once('value')
-        showsToUpdateIds = sortDataSnapshot(allShowsIdsSnapshot).map((item) => item.key)
+        showsToUpdateIds = sortDataSnapshot(allShowsIdsSnapshot)
+          .map((item) => item.key)
+          .filter((item) => Number(item) === 93405)
       } else {
         const { data: recentlyUpdatedShows } = await axios.get(
           `https://api.themoviedb.org/3/tv/changes?api_key=${process.env.REACT_APP_TMDB_API}&start_date=${startDate}`,
@@ -266,6 +268,7 @@ const SettingsContent = () => {
         updateDataFirebase[`allShowsList/${showData.showId}/episodes`] = showData.episodes
         updateDataFirebase[`allShowsList/${showData.showId}/status`] = showData.status
         updateDataFirebase[`allShowsList/${showData.showId}/info`] = showData.info
+        updateDataFirebase[`allShowsList/${showData.showId}/lastUpdatedTimestamp`] = firebase.timeStamp()
       })
 
       console.log({ updateData })
@@ -321,7 +324,8 @@ const SettingsContent = () => {
         )}
       </div>
       <PasswordUpdate />
-      {[process.env.REACT_APP_TEST_EMAIL, process.env.REACT_APP_ADMIN_EMAIL].includes(authUser?.email) && (
+      {/* {[process.env.REACT_APP_TEST_EMAIL, process.env.REACT_APP_ADMIN_EMAIL].includes(authUser?.email) && ( */}
+      {true && (
         <>
           <div className="update-database">
             <button onClick={updateShowsDataInDatabase} className="button button--profile" type="button">
