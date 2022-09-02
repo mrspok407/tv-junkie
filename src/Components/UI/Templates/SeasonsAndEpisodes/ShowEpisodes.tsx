@@ -5,7 +5,7 @@ import { selectShow, selectShowEpisodes } from 'Components/UserContent/UseUserSh
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import { SeasonTMDB } from 'Utils/@TypesTMDB'
 import { postCheckReleasedEpisodes } from 'Components/UserContent/UseUserShowsRed/DatabaseHandlers/PostData/postShowEpisodesData'
-import { releasedEpisodesToOneArray } from 'Components/UserContent/UseUserShowsRed/Utils/episodesOneArrayModifiers'
+import { releasedValidEpisodesToOneArray } from 'Components/UserContent/UseUserShowsRed/Utils/episodesOneArrayModifiers'
 import useFetchSeasons from './Hooks/UseFetchSeasons/UseFetchSeasons'
 import { ShowEpisodesFromAPIInt } from './@Types'
 import SeasonsGrid from './Components/SeasonsGrid'
@@ -25,7 +25,7 @@ const ShowEpisodes: React.FC<Props> = ({ seasonsTMDB, showId }) => {
 
   const isAnyEpisodeReleased = useAppSelector((state) => {
     const episodes = selectShowEpisodes(state, showId)
-    const releasedEpisodes = releasedEpisodesToOneArray(episodes)
+    const releasedEpisodes = releasedValidEpisodesToOneArray(episodes)
     return releasedEpisodes.length
   })
 

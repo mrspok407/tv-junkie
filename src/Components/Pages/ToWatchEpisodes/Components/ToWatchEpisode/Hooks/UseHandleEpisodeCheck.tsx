@@ -15,7 +15,7 @@ import {
 } from 'Utils/Constants'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import { getSeasonEpisodes, getSeasons } from 'Components/Pages/ToWatchEpisodes/Helpers'
-import { isContentReleased } from 'Utils'
+import { isContentReleasedValid } from 'Utils'
 
 type Props = {
   episodeData: SingleEpisodeStoreState
@@ -60,13 +60,13 @@ const useHandleEpisodeCheck = ({
 
     const isLastReleasedEpisodeInSeason =
       seasonEpisodesStore?.filter((episode) => {
-        const isEpisodeReleased = isContentReleased(episode.air_date)
+        const [isEpisodeReleased] = isContentReleasedValid(episode.air_date)
         return !episode.watched && isEpisodeReleased
       }).length === 1
 
     const isLastReleasedSeasonInShow =
       showEpisodesStore?.filter((season) => {
-        const isSeasonReleased = isContentReleased(season.air_date)
+        const [isSeasonReleased] = isContentReleasedValid(season.air_date)
         return !season.allReleasedEpisodesWatched && isSeasonReleased
       }).length === 1
 

@@ -1,7 +1,7 @@
 import { useAppSelector } from 'app/hooks'
 import { SingleEpisodeStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { selectSingleEpisode } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
-import { isContentReleased } from 'Utils'
+import { isContentReleasedValid } from 'Utils'
 
 type Props = {
   episodeData: SingleEpisodeStoreState
@@ -19,7 +19,7 @@ const useShouldToWatchEpisodeRender = ({ episodeData, showId }: Props) => {
     return episode?.watched ?? false
   })
 
-  const [isEpisodeReleased, isEpisodeDateValid] = isContentReleased(episodeData.air_date)
+  const [isEpisodeReleased, isEpisodeDateValid] = isContentReleasedValid(episodeData.air_date)
   const shouldEpisodeRender = !isWatched && isEpisodeReleased && isEpisodeDateValid
 
   return shouldEpisodeRender

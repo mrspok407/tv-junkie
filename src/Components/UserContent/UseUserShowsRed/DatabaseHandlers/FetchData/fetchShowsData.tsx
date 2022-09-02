@@ -6,6 +6,8 @@ import fetchShowsFullData from '../../FirebaseHelpers/FetchData/fetchShowsFullDa
 import { selectShow, setShowEpisodes, setUserShows } from '../../userShowsSliceRed'
 import { fetchEpisodesFullData } from '../../FirebaseHelpers/FetchData/fetchEpisodesFullData'
 import { handleShowsError } from '../../ErrorHandlers/handleShowsError'
+import { updateIsEpisodesWatched } from '../../Utils'
+import { EpisodesStoreState } from '../../@Types'
 
 export const fetchUserShows =
   (firebase: FirebaseInterface): AppThunk =>
@@ -36,7 +38,8 @@ export const fetchShowEpisodes =
 
     try {
       const episodes = await fetchEpisodesFullData({ authUserUid, showKey: id, firebase })
-      return dispatch(setShowEpisodes({ id, episodes }))
+      const [episodesFinalData, allReleasedEpisodesWatched] = updateIsEpisodesWatched<EpisodesStoreState>(episodes)
+      return dispatch(setShowEpisodes({ id, episodes: episodesFinalData, allReleasedEpisodesWatched }))
     } catch (err) {
       dispatch(handleShowsError(err))
     }

@@ -3,7 +3,7 @@ import { WritableDraft } from 'immer/dist/internal'
 import * as _pick from 'lodash.pick'
 import * as _isEqual from 'lodash.isequal'
 import { EpisodesStoreState, SingleEpisodeStoreState } from '../@Types'
-import { releasedEpisodesToOneArray } from './episodesOneArrayModifiers'
+import { releasedValidEpisodesToOneArray } from './episodesOneArrayModifiers'
 
 export const updateIsEpisodesWatched = <T,>(showEpisodes: any) => {
   let allReleasedEpisodesWatched: boolean | null = true
@@ -15,12 +15,12 @@ export const updateIsEpisodesWatched = <T,>(showEpisodes: any) => {
   }
 
   modifiedData = showEpisodes.reduce((acc, season) => {
-    const seasonReleasedEpisodes = releasedEpisodesToOneArray<SingleEpisodeStoreState>([season])
-    if (!seasonReleasedEpisodes.length) {
+    const seasonReleasedValidEpisodes = releasedValidEpisodesToOneArray<SingleEpisodeStoreState>([season])
+    if (!seasonReleasedValidEpisodes.length) {
       acc.push({ ...season, allReleasedEpisodesWatched: false })
       return acc
     }
-    const isAnySeasonReleasedEpisodeNotWatched = seasonReleasedEpisodes.some((episode) => !episode.watched)
+    const isAnySeasonReleasedEpisodeNotWatched = seasonReleasedValidEpisodes.some((episode) => !episode.watched)
     if (isAnySeasonReleasedEpisodeNotWatched) {
       allReleasedEpisodesWatched = false
     }

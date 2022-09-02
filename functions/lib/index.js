@@ -105,7 +105,7 @@ exports.updateAllEpisodesWatchedUserDatabase = functions.database
     const showsRef = contentRef === null || contentRef === void 0 ? void 0 : contentRef.child("shows");
     const showEpisodesUserSnapshot = await (contentRef === null || contentRef === void 0 ? void 0 : contentRef.child(`episodes/${showId}/episodes`).once("value"));
     const showEpisodesUserData = showEpisodesUserSnapshot === null || showEpisodesUserSnapshot === void 0 ? void 0 : showEpisodesUserSnapshot.val();
-    const isAnyEpisodeNotWatched = (0, helpers_1.episodesToOneArray)(showEpisodesUserData).some((episode) => !episode.watched);
+    const isAnyEpisodeNotWatched = (0, helpers_1.validEpisodesToOneArray)(showEpisodesUserData).some((episode) => !episode.watched);
     return showsRef === null || showsRef === void 0 ? void 0 : showsRef.child(`${showId}`).update({ allEpisodesWatched: !isAnyEpisodeNotWatched });
 });
 exports.updateAllShowsListIdsCreate = functions.database

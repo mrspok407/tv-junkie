@@ -162,9 +162,7 @@ const SettingsContent = () => {
     try {
       if (isUpdateAll) {
         const allShowsIdsSnapshot = await firebase.allShowsListIds().once('value')
-        showsToUpdateIds = sortDataSnapshot(allShowsIdsSnapshot)
-          .map((item) => item.key)
-          .filter((item) => Number(item) === 93405)
+        showsToUpdateIds = sortDataSnapshot(allShowsIdsSnapshot).map((item) => item.key)
       } else {
         const { data: recentlyUpdatedShows } = await axios.get(
           `https://api.themoviedb.org/3/tv/changes?api_key=${process.env.REACT_APP_TMDB_API}&start_date=${startDate}`,

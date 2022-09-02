@@ -1,10 +1,10 @@
 import React from 'react'
 import classNames from 'classnames'
-import { isArrayIncludes, currentDate, isContentReleased } from 'Utils'
+import { isArrayIncludes, currentDate, isContentReleasedValid } from 'Utils'
 import { SeasonTMDB } from 'Utils/@TypesTMDB'
 import Loader from 'Components/UI/Placeholders/Loader'
 import differenceInCalendarDays from 'date-fns/differenceInCalendarDays'
-import { format, isValid } from 'date-fns'
+import { format } from 'date-fns'
 import { FetchSeasonsInt } from '../Hooks/UseFetchSeasons/ReducerConfig/@Types'
 import { ShowEpisodesFromAPIInt } from '../@Types'
 import Season from './SeasonEpisodes/Season'
@@ -58,7 +58,7 @@ const SeasonsGrid: React.FC<Props> = ({
         const seasonDate = new Date(season.air_date ?? '')
 
         const daysToNewSeason = differenceInCalendarDays(seasonDate, currentDate)
-        const [isSeasonReleased, isSeasonDateValid] = isContentReleased(seasonDate)
+        const [isSeasonReleased, isSeasonDateValid] = isContentReleasedValid(seasonDate)
 
         const renderSeasonDate = () => {
           if (isArrayIncludes(season.id, errors)) {

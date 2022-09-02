@@ -1,3 +1,5 @@
+import {isValid} from "date-fns";
+
 export const mergeEpisodesFromFireDBwithUserDB = (showEpisodesFire: any, showEpisodesUser: any) => {
   const updateData: any = [];
 
@@ -34,4 +36,9 @@ export const episodesToOneArray = (data: any) => {
     acc.push(...seasonEpisodesWithIndex);
     return acc;
   }, []);
+};
+
+export const validEpisodesToOneArray = (data: any) => {
+  if (!Array.isArray(data)) return [];
+  return episodesToOneArray(data).filter((episode: any) => isValid(new Date(episode.air_date ?? "")));
 };

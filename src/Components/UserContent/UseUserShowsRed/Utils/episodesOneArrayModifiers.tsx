@@ -1,4 +1,5 @@
-import { isContentReleased } from 'Utils'
+import { isValid } from 'date-fns'
+import { isContentReleasedValid } from 'Utils'
 
 interface SeasonInt {
   episodes: Array<any>
@@ -15,16 +16,20 @@ export const episodesToOneArray = <T,>(data: DataType): T[] => {
     const seasonEpisodesWithIndex = seasonEpisodes.map((episode, index) => {
       return { ...episode, index }
     })
-    console.log({ seasonEpisodesWithIndex })
     acc.push(...seasonEpisodesWithIndex)
     return acc
   }, [] as T[])
 }
 
-export const releasedEpisodesToOneArray = <T,>(data: DataType) => {
+export const validEpisodesToOneArray = <T,>(data: DataType) => {
+  if (!Array.isArray(data)) return []
+  return episodesToOneArray<T>(data).filter((episode: any) => isValid(new Date(episode.air_date ?? '')))
+}
+
+export const releasedValidEpisodesToOneArray = <T,>(data: DataType) => {
   if (!Array.isArray(data)) return []
   return episodesToOneArray<T>(data).filter((episode: any) => {
-    const [isEpisodeReleased, isEpisodeDateValid] = isContentReleased(episode.air_date)
+    const [isEpisodeReleased, isEpisodeDateValid] = isContentReleasedValid(episode.air_date)
     return isEpisodeReleased && isEpisodeDateValid
   })
 }

@@ -12,7 +12,7 @@ import { EpisodesStoreState } from '../../@Types'
 import { addNewShow, changeShow, changeShowEpisodes, selectShow } from '../../userShowsSliceRed'
 import { fetchEpisodesFullData } from '../../FirebaseHelpers/FetchData/fetchEpisodesFullData'
 import { handleShowsError } from '../../ErrorHandlers/handleShowsError'
-import { episodesToOneArray } from '../../Utils/episodesOneArrayModifiers'
+import { validEpisodesToOneArray } from '../../Utils/episodesOneArrayModifiers'
 import { updateIsEpisodesWatched } from '../../Utils'
 
 export const handleNewShow =
@@ -79,8 +79,7 @@ export const handleChangeEpisodes =
   (showId: number, episodes: EpisodesFromUserDatabase['episodes'], firebase: FirebaseInterface): AppThunk =>
   async (dispatch, getState) => {
     const authUid = getAuthUidFromState(getState())
-
-    const isAnyEpisodeNotWatched = episodesToOneArray<SingleEpisodeFromUserDatabase>(episodes).some(
+    const isAnyEpisodeNotWatched = validEpisodesToOneArray<SingleEpisodeFromUserDatabase>(episodes).some(
       (episode) => !episode.watched,
     )
     const [episodesFinalData, allReleasedEpisodesWatched] = updateIsEpisodesWatched<SeasonFromUserDatabase>(episodes)

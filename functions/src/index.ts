@@ -1,6 +1,6 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
-import {episodesToOneArray, mergeEpisodesFromFireDBwithUserDB} from "./helpers";
+import {mergeEpisodesFromFireDBwithUserDB, validEpisodesToOneArray} from "./helpers";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 // const admin = require("firebase-admin");
 
@@ -112,7 +112,9 @@ export const updateAllEpisodesWatchedUserDatabase = functions.database
 
     const showEpisodesUserSnapshot = await contentRef?.child(`episodes/${showId}/episodes`).once("value");
     const showEpisodesUserData = showEpisodesUserSnapshot?.val();
-    const isAnyEpisodeNotWatched = episodesToOneArray(showEpisodesUserData).some((episode: any) => !episode.watched);
+    const isAnyEpisodeNotWatched = validEpisodesToOneArray(showEpisodesUserData).some(
+      (episode: any) => !episode.watched
+    );
 
     return showsRef?.child(`${showId}`).update({allEpisodesWatched: !isAnyEpisodeNotWatched});
   });
