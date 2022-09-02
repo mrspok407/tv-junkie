@@ -8,21 +8,19 @@ export interface ShowFullDataFireDatabase {
   id: string
   status: string
   usersWatching: number
+  lastUpdatedTimestamp: number
 }
-
-export interface ShowInfoFireDatabase extends MainDataTMDB {
-  lastUpdatedInDatabase: number
-}
+export interface ShowInfoFireDatabase extends MainDataTMDB {}
 
 export const SHOW_FULL_DATA_FIRE_DATABASE_INITIAL = {
   info: {
     ...MAINDATA_TMDB_INITIAL,
-    lastUpdatedInDatabase: 0,
   },
   episodes: [],
   id: '',
   status: '',
   usersWatching: 0,
+  lastUpdatedTimestamp: 0,
 }
 
 export interface EpisodesFromFireDatabase extends EpisodesTMDB {}

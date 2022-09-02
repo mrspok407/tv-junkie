@@ -68,9 +68,13 @@ export const userShowsSliceRed = createSlice({
     changeUserShowStatus: (state, action: PayloadAction<{ id: number; userShowStatus: UserShowStatuses }>) => {
       state.data.info[action.payload.id]!.database = action.payload.userShowStatus
     },
-    setShowEpisodes: (state, action: PayloadAction<{ id: number; episodes: EpisodesStoreState[] }>) => {
+    setShowEpisodes: (
+      state,
+      action: PayloadAction<{ id: number; episodes: EpisodesStoreState[]; allReleasedEpisodesWatched: boolean | null }>,
+    ) => {
       state.data.episodes[action.payload.id] = action.payload.episodes
       state.data.info[action.payload.id]!.episodesFetched = true
+      state.data.info[action.payload.id].allReleasedEpisodesWatched = action.payload.allReleasedEpisodesWatched
     },
     changeShowEpisodes: (
       state,

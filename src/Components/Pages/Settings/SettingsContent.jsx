@@ -266,6 +266,7 @@ const SettingsContent = () => {
         updateDataFirebase[`allShowsList/${showData.showId}/episodes`] = showData.episodes
         updateDataFirebase[`allShowsList/${showData.showId}/status`] = showData.status
         updateDataFirebase[`allShowsList/${showData.showId}/info`] = showData.info
+        updateDataFirebase[`allShowsList/${showData.showId}/lastUpdatedTimestamp`] = firebase.timeStamp()
       })
 
       console.log({ updateData })
@@ -321,7 +322,8 @@ const SettingsContent = () => {
         )}
       </div>
       <PasswordUpdate />
-      {[process.env.REACT_APP_TEST_EMAIL, process.env.REACT_APP_ADMIN_EMAIL].includes(authUser?.email) && (
+      {/* {[process.env.REACT_APP_TEST_EMAIL, process.env.REACT_APP_ADMIN_EMAIL].includes(authUser?.email) && ( */}
+      {true && (
         <>
           <div className="update-database">
             <button onClick={updateShowsDataInDatabase} className="button button--profile" type="button">

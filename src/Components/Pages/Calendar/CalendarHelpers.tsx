@@ -4,7 +4,7 @@ import {
   UserWillAirEpisodesInterface,
   EpisodesStoreState,
 } from 'Components/UserContent/UseUserShowsRed/@Types'
-import { isContentReleased } from 'Utils'
+import { isContentReleasedValid } from 'Utils'
 
 export const organizeFutureEpisodesByMonth = (
   data: ShowFullDataStoreState[],
@@ -16,8 +16,8 @@ export const organizeFutureEpisodesByMonth = (
     .flatMap((show) =>
       episodes[show.id].flatMap((season) =>
         season.episodes.reduce((acc: any[], episode) => {
-          const isEpisodeReleased = isContentReleased(episode.air_date)
-          if (!isEpisodeReleased) {
+          const [isEpisodeReleased, isEpisodeDateValid, isTodayRelease] = isContentReleasedValid(episode.air_date)
+          if ((!isEpisodeReleased || isTodayRelease) && isEpisodeDateValid) {
             acc.push({
               ...episode,
               show: show.name || show.original_name,

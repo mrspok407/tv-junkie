@@ -1,6 +1,6 @@
 import { differenceInCalendarDays, isValid } from 'date-fns'
 import format from 'date-fns/format'
-import { currentDate, isContentReleased } from 'Utils'
+import { currentDate, isContentReleasedValid } from 'Utils'
 
 type Props = {
   contentReleasedValue: Date | string | number | undefined | null
@@ -15,7 +15,7 @@ const useFormatContentDate = ({ contentReleasedValue, formatSettings }: Props) =
   const daysToRelease = isDateNotValid
     ? 'No date available'
     : differenceInCalendarDays(contentReleasedDate, currentDate)
-  const isContentAired = isContentReleased(contentReleasedValue)
+  const [isContentAired] = isContentReleasedValid(contentReleasedValue)
 
   return {
     dateReadableFormat,

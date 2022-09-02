@@ -21,13 +21,13 @@ const Episode: React.FC<Props> = ({ episodeData, showCheckboxes, showId, showTit
   const dispatch = useAppDispatch()
   const [isEpisodeOpen, setIsEpisodeOpen] = useState(false)
 
-  const episodeDateTest = { ...episodeData, air_date: episodeData.episode_number === 500 ? '' : episodeData.air_date }
   const {
     dateReadableFormat,
     daysToRelease,
     isContentAired: isEpisodeReleased,
+    isDateNotValid,
   } = useFormatContentDate({
-    contentReleasedValue: episodeDateTest.air_date,
+    contentReleasedValue: episodeData.air_date,
     formatSettings: 'MMMM d, yyyy',
   })
 
@@ -54,7 +54,7 @@ const Episode: React.FC<Props> = ({ episodeData, showCheckboxes, showId, showTit
         })}
         onClick={() => setIsEpisodeOpen(!isEpisodeOpen)}
       >
-        {isEpisodeReleased && (
+        {!(!isEpisodeReleased && !isDateNotValid) && (
           <EpisodeCheckbox
             isDisabled={!showCheckboxes || !authUser?.uid}
             episodeData={episodeData}
@@ -68,7 +68,7 @@ const Episode: React.FC<Props> = ({ episodeData, showCheckboxes, showId, showTit
           <span className="episodes__episode-number">{episodeData.episode_number}.</span>
           {episodeData.name}
         </div>
-        {!isEpisodeReleased && (
+        {!isEpisodeReleased && !isDateNotValid && (
           <div className="episodes__episode-days-to-air">
             {daysToRelease === 1 ? `${daysToRelease} day` : `${daysToRelease} days`}
           </div>

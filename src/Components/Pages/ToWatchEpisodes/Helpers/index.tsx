@@ -5,7 +5,7 @@ import {
   SingleEpisodeStoreState,
 } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { selectShowEpisodes, selectSingleSeason } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
-import { isContentReleased } from 'Utils'
+import { isContentReleasedValid } from 'Utils'
 
 interface GetSeasonsType {
   showId: number
@@ -30,6 +30,11 @@ export const getSeasonEpisodes =
   }
 
 export const shouldToWatchShowRender = (showData: ShowFullDataStoreState) => {
-  const isShowReleased = isContentReleased(showData.first_air_date)
-  return showData?.allReleasedEpisodesWatched === false && showData?.database === 'watchingShows' && isShowReleased
+  const [isShowReleased, isShowDateValid] = isContentReleasedValid(showData.first_air_date)
+  return (
+    showData?.allReleasedEpisodesWatched === false &&
+    showData?.database === 'watchingShows' &&
+    isShowReleased &&
+    isShowDateValid
+  )
 }

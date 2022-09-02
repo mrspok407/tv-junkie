@@ -1,7 +1,7 @@
 import { useAppSelector } from 'app/hooks'
 import { EpisodesStoreState, ShowFullDataStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
 import { selectSingleSeason } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
-import { isContentReleased } from 'Utils'
+import { isContentReleasedValid } from 'Utils'
 
 type Props = {
   seasonData: EpisodesStoreState
@@ -9,12 +9,28 @@ type Props = {
 }
 
 const useShouldToWatchSeasonRender = ({ seasonData, showData }: Props) => {
-  const isAllReleasedEpisodesWatched = useAppSelector((state) => {
+  const [isAllReleasedEpisodesWatched, isValidEpisodeExists] = useAppSelector((state) => {
     const season = selectSingleSeason(state, showData.id, seasonData.originalSeasonIndex)
-    return season?.allReleasedEpisodesWatched
+
+    const isValidEpisodeExists = season?.episodes.some((episode) => {
+      const [isEpisodeReleased, isEpisodeDateValid] = isContentReleasedValid(episode.air_date)
+      return isEpisodeReleased && isEpisodeDateValid
+    })
+    return [season?.allReleasedEpisodesWatched, isValidEpisodeExists]
   })!
-  const isSeasonReleased = isContentReleased(seasonData.air_date)
-  const shouldSeasonRender = !isAllReleasedEpisodesWatched && isSeasonReleased
+
+  const [isSeasonReleased, isSeasonDateValid] = isContentReleasedValid(seasonData.air_date)
+  let shouldSeasonRender: boolean
+
+  if (!isSeasonDateValid) {
+    shouldSeasonRender = !isAllReleasedEpisodesWatched && !!isValidEpisodeExists
+  } else {
+    if (isSeasonReleased) {
+      shouldSeasonRender = !isAllReleasedEpisodesWatched && !!isValidEpisodeExists
+    } else {
+      shouldSeasonRender = false
+    }
+  }
 
   return shouldSeasonRender
 }

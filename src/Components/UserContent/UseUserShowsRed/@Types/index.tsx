@@ -19,7 +19,6 @@ export interface ShowFullDataStoreState extends MainDataTMDB {
   episodesFetched: boolean | undefined
   finished: boolean
   key: string
-  lastUpdatedInDatabase: number
   timeStamp: number
   userRating: number
 }

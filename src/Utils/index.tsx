@@ -146,10 +146,10 @@ export const getPropertyValueCSS = (property: string, ref: Element) => {
   return value
 }
 
-export const isContentReleased = (contentReleasedValue: Date | string | number | undefined | null) => {
+export const isContentReleasedValid = (contentReleasedValue: Date | string | number | undefined | null) => {
   const contentReleasedDate = new Date(contentReleasedValue ?? '')
-  const isReleased = isValid(contentReleasedDate)
-    ? differenceInCalendarDays(contentReleasedDate, currentDate) <= 0
-    : true
-  return isReleased
+  const isDateValid = isValid(contentReleasedDate)
+  const isReleased = isDateValid && differenceInCalendarDays(contentReleasedDate, currentDate) <= 0
+  const isTodayRelease = differenceInCalendarDays(contentReleasedDate, currentDate) === 0
+  return [isReleased, isDateValid, isTodayRelease]
 }

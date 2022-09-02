@@ -22,6 +22,7 @@
             }
           },
           "shows": {
+            ".write": true,
             ".indexOn": ["timeStamp"]
           },
           "movies": {
