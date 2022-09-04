@@ -62,7 +62,7 @@ export const handleNewShowInDatabase =
         episodesFromFireDatabase = showData?.episodes!
       }
 
-      const showEpisodesUserDatabase = formatShowEpisodesForUserDatabase(episodesFromFireDatabase)
+      const showEpisodesUserDatabase = formatShowEpisodesForUserDatabase(episodesFromFireDatabase, id)
       const updateData = postUserShowScheme({
         authUid,
         showDetailsTMDB,

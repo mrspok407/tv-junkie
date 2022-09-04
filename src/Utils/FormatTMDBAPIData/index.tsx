@@ -1,6 +1,8 @@
+/* eslint-disable max-len */
 import { LIST_OF_GENRES } from 'Utils/Constants'
-import { EpisodesTMDB, MainDataTMDB } from 'Utils/@TypesTMDB'
+import { EpisodesTMDB, MainDataTMDB, SingleEpisodeTMDB } from 'Utils/@TypesTMDB'
 import { EpisodesFromUserDatabase } from 'Components/Firebase/@TypesFirebase'
+import { handleNotArrayData } from 'Utils'
 
 export const formatMovieBudget = (budget: number) => {
   if (budget === 0 || typeof budget !== 'number') return null
@@ -39,12 +41,17 @@ export const getGenresFromIds = (data: MainDataTMDB['genre_ids']) => {
 
 export const formatShowEpisodesForUserDatabase = (
   episodesData: EpisodesTMDB[],
+  id: number,
 ): EpisodesFromUserDatabase['episodes'] => {
-  if (!Array.isArray(episodesData)) {
-    throw new Error('Episodes should be an array.')
-  }
+  if (!Array.isArray(episodesData)) handleNotArrayData({ id, episodesData })
+
   const formattedEpisodes = episodesData.reduce((acc: EpisodesFromUserDatabase['episodes'], season) => {
-    const episodes = season.episodes.map((episode) => ({
+    if (!Array.isArray(season.episodes)) handleNotArrayData({ id, season })
+    const seasonEpisodes = Array.isArray(season.episodes)
+      ? season.episodes
+      : Object.values<SingleEpisodeTMDB>(season.episodes)
+
+    const episodes = seasonEpisodes.map((episode) => ({
       watched: false,
       userRating: 0,
       air_date: episode.air_date || '',

@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable no-useless-escape */
 import iconMediaTypeMulti from 'assets/images/icons/media-type-multi.png'
 import iconMediaTypeMovie from 'assets/images/icons/media-type-movie.png'
@@ -152,4 +153,12 @@ export const isContentReleasedValid = (contentReleasedValue: Date | string | num
   const isReleased = isDateValid && differenceInCalendarDays(contentReleasedDate, currentDate) <= 0
   const isTodayRelease = differenceInCalendarDays(contentReleasedDate, currentDate) === 0
   return [isReleased, isDateValid, isTodayRelease]
+}
+
+export const handleNotArrayData = (errorData: any) => {
+  console.error({
+    message:
+      'Received data should be an array. Investigate why it is not. The script will try to convert received data to the array.',
+    errorData,
+  })
 }
