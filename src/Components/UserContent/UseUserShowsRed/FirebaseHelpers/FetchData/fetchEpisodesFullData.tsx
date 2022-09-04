@@ -1,7 +1,8 @@
+/* eslint-disable max-len */
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
-import { combineMergeObjects } from 'Utils'
+import { combineMergeObjects, handleNotArrayData } from 'Utils'
 import merge from 'deepmerge'
-import { EpisodesStoreState } from '../../@Types'
+import { EpisodesStoreState, SingleEpisodeStoreState } from '../../@Types'
 
 interface FetchEpisodesFullData {
   authUserUid: string
@@ -21,13 +22,28 @@ export const fetchEpisodesFullData = async ({ authUserUid, showKey, firebase }: 
     },
   )
 
-  const episodesUserFireMergeWithIndexes = addOriginalIndexesToEpisodesFullData(episodesUserFireMerge)
+  const episodesUserFireMergeWithIndexes = addOriginalIndexesToEpisodesFullData(episodesUserFireMerge, showKey)
   return episodesUserFireMergeWithIndexes
 }
 
-export const addOriginalIndexesToEpisodesFullData = (episodesFullInfo: EpisodesStoreState[]) => {
+export const addOriginalIndexesToEpisodesFullData = (
+  episodesFullInfo: EpisodesStoreState[],
+  showId: number | string,
+) => {
   return episodesFullInfo.map((season, seasonIndex) => {
-    const episodesWithIndexes = season.episodes.map((episode, episodeIndex) => ({
+    if (!Array.isArray(season.episodes)) {
+      handleNotArrayData({
+        type: 'show',
+        id: showId,
+        seasonData: season,
+      })
+    }
+
+    const seasonEpisodes = Array.isArray(season.episodes)
+      ? season.episodes
+      : Object.values<SingleEpisodeStoreState>(season.episodes)
+
+    const episodesWithIndexes = seasonEpisodes.map((episode, episodeIndex) => ({
       ...episode,
       originalEpisodeIndex: episodeIndex,
       originalSeasonIndex: seasonIndex,

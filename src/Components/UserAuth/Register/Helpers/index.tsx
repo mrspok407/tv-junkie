@@ -19,7 +19,7 @@ export const formatEpisodesForUserDatabaseOnRegister = (shows: MainDataTMDB[], e
   const episodesInfoForUserDatabase: DataOnRegisterEpisodesInfo = {}
 
   episodesData.forEach((show) => {
-    const showEpisodesUserDatabase = formatShowEpisodesForUserDatabase(show.episodes)
+    const showEpisodesUserDatabase = formatShowEpisodesForUserDatabase(show.episodes, show.showId)
     const showInfoEpisodesUserDatabase = formatEpisodesInfoForUserDatabase(
       shows.find((item) => item.id === show.showId)!,
     )

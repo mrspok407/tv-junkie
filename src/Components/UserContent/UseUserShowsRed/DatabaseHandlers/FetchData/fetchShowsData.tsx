@@ -22,7 +22,7 @@ export const fetchUserShows =
       const showsFullData = await fetchShowsFullData({ userShows, firebase, authUserUid })
       dispatch(setUserShows(showsFullData))
     } catch (err) {
-      console.log({ err })
+      console.log(err)
       dispatch(handleShowsError(err))
     }
   }
