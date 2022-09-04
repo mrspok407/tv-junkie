@@ -14,6 +14,7 @@ export const store = configureStore({
       authUser: JSON.parse(localStorage.getItem('authUser')!) || authUserInitialState.authUser,
     },
   },
+  devTools: process.env.NODE_ENV !== 'production',
 })
 
 export type AppDispatch = typeof store.dispatch
