@@ -94,7 +94,7 @@ const Episode: React.FC<Props> = ({ episodeData, showCheckboxes, showId, showTit
           {isEpisodeReleased && (
             <>
               <UserRatingEpisode showRating={showCheckboxes} episodeData={episodeData} showId={showId} />
-              {authUser?.email !== process.env.REACT_APP_ADMIN_EMAIL && (
+              {[process.env.REACT_APP_TEST_EMAIL, process.env.REACT_APP_ADMIN_EMAIL].includes(authUser?.email) && (
                 <TorrentLinksEpisodes
                   showTitle={showTitle}
                   seasonNumber={episodeData.season_number}

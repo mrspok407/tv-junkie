@@ -8,7 +8,10 @@ import merge from 'deepmerge'
 import * as _transform from 'lodash.transform'
 import * as _isEqual from 'lodash.isequal'
 import * as _isObject from 'lodash.isobject'
+import * as _isPlainObject from 'lodash.isplainobject'
 import { differenceInCalendarDays, isValid } from 'date-fns'
+import { SeasonFromUserDatabase } from 'Components/Firebase/@TypesFirebase'
+import { EpisodesTMDB } from './@TypesTMDB'
 
 export const currentDate = new Date()
 
@@ -161,4 +164,44 @@ export const handleNotArrayData = (errorData: any) => {
       'Received data should be an array. Investigate why it is not. The script will try to convert received data to the array.',
     errorData,
   })
+}
+
+export const mergeObjects = (sourceObj: any, targetObj: any) => {
+  const newObj: any = targetObj
+  Object.entries(sourceObj).forEach(([key, value]) => {
+    if (!_isObject(value)) {
+      newObj[key] = value
+    } else {
+      if (Array.isArray(value)) {
+        let targetArray = []
+        if (Array.isArray(newObj[key])) {
+          targetArray = newObj[key]
+        } else if (_isPlainObject(newObj[key])) {
+          targetArray = Object.values(newObj[key])
+        } else {
+          console.error('Value of targetObj neither array or plainObject.')
+        }
+        newObj[key] = mergeFireUserEpisodes(value, targetArray)
+      } else {
+        newObj[key] = mergeObjects(value, newObj[key])
+      }
+    }
+  })
+
+  return newObj
+}
+
+export const mergeFireUserEpisodes = <T,>(sourceArray: SeasonFromUserDatabase[], targetArray: EpisodesTMDB[]): T[] => {
+  if (!Array.isArray(sourceArray) || !Array.isArray(targetArray)) {
+    console.error('Both arguments should be an array.')
+    return []
+  }
+  const newArray: T[] = []
+  sourceArray.forEach((seasonData, seasonIndex) => {
+    if (_isObject(seasonData) && _isObject(targetArray[seasonIndex])) {
+      newArray.push(mergeObjects(seasonData, targetArray[seasonIndex]))
+    }
+  })
+
+  return newArray
 }

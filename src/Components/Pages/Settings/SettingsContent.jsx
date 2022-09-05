@@ -352,11 +352,6 @@ const SettingsContent = () => {
             </button>
           </div>
           <div className="update-database">
-            <button onClick={() => updateShowsDataInDatabase()} className="button button--profile" type="button">
-              Update Database
-            </button>
-          </div>
-          <div className="update-database">
             <button
               onClick={() => updateAllEpisodesWatchedUserShows()}
               className="button button--profile"

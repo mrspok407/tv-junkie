@@ -32,7 +32,7 @@ const MoviesGrid: React.FC<Props> = ({ data, section }) => {
                   )}
                 </div>
                 <div className="content-results__item-genres">
-                  {item.genres.map((item) => (
+                  {item.genres?.map((item) => (
                     <span key={item.id}>{item.name}</span>
                   ))}
                 </div>
