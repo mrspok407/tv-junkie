@@ -37,7 +37,7 @@ export interface MainDataTMDB {
   episode_run_time: number[]
   first_air_date: string
   genre_ids: number[]
-  genres: { id: number; name: string }[]
+  genres?: { id: number; name: string }[]
   id: number
   imdb_id: string | null
   known_for: {

@@ -33,7 +33,7 @@ export const getGenresFromIds = (data: MainDataTMDB['genre_ids']) => {
     if (genreInfo === undefined) {
       return acc
     } else {
-      acc.push(genreInfo)
+      acc?.push(genreInfo)
       return acc
     }
   }, [] as MainDataTMDB['genres'])

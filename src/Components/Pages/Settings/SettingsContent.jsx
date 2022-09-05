@@ -322,8 +322,7 @@ const SettingsContent = () => {
         )}
       </div>
       <PasswordUpdate />
-      {/* {[process.env.REACT_APP_TEST_EMAIL, process.env.REACT_APP_ADMIN_EMAIL].includes(authUser?.email) && ( */}
-      {true && (
+      {[process.env.REACT_APP_TEST_EMAIL, process.env.REACT_APP_ADMIN_EMAIL].includes(authUser?.email) && (
         <>
           <div className="update-database">
             <button onClick={updateShowsDataInDatabase} className="button button--profile" type="button">
@@ -350,11 +349,6 @@ const SettingsContent = () => {
           <div className="update-database">
             <button onClick={setUsersWatchingShow} className="button button--profile" type="button">
               Set users watching show
-            </button>
-          </div>
-          <div className="update-database">
-            <button onClick={() => updateShowsDataInDatabase()} className="button button--profile" type="button">
-              Update Database
             </button>
           </div>
           <div className="update-database">

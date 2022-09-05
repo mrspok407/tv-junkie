@@ -1,7 +1,6 @@
 /* eslint-disable max-len */
 import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
-import { combineMergeObjects, handleNotArrayData } from 'Utils'
-import merge from 'deepmerge'
+import { handleNotArrayData, mergeFireUserEpisodes } from 'Utils'
 import { EpisodesStoreState, SingleEpisodeStoreState } from '../../@Types'
 
 interface FetchEpisodesFullData {
@@ -14,12 +13,10 @@ export const fetchEpisodesFullData = async ({ authUserUid, showKey, firebase }: 
     firebase.showEpisodesFireDatabase(showKey).once('value'),
     firebase.showEpisodesUserDatabase(authUserUid, showKey).once('value'),
   ])
-  const episodesUserFireMerge: EpisodesStoreState[] = merge(
-    episodesFireDatabase.val() || [],
-    episodesUserDatabase.val() || [],
-    {
-      arrayMerge: combineMergeObjects,
-    },
+
+  const episodesUserFireMerge = mergeFireUserEpisodes<EpisodesStoreState>(
+    episodesUserDatabase.val()!,
+    episodesFireDatabase.val()!,
   )
 
   const episodesUserFireMergeWithIndexes = addOriginalIndexesToEpisodesFullData(episodesUserFireMerge, showKey)
