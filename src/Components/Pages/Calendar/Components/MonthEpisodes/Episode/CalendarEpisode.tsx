@@ -39,13 +39,14 @@ const CalendarEpisode: React.FC<Props> = ({ episodeData, isAirDateShown }) => {
 
         {daysToNewEpisode >= 0 && (
           <div className="episodes__episode-days-to-air">
-            {willAirToday && authUser?.email === process.env.REACT_APP_ADMIN_EMAIL && (
-              <TorrentLinksEpisodes
-                showTitle={episodeData.show}
-                seasonNumber={episodeData.season_number}
-                episodeNumber={episodeData.episode_number}
-              />
-            )}
+            {willAirToday &&
+              [process.env.REACT_APP_TEST_EMAIL, process.env.REACT_APP_ADMIN_EMAIL].includes(authUser?.email) && (
+                <TorrentLinksEpisodes
+                  showTitle={episodeData.show}
+                  seasonNumber={episodeData.season_number}
+                  episodeNumber={episodeData.episode_number}
+                />
+              )}
             <span>{handleDaysToNewEpisode()}</span>
           </div>
         )}

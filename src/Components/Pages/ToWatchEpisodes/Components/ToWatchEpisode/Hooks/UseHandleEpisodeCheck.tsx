@@ -66,8 +66,8 @@ const useHandleEpisodeCheck = ({
 
     const isLastReleasedSeasonInShow =
       showEpisodesStore?.filter((season) => {
-        const [isSeasonReleased] = isContentReleasedValid(season.air_date)
-        return !season.allReleasedEpisodesWatched && isSeasonReleased
+        const [isSeasonReleased, isValidSeasonDate] = isContentReleasedValid(season.air_date)
+        return !season.allReleasedEpisodesWatched && (isSeasonReleased || !isValidSeasonDate)
       }).length === 1
 
     const isLastReleasedEpisodeInShow = isLastReleasedEpisodeInSeason && isLastReleasedSeasonInShow
