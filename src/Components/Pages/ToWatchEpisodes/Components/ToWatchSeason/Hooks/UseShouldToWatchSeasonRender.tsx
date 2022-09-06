@@ -1,6 +1,7 @@
+import { useMemo } from 'react'
 import { useAppSelector } from 'app/hooks'
 import { EpisodesStoreState, ShowFullDataStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
-import { selectSingleSeason } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
+import { selectShouldSeasonRender } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
 import { isContentReleasedValid } from 'Utils'
 
 type Props = {
@@ -9,15 +10,10 @@ type Props = {
 }
 
 const useShouldToWatchSeasonRender = ({ seasonData, showData }: Props) => {
-  const [isAllReleasedEpisodesWatched, isValidEpisodeExists] = useAppSelector((state) => {
-    const season = selectSingleSeason(state, showData.id, seasonData.originalSeasonIndex)
-
-    const isValidEpisodeExists = season?.episodes.some((episode) => {
-      const [isEpisodeReleased, isEpisodeDateValid] = isContentReleasedValid(episode.air_date)
-      return isEpisodeReleased && isEpisodeDateValid
-    })
-    return [season?.allReleasedEpisodesWatched, isValidEpisodeExists]
-  })!
+  const shouldSeasonRenderSelector = useMemo(selectShouldSeasonRender, [])
+  const [isAllReleasedEpisodesWatched, isValidEpisodeExists] = useAppSelector((state) =>
+    shouldSeasonRenderSelector(state, showData.id, seasonData.originalSeasonIndex),
+  )
 
   const [isSeasonReleased, isSeasonDateValid] = isContentReleasedValid(seasonData.air_date)
   let shouldSeasonRender: boolean
