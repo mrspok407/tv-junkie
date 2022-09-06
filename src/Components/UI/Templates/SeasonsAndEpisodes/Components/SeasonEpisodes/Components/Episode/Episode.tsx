@@ -54,7 +54,6 @@ const Episode: React.FC<Props> = ({ episodeData, showCheckboxes, showId, showTit
         })}
         onClick={() => setIsEpisodeOpen(!isEpisodeOpen)}
       >
-        {/* {!(!isEpisodeReleased && !isDateNotValid) && ( */}
         {isEpisodeReleased && !isDateNotValid && (
           <EpisodeCheckbox
             isDisabled={!showCheckboxes || !authUser?.uid}
