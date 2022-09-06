@@ -15,6 +15,7 @@ import PageNotFound from 'Components/Pages/PageNotFound/PageNotFound'
 import useInitializeApp from 'Components/UserContent/UseUserShowsRed/UseInitializeApp'
 import ErrorPopupGlobal from 'Components/UI/ErrorPopupGlobal/ErrorPopupGlobal'
 import Loader from 'Components/UI/Placeholders/Loader'
+import { GoogleRedirectWrapper } from 'Components/UserAuth/SignIn/UseGoogleRedirect'
 
 const ContactsPage = lazy(() => import('Components/Pages/Contacts/Contacts'))
 
@@ -23,23 +24,25 @@ const App = () => {
   return (
     <Router basename="/">
       <div className="container">
-        <Suspense fallback={<Loader className="loader--pink loader--lazy-load" />}>
-          <Switch>
-            <Route path={ROUTES.HOME_PAGE} exact component={HomePage} />
-            <Route path={ROUTES.SEARCH_PAGE} exact component={SearchPage} />
-            <Route path={ROUTES.SHOWS} exact component={ShowsPage} />
-            <Route path={ROUTES.TO_WATCH} exact component={ToWatchEpisodesPage} />
-            <Route path={ROUTES.CALENDAR} exact component={CalendarPage} />
-            <Route path={ROUTES.MOVIES} exact component={MoviesPage} />
-            <Route path={ROUTES.USER_PROFILE} exact component={UserProfile} />
-            <Route path={ROUTES.DETAILS_PAGE} exact component={DetailsPage} />
-            <Route path={ROUTES.SETTINGS} exact component={SettingsPage} />
-            <Route path={ROUTES.CONTACTS_PAGE} exact component={ContactsPage} />
-            <Route path={ROUTES.LOGIN_PAGE} exact component={LoginPage} />
-            <Route component={PageNotFound} />
-          </Switch>
-          <ErrorPopupGlobal />
-        </Suspense>
+        <GoogleRedirectWrapper>
+          <Suspense fallback={<Loader className="loader--pink loader--lazy-load" />}>
+            <Switch>
+              <Route path={ROUTES.HOME_PAGE} exact component={HomePage} />
+              <Route path={ROUTES.SEARCH_PAGE} exact component={SearchPage} />
+              <Route path={ROUTES.SHOWS} exact component={ShowsPage} />
+              <Route path={ROUTES.TO_WATCH} exact component={ToWatchEpisodesPage} />
+              <Route path={ROUTES.CALENDAR} exact component={CalendarPage} />
+              <Route path={ROUTES.MOVIES} exact component={MoviesPage} />
+              <Route path={ROUTES.USER_PROFILE} exact component={UserProfile} />
+              <Route path={ROUTES.DETAILS_PAGE} exact component={DetailsPage} />
+              <Route path={ROUTES.SETTINGS} exact component={SettingsPage} />
+              <Route path={ROUTES.CONTACTS_PAGE} exact component={ContactsPage} />
+              <Route path={ROUTES.LOGIN_PAGE} exact component={LoginPage} />
+              <Route component={PageNotFound} />
+            </Switch>
+            <ErrorPopupGlobal />
+          </Suspense>
+        </GoogleRedirectWrapper>
       </div>
     </Router>
   )

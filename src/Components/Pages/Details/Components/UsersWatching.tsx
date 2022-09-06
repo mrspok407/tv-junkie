@@ -14,6 +14,7 @@ const UsersWatching: React.FC<Props> = ({ showId }) => {
   const [usersWatchingShowAmount, setUsersWatchingShowAmount] = useState<number | null>(null)
 
   useEffect(() => {
+    if (!authUser.uid) return
     const getUsersWatching = async () => {
       try {
         const usersWatchingShowListSnapshot = await firebase.usersWatchingShowList(showId).once('value')
@@ -23,7 +24,7 @@ const UsersWatching: React.FC<Props> = ({ showId }) => {
       }
     }
     getUsersWatching()
-  }, [firebase, dispatch, showId])
+  }, [showId, dispatch, firebase, authUser])
 
   if (![process.env.REACT_APP_TEST_EMAIL, process.env.REACT_APP_ADMIN_EMAIL].includes(authUser?.email)) {
     return null
