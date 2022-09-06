@@ -58,6 +58,8 @@ export const updateShowEpisodesForUserDatabase = functions.database
 
     const showEpisodesFireData = episodesRef?.val() ?? [];
     const usersWatchingSnapshot = await afterData.ref.parent?.child("usersWatchingList").once("value");
+    if (usersWatchingSnapshot?.val() === null) return;
+
     const usersWatchingKeys = Object.keys(usersWatchingSnapshot?.val());
 
     const updateData: {[key: string]: any} = {};
@@ -91,6 +93,8 @@ export const updateShowStatusForUserDatabase = functions.database
       showStatusLowerCase === "ended" || showStatusLowerCase === "canceled" ? "ended" : "ongoing";
 
     const usersWatchingSnapshot = await afterData.ref.parent?.child("usersWatchingList").once("value");
+    if (usersWatchingSnapshot?.val() === null) return;
+
     const usersWatchingKeys = Object.keys(usersWatchingSnapshot?.val());
 
     const updateData: {[key: string]: any} = {};

@@ -37,8 +37,8 @@ const App = () => {
             <Route path={ROUTES.CONTACTS_PAGE} exact component={ContactsPage} />
             <Route path={ROUTES.LOGIN_PAGE} exact component={LoginPage} />
             <Route component={PageNotFound} />
-            <ErrorPopupGlobal />
           </Switch>
+          <ErrorPopupGlobal />
         </Suspense>
       </div>
     </Router>
