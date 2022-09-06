@@ -50,11 +50,12 @@ const Episode: React.FC<Props> = ({ episodeData, showCheckboxes, showId, showTit
     >
       <div
         className={classNames('episodes__episode-wrapper', {
-          'episodes__episode-wrapper--not-aired': !isEpisodeReleased,
+          'episodes__episode-wrapper--not-aired': !isEpisodeReleased || isDateNotValid,
         })}
         onClick={() => setIsEpisodeOpen(!isEpisodeOpen)}
       >
-        {!(!isEpisodeReleased && !isDateNotValid) && (
+        {/* {!(!isEpisodeReleased && !isDateNotValid) && ( */}
+        {isEpisodeReleased && !isDateNotValid && (
           <EpisodeCheckbox
             isDisabled={!showCheckboxes || !authUser?.uid}
             episodeData={episodeData}
@@ -94,7 +95,8 @@ const Episode: React.FC<Props> = ({ episodeData, showCheckboxes, showId, showTit
           {isEpisodeReleased && (
             <>
               <UserRatingEpisode showRating={showCheckboxes} episodeData={episodeData} showId={showId} />
-              {[process.env.REACT_APP_TEST_EMAIL, process.env.REACT_APP_ADMIN_EMAIL].includes(authUser?.email) && (
+              {(process.env.NODE_ENV !== 'production' ||
+                [process.env.REACT_APP_TEST_EMAIL, process.env.REACT_APP_ADMIN_EMAIL].includes(authUser?.email)) && (
                 <TorrentLinksEpisodes
                   showTitle={showTitle}
                   seasonNumber={episodeData.season_number}

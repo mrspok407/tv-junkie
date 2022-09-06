@@ -265,9 +265,13 @@ $font-sizes: (
       cursor: pointer;
 
       &--not-aired {
-        grid-template-columns: minmax(200px, max-content) auto auto;
+        grid-template-columns: 160px max-content auto;
         padding-left: 12px;
         background-color: $seasonInfoBgClrError;
+
+        @include mediaMaxW(#{$mobileViewPort}) {
+          grid-template-columns: 105px auto auto;
+        }
       }
 
       &:before {
