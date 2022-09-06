@@ -1,7 +1,7 @@
 {
   "rules": {
-    ".read": true,
-    // ".write": true,
+    ".read": "root.child('users').child(auth.uid).child('role').val() === 'ADMIN'",
+    ".write": "root.child('users').child(auth.uid).child('role').val() === 'ADMIN'",
     "users": {
       "$uid": {
         ".read": "auth != null && auth.uid == $uid",
@@ -11,7 +11,6 @@
         "email": { ".write": "newData.exists() && auth.token.firebase.sign_in_provider === 'google.com'" },
         "role": { ".write": "newData.exists() && auth.token.firebase.sign_in_provider === 'google.com'" },
         "content": {
-          ".read": "auth != null && auth.uid == $uid",
           ".write": "auth != null && auth.uid == $uid",
           "episodes": {
             ".indexOn": ["info/isAllWatched_database", "info/finished"],
@@ -22,7 +21,6 @@
             }
           },
           "shows": {
-            ".write": true,
             ".indexOn": ["timeStamp"]
           },
           "movies": {
@@ -32,8 +30,8 @@
           }
         },
         "contactsDatabase": {
-          ".read": true,
-          ".write": true,
+          ".read": "auth != null",
+          ".write": "auth != null",
           "contactsList": {
             ".indexOn": ["pinned_lastActivityTS", "userName", "userNameLowerCase"]
           },
@@ -44,8 +42,8 @@
       }
     },
     "privateChats": {
-      ".read": true,
-      ".write": true,
+      ".read": "auth != null",
+      ".write": "auth != null",
       "$key": {
         "messages": {
           ".indexOn": "timeStamp"
@@ -53,8 +51,8 @@
       }
     },
     "groupChats": {
-      ".read": true,
-      ".write": true,
+      ".read": "auth != null",
+      ".write": "auth != null",
       "$key": {
         "messages": {
           ".indexOn": "timeStamp"
@@ -62,28 +60,24 @@
       }
     },
     "allShowsList": {
-      ".read": "root.child('users').child(auth.uid).child('role').val() === 'ADMIN'",
-      ".write": true,
+      ".read": "auth != null",
+      ".write": "root.child('users').child(auth.uid).child('role').val() === 'ADMIN'",
       "$id": {
-        ".write": true
-        // "usersWatchingList": {
-        //   "$uid": {
-        //     ".validate": "!data.exists()"
-        //   }
-        // }
-        // ".read": "auth != null",
-        // // ".write": "(auth != null && !data.exists()) || root.child('users').child(auth.uid).child('role').val() === 'ADMIN'",
-        // ".write": "(auth != null && !data.exists())",
-        // "usersWatching": {
-        //   ".write": "auth != null && data.exists() && newData.exists()"
-        // },
-        // "info": { ".read": true },
-        // ".validate": "newData.hasChildren(['id', 'info'])"
+        ".write": "auth != null",
+        "usersWatching": {
+          ".validate": "newData.exists()"
+        },
+        "usersWatchingList": {
+          "$uid": {
+            ".validate": "auth.uid == $uid && newData.val() == true"
+          }
+        }
       }
     },
     "allShowsListIds": {
       "$id": {
-        ".write": true
+        ".read": "root.child('users').child(auth.uid).child('role').val() === 'ADMIN'",
+        ".write": "root.child('users').child(auth.uid).child('role').val() === 'ADMIN'"
       }
     }
   }

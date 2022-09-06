@@ -64,6 +64,8 @@ exports.updateShowEpisodesForUserDatabase = functions.database
     const timeStamp = admin.database.ServerValue.TIMESTAMP;
     const showEpisodesFireData = (_b = episodesRef === null || episodesRef === void 0 ? void 0 : episodesRef.val()) !== null && _b !== void 0 ? _b : [];
     const usersWatchingSnapshot = await ((_c = afterData.ref.parent) === null || _c === void 0 ? void 0 : _c.child("usersWatchingList").once("value"));
+    if ((usersWatchingSnapshot === null || usersWatchingSnapshot === void 0 ? void 0 : usersWatchingSnapshot.val()) === null)
+        return;
     const usersWatchingKeys = Object.keys(usersWatchingSnapshot === null || usersWatchingSnapshot === void 0 ? void 0 : usersWatchingSnapshot.val());
     const updateData = {};
     const usersEpisodesSnapshot = await Promise.all(usersWatchingKeys.map((userUid) => {
@@ -88,6 +90,8 @@ exports.updateShowStatusForUserDatabase = functions.database
     const showStatusLowerCase = afterData.val().toLowerCase();
     const showStatusForUserDatabase = showStatusLowerCase === "ended" || showStatusLowerCase === "canceled" ? "ended" : "ongoing";
     const usersWatchingSnapshot = await ((_a = afterData.ref.parent) === null || _a === void 0 ? void 0 : _a.child("usersWatchingList").once("value"));
+    if ((usersWatchingSnapshot === null || usersWatchingSnapshot === void 0 ? void 0 : usersWatchingSnapshot.val()) === null)
+        return;
     const usersWatchingKeys = Object.keys(usersWatchingSnapshot === null || usersWatchingSnapshot === void 0 ? void 0 : usersWatchingSnapshot.val());
     const updateData = {};
     usersWatchingKeys.forEach((userUid) => {

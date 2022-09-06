@@ -49,7 +49,8 @@ const ToWatchEpisode: React.FC<Props> = ({
   const shouldEpisodeRender = useShouldToWatchEpisodeRender({ episodeData, showId })
   if (!shouldEpisodeRender) return null
 
-  const showTorrentLinks = authUser?.email === process.env.REACT_APP_ADMIN_EMAIL
+  const showTorrentLinks =
+    authUser?.email === process.env.REACT_APP_ADMIN_EMAIL || process.env.NODE_ENV !== 'production'
   return (
     <div className="episodes__episode" data-episodenumber={episodeData.episode_number} data-id={episodeData.id}>
       <div

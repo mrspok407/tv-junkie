@@ -1,6 +1,7 @@
 import { RootState } from 'app/store'
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { EpisodesFromUserDatabase } from 'Components/Firebase/@TypesFirebase'
+import { isContentReleasedValid } from 'Utils'
 import {
   UserShowsStoreState,
   ShowFullDataStoreState,
@@ -155,6 +156,26 @@ export const selectSingleSeason = (state: RootState, showId: number, seasonNum: 
   if (episodes === undefined) return undefined
   const singleSeason = episodes[seasonNum]
   return singleSeason
+}
+
+export const selectSeasonAllReleasedEpisodesWatched = (state: RootState, showId: number, seasonNum: number) =>
+  selectSingleSeason(state, showId, seasonNum)?.allReleasedEpisodesWatched
+
+export const selectSeasonIsValidEpisodesExists = (state: RootState, showId: number, seasonNum: number) => {
+  const season = selectSingleSeason(state, showId, seasonNum)
+  const isValidEpisodeExists = season?.episodes.some((episode) => {
+    const [isEpisodeReleased, isEpisodeDateValid] = isContentReleasedValid(episode.air_date)
+    return isEpisodeReleased && isEpisodeDateValid
+  })
+  return isValidEpisodeExists
+}
+
+export const selectShouldSeasonRender = () => {
+  return createSelector(
+    selectSeasonAllReleasedEpisodesWatched,
+    selectSeasonIsValidEpisodesExists,
+    (allReleasedEpisodesWatched, isValidEpisodeExists) => [allReleasedEpisodesWatched, isValidEpisodeExists],
+  )
 }
 
 export const selectSingleEpisode = (state: RootState, showId: number, seasonNum: number, episodeNumber: number) => {
