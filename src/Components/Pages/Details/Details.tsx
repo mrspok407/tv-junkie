@@ -7,7 +7,6 @@ import ScrollToTopBar from 'Utils/ScrollToTopBar'
 import ScrollToTopOnUpdate from 'Utils/ScrollToTopOnUpdate'
 import Footer from 'Components/UI/Footer/Footer'
 import PlaceholderLoadingFullInfo from 'Components/UI/Placeholders/PlaceholderLoadingFullInfo/PlaceholderLoadingFullInfo'
-import useGoogleRedirect from 'Components/UserAuth/SignIn/UseGoogleRedirect'
 import { useAppSelector } from 'app/hooks'
 import { selectShowsLoading } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
 import PosterWrapper from './Components/PosterWrapper'
@@ -30,8 +29,6 @@ export const DetailsPage: React.FC<Props> = ({
 
   const showsInitialLoading = useAppSelector(selectShowsLoading)
   const { loadingFireEpisodes } = useFetchShowEpisodes({ mediaType: details.mediaType, id: details.id })
-
-  useGoogleRedirect()
 
   const renderDetails = () => {
     if (error) {

@@ -33,7 +33,7 @@ export const fetchShowEpisodes =
     const authUserUid = getAuthUidFromState(getState())
     const showFromStore = selectShow(getState(), id)
 
-    if (!showFromStore) return
+    if (!showFromStore || !authUserUid) return
     if (showFromStore.database === 'notWatchingShows' || showFromStore.episodesFetched) return
 
     try {

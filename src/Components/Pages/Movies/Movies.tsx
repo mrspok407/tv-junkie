@@ -5,12 +5,9 @@ import Header from 'Components/UI/Header/Header'
 import ScrollToTopBar from 'Utils/ScrollToTopBar'
 import ScrollToTopOnMount from 'Utils/ScrollToTopOnMount'
 import Footer from 'Components/UI/Footer/Footer'
-import useGoogleRedirect from 'Components/UserAuth/SignIn/UseGoogleRedirect'
 import MoviesContent from './MoviesContent'
 
 const Movies: React.FC = () => {
-  useGoogleRedirect()
-
   return (
     <>
       <Helmet>

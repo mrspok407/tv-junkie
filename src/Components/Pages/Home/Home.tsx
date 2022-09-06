@@ -8,7 +8,6 @@ import Slider from 'Components/UI/Slider/Slider'
 import * as ROUTES from 'Utils/Constants/routes'
 import Footer from 'Components/UI/Footer/Footer'
 import ScrollToTopOnMount from 'Utils/ScrollToTopOnMount'
-import useGoogleRedirect from 'Components/UserAuth/SignIn/UseGoogleRedirect'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import useAppSelectorArray from 'Utils/Hooks/UseAppSelectorArray'
 import { ShowFullDataStoreState, UserWillAirEpisodesInterface } from 'Components/UserContent/UseUserShowsRed/@Types'
@@ -34,8 +33,6 @@ const HomePage: React.FC = () => {
   const willAirEpisodes = willAirEpisodesData.slice(0, 2)
 
   const showsInitialLoading = useAppSelector(selectShowsLoading)
-
-  useGoogleRedirect()
 
   const renderNonAuthUser = () => (
     <>

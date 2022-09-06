@@ -1,4 +1,4 @@
-import { useEffect, useContext } from 'react'
+import React, { useEffect, useContext } from 'react'
 import * as ROUTES from 'Utils/Constants/routes'
 import { useHistory } from 'react-router-dom'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
@@ -9,6 +9,11 @@ import useAuthListenerSubscriber from '../Session/Authentication/Hooks/useAuthLi
 import { formatEpisodesForUserDatabaseOnRegister, handleContentOnRegister } from '../Register/Helpers'
 import { AuthUserGoogleSignInInterface } from '../Session/Authentication/@Types'
 
+export const GoogleRedirectWrapper = ({ children }: { children: React.ReactNode }) => {
+  useGoogleRedirect()
+  return <>{children}</>
+}
+
 const useGoogleRedirect = () => {
   const { firebase } = useFrequentVariables()
   const handleError = useContext(ErrorsHandlerContext)
@@ -17,7 +22,6 @@ const useGoogleRedirect = () => {
   const initializeAuthUserListener = useAuthListenerSubscriber()
 
   const { watchingShows: watchingShowsLS, watchLaterMovies: watchLaterMoviesLS } = useContext(LocalStorageValueContext)
-
   useEffect(() => {
     const handleGoogleRedirectAuth = async () => {
       let error: ErrorInterface['errorData'] = { message: '' }
