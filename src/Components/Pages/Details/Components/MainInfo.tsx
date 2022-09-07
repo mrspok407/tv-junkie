@@ -15,6 +15,7 @@ type Props = {
 
 export const MainInfo: React.FC<Props> = ({ details, showId }) => {
   const isMediaTypeTV = details.mediaType === 'show'
+  console.log({ isMediaTypeTV })
 
   const { companyName, genres, title, yearRelease, yearRange, runtime } = useFormatDetailsValues({
     details,
@@ -52,7 +53,8 @@ export const MainInfo: React.FC<Props> = ({ details, showId }) => {
         <div className="details-page__info-option">Users rating</div>
         <div className="details-page__info-value">{details.vote_average?.toFixed(1) || noDataPlaceholder()}</div>
       </div>
-      <UsersWatching showId={showId} />
+
+      {isMediaTypeTV && <UsersWatching showId={showId} />}
 
       <div className="details-page__info-row">
         <div className="details-page__info-option">Runtime</div>
