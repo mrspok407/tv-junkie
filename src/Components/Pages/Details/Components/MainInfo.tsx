@@ -15,7 +15,6 @@ type Props = {
 
 export const MainInfo: React.FC<Props> = ({ details, showId }) => {
   const isMediaTypeTV = details.mediaType === 'show'
-  console.log({ isMediaTypeTV })
 
   const { companyName, genres, title, yearRelease, yearRange, runtime } = useFormatDetailsValues({
     details,
