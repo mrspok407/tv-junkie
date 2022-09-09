@@ -1,15 +1,15 @@
 import { useEffect } from 'react'
-import { useLocation, useHistory } from 'react-router-dom'
+import { useLocation, useNavigationType } from 'react-router-dom'
 
 const ScrollToTopOnUpdate = () => {
   const { pathname } = useLocation()
-  const history = useHistory()
+  const navigationType = useNavigationType()
 
   useEffect(() => {
-    if (history.action === 'PUSH') {
+    if (navigationType === 'PUSH') {
       window.scrollTo(0, 0)
     }
-  }, [pathname, history.action])
+  }, [pathname, navigationType])
 
   return null
 }

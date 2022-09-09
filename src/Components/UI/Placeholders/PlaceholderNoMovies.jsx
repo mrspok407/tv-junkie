@@ -10,7 +10,7 @@ const PlaceholderNoMovies = ({ authUser, activeSection }) => {
       <Link className="placeholder--no-shows__link" to={ROUTES.LOGIN_PAGE}>
         register
       </Link>
-      . Your allready selected movies will be saved.
+      . Your already selected movies will be saved.
     </h1>
   )
 

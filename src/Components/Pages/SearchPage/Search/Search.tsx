@@ -2,7 +2,7 @@
 /* eslint-disable no-nested-ternary */
 import React, { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
-import { Link, useHistory } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import * as _isFunction from 'lodash.isfunction'
 import * as ROUTES from 'Utils/Constants/routes'
@@ -34,7 +34,7 @@ const Search: React.FC<Props> = ({ navSearch = false, closeNavMobile }) => {
   const [error, setError] = useState('')
 
   const searchContRef = useRef<HTMLDivElement>(null!)
-  const history = useHistory()
+  const navigate = useNavigate()
 
   useEffect(
     () => () => {
@@ -125,7 +125,7 @@ const Search: React.FC<Props> = ({ navSearch = false, closeNavMobile }) => {
 
     closeList()
 
-    history.push(`/${mediaType}/${content.id}`)
+    navigate(`/${mediaType}/${content.id}`)
   }
 
   const navigateSearchListByArrows = (arrowKey: number) => {

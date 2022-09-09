@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react'
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import SettingsPage from 'Components/Pages/Settings/SettingsPage'
 import LoginPage from 'Components/Pages/Login/LoginPage'
 import SearchPage from 'Components/Pages/SearchPage/SearchPage'
@@ -21,25 +21,26 @@ const ContactsPage = lazy(() => import('Components/Pages/Contacts/Contacts'))
 
 const App = () => {
   useInitializeApp()
+
   return (
     <Router basename="/">
       <div className="container">
         <GoogleRedirectWrapper>
           <Suspense fallback={<Loader className="loader--pink loader--lazy-load" />}>
-            <Switch>
-              <Route path={ROUTES.HOME_PAGE} exact component={HomePage} />
-              <Route path={ROUTES.SEARCH_PAGE} exact component={SearchPage} />
-              <Route path={ROUTES.SHOWS} exact component={ShowsPage} />
-              <Route path={ROUTES.TO_WATCH} exact component={ToWatchEpisodesPage} />
-              <Route path={ROUTES.CALENDAR} exact component={CalendarPage} />
-              <Route path={ROUTES.MOVIES} exact component={MoviesPage} />
-              <Route path={ROUTES.USER_PROFILE} exact component={UserProfile} />
-              <Route path={ROUTES.DETAILS_PAGE} exact component={DetailsPage} />
-              <Route path={ROUTES.SETTINGS} exact component={SettingsPage} />
-              <Route path={ROUTES.CONTACTS_PAGE} exact component={ContactsPage} />
-              <Route path={ROUTES.LOGIN_PAGE} exact component={LoginPage} />
-              <Route component={PageNotFound} />
-            </Switch>
+            <Routes>
+              <Route path={ROUTES.HOME_PAGE} element={<HomePage />} />
+              <Route path={ROUTES.SEARCH_PAGE} element={<SearchPage />} />
+              <Route path={ROUTES.SHOWS} element={<ShowsPage />} />
+              <Route path={ROUTES.TO_WATCH} element={<ToWatchEpisodesPage />} />
+              <Route path={ROUTES.CALENDAR} element={<CalendarPage />} />
+              <Route path={ROUTES.MOVIES} element={<MoviesPage />} />
+              <Route path={ROUTES.USER_PROFILE} element={<UserProfile />} />
+              <Route path={ROUTES.DETAILS_PAGE} element={<DetailsPage />} />
+              <Route path={ROUTES.SETTINGS} element={<SettingsPage />} />
+              <Route path={ROUTES.CONTACTS_PAGE} element={<ContactsPage />} />
+              <Route path={ROUTES.LOGIN_PAGE} element={<LoginPage />} />
+              <Route path="*" element={<PageNotFound />} />
+            </Routes>
             <ErrorPopupGlobal />
           </Suspense>
         </GoogleRedirectWrapper>

@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import classNames from 'classnames'
 import Loader from 'Components/UI/Placeholders/Loader'
-import { Helmet } from 'react-helmet'
+import { Helmet } from 'react-helmet-async'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import useResponseContactRequest from './Hooks/UseResponseContactRequest'
 import useSendContactRequest from './Hooks/UseSendContactRequest'

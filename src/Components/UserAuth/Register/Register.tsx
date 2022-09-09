@@ -1,6 +1,6 @@
 /* eslint-disable react/no-access-state-in-setstate */
 import React, { useContext, useState } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { validEmailRegex } from 'Utils'
 import * as ROUTES from 'Utils/Constants/routes'
 import classNames from 'classnames'
@@ -68,7 +68,7 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
   const [showPassword, setShowPassword] = useState(false)
   const [isEmailValid, setIsEmailValid] = useState(false)
 
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const handleSuccessSubmit = () => {
     initializeAuthUserListener()
@@ -121,7 +121,7 @@ const Register: React.FC<Props> = ({ closeNavMobile }) => {
     } finally {
       if (closeNavMobile) closeNavMobile()
       setSubmitRequestLoading(false)
-      history.push(ROUTES.HOME_PAGE)
+      navigate(ROUTES.HOME_PAGE)
     }
   }
 

@@ -6,7 +6,7 @@ import * as ROUTES from 'Utils/Constants/routes'
 import { ShowFullDataStoreState } from 'Components/UserContent/UseUserShowsRed/@Types'
 import merge from 'deepmerge'
 import classNames from 'classnames'
-import { Link, useHistory } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import Loader from 'Components/UI/Placeholders/Loader'
 import PlaceholderNoShowsUser from 'Components/UI/Placeholders/PlaceholderNoShowsUser'
 import UserRating from 'Components/UI/UserRating/UserRating'
@@ -24,7 +24,7 @@ type Props = {
 
 const UserProfileContent: React.FC<Props> = ({ userUid }) => {
   const { firebase } = useFrequentVariables()
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const [loadingContent, setLoadingContent] = useState(true)
   const [sortByState, setSortByState] = useState('name')
@@ -35,7 +35,7 @@ const UserProfileContent: React.FC<Props> = ({ userUid }) => {
     const user = await firebase.user(userUid).child('username').once('value')
     if (user.val() === null) {
       setLoadingContent(false)
-      history.push(ROUTES.PAGE_DOESNT_EXISTS)
+      navigate(ROUTES.PAGE_DOESNT_EXISTS)
       return
     }
 
@@ -62,7 +62,7 @@ const UserProfileContent: React.FC<Props> = ({ userUid }) => {
 
     dispatch({ type: ActionTypes.UpdateContent, payload: mergedShows })
     setLoadingContent(false)
-  }, [userUid, firebase, history])
+  }, [userUid, firebase, navigate])
 
   useEffect(() => {
     getUserShows()

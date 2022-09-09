@@ -1,6 +1,6 @@
 import React, { useEffect, useContext } from 'react'
 import * as ROUTES from 'Utils/Constants/routes'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import { LocalStorageValueContext } from 'Components/AppContext/Contexts/LocalStorageContentContext/LocalStorageContentContext'
 import { ErrorInterface, ErrorsHandlerContext, IGNORED_ERROR_CODES } from 'Components/AppContext/Contexts/ErrorsContext'
@@ -18,7 +18,7 @@ const useGoogleRedirect = () => {
   const { firebase } = useFrequentVariables()
   const handleError = useContext(ErrorsHandlerContext)
 
-  const history = useHistory()
+  const navigate = useNavigate()
   const initializeAuthUserListener = useAuthListenerSubscriber()
 
   const { watchingShows: watchingShowsLS, watchLaterMovies: watchLaterMoviesLS } = useContext(LocalStorageValueContext)
@@ -57,14 +57,14 @@ const useGoogleRedirect = () => {
       } finally {
         if (authData?.user !== null) {
           if (!IGNORED_ERROR_CODES.includes(error?.code!)) {
-            history.push(ROUTES.HOME_PAGE)
+            navigate(ROUTES.HOME_PAGE)
           }
         }
       }
     }
 
     handleGoogleRedirectAuth()
-  }, [firebase, handleError, history, initializeAuthUserListener, watchLaterMoviesLS, watchingShowsLS])
+  }, [firebase, handleError, navigate, initializeAuthUserListener, watchLaterMoviesLS, watchingShowsLS])
 }
 
 export default useGoogleRedirect

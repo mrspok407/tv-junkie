@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import * as ROUTES from 'Utils/Constants/routes'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import { LocalStorageValueContext } from 'Components/AppContext/Contexts/LocalStorageContentContext/LocalStorageContentContext'
@@ -20,7 +20,7 @@ const SignInWithGoogleForm = () => {
   const { watchingShows: watchingShowsLS, watchLaterMovies: watchLaterMoviesLS } = useContext(LocalStorageValueContext)
 
   const [windowSize, setWindowSize] = useState(window.innerWidth)
-  const history = useHistory()
+  const navigate = useNavigate()
 
   useEffect(() => {
     setWindowSize(window.innerWidth)
@@ -63,7 +63,7 @@ const SignInWithGoogleForm = () => {
       handleError({ errorData: error, message: 'Error occurred during register process. Please try again.' })
     } finally {
       if (!IGNORED_ERROR_CODES.includes(error?.code!)) {
-        history.push(ROUTES.HOME_PAGE)
+        navigate(ROUTES.HOME_PAGE)
       }
     }
   }
