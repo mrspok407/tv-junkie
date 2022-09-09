@@ -3,7 +3,7 @@
 import React, { Component } from 'react'
 import axios, { CancelToken } from 'axios'
 import { throttle } from 'throttle-debounce'
-import { Helmet } from 'react-helmet'
+import { Helmet } from 'react-helmet-async'
 import ScrollToTopBar from 'Utils/ScrollToTopBar'
 import AdvancedSearch from 'Components/Pages/SearchPage/Search/AdvancedSearch/AdvancedSearch'
 import PlaceholderNoResults from 'Components/UI/Placeholders/PlaceholderNoResults'

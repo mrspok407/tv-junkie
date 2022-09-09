@@ -63,12 +63,7 @@ const AdvSearchResults: React.FC<Props> = ({ advancedSearchContent, loadingNewPa
 
             return (
               <div key={id} className="content-results__item">
-                <Link
-                  to={{
-                    pathname: `/${mediaType}/${id}`,
-                    state: { logoDisable: true },
-                  }}
-                >
+                <Link to={`/${mediaType}/${id}`}>
                   <div className="content-results__item-main-info">
                     <div className="content-results__item-title">
                       {!contentTitle ? 'No title available' : contentTitle}

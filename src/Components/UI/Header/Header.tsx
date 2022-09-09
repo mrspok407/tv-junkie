@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { NavLink } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 import classNames from 'classnames'
 import logo from 'assets/images/main-page-logo.png'
 import * as ROUTES from 'Utils/Constants/routes'
@@ -58,10 +58,12 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false, cont
             })}
           >
             <NavLink
-              exact
               to={ROUTES.HOME_PAGE}
-              activeClassName="nav__item--active"
-              className="nav__link--logo"
+              className={({ isActive }) =>
+                classNames('nav__link--logo', {
+                  'nav__item--active': isActive,
+                })
+              }
               onClick={() => closeNavMobile()}
             >
               <li className="nav__item nav__item--logo" />
@@ -70,24 +72,26 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false, cont
             {authUser?.uid && (
               <>
                 <NavLink
-                  exact
                   to={ROUTES.CALENDAR}
-                  className={classNames('nav__link', {
-                    'nav__link--non-auth': !authUser?.uid,
-                  })}
-                  activeClassName="nav__item--active"
+                  className={({ isActive }) =>
+                    classNames('nav__link', {
+                      'nav__link--non-auth': !authUser?.uid,
+                      'nav__item--active': isActive,
+                    })
+                  }
                   onClick={() => closeNavMobile()}
                 >
                   <li className="nav__item">Calendar</li>
                 </NavLink>
 
                 <NavLink
-                  exact
                   to={ROUTES.TO_WATCH}
-                  className={classNames('nav__link', {
-                    'nav__link--non-auth': !authUser?.uid,
-                  })}
-                  activeClassName="nav__item--active"
+                  className={({ isActive }) =>
+                    classNames('nav__link', {
+                      'nav__link--non-auth': !authUser?.uid,
+                      'nav__item--active': isActive,
+                    })
+                  }
                   onClick={() => closeNavMobile()}
                 >
                   <li className="nav__item">To Watch</li>
@@ -96,24 +100,26 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false, cont
             )}
 
             <NavLink
-              exact
               to={ROUTES.SHOWS}
-              className={classNames('nav__link', {
-                'nav__link--non-auth': !authUser?.uid,
-              })}
-              activeClassName="nav__item--active"
+              className={({ isActive }) =>
+                classNames('nav__link', {
+                  'nav__link--non-auth': !authUser?.uid,
+                  'nav__item--active': isActive,
+                })
+              }
               onClick={() => closeNavMobile()}
             >
               <li className="nav__item">Shows</li>
             </NavLink>
 
             <NavLink
-              exact
               to={ROUTES.MOVIES}
-              className={classNames('nav__link', {
-                'nav__link--non-auth': !authUser?.uid,
-              })}
-              activeClassName="nav__item--active"
+              className={({ isActive }) =>
+                classNames('nav__link', {
+                  'nav__link--non-auth': !authUser?.uid,
+                  'nav__item--active': isActive,
+                })
+              }
               onClick={() => closeNavMobile()}
             >
               <li className="nav__item">Movies</li>
@@ -156,9 +162,9 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false, cont
               }
         }
       >
-        <NavLink to={ROUTES.HOME_PAGE} onClick={() => closeNavMobile()}>
+        <Link to={ROUTES.HOME_PAGE} onClick={() => closeNavMobile()}>
           <img width="517" height="190" className="logo__img" src={logo} alt="logo" />
-        </NavLink>
+        </Link>
       </div>
     </header>
   )

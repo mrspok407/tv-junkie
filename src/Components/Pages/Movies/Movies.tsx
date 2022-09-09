@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 import React from 'react'
-import { Helmet } from 'react-helmet'
+import { Helmet } from 'react-helmet-async'
 import Header from 'Components/UI/Header/Header'
 import ScrollToTopBar from 'Utils/ScrollToTopBar'
 import ScrollToTopOnMount from 'Utils/ScrollToTopOnMount'

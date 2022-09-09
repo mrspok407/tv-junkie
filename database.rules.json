@@ -21,6 +21,7 @@
             }
           },
           "shows": {
+            ".read": "auth != null",
             ".indexOn": ["timeStamp"]
           },
           "movies": {

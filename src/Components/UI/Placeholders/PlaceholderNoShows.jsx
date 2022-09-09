@@ -10,7 +10,7 @@ const PlaceholderNoShows = ({ authUser, activeSection }) => {
       <Link className="placeholder--no-shows__link" to={ROUTES.LOGIN_PAGE}>
         register
       </Link>
-      . Your allready selected shows will be saved.
+      . Your already selected shows will be saved.
     </h1>
   )
 

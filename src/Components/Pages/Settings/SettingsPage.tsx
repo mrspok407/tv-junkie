@@ -1,7 +1,7 @@
 import React from 'react'
 import Header from 'Components/UI/Header/Header'
 import Footer from 'Components/UI/Footer/Footer'
-import { Helmet } from 'react-helmet'
+import { Helmet } from 'react-helmet-async'
 import useAuthorization from 'Components/UserAuth/Session/Authentication/Hooks/useAuthorization'
 import SettingsContent from './SettingsContent'
 
