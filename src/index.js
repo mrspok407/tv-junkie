@@ -16,8 +16,8 @@ import 'lazysizes'
 import 'lazysizes/plugins/unveilhooks/ls.unveilhooks'
 import './index.scss'
 
-const container = document.getElementById('root')
-const root = createRoot(container)
+const rootRef = document.getElementById('root')
+const root = createRoot(rootRef)
 
 root.render(
   <React.StrictMode>

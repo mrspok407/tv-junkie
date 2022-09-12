@@ -5,7 +5,6 @@ import {
   updateUserShowStatusScheme,
 } from 'Components/Firebase/FirebasePostSchemes/Post/ContentSchemes'
 import { getAuthUidFromState } from 'Components/UserAuth/Session/Authentication/Helpers'
-import { batch } from 'react-redux'
 import { EpisodesTMDB, MainDataTMDB } from 'Utils/@TypesTMDB'
 import { formatShowEpisodesForUserDatabase } from 'Utils/FormatTMDBAPIData'
 import { UserShowStatuses } from '../../@Types'
@@ -37,10 +36,8 @@ export const updateUserShowStatus =
       return firebase.rootRef().update(updateData)
     } catch (err) {
       console.log({ err })
-      batch(() => {
-        dispatch(optimisticChangeUserShowStatus({ id, userShowStatus: showFromStore.database }))
-        dispatch(handleShowsError(err))
-      })
+      dispatch(optimisticChangeUserShowStatus({ id, userShowStatus: showFromStore.database }))
+      dispatch(handleShowsError(err))
     }
   }
 

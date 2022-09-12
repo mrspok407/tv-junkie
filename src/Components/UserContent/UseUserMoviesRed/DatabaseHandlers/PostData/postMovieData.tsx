@@ -3,7 +3,6 @@ import { FirebaseInterface } from 'Components/Firebase/FirebaseContext'
 import { postUserMovieScheme } from 'Components/Firebase/FirebasePostSchemes/Post/ContentSchemes'
 import { formatMovieForPostFirebase } from 'Components/Firebase/FirebasePostSchemes/Post/Helpers'
 import { getAuthUidFromState } from 'Components/UserAuth/Session/Authentication/Helpers'
-import { batch } from 'react-redux'
 import { MainDataTMDB } from 'Utils/@TypesTMDB'
 import { handleMoviesError } from '../../ErrorHandlers/handleMoviesError'
 import { optimisticAddMovie, optimisticRemoveMovie, optimisticUpdateMovieFinished } from '../../OptimisticHandlers'
@@ -13,7 +12,6 @@ interface HandleMovieDatabase {
   movieId: number
   firebase: FirebaseInterface
 }
-
 interface HandleNewMovie extends HandleMovieDatabase {
   movieDetailsTMDB: MainDataTMDB
 }
@@ -33,10 +31,8 @@ export const handleAddMovieToDatabase =
       const updateData = postUserMovieScheme({ authUid, movieDetailsTMDB, firebase })
       return firebase.rootRef().update(updateData)
     } catch (err) {
-      batch(() => {
-        dispatch(optimisticRemoveMovie({ movieId }))
-        dispatch(handleMoviesError(err))
-      })
+      dispatch(optimisticRemoveMovie({ movieId }))
+      dispatch(handleMoviesError(err))
     } finally {
       dispatch(updateLoadingMovie(false))
     }
@@ -54,10 +50,8 @@ export const handleRemoveMovieFromDatabase =
     try {
       return await firebase.userMovie({ authUid, key: movieId }).set(null)
     } catch (err) {
-      batch(() => {
-        dispatch(optimisticAddMovie({ data: movieFromStore }))
-        dispatch(handleMoviesError(err))
-      })
+      dispatch(optimisticAddMovie({ data: movieFromStore }))
+      dispatch(handleMoviesError(err))
     } finally {
       dispatch(updateLoadingMovie(false))
     }
@@ -75,9 +69,7 @@ export const updateMovieFinished =
     try {
       return await firebase.userMovie({ authUid, key: movieId }).update({ finished: !movieFromStore.finished })
     } catch (err) {
-      batch(() => {
-        dispatch(optimisticUpdateMovieFinished({ data: movieFromStore }))
-        dispatch(handleMoviesError(err))
-      })
+      dispatch(optimisticUpdateMovieFinished({ data: movieFromStore }))
+      dispatch(handleMoviesError(err))
     }
   }

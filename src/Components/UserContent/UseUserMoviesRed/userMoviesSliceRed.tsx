@@ -51,9 +51,19 @@ export const userMoviesSliceRed = createSlice({
     resetMovies: () => {
       return USER_MOVIES_RESET_STATE
     },
-    setMoviesError: (state, action: PayloadAction<UserMoviesStoreState['error']>) => {
-      state.error = action.payload
-      state.initialLoading = false
+    setMoviesError: {
+      reducer(state, action: PayloadAction<UserMoviesStoreState['error']>) {
+        state.error = action.payload
+        state.initialLoading = false
+      },
+      prepare(data: UserMoviesStoreState['error']) {
+        return {
+          payload: {
+            message: data?.message!,
+            errorData: { message: data?.message! },
+          },
+        }
+      },
     },
   },
   extraReducers: (builder) => {
