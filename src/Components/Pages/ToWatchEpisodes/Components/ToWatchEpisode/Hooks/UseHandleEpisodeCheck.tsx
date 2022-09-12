@@ -16,6 +16,7 @@ import {
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import { getSeasonEpisodes, getSeasons } from 'Components/Pages/ToWatchEpisodes/Helpers'
 import { isContentReleasedValid } from 'Utils'
+import { flushSync } from 'react-dom'
 
 type Props = {
   episodeData: SingleEpisodeStoreState
@@ -111,18 +112,20 @@ const useHandleEpisodeCheck = ({
 
       document.documentElement.style.setProperty(TO_WATCH_TRANSLATE_UP_VAR, `-${TO_WATCH_TRANSLATE_UP_VALUE_DEFAULT}px`)
 
-      if (rating === undefined) {
-        dispatch(
-          postCheckSingleEpisode({
-            showId,
-            seasonNumber: episodeData.originalSeasonIndex,
-            episodeNumber: episodeData.originalEpisodeIndex,
-            firebase,
-          }),
-        )
-      } else {
-        handleCheckWithRating(rating)
-      }
+      flushSync(() => {
+        if (rating === undefined) {
+          dispatch(
+            postCheckSingleEpisode({
+              showId,
+              seasonNumber: episodeData.originalSeasonIndex,
+              episodeNumber: episodeData.originalEpisodeIndex,
+              firebase,
+            }),
+          )
+        } else {
+          handleCheckWithRating(rating)
+        }
+      })
     }, TO_WATCH_TRANSLATE_DURATION)
   }
 
