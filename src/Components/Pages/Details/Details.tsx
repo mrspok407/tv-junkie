@@ -1,8 +1,8 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { Helmet } from 'react-helmet-async'
 import Header from 'Components/UI/Header/Header'
 import Slider from 'Components/UI/Slider/Slider'
-import { useParams } from 'react-router-dom'
+import { Outlet, useLocation, useParams } from 'react-router-dom'
 import ShowEpisodes from 'Components/UI/Templates/SeasonsAndEpisodes/ShowEpisodes'
 import ScrollToTopBar from 'Utils/ScrollToTopBar'
 import ScrollToTopOnUpdate from 'Utils/ScrollToTopOnUpdate'
@@ -14,6 +14,8 @@ import PosterWrapper from './Components/PosterWrapper'
 import { MainInfo } from './Components/MainInfo'
 import useGetDataTMDB from './Hooks/UseGetDataTMDB'
 import useFetchShowEpisodes from './Hooks/UseFetchShowEpisodes'
+import CreatePortal from 'Components/UI/Modal/CreatePortal'
+import ModalContent from 'Components/UI/Modal/ModalContent'
 import './Details.scss'
 
 type Params = {
@@ -21,7 +23,7 @@ type Params = {
   mediaType: string
 }
 
-export const DetailsPage: React.FC = () => {
+export const DetailsPage: React.FC<{ isPopup?: boolean }> = ({ isPopup }) => {
   const { id, mediaType } = useParams<Params>()
 
   const [details, loadingTMDB, similarContent, error] = useGetDataTMDB({ id: id!, mediaType: mediaType! })
@@ -29,6 +31,10 @@ export const DetailsPage: React.FC = () => {
 
   const showsInitialLoading = useAppSelector(selectShowsLoading)
   const { loadingFireEpisodes } = useFetchShowEpisodes({ mediaType: details.mediaType, id: details.id })
+
+  const location = useLocation()
+
+  console.log(location.state)
 
   const renderDetails = () => {
     if (error) {
@@ -62,6 +68,10 @@ export const DetailsPage: React.FC = () => {
             <Slider sliderData={similarContent} />
           </div>
         )}
+
+        <Outlet />
+
+        {/* {isPopup && <CreatePortal element={<ModalContent message="test" />} />} */}
       </div>
     )
   }

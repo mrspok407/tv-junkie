@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { MainDataTMDB, MAINDATA_TMDB_INITIAL } from 'Utils/@TypesTMDB'
@@ -63,6 +63,13 @@ const useGetDataTMDB = ({ id, mediaType }: Props) => {
   const [similarContent, setSimilarContent] = useState<MainDataTMDB[]>([])
   const [error, setError] = useState('')
 
+  const navigateRef = useRef(navigate)
+
+  useEffect(() => {
+    navigateRef.current = navigate
+    console.log('navigate')
+  }, [navigate])
+
   useEffect(() => {
     const getContent = async () => {
       setLoading(true)
@@ -82,7 +89,8 @@ const useGetDataTMDB = ({ id, mediaType }: Props) => {
         const errorData: any = err
         if (axios.isCancel(errorData)) return
         if (errorData?.response?.status === 404) {
-          navigate(ROUTES.PAGE_DOESNT_EXISTS)
+          // navigate(ROUTES.PAGE_DOESNT_EXISTS)
+          navigateRef.current(ROUTES.PAGE_DOESNT_EXISTS)
           return
         }
         setError('Something went wrong, sorry. Try to reload the page.')
@@ -94,7 +102,7 @@ const useGetDataTMDB = ({ id, mediaType }: Props) => {
     return () => {
       if (cancelRequest !== undefined) cancelRequest()
     }
-  }, [mediaType, id, navigate])
+  }, [mediaType, id])
 
   return [details, loading, similarContent, error] as [MainDataTMDB, boolean, MainDataTMDB[], string]
 }

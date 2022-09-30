@@ -16,6 +16,8 @@ import useInitializeApp from 'Components/UserContent/UseUserShowsRed/UseInitiali
 import ErrorPopupGlobal from 'Components/UI/ErrorPopupGlobal/ErrorPopupGlobal'
 import Loader from 'Components/UI/Placeholders/Loader'
 import { GoogleRedirectWrapper } from 'Components/UserAuth/SignIn/UseGoogleRedirect'
+import CreatePortal from 'Components/UI/Modal/CreatePortal'
+import ModalContent from 'Components/UI/Modal/ModalContent'
 
 const ContactsPage = lazy(() => import('Components/Pages/Contacts/Contacts'))
 
@@ -35,7 +37,9 @@ const App = () => {
               <Route path={ROUTES.CALENDAR} element={<CalendarPage />} />
               <Route path={ROUTES.MOVIES} element={<MoviesPage />} />
               <Route path={ROUTES.USER_PROFILE} element={<UserProfile />} />
-              <Route path={ROUTES.DETAILS_PAGE} element={<DetailsPage />} />
+              <Route path={ROUTES.DETAILS_PAGE} element={<DetailsPage />}>
+                <Route path=":popupconfirm" element={<CreatePortal element={<ModalContent message="test" />} />} />
+              </Route>
               <Route path={ROUTES.SETTINGS} element={<SettingsPage />} />
               <Route path={ROUTES.CONTACTS_PAGE} element={<ContactsPage />} />
               <Route path={ROUTES.LOGIN_PAGE} element={<LoginPage />} />

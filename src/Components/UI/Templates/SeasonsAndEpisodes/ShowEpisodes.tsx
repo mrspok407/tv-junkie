@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useRef } from 'react'
 import classNames from 'classnames'
 import { useAppDispatch, useAppSelector } from 'app/hooks'
 import { selectShow, selectShowEpisodes } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
@@ -11,6 +11,7 @@ import { ShowEpisodesFromAPIInt } from './@Types'
 import SeasonsGrid from './Components/SeasonsGrid'
 import { ActionTypesEnum } from './Hooks/UseFetchSeasons/ReducerConfig/@Types'
 import './ShowsEpisodes.scss'
+import { Link, useNavigate } from 'react-router-dom'
 
 type Props = {
   seasonsTMDB: SeasonTMDB[]
@@ -20,6 +21,9 @@ type Props = {
 const INITIAL_OPEN_SEASON = 1
 
 const ShowEpisodes: React.FC<Props> = ({ seasonsTMDB, showId }) => {
+  const count = useRef(0)
+  const navigate = useNavigate()
+
   const { firebase, authUser } = useFrequentVariables()
   const dispatch = useAppDispatch()
 
@@ -48,7 +52,9 @@ const ShowEpisodes: React.FC<Props> = ({ seasonsTMDB, showId }) => {
   )
 
   const handleCloseAllOpenSeasons = () => {
-    fetchSeasonsDispatch({ type: ActionTypesEnum.HandleCloseAll })
+    navigate('.', { state: count.current })
+    count.current += 1
+    //  fetchSeasonsDispatch({ type: ActionTypesEnum.HandleCloseAll })
   }
 
   const showCheckboxes = useAppSelector((state) => {
@@ -56,6 +62,7 @@ const ShowEpisodes: React.FC<Props> = ({ seasonsTMDB, showId }) => {
     return !!(showInfo && showInfo?.database !== 'notWatchingShows' && authUser?.uid)
   })
   const showCheckAllEpisodes = !!(showCheckboxes && isAnyEpisodeReleased)
+
   return (
     <>
       {showCheckAllEpisodes && (
@@ -82,6 +89,9 @@ const ShowEpisodes: React.FC<Props> = ({ seasonsTMDB, showId }) => {
         <button type="button" className="button" onClick={() => handleCloseAllOpenSeasons()}>
           Close all
         </button>
+        {/* <Link className="button" to="." state={{ fromCloseall: count.current }}>
+          Close All
+        </Link> */}
       </div>
 
       <SeasonsGrid
