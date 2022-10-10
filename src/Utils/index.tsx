@@ -10,6 +10,7 @@ import * as _isEqual from 'lodash.isequal'
 import * as _isObject from 'lodash.isobject'
 import * as _isPlainObject from 'lodash.isplainobject'
 import { differenceInCalendarDays, isValid } from 'date-fns'
+import * as Bowser from 'bowser'
 import { SeasonFromUserDatabase } from 'Components/Firebase/@TypesFirebase'
 import { EpisodesTMDB } from './@TypesTMDB'
 
@@ -204,4 +205,12 @@ export const mergeFireUserEpisodes = <T,>(sourceArray: SeasonFromUserDatabase[],
   })
 
   return newArray
+}
+
+export const getUserAgent = () => {
+  const browser = Bowser.getParser(window.navigator.userAgent)
+  const platform = browser.getPlatform()
+  return {
+    isMobileUserAgent: platform.type === 'mobile',
+  }
 }

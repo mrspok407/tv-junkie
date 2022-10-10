@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import classNames from 'classnames'
 import logo from 'assets/images/main-page-logo.png'
 import * as ROUTES from 'Utils/Constants/routes'
 import Search from 'Components/Pages/SearchPage/Search/Search'
 import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
+import { getUserAgent } from 'Utils'
 import ProfileMenu from './Components/ProfileMenu'
 import './Header.scss'
 
@@ -15,12 +16,18 @@ type Props = {
 }
 
 const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false, contactsPage = false }) => {
+  const { isMobileUserAgent } = getUserAgent()
+  const location = useLocation() as any
+  const navigate = useNavigate()
+  const isNavOpenURLState = location.state?.isNavOpen
+
   const { authUser } = useFrequentVariables()
   const [navMobileOpen, setNavMobileOpen] = useState(false)
   const navRef = useRef<HTMLElement>(null)
   const toggleNavButtonRef = useRef<HTMLButtonElement>(null)
 
   const closeNavMobile = () => {
+    if (isMobileUserAgent) return
     setNavMobileOpen(false)
   }
 
@@ -40,6 +47,9 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false, cont
     }
   }
 
+  const isNavOpen = isMobileUserAgent ? isNavOpenURLState : navMobileOpen
+  const shouldRouteReplace = isMobileUserAgent
+
   return (
     <header
       className={classNames('header', {
@@ -48,7 +58,7 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false, cont
     >
       <div
         className={classNames('nav-container', {
-          'nav-container--mobile-open': navMobileOpen,
+          'nav-container--mobile-open': isNavOpen,
         })}
       >
         <nav ref={navRef} className={classNames('nav')}>
@@ -59,6 +69,7 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false, cont
           >
             <NavLink
               to={ROUTES.HOME_PAGE}
+              replace={shouldRouteReplace}
               className={({ isActive }) =>
                 classNames('nav__link--logo', {
                   'nav__item--active': isActive,
@@ -73,6 +84,7 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false, cont
               <>
                 <NavLink
                   to={ROUTES.CALENDAR}
+                  replace={shouldRouteReplace}
                   className={({ isActive }) =>
                     classNames('nav__link', {
                       'nav__link--non-auth': !authUser?.uid,
@@ -86,6 +98,7 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false, cont
 
                 <NavLink
                   to={ROUTES.TO_WATCH}
+                  replace={shouldRouteReplace}
                   className={({ isActive }) =>
                     classNames('nav__link', {
                       'nav__link--non-auth': !authUser?.uid,
@@ -101,6 +114,7 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false, cont
 
             <NavLink
               to={ROUTES.SHOWS}
+              replace={shouldRouteReplace}
               className={({ isActive }) =>
                 classNames('nav__link', {
                   'nav__link--non-auth': !authUser?.uid,
@@ -114,6 +128,7 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false, cont
 
             <NavLink
               to={ROUTES.MOVIES}
+              replace={shouldRouteReplace}
               className={({ isActive }) =>
                 classNames('nav__link', {
                   'nav__link--non-auth': !authUser?.uid,
@@ -125,7 +140,7 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false, cont
               <li className="nav__item">Movies</li>
             </NavLink>
 
-            <ProfileMenu closeNavMobile={closeNavMobile} hideLogin={hideLogin} />
+            <ProfileMenu closeNavMobile={closeNavMobile} hideLogin={hideLogin} shouldRouteReplace />
 
             <li
               className={classNames('nav__item nav__item--nav-search', {
@@ -142,9 +157,19 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false, cont
         type="button"
         ref={toggleNavButtonRef}
         className={classNames('header__show-nav', {
-          'header__show-nav--open': navMobileOpen,
+          'header__show-nav--open': isNavOpen,
         })}
-        onClick={() => setNavMobileOpen(!navMobileOpen)}
+        onClick={() => {
+          if (isMobileUserAgent) {
+            if (isNavOpenURLState) {
+              navigate(-1)
+            } else {
+              navigate('', { state: { isNavOpen: true } })
+            }
+          } else {
+            setNavMobileOpen(!navMobileOpen)
+          }
+        }}
       >
         <span />
         <span />
