@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react'
-import { Helmet } from 'react-helmet'
+import { Helmet } from 'react-helmet-async'
 import Header from 'Components/UI/Header/Header'
 import Slider from 'Components/UI/Slider/Slider'
+import { useParams } from 'react-router-dom'
 import ShowEpisodes from 'Components/UI/Templates/SeasonsAndEpisodes/ShowEpisodes'
 import ScrollToTopBar from 'Utils/ScrollToTopBar'
 import ScrollToTopOnUpdate from 'Utils/ScrollToTopOnUpdate'
@@ -15,16 +16,15 @@ import useGetDataTMDB from './Hooks/UseGetDataTMDB'
 import useFetchShowEpisodes from './Hooks/UseFetchShowEpisodes'
 import './Details.scss'
 
-type Props = {
-  match: { params: { id: string; mediaType: string } }
+type Params = {
+  id: string
+  mediaType: string
 }
 
-export const DetailsPage: React.FC<Props> = ({
-  match: {
-    params: { id, mediaType },
-  },
-}) => {
-  const [details, loadingTMDB, similarContent, error] = useGetDataTMDB({ id, mediaType })
+export const DetailsPage: React.FC = () => {
+  const { id, mediaType } = useParams<Params>()
+
+  const [details, loadingTMDB, similarContent, error] = useGetDataTMDB({ id: id!, mediaType: mediaType! })
   const seasonsTMDB = useMemo(() => details.seasons.filter((item) => item.name !== 'Specials'), [details.seasons])
 
   const showsInitialLoading = useAppSelector(selectShowsLoading)

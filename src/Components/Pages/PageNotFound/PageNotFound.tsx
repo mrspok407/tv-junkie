@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { Link, useHistory } from 'react-router-dom'
-import { Helmet } from 'react-helmet'
+import { Link, useNavigate } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
 import * as ROUTES from 'Utils/Constants/routes'
 import Header from 'Components/UI/Header/Header'
 import logo404 from 'assets/images/doge-404.png'
@@ -10,7 +10,7 @@ import './PageNotFound.scss'
 const COUNTDOWN_INTERVAL = 1000
 
 const PageNotFound: React.FC = () => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const [countdown, setCountdown] = useState(5)
 
   useEffect(() => {
@@ -25,9 +25,9 @@ const PageNotFound: React.FC = () => {
 
   useEffect(() => {
     if (countdown === 0) {
-      history.push(ROUTES.HOME_PAGE)
+      navigate(ROUTES.HOME_PAGE)
     }
-  }, [countdown, history])
+  }, [countdown, navigate])
 
   return (
     <>

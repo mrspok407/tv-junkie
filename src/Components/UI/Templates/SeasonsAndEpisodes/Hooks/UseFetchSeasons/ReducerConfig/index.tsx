@@ -17,9 +17,10 @@ const reducer = <T,>(): React.Reducer<FetchSeasonsInt<T>, ACTIONTYPES> =>
       }
 
       case ActionTypesEnum.HandleSuccess: {
-        const { data, seasonId } = action.payload
+        const { data, seasonId, isSideEffect } = action.payload
 
         if (fetchedData.includes(seasonId)) {
+          if (isSideEffect) return
           draft.openData = openData.includes(seasonId)
             ? openData.filter((item) => item !== seasonId)
             : [...openData, seasonId]

@@ -1,7 +1,7 @@
 /* eslint-disable import/no-cycle */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect, useRef, useCallback } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigationType } from 'react-router-dom'
 import debounce from 'debounce'
 import classNames from 'classnames'
 import Loader from 'Components/UI/Placeholders/Loader'
@@ -44,11 +44,11 @@ const Input: React.FC<Props> = ({
   const mediaTypeRef = useRef<HTMLDivElement>(null!)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const history = useHistory()
+  const navigationType = useNavigationType()
 
   useEffect(() => {
     const windowWidth = window.innerWidth
-    if (history.action === 'PUSH' && !navSearch && windowWidth > MOBILE_LAYOUT && inputRef?.current) {
+    if (navigationType === 'PUSH' && !navSearch && windowWidth > MOBILE_LAYOUT && inputRef?.current) {
       inputRef.current.focus()
     }
   }, [])

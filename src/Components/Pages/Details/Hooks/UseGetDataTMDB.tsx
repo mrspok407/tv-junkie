@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { MainDataTMDB, MAINDATA_TMDB_INITIAL } from 'Utils/@TypesTMDB'
 import * as ROUTES from 'Utils/Constants/routes'
@@ -57,7 +57,7 @@ export const fetchContentDetailsTMDB = async ({ mediaType, id }: { mediaType: st
 }
 
 const useGetDataTMDB = ({ id, mediaType }: Props) => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [details, setDetails] = useState<MainDataTMDB>(MAINDATA_TMDB_INITIAL)
   const [similarContent, setSimilarContent] = useState<MainDataTMDB[]>([])
@@ -77,15 +77,15 @@ const useGetDataTMDB = ({ id, mediaType }: Props) => {
 
         setDetails(data)
         setSimilarContent(similarContentSortByVotes)
+        setLoading(false)
       } catch (err) {
         const errorData: any = err
         if (axios.isCancel(errorData)) return
         if (errorData?.response?.status === 404) {
-          history.push(ROUTES.PAGE_DOESNT_EXISTS)
+          navigate(ROUTES.PAGE_DOESNT_EXISTS)
           return
         }
         setError('Something went wrong, sorry. Try to reload the page.')
-      } finally {
         setLoading(false)
       }
     }
@@ -94,7 +94,7 @@ const useGetDataTMDB = ({ id, mediaType }: Props) => {
     return () => {
       if (cancelRequest !== undefined) cancelRequest()
     }
-  }, [mediaType, id, history])
+  }, [mediaType, id, navigate])
 
   return [details, loading, similarContent, error] as [MainDataTMDB, boolean, MainDataTMDB[], string]
 }

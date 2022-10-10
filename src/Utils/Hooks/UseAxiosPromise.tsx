@@ -1,23 +1,14 @@
-import { useEffect, useCallback } from 'react'
+import { useCallback } from 'react'
 import axios from 'axios'
 import { tmdbTvSeasonURL } from 'Utils/APIUrls'
 import useMemoized from './UseMemoized'
-
-const { CancelToken } = require('axios')
-
-let cancelRequest: any
 
 type Props = {
   showId: number
 }
 
 const useAxiosPromise = ({ showId }: Props) => {
-  const axiosGet = (url: string) =>
-    axios.get(url, {
-      cancelToken: new CancelToken((c: any) => {
-        cancelRequest = c
-      }),
-    })
+  const axiosGet = (url: string) => axios.get(url)
 
   const memoizedCallback = useMemoized<Promise<any>, string>({ callback: axiosGet })
 
@@ -29,12 +20,6 @@ const useAxiosPromise = ({ showId }: Props) => {
     },
     [showId, memoizedCallback],
   )
-
-  useEffect(() => {
-    return () => {
-      if (cancelRequest !== undefined) cancelRequest()
-    }
-  }, [])
 
   return getPromise
 }

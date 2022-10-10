@@ -1,7 +1,7 @@
 import Header from 'Components/UI/Header/Header'
 import useAuthorization from 'Components/UserAuth/Session/Authentication/Hooks/useAuthorization'
 import React from 'react'
-import { Helmet } from 'react-helmet'
+import { Helmet } from 'react-helmet-async'
 import ScrollToTopOnMount from 'Utils/ScrollToTopOnMount'
 import ContactsContent from './ContactsContent'
 import './styles/index.scss'

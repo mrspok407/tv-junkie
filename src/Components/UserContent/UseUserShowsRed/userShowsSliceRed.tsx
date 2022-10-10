@@ -100,10 +100,20 @@ export const userShowsSliceRed = createSlice({
     resetShows: () => {
       return USER_SHOWS_RESET_STATE
     },
-    setShowsError: (state, action: PayloadAction<UserShowsStoreState['error']>) => {
-      state.error = action.payload
-      state.initialLoading = false
-      state.loadingNewShow = false
+    setShowsError: {
+      reducer(state, action: PayloadAction<UserShowsStoreState['error']>) {
+        state.error = action.payload
+        state.initialLoading = false
+        state.loadingNewShow = false
+      },
+      prepare(data: UserShowsStoreState['error']) {
+        return {
+          payload: {
+            message: data?.message!,
+            errorData: { message: data?.message! },
+          },
+        }
+      },
     },
   },
   extraReducers: (builder) => {

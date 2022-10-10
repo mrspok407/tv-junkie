@@ -8,7 +8,7 @@ export enum ActionTypesEnum {
 
 export type ACTIONTYPES =
   | { type: ActionTypesEnum.HandleLoading; payload: { seasonId: number } }
-  | { type: ActionTypesEnum.HandleSuccess; payload: { seasonId: number; data: any } }
+  | { type: ActionTypesEnum.HandleSuccess; payload: { seasonId: number; data: any; isSideEffect: boolean } }
   | { type: ActionTypesEnum.HandleOpenData; payload: { seasonId: number } }
   | { type: ActionTypesEnum.HandleFailure; payload: { seasonId: number } }
   | { type: ActionTypesEnum.HandleCloseAll }

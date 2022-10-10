@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState, useCallback, useLayoutEffect } from 'react'
+import React, { useEffect, useState, useCallback, useLayoutEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import debounce from 'debounce'
 import classNames from 'classnames'
@@ -21,9 +21,9 @@ export const Slider = ({ sliderData }: { sliderData: MainDataTMDB[] }) => {
 
   const itemsInSlider = sliderData.length
   const nonVisibleItems = itemsInSlider - itemsInRow
-  const dragСoefficient = 1.25
+  const dragCoefficient = 1.25
   const thresholdToSlide = itemWidth / 2
-  const sliderRange = nonVisibleItems * itemWidth * dragСoefficient
+  const sliderRange = nonVisibleItems * itemWidth * dragCoefficient
   const sliderAvailable = itemsInSlider > itemsInRow
 
   const [currentItem, setCurrentItem] = useState(0)
@@ -33,9 +33,9 @@ export const Slider = ({ sliderData }: { sliderData: MainDataTMDB[] }) => {
   const [blockLinks, setBlockLinks] = useState(false)
 
   const [leftArrowVisible, setLeftArrowVisible] = useState(true)
-  const [rightArrowVisible, setrightArrowVisible] = useState(true)
+  const [rightArrowVisible, setRightArrowVisible] = useState(true)
 
-  const [isMounted, setIsMounted] = useState(false)
+  const isMountedRef = useRef(false)
 
   let startDragPoint = 0
 
@@ -53,16 +53,16 @@ export const Slider = ({ sliderData }: { sliderData: MainDataTMDB[] }) => {
       slider.style.cssText = ''
     }
 
-    if (!isMounted) return
+    if (!isMountedRef.current) return
     setSliderWidth(slider.getBoundingClientRect().width)
   }, [slider])
 
   const handleResizeDeb = debounce(() => handleResize(), 200)
 
   useEffect(() => {
-    setIsMounted(true)
+    isMountedRef.current = true
     return () => {
-      setIsMounted(false)
+      isMountedRef.current = false
     }
   }, [])
 
@@ -148,7 +148,7 @@ export const Slider = ({ sliderData }: { sliderData: MainDataTMDB[] }) => {
     setBlockLinks(true)
 
     const diffFromStartPoint = (startDragPoint - e.pageX) * -1
-    const sliderPosition = currentItem * itemWidth * dragСoefficient
+    const sliderPosition = currentItem * itemWidth * dragCoefficient
 
     const maxDragDistance = sliderPosition >= sliderRange ? sliderRange : sliderPosition
 
@@ -156,12 +156,12 @@ export const Slider = ({ sliderData }: { sliderData: MainDataTMDB[] }) => {
       maxDragDistance - diffFromStartPoint >= sliderRange ? sliderRange : maxDragDistance - diffFromStartPoint
 
     const currentItemStorage = Math.ceil(
-      (translateX - thresholdToSlide * dragСoefficient) / dragСoefficient / itemWidth,
+      (translateX - thresholdToSlide * dragCoefficient) / dragCoefficient / itemWidth,
     )
 
     setCurrentItem(currentItemStorage < 0 ? 0 : currentItemStorage)
 
-    slider.style.transform = `translate3d(-${translateX / dragСoefficient}px, 0, 0)`
+    slider.style.transform = `translate3d(-${translateX / dragCoefficient}px, 0, 0)`
     slider.style.transition = '0ms'
   }
 
@@ -191,7 +191,7 @@ export const Slider = ({ sliderData }: { sliderData: MainDataTMDB[] }) => {
     if (!sliderAvailable) return
 
     setLeftArrowVisible(!(currentItem <= 0))
-    setrightArrowVisible(!(currentItem >= nonVisibleItems))
+    setRightArrowVisible(!(currentItem >= nonVisibleItems))
   }
 
   return (
@@ -215,9 +215,7 @@ export const Slider = ({ sliderData }: { sliderData: MainDataTMDB[] }) => {
                 onClick={(e) => {
                   if (blockLinks) e.preventDefault()
                 }}
-                to={{
-                  pathname: `/${mediaType}/${id}`,
-                }}
+                to={`/${mediaType}/${id}`}
               >
                 <div className="slider__item lazyload" data-bg={`${POSTER_PATH}${poster_path}`} />
               </Link>

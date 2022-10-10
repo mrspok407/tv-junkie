@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { validEmailRegex } from 'Utils'
 import * as ROUTES from 'Utils/Constants/routes'
 import classNames from 'classnames'
@@ -44,7 +44,7 @@ const SignInFormBase: React.FC<Props> = ({ closeNavMobile, togglePasswordForget 
   const [showPassword, setShowPassword] = useState(false)
   const [isEmailValid, setIsEmailValid] = useState(false)
 
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     setSubmitRequestLoading(true)
@@ -72,7 +72,7 @@ const SignInFormBase: React.FC<Props> = ({ closeNavMobile, togglePasswordForget 
       })
       .finally(() => {
         if (closeNavMobile) closeNavMobile()
-        history.push(ROUTES.HOME_PAGE)
+        navigate(ROUTES.HOME_PAGE)
         setSubmitRequestLoading(false)
         initializeAuthUserListener()
       })

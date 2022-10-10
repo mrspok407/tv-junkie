@@ -20,12 +20,13 @@ const ProfileMenu: React.FC<Props> = ({ closeNavMobile, hideLogin = false }) => 
       {authUser?.uid ? (
         <>
           <NavLink
-            exact
             to={ROUTES.CONTACTS_PAGE}
-            className={classNames('nav__link', {
-              'nav__link--non-auth': !authUser?.uid,
-            })}
-            activeClassName="nav__item--active"
+            className={({ isActive }) =>
+              classNames('nav__link', {
+                'nav__link--non-auth': !authUser?.uid,
+                'nav__item--active': isActive,
+              })
+            }
             onClick={() => closeNavMobile()}
           >
             <li
@@ -38,12 +39,13 @@ const ProfileMenu: React.FC<Props> = ({ closeNavMobile, hideLogin = false }) => 
           </NavLink>
 
           <NavLink
-            exact
             to={ROUTES.SETTINGS}
-            className={classNames('nav__link', {
-              'nav__link--non-auth': !authUser?.uid,
-            })}
-            activeClassName="nav__item--active"
+            className={({ isActive }) =>
+              classNames('nav__link', {
+                'nav__link--non-auth': !authUser?.uid,
+                'nav__item--active': isActive,
+              })
+            }
             onClick={() => closeNavMobile()}
           >
             <li className="nav__item" onClick={() => closeNavMobile()}>

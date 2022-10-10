@@ -1,5 +1,4 @@
 import { useEffect, useCallback, useReducer } from 'react'
-import axios from 'axios'
 import useAxiosPromise from 'Utils/Hooks/UseAxiosPromise'
 import { isArrayIncludes } from 'Utils'
 import { SeasonTMDB } from 'Utils/@TypesTMDB'
@@ -18,7 +17,15 @@ function useFetchSeasons<DataType>({ showId, preloadSeason }: Props) {
   const getPromise = useAxiosPromise({ showId })
 
   const handleFetch = useCallback(
-    async ({ seasonNum, seasonId }: { seasonNum: number; seasonId: number }) => {
+    async ({
+      seasonNum,
+      seasonId,
+      isSideEffect = false,
+    }: {
+      seasonNum: number
+      seasonId: number
+      isSideEffect?: boolean
+    }) => {
       if (loadingData.includes(seasonId)) return
       dispatch({ type: ActionTypesEnum.HandleLoading, payload: { seasonId } })
 
@@ -34,10 +41,9 @@ function useFetchSeasons<DataType>({ showId, preloadSeason }: Props) {
 
         dispatch({
           type: ActionTypesEnum.HandleSuccess,
-          payload: { seasonId, data: { showTitle: data.name, seasonId, episodes } },
+          payload: { seasonId, data: { showTitle: data.name, seasonId, episodes }, isSideEffect },
         })
       } catch (error) {
-        if (axios.isCancel(error)) return
         dispatch({ type: ActionTypesEnum.HandleFailure, payload: { seasonId } })
       }
     },
@@ -49,7 +55,7 @@ function useFetchSeasons<DataType>({ showId, preloadSeason }: Props) {
     if (isArrayIncludes(seasonId, fetchedData) || isArrayIncludes(seasonId, errors)) return
     if (isArrayIncludes(seasonId, loadingData)) return
 
-    handleFetch({ seasonNum: preloadSeason.season_number, seasonId })
+    handleFetch({ seasonNum: preloadSeason.season_number, seasonId, isSideEffect: true })
   }, [handleFetch, preloadSeason, loadingData, fetchedData, errors])
 
   return { state, handleFetch, dispatch }
