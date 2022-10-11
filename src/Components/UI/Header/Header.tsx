@@ -61,7 +61,7 @@ const Header: React.FC<Props> = ({ isLogoVisible = true, hideLogin = false, cont
           'nav-container--mobile-open': isNavOpen,
         })}
       >
-        <nav ref={navRef} className={classNames('nav')}>
+        <nav ref={navRef} className="nav">
           <ul
             className={classNames('nav__list', {
               'nav__list--not-auth': !authUser?.uid,
