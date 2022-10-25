@@ -6,6 +6,9 @@
 
 Персональный проект/портфолио, создано с помощью React и Firebase.
 
+#### Пожалуйста обратите внимание, последнее изменение этого Readme было 25 октября 2021 года. Сам код, так и варианты реализации какого-то функционала описанные здесь, могут не совпадает с моим текущим видением в связи с ростом профессионального опыта и т.д. Спасибо.
+#### Please note this Readme was last modified on October 25, 2021. The code itself, as well as the options for implementing some functionality described here, may not coincide with my current vision due to the growth of professional experience, etc. Thank you.
+
 ## Демо
 
 - https://www.tv-junkie.com - сайт.
