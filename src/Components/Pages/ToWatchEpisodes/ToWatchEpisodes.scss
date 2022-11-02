@@ -69,7 +69,7 @@ $seasonInfoBgClr: #1d1d1d96;
 
   .episodes__episode-name {
     align-self: initial;
-    padding-right: 0px;
+    padding: 1px 0 1px 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -122,7 +122,7 @@ $seasonInfoBgClr: #1d1d1d96;
     }
 
     &--torrent-links {
-      grid-template-columns: max-content var(--ratingMinWidth) max-content 1fr 200px;
+      grid-template-columns: max-content var(--ratingMinWidth) minmax(var(--dateMinWidth), max-content) 1fr 200px;
       @include mediaMaxW(#{$mobileViewPort}) {
         grid-template-columns: 20px 160px auto;
       }

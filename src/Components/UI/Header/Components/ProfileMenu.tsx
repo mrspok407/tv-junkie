@@ -9,9 +9,10 @@ import Login from '../Login'
 type Props = {
   closeNavMobile: () => void
   hideLogin?: boolean
+  shouldRouteReplace?: boolean
 }
 
-const ProfileMenu: React.FC<Props> = ({ closeNavMobile, hideLogin = false }) => {
+const ProfileMenu: React.FC<Props> = ({ closeNavMobile, hideLogin = false, shouldRouteReplace = false }) => {
   const { authUser } = useFrequentVariables()
   const newContactsActivity = useContext(ContactsActivityContext)
 
@@ -21,6 +22,7 @@ const ProfileMenu: React.FC<Props> = ({ closeNavMobile, hideLogin = false }) => 
         <>
           <NavLink
             to={ROUTES.CONTACTS_PAGE}
+            replace={shouldRouteReplace}
             className={({ isActive }) =>
               classNames('nav__link', {
                 'nav__link--non-auth': !authUser?.uid,
@@ -40,6 +42,7 @@ const ProfileMenu: React.FC<Props> = ({ closeNavMobile, hideLogin = false }) => 
 
           <NavLink
             to={ROUTES.SETTINGS}
+            replace={shouldRouteReplace}
             className={({ isActive }) =>
               classNames('nav__link', {
                 'nav__link--non-auth': !authUser?.uid,

@@ -32,12 +32,12 @@ const MovieButtons: React.FC<Props> = ({ movieId, details }: Props) => {
 
   const renderIsFinishedTitle = () => {
     if (!authUser?.uid) {
-      return 'Not finished'
+      return 'Mark as finished'
     }
     if (movieFromStore?.finished) {
       return 'Finished'
     }
-    return 'Not finished'
+    return 'Mark as finished'
   }
 
   return (
