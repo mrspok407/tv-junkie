@@ -17,7 +17,7 @@
 
     .episodes__episode-group-info {
       display: grid;
-      grid-template-columns: 0.8fr 3fr;
+      grid-template-columns: max-content 1fr;
       background-color: transparent;
       border-bottom: 1px solid #333;
       align-items: initial;

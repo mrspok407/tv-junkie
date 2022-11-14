@@ -12,7 +12,11 @@ import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import sub from 'date-fns/sub'
 import './Settings.scss'
 import sortDataSnapshot from 'Components/UserContent/FirebaseHelpers/sortDataSnapshot'
-import { episodesToOneArray } from 'Components/UserContent/UseUserShowsRed/Utils/episodesOneArrayModifiers'
+import {
+  episodesToOneArray,
+  validEpisodesToOneArray,
+} from 'Components/UserContent/UseUserShowsRed/Utils/episodesOneArrayModifiers'
+import { mergeEpisodesFromFireDBwithUserDB } from './helpers'
 
 let startTimeStampGroupChats = 1311011245000
 
@@ -270,10 +274,81 @@ const SettingsContent = () => {
       })
 
       console.log({ updateData })
-      firebase.rootRef().update(updateDataFirebase)
+      await firebase.rootRef().update(updateDataFirebase)
+      return updateData
     } catch (error) {
       console.log({ error })
     }
+  }
+
+  const updateUserShowsOnClient = async ({ showsData }) => {
+    const showsUsersWatchingListSnapshot = await Promise.all(
+      showsData.map((show) => {
+        return firebase.usersWatchingShowList(show.showId).once('value')
+      }),
+    )
+
+    const showsUsersWatchingList = showsUsersWatchingListSnapshot.map((item, index) => ({
+      showId: showsData[index].showId,
+      usersWatching: item.val(),
+    }))
+
+    const usersEpisodesSnapshot = await Promise.all(
+      showsUsersWatchingList.map((show) => {
+        if (!show.usersWatching) return null
+        const usersWatchingKeys = Object.keys(show.usersWatching)
+        return Promise.all(
+          usersWatchingKeys.map((userUid) => {
+            return firebase.showEpisodesUserDatabase(userUid, show.showId).once('value')
+          }),
+        )
+      }),
+    )
+
+    const showsUserWatchingListWithEpisodes = usersEpisodesSnapshot.reduce((acc, item, index) => {
+      if (item === null) return acc
+      const usersWatchingKeys = Object.keys(showsUsersWatchingList[index].usersWatching ?? {})
+      const usersWatchingWithEpisodesAsObject = usersWatchingKeys.reduce((acc, key, index) => {
+        acc[key] = item[index].val()
+        return acc
+      }, {})
+      acc.push({ showId: showsData[index].showId, usersWatching: usersWatchingWithEpisodesAsObject })
+      return acc
+    }, [])
+
+    const updateData = {}
+
+    showsUserWatchingListWithEpisodes.forEach((show) => {
+      const { episodes: showEpisodesFireData, status } = showsData.find(
+        (item) => item.showId.toString() === show.showId.toString(),
+      )
+      const showStatusLowerCase = status?.toLowerCase()
+      const showStatusForUserDatabase =
+        showStatusLowerCase === 'ended' || showStatusLowerCase === 'canceled' ? 'ended' : 'ongoing'
+
+      Object.entries(show.usersWatching).forEach(([userUid, userEpisodes]) => {
+        const mergedEpisodes = mergeEpisodesFromFireDBwithUserDB(showEpisodesFireData, userEpisodes)
+        const isAnyEpisodeNotWatched = validEpisodesToOneArray(mergedEpisodes).some((episode) => !episode.watched)
+
+        updateData[`users/${userUid}/content/episodes/${show.showId}/episodes`] = mergedEpisodes
+        updateData[`users/${userUid}/content/showsLastUpdateList/${show.showId}/lastUpdatedInUser`] =
+          firebase.timeStamp()
+        updateData[`users/${userUid}/content/shows/${show.showId}/status`] = showStatusForUserDatabase
+        updateData[`users/${userUid}/content/shows/${show.showId}/allEpisodesWatched`] = isAnyEpisodeNotWatched
+      })
+    })
+
+    firebase.rootRef().update(updateData)
+  }
+
+  const updateShowsWrapper = async ({ isUpdateAll = false }) => {
+    const showsDataPromise = await updateShowsDataInDatabase({ isUpdateAll })
+    const showsData = showsDataPromise.reduce((acc, item) => {
+      if (item.status !== 'fulfilled') return acc
+      acc.push({ ...item?.value })
+      return acc
+    }, [])
+    updateUserShowsOnClient({ showsData })
   }
 
   const setUsersWatchingShow = async () => {
@@ -326,14 +401,14 @@ const SettingsContent = () => {
         [process.env.REACT_APP_TEST_EMAIL, process.env.REACT_APP_ADMIN_EMAIL].includes(authUser?.email)) && (
         <>
           <div className="update-database">
-            <button onClick={updateShowsDataInDatabase} className="button button--profile" type="button">
+            <button onClick={updateShowsWrapper} className="button button--profile" type="button">
               Update Recent Shows In Database
             </button>
           </div>
 
           <div className="update-database">
             <button
-              onClick={() => updateShowsDataInDatabase({ isUpdateAll: true })}
+              onClick={() => updateShowsWrapper({ isUpdateAll: true })}
               className="button button--profile"
               type="button"
             >
