@@ -12,7 +12,10 @@ import useFrequentVariables from 'Utils/Hooks/UseFrequentVariables'
 import sub from 'date-fns/sub'
 import './Settings.scss'
 import sortDataSnapshot from 'Components/UserContent/FirebaseHelpers/sortDataSnapshot'
-import { episodesToOneArray } from 'Components/UserContent/UseUserShowsRed/Utils/episodesOneArrayModifiers'
+import {
+  episodesToOneArray,
+  validEpisodesToOneArray,
+} from 'Components/UserContent/UseUserShowsRed/Utils/episodesOneArrayModifiers'
 import { mergeEpisodesFromFireDBwithUserDB } from './helpers'
 
 let startTimeStampGroupChats = 1311011245000
@@ -313,32 +316,33 @@ const SettingsContent = () => {
       return acc
     }, [])
 
-    console.log({ showsData })
-    console.log({ showsUsersWatchingList })
-    console.log({ showsUserWatchingListWithEpisodes })
-
     const updateData = {}
 
     showsUserWatchingListWithEpisodes.forEach((show) => {
-      const showEpisodesFireData = showsData.find((item) => item.showId.toString() === show.showId.toString())?.episodes
+      const { episodes: showEpisodesFireData, status } = showsData.find(
+        (item) => item.showId.toString() === show.showId.toString(),
+      )
+      const showStatusLowerCase = status?.toLowerCase()
+      const showStatusForUserDatabase =
+        showStatusLowerCase === 'ended' || showStatusLowerCase === 'canceled' ? 'ended' : 'ongoing'
 
       Object.entries(show.usersWatching).forEach(([userUid, userEpisodes]) => {
-        console.log({ userUid, id: show.showId })
         const mergedEpisodes = mergeEpisodesFromFireDBwithUserDB(showEpisodesFireData, userEpisodes)
+        const isAnyEpisodeNotWatched = validEpisodesToOneArray(mergedEpisodes).some((episode) => !episode.watched)
 
         updateData[`users/${userUid}/content/episodes/${show.showId}/episodes`] = mergedEpisodes
         updateData[`users/${userUid}/content/showsLastUpdateList/${show.showId}/lastUpdatedInUser`] =
           firebase.timeStamp()
+        updateData[`users/${userUid}/content/shows/${show.showId}/status`] = showStatusForUserDatabase
+        updateData[`users/${userUid}/content/shows/${show.showId}/allEpisodesWatched`] = isAnyEpisodeNotWatched
       })
     })
 
-    console.log({ updateData })
-
-    // const usersWatchingSnapshot = await afterData.ref.parent?.child("usersWatchingList").once("value");
+    firebase.rootRef().update(updateData)
   }
 
-  const updateShowsWrapper = async () => {
-    const showsDataPromise = await updateShowsDataInDatabase({})
+  const updateShowsWrapper = async ({ isUpdateAll = false }) => {
+    const showsDataPromise = await updateShowsDataInDatabase({ isUpdateAll })
     const showsData = showsDataPromise.reduce((acc, item) => {
       if (item.status !== 'fulfilled') return acc
       acc.push({ ...item?.value })
@@ -405,7 +409,8 @@ const SettingsContent = () => {
 
           <div className="update-database">
             <button
-              onClick={() => updateShowsDataInDatabase({ isUpdateAll: true })}
+              // onClick={() => updateShowsDataInDatabase({ isUpdateAll: true })}
+              onClick={() => updateShowsWrapper({ isUpdateAll: true })}
               className="button button--profile"
               type="button"
             >

@@ -1,24 +1,11 @@
-import { isValid } from 'date-fns'
-
 export const mergeEpisodesFromFireDBwithUserDB = (showEpisodesFire: any, showEpisodesUser: any) => {
   const updateData: any = []
-  console.log({ showEpisodesUser })
   showEpisodesFire.forEach((season: any, seasonIndex: any) => {
     const newEpisodes = season.episodes.map((episode: any, episodeIndex: any) => {
-      console.log(
-        (showEpisodesUser[seasonIndex]?.episodes &&
-          showEpisodesUser[seasonIndex]?.episodes[episodeIndex]?.userRating) ??
-          0,
-      )
       const newEpisode = {
         air_date: episode?.air_date,
-        userRating:
-          (showEpisodesUser[seasonIndex]?.episodes &&
-            showEpisodesUser[seasonIndex]?.episodes[episodeIndex]?.userRating) ??
-          0,
-        watched:
-          (showEpisodesUser[seasonIndex]?.episodes && showEpisodesUser[seasonIndex]?.episodes[episodeIndex]?.watched) ??
-          false,
+        userRating: showEpisodesUser?.[seasonIndex]?.episodes?.[episodeIndex]?.userRating ?? 0,
+        watched: showEpisodesUser?.[seasonIndex]?.episodes?.[episodeIndex]?.watched ?? false,
       }
       return newEpisode
     })
@@ -46,9 +33,4 @@ export const episodesToOneArray = (data: any) => {
     acc.push(...seasonEpisodesWithIndex)
     return acc
   }, [])
-}
-
-export const validEpisodesToOneArray = (data: any) => {
-  if (!Array.isArray(data)) return []
-  return episodesToOneArray(data).filter((episode: any) => isValid(new Date(episode.air_date ?? '')))
 }
