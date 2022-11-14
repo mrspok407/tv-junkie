@@ -401,7 +401,6 @@ const SettingsContent = () => {
         [process.env.REACT_APP_TEST_EMAIL, process.env.REACT_APP_ADMIN_EMAIL].includes(authUser?.email)) && (
         <>
           <div className="update-database">
-            {/* <button onClick={updateShowsDataInDatabase} className="button button--profile" type="button"> */}
             <button onClick={updateShowsWrapper} className="button button--profile" type="button">
               Update Recent Shows In Database
             </button>
@@ -409,7 +408,6 @@ const SettingsContent = () => {
 
           <div className="update-database">
             <button
-              // onClick={() => updateShowsDataInDatabase({ isUpdateAll: true })}
               onClick={() => updateShowsWrapper({ isUpdateAll: true })}
               className="button button--profile"
               type="button"
