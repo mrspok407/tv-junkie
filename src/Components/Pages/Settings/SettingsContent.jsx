@@ -334,7 +334,7 @@ const SettingsContent = () => {
         updateData[`users/${userUid}/content/showsLastUpdateList/${show.showId}/lastUpdatedInUser`] =
           firebase.timeStamp()
         updateData[`users/${userUid}/content/shows/${show.showId}/status`] = showStatusForUserDatabase
-        updateData[`users/${userUid}/content/shows/${show.showId}/allEpisodesWatched`] = isAnyEpisodeNotWatched
+        updateData[`users/${userUid}/content/shows/${show.showId}/allEpisodesWatched`] = !isAnyEpisodeNotWatched
       })
     })
 
