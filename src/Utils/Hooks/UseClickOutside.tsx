@@ -1,5 +1,4 @@
 import { useEffect, useCallback } from 'react'
-import * as _isFunction from 'lodash.isfunction'
 
 type Props = {
   ref: { current: HTMLElement | null }
@@ -9,7 +8,7 @@ type Props = {
 const useClickOutside = ({ ref, callback }: Props) => {
   const handleClickOutside = useCallback(
     (e: CustomEvent) => {
-      if (!_isFunction(callback)) return
+      if (typeof callback !== 'function') return
       if (!ref.current?.contains(e.target as Node)) {
         callback()
       }

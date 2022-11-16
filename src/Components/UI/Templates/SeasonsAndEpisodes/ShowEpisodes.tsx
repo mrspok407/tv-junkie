@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import classNames from 'classnames'
 import { useAppDispatch, useAppSelector } from 'app/hooks'
 import { selectShow, selectShowEpisodes } from 'Components/UserContent/UseUserShowsRed/userShowsSliceRed'
@@ -40,6 +40,8 @@ const ShowEpisodes: React.FC<Props> = ({ seasonsTMDB, showId }) => {
     preloadSeason: initialOpenedSeason,
   })
 
+  console.log(seasonsTMDB)
+
   const handleOpenSeasonEpisodes = useCallback(
     (seasonId: number, seasonNum: number) => {
       handleFetch({ seasonNum, seasonId })
@@ -47,8 +49,10 @@ const ShowEpisodes: React.FC<Props> = ({ seasonsTMDB, showId }) => {
     [handleFetch],
   )
 
+  const [isOpen, setIsOpen] = useState(false)
   const handleCloseAllOpenSeasons = () => {
     fetchSeasonsDispatch({ type: ActionTypesEnum.HandleCloseAll })
+    setIsOpen(!isOpen)
   }
 
   const showCheckboxes = useAppSelector((state) => {
@@ -79,8 +83,8 @@ const ShowEpisodes: React.FC<Props> = ({ seasonsTMDB, showId }) => {
           'episodes__close-all-open--left': !showCheckAllEpisodes,
         })}
       >
-        <button type="button" className="button" onClick={() => handleCloseAllOpenSeasons()}>
-          Close all
+        <button type="button" role="button" className="button" onClick={() => handleCloseAllOpenSeasons()}>
+          {seasonsData.openData.length ? 'Close all' : 'Open all'}
         </button>
       </div>
 

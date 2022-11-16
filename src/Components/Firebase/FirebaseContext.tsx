@@ -115,7 +115,6 @@ export interface FirebaseInterface {
   userContent: (uid: string) => any
   messages: ({ chatKey, isGroupChat }: { chatKey: string; isGroupChat: boolean }) => any
   message: ({ chatKey, messageKey, isGroupChat }: { chatKey: string; messageKey: string; isGroupChat: boolean }) => any
-  privateChat: () => any
   unreadMessages: ({ uid, chatKey }: { uid: string | undefined; chatKey: string; isGroupChat: boolean }) => any
   newContactsRequests: ({ uid }: { uid: string | undefined }) => any
   newContactsActivity: ({ uid }: { uid: string | undefined }) => any

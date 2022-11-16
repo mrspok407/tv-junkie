@@ -7,7 +7,7 @@ import { createRoot } from 'react-dom/client'
 import { store } from 'app/store'
 import { Provider } from 'react-redux'
 import ContextsWrapper from 'Components/AppContext/ContextsWrapper'
-import App from 'App'
+import App, { TestComp } from 'App'
 import { HelmetProvider } from 'react-helmet-async'
 import Firebase, { FirebaseContext } from './Components/Firebase'
 import 'normalize.css'
@@ -30,5 +30,6 @@ root.render(
         </FirebaseContext.Provider>
       </Provider>
     </HelmetProvider>
+    <TestComp />
   </React.StrictMode>,
 )

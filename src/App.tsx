@@ -19,6 +19,10 @@ import { GoogleRedirectWrapper } from 'Components/UserAuth/SignIn/UseGoogleRedir
 
 const ContactsPage = lazy(() => import('Components/Pages/Contacts/Contacts'))
 
+export const TestComp = () => {
+  return <div>test</div>
+}
+
 const App = () => {
   useInitializeApp()
 
