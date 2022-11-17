@@ -84,8 +84,19 @@
     "build": "GENERATE_SOURCEMAP=false react-scripts build",
     "winBuild": "set \"GENERATE_SOURCEMAP=false\" && react-scripts build",
     "test": "react-scripts test",
+    "coverage": "yarn test --coverage --watchAll --collectCoverageFrom='src/Components/**/*.{ts,tsx}' --collectCoverageFrom='src/Utils/**/*.{ts,tsx,js,jsx}'",
     "eject": "react-scripts eject",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
+  },
+  "jest": {
+    "coverageThreshold": {
+      "global": {
+        "branches": 80,
+        "functions": 80,
+        "lines": 80,
+        "statements": -10
+      }
+    }
   },
   "browserslist": {
     "production": [
