@@ -40,8 +40,6 @@ const ShowEpisodes: React.FC<Props> = ({ seasonsTMDB, showId }) => {
     preloadSeason: initialOpenedSeason,
   })
 
-  console.log(seasonsTMDB)
-
   const handleOpenSeasonEpisodes = useCallback(
     (seasonId: number, seasonNum: number) => {
       handleFetch({ seasonNum, seasonId })
@@ -83,7 +81,7 @@ const ShowEpisodes: React.FC<Props> = ({ seasonsTMDB, showId }) => {
           'episodes__close-all-open--left': !showCheckAllEpisodes,
         })}
       >
-        <button type="button" role="button" className="button" onClick={() => handleCloseAllOpenSeasons()}>
+        <button type="button" className="button" onClick={() => handleCloseAllOpenSeasons()}>
           {seasonsData.openData.length ? 'Close all' : 'Open all'}
         </button>
       </div>

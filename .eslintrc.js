@@ -42,6 +42,7 @@ module.exports = {
     '@typescript-eslint/comma-dangle': 0,
     'jsx-a11y/no-static-element-interactions': 0,
     'jsx-a11y/no-redundant-roles': 0,
+    'jsx-a11y/aria-role': 0,
     'jsx-a11y/control-has-associated-label': 0,
     'react/destructuring-assignment': 0,
     'react/require-default-props': 0,

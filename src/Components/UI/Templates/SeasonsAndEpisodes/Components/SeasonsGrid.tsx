@@ -51,7 +51,7 @@ const SeasonsGrid: React.FC<Props> = ({
   }
 
   return (
-    <div className="episodes">
+    <div className="episodes" data-testid="seasons-list">
       {seasonsTMDB.map((season) => {
         if (renderEdgeCases(season)) return null
 

@@ -8,13 +8,19 @@ import { MAINDATA_TMDB_INITIAL } from 'Utils/@TypesTMDB'
 import { renderWithProviders } from 'Utils/Tests/test-utils'
 import ShowEpisodes from 'Components/UI/Templates/SeasonsAndEpisodes/ShowEpisodes'
 import { detailsData } from 'Utils/Tests/mocks'
+import { debug } from 'console'
 
-describe('describe test', () => {
-  it('Renders DetailsPage2', async () => {
-    //   renderWithProviders(<Slider sliderData={[MAINDATA_TMDB_INITIAL]} />)
+describe('ShowEpisodes', () => {
+  test('Renders correctly', () => {
+    renderWithProviders(<ShowEpisodes seasonsTMDB={detailsData} showId={83867} />)
+    const seasonListNode = screen.getByTestId('seasons-list')
+    expect(seasonListNode).toBeInTheDocument()
+  })
+
+  test('The button text change correctly after click.', async () => {
     const user = userEvent.setup()
     renderWithProviders(<ShowEpisodes seasonsTMDB={detailsData} showId={83867} />)
-    const button = screen.getByRole('button')
+    const button = screen.getByRole('button', { name: 'Open all' })
 
     await waitFor(() => {
       expect(button).toHaveTextContent('Close all')
@@ -24,24 +30,14 @@ describe('describe test', () => {
     await waitFor(() => {
       expect(button).toHaveTextContent('Open all')
     })
-
-    //   await waitFor(() => {
-    //     expect(button).toHaveTextContent('Open all')
-    //   })
-
-    //   const button = screen.getByRole('button', { name: 'Open all' })
-    //   expect(button).toBeInTheDocument()
-
-    //   await user.click(button)
-    //   expect(button).toHaveTextContent('Close all')
-
-    //   await user.click(button)
-    //   expect(button).toHaveTextContent('Open all')
-
-    //   userEvent.click(openAllButton)
-    //   await waitFor(() => {
-    //     expect(screen.getByText('Close all')).toBeInTheDocument()
-    //   })
-    //   const { getByText } = render(<Slider sliderData={[MAINDATA_TMDB_INITIAL]} />)
   })
 })
+
+// export const testIt = (name: string, fn: any) => {
+//   const callback = (...args: any) => {
+//     const settings = renderWithProviders(<ShowEpisodes seasonsTMDB={detailsData} showId={83867} />)
+//     fn(settings, ...args)
+//   }
+
+//   return test(name, callback)
+// }
