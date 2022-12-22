@@ -33,7 +33,7 @@
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-prettier": "^8.5.0",
     "firebase": "^9.8.1",
-    "firebase-admin": "^10.2.0",
+    "firebase-admin": "^11.4.1",
     "firebase-functions": "^3.14.1",
     "formik": "^2.2.9",
     "formik-persist": "^1.1.0",
